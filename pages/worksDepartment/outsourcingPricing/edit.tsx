@@ -146,51 +146,111 @@ export default function OutsourcingPricingEdit({
 
   const paymentOri = data_payment;
 
-  // '上期保留10%' // 上期保留款
-  const latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0;
-
   const {
-    subTotal_detail,
-    subTotal_deduction,
-
+    detailTotal,
+    latestPeriodKeep,
+    currentPayment,
     retainage,
-    subTotal_actualReceived,
+    installationMaterials,
+    laborInsuranceLoan,
+    deductionSubtotal,
     tax,
     actualAmountReceived,
+
+    deductionTotal,
+    actualAmountReceivedProcess,
   } = useMemo(() => {
-    let subTotal_detail_d = new Decimal(0); // 請款的小計，不是「請款小計」
-    let subTotal_deduction_d = new Decimal(0); // 應扣明細的小計
+    let a_detailTotal = new Decimal(0); // 請款合計 // 工程列表的小計
+    const b_latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0; // 上期保留
+    let c_currentPayment = new Decimal(0); // 本期應付款
+    let d_retainage = new Decimal(0); // 本期保留
+    let e_installationMaterials = new Decimal(0); // 按裝物料
+    let f_laborInsuranceLoan = new Decimal(0); // 借支勞保
+    let g_deductionSubtotal = new Decimal(0); // 應扣合計
+    let h_tax = new Decimal(0); // 稅額5%
+    let i_actualAmountReceived = new Decimal(0); // 實領金額
 
     paymentDetail?.forEach((detail) => {
       const { outsourcingTotal } = detail;
-      subTotal_detail_d = subTotal_detail_d.add(outsourcingTotal);
+      a_detailTotal = a_detailTotal.add(outsourcingTotal);
     });
+
+    c_currentPayment = a_detailTotal.add(b_latestPeriodKeep);
+
+    d_retainage = a_detailTotal.mul(0.1).toDecimalPlaces(0);
 
     state_deductionArr?.forEach((deduction) => {
-      subTotal_deduction_d = subTotal_deduction_d.add(deduction.price);
+      const type = deduction.type;
+
+      if (type === '按裝物料') {
+        e_installationMaterials = e_installationMaterials.add(deduction.price);
+      } else if (type === '借支勞保') {
+        f_laborInsuranceLoan = f_laborInsuranceLoan.add(deduction.price);
+      }
     });
 
-    // 本期保留10% // 本期保留款
-    const retainage = new Decimal(subTotal_detail_d).mul(0.1).toDecimalPlaces(0).toNumber();
+    g_deductionSubtotal = d_retainage.add(e_installationMaterials).add(f_laborInsuranceLoan);
+    h_tax = c_currentPayment.minus(d_retainage).mul(0.05).toDecimalPlaces(0);
+    i_actualAmountReceived = c_currentPayment.minus(g_deductionSubtotal).add(h_tax);
 
-    // 實領金額小計
-    const subTotal_actualReceived = new Decimal(subTotal_detail_d)
-      .sub(retainage)
-      .add(latestPeriodKeep)
-      .sub(subTotal_deduction_d)
-      .toNumber();
+    const deductionTotal = e_installationMaterials.add(f_laborInsuranceLoan).toNumber();
 
-    const tax = new Decimal(subTotal_actualReceived).mul(0.05).toDecimalPlaces(0).toNumber();
-    const actualAmountReceived = new Decimal(subTotal_actualReceived).add(tax).toNumber();
+    const currentPayment = c_currentPayment.toNumber();
+    const deductionSubtotal = g_deductionSubtotal.toNumber();
+    const tax = h_tax.toNumber();
+    const actualAmountReceived = i_actualAmountReceived.toNumber();
+
+    const actualAmountReceivedProcess = `${currentPayment.toLocaleString()} - ${deductionSubtotal.toLocaleString()} + ${tax.toLocaleString()} = ${actualAmountReceived.toLocaleString()}`;
+    const actualAmountReceivedProcess_jsx = <span></span>;
 
     return {
-      subTotal_detail: subTotal_detail_d.toNumber(),
-      subTotal_deduction: subTotal_deduction_d.toNumber(),
-      retainage,
-      subTotal_actualReceived,
-      tax,
-      actualAmountReceived,
+      detailTotal: a_detailTotal.toNumber(),
+      latestPeriodKeep: b_latestPeriodKeep,
+      currentPayment: currentPayment,
+      retainage: d_retainage.toNumber(),
+      installationMaterials: e_installationMaterials.toNumber(),
+      laborInsuranceLoan: f_laborInsuranceLoan.toNumber(),
+      deductionSubtotal: deductionSubtotal,
+      tax: tax,
+      actualAmountReceived: actualAmountReceived,
+      //
+      deductionTotal,
+      actualAmountReceivedProcess,
     };
+
+    // let subTotal_detail_d = new Decimal(0); // 請款的小計，不是「請款小計」
+    // let subTotal_deduction_d = new Decimal(0); // 應扣明細的小計
+
+    // paymentDetail?.forEach((detail) => {
+    //   const { outsourcingTotal } = detail;
+    //   subTotal_detail_d = subTotal_detail_d.add(outsourcingTotal);
+    // });
+
+    // state_deductionArr?.forEach((deduction) => {
+    //   subTotal_deduction_d = subTotal_deduction_d.add(deduction.price);
+    // });
+
+    // // 本期保留10% // 本期保留款
+    // const retainage = new Decimal(subTotal_detail_d).mul(0.1).toDecimalPlaces(0).toNumber();
+
+    // // 實領金額小計
+    // const subTotal_actualReceived = new Decimal(subTotal_detail_d)
+    //   .sub(retainage)
+    //   .add(latestPeriodKeep)
+    //   .sub(subTotal_deduction_d)
+    //   .toNumber();
+
+    // const tax = new Decimal(subTotal_actualReceived).mul(0.05).toDecimalPlaces(0).toNumber();
+    // const actualAmountReceived = new Decimal(subTotal_actualReceived).add(tax).toNumber();
+
+    // return {
+    //   subTotal_detail: subTotal_detail_d.toNumber(),
+    //   subTotal_deduction: subTotal_deduction_d.toNumber(),
+    //   retainage,
+    //   subTotal_actualReceived,
+    //   tax,
+    //   actualAmountReceived,
+    // };
   }, [paymentDetail, state_deductionArr, data_payment]);
 
   // -------------------------------------------------------------------------
@@ -231,11 +291,11 @@ export default function OutsourcingPricingEdit({
 
     const body = {
       date: new Date().toISOString(),
-      paymentSubTotal: subTotal_detail,
+      paymentSubTotal: detailTotal,
       deduction: state_deductionArr,
-      deductionTotal: subTotal_deduction,
+      deductionTotal: deductionTotal,
       retainage: retainage,
-      subTotal: subTotal_actualReceived,
+      subTotal: deductionSubtotal,
       salesTax: tax,
       total: actualAmountReceived,
       reviewCheckerEmployeeId: undefined,
@@ -289,17 +349,14 @@ export default function OutsourcingPricingEdit({
       year,
       month,
       signer: null,
-      subTotal_detail: subTotal_detail.toLocaleString(),
+      subTotal_detail: detailTotal.toLocaleString(),
       latestPeriodRemain: latestPeriodKeep.toLocaleString(), // 上期保留
-      subTotal_detailAddLatestPeriodRemain: new Decimal(subTotal_detail)
-        .add(latestPeriodKeep)
-        .toNumber()
-        .toLocaleString(),
+      subTotal_detailAddLatestPeriodRemain: new Decimal(detailTotal).add(latestPeriodKeep).toNumber().toLocaleString(),
       tax: tax.toLocaleString(),
       retainage: retainage.toLocaleString(),
       deduction_installationMaterials: null,
       deduction_laborInsuranceLoan: null,
-      subTotal_deduction: subTotal_deduction.toLocaleString(),
+      subTotal_deduction: deductionTotal.toLocaleString(),
       deduction_amount: null,
       actualAmountReceived: actualAmountReceived.toLocaleString(),
       managerName: null,
@@ -311,12 +368,12 @@ export default function OutsourcingPricingEdit({
     return props_pdf;
   }, [
     data_payment,
-    subTotal_detail,
+    detailTotal,
     paymentDetail,
     latestPeriodKeep,
     tax,
     retainage,
-    subTotal_deduction,
+    deductionTotal,
     actualAmountReceived,
   ]);
 
@@ -532,7 +589,7 @@ export default function OutsourcingPricingEdit({
             })}
             <Row style={{ width: '100%' }}>
               <Cell style={config_project.label_subTotal.style}>小計</Cell>
-              <Cell style={config_project.subTotal.style}>{subTotal_detail.toLocaleString()}</Cell>
+              <Cell style={config_project.subTotal.style}>{detailTotal.toLocaleString()}</Cell>
               <Cell style={config_project.detail.style}></Cell>
             </Row>
           </div>
@@ -583,13 +640,13 @@ export default function OutsourcingPricingEdit({
 
             <Row style={{ width: '100%' }}>
               <Cell style={config_deduction.label_subTotal.style}>小計</Cell>
-              <Cell style={config_deduction.subTotal.style}>{subTotal_deduction.toLocaleString()}</Cell>
+              <Cell style={config_deduction.subTotal.style}>{deductionTotal.toLocaleString()}</Cell>
               <Cell style={config_deduction.btn_delete.style}></Cell>
             </Row>
           </div>
         </div>
 
-        <div className="w-[500px] m-auto mt-[96px] ml-[277.5px]">
+        <div className="w-[400px] m-auto mt-[96px] ml-[277.5px]">
           <div className="mb-2 ">
             <span className="text-main text-lg">結算</span>
           </div>
@@ -605,41 +662,65 @@ export default function OutsourcingPricingEdit({
                 );
               })}
             </Row>
+
             <Row style={{ width: '100%' }}>
               <Cell style={config_settlement.amountsName.style}>請款合計</Cell>
-              <Cell style={config_settlement.amounts.style}>{subTotal_detail.toLocaleString()}</Cell>
+              <Cell style={config_settlement.amounts.style}>{detailTotal.toLocaleString()}</Cell>
+              <Cell style={config_settlement.subTotal.style}>{}</Cell>
             </Row>
+
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>上期保留10%</Cell>
+              <Cell style={config_settlement.amounts.style}>{latestPeriodKeep.toLocaleString()}</Cell>
+              <Cell style={config_settlement.subTotal.style}>{}</Cell>
+            </Row>
+
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>請款金額</Cell>
+              <Cell style={config_settlement.amounts.style}>{}</Cell>
+              <Cell style={config_settlement.subTotal.style}>{currentPayment.toLocaleString()}</Cell>
+            </Row>
+
             <Row style={{ width: '100%' }}>
               <Cell style={config_settlement.amountsName.style}>本期保留10%</Cell>
               <Cell style={config_settlement.amounts.style} className="text-red-500">
                 {retainage.toLocaleString()}
               </Cell>
+              <Cell style={config_settlement.subTotal.style}></Cell>
             </Row>
+
             <Row style={{ width: '100%' }}>
-              <Cell style={config_settlement.amountsName.style}>上期保留10%</Cell>
-              <Cell style={config_settlement.amounts.style} className="text-green-500">
-                {latestPeriodKeep.toLocaleString()}
-              </Cell>
-            </Row>
-            <Row style={{ width: '100%' }}>
-              <Cell style={config_settlement.amountsName.style}>應扣明細</Cell>
+              <Cell style={config_settlement.amountsName.style}>按裝物料</Cell>
               <Cell style={config_settlement.amounts.style} className="text-red-500">
-                {subTotal_deduction.toLocaleString()}
+                {installationMaterials.toLocaleString()}
+              </Cell>
+              <Cell style={config_settlement.subTotal.style}>{}</Cell>
+            </Row>
+
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>借支勞保</Cell>
+              <Cell style={config_settlement.amounts.style} className="text-red-500">
+                {laborInsuranceLoan.toLocaleString()}
+              </Cell>
+              <Cell style={config_settlement.subTotal.style}>{}</Cell>
+            </Row>
+
+            <Row style={{ width: '100%' }}>
+              <Cell style={config_settlement.amountsName.style}>應扣合計</Cell>
+              <Cell style={config_settlement.amounts.style}>{}</Cell>
+              <Cell style={config_settlement.subTotal.style} className="text-red-500">
+                {deductionSubtotal.toLocaleString()}
               </Cell>
             </Row>
-            <Row style={{ width: '100%' }}>
-              <Cell style={config_settlement.amountsName.style}>小計</Cell>
-              <Cell style={config_settlement.amounts.style}>{subTotal_actualReceived.toLocaleString()}</Cell>
-            </Row>
+
             <Row style={{ width: '100%' }}>
               <Cell style={config_settlement.amountsName.style}>稅額5%</Cell>
-              <Cell style={config_settlement.amounts.style}>{tax.toLocaleString()}</Cell>
+              <Cell style={config_settlement.subTotal.style}>{tax.toLocaleString()}</Cell>
             </Row>
+
             <Row style={{ width: '100%' }}>
               <Cell style={config_settlement.amountsName.style}>實領金額</Cell>
-              <Cell style={config_settlement.amounts.style} className="font-bold">
-                {actualAmountReceived.toLocaleString()}
-              </Cell>
+              <Cell style={config_settlement.subTotal.style}>{actualAmountReceived.toLocaleString()}</Cell>
             </Row>
           </div>
         </div>
@@ -714,7 +795,7 @@ type Tconfig_deduction = Record<
   TconfigItem_deduction
 >;
 
-type Tconfig_settlement = Record<'amountsName' | 'amounts', TconfigItem>;
+type Tconfig_settlement = Record<'amountsName' | 'amounts' | 'subTotal', TconfigItem>;
 
 // MARK:config_project
 const keyArr_project: (keyof Tconfig_project)[] = [
@@ -886,7 +967,7 @@ const config_deduction: Tconfig_deduction = {
 };
 
 // MARK:config_settlement
-const keyArr_settlement: (keyof Tconfig_settlement)[] = ['amountsName', 'amounts'];
+const keyArr_settlement: (keyof Tconfig_settlement)[] = ['amountsName', 'amounts', 'subTotal'];
 const config_settlement: Tconfig_settlement = {
   amountsName: {
     label: '金額名稱',
@@ -899,7 +980,15 @@ const config_settlement: Tconfig_settlement = {
   amounts: {
     label: '金額',
     style: {
-      width: '170px',
+      width: '100px',
+      justifyContent: 'right',
+      paddingRight: '20px',
+    },
+  },
+  subTotal: {
+    label: '小計',
+    style: {
+      width: '100px',
       justifyContent: 'right',
       paddingRight: '20px',
     },
