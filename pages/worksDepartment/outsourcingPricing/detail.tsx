@@ -129,11 +129,7 @@ export default function OutsourcingPricingDetail() {
   const paymentDetailId = isNew ? undefined : query.paymentDetailId;
 
   // ---------------------------------------------------------------------
-  // const [disabled, setDisabled] = useState(!isNew);
-  const stateDisabled = useState(false);
-  const disabled = stateDisabled[0];
-  const setDisabled = stateDisabled[1];
-
+  const [disabled, setDisabled] = useState(!isNew);
   const [isLoading, setIsLoading] = useState(false);
   // ---------------------------------------------------------------------
 
@@ -464,7 +460,7 @@ export default function OutsourcingPricingDetail() {
   // MARK: RENDER
 
   return (
-    <SubLayer isLoading_subLayer={isLoading_outsourcingPaymentDetail}>
+    <SubLayer isLoading_subLayer={isLoading || isLoading_outsourcingPaymentDetail}>
       <PageHeader02 tag="外包計價單明細" panelList={panelList} />
       <div className={scss.main}>
         {/*  */}
