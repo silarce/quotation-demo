@@ -599,9 +599,11 @@ export default function OutsourcingPricingEdit({
                   <Cell style={config_project.projectName.style}>{projectName}</Cell>
                   <Cell style={config_project.outsourcingTotal.style}>{outsourcingTotal.toLocaleString()}</Cell>
                   <Cell style={config_project.detail.style}>
-                    <Link href={href}>
-                      <IconDetail />
-                    </Link>
+                    {disabled && (
+                      <Link href={href}>
+                        <IconDetail />
+                      </Link>
+                    )}
                   </Cell>
                 </Row>
               );
