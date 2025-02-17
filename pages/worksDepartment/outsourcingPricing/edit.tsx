@@ -520,7 +520,9 @@ export default function OutsourcingPricingEdit({
                   <Cell style={config_project.projectName.style}>{projectName}</Cell>
                   <Cell style={config_project.outsourcingTotal.style}>{outsourcingTotal.toLocaleString()}</Cell>
                   <Cell style={config_project.detail.style}>
-                    <IconDetail onClick={() => router.push(href)} />
+                    <Link href={href}>
+                      <IconDetail />
+                    </Link>
                   </Cell>
                 </Row>
               );
