@@ -109,6 +109,7 @@ export default function OutsourcingPricingEdit({
     autoUpdate: false,
   });
   const outsourcingId = data_payment?.outsourcing.id;
+  const isPaymentCleared = data_payment?.isPaymentCleared;
 
   const {
     fileInfoArr,
@@ -349,7 +350,7 @@ export default function OutsourcingPricingEdit({
         }
       : null,
 
-    !data_payment?.isPaymentCleared && isAllReviewPass
+    !isPaymentCleared && isAllReviewPass
       ? {
           type: 'myButton',
           label: '結清',
@@ -378,7 +379,7 @@ export default function OutsourcingPricingEdit({
         setShowPdfModal(true);
       },
     },
-    !(isReviewing || data_payment?.isPaymentCleared || isAllReviewPass)
+    !(isReviewing || isPaymentCleared || isAllReviewPass)
       ? {
           type: 'myButton',
           label: '編輯',
@@ -407,7 +408,7 @@ export default function OutsourcingPricingEdit({
   const panelList: TpanelList = disabled ? panelList_disabled : panelList_enabled;
 
   const customerRight = [
-    data_payment?.isPaymentCleared ? (
+    isPaymentCleared ? (
       <span key="0" className="text-red-500 text-base">
         已結清
       </span>
@@ -484,9 +485,11 @@ export default function OutsourcingPricingEdit({
                 },
               }}
             >
-              <SquareBtn sharp="mini" className="ml-3">
-                新建明細
-              </SquareBtn>
+              {disabled && !isPaymentCleared && (
+                <SquareBtn sharp="mini" className="ml-3">
+                  新建明細
+                </SquareBtn>
+              )}
             </Link>
           </div>
           <div className="border border-b-0">
@@ -538,7 +541,7 @@ export default function OutsourcingPricingEdit({
         <div className="w-[1100px] m-auto mt-[96px]">
           <div className="mb-2 flex gap-2 items-center">
             <span className="text-main text-lg">應扣明細</span>
-            <IconAddCircle className="w-[20px] h-[20px]" onClick={addDeduction} />
+            {!disabled && <IconAddCircle className="w-[20px] h-[20px]" onClick={addDeduction} />}
           </div>
           <div className="border border-b-0">
             <Row thead={true} style={{ width: '100%' }}>
@@ -657,7 +660,9 @@ export default function OutsourcingPricingEdit({
               removeFile(uid);
             }}
           >
-            <SquareBtn sharp="long">新增附件</SquareBtn>
+            <SquareBtn sharp="long" className={classNames(disabled && 'invisible')}>
+              新增附件
+            </SquareBtn>
           </Upload>
         </div>
 
