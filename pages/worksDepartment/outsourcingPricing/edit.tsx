@@ -21,8 +21,8 @@ import { Upload } from 'antd';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
-
 import Row, { Cell } from 'components/global/gear/table/row';
+import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import { IconDetail, IconDelete01, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
@@ -780,20 +780,39 @@ const config_deduction: Tconfig_deduction = {
     label: '類別',
     style: {
       width: 414,
-      justifyContent: 'center',
+      justifyContent: 'left',
       paddingLeft: '20px',
     },
     createNode({ disabled, state_deduction, setDeduction }) {
+      const options = [
+        { value: '按裝物料', label: '按裝物料' },
+        { value: '借支勞保', label: '借支勞保' },
+      ];
+
+      const value = options.find((option) => option.value === state_deduction.type) ?? {
+        value: state_deduction.type,
+        label: state_deduction.type,
+      };
+
       return (
-        <input
-          value={state_deduction.type}
-          onChange={(e) => {
-            setDeduction((prev) => {
-              return { ...prev, type: e.target.value };
-            });
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          selectProps={{
+            props: {
+              options: [
+                { value: '按裝物料', label: '按裝物料' },
+                { value: '借支勞保', label: '借支勞保' },
+              ],
+              value,
+              onChange(option) {
+                const value = option?.value ?? '';
+                setDeduction((prev) => {
+                  return { ...prev, type: value };
+                });
+              },
+            },
           }}
-          className={classNames(scss.inputInTable, !disabled && scss.enabled)}
-          readOnly={disabled}
         />
       );
     },
@@ -803,7 +822,7 @@ const config_deduction: Tconfig_deduction = {
     style: {
       // width: 414,
       flex: 'auto',
-      justifyContent: 'center',
+      justifyContent: 'left',
       paddingLeft: '20px',
     },
     createNode({ disabled, state_deduction, setDeduction }) {
