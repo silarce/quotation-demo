@@ -32,20 +32,27 @@ type Tprops = {
   year: React.ReactNode;
   month: React.ReactNode;
   signer: React.ReactNode; //右上方的名字
-  subTotal_detail: React.ReactNode; // 請款合計
-  latestPeriodRemain: React.ReactNode; // 上期保留
-  subTotal_detailAddLatestPeriodRemain: React.ReactNode; // 請款合計 + 上期保留
+
+  detailTotal: React.ReactNode; // 請款合計
+  latestPeriodKeep: React.ReactNode; // 上期保留
+  currentPayment: React.ReactNode; // 請款合計 + 上期保留
   tax: React.ReactNode; // tax 5%
   retainage: React.ReactNode; // 應扣明細 保留10%
   deduction_installationMaterials: React.ReactNode; // 應扣明細 按裝物料
   deduction_laborInsuranceLoan: React.ReactNode; // 應扣明細 借支勞保
-  subTotal_deduction: React.ReactNode; // 應扣明細
-  deduction_amount: React.ReactNode; // 核扣金額
-  actualAmountReceived: React.ReactNode; // 實領金額
+  deductionSubtotal: React.ReactNode; // 應扣明細
+  // deduction_amount: React.ReactNode; // 核扣金額
+  // actualAmountReceived: React.ReactNode; // 實領金額
+
+  actualAmountReceivedProcess: React.ReactNode; // 實領金額計算過程
+
   managerName: React.ReactNode; // 核准
   supervisorName: React.ReactNode; // 主管
   checkerName: React.ReactNode; // 核對
   agentName: React.ReactNode; // 經辦
+
+  installationMaterialsArr: { label: React.ReactNode; amount: React.ReactNode }[];
+  laborInsuranceLoanArr: { label: React.ReactNode; amount: React.ReactNode }[];
 };
 
 // ======================================================================
@@ -77,20 +84,25 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
   year,
   month,
   signer,
-  subTotal_detail,
-  latestPeriodRemain,
-  subTotal_detailAddLatestPeriodRemain,
+  detailTotal: subTotal_detail,
+  latestPeriodKeep: latestPeriodRemain,
+  currentPayment: subTotal_detailAddLatestPeriodRemain,
   tax,
   retainage,
   deduction_installationMaterials,
   deduction_laborInsuranceLoan,
-  subTotal_deduction,
-  deduction_amount,
-  actualAmountReceived,
+  deductionSubtotal: subTotal_deduction,
+  // deduction_amount,
+  // actualAmountReceived,
   managerName,
   supervisorName,
   checkerName,
   agentName,
+
+  actualAmountReceivedProcess,
+
+  installationMaterialsArr,
+  laborInsuranceLoanArr,
   ...modalProps
 }: Tprops & ModalProps) {
   const ref_pageArr = useRef<(HTMLDivElement | null)[]>([]);
@@ -230,20 +242,25 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
           year,
           month,
           signer,
-          subTotal_detail,
-          latestPeriodRemain,
-          subTotal_detailAddLatestPeriodRemain,
+          detailTotal: subTotal_detail,
+          latestPeriodKeep: latestPeriodRemain,
+          currentPayment: subTotal_detailAddLatestPeriodRemain,
           tax,
           retainage,
           deduction_installationMaterials,
           deduction_laborInsuranceLoan,
-          subTotal_deduction,
-          deduction_amount,
-          actualAmountReceived,
+          deductionSubtotal: subTotal_deduction,
+          // deduction_amount,
+          // actualAmountReceived,
           managerName,
           supervisorName,
           checkerName,
           agentName,
+
+          actualAmountReceivedProcess,
+
+          installationMaterialsArr,
+          laborInsuranceLoanArr,
         }}
       >
         {chunkedRowArr_table.map((item, index) => {
@@ -463,53 +480,75 @@ const Top = () => {
 // MARK:Bottom
 const Bottom = ({ className }: { className?: string }) => {
   const {
-    subTotal_detail,
-    latestPeriodRemain,
-    subTotal_detailAddLatestPeriodRemain,
+    detailTotal,
+    latestPeriodKeep,
+    currentPayment,
     tax,
     retainage,
     deduction_installationMaterials,
     deduction_laborInsuranceLoan,
-    subTotal_deduction,
-    deduction_amount,
-    actualAmountReceived,
+    deductionSubtotal,
+    // deduction_amount,
+    // actualAmountReceived,
     managerName,
     supervisorName,
     checkerName,
     agentName,
+
+    actualAmountReceivedProcess,
+
+    installationMaterialsArr,
+    laborInsuranceLoanArr,
   } = useContext(Context);
 
   return (
     <div className={classNames(scss.bottom, className)}>
       <div className={scss.total}>
         <span className="">請款合計:</span>
-        <span className="border-b border-black w-[120px] text-center">{subTotal_detail}</span>
+        <span className="border-b border-black w-[120px] text-center">{detailTotal}</span>
         <span className="mx-2">＋</span>
         <span className="">上期保留:</span>
-        <span className="border-b border-black w-[120px] text-center">{latestPeriodRemain}</span>
+        <span className="border-b border-black w-[120px] text-center">{latestPeriodKeep}</span>
         <span className="mx-4">＝</span>
-        <span className="border-b border-black w-[160px] text-center">{subTotal_detailAddLatestPeriodRemain}</span>
+        <span className="border-b border-black w-[160px] text-center">{currentPayment}</span>
       </div>
 
       <div className={scss.deductionTotal}>
-        <Cell className={classNames(scss.a)}>減</Cell>
-        <Cell className={classNames(scss.b)}>應扣明細</Cell>
-        <Cell className={classNames(scss.c)}>5%</Cell>
-        <Cell className={classNames(scss.d)}>保留　10%</Cell>
-        <Cell className={classNames(scss.e)}>按裝物料</Cell>
-        <Cell className={classNames(scss.f)}>借支勞保</Cell>
-        <Cell className={classNames(scss.g)}>應扣明細</Cell>
-        <Cell className={classNames(scss.h)}>核扣金額</Cell>
-        <Cell className={classNames(scss.i, scss.textVertical)}>金　額</Cell>
-        <Cell className={classNames(scss.j)}>{tax}</Cell>
-        <Cell className={classNames(scss.k)}>{retainage}</Cell>
-        <Cell className={classNames(scss.l)}>{deduction_installationMaterials}</Cell>
-        <Cell className={classNames(scss.m)}>{deduction_laborInsuranceLoan}</Cell>
-        <Cell className={classNames(scss.n)}>{subTotal_deduction}</Cell>
-        <Cell className={classNames(scss.o)}>{deduction_amount}</Cell>
+        <Cell className={classNames(scss.a)}>按裝物料</Cell>
+        <Cell className={classNames(scss.b, 'text-sm')}>
+          {installationMaterialsArr.map((item, index) => {
+            return (
+              <React.Fragment key={index}>
+                <span>{item.label}:</span>
+                <span>{item.amount}</span>
+              </React.Fragment>
+            );
+          })}
+        </Cell>
+        <Cell className={classNames(scss.c)}>借支勞保</Cell>
+        <Cell className={classNames(scss.d, 'text-sm')}>
+          {laborInsuranceLoanArr.map((item, index) => {
+            return (
+              <React.Fragment key={index}>
+                <span>{item.label}:</span>
+                <span>{item.amount}</span>
+              </React.Fragment>
+            );
+          })}
+        </Cell>
+
+        <Cell className={classNames(scss.e)}>保留10%</Cell>
+        <Cell className={classNames(scss.f)}>應扣合計</Cell>
+        <Cell className={classNames(scss.g)}>稅額5%</Cell>
+
+        <Cell className={classNames(scss.h)}>{deduction_installationMaterials}</Cell>
+        <Cell className={classNames(scss.i)}>{deduction_laborInsuranceLoan}</Cell>
+        <Cell className={classNames(scss.j)}>{retainage}</Cell>
+        <Cell className={classNames(scss.k)}>{deductionSubtotal}</Cell>
+        <Cell className={classNames(scss.l)}>{tax}</Cell>
       </div>
 
-      <div className={scss.actualAmountReceived}>實　領　金　額 :{actualAmountReceived}</div>
+      <div className={scss.actualAmountReceived}>實　領　金　額 :{actualAmountReceivedProcess}</div>
 
       <div className={scss.review}>
         <Cell className={scss.textVertical}>核　准</Cell>

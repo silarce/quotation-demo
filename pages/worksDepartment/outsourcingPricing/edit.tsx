@@ -151,14 +151,17 @@ export default function OutsourcingPricingEdit({
     latestPeriodKeep,
     currentPayment,
     retainage,
-    installationMaterials,
-    laborInsuranceLoan,
+    deduction_installationMaterials,
+    deduction_laborInsuranceLoan,
     deductionSubtotal,
     tax,
     actualAmountReceived,
 
     deductionTotal,
     actualAmountReceivedProcess,
+
+    installationMaterialsArr,
+    laborInsuranceLoanArr,
   } = useMemo(() => {
     // a + b = c
     // d + e + f = g
@@ -175,6 +178,9 @@ export default function OutsourcingPricingEdit({
     let h_tax = new Decimal(0); // 稅額5%
     let i_actualAmountReceived = new Decimal(0); // 實領金額
 
+    const installationMaterialsArr: { label: string; amount: string }[] = [];
+    const laborInsuranceLoanArr: { label: string; amount: string }[] = [];
+
     paymentDetail?.forEach((detail) => {
       const { outsourcingTotal } = detail;
       a_detailTotal = a_detailTotal.add(outsourcingTotal);
@@ -189,8 +195,10 @@ export default function OutsourcingPricingEdit({
 
       if (type === '按裝物料') {
         e_installationMaterials = e_installationMaterials.add(deduction.price);
+        installationMaterialsArr.push({ label: deduction.itemName, amount: deduction.price.toLocaleString() });
       } else if (type === '借支勞保') {
         f_laborInsuranceLoan = f_laborInsuranceLoan.add(deduction.price);
+        laborInsuranceLoanArr.push({ label: deduction.itemName, amount: deduction.price.toLocaleString() });
       }
     });
 
@@ -206,21 +214,22 @@ export default function OutsourcingPricingEdit({
     const actualAmountReceived = i_actualAmountReceived.toNumber();
 
     const actualAmountReceivedProcess = `${currentPayment.toLocaleString()} - ${deductionSubtotal.toLocaleString()} + ${tax.toLocaleString()} = ${actualAmountReceived.toLocaleString()}`;
-    const actualAmountReceivedProcess_jsx = <span></span>;
 
     return {
       detailTotal: a_detailTotal.toNumber(),
       latestPeriodKeep: b_latestPeriodKeep,
       currentPayment: currentPayment,
       retainage: d_retainage.toNumber(),
-      installationMaterials: e_installationMaterials.toNumber(),
-      laborInsuranceLoan: f_laborInsuranceLoan.toNumber(),
+      deduction_installationMaterials: e_installationMaterials.toNumber(),
+      deduction_laborInsuranceLoan: f_laborInsuranceLoan.toNumber(),
       deductionSubtotal: deductionSubtotal,
       tax: tax,
       actualAmountReceived: actualAmountReceived,
       //
       deductionTotal,
       actualAmountReceivedProcess,
+      installationMaterialsArr,
+      laborInsuranceLoanArr,
     };
 
     // let subTotal_detail_d = new Decimal(0); // 請款的小計，不是「請款小計」
@@ -354,20 +363,25 @@ export default function OutsourcingPricingEdit({
       year,
       month,
       signer: null,
-      subTotal_detail: detailTotal.toLocaleString(),
-      latestPeriodRemain: latestPeriodKeep.toLocaleString(), // 上期保留
-      subTotal_detailAddLatestPeriodRemain: new Decimal(detailTotal).add(latestPeriodKeep).toNumber().toLocaleString(),
+      detailTotal: detailTotal.toLocaleString(),
+      latestPeriodKeep: latestPeriodKeep.toLocaleString(),
+      currentPayment: currentPayment.toLocaleString(),
       tax: tax.toLocaleString(),
       retainage: retainage.toLocaleString(),
-      deduction_installationMaterials: null,
-      deduction_laborInsuranceLoan: null,
-      subTotal_deduction: deductionTotal.toLocaleString(),
-      deduction_amount: null,
-      actualAmountReceived: actualAmountReceived.toLocaleString(),
+      deduction_installationMaterials: deduction_installationMaterials,
+      deduction_laborInsuranceLoan: deduction_laborInsuranceLoan,
+      deductionSubtotal: deductionSubtotal.toLocaleString(),
+      // deduction_amount: null,
+      // actualAmountReceived: actualAmountReceived.toLocaleString(),
+      actualAmountReceivedProcess,
+
       managerName: null,
       supervisorName: null,
       checkerName: null,
       agentName: null,
+
+      installationMaterialsArr,
+      laborInsuranceLoanArr,
     };
 
     return props_pdf;
@@ -697,7 +711,7 @@ export default function OutsourcingPricingEdit({
             <Row style={{ width: '100%' }}>
               <Cell style={config_settlement.amountsName.style}>按裝物料</Cell>
               <Cell style={config_settlement.amounts.style} className="text-red-500">
-                {installationMaterials.toLocaleString()}
+                {deduction_installationMaterials.toLocaleString()}
               </Cell>
               <Cell style={config_settlement.subTotal.style}>{}</Cell>
             </Row>
@@ -705,7 +719,7 @@ export default function OutsourcingPricingEdit({
             <Row style={{ width: '100%' }}>
               <Cell style={config_settlement.amountsName.style}>借支勞保</Cell>
               <Cell style={config_settlement.amounts.style} className="text-red-500">
-                {laborInsuranceLoan.toLocaleString()}
+                {deduction_laborInsuranceLoan.toLocaleString()}
               </Cell>
               <Cell style={config_settlement.subTotal.style}>{}</Cell>
             </Row>
