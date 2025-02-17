@@ -160,6 +160,11 @@ export default function OutsourcingPricingEdit({
     deductionTotal,
     actualAmountReceivedProcess,
   } = useMemo(() => {
+    // a + b = c
+    // d + e + f = g
+    // (c - d)*0.05 = h
+    // c - g + h = i
+
     let a_detailTotal = new Decimal(0); // 請款合計 // 工程列表的小計
     const b_latestPeriodKeep = data_payment?.priorPeriodRetainage ?? 0; // 上期保留
     let c_currentPayment = new Decimal(0); // 本期應付款
