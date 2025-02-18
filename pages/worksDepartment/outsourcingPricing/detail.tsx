@@ -33,9 +33,10 @@ import {
   TitemDetail,
   TsingleItemDetail,
   useGetOutsourcingPaymentDetail_id,
-  apiPatchOutsourcingPaymentDetail,
+  // apiPatchOutsourcingPaymentDetail,
   apiPostOutsourcingPaymentDetail,
   useGetOutsourcing_id,
+  apiPatchOutsourcingPaymentDetail_updateRetainage,
 } from 'js/api/api_outsourcing';
 
 // utils
@@ -293,7 +294,8 @@ export default function OutsourcingPricingDetail() {
 
     try {
       setIsLoading(true);
-      await apiPatchOutsourcingPaymentDetail(paymentDetailId, body);
+      // await apiPatchOutsourcingPaymentDetail(paymentDetailId, body);
+      await apiPatchOutsourcingPaymentDetail_updateRetainage(paymentDetailId, body);
       await update();
       setDisabled(true);
     } catch (error) {

@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
+import { useState } from 'react';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { Decimal } from 'decimal.js';
 
 import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
@@ -503,6 +503,46 @@ export const apiPatchOutsourcingPaymentDetail = async (
 
       return Promise.reject(err);
     });
+};
+
+export const apiPatchOutsourcingPaymentDetail_updateRetainage = async (
+  id: string,
+  body: TupdateOutsourcingPaymentDetailDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing-payment-detail/${id}`;
+
+  try {
+    const {
+      data: { outsourcingPaymentId },
+    } = await axi.patch<ToutsourcingPaymentDetailDto>(api, body);
+
+    if (!outsourcingPaymentId) {
+      throw new Error('apiPatchOutsourcingPaymentDetail_updateRetainage: 沒有外包計價單id');
+    }
+
+    const { data: detailArr } = await apiGetOutsourcingPaymentDetail(outsourcingPaymentId);
+    const outsourcingPayment = await apiGetOutsourcingPayment_id(outsourcingPaymentId);
+
+    const retainage = detailArr
+      .reduce((total_d, { outsourcingTotal }) => {
+        return total_d.add(outsourcingTotal);
+      }, new Decimal(0))
+      .mul(0.1)
+      .toDecimalPlaces(0)
+      .toNumber();
+
+    const body_outsourcingPayment: TupdateOutsourcingPaymentDto = {
+      date: outsourcingPayment.date,
+      retainage,
+    };
+    await apiPatchOutsourcingPayment(outsourcingPaymentId, body_outsourcingPayment);
+  } catch (error) {
+    const err = error as AxiosError;
+    callAlert && myAlert.err({ title: '更新保留金失敗', content: JSON.stringify(err.message) });
+
+    return Promise.reject(err);
+  }
 };
 
 // 結清外包計價單(須提醒使用者，此動作不可逆)
