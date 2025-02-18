@@ -3,6 +3,7 @@ import ChangePwPanel from 'components/global/gear/modal/changePwPanel';
 import Image from 'next/image';
 
 import Dropdown from 'components/global/gear/dropdown/Dropdown';
+import { Switch } from 'antd';
 
 // img
 import iconMember from 'public/image/icon/member.svg';
@@ -19,6 +20,8 @@ import { LayerCtx } from 'components/Layer/Layer';
 
 import { useTranslation } from 'react-i18next';
 
+import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+
 // ===================================================================
 
 export default function Info() {
@@ -27,6 +30,8 @@ export default function Info() {
 
   const { t, i18n } = useTranslation('common');
   const { changeLanguage } = i18n;
+
+  const { isRefactoredQuotaion: isQuotation2, setIsRefactoredQuotaion: setIsQuotation2 } = useGlobal_OptionalConfig();
 
   // ----------------------------------------------
 
@@ -95,7 +100,22 @@ export default function Info() {
           <span>登出</span>
         </div>
 
-        <Dropdown className={scss.gear} props_menu={{}}>
+        <Dropdown
+          className={scss.gear}
+          props_menu={{
+            itemArr: [
+              <div key="0" className="flex gap-2 cursor-auto" onClick={(e) => e.stopPropagation()}>
+                <span>使用新版報價單</span>
+                <Switch
+                  onChange={(isChecked) => {
+                    setIsQuotation2(isChecked);
+                  }}
+                  checked={isQuotation2}
+                />
+              </div>,
+            ],
+          }}
+        >
           <Image className="h-5 w-5" src={iconGear} alt="設定" priority={true} />
         </Dropdown>
       </div>

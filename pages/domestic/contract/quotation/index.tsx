@@ -99,6 +99,9 @@ import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
 
 // icon
 import iconUpload from 'public/image/icon/upload.svg';
+
+import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+
 // =============================================================
 
 // region TYPE
@@ -1287,6 +1290,10 @@ const usePanelList = ({
 }) => {
   const router = useRouter();
 
+  // const { isRefactoredQuotaion } = useGlobal_OptionalConfig();
+  const optionalConfig = useGlobal_OptionalConfig();
+  const { isRefactoredQuotaion } = optionalConfig;
+
   const panel_quotation01: TpanelList = [
     // 現在後端會在合約產生時自動產生工程聯絡單，因此把這個按鈕拿掉
     (() =>
@@ -1347,7 +1354,10 @@ const usePanelList = ({
           }
 
           router.push({
-            pathname: '/domestic/contract/attachContract',
+            // pathname: '/domestic/contract/attachContract',
+            pathname: isRefactoredQuotaion
+              ? optionalConfig.path_refactoredQuotation
+              : optionalConfig.path_contractAttachContact,
             query: {
               contractId: contract.id,
             },
