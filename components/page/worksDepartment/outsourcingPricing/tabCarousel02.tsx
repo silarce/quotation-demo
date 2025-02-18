@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import classNames from 'classnames';
 
 import Slider, { CustomArrowProps, Settings as TreactSlickProps } from 'react-slick';
@@ -25,41 +25,40 @@ type Tcontrol = {
   tabArr: Ttab[];
 };
 
-export type { Tcontrol as Tcontrol_tabCarousel };
+type TimperativeHandle = {
+  slideToIndex: (index: number) => void;
+};
 
 // ======================================================================
-export default function TabCarousel02({
-  //
-  className,
-  control,
-  theme = 'default',
-  props,
-  onMount,
-  slideToIndex,
-}: {
-  className?: string;
-  control: Tcontrol;
-  theme?: 'default' | 'dashed';
-  props?: TreactSlickProps;
-  onMount?: (props: { ref_slider: React.MutableRefObject<Slider> }) => void;
-  slideToIndex?: number;
-}) {
-  // const [viewRef_first, inView_first] = useInView();
-  // const [viewRef_last, inView_last] = useInView();
-
+function TabCarousel02_pre(
+  {
+    className,
+    control,
+    theme = 'default',
+    props,
+  }: {
+    className?: string;
+    control: Tcontrol;
+    theme?: 'default' | 'dashed';
+    props?: TreactSlickProps;
+  },
+  ref: React.ForwardedRef<TimperativeHandle>
+) {
   const [isSliding, setIsSliding] = useState(false);
 
   // -------------------------------------------------------------------------
   const sliderRef = useRef<Slider>(null!);
   const { tabArr, activeIndex } = control;
 
-  useEffect(() => {
-    !slideToIndex && onMount && onMount({ ref_slider: sliderRef });
-  }, []);
+  // -------------------------------------------------------------------------
 
-  useEffect(() => {
-    slideToIndex !== undefined && sliderRef.current.slickGoTo(slideToIndex);
-  }, [slideToIndex]);
+  useImperativeHandle(ref, () => ({
+    slideToIndex: (index) => {
+      sliderRef.current.slickGoTo(index);
+    },
+  }));
+
+  // -------------------------------------------------------------------------
 
   return (
     <Slider
@@ -198,3 +197,8 @@ const Svg_arrowRight = (props: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
+
+const TabCarousel02 = forwardRef(TabCarousel02_pre);
+
+export default TabCarousel02;
+export type { Tcontrol as Tcontrol_tabCarousel, TimperativeHandle };

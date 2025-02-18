@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
+import _ from 'lodash';
 
 // component
 import Header from './header';
@@ -402,7 +403,7 @@ const productTomainProduct = ({
     bounceDoorWidth,
 
     //
-    accessories,
+    accessories: _accessories,
     components: _components,
     //
   } = product_item;
@@ -412,7 +413,11 @@ const productTomainProduct = ({
     quotationDiscount,
   });
 
-  const components = [..._components];
+  let components = [..._components];
+  components = _.sortBy(components, 'order');
+
+  let accessories = [..._accessories];
+  accessories = _.sortBy(accessories, 'order');
 
   const fullWidtn_cm = new Decimal(fullWidth || 0).div(10).toNumber();
   const height_cm = new Decimal(height || 0).div(10).toNumber();

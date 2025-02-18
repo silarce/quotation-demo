@@ -177,7 +177,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
   ) as TcreateQuotationProductComponentDto[];
 
   const accessoryArr = accessoryKeyArr.map((key) => data_accessoryDict[key]);
-  const accessories: TcreateQuotationProductAccessoryDto[] = accessoryArr.map((acce) => {
+  const accessories: TcreateQuotationProductAccessoryDto[] = accessoryArr.map((acce, index) => {
     const body: TcreateQuotationProductAccessoryDto = {
       codeName: acce.codeName,
       name: acce.name,
@@ -188,7 +188,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
       originalPrice: acce.originalPrice,
       price: Number(acce.price || 0),
       dualPrice: Number(acce.dualPrice || 0),
-      order: acce.order,
+      order: index,
       referenceSpec: acce.referenceSpec,
     };
 

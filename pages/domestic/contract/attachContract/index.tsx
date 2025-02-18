@@ -63,6 +63,8 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 
 import { calcNTDToForeignCurrency } from 'components/page/domestic/quotation/function/utils_quotation';
 
+import { ToptionalConfigState, useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+
 // ===========================================================================
 
 type Tstate_paymentMethodItem = { milestone: string; totalPaymentRatio: string };
@@ -85,6 +87,8 @@ export default function AttachContract({
   const userId = userEmp?.id;
 
   let taxRate: number | undefined = undefined;
+
+  const optionalConfig = useGlobal_OptionalConfig();
 
   // ------------------------------------------------------------------------------
   // region useState
@@ -248,6 +252,7 @@ export default function AttachContract({
       foreignTotal,
       //
       verifyForm: data_contract?.content.verifyForm,
+      optionalConfig,
     });
   };
 
@@ -772,6 +777,8 @@ const reqModify = async ({
   foreignTotal,
   //
   verifyForm,
+
+  optionalConfig,
 }: {
   router: ReturnType<typeof useRouter>;
   setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
@@ -801,6 +808,8 @@ const reqModify = async ({
   foreignTotal: `${number}`;
   //
   verifyForm: TcreateQuotationVerifyFormDto | undefined;
+
+  optionalConfig: ToptionalConfigState;
 }) => {
   try {
     setIsLading(true);
@@ -1030,7 +1039,15 @@ const reqModify = async ({
       verifyForm && (await apiSubmitContracting({ contentId, body: verifyForm }));
       setIsLading(false);
       // router.back();
-      router.push(`/domestic/quotationList/attachQuotation?id=${res.id}`);
+      const pathname = optionalConfig.isRefactoredQuotaion
+        ? optionalConfig.path_refactoredQuotation
+        : optionalConfig.path_attachQuotation;
+
+      // router.push(`/domestic/quotationList/attachQuotation?id=${res.id}`);
+      router.push({
+        pathname: pathname,
+        query: { id: res.id },
+      });
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '上傳失敗', content: err.message });

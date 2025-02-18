@@ -34,6 +34,7 @@ import { optionsCreator_productMaterial, optionsCreator_doorModelName } from 'js
 // type
 import type { Thead_popFormList } from 'components/page/domestic/queryQuotation/queryQuotationList/thead';
 
+import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 // ===========================================
 
 type Tquery = {
@@ -99,6 +100,11 @@ export default function Budget() {
   dateStart_moment && (dateStart_moment.add(1911, 'year') as moment.Moment);
   const dateEnd_moment = dateEnd ? moment(dateEnd) : undefined;
   dateEnd_moment && (dateEnd_moment.add(1911, 'year') as moment.Moment);
+
+  // ----------------------------------------------------------------------
+
+  const optionalConfig = useGlobal_OptionalConfig();
+  const { isRefactoredQuotaion } = optionalConfig;
 
   // ----------------------------------------------------------------------
 
@@ -196,7 +202,8 @@ export default function Budget() {
         isAttachtQuotation && (href_contract.query.id = attachedToContractId);
 
         const href_quotation = {
-          pathname: '/domestic/quotationList/quotation',
+          // pathname: '/domestic/quotationList/quotation',
+          pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
           query: {
             id: id,
             status: latestContent.status,
@@ -204,7 +211,10 @@ export default function Budget() {
         };
 
         const href_attachQuotation = {
-          pathname: '/domestic/quotationList/attachQuotation',
+          // pathname: '/domestic/quotationList/attachQuotation',
+          pathname: isRefactoredQuotaion
+            ? optionalConfig.path_refactoredQuotation
+            : optionalConfig.path_attachQuotation,
           // pathname: '/domestic/quotationList/quotation',
           query: {
             id: id,
@@ -275,12 +285,15 @@ export default function Budget() {
           }
 
           const href_body = {
-            pathname: '/domestic/quotationList/quotation',
+            // pathname: '/domestic/quotationList/quotation',
+            pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
             query,
           };
           const href_body_attach = {
-            pathname: '/domestic/quotationList/attachQuotation',
-            // pathname: '/domestic/quotationList/quotation',
+            // pathname: '/domestic/quotationList/attachQuotation',
+            pathname: isRefactoredQuotaion
+              ? optionalConfig.path_refactoredQuotation
+              : optionalConfig.path_attachQuotation,
             query: {
               ...query,
             },
