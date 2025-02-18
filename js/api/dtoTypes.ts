@@ -4769,7 +4769,7 @@ export type ToutsourcingPaymentDto = {
   //  '是否已結清'
   isPaymentCleared: boolean;
   //  '請款合計'
-  paymentSubTotal: number | null;
+  // paymentSubTotal: number | null;
   //  '扣款明細'
   deduction: TdeductionDto[] | null;
   //  '扣款合計'
@@ -4779,13 +4779,14 @@ export type ToutsourcingPaymentDto = {
   //  '本期保留款'
   retainage: number | null;
   //  '小計'
-  subTotal: number | null;
+  // subTotal: number | null;
   //  '營業稅'
-  salesTax: number | null;
+  // salesTax: number | null;
   //  '實領總計'
-  total: number | null;
+  // total: number | null;
   //  '外包計價帳款明細'
   outsourcingPaymentDetail: ToutsourcingPaymentDetailDto[];
+
   //  '經辦人Id'
   agentEmployeeId: string | null;
   //  '經辦人'
