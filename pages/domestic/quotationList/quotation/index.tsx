@@ -1493,6 +1493,10 @@ function TheQuotation({ router }: { router: NextRouter }) {
             value: state_summary.tuneTotal,
             placeholder: '範圍正負1000',
             onChange: (e) => {
+              if (!e.target.validity.valid) {
+                return;
+              }
+
               const value_num = Number(e.target.value);
 
               if (Math.abs(value_num) > 1000) {
