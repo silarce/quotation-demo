@@ -191,6 +191,9 @@ export default function PayInfo({
             <input
               onWheel={blurOnWheel}
               type="number"
+              min={-1000}
+              max={1000}
+              step={0}
               className={classNames(
                 //
                 'bg-transparent',
