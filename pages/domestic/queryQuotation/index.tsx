@@ -52,7 +52,8 @@ type Tquery = {
   dateStart?: string | undefined;
   dateEnd?: string | undefined;
   projectName?: string | undefined;
-  projectNumber?: string | undefined;
+  contractNumber?: string | undefined;
+  quotationNumber?: string | undefined;
   //
   order?: 'ASC' | 'DESC' | undefined;
   isLost?: 'true' | 'false' | undefined;
@@ -84,7 +85,8 @@ export default function Budget() {
     dateStart,
     dateEnd,
     projectName,
-    projectNumber,
+    quotationNumber,
+    contractNumber,
     order,
     isLost: isLost_str,
     agentName,
@@ -139,7 +141,11 @@ export default function Budget() {
       // 工程名稱
       'latestContent.projectName': { $contains: projectName },
       // 報價編號
-      'latestContent.quotationNumber': { $contains: projectNumber },
+      $or: {
+        'latestContent.quotationNumber': { $contains: quotationNumber },
+        'latestContent.contract.contractNumber': { $contains: contractNumber },
+      },
+
       // 失件
       'latestContent.isLost': { $eq: isLost },
 
@@ -221,7 +227,7 @@ export default function Budget() {
         const latestCustomer = sortedContent[0].customer;
 
         const header: Tcontrol_queryQuotationList['panelArr'][number]['header'] = {
-          quotationNumber: latestContent.quotationNumber,
+          quotationNumber: latestContent.contract?.contractNumber ?? latestContent.quotationNumber,
           status: <Status status={quotationStatusLookup[latestContent.status]} isLost={latestContent.isLost} />,
           quoteDate: moment(convertDate_reduce1911(latestContent.quotationDate)).format('yy-MM-DD'),
           county: latestContent.county,
@@ -359,7 +365,7 @@ export default function Budget() {
     const prodMaterial = prodMaterialOption.value;
     const doorModel = doorModelOption.value;
 
-    router.push({
+    router.replace({
       query: clearEmptyProperty({
         ...query,
         contactPerson,
@@ -422,7 +428,8 @@ const usePopFormListCreator = () => {
     projectName,
     dateStart,
     dateEnd,
-    projectNumber,
+    quotationNumber,
+    contractNumber,
     order,
     isLost,
     reviewStatus,
@@ -437,19 +444,32 @@ const usePopFormListCreator = () => {
     const popFormList: Thead_popFormList = {
       quotationNumber: {
         onConfirm: (list) => {
-          const { projectNumber } = list;
+          const { quotationNumber, contractNumber } = list;
 
-          router.push({
-            query: clearEmptyProperty({ ...query, projectNumber: projectNumber }),
+          router.replace({
+            query: clearEmptyProperty({ ...query, quotationNumber, contractNumber }),
           });
         },
         inputSelArr: [
           {
             caption: '報價編號',
-            name: 'projectNumber',
+            name: 'quotationNumber',
             inputProps: {
               props: {
-                defaultValue: projectNumber,
+                defaultValue: quotationNumber,
+              },
+            },
+          },
+          {
+            showBaseline: 'invisible',
+            node: <div className="text-center">OR</div>,
+          },
+          {
+            caption: '合約編號',
+            name: 'contractNumber',
+            inputProps: {
+              props: {
+                defaultValue: contractNumber,
               },
             },
           },
@@ -466,7 +486,7 @@ const usePopFormListCreator = () => {
             isLost: isLost === 'undefined' ? undefined : isLost,
             reviewStatus: reviewStatus === 'undefined' ? undefined : reviewStatus,
           });
-          router.push({
+          router.replace({
             query: theQuery,
           });
         },
@@ -523,7 +543,7 @@ const usePopFormListCreator = () => {
       quoteDate: {
         onConfirm: (list) => {
           const { dateStart, dateEnd, order } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({
               ...query,
               dateStart: dateStart,
@@ -572,7 +592,7 @@ const usePopFormListCreator = () => {
       county: {
         onConfirm: (list) => {
           const { county } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({ ...query, county: county }),
           });
         },
@@ -593,7 +613,7 @@ const usePopFormListCreator = () => {
       projectName: {
         onConfirm: (list) => {
           const { projectName } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({ ...query, projectName: projectName }),
           });
         },
@@ -612,7 +632,7 @@ const usePopFormListCreator = () => {
       customerName: {
         onConfirm: (list) => {
           const { customerName } = list;
-          router.push({
+          router.replace({
             query: clearEmptyProperty({ ...query, customerName: customerName }),
           });
         },

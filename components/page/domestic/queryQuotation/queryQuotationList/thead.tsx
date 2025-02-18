@@ -25,7 +25,7 @@ export default function Thead({ popFormList }: { popFormList: TpopFormList }) {
     <div className={scss.thead}>
       <Pop_form control={popFormList.quotationNumber} placement="bottom">
         <div className={scss.cell}>
-          <span>報價編號</span>
+          <span>編號</span>
           <DownSquareFilled />
         </div>
       </Pop_form>

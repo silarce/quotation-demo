@@ -693,9 +693,7 @@ export default function AddPurchaseOrderList() {
         contact: ''
     });
 
-    useEffect(() => {
-        setIsFilterVisible(true);
-    }, [suppliernamein])
+
 
     // 根據篩選條件更新資料
     useEffect(() => {
@@ -706,6 +704,16 @@ export default function AddPurchaseOrderList() {
         );
         setFilteredData2(filtered);
     }, [filters]);
+
+    useEffect(() => {
+        setFilteredData2(
+            customerdata.filter(
+                (item) =>
+                    (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+                    (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+            )
+        );
+    }, [supplieridin, suppliernamein]); // 當 supplieridin 或 suppliernamein 變化時觸發
 
     //#endregion
 
@@ -927,14 +935,18 @@ export default function AddPurchaseOrderList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商統編"
+                                            caption="廠商編號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             // disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                    value: supplieridin,
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setSupplieridin(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -950,14 +962,9 @@ export default function AddPurchaseOrderList() {
                                                     // onChange: (e) => { setSuppliernamein(e.target.value) }
                                                     onChange: (e) => {
                                                         const value = e.target.value;
-                                                        setSuppliernamein(value);
-                                                        setFilters({ ...filters, name: value });
-                                                        setFilteredData2(
-                                                            data.filter((item) =>
-                                                                item.name.toLowerCase().includes(value.toLowerCase())
-                                                            )
-                                                        );
-                                                    }
+                                                        setSuppliernamein(value); // 僅更新 suppliernamein
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -1082,7 +1089,7 @@ export default function AddPurchaseOrderList() {
                                         borderRadius: '4px',
                                     }}
                                 >
-                                    {filters.name && filteredData2.length > 0 && isFilterVisible && (
+                                    {(suppliernamein || supplieridin) && filteredData2.length > 0 && isFilterVisible && (
                                         <div
                                             style={{
                                                 position: 'absolute',
@@ -1115,6 +1122,7 @@ export default function AddPurchaseOrderList() {
                                                         setSuppliercontactin(_item.contact || '');
                                                         setSupplieruuidin(_item.id || '');
                                                         setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                        setIsFilterVisible(false);
                                                     }}
                                                     style={{
                                                         padding: '10px',
