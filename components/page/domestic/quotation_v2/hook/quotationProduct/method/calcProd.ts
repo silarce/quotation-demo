@@ -361,7 +361,7 @@ const calcPriceDiscount_percent = ({
   const prodDiscount_percent = new Decimal(prodDiscount || 0).div(100).toNumber();
   const quotationDiscount_percent = new Decimal(quotationDiscount || 0).div(100).toNumber();
 
-  return new Decimal(prodDiscount_percent).mul(quotationDiscount_percent).toDecimalPlaces(3).toNumber();
+  return new Decimal(prodDiscount_percent).mul(quotationDiscount_percent).toNumber();
 };
 
 // MARK:calcProdDistributionBoxAndInstallationFee

@@ -21,6 +21,8 @@ import scss from './budgetList.module.scss';
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
+import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+
 // ===========================================
 import { TquotationDto } from 'js/api/api_quotation';
 import ProcessChain from 'components/global/gear/processChain';
@@ -46,6 +48,10 @@ export default function BudgetList({
 }) {
   const router = useRouter();
 
+  // const { isRefactoredQuotaion: isRefactoredQuotaion } = useGlobal_OptionalConfig();
+  const optionalConfig = useGlobal_OptionalConfig();
+  const { isRefactoredQuotaion } = optionalConfig;
+
   // panelHeader點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -69,14 +75,20 @@ export default function BudgetList({
           const linkProps = attachedToContract
             ? {
                 href: {
-                  pathname: `/domestic/quotationList/attachQuotation`,
+                  // pathname: `/domestic/quotationList/attachQuotation`,
                   // pathname: `/domestic/quotationList/quotation`,
+                  pathname: isRefactoredQuotaion
+                    ? optionalConfig.path_oldQuotation
+                    : optionalConfig.path_attachQuotation,
                   query: { id },
                 },
               }
             : {
                 href: {
-                  pathname: `/domestic/quotationList/quotation`,
+                  // pathname: `/domestic/quotationList/quotation`,
+                  pathname: isRefactoredQuotaion
+                    ? optionalConfig.path_refactoredQuotation
+                    : optionalConfig.path_oldQuotation,
                   query: { id, status },
                 },
               };
@@ -100,7 +112,10 @@ export default function BudgetList({
             const { quotationDate, editNotes, averageDiscount, quantity, total } = content;
 
             const href_body = {
-              pathname: '/domestic/quotationList/quotation',
+              // pathname: '/domestic/quotationList/quotation',
+              pathname: isRefactoredQuotaion
+                ? optionalConfig.path_refactoredQuotation
+                : optionalConfig.path_oldQuotation,
               query: {
                 id: id,
                 status: content.status,

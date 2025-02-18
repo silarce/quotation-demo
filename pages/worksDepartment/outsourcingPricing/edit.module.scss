@@ -1,18 +1,18 @@
-.captionBar {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 7px;
-  > svg {
-    width: 34px;
-    height: 34px;
-  }
-  .tableCaption {
-    color: theme("colors.main");
-    font-size: 18px;
-    margin-bottom: 5px;
-  }
-}
+// .captionBar {
+//   display: flex;
+//   align-items: center;
+//   gap: 5px;
+//   margin-bottom: 7px;
+//   > svg {
+//     width: 34px;
+//     height: 34px;
+//   }
+//   .tableCaption {
+//     color: theme("colors.main");
+//     font-size: 18px;
+//     margin-bottom: 5px;
+//   }
+// }
 
 .textRed {
   color: red;
@@ -42,4 +42,8 @@
   &.enabled {
     border-color: black;
   }
+}
+
+.foo {
+  pointer-events: none;
 }
