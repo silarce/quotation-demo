@@ -1,6 +1,8 @@
 import { useState, useRef, useMemo } from 'react';
 import _ from 'lodash';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 // component
 import Header from './header';
 import Info from './info';
@@ -498,10 +500,18 @@ const usePdfPart = ({
       ? prodArrForPDf
       : quotationContent?.products ?? [];
 
-    const pdfPartProps: TmainProduct[] = products.map((_prod) => {
+    const isItemsEmpty: string[] = [];
+
+    const pdfPartProps_pre: (TmainProduct | null)[] = products.map((_prod) => {
       const prod = _prod as TprodSource | TquotationProductDto;
 
       const { items } = prod;
+
+      if (!items[0]) {
+        isItemsEmpty.push(`id:${prod.id}, itemName:${prod.itemName}, items[0]為undefined`);
+
+        return null;
+      }
 
       const addition = 'addition' in prod ? prod.addition : undefined;
 
@@ -513,6 +523,15 @@ const usePdfPart = ({
         quotationDiscount: quotationDiscount,
       });
     });
+
+    if (isItemsEmpty.length > 0) {
+      myAlert.err({
+        title: '單價分析PDF發生錯誤，請勿使用匯出單價分析',
+        content: isItemsEmpty.join('---'),
+      });
+    }
+
+    const pdfPartProps = pdfPartProps_pre.filter((prod) => prod !== null) as TmainProduct[];
 
     return pdfPartProps;
   }, [quotationContent, prodArrForPDf]);
