@@ -202,7 +202,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     attachedToProductId,
 
     // 折數
-    discount: data_prod.discount, // `${number}`
+    discount: data_prod.discount || '0', // `${number}`
     // 項目名
     itemName: data_prod.itemName,
     // 報價別
@@ -220,27 +220,27 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // D(mm) // 單位為mm
     boxD: new Decimal(data_prod.boxD || 0).mul(1000).toNumber(),
     // 面積
-    area: data_prod.area,
+    area: data_prod.area || null,
     // 才數
-    volume: data_prod.volume,
+    volume: data_prod.volume || null,
     // 材料
     materialName: data_prod.materialName,
     // 表面
-    materialSurface: data_prod.materialSurface,
+    materialSurface: data_prod.materialSurface || null,
     // 門軌
-    guideRail: data_prod.guideRail,
+    guideRail: data_prod.guideRail || null,
     // 馬力
     horsepower: data_prod.horsepower,
     // 馬達廠商
     motorVendor: data_prod.motorVendor || null,
     // 電壓
-    motorVoltage: data_prod.motorVoltage,
+    motorVoltage: data_prod.motorVoltage || null,
     // 馬達支撐架
     hasMotorSupportStand: data_prod.hasMotorSupportStand,
     // 底座類型
-    bottomBar: data_prod.bottomBar, // 鋁障感 | 止水型 | ''
+    bottomBar: data_prod.bottomBar || null, // 鋁障感 | 止水型 | ''
     // 馬達鎖盒
-    motorLockBox: data_prod.motorLockBox,
+    motorLockBox: data_prod.motorLockBox || null,
     // 門軌厚度
     guideRailThickness: data_prod.guideRailThickness || null,
     // 捲軸規格  // 棄用
@@ -250,7 +250,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // 一體式捲箱
     isIntegratedHeadBox: data_prod.isIntegratedHeadBox,
     // 捲箱厚度
-    headBoxThickness: data_prod.headBoxThickness,
+    headBoxThickness: data_prod.headBoxThickness || null,
     // 數量
     quantity: Number(data_prod.quantity || 0),
     // 單價
@@ -272,19 +272,19 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // 彈射門長度
     // bounceDoorLength?: data_prod.bounceDoorLength,
     // 關閉方式 // 在前端顯示的label為開閉方式
-    closingType: data_prod.closingType,
+    closingType: data_prod.closingType || null,
     // 備註
     notes: data_prod.notes,
     // 相數
-    motorPhase: data_prod.motorPhase,
+    motorPhase: data_prod.motorPhase || null,
     // 底座角鐵
-    bottomBarAngleIron: data_prod.bottomBarAngleIron,
+    bottomBarAngleIron: data_prod.bottomBarAngleIron || null,
     // 底座板
-    bottomBarPlate: data_prod.bottomBarPlate,
+    bottomBarPlate: data_prod.bottomBarPlate || null,
     // 排序
     order: data_prod.order ?? 9999,
     // 門片厚度
-    thickness: data_prod.thickness,
+    thickness: data_prod.thickness || null,
     // 配電箱牌價
     distributionBoxPrice: data_prod.distributionBoxPrice ? Number(data_prod.distributionBoxPrice) : null,
     // 配電箱單價
@@ -306,35 +306,35 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // 安裝費複價
     installationFeeTotalPrice: data_prod.installationFeeTotalPrice || null,
     // 門片 - 捲片支數
-    slatCount: data_prod.slatCount,
+    slatCount: data_prod.slatCount || null,
     // 鏈齒輪 - 鏈齒輪番號
-    sprocketWheelModel: data_prod.sprocketWheelModel,
+    sprocketWheelModel: data_prod.sprocketWheelModel || null,
     // 鏈齒輪 - 大鏈輪
-    sprocketWheelTeethNumber: data_prod.sprocketWheelTeethNumber,
+    sprocketWheelTeethNumber: data_prod.sprocketWheelTeethNumber || null,
     // 不確定這個property的意義，可能為鍊條數量
-    sprocketWheelChains: data_prod.sprocketWheelChains,
+    sprocketWheelChains: data_prod.sprocketWheelChains || null,
     // 鏈齒輪/捲軸 - 孔徑/軸徑
-    bearingInnerDiameter: data_prod.bearingInnerDiameter,
+    bearingInnerDiameter: data_prod.bearingInnerDiameter || null,
     // 捲軸 - 尺寸
-    diameter: data_prod.diameter,
+    diameter: data_prod.diameter || null,
     // 捲軸 - 總長
-    bearingHousingTotalLength: data_prod.bearingHousingTotalLength,
+    bearingHousingTotalLength: data_prod.bearingHousingTotalLength || null,
     // 底座 - 開口
-    guideRailsOpening: data_prod.guideRailsOpening,
+    guideRailsOpening: data_prod.guideRailsOpening || null,
     // 門片長度
-    slatLength: data_prod.slatLength,
+    slatLength: data_prod.slatLength || null,
     // 門軌長度
-    guideRailLength: data_prod.guideRailLength,
+    guideRailLength: data_prod.guideRailLength || null,
     // 捲箱長度
-    headBoxLength: data_prod.headBoxLength,
+    headBoxLength: data_prod.headBoxLength || null,
     // 軸承座寸法
-    bearingHousingSize: data_prod.bearingHousingSize,
+    bearingHousingSize: data_prod.bearingHousingSize || null,
     // 軸承
-    bearingName: data_prod.bearingName,
+    bearingName: data_prod.bearingName || null,
     gapA: data_prod.gapA || null,
     gapC: data_prod.gapC || null,
-    gearNumber: data_prod.gearNumber,
-    weight: data_prod.weight,
+    gearNumber: data_prod.gearNumber || null,
+    weight: data_prod.weight || null,
     // guideRailG為門軌的width
     // guideRailG是指單邊門軌的寬度。要注意，在工務部，G是指兩邊門軌寬度的總和。
     guideRailG: data_prod.guideRailG,
