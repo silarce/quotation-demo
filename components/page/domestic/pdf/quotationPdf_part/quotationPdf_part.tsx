@@ -507,6 +507,7 @@ const usePdfPart = ({
 
       const { items } = prod;
 
+      // items為空陣列是不應該發生的，若發生請通知後端
       if (!items[0]) {
         isItemsEmpty.push(`id:${prod.id}, itemName:${prod.itemName}, items[0]為undefined`);
 
