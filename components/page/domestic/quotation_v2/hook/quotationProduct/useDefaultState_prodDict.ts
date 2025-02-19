@@ -136,6 +136,7 @@ const useDefaultState_prodDict = ({
         accessoryKeyArr,
 
         doorModel: doorModelDict?.[data_prod.doorModelName] || null,
+        isCustomPrice: doorModelDict ? !(data_prod.doorModelName in doorModelDict) : true,
         generalSpecs: undefined,
         availableComponents: undefined,
 

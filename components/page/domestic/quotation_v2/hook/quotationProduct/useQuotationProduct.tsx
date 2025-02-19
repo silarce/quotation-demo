@@ -677,10 +677,15 @@ const useQuotationProduct = ({
   }, [disabled, defaultQuotationDiscount]);
 
   useEffect(() => {
+    // if (disabled) {
+    //   return;
+    // }
+
     const newState_prodDict = calcAndRenewAllProdPrice({
       prodDict: state_prodDict,
       // 因為state_quotationDiscount更及時
       // 所以用state_quotationDiscount而不用debounced_state_quotationDiscount
+      // 但其實用debounced_state_quotationDiscount是完全一樣的阿....
       quotationDiscount: state_quotationDiscount,
     });
 
