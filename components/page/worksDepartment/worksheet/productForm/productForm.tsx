@@ -35,7 +35,8 @@ import {
   optionsCreator_boolean,
   optionsCreator_sprocketWheelModel,
   optionsCreator_bearingName,
-
+  optionsCreator_horsePower,
+  optionsCreator_motorVender,
   //
 } from 'js/utils/options/productOptions';
 
@@ -45,6 +46,13 @@ import { findOption } from 'js/utils/options/findOption';
 // =====================================================================
 
 const options_doorType = optionsCreator_quoteType();
+const options_horsepower = optionsCreator_horsePower();
+const options_motorVendor = optionsCreator_motorVender();
+const opttions_motorSupportStand = [
+  { value: 'true', label: '有' },
+  { value: 'false', label: '無' },
+];
+const options_motorLockBox = optionsCreator_motorLockBox();
 
 // =====================================================================
 
@@ -1613,14 +1621,92 @@ const Table_bottomBar = () => {
 // =====================================================================
 // =====================================================================
 
+// MARK:Form_specialProd_location
+type Tstate_specialProd_location = {
+  serialNumberArr: string[];
+  floor: string;
+  locationArea: string;
+};
+
+const Form_specialProd_location = ({
+  state: { serialNumberArr, floor, locationArea },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_location;
+  setState: React.Dispatch<React.SetStateAction<Tstate_specialProd_location>>;
+  disabled: boolean;
+}) => {
+  return (
+    <div className={scss.grid}>
+      <InputSel
+        {...basicConfig}
+        disabled={disabled}
+        caption="樓層"
+        inputProps={{
+          props: {
+            value: floor,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setState((prev) => ({ ...prev, floor: e.target.value }));
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        disabled={disabled}
+        caption="區域"
+        inputProps={{
+          props: {
+            value: locationArea,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              setState((prev) => ({ ...prev, locationArea: e.target.value }));
+            },
+          },
+        }}
+      />
+      <div className="col-span-2">
+        <InputSel {...basicConfig} disabled={true} caption="門編號" showBaseline="invisible" />
+
+        <ul className="grid grid-cols-8 gap-10">
+          {serialNumberArr.map((value, index) => {
+            return (
+              <li key={index}>
+                <input
+                  placeholder="選填"
+                  className={`border-b border-black w-full text-[${basicConfig.fontSize}px]`}
+                  readOnly={disabled}
+                  value={value}
+                  onChange={(e) => {
+                    setState((prev) => {
+                      const copy = [...prev.serialNumberArr];
+                      copy[index] = e.target.value;
+
+                      return {
+                        ...prev,
+                        serialNumberArr: copy,
+                      };
+                    });
+                  }}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+// MARK:Form_specialProd_basic
 type Tstate_specialProd_basic = {
   itemName: string;
   quoteType: string;
   doorModelName: string;
+  qty: number;
   fullWidth: `${number}` | '';
   WG: `${number}` | '';
   height: `${number}` | '';
-  qty: number;
   materialName: string;
   materialSurface: string;
   isAntiTyphoon: boolean;
@@ -1628,7 +1714,6 @@ type Tstate_specialProd_basic = {
 
 const Form_specialProd_basic = ({
   state: {
-    //
     itemName,
     quoteType,
     doorModelName,
@@ -1644,16 +1729,19 @@ const Form_specialProd_basic = ({
   disabled,
 }: {
   state: Tstate_specialProd_basic;
-  setState: React.Dispatch<React.SetStateAction<Tstate_specialProd_basic>>;
+  setState: React.Dispatch<
+    React.SetStateAction<Omit<Tstate_specialProd_basic, 'itemName' | 'quoteType' | 'doorModelName' | 'qty'>>
+  >;
   disabled: boolean;
 }) => {
   return (
     <div>
       <div className={scss.grid}>
-        <InputSel {...basicConfig} disabled={true} caption="報價別" node={quoteType} />
-        <div></div>
-        <InputSel {...basicConfig} disabled={true} caption="項目" node={itemName} />
-        <InputSel {...basicConfig} caption="門型" disabled={true} node={doorModelName} />
+        <InputSel {...basicConfig} disabled={true} caption="報價別" node={quoteType} showBaseline="invisible" />
+        <InputSel {...basicConfig} disabled={true} caption="項目" node={itemName} showBaseline="invisible" />
+        <InputSel {...basicConfig} caption="門型" disabled={true} node={doorModelName} showBaseline="invisible" />
+        <InputSel {...basicConfig} caption="數量" disabled={true} node={qty} showBaseline="invisible" />
+
         <InputSel
           {...basicConfig}
           caption="全寬(L)"
@@ -1673,7 +1761,7 @@ const Form_specialProd_basic = ({
             },
           }}
         />
-        <InputSel {...basicConfig} caption="數量" disabled={true} node={qty} />
+
         <InputSel
           {...basicConfig}
           caption="W+G"
@@ -1760,6 +1848,249 @@ const Form_specialProd_basic = ({
   );
 };
 
+// MARK:Form_specialProduct_ABCD
+
+type Tstate_specialProduct_ABCD = {
+  gapA: `${number}` | '';
+  gapC: `${number}` | '';
+  boxB: `${number}` | '';
+  boxD: `${number}` | '';
+};
+
+function Form_specialProduct_ABCD({
+  state: { gapA, gapC, boxB, boxD },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProduct_ABCD;
+  setState: React.Dispatch<React.SetStateAction<Tstate_specialProduct_ABCD>>;
+  disabled: boolean;
+}) {
+  return (
+    <div className={scss.grid}>
+      <InputSel
+        {...basicConfig}
+        caption="機械縫 A"
+        disabled={disabled}
+        inputProps={{
+          props: {
+            type: 'number',
+            min: 0,
+            step: 1,
+            value: gapA,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.validity.valid) {
+                setState((prev) => ({ ...prev, gapA: e.target.value as `${number}` }));
+              }
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="機械縫 C"
+        disabled={disabled}
+        inputProps={{
+          props: {
+            type: 'number',
+            min: 0,
+            step: 1,
+            value: gapC,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.validity.valid) {
+                setState((prev) => ({ ...prev, gapC: e.target.value as `${number}` }));
+              }
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="支板尺寸 B"
+        disabled={disabled}
+        inputProps={{
+          props: {
+            type: 'number',
+            min: 0,
+            step: 1,
+            value: boxB,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.validity.valid) {
+                setState((prev) => ({ ...prev, boxB: e.target.value as `${number}` }));
+              }
+            },
+          },
+        }}
+      />
+      <InputSel
+        {...basicConfig}
+        caption="支板尺寸 D"
+        disabled={disabled}
+        inputProps={{
+          props: {
+            type: 'number',
+            min: 0,
+            step: 1,
+            value: boxD,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.validity.valid) {
+                setState((prev) => ({ ...prev, boxD: e.target.value as `${number}` }));
+              }
+            },
+          },
+        }}
+      />
+    </div>
+  );
+}
+
+// MARK:Form_specialProduct_motor
+type Tprops_specialProduct_motor = {
+  motorVoltage: 110 | 380 | null;
+  motorPhase: 1 | 3 | null;
+  horsepower: string;
+  motorVendor: string;
+  hasMotorSupportStand: boolean;
+  motorLockBox: string;
+};
+
+type TsetStateAction<T> = Partial<T> | ((prev: T) => Partial<T>);
+type TsetState<T> = (action: TsetStateAction<T>) => void;
+
+const options_electricSupply = [
+  { value: JSON.stringify({ motorPhase: 1, motorVoltage: 110 }), label: '單相 110V' },
+  { value: JSON.stringify({ motorPhase: 3, motorVoltage: 110 }), label: '三相 110V' },
+  { value: JSON.stringify({ motorPhase: 3, motorVoltage: 380 }), label: '三相 380V' },
+  { value: JSON.stringify({ motorPhase: null, motorVoltage: null }), label: '無' },
+];
+
+function Form_specialProduct_motor({
+  state: { motorVoltage, motorPhase, horsepower, motorVendor, hasMotorSupportStand, motorLockBox },
+  setState,
+  disabled,
+}: {
+  state: Tprops_specialProduct_motor;
+  // setState: (action: TsetStateAction<Tprops_specialProduct_motor>) => void;
+  setState: TsetState<Tprops_specialProduct_motor>;
+  disabled: boolean | undefined;
+}) {
+  let value_electricSupply = {
+    value: JSON.stringify({ motorPhase, motorVoltage }),
+    label: `${motorPhase === 1 ? '單' : motorPhase === 3 ? '三' : motorPhase}相 ${motorVoltage}V`,
+  };
+
+  if (!motorVoltage && !motorPhase) {
+    value_electricSupply = { value: JSON.stringify({ motorPhase: null, motorVoltage: null }), label: '無' };
+  }
+
+  const value_horsepower = findOption({ value: horsepower, options: options_horsepower });
+  const value_motorVendor = findOption({ value: motorVendor, options: options_motorVendor });
+  const value_motorSupportStand = findOption({
+    value: String(hasMotorSupportStand),
+    options: opttions_motorSupportStand,
+  });
+  const value_motorLockBox = findOption({ value: motorLockBox, options: options_motorLockBox });
+
+  return (
+    <div>
+      <p className={scss.caption}>●電動機</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="電供"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_electricSupply,
+              value: value_electricSupply,
+              onChange: (option) => {
+                const value = option?.value;
+
+                if (!value) {
+                  setState({ motorPhase: null, motorVoltage: null });
+                } else {
+                  const { motorPhase, motorVoltage } = JSON.parse(value);
+                  setState({ motorPhase, motorVoltage });
+                }
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="馬力"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_horsepower,
+              isSearchable: true,
+              value: value_horsepower,
+              onChange: (option) => {
+                setState({ horsepower: option?.value ?? '' });
+              },
+              // onInputChange: (value, action) => {
+              //   if (action.action === 'input-change') {
+              //     setState({ horsepower: value });
+              //   }
+              // },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="廠商"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_motorVendor,
+              isSearchable: true,
+              value: value_motorVendor,
+              onChange: (option) => {
+                setState({ motorVendor: option?.value ?? '' });
+              },
+              // onInputChange: (value, action) => {
+              //   if (action.action === 'input-change') {
+              //     motor.setMotor_str({ key: 'vendor', value });
+              //   }
+              // },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="馬達支撐架"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: opttions_motorSupportStand,
+              value: value_motorSupportStand,
+              onChange: (option) => {
+                setState({ hasMotorSupportStand: option?.value === 'true' });
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="馬達鎖盒"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_motorLockBox,
+              value: value_motorLockBox,
+              isSearchable: true,
+              onChange: (option) => {
+                setState({ motorLockBox: option?.value ?? '' });
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // =====================================================================
 // =====================================================================
 // =====================================================================
@@ -1792,6 +2123,9 @@ export {
   Form_product_other,
   //
   Form_specialProd_basic,
+  Form_specialProd_location,
+  Form_specialProduct_ABCD,
+  Form_specialProduct_motor,
 };
 
 export { WorksheetTable };

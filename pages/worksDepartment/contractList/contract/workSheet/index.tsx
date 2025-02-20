@@ -77,8 +77,15 @@ import { useShallow } from 'zustand/react/shallow';
 import WorksheetForm from './WorksheetForm';
 
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
-
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
+
+import {
+  Form_specialProd_basic,
+  Form_specialProd_location,
+  Form_specialProduct_ABCD,
+  Form_specialProduct_motor,
+} from 'components/page/worksDepartment/worksheet/productForm/productForm';
+import * as FormLayout from 'components/page/worksDepartment/worksheet/productForm/productFormLayout';
 
 // ====================================================================
 
@@ -190,6 +197,13 @@ export default function Worksheet({
       getFloorLocations: state.getFloorLocations,
     }))
   );
+
+  // -------------------------------------------------------------------------
+
+  const { state_specialDoor, setState_specialDoor } = useSpecialDoor({
+    activeRecordData,
+    disabled,
+  });
 
   // -------------------------------------------------------------------------
 
@@ -725,6 +739,8 @@ export default function Worksheet({
                 activeWorksheetOriginalAccessories={activeWorksheetOriginalAccessories}
                 reqPatchWorkSheet={reqPatchWorkSheet}
                 disabled={disabled}
+                state_specialDoor={state_specialDoor}
+                setState_specialDoor={setState_specialDoor}
               />
             )}
           </div>
@@ -761,12 +777,18 @@ const TheWorksheetForm = ({
   disabled,
   activeWorksheetId,
   activeWorksheetOriginalAccessories,
+
+  state_specialDoor,
+  setState_specialDoor,
 }: {
   activeRecordData: TworksheetRecordDto_addition | undefined;
   reqPatchWorkSheet: () => void;
   disabled: boolean;
   activeWorksheetId: string | undefined;
   activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[];
+
+  state_specialDoor: Tstate_specialDoor;
+  setState_specialDoor: React.Dispatch<React.SetStateAction<Tstate_specialDoor>>;
 }) => {
   const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
 
@@ -799,6 +821,16 @@ const TheWorksheetForm = ({
 
   if (!doorModelDict) {
     return null;
+  }
+
+  if (isSpecialDoor) {
+    return (
+      <WorksheetForm_specialDoor
+        disabled={disabled}
+        state_specialDoor={state_specialDoor}
+        setState_specialDoor={setState_specialDoor}
+      />
+    );
   }
 
   return <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />;
@@ -1077,13 +1109,15 @@ const useControl_pdf = ({
 
 // ===========================================================================
 
-type state_specialDoor = {
+type Tstate_specialDoor = {
   // 項目名
   readonly itemName: string;
   // 報價別
   readonly quoteType: string;
   // 門型
   readonly doorModelName: string;
+
+  readonly qty: number;
 
   // L(mm)全寬
   fullWidth: `${number}` | '';
@@ -1115,13 +1149,13 @@ type state_specialDoor = {
   motorPhase: 1 | 3 | null;
 
   // 馬達支撐架
-  hasMotorSupportStand: boolean | null;
+  hasMotorSupportStand: boolean;
   // 底座類型
   bottomBar: string;
   // 馬達鎖盒
   motorLockBox: string;
   // 門軌厚度
-  guideRailThickness: string;
+  guideRailThickness: `${number}` | '';
   // 門軌消音條
   hasSilencingStrip: boolean;
   // 一體式捲箱
@@ -1208,33 +1242,129 @@ type state_specialDoor = {
   isULGuideRail: boolean;
 
   // 門編號
-  serialNumber: string | null;
+  serialNumberArr: string[];
   // 樓層
-  floor: string | null;
+  floor: string;
   // 區域位置
-  locationArea: string | null;
+  locationArea: string;
 };
 
-const useSpecialDoor = ({ activeRecordData }: { activeRecordData: TworksheetRecordDto_addition | undefined }) => {};
+// MARK:useSpecialDoor
+const useSpecialDoor = ({
+  activeRecordData,
+  disabled,
+}: {
+  activeRecordData: TworksheetRecordDto_addition | undefined;
+  disabled: boolean;
+}) => {
+  const defaultState = useDefaultState_specialDoor({
+    // quotationProductItem: activeRecordData?.contractProductItems?.[0],
+    contractProductItems: activeRecordData?.contractProductItems,
+    qty: activeRecordData?.contractProductItems?.length ?? 0,
+  });
+
+  const [state_specialDoor, setState_specialDoor] = useState<Tstate_specialDoor>(defaultState);
+
+  useEffect(() => {
+    setState_specialDoor(defaultState);
+  }, [defaultState, disabled]);
+
+  return { state_specialDoor, setState_specialDoor };
+};
 
 const useDefaultState_specialDoor = ({
-  quotationProductItem,
+  contractProductItems,
+  qty,
 }: {
-  quotationProductItem: TquotationProductItemDto | undefined;
+  // quotationProductItem: TquotationProductItemDto | undefined;
+  contractProductItems: TquotationProductItemDto[] | undefined;
+  qty: number;
 }) => {
-  if (!quotationProductItem) {
-    return emptyState_specialDoor();
-  }
-  // fullWidth: `${quotationProductItem.fullWidth}`,
+  const defaultState: Tstate_specialDoor = useMemo(() => {
+    if (!contractProductItems || contractProductItems.length === 0) {
+      return emptyState_specialDoor();
+    }
 
-  // const defaultState: state_specialDoor = {};
+    const quotationProductItem = contractProductItems[0];
+
+    const defaultState: Tstate_specialDoor = {
+      itemName: quotationProductItem.itemName,
+      quoteType: quotationProductItem.quoteType,
+      doorModelName: quotationProductItem.doorModelName,
+      qty: qty,
+
+      fullWidth: `${quotationProductItem.fullWidth}`,
+      WG: `${quotationProductItem.WG}`,
+      height: `${quotationProductItem.height}`,
+      boxB: `${quotationProductItem.boxB}`,
+      boxD: `${quotationProductItem.boxD ?? ''}`,
+      area: `${quotationProductItem.area ?? ''}` as `${number}` | '',
+      volume: `${quotationProductItem.volume ?? ''}` as `${number}` | '',
+      materialName: quotationProductItem.materialName,
+      materialSurface: quotationProductItem.materialSurface ?? '',
+      guideRail: quotationProductItem.guideRail ?? '',
+      horsepower: quotationProductItem.horsepower,
+      motorVendor: quotationProductItem.motorVendor ?? '',
+      motorVoltage: quotationProductItem.motorVoltage as 110 | 380 | null,
+      motorPhase: quotationProductItem.motorPhase as 1 | 3 | null,
+      hasMotorSupportStand: !!quotationProductItem.hasMotorSupportStand,
+      bottomBar: quotationProductItem.bottomBar ?? '',
+      motorLockBox: quotationProductItem.motorLockBox ?? '',
+      guideRailThickness: `${quotationProductItem.guideRailThickness ?? ''}` as `${number}` | '',
+      hasSilencingStrip: !!quotationProductItem.hasSilencingStrip,
+      isIntegratedHeadBox: !!quotationProductItem.isIntegratedHeadBox,
+      headBoxThickness: `${quotationProductItem.headBoxThickness ?? ''}` as `${number}` | '',
+      isAntiTyphoon: !!quotationProductItem.isAntiTyphoon,
+      bounceDoor: !!quotationProductItem.bounceDoor,
+      bounceDoorWidth: `${quotationProductItem.bounceDoorWidth ?? ''}` as `${number}` | '',
+      bounceDoorHeight: `${quotationProductItem.bounceDoorHeight ?? ''}` as `${number}` | '',
+      bounceDoorLength: `${quotationProductItem.bounceDoorLength ?? ''}` as `${number}` | '',
+      closingType: quotationProductItem.closingType ?? '',
+      bottomBarAngleIron: quotationProductItem.bottomBarAngleIron ?? '',
+      bottomBarPlate: quotationProductItem.bottomBarPlate ?? '',
+      thickness: `${quotationProductItem.thickness ?? ''}` as `${number}` | '',
+      slatCount: `${quotationProductItem.slatCount ?? ''}` as `${number}` | '',
+      diameter: `${quotationProductItem.diameter ?? ''}` as `${number}` | '',
+      bearingHousingTotalLength: `${quotationProductItem.bearingHousingTotalLength ?? ''}` as `${number}` | '',
+      guideRailsOpening: quotationProductItem.guideRailsOpening ?? '',
+      slatLength: `${quotationProductItem.slatLength ?? ''}` as `${number}` | '',
+      guideRailLength: `${quotationProductItem.guideRailLength ?? ''}` as `${number}` | '',
+      headBoxLength: `${quotationProductItem.headBoxLength ?? ''}` as `${number}` | '',
+      bearingHousingSize: `${quotationProductItem.bearingHousingSize ?? ''}` as `${number}` | '',
+      bearingName: quotationProductItem.bearingName ?? '',
+      gapA: `${quotationProductItem.gapA ?? ''}` as `${number}` | '',
+      gapC: `${quotationProductItem.gapC ?? ''}` as `${number}` | '',
+      gearNumber: quotationProductItem.gearNumber ?? '',
+      weight: `${quotationProductItem.weight ?? ''}` as `${number}` | '',
+      headBoxFront: quotationProductItem.headBoxFront ?? '',
+      headBoxAngleIronQuantity: `${quotationProductItem.headBoxAngleIronQuantity ?? ''}` as `${number}` | '',
+      sidePlateChain: quotationProductItem.sidePlateChain ?? '',
+      sidePlateDirection: quotationProductItem.sidePlateDirection ?? '',
+      electricMotorChainType: quotationProductItem.electricMotorChainType ?? '',
+      electricMotorDirection: quotationProductItem.electricMotorDirection ?? '',
+      guideRailType: quotationProductItem.guideRailType ?? '',
+      bottomBarSurface: quotationProductItem.bottomBarSurface ?? '',
+      guideRailSurface: quotationProductItem.guideRailSurface ?? '',
+      guideRailG: `${quotationProductItem.guideRailG ?? ''}` as `${number}` | '',
+      isULGuideRail: !!quotationProductItem.isULGuideRail,
+      serialNumberArr: contractProductItems.map((item) => item.serialNumber ?? ''),
+      floor: quotationProductItem.floor ?? '',
+      locationArea: quotationProductItem.locationArea ?? '',
+    };
+
+    return defaultState;
+  }, [contractProductItems]);
+
+  return defaultState;
 };
 
-const emptyState_specialDoor = (): state_specialDoor => {
-  const state: state_specialDoor = {
+const emptyState_specialDoor = (): Tstate_specialDoor => {
+  const state: Tstate_specialDoor = {
     itemName: '',
     quoteType: '',
     doorModelName: '',
+    qty: 0,
+
     fullWidth: '',
     WG: '',
     height: '',
@@ -1249,7 +1379,7 @@ const emptyState_specialDoor = (): state_specialDoor => {
     motorVendor: '',
     motorVoltage: null,
     motorPhase: null,
-    hasMotorSupportStand: null,
+    hasMotorSupportStand: false,
     bottomBar: '',
     motorLockBox: '',
     guideRailThickness: '',
@@ -1289,14 +1419,58 @@ const emptyState_specialDoor = (): state_specialDoor => {
     guideRailSurface: '',
     guideRailG: '',
     isULGuideRail: false,
-    serialNumber: null,
-    floor: null,
-    locationArea: null,
+    serialNumberArr: [],
+    floor: '',
+    locationArea: '',
   };
 
   return state;
 };
 
-const WorksheetForm_specialDoor = () => {
-  return <div></div>;
+const WorksheetForm_specialDoor = ({
+  //
+  disabled,
+  state_specialDoor,
+  setState_specialDoor,
+}: {
+  disabled: boolean;
+  state_specialDoor: Tstate_specialDoor;
+  setState_specialDoor: React.Dispatch<React.SetStateAction<Tstate_specialDoor>>;
+}) => {
+  const { Container, Section, MainFormWrapper, FormGrid } = FormLayout;
+
+  type TsetStateAction = Partial<Tstate_specialDoor> | ((prev: Tstate_specialDoor) => Partial<Tstate_specialDoor>);
+
+  const setState = (action: TsetStateAction) => {
+    setState_specialDoor((prev) => ({
+      ...prev,
+      ...(typeof action === 'function' ? action(prev) : action),
+    }));
+  };
+
+  const props = {
+    state: state_specialDoor,
+    setState,
+    disabled,
+  };
+
+  return (
+    <Container>
+      <div>
+        <Section>位置與編號：</Section>
+        <Form_specialProd_location {...props} />
+      </div>
+      <div>
+        <Section>設定產品基本規格：</Section>
+        <Form_specialProd_basic {...props} />
+      </div>
+      <div>
+        <Section>設定產品細部規格：</Section>
+        <FormGrid>
+          <Form_specialProduct_ABCD {...props} />
+          <Form_specialProduct_motor {...props} />
+        </FormGrid>
+      </div>
+    </Container>
+  );
 };
