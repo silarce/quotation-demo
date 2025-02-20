@@ -1,11 +1,3 @@
-// 工作表
-
-// 為了使用useControl_pdf，在useGetContract_id的populate中
-// 設置了
-// 'worksheet.latestRecord.contractProductItems.components'
-// 'worksheet.latestRecord.contractProductItems.accessories'
-// 未來可能會有效能的問題，之後要找時間處理
-
 import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -25,30 +17,12 @@ import WorkSheetProfile, {
   Tcontrol_profile,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
 
-// import WorkSheetProdCard, {
-//   Tcontrol_prodCard,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProdCard';
-
 import ProductCard, {
   Tcontrol_productCard,
   TworksheetIntro,
 } from 'components/page/worksDepartment/worksheet/productCard';
 import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
 
-// import WorkSheetProductOutline, {
-//   Tcontrol_productOutline,
-//   ToldProductOutline,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductOutline';
-// import WorkSheetProductDetail01, {
-//   Tcontrol_detail,
-//   Tcontrol_ABCD,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail01';
-// import WorkSheetOptional, {
-//   Tcontrol_optional,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetOptional';
-// import WorkSheetProductDetail02, {
-//   Tcontrol_detail02,
-// } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProductDetail02';
 import WorkSheetPDF, {
   Tcontrol_workSheetPDF_01,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
@@ -59,41 +33,22 @@ import WorkSheetPDF_02, {
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpleModal/inputModal_v2';
-import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-import MultButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
 
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import {
-  // TupdateWorkSheetItem,
   TcreateWorksheetDto,
-  // TupdateWorkSheet,
-  // useGetEngineeringContact,
-  // useGetWorkSheet,
-  // apiPatchWorkSheetProducts,
-  // apiDeleteWorkSheetItem,
   apiPostWorkSheet,
   apiDeleteWorksheet,
   useGetWorksheet_id,
   apiPatchWorkSheetProducts,
   useApiGetWorksheetRecord_id,
-  // apiPatchWorksheetRecordSubmit,
-  // apiPatchWorksheetRecordReview,
 } from 'js/api/api_engineering';
-
-import { useApiGetProdDoorModels } from 'js/api/api_product';
 
 // import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
 
 // hook
-import {
-  TdoorComponentType_old,
-  TupdateQuotationProductComponentDto_old,
-  TquotationProductComponentDto_old,
-  TcreateQuotationProductComponentDto_old,
-  TquotationProductItemDto_old,
-} from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import { TquotationProductItemDto_old } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
@@ -126,6 +81,8 @@ import WorksheetForm from './WorksheetForm';
 
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
+
 // ====================================================================
 
 type Tquery = {
@@ -135,18 +92,6 @@ type Tquery = {
   activedProdId?: string | undefined;
   activeRecordId?: string | undefined;
 };
-
-// ====================================================================
-
-// const SelectorGroup = selectModalCreator_multi<['employee']>({
-//   selectorArr: [
-//     {
-//       key: 'employee',
-//       caption: '請選擇審核業務',
-//       limit: 1,
-//     },
-//   ],
-// });
 
 // ====================================================================
 
@@ -160,6 +105,8 @@ export default function Worksheet({
   userInfo: TuserDto;
 }) {
   const { req_reviewBack, req_backThanAdd } = useGlobal_review();
+
+  const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
 
   // ----------------------------------------------------------------
   const ref_main = useRef<HTMLDivElement>(null!);
@@ -188,45 +135,29 @@ export default function Worksheet({
   const [isLoading, setIsLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
-  // const [activeWorksheetId, setActiveWorksheetId] = useState<string | undefined>(undefined);
   const [inputModalProps, setInputModalProps] = useState<Pick<TinputModalProps, 'onConfirm' | 'title'>>();
-
-  // const [activeWorksheetOriginalAccessories, setActiveWorksheetOriginalAccessories] = useState<
-  //   TquotationProductAccessoryDto[]
-  // >([]);
-
-  // const [activedProdId, setActivedProdId] = useState<string>();
 
   const [isShowPdf, setIsShowPdf] = useState(false);
   const [isShowPdf02, setIsShowPdf02] = useState(false);
 
   // -------------------------------------------------------------------------
 
-  // const [activeRecordId, setActiveRecordId] = useState<string | undefined>(undefined);
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
-
-  // const [showReviewerSelector, setShowReviewerSelector] = useState(false);
-
-  // const [showReviewModal, setShowReviewModal] = useState<boolean>();
-
-  // -------------------------------------------------------------------------
-
-  // let isReviewer = false;
 
   // -------------------------------------------------------------------------
   const { data: contract, update: update_contract } = useGetContract_id(contractId, {
     customPopulate: [
-      //
       'content.customer',
       'engineeringContact',
       'worksheet.latestRecord.reviewSalesEmployee',
       'worksheet.latestRecord.reviewManagerEmployee',
+      // 為了使用useControl_pdf，在useGetContract_id的populate中
+      // 設置了
+      // 'worksheet.latestRecord.contractProductItems.components'
+      // 'worksheet.latestRecord.contractProductItems.accessories'
+      // 未來可能會有效能的問題
       'worksheet.latestRecord.contractProductItems.components',
       'worksheet.latestRecord.contractProductItems.accessories',
-      // 'worksheet.records.reviewSalesEmployee',
-      // 'worksheet.records.reviewManagerEmployee',
-      // 'worksheet.records.contractProductItems.components',
-      // 'worksheet.records.contractProductItems.accessories',
     ],
     addintion_latestRecordReview: true,
   });
@@ -240,8 +171,6 @@ export default function Worksheet({
     recordsWithReview: true,
   });
 
-  const { doorModelList, update: update_doorModel, checkIsSpecialDoor } = useApiGetProdDoorModels();
-
   // -------------------------------------------------------------------------
 
   const {
@@ -250,25 +179,6 @@ export default function Worksheet({
     isLoading: isLoading_activeRecord,
     clear: clear_activeRecord,
   } = useApiGetWorksheetRecord_id(activeRecordId, { addition_reviewArr: true });
-
-  const {
-    // reviewSalesEmployeeId = null,
-    // reviewSalesEmployee = null,
-    // toReviewSales = null,
-    // salesReviewAt = null,
-    // reviewManagerEmployeeId = null,
-    // reviewManagerEmployee = null,
-    // toReviewManager = null,
-    // managerReviewAt = null,
-  } = activeRecordData ?? {};
-
-  // if (toReviewManager && reviewManagerEmployee?.id === userId) {
-  //   isReviewer = true;
-  // }
-
-  // if (toReviewSales && reviewSalesEmployee?.id === userId) {
-  //   isReviewer = true;
-  // }
 
   const activedProd = useMemo(() => {
     return finalProduct.find((prod) => prod.id === activedProdId);
@@ -287,14 +197,6 @@ export default function Worksheet({
       getFloorLocations: state.getFloorLocations,
     }))
   );
-
-  // const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
-  //   useShallow((state) => ({
-  //     shouldCalcData: state.shouldCalcData,
-  //     shouldCalcData2: state.shouldCalcData2,
-  //     calcData_2: state.calcData_2,
-  //   }))
-  // );
 
   // -------------------------------------------------------------------------
 
@@ -417,51 +319,10 @@ export default function Worksheet({
 
     try {
       await req_backThanAdd(body);
-      // await apiGetReviewBack(activeRecordId, { showSuccess: false, returnReject: true });
-      // await apiAddReview(body);
     } catch (error) {}
 
     await refreshData();
-
-    // if (!activeRecordId) {
-    //   return;
-    // }
-
-    // try {
-    //   await apiPatchWorksheetRecordSubmit(activeRecordId, {
-    //     reviewSalesEmployeeId: employeeId,
-    //   });
-    //   setShowReviewerSelector(false);
-    //   await refreshData();
-    // } catch (error) {}
   };
-
-  // const rewSubmitWorksheet = async (employeeId: string) => {
-  //   if (!activeRecordId) {
-  //     return;
-  //   }
-
-  //   try {
-  //     await apiPatchWorksheetRecordSubmit(activeRecordId, {
-  //       reviewSalesEmployeeId: employeeId,
-  //     });
-  //     setShowReviewerSelector(false);
-  //     await refreshData();
-  //   } catch (error) {}
-  // };
-
-  // 審核
-  // const reqReviewWorksheet = async (isPass: boolean) => {
-  //   if (!activeRecordId) {
-  //     return;
-  //   }
-
-  //   try {
-  //     await apiPatchWorksheetRecordReview(activeRecordId, { isPass });
-  //     await refreshData();
-  //     setShowReviewModal(false);
-  //   } catch (error) {}
-  // };
 
   // -------------------------------------------------------------------------
 
@@ -474,7 +335,7 @@ export default function Worksheet({
         //
         update_contract(),
         update_finalProduce(),
-        update_doorModel(),
+        // update_doorModel(),
       ]);
       setIsLoading(false);
     })();
@@ -517,15 +378,15 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
   const { control_productCardArr, latestRecordArr } = useMemo(() => {
-    if (!doorModelList) {
-      return {
-        control_productCardArr: [],
-        latestRecordArr: [],
-      };
-    }
-
     const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
     const latestRecordArr: TworksheetRecordDto[] = [];
+
+    if (!doorModelDict) {
+      return {
+        control_productCardArr,
+        latestRecordArr,
+      };
+    }
 
     const worksheetList: { [id: string]: TworksheetDto } = {};
 
@@ -571,13 +432,6 @@ export default function Worksheet({
         const {
           contractProductItems,
 
-          // reviewSalesEmployee,
-          // toReviewSales,
-          // salesReviewAt,
-
-          // reviewManagerEmployee,
-          // toReviewManager,
-          // managerReviewAt,
           addition: { reviewArr } = {},
         } = latestRecord;
 
@@ -585,18 +439,6 @@ export default function Worksheet({
 
         const width_m = new Decimal(contractProductItem?.fullWidth ?? 0).div(1000).toString();
         const height_m = new Decimal(contractProductItem?.height ?? 0).div(1000).toString();
-
-        // let reviewStatus: TworksheetIntro['reviewStatus'] = {
-        //   label: `業務 ${reviewSalesEmployee?.chName ?? ''}`,
-        //   dotColor: salesReviewAt ? 'green' : toReviewSales ? 'red' : 'gray',
-        // };
-
-        // if (toReviewManager) {
-        //   reviewStatus = {
-        //     label: `總經理 ${reviewManagerEmployee?.chName}`,
-        //     dotColor: managerReviewAt ? 'green' : 'red',
-        //   };
-        // }
 
         const reviewStatus = (() => {
           const reviewStatus: TworksheetIntro['reviewStatus'] = {
@@ -631,13 +473,6 @@ export default function Worksheet({
           isActive: activeWorksheetId === worksheet.id,
           reviewStatus,
           onClick: () => {
-            // setActiveWorksheetId(worksheet.id);
-
-            // setActiveWorksheetOriginalAccessories(prod.items?.[0].accessories ?? []);
-            // setActivedProdId(prod.id);
-
-            // setActiveRecordId(undefined);
-
             router.replace({
               query: {
                 ...query,
@@ -708,7 +543,7 @@ export default function Worksheet({
       });
     });
 
-    return { control_productCardArr, latestRecordArr, doorModelList };
+    return { control_productCardArr, latestRecordArr, doorModelDict };
     //
   }, [activeWorksheetId, finalProduct, worksheetArr]);
 
@@ -721,12 +556,7 @@ export default function Worksheet({
     const recordArr: Trecord[] = records.map((record, index) => {
       const {
         contractProductItems,
-        // reviewSalesEmployee,
-        // toReviewSales,
-        // salesReviewAt,
-        // reviewManagerEmployee,
-        // toReviewManager,
-        // managerReviewAt,
+
         agentEmployee, // 開立
         addition: { reviewArr } = {},
       } = record;
@@ -747,22 +577,6 @@ export default function Worksheet({
       const fullWidth_m = new Decimal(fullWidth).div(1000).toString();
       const height_m = new Decimal(height).div(1000).toString();
 
-      // let reviewSalesStatus: Trecord['reviewSalesStatus'] = 'gray';
-
-      // if (salesReviewAt) {
-      //   reviewSalesStatus = 'green';
-      // } else if (toReviewSales) {
-      //   reviewSalesStatus = 'red';
-      // }
-
-      // let reveiwManagerStatus: Trecord['reveiwManagerStatus'] = 'gray';
-
-      // if (managerReviewAt) {
-      //   reveiwManagerStatus = 'green';
-      // } else if (toReviewManager) {
-      //   reveiwManagerStatus = 'red';
-      // }
-
       const control_record: Trecord = {
         itemName,
         doorModel: doorModelName ?? '',
@@ -772,17 +586,11 @@ export default function Worksheet({
         material: materialName,
         isAntiTyphoon: isAntiTyphoon ?? false,
 
-        // reviewSalesName: reviewSalesEmployee?.chName ?? '',
-        // reviewSalesStatus,
-        // reviewManagerName: reviewManagerEmployee?.chName ?? '',
-        // reveiwManagerStatus,
         agent: agentEmployee?.chName ?? '',
 
         reviewFlowData: reviewArr,
 
         onDetailClick: () => {
-          // setActiveRecordId(record.id);
-          // setQuery('activeRecordId', record.id);
           router.replace({
             query: {
               ...query,
@@ -812,15 +620,11 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  // -------------------------------------------------------------------------
-
   let panelList_notAllow: TpanelList = [
     {
       type: 'myButton',
       label: '關閉工作表',
       onClick: () => {
-        // setActiveRecordId(undefined);
-        // setQuery('activeRecordId', undefined);
         router.replace({
           query: {
             ...query,
@@ -838,7 +642,6 @@ export default function Worksheet({
       type: 'redButton',
       label: '送審',
       onClick: () => {
-        // setShowReviewerSelector(true);
         const { destroy } = ReviewFlowSelector.open2({
           userId,
           onConfirm: ({ reviewFlowId, purpose }) => {
@@ -853,16 +656,6 @@ export default function Worksheet({
       },
     });
   }
-
-  // if (isLastestRecord && isReviewer) {
-  //   panelList_notAllow.splice(-1, 0, {
-  //     type: 'myButton',
-  //     label: '審核',
-  //     onClick: () => {
-  //       setShowReviewModal(true);
-  //     },
-  //   });
-  // }
 
   if (isLastestRecord) {
     panelList_notAllow.splice(-1, 0, {
@@ -961,42 +754,6 @@ export default function Worksheet({
       />
       <WorkSheetPDF isShow={isShowPdf} onCancel={() => setIsShowPdf(false)} control={control_workSheetPDF_01} />
       <WorkSheetPDF_02 isShow={isShowPdf02} onCancel={() => setIsShowPdf02(false)} control={control_workSheetPDF_02} />
-
-      {/* <SelectorGroup
-        showModal={showReviewerSelector}
-        onConfirm={(arr) => {
-          const employee = arr[0][0];
-
-          if (employee) {
-            rewSubmitWorksheet(employee.id);
-          } else {
-            myAlert.info({ title: '請選擇審核人員' });
-          }
-        }}
-        onCancel={() => setShowReviewerSelector(false)}
-      /> */}
-
-      {/* <MultButtonModal
-        visible={!!showReviewModal}
-        text={'是否通過審核?'}
-        onCancel={() => setShowReviewModal(undefined)}
-        modalWidth={600}
-        btnPropsArr={[
-          {
-            label: '通過審核',
-            theme: 'danger',
-            onClick: () => reqReviewWorksheet(true),
-          },
-          {
-            label: '不通過審核',
-            onClick: () => reqReviewWorksheet(false),
-          },
-          {
-            label: '取消',
-            onClick: () => setShowReviewModal(undefined),
-          },
-        ]}
-      /> */}
     </SubLayer>
   );
 }
