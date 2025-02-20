@@ -291,6 +291,45 @@ export default function WareHouseList() {
         }
     };
 
+    const DeleteWareHouseById = async (item: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                id: item.id,
+                employee_id: userInfo?.employee?.id
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'DeleteWareHouseById',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(inputModel);
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/DeleteWareHouseById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const result = await response.json();
+            if (result?.success) {
+                myAlert.success({ title: result.message })
+                GetWareHouse();
+                GetWareHouseType();
+            } else {
+                myAlert.err({ title: '刪除失敗' })
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
     // 點擊處理函數
@@ -336,6 +375,18 @@ export default function WareHouseList() {
         });
     };
 
+    const handleDelete = async (index: any, item: any) => {
+        myAlert.confirm({
+            title: '確定刪除嗎?',
+            props: {
+                onOk: () => {
+                    DeleteWareHouseById(item);
+                }
+            }
+        });
+
+    }
+
     return (
 
         <SubLayer isLoading_subLayer={isLoading}>
@@ -358,14 +409,7 @@ export default function WareHouseList() {
                                 >
                                     <span>
                                         <button onClick={() => {
-                                            myAlert.confirm({
-                                                title: '確定刪除嗎?',
-                                                props: {
-                                                    onOk: () => {
-                                                        handleEdit(index, _item)
-                                                    }
-                                                }
-                                            });
+                                            handleDelete(index, _item);
                                         }}
                                             style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
                                             <img src={icon_delete.src} alt="add" style={{ width: '30px', height: '20px' }} />
