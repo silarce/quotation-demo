@@ -67,6 +67,7 @@ export default function WareHouseList() {
     const { type, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
 
     const [data, setData] = useState<any[]>([]);
+    const [typedata, setTypeData] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     const status = router.query.status as TquotationStatus;
@@ -76,7 +77,7 @@ export default function WareHouseList() {
 
     const urlRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
-
+    const selectRefs = useRef<(HTMLSelectElement | null)[]>([]);
 
     const searchTargetList = [
         {
@@ -90,9 +91,9 @@ export default function WareHouseList() {
         doSearch: (arr: any) => {
             const keyword = arr[0] as string;
             if (keyword === '' || keyword === undefined) {
-                fetchData();
+                GetWareHouse();
             } else {
-                searchData(keyword);
+                SearchWareHouseByID(keyword);
             }
         }
     };
@@ -117,14 +118,15 @@ export default function WareHouseList() {
     useEffect(() => {
         // setting.apipath = process.env.NEXT_PUBLIC_API_NETCORE_URL || '';
         // setting.apipath = "https://localhost:44383";
-        fetchData();
-        console.log(`${process.env.NEXT_PUBLIC_API_NETCORE_URL}`);
+        GetWareHouse();
+        GetWareHouseType();
+        // console.log(`${process.env.NEXT_PUBLIC_API_NETCORE_URL}`);
     }, []);
 
 
 
     //call api
-    const fetchData = async () => {
+    const GetWareHouse = async () => {
         try {
             setIsLoading(true);
             // const response = await fetch('YOUR_C#_API_ENDPOINT');
@@ -145,7 +147,7 @@ export default function WareHouseList() {
         }
     };
 
-    const searchData = async (keyword: string) => {
+    const SearchWareHouseByID = async (keyword: string) => {
         try {
             // 傳給api的參數JSON
             const conditionModel = {
@@ -182,8 +184,8 @@ export default function WareHouseList() {
             const conditionModel = {
                 id: item.id,
                 note: item.note,
-                employee_id: userInfo?.employee?.id
-
+                employee_id: userInfo?.employee?.id,
+                type: item.type
             };
 
             var inputModel = {
@@ -217,7 +219,8 @@ export default function WareHouseList() {
                 // myAlert.success({ title: '成功', content: result.message });
                 myAlert.success({ title: result.message });
                 setEditlist(false);
-                fetchData();
+                GetWareHouse();
+                GetWareHouseType();
 
             } else {
                 // 失敗，顯示錯誤提示
@@ -256,6 +259,76 @@ export default function WareHouseList() {
             },
         });
     }
+
+    const GetWareHouseType = async () => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'GetWareHouseType',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(inputModel);
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWareHouseType?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+            setTypeData(data);
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    const DeleteWareHouseById = async (item: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                id: item.id,
+                employee_id: userInfo?.employee?.id
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'DeleteWareHouseById',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(inputModel);
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/DeleteWareHouseById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const result = await response.json();
+            if (result?.success) {
+                myAlert.success({ title: result.message })
+                GetWareHouse();
+                GetWareHouseType();
+            } else {
+                myAlert.err({ title: '刪除失敗' })
+            }
+
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
 
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
@@ -302,6 +375,18 @@ export default function WareHouseList() {
         });
     };
 
+    const handleDelete = async (index: any, item: any) => {
+        myAlert.confirm({
+            title: '確定刪除嗎?',
+            props: {
+                onOk: () => {
+                    DeleteWareHouseById(item);
+                }
+            }
+        });
+
+    }
+
     return (
 
         <SubLayer isLoading_subLayer={isLoading}>
@@ -323,8 +408,15 @@ export default function WareHouseList() {
                                 // onClick={() => getTrayByWareHouse(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
                                 >
                                     <span>
-                                        <button onClick={() => { handleEdit(index, _item) }}>
-                                            <img src={icon_edit.src} alt="cancel" style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}`, width: '30px', height: '20px' }} />
+                                        <button onClick={() => {
+                                            handleDelete(index, _item);
+                                        }}
+                                            style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
+                                            <img src={icon_delete.src} alt="add" style={{ width: '30px', height: '20px' }} />
+                                        </button>
+                                        <button onClick={() => { handleEdit(index, _item) }}
+                                            style={{ display: `${(index === editlistindex && editlist === true) ? 'none' : ''}` }}>
+                                            <img src={icon_edit.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                         </button>
                                         <button onClick={() => { handleUpdate(index, _item) }} style={{ display: `${(index === editlistindex && editlist === true) ? '' : 'none'}` }}>
                                             <img src={icon_fc_check.src} alt="add" style={{ width: '30px', height: '20px' }} />
@@ -334,7 +426,36 @@ export default function WareHouseList() {
                                         </button>
                                     </span>
                                     <span>{_item.whname}</span>
-                                    <span>{_item.type}</span>
+                                    <span style={{ textAlign: 'left' }}>
+                                        <select
+                                            ref={(el) => (selectRefs.current[index] = el)} // 正確對應到 HTMLSelectElement
+                                            style={{
+                                                backgroundColor: 'transparent',
+                                                borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                width: '100%',
+                                                border: '0px',
+                                                outline: 'none'
+                                            }}
+                                            disabled={!(editlist && editlistindex === index)} // 非編輯模式下禁用
+                                            value={editlist && editlistindex === index ? _item.type : _item.type} // 設定選中值
+                                            onChange={(e) => {
+                                                const newData = [...data];
+                                                const newType = e.target.value; // 取得選中的值
+                                                newData[index] = {
+                                                    ...newData[index],
+                                                    type: newType, // 更新 type 值
+                                                };
+                                                setData(newData); // 更新狀態
+                                            }}
+                                        >
+                                            {/* 從 typedata 動態渲染選項 */}
+                                            {typedata.map((type: any) => (
+                                                <option key={type.id} value={type.name}>
+                                                    {type.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </span>
                                     <span>
                                         <input
                                             ref={noteRefs.current[index]}
