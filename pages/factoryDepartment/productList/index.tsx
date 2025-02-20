@@ -1074,10 +1074,10 @@ export default function ProductList() {
             myAlert.warning({ title: '物料編號已經存在' })
             return;
         }
-        if (addproductid.length < 14) {
-            myAlert.warning({ title: '料號不符合編碼原則，請重新編碼' })
-            return;
-        }
+        // if (addproductid.length < 14) {
+        //     myAlert.warning({ title: '料號不符合編碼原則，請重新編碼' })
+        //     return;
+        // }
         // 顯示確認對話框
         myAlert.confirm({
             title: '確定要新增物料嗎?',
