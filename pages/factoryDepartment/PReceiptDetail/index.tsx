@@ -2024,31 +2024,6 @@ export default function PReceiptDetail() {
                                                 },
                                             }}
                                         />
-                                        {/* <InputSel
-                                            {...inputSelProps}
-                                            caption="申請部門"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: userInfo?.employee?.jobs[0].department.name
-                                                },
-                                            }}
-                                        /> */}
-                                        {/* <InputSel
-                                            caption="需用日期"
-                                            className="global_tip_must"
-                                            disabled={!isEditing}
-                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            datePickerProps={{
-                                                props: {
-                                                    value: need_datein ? moment(need_datein) : null,
-                                                    onChange: (e) => { setNeed_datein(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
-                                                },
-                                            }}
-                                        /> */}
 
                                     </div>
                                     <div>

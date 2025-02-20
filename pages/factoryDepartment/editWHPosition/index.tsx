@@ -53,12 +53,21 @@ export interface WHPositionModel {
 
 
 export default function EditWHPosition() {
-    // 路由傳進來的
-    const router = useRouter();
-    const { type, whid, trayname, whname, id, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    //#region ===========【頁面參數】
 
+    //#endregion
+
+    //#region ===========【路由參數】
+    const router = useRouter();
+    const { whid, trayname, whname, id, traycalled, traycalledname, traytransfer, whnamecalled } = router.query;
+    //#endregion
+
+    //#region ===========【登入者】
     const { userInfo } = useContext(AppContext);
-    //備分原本model
+    const { erpFeature } = useContext(AppContext);
+    //#endregion
+
+    //#region ===========【變數宣告】
     const [productdata, setProductdata] = useState<any[]>([]);
     const [data, setData] = useState<WHPositionModel>([]);
     const [data1, setData1] = useState<WHPositionModel>([]);
@@ -66,9 +75,6 @@ export default function EditWHPosition() {
     const [error, setError] = useState<string | null>(null);
     const [hoverInfo, setHoverInfo] = useState<string | null>(null);
     const [canedit, setCanEdit] = useState<boolean | undefined>(false);
-    // const [traycalledin, setTrayCalled] = useState<boolean | undefined>(false);
-    // const [traycallednamein, setTrayCalledName] = useState<string | undefined>("");
-    // const [traytransferin, setTrayTransfer] = useState<boolean | undefined>(false);
     const [data12, setData12] = useState<any[]>([]);
 
 
@@ -117,9 +123,9 @@ export default function EditWHPosition() {
     const [currentchildlength, setCurrentchildlength] = useState<string>("");
     const [currentchildwidth, setCurrentchildwidth] = useState<string>("");
 
+    //#endregion
 
-    //#region 右側功能按鈕區塊
-    // const panelList: TpanelList = [
+    //#region ===========【上方功能列】
     //還沒編輯前功能紐
     const panelList_unedit: TpanelList = canedit ? [
         {
@@ -165,7 +171,6 @@ export default function EditWHPosition() {
             label: '返回',
             onClick: () => {
                 router.push({
-                    // pathname: `/factoryDepartment/whPositionList`,
                     pathname: `/factoryDepartment/trayList`,
                     query: {
                         type: 'WareHouse',
@@ -191,16 +196,6 @@ export default function EditWHPosition() {
             label: '儲存',
             onClick: () => {
                 if (editstatus === "編輯") {
-
-
-                    // if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
-                    //     data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
-                    //     data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
-                    //     data1.spec === '' || data1.spec === undefined || data1.spec === null &&
-                    //     data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
-                    // ) {
-                    //     myAlert.warning({ title: '請確實填寫儲位資訊' });
-                    // } else {
                     myAlert.confirm({
                         title: '確定修改?',
                         props: {
@@ -210,16 +205,7 @@ export default function EditWHPosition() {
                             }
                         }
                     });
-                    // }
                 } else {
-                    // if (data1.materialnumber === '' || data1.materialnumber === undefined || data1.materialnumber === null &&
-                    //     data1.whpname === '' || data1.whpname === undefined || data1.whpname === null &&
-                    //     data1.batchnumber === '' || data1.batchnumber === undefined || data1.batchnumber === null &&
-                    //     data1.spec === '' || data1.spec === undefined || data1.spec === null &&
-                    //     data1.quantity === 0 || data1.quantity === undefined || data1.quantity === null
-                    // ) {
-                    // myAlert.warning({ title: '請確實填寫儲位資訊' });
-                    // } else {
                     myAlert.confirm({
                         title: '確定修改?',
                         props: {
@@ -229,7 +215,6 @@ export default function EditWHPosition() {
                             }
                         }
                     });
-                    // }
                 }
             },
         },
@@ -242,20 +227,28 @@ export default function EditWHPosition() {
             },
         },
     ];
-
-
-
-
     const panelList = disabled ? panelList_unedit : panelList_edit;
     //#endregion
 
-    //#region 與api 溝通區塊
+
+
+    //#region ===========【頁面進入】
+
+    useEffect(() => {
+        getProduct();
+    }, []);
+
+
+    // useEffect(() => {
+
+    // }, [item]);
+
+
     useEffect(() => {
         const fetchDataAndLayout = async () => {
             await fetchData();
             await GetLayOut();
 
-            // if (!disabled) { // 只有在未編輯狀態下處理滑鼠移動事件
             const handleMouseMove = (event: MouseEvent) => {
                 setMouseX(`${event.pageX}px`);
                 setMouseY(`${event.pageY}px`);
@@ -266,19 +259,21 @@ export default function EditWHPosition() {
             return () => {
                 window.removeEventListener('mousemove', handleMouseMove);
             };
-            // }
+
         };
 
         fetchDataAndLayout();
     }, [router.query, disabled]);
 
+
+    //#endregion
+
+    //#region ===========【API】
+    //撈取物料
     const getProduct = async () => {
         try {
-            //  console.log(userInfo);
             setIsLoading(true);
-            const conditionModel: {
-                // keyword: string | undefined;
-            } = {
+            const conditionModel = {
                 // keyword: "search" as string | undefined,
             };
 
@@ -310,10 +305,6 @@ export default function EditWHPosition() {
             setIsLoading(false);
         }
     };
-    useEffect(() => {
-        getProduct();
-    }, []);
-
 
     //撈取儲位資料 api
     const fetchData = async () => {
@@ -424,6 +415,7 @@ export default function EditWHPosition() {
                         id: id
                     },
                 });
+
             } catch (error) {
                 console.error('Error updating data:', error);
             } finally {
@@ -481,6 +473,7 @@ export default function EditWHPosition() {
         }
     };
 
+    //取托盤樣式
     const GetLayOut = async () => {
         try {
             setIsLoading(true);
@@ -516,9 +509,8 @@ export default function EditWHPosition() {
             setIsLoading(false);
         }
     };
-    //#region 呼叫托盤
 
-
+    //呼叫托盤API
     const CallTrayAPI = async () => {
         try {
             setIsLoading(true);
@@ -597,6 +589,7 @@ export default function EditWHPosition() {
         }
     };
 
+    //收回托盤API
     const CallTrayBackAPI = async () => {
         try {
             setIsLoading(true);
@@ -620,11 +613,9 @@ export default function EditWHPosition() {
             const regaddress = '253';
             const cmdvalue = '1';
 
-            // 收回清空設定的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
             setWhnameCalledin('');
             setTrayCalledin(false);
             setTrayCalledNamein('');
-            // alert(url);
 
             // 呼叫 traycommand API
             const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
@@ -668,8 +659,10 @@ export default function EditWHPosition() {
         }
     };
 
+    //#endregion
 
-
+    //#region ===========【托盤功能區】
+    //呼叫
     const CallTray = async () => {
         try {
             if (traycalledin === true) {
@@ -692,6 +685,7 @@ export default function EditWHPosition() {
         }
     };
 
+    //收回
     const CallTrayBack = async () => {
         if (traycalledin != true) {
             myAlert.warning({ title: '目前無托盤可收回' });
@@ -708,17 +702,11 @@ export default function EditWHPosition() {
         }
     }
 
-    // 領料才需要
-    const CallTrayChange = async () => {
-        alert("交換托盤");
-        // setTrayCalledName(trayname);
-    }
-
-
-    //#endregion
     //#endregion
 
-    //#region model 作動區塊
+
+
+    //#region 
     //修改儲位連動model
     const handleChange = (key: keyof WHPositionModel, value: string | number) => {
         setData1(prevState => ({
@@ -732,6 +720,7 @@ export default function EditWHPosition() {
         updateData(data1);
     };
 
+
     const handleRestore = () => {
         console.log(data);
         setData1(data);
@@ -741,8 +730,7 @@ export default function EditWHPosition() {
 
     async function handlechangewhposition(id: any, whid: any, trayname: any, whname: any) {
 
-        // setCanEdit(false);
-        // panelList=panelList_unedit
+
         router.replace({
             pathname: `/factoryDepartment/editWHPosition`,
             query: {
@@ -758,6 +746,7 @@ export default function EditWHPosition() {
 
     //#endregion
 
+    // 重新編碼
     const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
         const convertToAlpha = (num: number): string => {
             return String.fromCharCode(65 + num - 1);
@@ -833,11 +822,6 @@ export default function EditWHPosition() {
     };
 
 
-
-
-
-
-
     interface DataItem {
         id: string;
         productid: string;
@@ -852,9 +836,7 @@ export default function EditWHPosition() {
     const [filteredData, setFilteredData] = useState<DataItem[]>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const isSelectingRef = useRef(false);
-    // const data: DataItem[] = [
-    //     // 你的資料項目
-    // ];
+
 
     useEffect(() => {
         if (isSelectingRef.current) return;
@@ -870,32 +852,7 @@ export default function EditWHPosition() {
 
         setFilteredData(filteredData);
 
-        // // 只有當有過濾條件且有匹配結果時才顯示建議框
-        // const shouldShowSuggestions = filtered.length > 0 && (searchProductId || searchName || searchSpec);
-        // setShowSuggestions(Boolean(shouldShowSuggestions));
-
     }, [searchProductId, searchName, searchSpec, productdata]);
-
-
-
-
-
-
-    // const handleProductidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     isSelectingRef.current = false;
-    //     handleChange('productid', e.target.value);
-    // };
-
-    // const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     isSelectingRef.current = false;
-    //     handleChange('productname', e.target.value);
-    // };
-
-    // const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     isSelectingRef.current = false;
-    //     handleChange('productspec', e.target.value);
-    // };
-
 
     const handleSelect = (item: DataItem) => {
         if (data1.quantity !== 0) {
@@ -919,20 +876,13 @@ export default function EditWHPosition() {
     };
 
 
-
-
-
-
     const [dragging, setDragging] = useState(false);
     const [position, setPosition] = useState({ x: 500, y: 100 });
     const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-
-
     const handleMouseUp = () => {
         setDragging(false);
     };
-
 
     useEffect(() => {
         document.addEventListener('mousemove', handleMouseMove);
@@ -1003,331 +953,37 @@ export default function EditWHPosition() {
     };
 
 
-    const handleChildKeyDown2 = (e: any, type: any) => {
-        // alert(e.target.value);
-
-        if (type === "width") {
-
-            const value = e.target.value;
-            if (Number(value) < (childwidth || 1)) {
-                handleRemoveMax(value);
-            } else if (Number(value) > (childwidth || 1)) {
-                handleAdd(value);
-            }
-            setChildWidth(value);
-        } else {
-            const value = e.target.value;
-            // alert(value);
-            if (Number(value) < (childlength || 1)) {
-                handleRemoveAndAddNew(value);
-            } else if (Number(value) > (childlength || 1)) {
-                handleAdd2(value);
-            }
-            setChildLength(value);
-        }
-    };
-
-    const handleRemoveAndAddNew = (value: any) => {
-
-        // alert(value);
-        const newchildlength = parseInt(value) + 1; // 新的 childlength
-
-        // 取得 data12 的第一筆資料
-        const firstItem = data12[0];
-
-        // 新資料模型
-        const newDataItem = {
-            childlengthid: newchildlength, // 使用新的 childlength 作為 childlengthid
-            childwidthdata: [
-                {
-                    id: null,
-                    whpname: "",
-                    whid: firstItem.widthdata.whid,
-                    volume: 0,
-                    spec: "",
-                    trayid: null,
-                    length: firstItem.widthdata.length, // 使用相同的 length
-                    width: firstItem.widthdata.width, // 使用相同的 width
-                    childlength: newchildlength, // 新的 childlength
-                    childwidth: 1, // 預設值，或根據其他邏輯設置
-                    materialnumber: '',
-                    batchnumber: '',
-                    unit: '',
-                    quantity: 0,
-                    whname: firstItem.widthdata.whname,
-                    trayname: firstItem.widthdata.trayname,
-                    color: "#FFFFFF", // 預設顏色
-                    productname: null,
-                    productspec: null,
-                    productid: null,
-                }
-            ]
-        };
-
-        setData12(prevData12 => {
-            // 複製前一個狀態
-            const updatedData = [...prevData12];
-
-            // 確保 widthdata 和 childtraylayoutmodel 存在
-            if (!updatedData[0].widthdata) {
-                updatedData[0].widthdata = {};
-            }
-            if (!updatedData[0].widthdata.childtraylayoutmodel) {
-                updatedData[0].widthdata.childtraylayoutmodel = [];
-            }
-
-            // 移除與 `newchildlength` 相符的項目
-            updatedData[0].widthdata.childtraylayoutmodel = updatedData[0].widthdata.childtraylayoutmodel.filter(
-                (item: any) => item.childlengthid !== newchildlength
-            );
-            // const maxChildlengthId = Math.max(
-            //     ...updatedData[0].widthdata.childtraylayoutmodel.map((item: any) => item.childlengthid)
-            // );
-
-            // // 移除與最大 childlengthid 相符的項目
-            // updatedData[0].widthdata.childtraylayoutmodel = updatedData[0].widthdata.childtraylayoutmodel.filter(
-            //     (item: any) => item.childlengthid == maxChildlengthId
-            // );
-
-            return updatedData; // 返回更新後的資料
-        });
-
-        console.log(data12); // 輸出更新後的 data12
-    };
-
-    const handleAdd = (value: any) => {
-        console.log(currentchildlength);
-        console.log(data12);
-        console.log(data11);
-
-        const newchildwidth = parseInt(value); // 新的 childwidth
-
-        // 取得 data12 的第一筆資料
-        const firstItem = data12[0];
-
-        // 建立新資料模型
-        const newDataItem = {
-            id: "",
-            whpname: "",
-            whid: firstItem.widthdata.whid,
-            volume: 0,
-            spec: "",
-            trayid: null,
-            length: firstItem.widthdata.length, // 使用相同的 length
-            width: firstItem.widthdata.width, // 使用相同的 width
-            // childlength: firstItem.widthdata.childlength+1, // 繼續使用相同的 childlength
-            childlength: parseInt((currentchildlength ?? 0).toString()),
-            childwidth: newchildwidth, // 使用新的 childwidth
-            materialnumber: '',
-            batchnumber: '',
-            unit: '',
-            quantity: 0,
-            whname: firstItem.widthdata.whname,
-            trayname: firstItem.widthdata.trayname,
-            color: "#FFFFFF", // 預設顏色
-            productname: null,
-            productspec: null,
-            productid: null,
-        };
-
-        // 將新的資料加入到 data12 的索引 0 的 childtraylayoutmodel
-        setData12(prevData12 => {
-            const updatedData = [...prevData12];
-
-            // 確保 childtraylayoutmodel 存在
-            if (!updatedData[0].widthdata.childtraylayoutmodel) {
-                updatedData[0].widthdata.childtraylayoutmodel = [];
-            }
-
-            // 取出 childtraylayoutmodel 中的第一筆資料
-            const firstChildTrayLayout = updatedData[0].widthdata.childtraylayoutmodel[parseInt(currentchildlength) - 1];
-
-            // 確保 childwidthdata 存在
-            if (!firstChildTrayLayout?.childwidthdata) {
-                firstChildTrayLayout.childwidthdata = [];
-            }
-
-            // 檢查是否已存在相同的 childwidthdata
-            const exists = firstChildTrayLayout.childwidthdata.some((item: any) =>
-                item.childwidth === newDataItem.childwidth &&
-                item.length === newDataItem.length // 可以根據需要檢查其他字段
-            );
-
-            // 如果不存在，則添加新的 childwidthdata
-            if (!exists) {
-                firstChildTrayLayout.childwidthdata.push(newDataItem);
-            }
-
-            return updatedData; // 返回更新後的資料
-        });
-
-        console.log(newDataItem);
-        console.log(data12); // 輸出更新後的 data12
-        console.log(data11);
-    };
-
-    // 建立新資料模型
-    const handleAdd2 = (value: any) => {
-        console.log(data12);
-        console.log(data11);
-
-        const newchildlength = parseInt(value); // 新的 childlength
-        console.log(value);
-
-        // 取得 data12 的第一筆資料
-        const firstItem = data12[0];
-
-        // 建立新資料模型
-        const newDataItem = {
-            childlengthid: newchildlength, // 使用新的 childlength 作為 childlengthid
-            childwidthdata: [
-                {
-                    id: "",
-                    whpname: "",
-                    whid: firstItem.widthdata.whid,
-                    volume: 0,
-                    spec: "",
-                    trayid: null,
-                    length: firstItem.widthdata.length, // 使用相同的 length
-                    width: firstItem.widthdata.width, // 使用相同的 width
-                    childlength: newchildlength, // 新的 childlength
-                    childwidth: 1, // 預設值，或根據其他邏輯設置
-                    materialnumber: '',
-                    batchnumber: '',
-                    unit: '',
-                    quantity: 0,
-                    whname: firstItem.widthdata.whname,
-                    trayname: firstItem.widthdata.trayname,
-                    color: "#FFFFFF", // 預設顏色
-                    productname: null,
-                    productspec: null,
-                    productid: null,
-                }
-            ]
-        };
-
-        console.log(newDataItem);
-
-        // 將新的資料加入到 data12 的索引 0 的 childtraylayoutmodel
-        setData12(prevData12 => {
-            // 複製前一個狀態
-            const updatedData = [...prevData12];
-
-            // 確保 widthdata 存在
-            if (!updatedData[0].widthdata) {
-                updatedData[0].widthdata = {};
-            }
-
-            // 確保 childtraylayoutmodel 存在，並初始化為空陣列如果不存在
-            if (!updatedData[0].widthdata.childtraylayoutmodel) {
-                updatedData[0].widthdata.childtraylayoutmodel = [];
-            }
-
-            // 檢查是否已存在相同的 childlengthid
-            const exists = updatedData[0].widthdata.childtraylayoutmodel.some((item: any) =>
-                item.childlengthid === newDataItem.childlengthid
-            );
-
-            // 如果不存在，則添加新的 childtraylayoutmodel
-            if (!exists) {
-                updatedData[0].widthdata.childtraylayoutmodel.push(newDataItem);
-            }
-
-            return updatedData; // 返回更新後的資料
-        });
-
-        console.log(newDataItem);
-        console.log(data12); // 輸出更新後的 data12
-        console.log(data11);
-    };
-
-    const handleRemoveMax = (value: any) => {
-        // alert(value);
-        const newchildwidth = parseInt(value) + 1; // 新的 childlength
-        setData12(prevData12 => {
-            const updatedData = [...prevData12];
-
-            // 確保 childtraylayoutmodel 存在
-            if (updatedData[0].widthdata.childtraylayoutmodel && updatedData[0].widthdata.childtraylayoutmodel.length > 0) {
-                // 取得第一個 childtraylayoutmodel
-                const firstChildTrayLayout = updatedData[0].widthdata.childtraylayoutmodel[parseInt(currentchildlength) - 1];
-
-                // 確保 childwidthdata 存在並且有資料
-                if (firstChildTrayLayout.childwidthdata && firstChildTrayLayout.childwidthdata.length > 0) {
-                    // 找到 childwidth 值最大的那筆資料
-                    // const maxChildWidthItem = firstChildTrayLayout.childwidthdata.reduce((prev: any, current: any) =>
-                    //     prev.childwidth > current.childwidth ? prev : current
-                    // );
-
-                    // 過濾掉 childwidth 值最大的那筆資料
-                    firstChildTrayLayout.childwidthdata = firstChildTrayLayout.childwidthdata.filter(
-                        (item: any) => item.childwidth !== newchildwidth
-                    );
-
-                }
-            }
-
-            return updatedData; // 返回更新後的資料
-        });
-
-        console.log(data12); // 輸出更新後的 data12
-    };
-
     return (
         <SubLayer isLoading_subLayer={false}>
             {/* <> */}
             <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫名稱：' + whname + "｜托盤名稱：" + trayname} panelList={panelList}
                 customeLeft={[
                     <>
-                        {/* <span style={{ fontSize: '18px', padding: '0px 10px' }}>
+                        <span style={{ fontSize: '18px', padding: '0px 10px' }}>
 
                             <button
                                 className={scss.shortsquarebtn}
                                 style={{
+                                    display: `${(editstatus === "編輯" || editstatus === "修改" && data1.quantity === 0) ? '' : 'none'}`,
                                 }}
                                 onClick={() => {
                                     // setPrbar(!prbar);
+                                    setSearchbar(true);
                                 }}
                             >
                                 <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
                                     ☰
                                 </span>
-                                品項查詢
+                                物料查詢
                             </button>
-                        </span> */}
+                        </span>
                     </>
                 ]}
             />
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div className={scss.top}>
-                        <button
-                            style={{
-                                display: `${editstatus === "編輯" ? '' : 'none'}`,
-                                width: '39px',
-                                backgroundColor: '#f5f5f5',
-                                border: '1px solid #c1c1c1',
-                                borderRadius: '3px',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                fontWeight: 'bolder'
-                            }}
-                            onMouseOver={(e) => {
-                                e.currentTarget.style.backgroundColor = '#e0e0e0';
-                                e.currentTarget.style.borderColor = '#a1a1a1';
-                            }}
-                            onMouseOut={(e) => {
-                                e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                e.currentTarget.style.borderColor = '#c1c1c1';
-                            }}
-                            onClick={() => {
-                                // setCustomerbar(true);
-                                setSearchbar(true);
-                            }}
-                        >
-                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                        </button>
-                        {/* <div> */}
+
                         <InputSel
                             {...inputSelProps}
                             caption="物料編碼"
@@ -1513,119 +1169,6 @@ export default function EditWHPosition() {
                 </div>
             </div >
 
-            <div className={scss.main} style={{ display: 'none' }}>
-
-                <div className={scss.left}>
-
-
-                </div>
-                <div className={scss.right}>
-                    {(editstatus && data1.quantity === 0) && (
-                        <>
-
-                            <div className={scss.edit_head} style={{ paddingTop: '50px' }}>
-                                <div className="input-wrapper">
-                                    <span style={{ color: "#14256a", fontSize: '20px', fontWeight: 'bolder' }}>
-                                        子儲格
-                                        ({currentlength}-{currentwidth})
-                                    </span>
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="儲位編號"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                value: childwhposition ?? " ",
-                                            },
-                                        }}
-                                    />
-
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="寬"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                type: 'number',
-                                                value: childwidth ?? 1,
-                                                min: 1, // 設定最小值為1
-                                                onChange: (e) => {
-                                                    // const value = Math.max(1, Number(e.target.value)); // 確保值不小於1
-                                                    handleChildKeyDown2(e, "width"); // 傳入正確的數值
-                                                }
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
-                                        caption="長"
-                                        disabled={false}
-                                        inputProps={{
-                                            props: {
-                                                type: 'number',
-                                                value: childlength ?? 1,
-                                                min: 1, // 設定最小值為1
-                                                onChange: (e) => {
-                                                    // const value = Math.max(1, Number(e.target.value)); // 確保值不小於1
-                                                    handleChildKeyDown2(e, "length"); // 傳入正確的數值
-                                                }
-                                            },
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                            <div style={{ paddingTop: '10px' }}>
-                                <div className={scss.content} >
-                                    {/* 渲染一個 table 類似於 data11 的顯示方式 */}
-                                    {data12.map((dataItem, index) => (
-
-                                        <table key={index} className={scss.traytable} style={{ border: 'solid 1px black' }}>
-                                            <tbody>
-
-                                                <tr className={scss.tr}>
-                                                    <td className={scss.td} style={{ backgroundColor: dataItem.widthdata.color || 'white' }}>
-
-                                                        {dataItem.widthdata.childtraylayoutmodel.map((childLayout: any, layoutIndex: any) => (
-                                                            <div key={layoutIndex}>
-                                                                <table className={scss.childtraytable}>
-                                                                    <tbody>
-                                                                        <tr className={scss.childtraytabletr}>
-                                                                            {childLayout.childwidthdata.map((childDataItem: any, childIndex: any) => (
-
-                                                                                <td
-                                                                                    className={scss.childtraytabletd}
-                                                                                    key={childDataItem.id || childIndex} // 使用 id 或索引作為 key
-                                                                                    style={{ backgroundColor: childDataItem.color || '#FFFFFF', height: '80px' }}
-                                                                                >
-                                                                                    <button
-                                                                                        style={{ height: '80px' }}
-                                                                                        className={scss.childtraytabletdButton}
-                                                                                    >
-                                                                                        {recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}
-                                                                                    </button>
-                                                                                </td>
-                                                                            ))}
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        ))}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    ))}
-                                </div>
-                            </div >
-                        </>
-                    )}
-                    {editstatus && data1.quantity !== 0 && (
-                        <div style={{ color: 'red', fontWeight: 'bold', marginTop: '10px' }}>
-                            該儲格尚有庫存，無法重劃儲格
-                        </div>
-                    )}
-                </div>
-            </div>
             <div
                 style={{
                     position: 'absolute',
