@@ -20,6 +20,13 @@ import {
   WorksheetTable,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 
+import {
+  Container,
+  Section,
+  MainFormWrapper,
+  FormGrid,
+} from 'components/page/worksDepartment/worksheet/productForm/productFormLayout';
+
 export default function WorksheetForm({
   reqPatchWorkSheet = () => {},
   disabled = false,
@@ -38,18 +45,18 @@ export default function WorksheetForm({
   );
 
   return (
-    <form className={scss.productForm}>
+    <Container>
       <div>
-        <p className={'mb-8 text-main text-xl font-bold'}>位置與編號：</p>
+        <Section>位置與編號：</Section>
         <Form_product_location disabled={disabled} />
       </div>
       <div>
-        <p className={'mb-8 text-main text-xl font-bold'}>設定產品基本規格：</p>
+        <Section>設定產品基本規格：</Section>
         <Form_product_basic disabled={disabled} />
       </div>
-      <div className={scss.mainFormWrapper}>
-        <p className={'mb-8 text-main text-xl font-bold'}>設定產品細部規格：</p>
-        <div className={scss.formGrid}>
+      <MainFormWrapper>
+        <Section>設定產品細部規格：</Section>
+        <FormGrid>
           <Form_product_ABCD disabled={disabled} />
           <Form_product_motor disabled={disabled} />
           <Form_product_headBox disabled={disabled} />
@@ -59,9 +66,9 @@ export default function WorksheetForm({
           <Form_product_bottomBar disabled={disabled} />
           <Form_product_sidePlate disabled={disabled} />
           <Form_product_other disabled={disabled} />
-        </div>
+        </FormGrid>
         <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
-      </div>
+      </MainFormWrapper>
       <div>
         <Form_product_accessories disabled={disabled} />
       </div>
@@ -83,6 +90,6 @@ export default function WorksheetForm({
           <div className={classNames(scss.cover, !shouldCalcData2 && 'hidden')}></div>
         </div>
       )}
-    </form>
+    </Container>
   );
 }
