@@ -56,6 +56,12 @@ const options_motorLockBox = optionsCreator_motorLockBox();
 
 // =====================================================================
 
+type TsetStateAction<T> = Partial<T> | ((prev: T) => Partial<T>);
+type TsetState<T> = (action: TsetStateAction<T>) => void;
+
+// =====================================================================
+// =====================================================================
+
 // MARK: location
 function Form_product_location({ disabled }: { disabled: boolean | undefined }) {
   const { locationArea, setLocationArea, floor, setFloor, serialNumberArr, setSerialNumber } = useWorksheet(
@@ -1634,7 +1640,7 @@ const Form_specialProd_location = ({
   disabled,
 }: {
   state: Tstate_specialProd_location;
-  setState: React.Dispatch<React.SetStateAction<Tstate_specialProd_location>>;
+  setState: TsetState<Tstate_specialProd_location>;
   disabled: boolean;
 }) => {
   return (
@@ -1729,9 +1735,7 @@ const Form_specialProd_basic = ({
   disabled,
 }: {
   state: Tstate_specialProd_basic;
-  setState: React.Dispatch<
-    React.SetStateAction<Omit<Tstate_specialProd_basic, 'itemName' | 'quoteType' | 'doorModelName' | 'qty'>>
-  >;
+  setState: TsetState<Tstate_specialProd_basic>;
   disabled: boolean;
 }) => {
   return (
@@ -1863,7 +1867,7 @@ function Form_specialProduct_ABCD({
   disabled,
 }: {
   state: Tstate_specialProduct_ABCD;
-  setState: React.Dispatch<React.SetStateAction<Tstate_specialProduct_ABCD>>;
+  setState: TsetState<Tstate_specialProduct_ABCD>;
   disabled: boolean;
 }) {
   return (
@@ -1954,9 +1958,6 @@ type Tprops_specialProduct_motor = {
   motorLockBox: string;
 };
 
-type TsetStateAction<T> = Partial<T> | ((prev: T) => Partial<T>);
-type TsetState<T> = (action: TsetStateAction<T>) => void;
-
 const options_electricSupply = [
   { value: JSON.stringify({ motorPhase: 1, motorVoltage: 110 }), label: '單相 110V' },
   { value: JSON.stringify({ motorPhase: 3, motorVoltage: 110 }), label: '三相 110V' },
@@ -1970,7 +1971,6 @@ function Form_specialProduct_motor({
   disabled,
 }: {
   state: Tprops_specialProduct_motor;
-  // setState: (action: TsetStateAction<Tprops_specialProduct_motor>) => void;
   setState: TsetState<Tprops_specialProduct_motor>;
   disabled: boolean | undefined;
 }) {
@@ -2028,11 +2028,11 @@ function Form_specialProduct_motor({
               onChange: (option) => {
                 setState({ horsepower: option?.value ?? '' });
               },
-              // onInputChange: (value, action) => {
-              //   if (action.action === 'input-change') {
-              //     setState({ horsepower: value });
-              //   }
-              // },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  setState({ horsepower: value });
+                }
+              },
             },
           }}
         />
@@ -2048,11 +2048,11 @@ function Form_specialProduct_motor({
               onChange: (option) => {
                 setState({ motorVendor: option?.value ?? '' });
               },
-              // onInputChange: (value, action) => {
-              //   if (action.action === 'input-change') {
-              //     motor.setMotor_str({ key: 'vendor', value });
-              //   }
-              // },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  setState({ motorVendor: value });
+                }
+              },
             },
           }}
         />
@@ -2082,6 +2082,11 @@ function Form_specialProduct_motor({
               isSearchable: true,
               onChange: (option) => {
                 setState({ motorLockBox: option?.value ?? '' });
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  setState({ motorLockBox: value });
+                }
               },
             },
           }}
