@@ -63,6 +63,7 @@ import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
+import { callTray, updateTrayStatus, getTrayStatus } from "../service/callTrayService";
 
 export default function PEntryIn() {
     const [pagename, setPagename] = useState<string>("待入品項")
@@ -330,6 +331,7 @@ export default function PEntryIn() {
     };
 
     //#endregion
+
     //#region ===========【明細功能區】
     //focus選中的明細
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -404,13 +406,10 @@ export default function PEntryIn() {
     }, [keyword2, keyword3, keyword4, keyword5]);
     //#endregion
 
-
     //#region ===========【儲格Modal】
 
-
-
+    //#region ===【儲格變數】
     const [data11, setData11] = useState<any[]>([]);
-    //儲格變數
     const [whpositionqmodalopen, setWhpositionqmodalopen] = useState<boolean>(false);
 
     const [whpnumber, setWhpnumber] = useState<string>("");
@@ -443,13 +442,24 @@ export default function PEntryIn() {
     const [nowwhpositionuuid, setNowwhpositionuuid] = useState<string>("");
     const [nowprodentrydetailuuid, setNowprodentrydetailuuid] = useState<string>("");
     const [nowbatchidin, setNowbatchidin] = useState<string>("");
-
+    const [modalcheckfirstin, setModalcheckfirstin] = useState<number>(0);
+    //滑鼠hover
     const [hoverInfo, setHoverInfo] = useState<string | null>(null);
     const [mouseX, setMouseX] = useState('0px');
     const [mouseY, setMouseY] = useState('0px');
 
-    const [modalcheckfirstin, setModalcheckfirstin] = useState<number>(0);
 
+    //托盤呼叫
+    const [called, setCalled] = useState(false);
+    const [ip, setIP] = useState<string>('');
+    const [calledTray, setCalledTray] = useState<string>('');
+    const [whid, setWhid] = useState('');
+    const [calledWarehouse, setCalledWarehouse] = useState<string>('');
+
+    //#endregion
+
+    //#region ===【儲格頁面進入】
+    //滑鼠hover
     useEffect(() => {
         // 明確指定參數類型為 Window 的 MouseEvent
         const handleMouseMove = (event: globalThis.MouseEvent) => {
@@ -466,12 +476,383 @@ export default function PEntryIn() {
         };
     }, []); // 空依賴數組，確保只在組件加載和卸載時運行
 
+    //#endregion
 
-    const whpositionqModalClose = async () => {
+
+
+
+
+
+
+
+
+    //#region ===【儲格API】
+    const GetLayOut = async (whid: any, trayname: any, id: any) => {
+        try {
+
+            // setIsLoading(true);
+            const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
+                whid: whid as string | undefined,
+                trayname: trayname as string | undefined,
+                id: id as string | undefined
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'test',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            console.log(inputModel);
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const responseData = await response.json();
+
+            console.log(responseData);
+
+            setData11(responseData);
+
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 入庫加庫存
+    const AddWHPositionQuantity = async () => {
+
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                whpositionuuid: nowwhpositionuuid,
+                prodentrydetailuuid: nowprodentrydetailuuid,
+                quantity: inboxquantity.toString() as string | undefined,
+                batchid: nowbatchidin,
+                type: whpproductid != nowproductid ? 'false' : 'true',
+                productid: nowproductid
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/AddWHPositionQuantity?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            getWhpositionDetailByProductId(nowproductid);
+            setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
+            //   GetDetailById(uuidin);
+            Get();
+            setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
+            setInboxquantity(0);
+
+        } catch (error: any) {
+            setError("getProdReceiptDetail:" + error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    //取得儲格物料資訊
+    const getWhpositionDetailByProductId = async (productid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel: {
+                productid: string | undefined
+                type: string | undefined
+            } = {
+                productid: productid as string | undefined,
+                type: "entry"
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetWhpositionDetailByProductId?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            if (data.length === 0) {
+                myAlert.warning({
+                    title: "查詢結果",
+                    content: "目前沒有可存放的儲位資訊"
+                });
+                return;
+            }
+
+            setData3(data);
+
+
+
+            handleRowClick(data[0].id);
+            GetTrayStatus(data[0].whid);
+            GetLayOut(data[0].whid, data[0].trayname, data[0].id);
+            if (modalcheckfirstin === 0) {
+                setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+                setWhpname(data[0].name);
+                setWhpproductid(data[0].productid);
+                setWhpspec(data[0].spec);
+                setWhpquantity(data[0].quantity);
+                setNowwhname(data[0].whname);
+                setNowtrayname(data[0].trayname);
+                setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+            }
+
+
+
+            const distinctWhnames = data
+                .map((item: { whname: any; }) => item.whname)  // 提取所有 whname
+                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
+
+            setSelectwhnamedata(distinctWhnames);
+
+            const distincttraynames = data
+                .map((item: { trayname: any; }) => item.trayname)  // 提取所有 trayname
+                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
+
+
+            setSelecttraynamedata(distincttraynames);
+
+
+
+        } catch (error: any) {
+            myAlert.err({
+                title: "prodEntry(getWhpositionDetailByProductId)",
+                content: error.message
+            })
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    //取得托盤呼叫狀態
+    const GetTrayStatus = async (whid: string) => {
+        try {
+            // setIsLoading(true);
+
+            const trayStatus = await getTrayStatus(setting.apipath, whid);
+
+            // 更新狀態
+            setCalled(trayStatus.called);
+            setIP(trayStatus.ip);
+            setCalledTray(trayStatus.trayname); // trayname 可正常取值
+            setCalledWarehouse(trayStatus.whname);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    //更新托盤呼叫狀態
+    const UpdateTrayStatus = async () => {
+        try {
+            setIsLoading(true);
+
+            const conditionModel = {
+                whid: whid,
+                called: !called,
+                trayname: nowtrayname,
+                called_by: userInfo?.employee?.id,
+            };
+
+            const result = await updateTrayStatus(setting.apipath, conditionModel);
+
+            if (result.success) {
+                // 成功，更新狀態
+                setCalled(!called);
+            } else {
+                // 失敗，顯示錯誤提示
+                setCalled(false);
+                myAlert.warning({ title: "失敗", content: result.message });
+            }
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 呼叫托盤
+    const CallTray = async () => {
+        try {
+            setIsLoading(true);
+
+            // 設定基礎參數
+            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const deviceName = "Device1";
+            const trayNumber = nowtrayname;
+            const trayCommand = "100";
+            const regAddress = "253";
+            const cmdValue = "1";
+
+            // 使用 callTray 服務
+            await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 退回托盤
+    const CallTrayBack = async () => {
+        try {
+            setIsLoading(true);
+
+            // 設定基礎參數
+            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const deviceName = "Device1";
+            const trayNumber = nowtrayname;
+            const trayCommand = "200";
+            const regAddress = "253";
+            const cmdValue = "1";
+
+            // 使用 callTray 服務
+            await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    //#endregion
+
+    //#region ===【儲格功能區】
+
+    // 關閉Modal
+    const handleModalClose = async () => {
         setWhpositionqmodalopen(false);
+        setSelectedItemId(null);
+    }
+
+    // 入庫加庫存
+    const handleaddquantity = () => {
+        myAlert.confirm({
+            title: `確定要入到此儲格嗎?: ${nowwhname}-${nowtrayname}-${nowwhposition}`,
+            props: {
+                onOk: () => {
+                    AddWHPositionQuantity();
+                }
+            }
+        });
+    }
+
+    const handleinbox = (item: any) => {
+        setWhpnumber('');
+        setWhpproductid('');
+        setWhpname('');
+        setWhpspec('');
+        setWhpquantity('');
+        setData3([]);
+        setData11([]);
+        getWhpositionDetailByProductId(item.detail_productid);
+        setWhpositionqmodalopen(!whpositionqmodalopen);
+        setNowproductid(item.detail_productid);
+        setNowname(item.detail_name);
+        setNowspec(item.detail_spec);
+        setNowquantity(item.detail_quantity);
+        setNowentryqty(item.detail_entry_qty);
+        setNowprodentrydetailuuid(item.detail_id);
+        setNowbatchidin(item.batchid);
+    }
+
+    const handleGetLayOut = (item: any) => {
+        GetTrayStatus(item.whid);//取得托盤呼叫狀態
+        handleRowClick(item.id);
+        setWhid(item.whid);
+        setNowwhname(item.whname);
+        setNowtrayname(item.trayname);
+        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+        GetLayOut(item.whid, item.trayname, item.id)
+        if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
+            setInboxquantity(0);
+        }
+        setNowwhpositionuuid(item.id);
+        setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+        setWhpname(item.name);
+        setWhpproductid(item.productid);
+        setWhpspec(item.spec);
+        setWhpquantity(item.quantity);
+        setWhid(item.whid);
+        setNowwhname(item.whname);
+        setNowtrayname(item.trayname);
+        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+    }
+
+    //呼叫托盤
+    const handleCall = async () => {
+        await GetTrayStatus(whid);
+        if (called === true) {
+            myAlert.warning({ title: '請先收回托盤' });
+            return;
+        } else {
+            myAlert.confirm({
+                title: `呼叫: ${nowtrayname}`,
+                content: '請勿靠近設備!!',
+                props: {
+                    onOk: async () => {
+                        await CallTray();
+                        UpdateTrayStatus();
+                    }
+                }
+            });
+
+        }
+    }
+
+    //退回托盤
+    const handleBack = async () => {
+        await GetTrayStatus(whid);
+        if (called === false) {
+            myAlert.warning({ title: '托盤已退回' });
+            return;
+        } else {
+            myAlert.confirm({
+                title: `退回: ${calledTray}`,
+                content: '請勿靠近設備!!',
+                props: {
+                    onOk: async () => {
+                        await CallTrayBack();
+                        UpdateTrayStatus();
+                    }
+                }
+            });
+
+        }
     }
 
 
+    //#endregion
+
+    //#region ===【邏輯】
+    //儲格編碼轉換
     const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
         const convertToAlpha = (num: number): string => {
             return String.fromCharCode(65 + num - 1);
@@ -545,417 +926,9 @@ export default function PEntryIn() {
 
         return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
     };
+    //#endregion
 
-    function handleinbox(item: any) {
-        setWhpnumber('');
-        setWhpproductid('');
-        setWhpname('');
-        setWhpspec('');
-        setWhpquantity('');
-        setData3([]);
-        setData11([]);
-        getWhpositionDetailByProductId(item.detail_productid);
-        setWhpositionqmodalopen(!whpositionqmodalopen);
-        // setMaxinboxquantity(item.quantity);
-        setNowproductid(item.detail_productid);
-        setNowname(item.detail_name);
-        setNowspec(item.detail_spec);
-        setNowquantity(item.detail_quantity);
-        setNowentryqty(item.detail_entry_qty);
-        setNowprodentrydetailuuid(item.detail_id);
-        setNowbatchidin(item.batchid);
-        // setNowWhp
-    }
 
-    function handleGetLayOut(item: any) {
-        handleRowClick(item.id);
-        console.log(item);
-        setNowwhname(item.whname);
-        setNowtrayname(item.trayname);
-        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        GetLayOut(item.whid, item.trayname, item.id)
-        if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
-            setInboxquantity(0);
-        }
-        setNowwhpositionuuid(item.id);
-        setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        setWhpname(item.name);
-        setWhpproductid(item.productid);
-        setWhpspec(item.spec);
-        setWhpquantity(item.quantity);
-        setNowwhname(item.whname);
-        setNowtrayname(item.trayname);
-        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-
-    }
-
-    const getWhpositionDetailByProductId = async (productid: any) => {
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                productid: string | undefined
-                type: string | undefined
-            } = {
-                productid: productid as string | undefined,
-                type: "entry"
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/GetWhpositionDetailByProductId?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: "查詢結果",
-                    content: "目前沒有可存放的儲位資訊"
-                });
-                return;
-            }
-
-            setData3(data);
-
-            GetLayOut(data[0].whid, data[0].trayname, data[0].id);
-
-
-            console.log(data);
-            if (modalcheckfirstin === 0) {
-                setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-                setWhpname(data[0].name);
-                setWhpproductid(data[0].productid);
-                setWhpspec(data[0].spec);
-                setWhpquantity(data[0].quantity);
-                setNowwhname(data[0].whname);
-                setNowtrayname(data[0].trayname);
-                setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-            }
-            console.log(data);
-
-
-
-            const distinctWhnames = data
-                .map((item: { whname: any; }) => item.whname)  // 提取所有 whname
-                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
-
-            setSelectwhnamedata(distinctWhnames);
-
-            const distincttraynames = data
-                .map((item: { trayname: any; }) => item.trayname)  // 提取所有 trayname
-                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
-
-
-            setSelecttraynamedata(distincttraynames);
-
-
-
-        } catch (error: any) {
-            myAlert.err({
-                title: "prodEntry(getWhpositionDetailByProductId)",
-                content: error.message
-            })
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-
-    const GetLayOut = async (whid: any, trayname: any, id: any) => {
-        try {
-
-            setIsLoading(true);
-            const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
-                whid: whid as string | undefined,
-                trayname: trayname as string | undefined,
-                id: id as string | undefined
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'test',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            console.log(inputModel);
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const responseData = await response.json();
-
-            console.log(responseData);
-
-            setData11(responseData);
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-
-
-    const CallTray = async () => {
-        try {
-            if (traycalled === true) {
-                myAlert.warning({ title: '請先收回托盤' });
-            } else {
-                myAlert.confirm({
-                    title: `呼叫: ${nowwhname}-${nowtrayname}`,
-                    content: '!!請勿靠近設備!!',
-                    props: {
-                        onOk: () => {
-                            CallTrayAPI();
-                            // alert("呼叫托盤");
-                        }
-                    }
-                });
-
-            }
-        } catch (error: any) {
-            setError(error.message);
-        }
-    };
-
-    const CallTrayBack = async () => {
-        if (traycalled != true) {
-            myAlert.warning({ title: '目前無托盤可收回' });
-        } else {
-            myAlert.confirm({
-                title: `收回: ${nowwhname}-${nowtrayname}`,
-                content: '!!請勿靠近設備!!',
-                props: {
-                    onOk: () => {
-                        CallTrayBackAPI();
-                    }
-                }
-            });
-        }
-    }
-
-
-    const CallTrayAPI = async () => {
-        try {
-            setIsLoading(true);
-
-            // 根據 whname 設置 deviceName
-            // 寫死
-            const deviceName =
-                (nowwhname === "101") ? "Device1" :
-                    (nowwhname === "102") ? "Device1" :
-                        (nowwhname === "103") ? "Device1" :
-                            (nowwhname === "104") ? "Device1" : "";
-            const traynumber = nowtrayname;
-            const traycommand = "100";
-
-            const url = (setting.env === "prod") ? (
-                (nowwhname === "101") ? `https://${setting.warehouse1}/` :
-                    (nowwhname === "102") ? `https://${setting.warehouse2}/` :
-                        (nowwhname === "103") ? `https://${setting.warehouse3}/` :
-                            (nowwhname === "104") ? `https://${setting.warehouse4}/` : ""
-            ) : "https://localhost:44383/WareHouse/";
-
-
-            // execcommand 的固定參數
-            const regaddress = '253';
-            const cmdvalue = '1';
-
-
-            // alert(whname + " : " + trayname);
-
-            // 設定呼叫的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
-            setTraycalled(true);
-            setWhnamecalled(nowwhname);
-            setTraynamecalled(nowtrayname);
-            setWhpnamecalled(nowwhposition);
-
-            // alert(url);
-            // return;
-
-            // 呼叫 traycommand API
-            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-
-            // 檢查 traycommand API 的回應
-            if (!response.ok) {
-                throw new Error('Failed to call traycommand API');
-            }
-            console.log(response);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            // 呼叫 execcommand API
-            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-
-            // 檢查 execcommand API 的回應
-            if (!response2.ok) {
-                throw new Error('Failed to call execcommand API');
-            }
-            console.log(response2);
-
-            // 如果成功，設置 traycalled 和 traycalledname 狀態
-            setTraycalled(true);
-            setWhnamecalled(nowwhname);
-            setTraynamecalled(nowtrayname);
-            setWhpnamecalled(nowwhposition);
-
-        } catch (error: any) {
-            myAlert.warning(error.message);
-            console.error;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const CallTrayBackAPI = async () => {
-        try {
-            setIsLoading(true);
-
-            // 根據 whname 設置 deviceName
-            const deviceName =
-                (whnamecalled === "101") ? "Device1" :
-                    (whnamecalled === "102") ? "Device1" :
-                        (whnamecalled === "103") ? "Device1" :
-                            (whnamecalled === "104") ? "Device1" : "";
-            const traynumber = traynamecalled;
-            const traycommand = "200";
-            const url = (setting.env === "prod") ? (
-                (whnamecalled === "101") ? `https://${setting.warehouse1}/` :
-                    (whnamecalled === "102") ? `https://${setting.warehouse2}/` :
-                        (whnamecalled === "103") ? `https://${setting.warehouse3}/` :
-                            (whnamecalled === "104") ? `https://${setting.warehouse4}/` : ""
-            ) : "https://localhost:44383/WareHouse/";
-
-            // execcommand 的參數
-            const regaddress = '253';
-            const cmdvalue = '1';
-
-            // 收回清空設定的倉庫(setWhname)、托盤(setTrayCalled)，托盤狀態(setTrayCalledName)
-            setWhnamecalled('');
-            setTraycalled(false);
-            setTraynamecalled('');
-            setWhpnamecalled('');
-            // alert(url);
-
-            // 呼叫 traycommand API
-            const response = await fetch(`${url}Modbus/traycommand/${deviceName}/${traynumber}?traycommand=${traycommand}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-
-            // 檢查 traycommand API 的回應
-            if (!response.ok) {
-                throw new Error('Failed to call traycommand API');
-            }
-
-            // 等待一秒
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // 呼叫 execcommand API
-            const response2 = await fetch(`${url}Modbus/execcommand/${deviceName}/${regaddress}/${cmdvalue}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            });
-
-            // 檢查 execcommand API 的回應
-            if (!response2.ok) {
-                throw new Error('Failed to call execcommand API');
-            }
-
-            // 如果成功，設置 traycalled 和 traycalledname 狀態
-            setTraycalled(false);
-            setWhnamecalled('');
-            setTraynamecalled('');
-            setWhpnamecalled('')
-
-        } catch (error: any) {
-            // 處理錯誤，顯示警告
-            myAlert.warning(error.message);
-            console.error(error); // 這裡需要傳遞錯誤對象
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    function handleaddquantity() {
-        myAlert.confirm({
-            title: `確定要入到此儲格嗎?: ${nowwhname}-${nowtrayname}-${whpnamecalled}`,
-            props: {
-                onOk: () => {
-                    addWHPositionQuantity();
-                }
-            }
-        });
-    }
-
-    const addWHPositionQuantity = async () => {
-
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                whpositionuuid: nowwhpositionuuid,
-                prodentrydetailuuid: nowprodentrydetailuuid,
-                quantity: inboxquantity.toString() as string | undefined,
-                batchid: nowbatchidin,
-                type: whpproductid != nowproductid ? 'false' : 'true',
-                productid: nowproductid
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/AddWHPositionQuantity?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-
-            getWhpositionDetailByProductId(nowproductid);
-            setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
-            //   GetDetailById(uuidin);
-            Get();
-            setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
-            setInboxquantity(0);
-
-        } catch (error: any) {
-            setError("getProdReceiptDetail:" + error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
 
 
     //#endregion
@@ -1180,7 +1153,7 @@ export default function PEntryIn() {
                 <Modal
                     visible={whpositionqmodalopen}
                     footer={null}
-                    onCancel={whpositionqModalClose}
+                    onCancel={handleModalClose}
                     // width="2000px"
                     width="100%"
                     maskClosable={false}
@@ -1391,22 +1364,28 @@ export default function PEntryIn() {
                             <div className={scss.modal_content}>
                                 <div className={scss.traymodal_head_head1}>
                                     <div>
-                                        <span style={{ display: `${traycalled === true || data3.length === 0 ? 'none' : ''}` }}>
-                                            <button className={scss.redbtn} onClick={CallTray}>呼叫托盤</button>
-                                        </span>
-                                        <span style={{ display: `${traycalled === true || data3.length === 0 ? '' : 'none'}` }}>
-                                            <button className={scss.disabledbtn}>呼叫托盤</button>
-                                        </span>
-                                        &nbsp;
-                                        <span style={{ display: `${traycalled === true ? '' : 'none'}` }}>
-                                            <button className={scss.greenbutton} onClick={() => { CallTrayBack() }}>收回托盤</button>
-                                        </span>
-                                        <span style={{ display: `${traycalled === true ? 'none' : ''}` }} >
-                                            <button className={scss.disabledbtn} >收回托盤</button>
-                                        </span>
+                                        <button
+                                            className={
+                                                called
+                                                    ? (data3.length === 0 ? scss.disabledbtn : scss.greenbutton)
+                                                    : (data3.length === 0 ? scss.disabledbtn : scss.redbtn)
+                                            }
+                                            onClick={() => {
+                                                if (called) {
+                                                    if (data3.length !== 0) handleBack();
+                                                } else {
+                                                    if (data3.length !== 0) handleCall();
+                                                }
+                                            }}
+                                            disabled={data3.length === 0}
+                                        >
+                                            {called
+                                                ? (data3.length === 0 ? `收回托盤收回托盤(${calledTray})` : `收回托盤(${calledTray})`)
+                                                : (data3.length === 0 ? `呼叫托盤(${nowtrayname})` : `呼叫托盤(${nowtrayname})`)}
+                                        </button>
                                     </div>
                                     <div style={{ paddingTop: '5px' }}>
-                                        <InputSel
+                                        {/* <InputSel
                                             {...inputSelProps}
                                             caption="目前呼叫"
                                             className='align-bottom'
@@ -1416,7 +1395,7 @@ export default function PEntryIn() {
                                                     value: `${whnamecalled != "" ? `倉庫：${whnamecalled} 托盤：${traynamecalled} 儲位：${whpnamecalled}` : ' '}`
                                                 },
                                             }}
-                                        />
+                                        /> */}
                                     </div>
                                     <div style={{ paddingTop: '5px' }}>
                                         <InputSel
@@ -1432,10 +1411,10 @@ export default function PEntryIn() {
                                         />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && traycalled === true) ? '' : 'none'}` }}>
+                                        <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && called === true) ? '' : 'none'}` }}>
                                             <button className={scss.redbtn} onClick={() => { handleaddquantity() }}>確認入庫</button>
                                         </span>
-                                        <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || traycalled === false) ? '' : 'none'}` }}>
+                                        <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || called === false) ? '' : 'none'}` }}>
                                             <button className={scss.disabledbtn}>確認入庫</button>
                                         </span>
                                     </div>
@@ -1520,7 +1499,7 @@ export default function PEntryIn() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="入庫數量"
-                                            disabled={(traycalled === true && nowentryqty < nowquantity) ? false : true}
+                                            disabled={(called === true && nowentryqty < nowquantity) ? false : true}
                                             inputProps={{
                                                 props: {
                                                     type: "number",

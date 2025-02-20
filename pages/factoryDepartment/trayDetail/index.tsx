@@ -6,7 +6,7 @@ import { quotationStatusLookup } from 'config/lookupTable';
 import { JSXElementConstructor, Key, ReactElement, ReactFragment, ReactPortal, useContext, useEffect, useRef, useState } from 'react';
 import { TquotationStatus } from 'js/api/dtoTypes';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { PageHeader } from 'antd';
+import { Modal, PageHeader } from 'antd';
 import { ButtonBase } from '@mui/material';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
 import { AppContext } from 'pages/_app';
@@ -20,15 +20,22 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 //icon
-import icon_search from 'public/image/icon/fc_search.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
+import icon_search from 'public/image/icon/fc_search.svg';
+import icon_tray_out from 'public/image/icon/fc_tray_out.svg';
+import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg';
+//
 import { isWednesday } from 'date-fns';
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import { callTray, updateTrayStatus, getTrayStatus } from "../service/callTrayService";
+
+
+
 
 export default function TrayDetail() {
-    //region ===========【頁面參數】
+    //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>('')
     //#endregion
-
 
     //#region ===========【路由參數】
     const router = useRouter();
@@ -43,29 +50,51 @@ export default function TrayDetail() {
     //#endregion
 
     //#region ===========【變數宣告】
+    //載入狀態
+    const [isLoading, setIsLoading] = useState(false)
+
+    //錯誤處理
+    const [error, setError] = useState<string | null>(null);
+
+    //編輯狀態
+    const [isEditing, setIsEditing] = useState(false);
+
+    //物料查詢視窗
+    const [searchbar, setSearchbar] = useState(false);
+
 
     // 資料列宣告
     // const [dataState, setData] = useState(null);
     const [data1, setData1] = useState(null);
     const [data11, setData11] = useState<any[]>([]);
-
-
+    const [data, setData] = useState<any[]>([]);//物料查詢
+    const [searchbardata, setSearchBarData] = useState<any[]>([]);//物料查詢
+    const [modaldata, setModalData] = useState<any[]>([]);//物料查詢
 
     // 變數宣告
     //路由接進來的參數
     const [whname, setWhname] = useState<string>('');
-    const [trayname, setTrayname] = useState<string>();
+    const [trayname, setTrayname] = useState<string>('');
     const [whid, setWhid] = useState('');
     const [type, setType] = useState('');
     const [id, setId] = useState('');
 
     //編輯區塊
+    const [whpid, setwhpid] = useState<string>('');
     const [productid, setProductid] = useState<string>('');
     const [name, setName] = useState<string>('');
     const [spec, setSpec] = useState<string>('');
     const [prodbatch, setProdbatch] = useState<string>('');
     const [quantity, setQuantity] = useState<string>('');
     const [unit, setUnit] = useState<string>('');
+
+    //儲存原始資料
+    const [originalproductid, setOriginalProductid] = useState<string>('');
+    const [originalname, setOriginalName] = useState<string>('');
+    const [originalspec, setOriginalSpec] = useState<string>('');
+    const [originalprodbatch, setOriginalProdbatch] = useState<string>('');
+    const [originalquantity, setOriginalQuantity] = useState<string>('');
+    const [originalunit, setOriginalUnit] = useState<string>('');
 
 
     //滑鼠定位
@@ -75,10 +104,15 @@ export default function TrayDetail() {
 
 
 
-    //狀態
-    const [isEditing, setIsEditing] = useState(false);
-    //#endregion
+    //托盤呼叫
+    const [called, setCalled] = useState(false);
+    const [ip, setIP] = useState<string>('');
+    const [calledTray, setCalledTray] = useState<string>('');
+    const [calledWarehouse, setCalledWarehouse] = useState<string>('');
 
+
+
+    //#endregion
 
     //#region ===========【監控畫面大小】
     const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -119,18 +153,15 @@ export default function TrayDetail() {
     // Local 開發時會多次觸發，上線後不影響，但開發時覺得很煩，所以加了這個
     const hasFetchedData = useRef(false);
 
-
     useEffect(() => {
         if (!hasFetchedData.current) {
-
-
+            getProduct();
 
             hasFetchedData.current = true;
         }
     }, []);
 
     useEffect(() => {
-
         setId(parsedItem?.id);
         setWhname(parsedItem?.whname);
         setTrayname(parsedItem?.trayname);
@@ -139,12 +170,49 @@ export default function TrayDetail() {
         setPagename(`倉庫名稱：${whname}｜托盤名稱：${trayname}`)
         GetWhp(parsedItem?.id, parsedItem?.trayname, parsedItem?.whid);
         GetLayOut(parsedItem?.id, parsedItem?.trayname, parsedItem?.whid);
+        GetTrayStatus(parsedItem?.whid);
 
     }, [item]);
     //#endregion
 
-
     //#region ===========【API】
+    //取物料
+    const getProduct = async () => {
+        try {
+            setIsLoading(true);
+
+            const conditionModel = {
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const responseData = await response.json();
+            setData(responseData)
+            setModalData(responseData)
+            setSearchBarData(responseData)
+            setFilteredData2(responseData);
+
+            console.log(erpFeature);
+        } catch (error: any) {
+            setError(error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
     //取儲格資料
     const GetWhp = async (id: any, trayname: any, whid: any) => {
         try {
@@ -171,37 +239,11 @@ export default function TrayDetail() {
 
             const responseData = await response.json();
             // 不想用modal了
-            //#region 收
-            // const dataModel: WHPositionModel = {
-            //     id: responseData.id,
-            //     whpname: responseData.whpname,
-            //     whid: responseData.whid,
-            //     volume: responseData.volume,
-            //     spec: responseData.spec,
-            //     trayid: responseData.trayid,
-            //     length: responseData.length,
-            //     width: responseData.width,
-            //     childlength: responseData.childlength,
-            //     childwidth: responseData.childwidth,
-            //     materialnumber: responseData.materialnumber,
-            //     batchnumber: responseData.batchnumber,
-            //     unit: responseData.unit,
-            //     quantity: responseData.quantity,
-            //     whname: responseData.whname,
-            //     trayname: responseData.trayname,
-            //     canedit: responseData.canedit,
-            //     productname: responseData.productname,
-            //     productspec: responseData.productspec,
-            //     productid: responseData.productid
-            // };
-            //#endregion
 
             // 回傳處理
             setData1(responseData);
-            // setData(dataModel);//備分恢復原本的model
-            // setCanEdit(dataModel.canedit);//不擋了
-            // console.log("EditWHPositionByID:" + data1.id);
 
+            setwhpid(recodeWhpid(responseData?.length, responseData?.width, responseData?.childlength, responseData?.childwidth));
             setProductid(responseData?.productid);
             setName(responseData?.productname);
             setSpec(responseData?.productspec);
@@ -260,7 +302,14 @@ export default function TrayDetail() {
 
             const conditionModel = {
                 username: userInfo?.employee?.chName.toString(),
-                data: updatedData
+                data: updatedData,
+                productid: productid,
+                name: name,
+                spec: spec,
+                prodbatch: prodbatch,
+                quantity: quantity,
+                unit: unit
+
             };
 
             const inputModel = {
@@ -284,16 +333,23 @@ export default function TrayDetail() {
                 throw new Error('Failed to fetch or update data');
             }
 
-            router.replace({
-                pathname: `/factoryDepartment/editWHPosition`,
-                query: {
-                    type: 'WHPosition',
-                    whid: whid,
-                    trayname: trayname,
-                    whname: whname,
-                    id: id
-                },
-            });
+            const result = await response.json();
+
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: "更新成功" });
+                GetWhp(id, trayname, whid);
+                GetLayOut(id, trayname, whid);
+                setIsEditing(false);
+
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
+            }
+
+
+
         } catch (error: any) {
             myAlert.err({ title: error.message });
         } finally {
@@ -301,13 +357,191 @@ export default function TrayDetail() {
         }
     };
 
+    //取得托盤呼叫狀態
+    const GetTrayStatus = async (whid: string) => {
+        try {
+            setIsLoading(true);
+
+            const trayStatus = await getTrayStatus(setting.apipath, whid);
+
+            // 更新狀態
+            setCalled(trayStatus.called);
+            setIP(trayStatus.ip);
+            setCalledTray(trayStatus.trayname); // trayname 可正常取值
+            setCalledWarehouse(trayStatus.whname);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    //更新托盤呼叫狀態
+    const UpdateTrayStatus = async () => {
+        try {
+            setIsLoading(true);
+
+            const conditionModel = {
+                whid: whid,
+                called: !called,
+                trayname: trayname,
+                called_by: userInfo?.employee?.id,
+            };
+
+            const result = await updateTrayStatus(setting.apipath, conditionModel);
+
+            if (result.success) {
+                // 成功，更新狀態
+                setCalled(!called);
+            } else {
+                // 失敗，顯示錯誤提示
+                setCalled(false);
+                myAlert.warning({ title: "失敗", content: result.message });
+            }
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 呼叫托盤
+    const CallTray = async () => {
+        try {
+            setIsLoading(true);
+
+            // 設定基礎參數
+            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const deviceName = "Device1";
+            const trayNumber = trayname;
+            const trayCommand = "100";
+            const regAddress = "253";
+            const cmdValue = "1";
+
+            // 使用 callTray 服務
+            await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 退回托盤
+    const CallTrayBack = async () => {
+        try {
+            setIsLoading(true);
+
+            // 設定基礎參數
+            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const deviceName = "Device1";
+            const trayNumber = trayname;
+            const trayCommand = "200";
+            const regAddress = "253";
+            const cmdValue = "1";
+
+            // 使用 callTray 服務
+            await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
+        } catch (error: any) {
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
 
 
     //#endregion
 
-
     //#region ===========【功能區】
+    const handleSave = () => {
+        updateData(data1);
+    }
 
+    //編輯
+    const handleEdit = () => {
+        setIsEditing(true);
+        setOriginalProductid(productid);
+        setOriginalName(name);
+        setOriginalSpec(spec);
+        setOriginalProdbatch(prodbatch);
+        setOriginalQuantity(quantity);
+        setOriginalUnit(unit);
+    }
+
+    //取消編輯
+    const handleCancel = () => {
+        setIsEditing(false);  // 結束編輯模式
+        setProductid(originalproductid);
+        setName(originalname);
+        setSpec(originalspec);
+        setProdbatch(originalprodbatch);
+        setQuantity(originalquantity);
+        setUnit(originalunit);
+    };
+
+    //呼叫托盤
+    const handleCall = async () => {
+        await GetTrayStatus(whid);
+        if (called === true) {
+            myAlert.warning({ title: '請先收回托盤' });
+            return;
+        } else {
+            myAlert.confirm({
+                title: `呼叫: ${trayname}`,
+                content: '請勿靠近設備!!',
+                props: {
+                    onOk: async () => {
+                        // await CallTrayAPI();
+                        await CallTray();
+                        UpdateTrayStatus();
+                    }
+                }
+            });
+
+        }
+    }
+
+    //退回托盤
+    const handleBack = async () => {
+        await GetTrayStatus(whid);
+        if (called === false) {
+            myAlert.warning({ title: '托盤已退回' });
+            return;
+        } else {
+            myAlert.confirm({
+                title: `退回: ${calledTray}`,
+                content: '請勿靠近設備!!',
+                props: {
+                    onOk: async () => {
+                        await CallTrayBack();
+                        UpdateTrayStatus();
+                    }
+                }
+            });
+
+        }
+    }
+
+    //切換儲格
+    const handlechangewhposition = (id: any, whid: any, trayname: any, whname: any) => {
+        if (isEditing) {
+            setIsEditing(false);
+        }
+
+        setId(id);
+        setWhid(whid);
+        setTrayname(trayname);
+        setWhname(whname);
+        GetWhp(id, trayname, whid);
+        GetLayOut(id, trayname, whid);
+    }
+
+
+
+    //#endregion
+
+    //#region ===========【邏輯】
     //儲格重新編碼
     const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
         const convertToAlpha = (num: number): string => {
@@ -382,52 +616,72 @@ export default function TrayDetail() {
 
         return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
     };
-
-    //切換儲格
-    const handlechangewhposition = (id: any, whid: any, trayname: any, whname: any) => {
-        // router.replace({
-        //     pathname: `/factoryDepartment/editWHPosition`,
-        //     query: {
-        //         type: 'WHPosition',
-        //         whid: whid,
-        //         trayname: trayname,
-        //         whname: whname,
-        //         id: id,
-        //     },
-        // });
-
-        setId(id);
-        setWhid(whid);
-        setTrayname(trayname);
-        setWhname(whname);
-        GetWhp(id, trayname, whid);
-        GetLayOut(id, trayname, whid);
-
-    }
-
-
-
     //#endregion
 
+    //#region ===========【物料篩選】
+    const [isFilterVisible, setIsFilterVisible] = useState(false);
+    const [customerbar, setCustomerbar] = useState(false);
+    const [countyOptions, setCountyOptions] = useState<string[]>([]);
+    const [filteredData2, setFilteredData2] = useState<any[]>([]);
+    const [filters, setFilters] = useState({
+        productid: '',
+        name: '',
+        spec: ''
+    });
+
+    // 根據篩選條件更新資料
+    useEffect(() => {
+        const filtered = searchbardata.filter(item =>
+            (filters.productid === '' || item?.productid?.toLowerCase().includes(filters.productid.toLowerCase())) &&
+            (filters.name === '' || item?.name?.toLowerCase().includes(filters.name.toLowerCase())) &&
+            (filters.spec === '' || item?.spec?.toLowerCase().includes(filters.spec.toLowerCase()))
+        );
+        setFilteredData2(filtered);
+    }, [filters]);
 
 
 
+    // useEffect(() => {
+    //     setFilteredData2(
+    //         searchbardata.filter(
+    //             (item) =>
+    //                 (!productid || (item?.productid && item.productid.toLowerCase().includes(productid.toLowerCase()))) &&
+    //                 (!name || (item?.name && item.name.toLowerCase().includes(name.toLowerCase()))) &&
+    //                 (!spec || (item?.spec && item.spec.toLowerCase().includes(spec.toLowerCase())))
+    //         )
+    //     );
+    // }, [productid, name, spec]); // 當 supplieridin 或 suppliernamein 變化時觸發
 
+    //#endregion
 
     //#region ===========【渲染畫面】
     return (
 
         <SubLayer isLoading_subLayer={false} className='overflow-hidden'>
-            <PageHeader02 tag={`倉庫名稱：101｜托盤名稱：1001`} panelList={undefined}
+            <PageHeader02 tag={`倉庫編號：${whname}｜托盤編號：${trayname}`} panelList={undefined}
+                customeLeft={[
+
+                    <>
+                        {/* 托盤呼叫狀態:{called?.toString()} */}
+                    </>
+                ]}
                 customeRight={[
                     <>
                         {isEditing ? (
                             // 當 isEditing 為 true 時，顯示 "儲存" 和 "取消" 按鈕
                             <>
                                 <button
-                                    className={scss.shortsquarebtn}
+                                    className={scss.shortredsquarebtn}
                                     onClick={() => {
-                                        alert("儲存");
+                                        myAlert.confirm({
+                                            title: '確定修改?',
+                                            props: {
+                                                onOk: () => {
+                                                    // setDisabled(true);
+                                                    handleSave();
+                                                }
+                                            }
+                                        });
                                     }}
                                 >
                                     儲存
@@ -435,7 +689,17 @@ export default function TrayDetail() {
                                 <button
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
-                                        setIsEditing(false);
+                                        myAlert.confirm({
+                                            title: '確定要取消嗎?',
+                                            content: <>
+                                                <h1>未儲存的資料將不會保留</h1>
+                                            </>,
+                                            props: {
+                                                onOk: () => {
+                                                    handleCancel();
+                                                }
+                                            }
+                                        })
                                     }}
                                 >
                                     取消
@@ -447,7 +711,7 @@ export default function TrayDetail() {
                                 <button
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
-                                        setIsEditing(true);
+                                        handleEdit();
                                     }}
                                 >
                                     編輯
@@ -472,19 +736,46 @@ export default function TrayDetail() {
 
                     </>
                 ]} />
-            {/* <div>
-                <p>ID: {id}</p>
-                <p>WH Name: {whname}</p>
-                <p>Tray Name: {trayname}</p>
-                <p>WH ID: {whid}</p>
-                <p>Type: {type}</p>
-            </div> */}
+
             <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <div className={scss.head_body}>
+
                             <div className={scss.head_content0}>
                                 <div>
+                                    <button
+                                        style={{
+                                            visibility: isEditing ? 'visible' : 'hidden', // 保留空間但隱藏按鈕
+                                            width: '39px',
+                                            backgroundColor: '#f5f5f5',
+                                            border: '1px solid #c1c1c1',
+                                            borderRadius: '3px',
+                                            cursor: isEditing ? 'pointer' : 'default', // 非編輯模式禁用滑鼠效果
+                                            transition: 'all 0.3s ease',
+                                            fontWeight: 'bolder'
+                                        }}
+                                        onMouseOver={(e) => {
+                                            if (isEditing) {
+                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
+                                                e.currentTarget.style.borderColor = '#a1a1a1';
+                                            }
+                                        }}
+                                        onMouseOut={(e) => {
+                                            if (isEditing) {
+                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                                e.currentTarget.style.borderColor = '#c1c1c1';
+                                            }
+                                        }}
+                                        onClick={() => {
+                                            if (isEditing) {
+                                                // setCustomerbar(true);
+                                                setSearchbar(true);
+                                            }
+                                        }}
+                                    >
+                                        <img src={icon_search.src} alt="search" style={{ width: '30px', height: '20px' }} />
+                                    </button>
                                     <InputSel
                                         {...inputSelProps}
                                         caption={`料號`}
@@ -532,32 +823,21 @@ export default function TrayDetail() {
                                     />
                                     <InputSel
                                         {...inputSelProps}
-                                        caption={`批號`}
-                                        captionStyle={{ fontSize: '18px' }}
-                                        wrapperStyle={{ marginBottom: '10px' }}
-                                        disabled={!isEditing}
-                                        inputProps={{
-                                            props: {
-                                                value: prodbatch || ' ',
-                                                onChange: ((e) => {
-                                                    setProdbatch(e.target.value);
-                                                })
-                                            },
-                                        }}
-                                    />
-                                    <InputSel
-                                        {...inputSelProps}
                                         caption={`數量`}
                                         captionStyle={{ fontSize: '18px' }}
                                         wrapperStyle={{ marginBottom: '10px' }}
                                         disabled={!isEditing}
                                         inputProps={{
                                             props: {
-                                                type: `${!isEditing ? 'number' : 'text'}`,
-                                                value: `${!isEditing ? quantity : Number(quantity).toLocaleString()}`,
-                                                onChange: ((e) => {
-                                                    setQuantity(e.target.value);
-                                                })
+                                                type: 'text',
+                                                value: isEditing ? quantity : Number(quantity).toLocaleString(), // 編輯時顯示純數字，非編輯時格式化顯示
+                                                onChange: (e) => {
+                                                    const newValue = e.target.value;
+                                                    // 檢查是否為有效數值（避免非數值更新）
+                                                    if (!isNaN(Number(newValue)) && newValue.trim() !== "") {
+                                                        setQuantity(Number(newValue).toString()); // 更新為數字類型
+                                                    }
+                                                },
                                             },
                                         }}
                                     />
@@ -566,7 +846,7 @@ export default function TrayDetail() {
                                         caption={`單位`}
                                         captionStyle={{ fontSize: '18px' }}
                                         wrapperStyle={{ marginBottom: '10px' }}
-                                        disabled={!isEditing}
+                                        disabled={true}
                                         inputProps={{
                                             props: {
                                                 value: unit || ' ',
@@ -576,21 +856,70 @@ export default function TrayDetail() {
                                             },
                                         }}
                                     />
-                                    {/* <InputSel
+                                    <InputSel
+                                        {...inputSelProps}
+                                        caption={`批號`}
+                                        captionStyle={{ fontSize: '18px' }}
+                                        wrapperStyle={{ marginBottom: '10px' }}
+                                        disabled={true}
+                                        inputProps={{
+                                            props: {
+                                                value: prodbatch || ' ',
+                                                onChange: ((e) => {
+                                                    setProdbatch(e.target.value);
+                                                })
+                                            },
+                                        }}
+                                    />
+
+                                    <InputSel
                                         {...inputSelProps}
                                         caption={`儲格編號`}
                                         captionStyle={{ fontSize: '18px' }}
                                         wrapperStyle={{ marginBottom: '10px' }}
-                                        disabled={false}
+                                        disabled={true}
                                         inputProps={{
                                             props: {
-                                                value: whid || ' ',
+                                                value: whpid || ' ',
                                                 onChange: ((e) => {
-                                                    setWhid(e.target.value);
+                                                    setwhpid(e.target.value);
                                                 })
                                             },
                                         }}
-                                    /> */}
+                                    />
+                                    <button
+                                        onClick={() => {
+                                            if (!called) {
+                                                handleCall();
+                                            } else {
+                                                handleBack();
+                                            }
+                                        }}
+                                        style={{
+                                            width: '100%',  // 調整按鈕大小，與圖片更匹配
+                                            height: '50px', // 調整按鈕大小，與圖片更匹配
+                                            // border: '1px solid #ccc',
+                                            border: `${called ? '1px solid rgb(0, 105, 23, 0.267)' : '1px solid #ea1833'}`,
+                                            display: `${!isEditing ? 'flex' : 'none'}`,  // 根據 isEditing 顯示或隱藏按鈕
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            cursor: 'pointer',
+                                            borderRadius: '5px',
+                                            transition: 'background-color 0.3s',  // 添加過渡效果
+                                            fontSize: '16px',
+                                            color: `${called ? '#86bd07' : '#ea1833'}`
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            (e.target as HTMLButtonElement).style.backgroundColor = `${called ? 'rgb(0, 105, 23, 0.267)' : '#ea18341d'}`;
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                                        }}
+                                    >
+
+                                        {`${called ? `退回托盤(${calledTray})` : `呼叫托盤(${trayname})`}`}
+
+                                    </button>
 
                                 </div>
                                 <div style={{ boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)', padding: '20px 20px' }}>
@@ -667,6 +996,82 @@ export default function TrayDetail() {
                 </div>
             </div>
 
+            <Modal
+                visible={searchbar}
+                onCancel={() => setSearchbar(false)}
+                width="1010px"
+                closable={false} // 移除右上角的叉叉
+                style={{ top: 150 }}
+                bodyStyle={{ padding: 0, height: '500px', overflowY: 'auto' }}
+                title={
+                    <>
+
+                        {/* 篩選區域 */}
+                        <div style={{ display: 'flex', gap: '10px', padding: '10px', alignItems: 'center', fontSize: '16px' }}>
+                            {/* 料號篩選 */}
+                            <input
+                                type="text"
+                                placeholder="輸入料號"
+                                value={filters.productid}
+                                onChange={(e) => setFilters({ ...filters, productid: e.target.value })}
+                                style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                            />
+
+                            {/* 名稱篩選 */}
+                            <input
+                                type="text"
+                                placeholder="輸入名稱"
+                                value={filters.name}
+                                onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                                style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                            />
+
+                            {/* 規格篩選 */}
+                            <input
+                                type="text"
+                                placeholder="輸入規格"
+                                value={filters.spec}
+                                onChange={(e) => setFilters({ ...filters, spec: e.target.value })}
+                                style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                            />
+                        </div>
+                    </>
+                }
+                footer={null}
+            >
+
+
+                {/* 資料列表 */}
+                <div style={{ padding: '0px 35px' }}>
+
+
+                    <div className={scss.thead21}>
+                        <span>料號</span>
+                        <span>名稱</span>
+                        <span>規格</span>
+                        <span></span>
+                    </div>
+                    {filteredData2 && (
+                        filteredData2.map((_item: any, index: number) => (
+                            <CellWithBar key={index} className={scss.panelHeader21}
+                                onClick={() => {
+                                    setProductid(_item.productid);
+                                    setName(_item.name);
+                                    setSpec(_item.spec);
+                                    setQuantity("0");
+                                    setSearchbar(false);
+
+                                }}>
+                                <div className={scss.row01}>
+                                    <span>{_item.productid}</span>
+                                    <span>{_item.name}</span>
+                                    <span>{_item.spec}</span>
+                                </div>
+                            </CellWithBar>
+                        ))
+                    )}
+                </div>
+            </Modal>
 
         </SubLayer >
 
