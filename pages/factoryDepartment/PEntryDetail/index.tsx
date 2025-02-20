@@ -50,7 +50,7 @@ import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-
 import { title } from 'process';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 import icon_tray_in_gray from 'public/image/icon/fc_tray_in_gray.svg';
-import { callTray, updateTrayStatus, getTrayStatus } from "../service/callTrayService";
+import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/service/callTrayService";
 
 export default function PEntryDetail() {
     //#region ===========【頁面參數】

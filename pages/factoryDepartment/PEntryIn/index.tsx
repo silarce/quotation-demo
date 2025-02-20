@@ -63,7 +63,7 @@ import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
-import { callTray, updateTrayStatus, getTrayStatus } from "../service/callTrayService";
+import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/service/callTrayService";
 
 export default function PEntryIn() {
     const [pagename, setPagename] = useState<string>("待入品項")

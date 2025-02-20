@@ -51,7 +51,7 @@ import { title } from 'process';
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 import icon_tray_out from 'public/image/icon/fc_tray_out.svg';
 import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg';
-import { callTray, updateTrayStatus, getTrayStatus } from "../service/callTrayService";
+import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/service/callTrayService";
 
 
 export default function PKingDetail() {
