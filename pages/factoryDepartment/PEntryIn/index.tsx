@@ -63,7 +63,7 @@ import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
-import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/service/callTrayService";
+import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/api/callTrayService";
 
 export default function PEntryIn() {
     const [pagename, setPagename] = useState<string>("待入品項")
@@ -612,6 +612,7 @@ export default function PEntryIn() {
             GetTrayStatus(data[0].whid);
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
             if (modalcheckfirstin === 0) {
+                setWhid(data[0].whid);
                 setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
                 setWhpname(data[0].name);
                 setWhpproductid(data[0].productid);

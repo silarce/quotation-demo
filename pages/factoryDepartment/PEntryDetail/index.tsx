@@ -50,7 +50,7 @@ import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-
 import { title } from 'process';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 import icon_tray_in_gray from 'public/image/icon/fc_tray_in_gray.svg';
-import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/service/callTrayService";
+import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/api/callTrayService";
 
 export default function PEntryDetail() {
     //#region ===========【頁面參數】
@@ -1733,6 +1733,7 @@ export default function PEntryDetail() {
             GetTrayStatus(data[0].whid);
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
             if (modalcheckfirstin === 0) {
+                setWhid(data[0].whid);
                 setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
                 setWhpname(data[0].name);
                 setWhpproductid(data[0].productid);

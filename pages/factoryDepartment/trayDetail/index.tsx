@@ -27,7 +27,7 @@ import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg';
 //
 import { isWednesday } from 'date-fns';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/service/callTrayService";
+import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/api/callTrayService";
 
 
 
