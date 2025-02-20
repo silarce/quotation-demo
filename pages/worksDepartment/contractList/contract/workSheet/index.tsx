@@ -45,15 +45,12 @@ import {
   useApiGetWorksheetRecord_id,
 } from 'js/api/api_engineering';
 
-// import { apiAddReview, apiGetReviewBack } from 'js/api/api_netCore/api_review';
-
 // hook
 import { TquotationProductItemDto_old } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-// import { TworkSheetDto, workSheetReducer } from 'js/utils/worksheet/reducer';
 import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
 import { lookup_motorPhase } from 'config/product/lookup';
 
@@ -65,7 +62,6 @@ import type {
   TengineeringContactDto,
   TquotationProductItemDto,
   TerpFeatureDto,
-  // TworksheetDto_legacy,
   TquotationProductAccessoryDto,
   TworksheetRecordDto,
   TquotationProductComponentDto,
@@ -93,8 +89,13 @@ type Tquery = {
   activeRecordId?: string | undefined;
 };
 
+type TcomponentList = {
+  [key: string]: TquotationProductComponentDto | undefined;
+};
+
 // ====================================================================
 
+// MARK: START
 export default function Worksheet({
   isAdmin,
   userErpFeature,
@@ -107,6 +108,8 @@ export default function Worksheet({
   const { req_reviewBack, req_backThanAdd } = useGlobal_review();
 
   const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
+
+  const init = useWorksheet((state) => state.init);
 
   // ----------------------------------------------------------------
   const ref_main = useRef<HTMLDivElement>(null!);
@@ -140,8 +143,6 @@ export default function Worksheet({
   const [isShowPdf, setIsShowPdf] = useState(false);
   const [isShowPdf02, setIsShowPdf02] = useState(false);
 
-  // -------------------------------------------------------------------------
-
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
   // -------------------------------------------------------------------------
@@ -161,17 +162,12 @@ export default function Worksheet({
     ],
     addintion_latestRecordReview: true,
   });
-  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
-  const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
-
-  // ________________________________________________________________________
-  // ________________________________________________________________________
 
   const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId, {
     recordsWithReview: true,
   });
 
-  // -------------------------------------------------------------------------
+  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
 
   const {
     data: activeRecordData,
@@ -180,15 +176,13 @@ export default function Worksheet({
     clear: clear_activeRecord,
   } = useApiGetWorksheetRecord_id(activeRecordId, { addition_reviewArr: true });
 
+  const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
+
   const activedProd = useMemo(() => {
     return finalProduct.find((prod) => prod.id === activedProdId);
   }, [activedProdId, finalProduct]);
 
   const activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[] = activedProd?.items?.[0].accessories ?? [];
-
-  // -------------------------------------------------------------------------
-
-  const init = useWorksheet((state) => state.init);
 
   const worksheetExport = useWorksheet(
     useShallow((state) => ({
@@ -199,6 +193,8 @@ export default function Worksheet({
   );
 
   // -------------------------------------------------------------------------
+
+  // region REQ
 
   const refreshData = async () => {
     return Promise.all([
@@ -325,58 +321,11 @@ export default function Worksheet({
   };
 
   // -------------------------------------------------------------------------
-
-  // MARK: useEffect
-
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      await Promise.all([
-        //
-        update_contract(),
-        update_finalProduce(),
-        // update_doorModel(),
-      ]);
-      setIsLoading(false);
-    })();
-  }, [contractId]);
-
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      await update_worksheetData();
-      setIsLoading(false);
-    })();
-  }, [activeWorksheetId]);
-
-  useEffect(() => {
-    if (activeRecordId) {
-      update_activeRecord();
-    } else {
-      clear_activeRecord();
-    }
-  }, [activeRecordId]);
-
-  // zustand 狀態
-  useEffect(() => {
-    if (disabled && activeRecordData) {
-      const contractProductItems = activeRecordData.contractProductItems;
-
-      init({
-        worksheetId: activeWorksheetId!,
-        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
-        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
-        qty: contractProductItems?.length ?? 0,
-        originalAccessories: activeWorksheetOriginalAccessories,
-      });
-    }
-  }, [activeRecordData, disabled]);
-
-  // -------------------------------------------------------------------------
+  // region control
   const control_profile = useControl_profile(engineeringContact);
+  // ________________________________________________________________________
+  // ________________________________________________________________________
 
-  // -------------------------------------------------------------------------
   const { control_productCardArr, latestRecordArr } = useMemo(() => {
     const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
     const latestRecordArr: TworksheetRecordDto[] = [];
@@ -503,8 +452,6 @@ export default function Worksheet({
         return intro;
       });
 
-      // ----------------------
-
       control_productCardArr.push({
         id: prod.id,
         itemName: prod.itemName,
@@ -546,10 +493,8 @@ export default function Worksheet({
     return { control_productCardArr, latestRecordArr, doorModelDict };
     //
   }, [activeWorksheetId, finalProduct, worksheetArr]);
-
-  // ___________________________________________________________________________
-  // ___________________________________________________________________________
-
+  // ________________________________________________________________________
+  // ________________________________________________________________________
   const control_recordList: Tcontrol_recordList = useMemo(() => {
     const records = _.sortBy(worksheetData?.records, 'version').reverse();
 
@@ -609,6 +554,8 @@ export default function Worksheet({
 
     return { recordArr };
   }, [worksheetData]);
+  // ________________________________________________________________________
+  // ________________________________________________________________________
 
   const { control_workSheetPDF_01, control_workSheetPDF_02 } = useControl_pdf({
     contractNumber: contract?.contractNumber ?? '',
@@ -619,6 +566,8 @@ export default function Worksheet({
   });
 
   // -------------------------------------------------------------------------
+
+  // region panelList
 
   let panelList_notAllow: TpanelList = [
     {
@@ -700,7 +649,56 @@ export default function Worksheet({
   ];
 
   const panelList = disabled ? panelList_notAllow : panelList_allow;
-  // -----------------------------------------------------------------
+
+  // -----------------------------------------------------------------------
+
+  // MARK: useEffect
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      await Promise.all([
+        //
+        update_contract(),
+        update_finalProduce(),
+        // update_doorModel(),
+      ]);
+      setIsLoading(false);
+    })();
+  }, [contractId]);
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      await update_worksheetData();
+      setIsLoading(false);
+    })();
+  }, [activeWorksheetId]);
+
+  useEffect(() => {
+    if (activeRecordId) {
+      update_activeRecord();
+    } else {
+      clear_activeRecord();
+    }
+  }, [activeRecordId]);
+
+  // zustand 狀態
+  useEffect(() => {
+    if (disabled && activeRecordData) {
+      const contractProductItems = activeRecordData.contractProductItems;
+
+      init({
+        worksheetId: activeWorksheetId!,
+        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
+        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
+        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
+        qty: contractProductItems?.length ?? 0,
+        originalAccessories: activeWorksheetOriginalAccessories,
+      });
+    }
+  }, [activeRecordData, disabled]);
+
   // -----------------------------------------------------------------------
 
   // MARK: RENDER
@@ -758,20 +756,12 @@ export default function Worksheet({
   );
 }
 
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
+// MARK:END
+// ====================================================================
+// ====================================================================
+// ====================================================================
+
+// MARK:useControl_profile
 
 const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
   const control_profile = useMemo(() => {
@@ -854,26 +844,8 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
   return contractProductItems;
 };
 
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-
-type TcomponentList = {
-  [key: string]: TquotationProductComponentDto | undefined;
-};
-
+// MARK:useControl_pdf
 const useControl_pdf = ({
-  //
   contractNumber,
   customerName,
   contactPerson,
