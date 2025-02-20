@@ -1,0 +1,259 @@
+@use "styles/theme01" as *;
+
+.container {
+    display: flex;
+    overflow-y: hidden;
+    // height: 712px;
+}
+
+.right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    border: 1px solid #c1c1c1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: sticky;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    // height: 712px;
+}
+
+
+.content {
+    width: 100%;
+    overflow-y: auto;
+    top: 0;
+    padding-bottom: 20px;
+
+}
+
+.head_body {
+    display: grid;
+    grid-template-columns: 1fr;
+    // gap: 15px;
+    // width: auto;
+    // margin-top: 5px;
+    padding-top: 36px;
+    padding-bottom: 36px;
+    padding-left: 20px;
+    // margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+}
+
+.head_content0 {
+    display: grid;
+    grid-template-columns: 390px 1fr; // 左右兩邊比例，可以調整
+    gap: 20px;
+    width: auto;
+    // margin-top: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+
+    div {
+        margin-right: 2px;
+    }
+
+    // background-color: gray;
+}
+
+
+
+
+
+
+// 托盤
+.traytable {
+    width: 100%;
+    max-width: 100%;
+    height: 80px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: 1px solid black;
+    margin-bottom: 0px;
+    border: 0px;
+}
+
+.td {
+    height: 60px;
+    border: 1px solid #707070;
+    word-wrap: break-word;
+    text-align: center;
+    margin: 0px;
+}
+
+.childtraytable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.childtraytabletr td {
+    border: 1px solid #bbbaba;
+    word-wrap: break-word;
+    text-align: center;
+    background-color: white;
+}
+
+.childtraytabletr td button {
+    width: 100%;
+    height: 40px;
+    word-wrap: break-word;
+    text-align: center;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.childtraytabletr td button:hover {
+    background-color: #ea1833 !important;
+}
+
+
+
+.addBtn {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+    border: none;
+    background-color: white;
+
+}
+
+.shortsquarebtn {
+    display: inline-flex; // 確保內容水平垂直居中
+    align-items: center;
+    justify-content: center;
+    height: 43.16px;
+    min-width: 78px; // 避免過短導致內容擠壓
+    padding: 0 12px; // 適量的左右間距
+    border: solid 1px #c1c1c1;
+    background-color: $bgc01;
+    font-weight: 500;
+    font-size: 16px;
+    color: #14256a;
+    text-align: center;
+    white-space: nowrap; // 防止文字換行
+    box-sizing: border-box; // 包括 padding 在內計算寬高
+    transform: translateY(0px);
+
+    &:hover {
+        border: solid 1px #c1c1c1;
+        background-color: #c1c1c17c;
+    }
+
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #c1c1c1;
+    }
+}
+
+
+.shortredsquarebtn {
+    display: inline-flex; // 使內容水平垂直居中
+    align-items: center;
+    justify-content: center;
+    height: 43.16px;
+    min-width: 78px; // 使用 min-width 以適應不同文字長度
+    padding: 0 12px; // 控制左右間距
+    border: solid 1px #ea1833;
+    background-color: $bgc01;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ea1833;
+    text-align: center;
+    white-space: nowrap; // 防止文字換行
+    box-sizing: border-box; // 確保寬高包括 padding
+    transform: translateY(0px);
+
+    &:hover {
+        border: solid 1px #ea1833;
+        background-color: #ea18341d;
+    }
+
+    &:focus {
+        background-color: $bgc01;
+        border: solid 1px #ea1833;
+    }
+}
+
+
+//#region 物料
+.thead21 {
+    position: -webkit-sticky; // 為兼容性增加前綴
+    position: sticky;
+    top: 0;
+    z-index: 1000; // 確保元素位於其他內容的上層
+    display: grid;
+    grid-template-columns: 180px 300px 350px 30px;
+    // gap: 5px;
+    height: 40px;
+    padding: 0px 20px;
+    background-color: $bgc01;
+
+    >* {
+        margin: auto;
+        margin-left: 0;
+
+        &:nth-last-of-type(1) {
+            margin-left: auto;
+        }
+    }
+
+    >span {
+        font-weight: 400;
+        font-size: 18px;
+        // color: #979797;
+        color: #14256a;
+    }
+}
+
+div.panelHeader21 {
+    // padding-left: 20px;
+    padding: 10px 20px;
+    border-bottom: solid 1px $colorBorder01;
+
+    .row01,
+    .row02 {
+        span {
+            font-weight: 400;
+            font-size: 18px;
+        }
+
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
+    }
+
+    .row01 {
+        display: grid;
+        grid-template-columns: 180px 300px 350px 30px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .selectedRow {
+        background-color: #ecf1ff;
+        /* 當前選擇項目的背景顏色 */
+    }
+}
+
+//#endregion
+
+
+.addBtn {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+    border: none;
+    background-color: white;
+
+}
