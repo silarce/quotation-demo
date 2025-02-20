@@ -136,6 +136,7 @@ export default function WareHouseList() {
             }
             const data = await response.json();
             setData(data);
+
         } catch (error: any) {
             setError(error.message);
         }
@@ -245,7 +246,7 @@ export default function WareHouseList() {
             query: {
                 type: 'Tray',
                 whid: item.id,
-                whname: item.whname,
+                whname1: item.whname,
                 url: url,
                 traycalled: traycalled,
                 traycalledname: traycalledname,

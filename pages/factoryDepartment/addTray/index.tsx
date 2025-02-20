@@ -62,8 +62,8 @@ export default function AddTray() {
     const [data12, setData12] = useState<any[]>([]);
     const [originaldata11, setOriginalData11] = useState<any[]>([]);
 
-    const [length, setLength] = useState<number | null>(1);
-    const [width, setWidth] = useState<number | null>(1);
+    const [length, setLength] = useState<number | null>(0);
+    const [width, setWidth] = useState<number | null>(0);
     const [childlength, setChildLength] = useState<number | null>(1);
     const [childwidth, setChildWidth] = useState<number | null>(1);
     const [childparentlength, setChildParentLength] = useState<number | null>(0);
@@ -85,16 +85,20 @@ export default function AddTray() {
 
 
     const router = useRouter();
-    const { type, whid, whname, id } = router.query;
+    const { type, whid, whname, id, nextrayname } = router.query;
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [disabled, setDisabled] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     ;
 
+    // useEffect(() => {
+    //     setTrayName(nextrayname as string);
+    // });
+
     const AddLayOut = async () => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 whid: whid as string | undefined,
                 trayname: trayname as string | undefined,
@@ -138,7 +142,7 @@ export default function AddTray() {
 
     const AddChildLayOut = async () => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 whid: whid as string | undefined,
                 trayname: trayname as string | undefined,
@@ -184,7 +188,7 @@ export default function AddTray() {
 
     const TotalLayOut = async () => {
         try {
-            setIsLoading(true);
+            // setIsLoading(true);
             const conditionModel = {
                 whid: whid as string | undefined,
                 trayname: trayname as string | undefined,
@@ -232,7 +236,6 @@ export default function AddTray() {
 
     const AddTray = async () => {
         try {
-            console.log(traylayout);
             setIsLoading(true);
 
             const allChildWidthData: any[] = [];
@@ -248,16 +251,6 @@ export default function AddTray() {
                 });
             });
 
-            // 輸出所有 childwidthdata
-
-            // setTrayLayOut([]);
-            // setTrayLayOut(allChildWidthData);
-
-
-            console.log(allChildWidthData);
-
-
-
             const conditionModel = {
                 trayModel: {
                     trayname: trayname as string | undefined,
@@ -271,16 +264,12 @@ export default function AddTray() {
                 traylayout: allChildWidthData,
             };
 
-            // console.log("checkmodel: ", conditionModel.traylayout);
-
             const inputModel = {
                 TypeName: 'ERP',
                 ServiceName: 'WareHouseService',
                 FunctionName: 'test',
                 FilterConditions: JSON.stringify(conditionModel),
             };
-
-            // console.log("checkinput: ", inputModel);
 
             const response = await fetch(`${setting.apipath}/WareHouse/AddTray`, {
                 method: 'POST',
@@ -297,57 +286,26 @@ export default function AddTray() {
             const responseData = await response.json();
             if (response.ok) {
                 myAlert.success({ title: '新增成功' });
-                // router.push({
-                //     pathname: `/factoryDepartment/trayList`,
-                //     query: {
-                //         type: 'WareHouse',
-                //         whid: whid,
-                //         whname: whname
-                //     }
-                // });
+                router.back();
             }
-            // console.log("checkresponse: ", responseData);
-
-            // setData11child(responseData);
-            // setData11(responseData);
-            // setPreTrayLayout(responseData);
         } catch (error: any) {
-            console.error("Error in AddLayOut: ", error);
             setError(error.message);
         } finally {
             setIsLoading(false);
         }
     };
 
-
-
-
-// useEffect(() => {
-//     if (traylayout.length > 0 && trayname) {
-//         AddTray();
-//     }
-// }, [traylayout]); // 當 traylayout 改變時觸發
-
-
     // 點選呼叫托盤後功能紐
     const panelList: TpanelList = [
         {
             type: 'redButton',
             label: '新增',
-            onClick: () => {
-                console.log(data11);
-
-
-
-
-                // return;
-                // 可以在這裡添加其他新增邏輯
-                // alert("新增托盤")
-                if (trayname != "" && trayname != null && trayname != undefined) {
-                    AddTray();
+            onClick: async () => {
+                if ((trayname != "" && trayname != null && trayname != undefined) && (length && width !== 0)) {
+                    await AddTray();
                 } else {
-                    myAlert.err({
-                        title: "請輸入托盤名稱",
+                    myAlert.warning({
+                        title: "請確認名稱或儲格",
                     })
 
                 }
@@ -389,7 +347,6 @@ export default function AddTray() {
             }
         }
         setTrayLayOut(newLayout);
-        console.log(newLayout);
     };
 
     const updateTrayChildLayout = (currentLength: number, currentWidth: number) => {
@@ -684,12 +641,22 @@ export default function AddTray() {
             }
 
             // 取出 childtraylayoutmodel 中的第一筆資料
-            const firstChildTrayLayout = updatedData[0].widthdata.childtraylayoutmodel[parseInt(currentchildlength) - 1];
+            let firstChildTrayLayout = updatedData[0].widthdata.childtraylayoutmodel[parseInt(currentchildlength) - 1];
 
-            // 確保 childwidthdata 存在
-            if (!firstChildTrayLayout?.childwidthdata) {
+
+            if (!firstChildTrayLayout) {
+                // 如果 firstChildTrayLayout 不存在，可以初始化為一個空物件
+                firstChildTrayLayout = {};
+              }
+              
+              // 確保 childwidthdata 存在
+              if (!firstChildTrayLayout.childwidthdata) {
                 firstChildTrayLayout.childwidthdata = [];
-            }
+              }
+            // // 確保 childwidthdata 存在
+            // if (!firstChildTrayLayout?.childwidthdata) {
+            //     firstChildTrayLayout.childwidthdata = [];
+            // }
 
             // 檢查是否已存在相同的 childwidthdata
             const exists = firstChildTrayLayout.childwidthdata.some((item: any) =>
@@ -724,7 +691,7 @@ export default function AddTray() {
                 const firstChildTrayLayout = updatedData[0].widthdata.childtraylayoutmodel[parseInt(currentchildlength) - 1];
 
                 // 確保 childwidthdata 存在並且有資料
-                if (firstChildTrayLayout.childwidthdata && firstChildTrayLayout.childwidthdata.length > 0) {
+                if (firstChildTrayLayout?.childwidthdata && firstChildTrayLayout?.childwidthdata.length > 0) {
                     // 找到 childwidth 值最大的那筆資料
                     // const maxChildWidthItem = firstChildTrayLayout.childwidthdata.reduce((prev: any, current: any) =>
                     //     prev.childwidth > current.childwidth ? prev : current
@@ -1092,8 +1059,8 @@ export default function AddTray() {
 
 
     return (
-        <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname + '｜新增托盤'} panelList={panelList} />
+        <SubLayer isLoading_subLayer={isLoading}>
+            <PageHeader02 tag={`新增｜倉庫編號：${whname}`} panelList={panelList} />
             <div className={scss.main}>
                 <div className={scss.left}>
                     <div className={scss.top}>
@@ -1102,17 +1069,18 @@ export default function AddTray() {
                             <InputSel
                                 {...inputSelProps}
                                 caption="托盤名稱"
+                                captionStyle={{ fontSize: '18px' }}
                                 disabled={false}
                                 inputProps={{
                                     props: {
-                                        // value: width ?? 0,
-                                        onChange: (e) => setTrayName(e.target.value)
+                                        value: trayname?.toString(),
+                                        onChange: (e) => { setTrayName(e.target.value) }
                                     },
                                 }}
                             />
                             <InputSel
                                 {...inputSelProps}
-                                caption="寬"
+                                caption="寬↔"
                                 disabled={false}
                                 inputProps={{
                                     props: {
@@ -1124,7 +1092,7 @@ export default function AddTray() {
                             />
                             <InputSel
                                 {...inputSelProps}
-                                caption="長"
+                                caption="長↕"
                                 disabled={false}
                                 inputProps={{
                                     props: {
@@ -1134,6 +1102,10 @@ export default function AddTray() {
                                     },
                                 }}
                             />
+                            <div style={{ padding: '5px 0px' }}>
+                                <span style={{ color: 'red' }}>*請用方向鍵上下調整</span><br />
+                                <span style={{ color: 'red' }}>*點擊主儲格後，可於下方調整子儲格</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1169,16 +1141,9 @@ export default function AddTray() {
                                                                                 setCurrentlength(childDataItem.length);
                                                                                 setCurrentwidth(childDataItem.width);
                                                                                 setCurrentchildlength(childDataItem.childlength);
-                                                                                // alert(childDataItem.childlength);
-                                                                                // alert(childDataItem.childwidth);
                                                                                 setCurrentchildwidth(childDataItem.childwidth);
-                                                                                // setChildLength(1);
-                                                                                // setChildWidth(1);
-                                                                                // getLaychildOutBywhpositin(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth);
                                                                                 getLaychildOutBywhpositin(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth, childitem.childwidthdata.length);
 
-                                                                                // goToAddChildTray(childDataItem.whid, childDataItem.whname, childDataItem.length, childDataItem.width);
-                                                                                // console.log("check" + JSON.stringify(data11);
                                                                             }}
                                                                             style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
                                                                         >
@@ -1220,7 +1185,7 @@ export default function AddTray() {
 
                             <InputSel
                                 {...inputSelProps}
-                                caption="寬"
+                                caption="寬↔"
                                 disabled={false}
                                 inputProps={{
                                     props: {
@@ -1236,7 +1201,7 @@ export default function AddTray() {
                             />
                             <InputSel
                                 {...inputSelProps}
-                                caption="長"
+                                caption="長↕"
                                 disabled={false}
                                 inputProps={{
                                     props: {
