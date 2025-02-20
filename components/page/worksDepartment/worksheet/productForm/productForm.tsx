@@ -1613,6 +1613,157 @@ const Table_bottomBar = () => {
 // =====================================================================
 // =====================================================================
 
+type Tstate_specialProd_basic = {
+  itemName: string;
+  quoteType: string;
+  doorModelName: string;
+  fullWidth: `${number}` | '';
+  WG: `${number}` | '';
+  height: `${number}` | '';
+  qty: number;
+  materialName: string;
+  materialSurface: string;
+  isAntiTyphoon: boolean;
+};
+
+const Form_specialProd_basic = ({
+  state: {
+    //
+    itemName,
+    quoteType,
+    doorModelName,
+    fullWidth,
+    WG,
+    height,
+    qty,
+    materialName,
+    materialSurface,
+    isAntiTyphoon,
+  },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_basic;
+  setState: React.Dispatch<React.SetStateAction<Tstate_specialProd_basic>>;
+  disabled: boolean;
+}) => {
+  return (
+    <div>
+      <div className={scss.grid}>
+        <InputSel {...basicConfig} disabled={true} caption="報價別" node={quoteType} />
+        <div></div>
+        <InputSel {...basicConfig} disabled={true} caption="項目" node={itemName} />
+        <InputSel {...basicConfig} caption="門型" disabled={true} node={doorModelName} />
+        <InputSel
+          {...basicConfig}
+          caption="全寬(L)"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              type: 'number',
+              min: 0,
+              step: 1,
+              value: fullWidth,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                if (e.target.validity.valid) {
+                  const value = e.target.value as `${number}`;
+                  setState((prev) => ({ ...prev, fullWidth: value }));
+                }
+              },
+            },
+          }}
+        />
+        <InputSel {...basicConfig} caption="數量" disabled={true} node={qty} />
+        <InputSel
+          {...basicConfig}
+          caption="W+G"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              type: 'number',
+              min: 0,
+              step: 1,
+              value: WG,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                if (e.target.validity.valid) {
+                  const value = e.target.value as `${number}`;
+                  setState((prev) => ({ ...prev, WG: value }));
+                }
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="材質"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: materialName,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, materialName: e.target.value }));
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="表面"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: materialSurface,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, materialSurface: e.target.value }));
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="淨高(h)"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              type: 'number',
+              min: 0,
+              step: 1,
+              value: height,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                if (e.target.validity.valid) {
+                  const value = e.target.value as `${number}`;
+                  setState((prev) => ({ ...prev, height: value }));
+                }
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="防颱"
+          disabled={disabled}
+          wrapperStyle={{ width: '140px' }}
+          checkBoxProps_v2={{
+            props: {
+              disabled,
+              value: isAntiTyphoon ? ['isAntiTyphoon'] : [],
+              options: [{ label: null, value: 'isAntiTyphoon' }],
+              onChange: (strArr) => {
+                const isAntiTyphoon = strArr.includes('isAntiTyphoon');
+                setState((prev) => ({ ...prev, isAntiTyphoon }));
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// =====================================================================
+// =====================================================================
+// =====================================================================
+
 // MARK:basicConfig
 const basicConfig: TinputSelProps = {
   wrapperStyle: { gap: '10px' },
@@ -1640,6 +1791,7 @@ export {
   Form_product_accessories,
   Form_product_other,
   //
+  Form_specialProd_basic,
 };
 
 export { WorksheetTable };

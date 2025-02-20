@@ -38,10 +38,11 @@ import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpl
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import {
   TcreateWorksheetDto,
+  TworksheetRecordDto_addition,
   apiPostWorkSheet,
   apiDeleteWorksheet,
-  useGetWorksheet_id,
   apiPatchWorkSheetProducts,
+  useGetWorksheet_id,
   useApiGetWorksheetRecord_id,
 } from 'js/api/api_engineering';
 
@@ -108,8 +109,6 @@ export default function Worksheet({
   const { req_reviewBack, req_backThanAdd } = useGlobal_review();
 
   const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
-
-  const init = useWorksheet((state) => state.init);
 
   // ----------------------------------------------------------------
   const ref_main = useRef<HTMLDivElement>(null!);
@@ -683,22 +682,6 @@ export default function Worksheet({
     }
   }, [activeRecordId]);
 
-  // zustand 狀態
-  useEffect(() => {
-    if (disabled && activeRecordData) {
-      const contractProductItems = activeRecordData.contractProductItems;
-
-      init({
-        worksheetId: activeWorksheetId!,
-        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
-        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
-        qty: contractProductItems?.length ?? 0,
-        originalAccessories: activeWorksheetOriginalAccessories,
-      });
-    }
-  }, [activeRecordData, disabled]);
-
   // -----------------------------------------------------------------------
 
   // MARK: RENDER
@@ -734,7 +717,16 @@ export default function Worksheet({
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
             {activeWorksheetId && !activeRecordData && <RecordList control={control_recordList} />}
-            {activeRecordData && <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />}
+            {/* {activeRecordData && <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />} */}
+            {activeRecordData && (
+              <TheWorksheetForm
+                activeRecordData={activeRecordData}
+                activeWorksheetId={activeWorksheetId}
+                activeWorksheetOriginalAccessories={activeWorksheetOriginalAccessories}
+                reqPatchWorkSheet={reqPatchWorkSheet}
+                disabled={disabled}
+              />
+            )}
           </div>
           {/* right */}
         </div>
@@ -759,6 +751,59 @@ export default function Worksheet({
 // MARK:END
 // ====================================================================
 // ====================================================================
+// ====================================================================
+
+// MARK:TheWorksheetForm
+const TheWorksheetForm = ({
+  //
+  activeRecordData,
+  reqPatchWorkSheet,
+  disabled,
+  activeWorksheetId,
+  activeWorksheetOriginalAccessories,
+}: {
+  activeRecordData: TworksheetRecordDto_addition | undefined;
+  reqPatchWorkSheet: () => void;
+  disabled: boolean;
+  activeWorksheetId: string | undefined;
+  activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[];
+}) => {
+  const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
+
+  const doorModelName = activeRecordData?.contractProductItems?.[0].doorModelName;
+  const isSpecialDoor = !!doorModelName && checkIsSpecialDoor(doorModelName);
+
+  const init = useWorksheet((state) => state.init);
+
+  // zustand 狀態
+  useEffect(() => {
+    if (isSpecialDoor) {
+      return;
+    }
+
+    if (disabled && activeRecordData) {
+      const contractProductItems = activeRecordData.contractProductItems;
+
+      init({
+        worksheetId: activeWorksheetId!,
+        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
+        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
+        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
+        qty: contractProductItems?.length ?? 0,
+        originalAccessories: activeWorksheetOriginalAccessories,
+      });
+    }
+  }, [activeRecordData, disabled, isSpecialDoor]);
+
+  // -------------------------------------------------------------------------
+
+  if (!doorModelDict) {
+    return null;
+  }
+
+  return <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />;
+};
+
 // ====================================================================
 
 // MARK:useControl_profile
@@ -1028,4 +1073,230 @@ const useControl_pdf = ({
     control_workSheetPDF_01,
     control_workSheetPDF_02,
   };
+};
+
+// ===========================================================================
+
+type state_specialDoor = {
+  // 項目名
+  readonly itemName: string;
+  // 報價別
+  readonly quoteType: string;
+  // 門型
+  readonly doorModelName: string;
+
+  // L(mm)全寬
+  fullWidth: `${number}` | '';
+  WG: `${number}` | '';
+  // h(mm)
+  height: `${number}` | '';
+  // B(mm)
+  boxB: `${number}` | '';
+  // D(mm)
+  boxD: `${number}` | '';
+  // 面積
+  area: `${number}` | '';
+  // 才數
+  volume: `${number}` | '';
+  // 材料
+  materialName: string;
+  // 表面
+  materialSurface: string;
+  // 門軌
+  guideRail: string;
+  // 馬力
+  horsepower: string;
+  // 馬達廠商
+  motorVendor: string;
+
+  // 電壓
+  motorVoltage: 110 | 380 | null;
+  // 相數
+  motorPhase: 1 | 3 | null;
+
+  // 馬達支撐架
+  hasMotorSupportStand: boolean | null;
+  // 底座類型
+  bottomBar: string;
+  // 馬達鎖盒
+  motorLockBox: string;
+  // 門軌厚度
+  guideRailThickness: string;
+  // 門軌消音條
+  hasSilencingStrip: boolean;
+  // 一體式捲箱
+  isIntegratedHeadBox: boolean;
+  // 捲箱厚度
+  headBoxThickness: `${number}` | '';
+  // 防颱
+  isAntiTyphoon: boolean;
+  // 彈射門
+  bounceDoor: boolean;
+  // 彈射門寬度
+  bounceDoorWidth: `${number}` | '';
+  // 彈射門高度
+  bounceDoorHeight: `${number}` | '';
+  // 彈射門長度
+  bounceDoorLength: `${number}` | '';
+  // 關閉方式
+  closingType: string;
+
+  // 底座角鐵
+  bottomBarAngleIron: string;
+  // 底座板
+  bottomBarPlate: string;
+
+  // 門片厚度
+  thickness: `${number}` | '';
+
+  // 門片 - 捲片支數
+  slatCount: `${number}` | '';
+
+  // 鏈齒輪 - 鏈齒輪番號
+  // sprocketWheelModel: string;
+  // 鏈齒輪 - 大鏈輪
+  // sprocketWheelTeethNumber: string;
+  // 可能為鍊條數量
+  // sprocketWheelChains: `${number}` | '';
+  // 鏈齒輪/捲軸 - 孔徑/軸徑
+  // bearingInnerDiameter: string;
+
+  // 捲軸 - 尺寸
+  diameter: `${number}` | '';
+  // 捲軸 - 總長
+  bearingHousingTotalLength: `${number}` | '';
+  // 底座 - 開口
+  guideRailsOpening: string;
+  // 門片長度
+  slatLength: `${number}` | '';
+  // 門軌長度
+  guideRailLength: `${number}` | '';
+  // 捲箱長度
+  headBoxLength: `${number}` | '';
+  // 軸承座寸法
+  bearingHousingSize: `${number}` | '';
+  // 軸承
+  bearingName: string;
+
+  gapA: `${number}` | '';
+  gapC: `${number}` | '';
+  gearNumber: string;
+  weight: `${number}` | '';
+  // 捲箱 - 正面
+  headBoxFront: string;
+
+  // 捲箱 - 有無凸 // 棄用
+  // headBoxProtruding: string | null; // 棄用
+
+  // 捲箱 - 角鐵數量
+  headBoxAngleIronQuantity: `${number}` | '';
+  // 支板 - 鏈條
+  sidePlateChain: string;
+  // 支板 - 方向
+  sidePlateDirection: string;
+  // 電動機 - 鍊條形式
+  electricMotorChainType: string;
+  // 電動機 - 方向
+  electricMotorDirection: string;
+  // 門軌 - 型式
+  guideRailType: string;
+  // 底座 - 表面
+  bottomBarSurface: string;
+  // 門軌 - 表面
+  guideRailSurface: string;
+  guideRailG: `${number}` | '';
+  isULGuideRail: boolean;
+
+  // 門編號
+  serialNumber: string | null;
+  // 樓層
+  floor: string | null;
+  // 區域位置
+  locationArea: string | null;
+};
+
+const useSpecialDoor = ({ activeRecordData }: { activeRecordData: TworksheetRecordDto_addition | undefined }) => {};
+
+const useDefaultState_specialDoor = ({
+  quotationProductItem,
+}: {
+  quotationProductItem: TquotationProductItemDto | undefined;
+}) => {
+  if (!quotationProductItem) {
+    return emptyState_specialDoor();
+  }
+  // fullWidth: `${quotationProductItem.fullWidth}`,
+
+  // const defaultState: state_specialDoor = {};
+};
+
+const emptyState_specialDoor = (): state_specialDoor => {
+  const state: state_specialDoor = {
+    itemName: '',
+    quoteType: '',
+    doorModelName: '',
+    fullWidth: '',
+    WG: '',
+    height: '',
+    boxB: '',
+    boxD: '',
+    area: '',
+    volume: '',
+    materialName: '',
+    materialSurface: '',
+    guideRail: '',
+    horsepower: '',
+    motorVendor: '',
+    motorVoltage: null,
+    motorPhase: null,
+    hasMotorSupportStand: null,
+    bottomBar: '',
+    motorLockBox: '',
+    guideRailThickness: '',
+    hasSilencingStrip: false,
+    isIntegratedHeadBox: false,
+    headBoxThickness: '',
+    isAntiTyphoon: false,
+    bounceDoor: false,
+    bounceDoorWidth: '',
+    bounceDoorHeight: '',
+    bounceDoorLength: '',
+    closingType: '',
+    bottomBarAngleIron: '',
+    bottomBarPlate: '',
+    thickness: '',
+    slatCount: '',
+    diameter: '',
+    bearingHousingTotalLength: '',
+    guideRailsOpening: '',
+    slatLength: '',
+    guideRailLength: '',
+    headBoxLength: '',
+    bearingHousingSize: '',
+    bearingName: '',
+    gapA: '',
+    gapC: '',
+    gearNumber: '',
+    weight: '',
+    headBoxFront: '',
+    headBoxAngleIronQuantity: '',
+    sidePlateChain: '',
+    sidePlateDirection: '',
+    electricMotorChainType: '',
+    electricMotorDirection: '',
+    guideRailType: '',
+    bottomBarSurface: '',
+    guideRailSurface: '',
+    guideRailG: '',
+    isULGuideRail: false,
+    serialNumber: null,
+    floor: null,
+    locationArea: null,
+  };
+
+  return state;
+};
+
+const WorksheetForm_specialDoor = () => {
+  return <div></div>;
 };
