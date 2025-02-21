@@ -46,14 +46,17 @@ import {
   useApiGetWorksheetRecord_id,
 } from 'js/api/api_engineering';
 
+import { useApiGetProdDoorModels, useGetAssetDict, apiGetAsset } from 'js/api/api_product';
+
 // hook
 import { TquotationProductItemDto_old } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
-import { lookup_motorPhase } from 'config/product/lookup';
+import { lookup_motorPhase, getProductHeadBoxImgUrl } from 'config/product/lookup';
 
 // css
 import scss from './workSheet.module.scss';
@@ -104,6 +107,8 @@ type TcomponentList = {
 // ====================================================================
 
 // MARK: START
+// ====================================================================
+
 export default function Worksheet({
   isAdmin,
   userErpFeature,
@@ -363,7 +368,6 @@ export default function Worksheet({
     });
 
     sortedFinelProd.forEach((prod) => {
-      // const prodQty = String(prod.items?.length ?? 0);
       const prodQty = String(prod.quantity ?? 0);
       const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
       const pridHeight = new Decimal(prod.height).div(1000).toString();
@@ -514,7 +518,6 @@ export default function Worksheet({
     const recordArr: Trecord[] = records.map((record, index) => {
       const {
         contractProductItems,
-
         agentEmployee, // 開立
         addition: { reviewArr } = {},
       } = record;
@@ -543,9 +546,7 @@ export default function Worksheet({
         qty: String(qty),
         material: materialName,
         isAntiTyphoon: isAntiTyphoon ?? false,
-
         agent: agentEmployee?.chName ?? '',
-
         reviewFlowData: reviewArr,
 
         onDetailClick: () => {
@@ -935,6 +936,8 @@ const useControl_pdf = ({
   control_profile: Tcontrol_profile;
   latestRecordArr: TworksheetRecordDto[];
 }) => {
+  const { assetDict, updatePath } = useGetAssetDict<string>();
+
   const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
     const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
 
@@ -948,10 +951,6 @@ const useControl_pdf = ({
       const { motorVoltage, motorPhase, components, accessories } = item;
 
       const componentList = (() => {
-        // if (!components) {
-        //   return undefined;
-        // }
-
         const list: TcomponentList = {};
         components.forEach((component) => {
           list[component.type] = component;
@@ -976,6 +975,18 @@ const useControl_pdf = ({
           return componentList.slat?.material ?? '';
         }
       })();
+
+      const {
+        headBox1: url_headBox1,
+        headBox2: url_headBox2,
+        headBoxTopCover: url_headBoxTopCover,
+        headBoxCover: url_headBoxCover,
+      } = getProductHeadBoxImgUrl({
+        isIntegratedHeadBox: !!item.isIntegratedHeadBox,
+        hasWheel: !!item.hasWheel,
+        headBoxTopCover: !!item.headBoxTopCover,
+        headBoxCover: item.headBoxCover,
+      });
 
       const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
         itemName: item.itemName,
@@ -1012,6 +1023,26 @@ const useControl_pdf = ({
           // form: sheet.headBoxForm_str,
           form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
           surface: componentList.headBox?.materialSurface ?? '',
+
+          headBoxCover: item.headBoxCover === 'full' ? '全遮' : item.headBoxCover === 'half' ? '半遮' : '無',
+          headBoxTopCover: item.headBoxTopCover ? '有' : '無',
+          hasWheel: item.hasWheel ? '有' : '無',
+          headBoxSizeX: item.headBoxSizeX,
+          headBoxSizeY: item.headBoxSizeY,
+          headBoxSizeM: item.headBoxSizeM,
+          headBoxSizeN: item.headBoxSizeN,
+          headBoxSizeO: item.headBoxSizeO,
+          headBoxSizeP: item.headBoxSizeP,
+          headBoxSizeQ: item.headBoxSizeQ,
+          // imgUrl1: url_headBox1.url,
+          // imgUrl2: url_headBox2.url,
+          // imgUrl3: url_headBoxTopCover.url,
+          // imgUrl4: url_headBoxCover.url,
+
+          svgString1: assetDict[url_headBox1.name || 'null'] || null,
+          svgString2: assetDict[url_headBox2.name || 'null'] || null,
+          svgString3: assetDict[url_headBoxTopCover.name || 'null'] || null,
+          svgString4: assetDict[url_headBoxCover.name || 'null'] || null,
         },
         doorPiece: {
           material: material,
@@ -1039,6 +1070,7 @@ const useControl_pdf = ({
           antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
           bendStraight: item.guideRailType ?? '',
           surface: componentList.guideRail?.materialSurface ?? '',
+          dangerSvg: assetDict[item?.guideRail || 'null'] || undefined,
         },
         chainCog: {
           sprocketWheelModel: item.sprocketWheelModel ?? '',
@@ -1071,13 +1103,11 @@ const useControl_pdf = ({
         customerName: customerName,
         contactPerson: contactPerson,
         // 開單日
-        // billingDate: workSheet?.createdAt ? getTaiwanDateStr(workSheet.createdAt) ?? '' : '', // 未知
         billingDate: getTaiwanDateStr(new Date().toISOString()) ?? '', // 未知
         // 出貨日
         shippingDate: '', // 未知
       },
       itemArr: workSheetPDF_01_itemArr,
-      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
     };
 
     let totalQty_PDF_02 = 0;
@@ -1090,7 +1120,6 @@ const useControl_pdf = ({
         totalQty: String(totalQty_PDF_02),
       },
       itemArr: workSheetPDF_01_itemArr,
-      // itemArr: [...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr, ...workSheetPDF_01_itemArr],
     };
 
     return {
@@ -1099,7 +1128,42 @@ const useControl_pdf = ({
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contractNumber, customerName, contactPerson, control_profile, latestRecordArr]);
+  }, [
+    //
+    contractNumber,
+    customerName,
+    contactPerson,
+    control_profile,
+    latestRecordArr,
+    assetDict,
+  ]);
+
+  useEffect(() => {
+    latestRecordArr.forEach((record) => {
+      if (!record.contractProductItems) {
+        return;
+      }
+
+      const item = record.contractProductItems[0];
+
+      const { headBox1, headBox2, headBoxTopCover, headBoxCover } = getProductHeadBoxImgUrl({
+        isIntegratedHeadBox: !!item.isIntegratedHeadBox,
+        hasWheel: !!item.hasWheel,
+        headBoxTopCover: !!item.headBoxTopCover,
+        headBoxCover: item.headBoxCover,
+      });
+
+      const parameter: Parameters<typeof updatePath>[0] = {};
+      headBox1.url && headBox1.name && (parameter[headBox1.name] = headBox1.url);
+      headBox2.url && headBox2.name && (parameter[headBox2.name] = headBox2.url);
+      headBoxTopCover.url && headBoxTopCover.name && (parameter[headBoxTopCover.name] = headBoxTopCover.url);
+      headBoxCover.url && headBoxCover.name && (parameter[headBoxCover.name] = headBoxCover.url);
+
+      item.guideRail && (parameter[item.guideRail] = `door-track/${item.guideRail}`);
+
+      updatePath(parameter);
+    });
+  }, [latestRecordArr]);
 
   return {
     control_workSheetPDF_01,

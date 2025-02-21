@@ -119,39 +119,39 @@ export default function WorkSheetPDF({
 
   // ---------------------------------------------------------------------
 
-  const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
+  // const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
 
-  const getSvg = async ({ fileName }: { fileName: string }) => {
-    if (svgList[fileName] === null) {
-      return;
-    }
+  // const getSvg = async ({ fileName }: { fileName: string }) => {
+  //   if (svgList[fileName] === null) {
+  //     return;
+  //   }
 
-    if (svgList[fileName] === 'isLoading') {
-      return;
-    }
+  //   if (svgList[fileName] === 'isLoading') {
+  //     return;
+  //   }
 
-    if (!!svgList[fileName]) {
-      return;
-    }
+  //   if (!!svgList[fileName]) {
+  //     return;
+  //   }
 
-    try {
-      svgList[fileName] = 'isLoading';
+  //   try {
+  //     svgList[fileName] = 'isLoading';
 
-      const svg = await apiGetAssets(fileName);
+  //     const svg = await apiGetAssets(fileName);
 
-      if (svg) {
-        setSvgList((list) => ({
-          ...list,
-          [fileName]: svg,
-        }));
-      }
-    } catch (error) {
-      setSvgList((list) => ({
-        ...list,
-        [fileName]: null,
-      }));
-    }
-  };
+  //     if (svg) {
+  //       setSvgList((list) => ({
+  //         ...list,
+  //         [fileName]: svg,
+  //       }));
+  //     }
+  //   } catch (error) {
+  //     setSvgList((list) => ({
+  //       ...list,
+  //       [fileName]: null,
+  //     }));
+  //   }
+  // };
 
   // ---------------------------------------------------------------------
   return (
@@ -209,11 +209,11 @@ export default function WorkSheetPDF({
 
                 <div className={scss.itemGrid}>
                   {itemArr.map((control_item, index) => {
-                    const guideRailName = control_item.guideRail.guideRailName;
-                    getSvg({ fileName: guideRailName });
+                    // const guideRailName = control_item.guideRail.guideRailName;
+                    // getSvg({ fileName: guideRailName });
 
-                    const svgString = svgList[`${guideRailName}`] ?? '';
-                    control_item.guideRail.dangerSvg = svgString;
+                    // const svgString = svgList[`${guideRailName}`] ?? '';
+                    // control_item.guideRail.dangerSvg = svgString;
 
                     return (
                       <Fragment key={index}>

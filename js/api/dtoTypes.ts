@@ -1416,7 +1416,7 @@ export type TengineeringDeliveryStatusDto = {
   unitPrice: number | null;
   // 其他特殊工作項目
   // otherWorkItems: ToutsourcingPaymentDetailItemDto[] | null;
-  otherWorkItems: ToutsourcingPaymentDetailItemDto | null;
+  otherWorkItems: ToutsourcingPaymentDetailItemDto | ToutsourcingPaymentDetailItemDto[] | null;
   // 其他特殊工作項目合計
   otherWorkItemTotal: number | null;
   // 安裝項目
@@ -1731,6 +1731,28 @@ export type TquotationProductItemDto = {
   floor: string | null;
   // 區域位置
   locationArea: string | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱前遮' })
+  // headBoxCover: string | null;
+  headBoxCover: TupdateContractProductItemDto['headBoxCover'] | null;
+  // @ApiProperty({ nullable: true, description: '捲箱上蓋' })
+  headBoxTopCover: boolean | null;
+  // @ApiProperty({ nullable: true, description: '是否有檔輪' })
+  hasWheel: boolean | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeX' })
+  headBoxSizeX: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeY' })
+  headBoxSizeY: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeM' })
+  headBoxSizeM: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeN' })
+  headBoxSizeN: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeO' })
+  headBoxSizeO: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeP' })
+  headBoxSizeP: `${number}` | null;
+  // @ApiProperty({ nullable: true, description: '捲箱sizeQ' })
+  headBoxSizeQ: `${number}` | null;
 };
 
 type TquotationContentDto_copy = {
@@ -3800,6 +3822,68 @@ export type TupdateContractProductItemDto = {
   // 國外認證防火規範
   isULGuideRail?: boolean | null;
 
+  // @ApiProperty({ nullable: true, description: '捲箱前遮' })
+  // @IsString()
+  // @IsNullable()
+  // @IsOptional()
+  // headBoxCover?: string | null;
+  // 為下拉式選單，後端沒有設enum，所以在前端設定固定字串
+  headBoxCover?: 'none' | 'half' | 'full' | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱上蓋' })
+  // @IsBoolean()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxTopCover?: boolean | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeX' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeX?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeY' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeY?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeM' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeM?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeN' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeN?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeO' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeO?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeP' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeP?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '捲箱sizeQ' })
+  // @IsNumberString()
+  // @IsNullable()
+  // @IsOptional()
+  headBoxSizeQ?: `${number}` | null;
+
+  // @ApiProperty({ nullable: true, description: '是否有檔輪' })
+  // @IsBoolean()
+  // @IsNullable()
+  // @IsOptional()
+  hasWheel?: boolean | null;
+
   // @ApiProperty({ type: QuotationProductDto, description: '主產品' })
   // product: QuotationProductDto;
 
@@ -4685,7 +4769,7 @@ export type ToutsourcingPaymentDto = {
   //  '是否已結清'
   isPaymentCleared: boolean;
   //  '請款合計'
-  paymentSubTotal: number | null;
+  // paymentSubTotal: number | null;
   //  '扣款明細'
   deduction: TdeductionDto[] | null;
   //  '扣款合計'
@@ -4695,13 +4779,14 @@ export type ToutsourcingPaymentDto = {
   //  '本期保留款'
   retainage: number | null;
   //  '小計'
-  subTotal: number | null;
+  // subTotal: number | null;
   //  '營業稅'
-  salesTax: number | null;
+  // salesTax: number | null;
   //  '實領總計'
-  total: number | null;
+  // total: number | null;
   //  '外包計價帳款明細'
   outsourcingPaymentDetail: ToutsourcingPaymentDetailDto[];
+
   //  '經辦人Id'
   agentEmployeeId: string | null;
   //  '經辦人'
@@ -4762,21 +4847,21 @@ export type TupdateOutsourcingPaymentDto = {
   // 外包計價日期
   date: string;
   // 請款合計
-  paymentSubTotal: number | null;
+  paymentSubTotal?: number | null;
   // 扣款明細
-  deduction: TdeductionDto[] | null;
+  deduction?: TdeductionDto[] | null;
   // 扣款總金額
-  deductionTotal: number | null;
+  deductionTotal?: number | null;
   // 上期保留款項 // 不應該使用
   // priorPeriodRetainage: number | null;
   // 本期保留款項
-  retainage: number | null;
+  retainage?: number | null;
   // 小計
-  subTotal: number | null;
+  subTotal?: number | null;
   // 營業稅
-  salesTax: number | null;
+  salesTax?: number | null;
   // 實領總計
-  total: number | null;
+  total?: number | null;
 
   reviewCheckerEmployeeId?: string | null;
   reviewSupervisorEmployeeId?: string | null;
@@ -4811,6 +4896,14 @@ export type ToutsourcingPaymentDetailDto = {
   outsourcingPaymentId: string | null;
   // 外包計價單
   outsourcingPayment?: ToutsourcingPaymentDto;
+  //
+  projectNumber: string | null;
+  projectName: string | null;
+  projectCounty: string | null;
+  projectDistrict: string | null;
+  projectAddress: string | null;
+  projectDate: string | null;
+  itemDetail: TitemDetail[] | null;
 };
 
 export type TcreateOutsourcingPaymentDetailItemDto = {
@@ -4824,11 +4917,19 @@ export type TcreateOutsourcingPaymentDetailItemDto = {
   otherWorkItemTotal: number | null; // 特殊項目之合計
 };
 
+// export type TupdateOutsourcingPaymentDetailDto = {
+//   engineeringContactId: string; // 工程聯落單id
+//   installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
+//   // outsourcing: number; // 外包計價明細總計
+//   outsourcingTotal: number; // 外包計價明細總計
+// };
 export type TupdateOutsourcingPaymentDetailDto = {
-  engineeringContactId: string; // 工程聯落單id
-  installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 項目
+  engineeringContactId: string | null; // 工程聯落單id
+  installItems: TcreateOutsourcingPaymentDetailItemDto[] | null; // 項目
   // outsourcing: number; // 外包計價明細總計
   outsourcingTotal: number; // 外包計價明細總計
+
+  itemDetail?: TitemDetail[] | null;
 };
 
 export type ToutsourcingPaymentDetailItemDto = {
@@ -4842,6 +4943,87 @@ export type ToutsourcingPaymentDetailItemDto = {
   otherSubTotalPrice?: number | null;
   // 特殊項目關聯status
   quotationItemStatusId?: string | null; // 其實應該是必填，不給會沒效果的樣子
+};
+
+export type TcreateOutsourcingPaymentDetailDto = {
+  // @ApiProperty({ description: '工程聯絡單' })
+  // @IsString()
+  // @IsUUID()
+  // @IsOptional()
+  // @IsNullable()
+  engineeringContactId: string | null;
+
+  // @ApiProperty({ description: '工程編號' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectNumber: string | null;
+
+  // @ApiProperty({ description: '工程名稱' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectName: string | null;
+
+  // @ApiProperty({ description: '工程地址(縣市)' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectCounty: string | null;
+
+  // @ApiProperty({ description: '工程地址(區)' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectDistrict: string | null;
+
+  // @ApiProperty({ description: '工程地址(詳細地址)' })
+  // @IsString()
+  // @IsOptional()
+  // @IsNullable()
+  projectAddress: string | null;
+
+  // @ApiProperty({ description: '工程日期' })
+  // @IsDate()
+  // @Type(() => Date)
+  // @IsOptional()
+  // @IsNullable()
+  projectDate: string | null;
+
+  // @ApiProperty({ description: '項目' })
+  // @IsArray()
+  // @ValidateNested()
+  // @Type(() => CreateOutsourcingPaymentDetailItemDto)
+  // @IsOptional()
+  installItems: TcreateOutsourcingPaymentDetailItemDto[]; // 後端說不使用
+
+  // @ApiProperty({ description: '外包計價明細總計' })
+  // @IsNumber()
+  outsourcingTotal: number;
+
+  // @ApiProperty({ description: '外包計價明細總計' })  // 後端給的description顯然錯了
+  // @IsArray()
+  // @ValidateNested()
+  // @Type(() => ItemDetail)
+  // @IsOptional()
+  itemDetail: TitemDetail[] | null;
+};
+
+export type TitemDetail = {
+  floorNumber: string; //樓層編號
+  width: number; //寬
+  height: number; //高
+  talent: number; //才數
+  quantity: number; //樘數
+  unitPrice: number; //一才價格
+  singleItemDetail: TsingleItemDetail[];
+};
+
+export type TsingleItemDetail = {
+  floorNumber: string; //樓層編號
+  content: string; //內容
+  quantity: number; //數量
+  unitPrice: number; //單價
 };
 
 // ====================================================================

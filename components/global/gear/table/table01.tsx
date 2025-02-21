@@ -31,12 +31,14 @@ type Tcell = {
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 };
 
+type TcellArr = (Tcell | null)[];
+
 type Ttable = {
   className?: string;
   style?: React.CSSProperties;
   haveBorder?: boolean;
   thead: {
-    cellArr: Tcell[];
+    cellArr: TcellArr;
     rowProps?: Omit<Trow, 'children' | 'onClick' | 'viewRef'>;
     className?: string;
     style?: React.CSSProperties;
@@ -51,7 +53,7 @@ type Ttable = {
     // } & Omit<Trow, 'children'>)[];
     rowArr: (
       | ({
-          cellArr: Tcell[];
+          cellArr: TcellArr;
         } & Omit<Trow, 'children'>)
       | null
     )[];
@@ -78,7 +80,7 @@ type Tconfig_table = {
   inputWidth?: React.CSSProperties['width'];
 };
 
-export type { Trow, Tcell, Ttable, Tconfig_table };
+export type { Trow, Tcell, TcellArr, Ttable, Tconfig_table };
 
 // ===================================================================
 export default function Table01({
@@ -105,6 +107,10 @@ export default function Table01({
       >
         <Row_thead {...thead.rowProps}>
           {thead.cellArr.map((item, index) => {
+            if (!item) {
+              return null;
+            }
+
             const { width, flex, justifyContent, className, style, children } = item;
 
             return (
@@ -145,6 +151,10 @@ export default function Table01({
               props={props}
             >
               {cellArr.map((cell, cIndex) => {
+                if (!cell) {
+                  return null;
+                }
+
                 const { width, flex, justifyContent, className, style, children } = cell;
 
                 return (

@@ -13,6 +13,11 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 import { setting } from '../wareHouseList/index';
 import { WhatsAppOutlined } from '@ant-design/icons';
 import EditWHPosition from '../editWHPosition';
+import CellWithBar from 'components/global/gear/cell/cellWithBar';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import icon_print from 'public/image/icon/fc_printer.svg';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import icon_edit from 'public/image/icon/edit.svg';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -20,7 +25,8 @@ type Tquery = {
 
 export default function TrayList() {
     const router = useRouter();
-    const { firstin, type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    // const { firstin, type, whid, trayname, whname, traycalled, traycalledname, traytransfer, url, whnamecalled } = router.query;
+    const { whid, whname1 } = router.query;
 
     const [data, setData] = useState<any[]>([]);
     const [datafilter, setDatafilter] = useState<any[]>([]);
@@ -33,13 +39,21 @@ export default function TrayList() {
     const status = router.query.status as TquotationStatus;
     const { wareHouseId } = router.query as Tquery;
     const [isLoading, setIsLoading] = useState(false);
-    const [checkfirstin, setCheckFirstIn] = useState<number>(firstin ? parseInt(firstin as string, 10) : 0);
+    // const [checkfirstin, setCheckFirstIn] = useState<number>(firstin ? parseInt(firstin as string, 10) : 0);
 
     const [datatrans, setDataTrans] = useState<any[]>([]);
 
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
     const [keyword4, setKeyword4] = useState<string>("");
+
+    // const [whid, setWhid] = useState<string>("");
+    const [trayname, setTrayname] = useState<string>("");
+    const [trayid, setTrayid] = useState<string>("");
+    const [whname, setWhname] = useState<string>("");
+
+    const [editTray, setEditTray] = useState(false);
+
 
 
     const searchTargetList = [
@@ -73,31 +87,24 @@ export default function TrayList() {
             type: 'addButton',
             label: '新增托盤',
             onClick: () => {
+                // alert(((1000 + data.length) + 1).toString());
+                let nextrayname = ((1000 + data.length) + 1).toString();
                 router.push({
                     pathname: `/factoryDepartment/addTray`,
                     query: {
                         type: 'Tray',
                         whid: whid,
                         whname: whname,
+                        nextrayname: nextrayname,
                     },
                 });
             },
         },
         {
             type: 'myButton',
-            label: `${!!wareHouseId ? '取消' : '返回'}`,
+            label: `${'返回'}`,
             onClick: () => {
-                router.push({
-                    pathname: `/factoryDepartment/wareHouseList`,
-                    query: {
-                        type: 'WareHouse',
-                        whname: whname,
-                        traycalled: traycalled,
-                        traycalledname: traycalledname,
-                        traytransfer: traytransfer,
-                        whnamecalled: whnamecalled
-                    }
-                });
+                router.back();
             },
         },
     ];
@@ -110,24 +117,25 @@ export default function TrayList() {
 
         if (keyword2) {
             filteredData = filteredData.filter(item =>
-                item.productid && item.productid.toString().includes(keyword2.trim())
+                item.productid &&
+                item.productid.toString().toLowerCase().includes(keyword2.trim().toLowerCase())
             );
         }
 
         if (keyword3) {
             filteredData = filteredData.filter(item =>
-                item.name && item.name.toString().includes(keyword3.trim())
+                item.name &&
+                item.name.toString().toLowerCase().includes(keyword3.trim().toLowerCase())
             );
         }
 
         if (keyword4) {
             filteredData = filteredData.filter(item =>
-                item.spec && item.spec.toString().includes(keyword4.trim())
+                item.spec &&
+                item.spec.toString().toLowerCase().includes(keyword4.trim().toLowerCase())
             );
         }
 
-
-        // setFilteredData(filteredData);
         const distinctData = Array.from(
             new Map(filteredData.map((item: any) => [item.trayname, item])).values()
         );
@@ -137,8 +145,18 @@ export default function TrayList() {
     }, [keyword2, keyword3, keyword4]);
 
 
+    useEffect(() => {
 
-    const fetchData = async () => {
+        fetchData(whid);
+
+    }, []);
+
+
+
+
+
+
+    const fetchData = async (whid: any) => {
         try {
             setIsLoading(true);
             const response = await fetch(`${setting.apipath}/WareHouse/GetTray?Input=${whid}`);
@@ -146,22 +164,22 @@ export default function TrayList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            // setData(data);
             const distinctData = Array.from(
                 new Map(data.map((item: any) => [item.trayname, item])).values()
             );
 
             setData(distinctData);
             setDatafilter(data);
-            console.log(data);
-            await new Promise(resolve => setTimeout(resolve, 50));
-            if (data.length > 0 && checkfirstin > 0) {
-                const firstItem = data[0];
-                const { whid, trayname } = firstItem;
-                fetchData1(whid, trayname);
-                GetLayOut(whid, trayname);
-            }
 
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            const firstItem = data[0];
+            const { trayname, id, whname} = firstItem; // 僅解構 trayname
+            fetchData1(whid, trayname); // 使用外部的 whid 參數
+            GetLayOut(whid, trayname);
+            setTrayname(trayname);
+            setWhname(whname);
+            handleRowClick(id);
         } catch (error: any) {
             setError(error.message);
         } finally {
@@ -169,16 +187,12 @@ export default function TrayList() {
         }
     };
 
-    useEffect(() => {
 
-        fetchData();
 
-    }, []);
 
     const fetchData1 = async (whid: any, trayname: any) => {
         try {
             setIsLoading(true);
-            console.log(whid);
 
             const conditionModel: { whid: string | undefined; trayname: string | undefined } = {
                 whid: whid as string | undefined,
@@ -228,7 +242,6 @@ export default function TrayList() {
             }
 
             const responseData = await response.json();
-            console.log(responseData);
             setData11(responseData);
         } catch (error: any) {
             setError(error.message);
@@ -256,22 +269,40 @@ export default function TrayList() {
         fetchDataAndLayout();
     }, [whid, trayname]);
 
+    // async function handlechangewhposition(id: any, whid: any, trayname: any, whname: any) {
+    //     router.push({
+    //         pathname: `/factoryDepartment/editWHPosition`,
+    //         query: {
+    //             type: 'WHPosition',
+    //             whid: whid,
+    //             trayname: trayname,
+    //             whname: whname,
+    //             id: id,
+    //             traycalled: traycalled,
+    //             traycalledname: traycalledname,
+    //             traytransfer: traytransfer,
+    //             whnamecalled: whnamecalled
+    //         },
+    //     });
+    // }
+
     async function handlechangewhposition(id: any, whid: any, trayname: any, whname: any) {
+        const payload = {
+            type: 'trayDetail',
+            whid: whid,
+            trayname: trayname,
+            whname: whname,
+            id: id,
+        };
         router.push({
-            pathname: `/factoryDepartment/editWHPosition`,
+            pathname: `/factoryDepartment/trayDetail`,
             query: {
-                type: 'WHPosition',
-                whid: whid,
-                trayname: trayname,
-                whname: whname,
-                id: id,
-                traycalled: traycalled,
-                traycalledname: traycalledname,
-                traytransfer: traytransfer,
-                whnamecalled: whnamecalled
+                item: JSON.stringify(payload), // 確保 key 和接收端一致
             },
         });
+
     }
+
 
     const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
         const convertToAlpha = (num: number): string => {
@@ -369,10 +400,8 @@ export default function TrayList() {
                 throw new Error('Failed to fetch data');
             }
             const data = await response.json();
-            // console.log('Fetched data:', data);
             setDataTrans(data);
             await new Promise(resolve => setTimeout(resolve, 500));
-            console.log(data);
 
 
         } catch (error: any) {
@@ -381,6 +410,9 @@ export default function TrayList() {
             setIsLoading(false);
         }
     };
+
+
+
 
     useEffect(() => {
         if (datatrans.length > 0) {
@@ -395,7 +427,6 @@ export default function TrayList() {
 
     const DataTrans = async () => {
         // console.log('Updated data:', updatedDataTrans);
-        console.log(datatrans);
         // return;
         try {
             setIsLoading(true);
@@ -440,85 +471,162 @@ export default function TrayList() {
     const isLeftHidden = leftcount3 === 3;
     const isRightHidden = leftcount3 !== 3;
     const isFinalHidden = rightcount3 !== 9;
+
+    async function editWHPositionById(item: any) {
+        // router.replace({
+        //     pathname: `/factoryDepartment/editWHPosition`,
+        //     query: {
+        //         type: 'WHPosition',
+        //         whid: item.whid,
+        //         trayname: item.trayname,
+        //         whname: item.whname,
+        //         id: item.id,
+        //         traycalled: traycalled,
+        //         traycalledname: traycalledname,
+        //         traytransfer: traytransfer,
+        //         whnamecalled: whnamecalled
+        //     },
+        // });
+
+        const payload = {
+            type: 'trayDetail',
+            whid: item.whid,
+            trayname: item.trayname,
+            whname: item.whname,
+            id: item.id,
+        };
+        router.push({
+            pathname: `/factoryDepartment/trayDetail`,
+            query: {
+                item: JSON.stringify(payload), // 確保 key 和接收端一致
+            },
+        });
+
+    }
+
+    async function getWHPositionByWareHouseAndTray(item: any) {
+        handleRowClick(item.id)
+        // whid: item.whid,
+        // trayname: item.trayname,
+        // whname: item.whname,            
+        // trayid: item.trayid
+        // setWhid(item.whid);
+        setTrayname(item.trayname);
+        setTrayid(item.id);
+        setWhname(item.whname);
+    }
+
+
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+    // 點擊處理函數
+    const handleRowClick = (itemId: string) => {
+        setSelectedItemId(itemId);
+    };
+
     return (
         <SubLayer isLoading_subLayer={false}>
-            <PageHeader02 tag={quotationStatusLookup[status] ?? '倉庫編號：' + whname} panelList={panelList}
+            <PageHeader02 tag={`倉庫編號：${whname1}`} panelList={panelList}
                 customeLeft={
                     [
                         <>
+                            <div style={{ margin: '0px 10px' }}>
+                                <button
+                                    className={scss.shortsquarebtn}
+                                    onClick={() => {
+                                        if (trayname === undefined || trayname === '') {
+                                            myAlert.warning({ title: '尚未選擇托盤' })
+                                            return;
+                                        }
+                                        const payload = {
+                                            type: 'trayDetail',
+                                            whid: whid,
+                                            trayname: trayname,
+                                            whname: whname,
+                                            id: trayid
+                                        };
 
-
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <span style={{ padding: '0px 10px' }}>
-                                    {/* <button className={scss.longsquarebtn}
-                                        onClick={() => {
-                                            // SettlePayroll();
-
-                                            alert("入庫");
-                                        }}
-                                        title="">
-                                        入庫
-                                    </button> */}
-                                </span>
-                                <span style={{ padding: '0px 10px', fontSize: '18px', color: '#14256a' }}>
-                                {/* <button className={scss.longsquarebtn}
-                                        onClick={() => {
-                                            // SettlePayroll();
-
-                                            alert("出庫");
-                                        }}
-                                        title="">
-                                        出庫
-                                    </button> */}
-                                </span>
+                                        router.push({
+                                            pathname: `/factoryDepartment/editTray`,
+                                            query: {
+                                                item: JSON.stringify(payload),
+                                            },
+                                        });
+                                    }}
+                                >
+                                    <img src={icon_edit.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                                    &nbsp;
+                                    {`修改托盤(${trayname})`}
+                                </button >
                             </div>
-
-
-
-                            {/* <div>
-                                {!isLeftHidden && (
-                                    <div>
-                                        <button onClick={() => setLeftCount3(leftcount3 + 1)}>
-                                            <span style={{ width: '10px' }}>&nbsp;</span>
-                                        </button>
-                                    </div>
-                                )}
-
-                                {!isRightHidden && (
-                                    <div>
-                                        <button onClick={() => setRightCount3(rightcount3 + 1)}>
-                                            <span style={{ width: '10px' }}>&nbsp;</span>
-                                        </button>
-                                    </div>
-                                )}
-
-                                {!isFinalHidden && (
-                                    <div>
-                                        <button onClick={getDataTrans}>取得</button>
-                                        <button onClick={DataTrans}>轉換</button>
-                                        <button onClick={()=>{
-                                           setLeftCount3(0);
-                                           setRightCount3(0);
-                                        }}>關閉</button>
-                                    </div>
-                                )}
-                            </div> */}
-
                         </>
                     ]}
+                customeRight={[
+                    <>
+
+                    </>
+                ]}
             />
             <div className={scss.main}>
                 <div className={scss.left}>
 
                     <div>
                         <Thead01 type={'Tray'} />
-                        <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                        {/* <Tbody01 type={'Tray'} data={data} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} /> */}
+                        <div>
+                            {/* {error && <p>Error: {error}</p>} */}
+                            {data && (
+                                data.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader2}>
+                                        <div
+                                            key={index}
+                                            className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                            onClick={() => getWHPositionByWareHouseAndTray(_item)}
+                                        >
+                                            <span>{_item.whname}</span>
+                                            <span>{_item.trayname}</span>
+                                            <span>{_item.length}</span>
+                                            <span>{_item.width}</span>
+                                            <span>{getTaiwanDateStr(_item.update_at)}</span>
+                                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                            <span></span>
+                                            {/* <span style={{ fontSize: '4vmin' }}>{_item.length}X{_item.width}</span> */}
+                                            {/* <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled, _item.trayid)} /></span> */}
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className={scss.right}>
                     <div className={scss.content}>
                         <Thead01 type={'WHPosition'} />
-                        <Tbody01 type={'WHPosition'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} />
+                        {/* <Tbody01 type={'WHPosition'} data={data1} error={error} traycalled={traycalled} traycalledname={traycalledname} traytransfer={traytransfer} url={undefined} whnamecalled={whnamecalled} /> */}
+                        <div>
+                            {data1 && (
+                                data1.map((_item: any, index: number) => (
+                                    <CellWithBar key={index} className={scss.panelHeader3}
+                                    >
+                                        <div
+                                            key={index}
+                                            className={scss.row01}
+                                            style={{ backgroundColor: `${_item.quantity == 0 ? '#cfcfcf67' : ''}` }}
+                                            onClick={() => editWHPositionById(_item)}
+                                        >
+                                            <span>
+                                                {`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}
+                                            </span>
+                                            <span>{_item.productid}</span>
+                                            <span>{_item.productname}</span>
+                                            <span>{_item.productspec}</span>
+                                            <span>{_item.quantity}</span>
+                                            <span></span>
+                                        </div>
+                                    </CellWithBar>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -544,7 +652,7 @@ export default function TrayList() {
                                                                             onMouseLeave={() => setHoverInfo(null)}>
                                                                             {/* {childDataItem.length}-{childDataItem.width}-{childDataItem.childlength}-{childDataItem.childwidth}<br /> */}
                                                                             {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
-                                                                            <span style={{ fontSize: '10px' }}>{`${childDataItem.productid}\n`}</span><br />
+                                                                            <span style={{ fontSize: '14px' }}>{`${childDataItem.productid}\n`}</span><br />
                                                                         </button>
                                                                     </td>
                                                                 ))}
