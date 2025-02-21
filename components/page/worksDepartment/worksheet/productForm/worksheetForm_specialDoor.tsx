@@ -1,3 +1,7 @@
+import classNames from 'classnames';
+
+import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+
 import {
   Form_specialProd_basic,
   Form_specialProd_location,
@@ -20,14 +24,15 @@ import {
 import type { Tstate_specialDoor } from './useSpecialDoor';
 
 const WorksheetForm_specialDoor = ({
-  //
   disabled,
   state_specialDoor,
   setState_specialDoor,
+  onConfirm,
 }: {
   disabled: boolean;
   state_specialDoor: Tstate_specialDoor;
   setState_specialDoor: React.Dispatch<React.SetStateAction<Tstate_specialDoor>>;
+  onConfirm: () => void;
 }) => {
   type TsetStateAction = Partial<Tstate_specialDoor> | ((prev: Tstate_specialDoor) => Partial<Tstate_specialDoor>);
 
@@ -54,7 +59,7 @@ const WorksheetForm_specialDoor = ({
         <Section>設定產品基本規格：</Section>
         <Form_specialProd_basic {...props} />
       </div>
-      <div>
+      <MainFormWrapper>
         <Section>設定產品細部規格：</Section>
         <FormGrid>
           <Form_specialProduct_ABCD {...props} />
@@ -66,6 +71,12 @@ const WorksheetForm_specialDoor = ({
           <Form_specialProd_sidePlate {...props} />
           <Form_specailProd_other {...props} />
         </FormGrid>
+      </MainFormWrapper>
+
+      <div className={classNames('relative', disabled && 'hidden')}>
+        <MyButton_v2 px="px32" className="block m-auto " onClick={onConfirm}>
+          確認上傳
+        </MyButton_v2>
       </div>
     </Container>
   );

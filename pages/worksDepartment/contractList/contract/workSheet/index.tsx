@@ -202,9 +202,15 @@ export default function Worksheet({
     }))
   );
 
+  const isSpecialDoor = (() => {
+    const doorModelName = activeRecordData?.contractProductItems?.[0].doorModelName;
+
+    return doorModelName ? checkIsSpecialDoor(doorModelName) : true;
+  })();
+
   // -------------------------------------------------------------------------
 
-  const { state_specialDoor, setState_specialDoor } = useSpecialDoor({
+  const { state_specialDoor, setState_specialDoor, createBody } = useSpecialDoor({
     activeRecordData,
     disabled,
   });
@@ -284,31 +290,58 @@ export default function Worksheet({
 
   const reqPatchWorkSheet = async () => {
     const document_status = activeRecordData!.addition?.reviewArr?.[0].document_status;
+    const worksheetId = worksheetData?.id;
 
-    const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
-    const floorLocations = worksheetExport.getFloorLocations();
+    if (!worksheetId) {
+      myAlert.err({ title: '工作表ID不存在' });
 
-    if (contractProductItems && floorLocations) {
-      const body = {
-        contractProductItems,
-        floorLocations,
-      };
+      return;
+    }
 
-      try {
-        setIsLoading(true);
-        await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
+    console.log(isSpecialDoor);
 
-        if (document_status === '審核中' || document_status === '駁回') {
-          await req_reviewBack(activeRecordData!.id, { showSuccess: false });
+    const body = (() => {
+      if (isSpecialDoor) {
+        return createBody();
+      } else {
+        const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
+        const floorLocations = worksheetExport.getFloorLocations();
+
+        if (!contractProductItems || !floorLocations) {
+          console.error(contractProductItems);
+          console.error(floorLocations);
+
+          return null;
         }
 
-        await refreshData();
-        setDisabled(true);
-        ref_main.current.scrollIntoView();
-      } catch (error) {
-      } finally {
-        setIsLoading(false);
+        return {
+          contractProductItems,
+          floorLocations,
+        };
       }
+    })();
+
+    if (!body) {
+      myAlert.err({ title: '工作表資料有誤' });
+
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      // await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
+      await apiPatchWorkSheetProducts(worksheetId, body);
+
+      if (document_status === '審核中' || document_status === '駁回') {
+        await req_reviewBack(activeRecordData!.id, { showSuccess: false });
+      }
+
+      await refreshData();
+      setDisabled(true);
+      ref_main.current.scrollIntoView();
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -829,6 +862,7 @@ const TheWorksheetForm = ({
         disabled={disabled}
         state_specialDoor={state_specialDoor}
         setState_specialDoor={setState_specialDoor}
+        onConfirm={reqPatchWorkSheet}
       />
     );
   }
