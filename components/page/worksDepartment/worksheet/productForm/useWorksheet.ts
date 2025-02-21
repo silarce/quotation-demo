@@ -25,7 +25,7 @@ import {
   apiGetProdCalcDetailSpec,
   apiPostProdGenerateDoorProductBom,
   //
-  createAssetUrl,
+  // createAssetUrl,
 } from 'js/api/api_product';
 
 // type
@@ -296,12 +296,12 @@ type Tworksheet = {
       value: `${number}` | '';
     }) => void;
 
-    getHeadBoxImage: () => {
-      url1: string | null;
-      url2: string | null;
-      url3: string | null;
-      url4: string | null;
-    };
+    // getHeadBoxImage: () => {
+    //   url1: string | null;
+    //   url2: string | null;
+    //   url3: string | null;
+    //   url4: string | null;
+    // };
   };
 
   roller: {
@@ -814,24 +814,24 @@ const useWorksheet = create<Tworksheet>(
           })
         );
       },
-      getHeadBoxImage: () => {
-        const {
-          isIntegratedHeadBox,
-          hasWheel: _hasWheel,
-          headBoxTopCover: _headBoxTopCover,
-          headBoxCover,
-        } = get().headBox;
+      // getHeadBoxImage: () => {
+      //   const {
+      //     isIntegratedHeadBox,
+      //     hasWheel: _hasWheel,
+      //     headBoxTopCover: _headBoxTopCover,
+      //     headBoxCover,
+      //   } = get().headBox;
 
-        const hasWheel = _hasWheel === 'true';
-        const headBoxTopCover = _headBoxTopCover === 'true';
+      //   const hasWheel = _hasWheel === 'true';
+      //   const headBoxTopCover = _headBoxTopCover === 'true';
 
-        return {
-          url1: getSvgUrl1({ isIntegratedHeadBox, hasWheel }),
-          url2: getSvgUrl2({ isIntegratedHeadBox, hasWheel }),
-          url3: getSvgUrl3({ headBoxTopCover }),
-          url4: getSvgUrl4({ headBoxCover }),
-        };
-      },
+      //   return {
+      //     url1: getSvgUrl1({ isIntegratedHeadBox, hasWheel }),
+      //     url2: getSvgUrl2({ isIntegratedHeadBox, hasWheel }),
+      //     url3: getSvgUrl3({ headBoxTopCover }),
+      //     url4: getSvgUrl4({ headBoxCover }),
+      //   };
+      // },
     },
 
     roller: {
@@ -2718,60 +2718,60 @@ const calcWG_M = ({
 
 const lookup_sprocketWheelChains_electricMotorChainType = [undefined, '單排', '雙排'];
 
-const getSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-  let url: null | string = null;
+// const getSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
+//   let url: null | string = null;
 
-  if (isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '一體式有檔輪.svg');
-  } else if (isIntegratedHeadBox && !hasWheel) {
-    url = createAssetUrl('head-box', '一體式無檔輪.svg');
-  } else if (!isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '機加捲有檔輪.svg');
-  } else if (!isIntegratedHeadBox && !hasWheel) {
-    url = createAssetUrl('head-box', '機加捲無檔輪.svg');
-  }
+//   if (isIntegratedHeadBox && hasWheel) {
+//     url = createAssetUrl('head-box', '一體式有檔輪.svg');
+//   } else if (isIntegratedHeadBox && !hasWheel) {
+//     url = createAssetUrl('head-box', '一體式無檔輪.svg');
+//   } else if (!isIntegratedHeadBox && hasWheel) {
+//     url = createAssetUrl('head-box', '機加捲有檔輪.svg');
+//   } else if (!isIntegratedHeadBox && !hasWheel) {
+//     url = createAssetUrl('head-box', '機加捲無檔輪.svg');
+//   }
 
-  return url as string;
-};
+//   return url as string;
+// };
 
-const getSvgUrl2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-  let url: null | string = null;
+// const getSvgUrl2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
+//   let url: null | string = null;
 
-  // 阿不是都一樣...?給我的判斷條件長這樣那就這樣吧
-  if (isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '機械箱.svg');
-  } else if (isIntegratedHeadBox && !hasWheel) {
-    url = createAssetUrl('head-box', '機械箱.svg');
-  } else if (!isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '機械箱.svg');
-  } else if (!isIntegratedHeadBox && !hasWheel) {
-    url = createAssetUrl('head-box', '機械箱.svg');
-  }
+//   // 阿不是都一樣...?給我的判斷條件長這樣那就這樣吧
+//   if (isIntegratedHeadBox && hasWheel) {
+//     url = createAssetUrl('head-box', '機械箱.svg');
+//   } else if (isIntegratedHeadBox && !hasWheel) {
+//     url = createAssetUrl('head-box', '機械箱.svg');
+//   } else if (!isIntegratedHeadBox && hasWheel) {
+//     url = createAssetUrl('head-box', '機械箱.svg');
+//   } else if (!isIntegratedHeadBox && !hasWheel) {
+//     url = createAssetUrl('head-box', '機械箱.svg');
+//   }
 
-  return url as string;
-};
+//   return url as string;
+// };
 
-const getSvgUrl3 = ({ headBoxTopCover }: { headBoxTopCover: boolean }) => {
-  let url: null | string = null;
+// const getSvgUrl3 = ({ headBoxTopCover }: { headBoxTopCover: boolean }) => {
+//   let url: null | string = null;
 
-  if (headBoxTopCover) {
-    url = createAssetUrl('head-box', '上蓋.svg');
-  }
+//   if (headBoxTopCover) {
+//     url = createAssetUrl('head-box', '上蓋.svg');
+//   }
 
-  return url;
-};
+//   return url;
+// };
 
-const getSvgUrl4 = ({ headBoxCover }: { headBoxCover: Tworksheet['headBox']['headBoxCover'] }) => {
-  let url: null | string = null;
+// const getSvgUrl4 = ({ headBoxCover }: { headBoxCover: Tworksheet['headBox']['headBoxCover'] }) => {
+//   let url: null | string = null;
 
-  if (headBoxCover === 'half') {
-    url = createAssetUrl('head-box', '前遮半.svg');
-  } else if (headBoxCover === 'full') {
-    url = createAssetUrl('head-box', '前遮全.svg');
-  }
+//   if (headBoxCover === 'half') {
+//     url = createAssetUrl('head-box', '前遮半.svg');
+//   } else if (headBoxCover === 'full') {
+//     url = createAssetUrl('head-box', '前遮全.svg');
+//   }
 
-  return url;
-};
+//   return url;
+// };
 
 // =====================================================================
 export { useWorksheet };

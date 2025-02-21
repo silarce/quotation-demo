@@ -3,6 +3,7 @@ import {
   Form_specialProd_location,
   Form_specialProduct_ABCD,
   Form_specialProduct_motor,
+  Form_specialProd_headBox,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 import {
   Container,
@@ -53,6 +54,7 @@ const WorksheetForm_specialDoor = ({
         <FormGrid>
           <Form_specialProduct_ABCD {...props} />
           <Form_specialProduct_motor {...props} />
+          <Form_specialProd_headBox {...props} />
         </FormGrid>
       </div>
     </Container>

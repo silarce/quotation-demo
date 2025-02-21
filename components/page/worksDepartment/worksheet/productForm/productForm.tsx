@@ -12,7 +12,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import scss from './productForm.module.scss';
 
 // type
-import { TdoorModelInfoDto } from 'js/api/dtoTypes';
+import { TdoorModelInfoDto, TupdateContractProductItemDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 
 // zustand
 import { useWorksheet, Tworksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
@@ -44,9 +44,7 @@ import {
 // utils
 import { findOption } from 'js/utils/options/findOption';
 
-import img_husky from 'public/image/test/husky.svg';
-
-// =====================================================================
+import { createAssetUrl } from 'js/api/api_product';
 
 // =====================================================================
 
@@ -94,6 +92,63 @@ const inputNumberProps = {
   type: 'number',
   min: 0,
   step: 0,
+};
+
+// =====================================================================
+
+const getSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
+  let url: null | string = null;
+
+  if (isIntegratedHeadBox && hasWheel) {
+    url = createAssetUrl('head-box', '一體式有檔輪.svg');
+  } else if (isIntegratedHeadBox && !hasWheel) {
+    url = createAssetUrl('head-box', '一體式無檔輪.svg');
+  } else if (!isIntegratedHeadBox && hasWheel) {
+    url = createAssetUrl('head-box', '機加捲有檔輪.svg');
+  } else if (!isIntegratedHeadBox && !hasWheel) {
+    url = createAssetUrl('head-box', '機加捲無檔輪.svg');
+  }
+
+  return url as string;
+};
+
+const getSvgUrl2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
+  let url: null | string = null;
+
+  // 阿不是都一樣...?給我的判斷條件長這樣那就這樣吧
+  if (isIntegratedHeadBox && hasWheel) {
+    url = createAssetUrl('head-box', '機械箱.svg');
+  } else if (isIntegratedHeadBox && !hasWheel) {
+    url = createAssetUrl('head-box', '機械箱.svg');
+  } else if (!isIntegratedHeadBox && hasWheel) {
+    url = createAssetUrl('head-box', '機械箱.svg');
+  } else if (!isIntegratedHeadBox && !hasWheel) {
+    url = createAssetUrl('head-box', '機械箱.svg');
+  }
+
+  return url as string;
+};
+
+const getSvgUrl3 = ({ headBoxTopCover }: { headBoxTopCover: boolean }) => {
+  let url: null | string = null;
+
+  if (headBoxTopCover) {
+    url = createAssetUrl('head-box', '上蓋.svg');
+  }
+
+  return url;
+};
+
+const getSvgUrl4 = ({ headBoxCover }: { headBoxCover: NonNullable<TquotationProductItemDto['headBoxCover']> }) => {
+  let url: null | string = null;
+
+  if (headBoxCover === 'half') {
+    url = createAssetUrl('head-box', '前遮半.svg');
+  } else if (headBoxCover === 'full') {
+    url = createAssetUrl('head-box', '前遮全.svg');
+  }
+
+  return url;
 };
 
 // =====================================================================
@@ -669,7 +724,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     setBoxTopCover,
     setHasWheel,
     setBoxXYMNOPQ,
-    getHeadBoxImage,
+    // getHeadBoxImage,
 
     boxB,
     boxD,
@@ -697,14 +752,17 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
       setBoxTopCover: state.headBox.setBoxTopCover,
       setHasWheel: state.headBox.setHasWheel,
       setBoxXYMNOPQ: state.headBox.setBoxXYMNOPQ,
-      getHeadBoxImage: state.headBox.getHeadBoxImage,
+      // getHeadBoxImage: state.headBox.getHeadBoxImage,
 
       boxB: state.ABCD.boxB,
       boxD: state.ABCD.boxD,
     }))
   );
 
-  const { url1, url2, url3, url4 } = getHeadBoxImage();
+  const url1 = getSvgUrl1({ isIntegratedHeadBox: isIntegratedHeadBox === 'true', hasWheel: hasWheel === 'true' });
+  const url2 = getSvgUrl2({ isIntegratedHeadBox: isIntegratedHeadBox === 'true', hasWheel: hasWheel === 'true' });
+  const url3 = getSvgUrl3({ headBoxTopCover: headBoxTopCover === 'true' });
+  const url4 = getSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
 
   return (
     <div>
@@ -2377,6 +2435,374 @@ function Form_specialProduct_motor({
   );
 }
 
+// MARK:Form_specialProd_headBox
+
+type Tstate_specialProd_headBox = {
+  headBoxThickness: `${number}` | '';
+  headBoxFront: string;
+  headBoxAngleIronQuantity: `${number}` | '';
+  isIntegratedHeadBox: boolean;
+  boxB: `${number}` | '';
+  boxD: `${number}` | '';
+
+  hasWheel: boolean;
+  headBoxCover: TupdateContractProductItemDto['headBoxCover'] | null;
+  headBoxTopCover: boolean;
+
+  headBoxSizeX: `${number}` | '';
+  headBoxSizeY: `${number}` | '';
+  headBoxSizeM: `${number}` | '';
+  headBoxSizeN: `${number}` | '';
+  headBoxSizeO: `${number}` | '';
+  headBoxSizeP: `${number}` | '';
+  headBoxSizeQ: `${number}` | '';
+};
+
+function Form_specialProd_headBox({
+  //
+  state: {
+    headBoxThickness,
+    headBoxFront,
+    headBoxAngleIronQuantity,
+    isIntegratedHeadBox,
+    boxB,
+    boxD,
+
+    hasWheel,
+    headBoxCover,
+    headBoxTopCover,
+
+    headBoxSizeX,
+    headBoxSizeY,
+    headBoxSizeM,
+    headBoxSizeN,
+    headBoxSizeO,
+    headBoxSizeP,
+    headBoxSizeQ,
+  },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_headBox;
+  setState: TsetState<Tstate_specialProd_headBox>;
+  disabled: boolean | undefined;
+}) {
+  // const {
+  //   //
+  //   headBox,
+  //   getOptions_material_stable,
+  //   isIntegratedHeadBox,
+  //   getOptions_headBoxThickness,
+  //   isSpecialProd,
+
+  //   headBoxCover,
+  //   headBoxTopCover,
+  //   hasWheel,
+  //   headBoxSizeX,
+  //   headBoxSizeY,
+  //   headBoxSizeM,
+  //   headBoxSizeN,
+  //   headBoxSizeO,
+  //   headBoxSizeP,
+  //   headBoxSizeQ,
+  //   setHeadBoxCover,
+  //   setBoxTopCover,
+  //   setHasWheel,
+  //   setBoxXYMNOPQ,
+  //   getHeadBoxImage,
+
+  //   boxB,
+  //   boxD,
+  // } = useWorksheet(
+  //   useShallow((state) => ({
+  //     headBox: state.headBox,
+  //     isIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox(),
+  //     getOptions_material_stable: state.getOptions_material_stable,
+  //     getOptions_headBoxThickness: state.getOptions_headBoxThickness,
+  //     isSpecialProd: state.getIsSpecialProd(),
+  //     generalSpec: state.generalSpec, // 用於更新getOptions
+  //     avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+
+  //     headBoxCover: state.headBox.headBoxCover,
+  //     headBoxTopCover: state.headBox.headBoxTopCover,
+  //     hasWheel: state.headBox.hasWheel,
+  //     headBoxSizeX: state.headBox.headBoxSizeX,
+  //     headBoxSizeY: state.headBox.headBoxSizeY,
+  //     headBoxSizeM: state.headBox.headBoxSizeM,
+  //     headBoxSizeN: state.headBox.headBoxSizeN,
+  //     headBoxSizeO: state.headBox.headBoxSizeO,
+  //     headBoxSizeP: state.headBox.headBoxSizeP,
+  //     headBoxSizeQ: state.headBox.headBoxSizeQ,
+  //     setHeadBoxCover: state.headBox.setHeadBoxCover,
+  //     setBoxTopCover: state.headBox.setBoxTopCover,
+  //     setHasWheel: state.headBox.setHasWheel,
+  //     setBoxXYMNOPQ: state.headBox.setBoxXYMNOPQ,
+  //     getHeadBoxImage: state.headBox.getHeadBoxImage,
+
+  //     boxB: state.ABCD.boxB,
+  //     boxD: state.ABCD.boxD,
+  //   }))
+  // );
+
+  // const { url1, url2, url3, url4 } = getHeadBoxImage();
+  const url1 = getSvgUrl1({ isIntegratedHeadBox, hasWheel });
+  const url2 = getSvgUrl2({ isIntegratedHeadBox, hasWheel });
+  const url3 = getSvgUrl3({ headBoxTopCover });
+  const url4 = getSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
+
+  return (
+    <div>
+      <p className={scss.caption}>●捲箱</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="厚度"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: headBoxThickness,
+              type: 'number',
+              min: 0,
+              step: 0,
+              onChange: (e) => {
+                if (e.target.validity.valid) {
+                  setState((prev) => ({ ...prev, headBoxThickness: e.target.value as `${number}` }));
+                }
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="角鐵數量"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: headBoxAngleIronQuantity,
+              type: 'number',
+              min: 0,
+              step: 0,
+              onChange: (e) => {
+                if (e.target.validity.valid) {
+                  setState((prev) => ({ ...prev, headBoxAngleIronQuantity: e.target.value as `${number}` }));
+                }
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="形式"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: optionsCreator_isIntegratedHeadBox(),
+              value: findOption({
+                value: String(isIntegratedHeadBox),
+                options: optionsCreator_isIntegratedHeadBox(),
+              }),
+              onChange: (option) => {
+                const value = option?.value;
+                const bool = value === 'true';
+                setState((prev) => ({ ...prev, isIntegratedHeadBox: bool }));
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="檔輪"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_boolean,
+              value: findOption({
+                options: options_boolean,
+                value: String(hasWheel),
+              }),
+              onChange: (option) => {
+                const value = (option?.value ?? 'false') as 'true' | 'false';
+                setState((prev) => ({ ...prev, hasWheel: value === 'true' }));
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="前遮"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_前遮,
+              value: findOption({
+                options: options_前遮,
+                value: headBoxCover ?? '',
+              }),
+              onChange: (option) => {
+                const value = (option?.value ?? 'none') as Tworksheet['headBox']['headBoxCover'];
+                setState((prev) => ({ ...prev, headBoxCover: value }));
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="上蓋"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_boolean,
+              value: findOption({
+                options: options_boolean,
+                value: String(headBoxTopCover),
+              }),
+              onChange: (option) => {
+                const value = (option?.value ?? 'false') as 'true' | 'false';
+                setState((prev) => ({ ...prev, headBoxTopCover: value === 'true' }));
+              },
+            },
+          }}
+        />
+
+        <div className={scss.headBoxImgContainer}>
+          <div>{url1 && <Image src={url1} alt="" width={243} height={243} />}</div>
+          <div>{url2 && <Image src={url2} alt="" width={243} height={243} />}</div>
+          <div>{url3 && <Image src={url3} alt="上蓋" width={243} height={243} />}</div>
+          <div>{url4 && <Image src={url4} alt="前遮" width={243} height={243} />}</div>
+        </div>
+
+        <div className="grid gap-[25px] content-start">
+          <InputSel {...basicConfig} caption="SizeB" disabled={true} showBaseline="invisible" node={boxB} />
+          <InputSel {...basicConfig} caption="SizeD" disabled={true} showBaseline="invisible" node={boxD} />
+          <InputSel
+            {...basicConfig}
+            caption="SizeX"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeX,
+                onChange: (e) => {
+                  if (e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeX: value }));
+                  }
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeY"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeY,
+                onChange: (e) => {
+                  if (e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeY: value }));
+                  }
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeM"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeM,
+                onChange: (e) => {
+                  if (e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeM: value }));
+                  }
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeN"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeN,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeN: value }));
+                  }
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeO"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeO,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeO: value }));
+                  }
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeP"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeP,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeP: value }));
+                  }
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeQ"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeQ,
+                onChange: (e) => {
+                  if (!e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeQ: value }));
+                  }
+                },
+              },
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ======================================================================
 
 export {
@@ -2397,6 +2823,7 @@ export {
   Form_specialProd_location,
   Form_specialProduct_ABCD,
   Form_specialProduct_motor,
+  Form_specialProd_headBox,
 };
 
 export { WorksheetTable };

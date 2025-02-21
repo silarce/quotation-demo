@@ -1,6 +1,6 @@
 import { Toption } from './options';
 
-const findOption = ({ value, options }: { value: any; options: Toption[] }) => {
+const findOption = ({ value, options }: { value: string; options: Toption[] }) => {
   if (!value) {
     return null;
   }

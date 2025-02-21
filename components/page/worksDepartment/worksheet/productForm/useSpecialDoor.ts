@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 
-import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+import type { TquotationProductItemDto, TupdateContractProductItemDto } from 'js/api/dtoTypes';
 import type { TworksheetRecordDto_addition } from 'js/api/api_engineering';
 
 type Tstate_specialDoor = {
@@ -141,6 +141,18 @@ type Tstate_specialDoor = {
   floor: string;
   // 區域位置
   locationArea: string;
+
+  hasWheel: boolean;
+  headBoxCover: TupdateContractProductItemDto['headBoxCover'] | null;
+  headBoxTopCover: boolean;
+
+  headBoxSizeX: `${number}` | '';
+  headBoxSizeY: `${number}` | '';
+  headBoxSizeM: `${number}` | '';
+  headBoxSizeN: `${number}` | '';
+  headBoxSizeO: `${number}` | '';
+  headBoxSizeP: `${number}` | '';
+  headBoxSizeQ: `${number}` | '';
 };
 
 // MARK:useSpecialDoor
@@ -244,6 +256,17 @@ const useDefaultState_specialDoor = ({
       serialNumberArr: contractProductItems.map((item) => item.serialNumber ?? ''),
       floor: quotationProductItem.floor ?? '',
       locationArea: quotationProductItem.locationArea ?? '',
+      //
+      hasWheel: !!quotationProductItem.hasWheel,
+      headBoxCover: quotationProductItem.headBoxCover,
+      headBoxTopCover: !!quotationProductItem.headBoxTopCover,
+      headBoxSizeX: `${quotationProductItem.headBoxSizeX ?? ''}` as `${number}` | '',
+      headBoxSizeY: `${quotationProductItem.headBoxSizeY ?? ''}` as `${number}` | '',
+      headBoxSizeM: `${quotationProductItem.headBoxSizeM ?? ''}` as `${number}` | '',
+      headBoxSizeN: `${quotationProductItem.headBoxSizeN ?? ''}` as `${number}` | '',
+      headBoxSizeO: `${quotationProductItem.headBoxSizeO ?? ''}` as `${number}` | '',
+      headBoxSizeP: `${quotationProductItem.headBoxSizeP ?? ''}` as `${number}` | '',
+      headBoxSizeQ: `${quotationProductItem.headBoxSizeQ ?? ''}` as `${number}` | '',
     };
 
     return defaultState;
@@ -316,6 +339,17 @@ const emptyState_specialDoor = (): Tstate_specialDoor => {
     serialNumberArr: [],
     floor: '',
     locationArea: '',
+    //
+    hasWheel: false,
+    headBoxCover: null,
+    headBoxTopCover: false,
+    headBoxSizeX: '',
+    headBoxSizeY: '',
+    headBoxSizeM: '',
+    headBoxSizeN: '',
+    headBoxSizeO: '',
+    headBoxSizeP: '',
+    headBoxSizeQ: '',
   };
 
   return state;
