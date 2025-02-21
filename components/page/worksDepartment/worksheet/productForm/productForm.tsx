@@ -38,6 +38,7 @@ import {
   optionsCreator_bearingName,
   optionsCreator_horsePower,
   optionsCreator_motorVender,
+  optionsCreator_closingType,
   //
 } from 'js/utils/options/productOptions';
 
@@ -57,6 +58,7 @@ const options_doorType = optionsCreator_quoteType();
 const options_horsepower = optionsCreator_horsePower();
 const options_motorVendor = optionsCreator_motorVender();
 const options_motorLockBox = optionsCreator_motorLockBox();
+const options_closingtype = optionsCreator_closingType();
 
 const opttions_motorSupportStand = [
   { value: 'true', label: '有' },
@@ -2205,8 +2207,8 @@ const Form_specialProd_basic = ({
           disabled={disabled}
           selectProps={{
             props: {
-              value: findOption({ value: String(closingType), options: optionsCreator_boolean() }),
-              options: optionsCreator_boolean(),
+              value: findOption({ value: String(closingType), options: options_closingtype }),
+              options: options_closingtype,
               onChange: (option) => {
                 setState((prev) => ({ ...prev, closingType: option?.value ?? '' }));
               },
@@ -2700,7 +2702,7 @@ function Form_specialProd_headBox({
                 ...inputNumberProps,
                 value: headBoxSizeN,
                 onChange: (e) => {
-                  if (!e.target.validity.valid) {
+                  if (e.target.validity.valid) {
                     const value = e.target.value as `${number}`;
                     setState((prev) => ({ ...prev, headBoxSizeN: value }));
                   }
@@ -2717,7 +2719,7 @@ function Form_specialProd_headBox({
                 ...inputNumberProps,
                 value: headBoxSizeO,
                 onChange: (e) => {
-                  if (!e.target.validity.valid) {
+                  if (e.target.validity.valid) {
                     const value = e.target.value as `${number}`;
                     setState((prev) => ({ ...prev, headBoxSizeO: value }));
                   }
@@ -2734,7 +2736,7 @@ function Form_specialProd_headBox({
                 ...inputNumberProps,
                 value: headBoxSizeP,
                 onChange: (e) => {
-                  if (!e.target.validity.valid) {
+                  if (e.target.validity.valid) {
                     const value = e.target.value as `${number}`;
                     setState((prev) => ({ ...prev, headBoxSizeP: value }));
                   }
@@ -2751,7 +2753,7 @@ function Form_specialProd_headBox({
                 ...inputNumberProps,
                 value: headBoxSizeQ,
                 onChange: (e) => {
-                  if (!e.target.validity.valid) {
+                  if (e.target.validity.valid) {
                     const value = e.target.value as `${number}`;
                     setState((prev) => ({ ...prev, headBoxSizeQ: value }));
                   }
