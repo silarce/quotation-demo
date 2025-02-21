@@ -215,6 +215,9 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
             <input
               onWheel={(e) => e.currentTarget.blur()}
               type={disabled ? 'text' : 'number'}
+              min={-1000}
+              max={1000}
+              step={0}
               className={classNames(
                 //
                 'bg-transparent',
@@ -223,6 +226,10 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
               readOnly={disabled}
               value={disabled ? Number(tuneTotal.value || 0).toLocaleString() : tuneTotal.value}
               onChange={(e) => {
+                if (!e.target.validity.valid) {
+                  return;
+                }
+
                 const value = e.target.value;
                 tuneTotal.onChange?.(value as `${number}` | '');
               }}
@@ -274,6 +281,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
               disabled={disabled || currency.disabled || disabled_taxAndCurrency}
               selectProps={{
                 props: {
+                  menuPortalTarget: undefined,
                   placeholder: '',
                   value: { value: currency.value, label: currency.value },
                   options: optionsCreator_currency(),

@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 // -----------------------------------------------------------------------------------
 // 全域 css
@@ -94,6 +95,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // ----------------------------------------------------------------------------
 
   const globalState_review = useGlobal_review();
+  const optionalConfig = useGlobal_OptionalConfig();
 
   // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
@@ -155,6 +157,10 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       globalState_review.update_2();
     }
   }, [userInfo]);
+
+  useEffect(() => {
+    optionalConfig.init();
+  }, []);
 
   // -----------------------------------------------------------------------
   const appContextValue = {

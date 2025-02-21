@@ -1406,7 +1406,7 @@ const useData = () => {
         const rootProdQty = rootProd.quantity;
         rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
         rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
-          .mul(rootProd.price)
+          .mul(rootProd.unitPrice)
           .mul(-1)
           .toNumber();
       } else if (action === '變更追減') {
@@ -1430,7 +1430,7 @@ const useData = () => {
         rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).sub(qty_modify).toNumber();
         rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
           .add(qty_modify)
-          .mul(rootProd.price)
+          .mul(rootProd.unitPrice)
           .mul(-1)
           .toNumber();
       } else if (action === '變更追加') {
