@@ -1377,7 +1377,9 @@ export default function POrderDetail() {
             supplieraddress: null,
             supplierphone: null,
             suppliercontact: null,
-            supplierfax: null
+            supplierfax: null,
+            create_at: '',
+            create_by: userInfo?.employee?.id
         };
 
         // 將空資料新增進陣列

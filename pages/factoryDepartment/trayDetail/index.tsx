@@ -411,7 +411,7 @@ export default function TrayDetail() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = trayname;
             const trayCommand = "100";
@@ -433,7 +433,7 @@ export default function TrayDetail() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = trayname;
             const trayCommand = "200";
