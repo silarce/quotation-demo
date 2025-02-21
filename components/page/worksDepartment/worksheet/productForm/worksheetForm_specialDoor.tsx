@@ -7,6 +7,8 @@ import {
   Form_specialProd_roller,
   Form_specialProd_guideRail,
   Form_specialProd_bottomBar,
+  Form_specialProd_sidePlate,
+  Form_specailProd_other,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 import {
   Container,
@@ -61,6 +63,8 @@ const WorksheetForm_specialDoor = ({
           <Form_specialProd_roller {...props} />
           <Form_specialProd_guideRail {...props} />
           <Form_specialProd_bottomBar {...props} />
+          <Form_specialProd_sidePlate {...props} />
+          <Form_specailProd_other {...props} />
         </FormGrid>
       </div>
     </Container>

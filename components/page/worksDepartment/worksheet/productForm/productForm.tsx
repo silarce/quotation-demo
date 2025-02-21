@@ -2956,6 +2956,110 @@ function Form_specialProd_bottomBar({
   );
 }
 
+// MARK:Form_specialProd_sidePlate
+
+type Tstate_specialProd_sidePlate = {
+  bearingName: string;
+  sprocketWheelModel: string;
+  sidePlateDirection: string;
+};
+
+function Form_specialProd_sidePlate({
+  state: { bearingName, sprocketWheelModel, sidePlateDirection },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_sidePlate;
+  setState: TsetState<Tstate_specialProd_sidePlate>;
+  disabled: boolean | undefined;
+}) {
+  return (
+    <div>
+      <p className={scss.caption}>●支板</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="軸承"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: bearingName,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, bearingName: e.target.value }));
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="鏈條"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: sprocketWheelModel,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, sprocketWheelModel: e.target.value }));
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="方向"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              value: findOption({ value: sidePlateDirection, options: optionsCreator_direction() }),
+              options: optionsCreator_direction(),
+              onChange: (option) => {
+                setState((prev) => ({ ...prev, sidePlateDirection: option?.value ?? '' }));
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// MARK:Form_specailProd_other
+type Tstate_specialProd_other = {
+  isULGuideRail: boolean;
+};
+
+function Form_specailProd_other({
+  state: { isULGuideRail },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_other;
+  setState: TsetState<Tstate_specialProd_other>;
+  disabled: boolean | undefined;
+}) {
+  return (
+    <div>
+      <p className={scss.caption}>●其他</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="UL"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              value: findOption({ value: String(isULGuideRail), options: optionsCreator_boolean() }),
+              options: optionsCreator_boolean(),
+              onChange: (option) => {
+                const value = option?.value === 'true';
+                setState({ isULGuideRail: value });
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ======================================================================
 
 export {
@@ -2980,6 +3084,8 @@ export {
   Form_specialProd_roller,
   Form_specialProd_guideRail,
   Form_specialProd_bottomBar,
+  Form_specialProd_sidePlate,
+  Form_specailProd_other,
 };
 
 export { WorksheetTable };

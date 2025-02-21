@@ -81,7 +81,7 @@ type Tstate_specialDoor = {
   slatCount: `${number}` | '';
 
   // 鏈齒輪 - 鏈齒輪番號
-  // sprocketWheelModel: string;
+  sprocketWheelModel: string;
   // 鏈齒輪 - 大鏈輪
   // sprocketWheelTeethNumber: string;
   // 可能為鍊條數量
@@ -267,6 +267,8 @@ const useDefaultState_specialDoor = ({
       headBoxSizeO: `${quotationProductItem.headBoxSizeO ?? ''}` as `${number}` | '',
       headBoxSizeP: `${quotationProductItem.headBoxSizeP ?? ''}` as `${number}` | '',
       headBoxSizeQ: `${quotationProductItem.headBoxSizeQ ?? ''}` as `${number}` | '',
+      //
+      sprocketWheelModel: quotationProductItem.sprocketWheelModel ?? '',
     };
 
     return defaultState;
@@ -350,6 +352,8 @@ const emptyState_specialDoor = (): Tstate_specialDoor => {
     headBoxSizeO: '',
     headBoxSizeP: '',
     headBoxSizeQ: '',
+    //
+    sprocketWheelModel: '',
   };
 
   return state;
