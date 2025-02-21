@@ -2890,6 +2890,72 @@ function Form_specialProd_guideRail({
   );
 }
 
+// MAKR:Form_specialProd_bottomBar
+
+type Tstate_specialProd_bottomBar = {
+  bottomBarAngleIron: string;
+  bottomBarPlate: string;
+  bottomBar: string;
+};
+
+function Form_specialProd_bottomBar({
+  state: { bottomBarAngleIron, bottomBarPlate, bottomBar },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_bottomBar;
+  setState: TsetState<Tstate_specialProd_bottomBar>;
+  disabled: boolean | undefined;
+}) {
+  return (
+    <div>
+      <p className={scss.caption}>●底座</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="角鐵材質"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: bottomBarAngleIron,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, bottomBarAngleIron: e.target.value }));
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="底座板材質"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: bottomBarPlate,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, bottomBarPlate: e.target.value }));
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="類型"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: bottomBar,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, bottomBar: e.target.value }));
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ======================================================================
 
 export {
@@ -2913,6 +2979,7 @@ export {
   Form_specialProd_headBox,
   Form_specialProd_roller,
   Form_specialProd_guideRail,
+  Form_specialProd_bottomBar,
 };
 
 export { WorksheetTable };
