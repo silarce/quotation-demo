@@ -1291,7 +1291,9 @@ export default function PEntryDetail() {
             supplieraddress: null,
             supplierphone: null,
             suppliercontact: null,
-            supplierfax: null
+            supplierfax: null,
+            create_at: '',
+            create_by: userInfo?.employee?.id
         };
 
         // 將空資料新增進陣列
@@ -1826,7 +1828,7 @@ export default function PEntryDetail() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = nowtrayname;
             const trayCommand = "100";
@@ -1848,7 +1850,7 @@ export default function PEntryDetail() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = nowtrayname;
             const trayCommand = "200";
@@ -1940,7 +1942,7 @@ export default function PEntryDetail() {
                 title: `呼叫: ${nowtrayname}`,
                 content: '請勿靠近設備!!',
                 props: {
-                    onOk: async () => {                        
+                    onOk: async () => {
                         await CallTray();
                         UpdateTrayStatus();
                     }
@@ -3899,10 +3901,12 @@ export default function PEntryDetail() {
                                         />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && called === true) ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && called === true) ? '' : 'none'}` }}> */}
+                                        <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity) ? '' : 'none'}` }}>
                                             <button className={scss.redbtn} onClick={() => { handleaddquantity() }}>確認入庫</button>
                                         </span>
-                                        <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || called === false) ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || called === false) ? '' : 'none'}` }}> */}
+                                        <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity) ? '' : 'none'}` }}>
                                             <button className={scss.disabledbtn}>確認入庫</button>
                                         </span>
                                     </div>
@@ -3987,7 +3991,8 @@ export default function PEntryDetail() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="入庫數量"
-                                            disabled={(called === true && nowentryqty < nowquantity) ? false : true}
+                                            // disabled={(called === true && nowentryqty < nowquantity) ? false : true}
+                                            disabled={(nowentryqty < nowquantity) ? false : true}
                                             inputProps={{
                                                 props: {
                                                     type: "number",

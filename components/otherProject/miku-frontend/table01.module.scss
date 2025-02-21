@@ -1,0 +1,11 @@
+$width: 121.5px;
+$height: 121.5px;
+
+.svgContainer {
+  width: $width;
+  height: $height;
+  svg {
+    width: $width;
+    height: $height;
+  }
+}

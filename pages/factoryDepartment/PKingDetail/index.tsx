@@ -1384,6 +1384,8 @@ export default function PKingDetail() {
             remaining_quantity: 0, // 設置剩餘數量為
             spec: '', // 保留規格
             unit: '', // 保留單位
+            create_at: '',//保留建立時間，在後端建立
+            create_by: userInfo?.employee?.id//帶入新增品項的人員
         };
 
         // 將空資料新增到 data2
@@ -1939,7 +1941,7 @@ export default function PKingDetail() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = nowtrayname;
             const trayCommand = "100";
@@ -1961,7 +1963,7 @@ export default function PKingDetail() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = nowtrayname;
             const trayCommand = "200";
@@ -4038,10 +4040,12 @@ export default function PKingDetail() {
                                         />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <span style={{ display: `${(inboxquantity != 0 && nowpickingqty < nowquantity && called === true) ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${(inboxquantity != 0 && nowpickingqty < nowquantity && called === true) ? '' : 'none'}` }}> */}
+                                        <span style={{ display: `${(inboxquantity != 0 && nowpickingqty < nowquantity) ? '' : 'none'}` }}>
                                             <button className={scss.redbtn} onClick={() => { handleminusquantity() }}>確認領料</button>
                                         </span>
-                                        <span style={{ display: `${(inboxquantity === 0 || nowpickingqty === nowquantity || called === false) ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${(inboxquantity === 0 || nowpickingqty === nowquantity || called === false) ? '' : 'none'}` }}> */}
+                                        <span style={{ display: `${(inboxquantity === 0 || nowpickingqty === nowquantity) ? '' : 'none'}` }}>
                                             <button className={scss.disabledbtn}>確認領料</button>
                                         </span>
                                     </div>
@@ -4126,7 +4130,8 @@ export default function PKingDetail() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="領用數量"
-                                            disabled={(called === true && nowpickingqty < nowquantity) ? false : true}
+                                            // disabled={(called === true && nowpickingqty < nowquantity) ? false : true}
+                                            disabled={(nowpickingqty < nowquantity) ? false : true}
                                             inputProps={{
                                                 props: {
                                                     type: "number",
