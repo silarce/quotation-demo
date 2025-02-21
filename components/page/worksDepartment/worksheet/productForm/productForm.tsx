@@ -48,21 +48,54 @@ import img_husky from 'public/image/test/husky.svg';
 
 // =====================================================================
 
-const options_doorType = optionsCreator_quoteType();
-const options_horsepower = optionsCreator_horsePower();
-const options_motorVendor = optionsCreator_motorVender();
-const opttions_motorSupportStand = [
-  { value: 'true', label: '有' },
-  { value: 'false', label: '無' },
-];
-const options_motorLockBox = optionsCreator_motorLockBox();
-
 // =====================================================================
 
 type TsetStateAction<T> = Partial<T> | ((prev: T) => Partial<T>);
 type TsetState<T> = (action: TsetStateAction<T>) => void;
 
 // =====================================================================
+
+const options_doorType = optionsCreator_quoteType();
+const options_horsepower = optionsCreator_horsePower();
+const options_motorVendor = optionsCreator_motorVender();
+const options_motorLockBox = optionsCreator_motorLockBox();
+
+const opttions_motorSupportStand = [
+  { value: 'true', label: '有' },
+  { value: 'false', label: '無' },
+];
+const options_electricSupply = [
+  { value: JSON.stringify({ motorPhase: 1, motorVoltage: 110 }), label: '單相 110V' },
+  { value: JSON.stringify({ motorPhase: 3, motorVoltage: 110 }), label: '三相 110V' },
+  { value: JSON.stringify({ motorPhase: 3, motorVoltage: 380 }), label: '三相 380V' },
+  { value: JSON.stringify({ motorPhase: null, motorVoltage: null }), label: '無' },
+];
+const options_boolean = [
+  { value: 'false', label: '無' },
+  { value: 'true', label: '有' },
+];
+const options_前遮 = [
+  { value: 'none', label: '無' },
+  { value: 'half', label: '半遮' },
+  { value: 'full', label: '全遮' },
+];
+
+const basicConfig: TinputSelProps = {
+  wrapperStyle: { gap: '10px', height: 'fit-content' },
+  captionStyle: { width: '100px' },
+  captionSize: '18',
+  captionColor: 'main',
+  fontSize: '18',
+  showBaseline: 'always',
+  hrClassName: classNames(scss.inputSel_hr, scss.plus),
+};
+
+const inputNumberProps = {
+  type: 'number',
+  min: 0,
+  step: 0,
+};
+
 // =====================================================================
 
 // MARK: location
@@ -2213,13 +2246,6 @@ type Tprops_specialProduct_motor = {
   motorLockBox: string;
 };
 
-const options_electricSupply = [
-  { value: JSON.stringify({ motorPhase: 1, motorVoltage: 110 }), label: '單相 110V' },
-  { value: JSON.stringify({ motorPhase: 3, motorVoltage: 110 }), label: '三相 110V' },
-  { value: JSON.stringify({ motorPhase: 3, motorVoltage: 380 }), label: '三相 380V' },
-  { value: JSON.stringify({ motorPhase: null, motorVoltage: null }), label: '無' },
-];
-
 function Form_specialProduct_motor({
   state: { motorVoltage, motorPhase, horsepower, motorVendor, hasMotorSupportStand, motorLockBox },
   setState,
@@ -2350,55 +2376,6 @@ function Form_specialProduct_motor({
     </div>
   );
 }
-
-// =====================================================================
-// =====================================================================
-// =====================================================================
-
-// MARK:basicConfig
-const basicConfig: TinputSelProps = {
-  wrapperStyle: { gap: '10px', height: 'fit-content' },
-  captionStyle: { width: '100px' },
-  captionSize: '18',
-  captionColor: 'main',
-  fontSize: '18',
-  showBaseline: 'always',
-  hrClassName: classNames(scss.inputSel_hr, scss.plus),
-};
-
-const inputNumberProps = {
-  type: 'number',
-  min: 0,
-  step: 0,
-};
-
-// ======================================================================
-
-const options_boolean = [
-  {
-    value: 'false',
-    label: '無',
-  },
-  {
-    value: 'true',
-    label: '有',
-  },
-];
-
-const options_前遮 = [
-  {
-    value: 'none',
-    label: '無',
-  },
-  {
-    value: 'half',
-    label: '半遮',
-  },
-  {
-    value: 'full',
-    label: '全遮',
-  },
-];
 
 // ======================================================================
 
