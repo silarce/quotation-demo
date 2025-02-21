@@ -2787,6 +2787,109 @@ function Form_specialProd_roller({
   );
 }
 
+// MARK:Form_specialProd_slat
+
+// type Tstate_specialProd_slat = {};
+
+// function Form_specialProd_slat({ disabled }: { disabled: boolean | undefined }) {
+//   return (
+//     <div>
+//       <p className={scss.caption}>●門片</p>
+//       <div className={scss.grid}></div>
+//     </div>
+//   );
+// }
+
+// MARK:Form_specialProd_guideRail
+
+type Tstate_specialProd_guideRail = {
+  guideRailThickness: `${number}` | '';
+  hasSilencingStrip: boolean;
+  guideRailType: string;
+  guideRail: string;
+};
+
+function Form_specialProd_guideRail({
+  state: { guideRailThickness, hasSilencingStrip, guideRailType, guideRail },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_guideRail;
+  setState: TsetState<Tstate_specialProd_guideRail>;
+  disabled: boolean | undefined;
+}) {
+  return (
+    <div>
+      <p className={scss.caption}>●門軌</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="厚度"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              type: 'number',
+              min: 0,
+              step: 0,
+              value: guideRailThickness,
+              onChange: (e) => {
+                if (e.target.validity.valid) {
+                  setState((prev) => ({ ...prev, guideRailThickness: e.target.value as `${number}` }));
+                }
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="消音條"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              value: findOption({ value: String(hasSilencingStrip), options: options_boolean }),
+              options: options_boolean,
+              onChange: (option) => {
+                const value = option?.value === 'true';
+                setState((prev) => ({ ...prev, hasSilencingStrip: value }));
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="彎直"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: optionsCreator_bendStright(),
+              value: findOption({ value: guideRailType, options: optionsCreator_bendStright() }),
+              onChange: (option) => {
+                setState((prev) => ({ ...prev, guideRailType: option?.value ?? '' }));
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="形式"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: guideRail,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState((prev) => ({ ...prev, guideRail: e.target.value }));
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ======================================================================
 
 export {
@@ -2809,6 +2912,7 @@ export {
   Form_specialProduct_motor,
   Form_specialProd_headBox,
   Form_specialProd_roller,
+  Form_specialProd_guideRail,
 };
 
 export { WorksheetTable };
