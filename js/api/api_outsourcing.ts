@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
+import { useState } from 'react';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { Decimal } from 'decimal.js';
 
 import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
@@ -21,6 +21,10 @@ import type {
   TupdateOutsourcingPaymentDto,
   TupdateOutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailItemDto,
+  TfileDto,
+  TcreateOutsourcingPaymentDetailDto,
+  TitemDetail,
+  TsingleItemDetail,
 } from './dtoTypes';
 
 export type {
@@ -36,6 +40,9 @@ export type {
   TupdateOutsourcingPaymentDto,
   TupdateOutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailItemDto,
+  TcreateOutsourcingPaymentDetailDto,
+  TitemDetail,
+  TsingleItemDetail,
 };
 
 // /outsourcing
@@ -172,6 +179,33 @@ export const apiGetOutsourcingPayment_id = async (id: string, params?: Tparams) 
     .catch((err) => Promise.reject(err));
 };
 
+export const apiGetOutsourcingPaymentAttachments = async (outsourcingPaymentId: string) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/attachments`;
+
+  return axi
+    .get<TfileDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiPostOutsourcingPaymentAttachments = async (outsourcingPaymentId: string, body: FormData) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/attachments`;
+
+  return axi
+    .post<TfileDto[]>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
+export const apiDeleteOutsourcingPaymentAttachments = async (outsourcingPaymentId: string, fileId: string) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/attachments/${fileId}`;
+
+  return axi
+    .delete<TfileDto[]>(api)
+    .then(({ data }) => data)
+    .catch((err) => Promise.reject(err));
+};
+
 export const useGetOutsourcingPayment_id = (id?: string, customerParams?: Tparams) => {
   const [res, setRes] = useState<ToutsourcingPaymentDto>();
   const [isLoading, setIsLoading] = useState(false);
@@ -277,8 +311,83 @@ export const apiPatchOutsourcingPayment = async (
     });
 };
 
+export const useGetOutsourcingPayment_id_kit = (
+  id?: string,
+  {
+    customerParams,
+    autoUpdate = true,
+  }: {
+    customerParams?: Tparams;
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [res, setRes] = useState<ToutsourcingPaymentDto | null>();
+  const [attachments, setAttachments] = useState<TfileDto[] | null>();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const params = {
+    populate: ['outsourcing'],
+    ...customerParams,
+  };
+
+  const { get, patch } = apiKit_outsourcingPayment(id, { params_get: params });
+
+  const update = async () => {
+    if (!id) {
+      return;
+    }
+
+    setIsLoading(true);
+    await get()
+      .then(async (res) => {
+        const { outsourcingPayment, attachments } = res ?? {};
+        // const attachments = await apiGetOutsourcingPaymentAttachments(id);
+
+        setRes(outsourcingPayment);
+        setAttachments(attachments);
+
+        return {
+          outsourcingPayment,
+          attachments,
+        };
+      })
+      .catch((err) => {
+        setRes(null);
+        setAttachments(null);
+
+        myAlert.err({
+          title: '取得外包計價失敗',
+        });
+        console.error(err);
+      });
+    setIsLoading(false);
+  };
+
+  const handlePatch = async (...params: Parameters<typeof patch>) => {
+    return await patch(...params)
+      .then(() => {
+        autoUpdate && update();
+      })
+      .catch(() => {
+        myAlert.err({ title: '更新失敗' });
+      });
+  };
+
+  return {
+    data: res,
+    attachments,
+    update,
+    handlePatch,
+    isLoading_outsourcingPayment: isLoading,
+  };
+};
+
 // 送審
-export const apiPatchOutsourcingPaymentSubmit = async (id: string) => {
+export const apiPatchOutsourcingPaymentSubmit = async (
+  id: string,
+  { showAlert = true }: { showAlert?: boolean } = {}
+) => {
   const api = `/outsourcing-payment/${id}/submit`;
 
   return axi
@@ -287,17 +396,22 @@ export const apiPatchOutsourcingPaymentSubmit = async (id: string) => {
     .catch((error) => {
       const err = error as AxiosError;
 
-      myAlert.err({
-        title: '送審外包計價單失敗',
-        content: err.message,
-      });
+      showAlert &&
+        myAlert.err({
+          title: '送審外包計價單失敗',
+          content: err.message,
+        });
 
       return Promise.reject(err);
     });
 };
 
 // 審核
-export const apiPatchOutsourcingPaymentReview = async (id: string, body: { reviewResult: boolean }) => {
+export const apiPatchOutsourcingPaymentReview = async (
+  id: string,
+  body: { reviewResult: boolean },
+  { showAlert = true }: { showAlert?: boolean } = {}
+) => {
   const api = `/outsourcing-payment/${id}/review`;
 
   return axi
@@ -305,10 +419,11 @@ export const apiPatchOutsourcingPaymentReview = async (id: string, body: { revie
     .then((res) => res.data)
     .catch((error) => {
       const err = error as AxiosError;
-      myAlert.err({
-        title: '審核外包計價單失敗',
-        content: err.message,
-      });
+      showAlert &&
+        myAlert.err({
+          title: '審核外包計價單失敗',
+          content: err.message,
+        });
 
       return Promise.reject(err);
     });
@@ -390,6 +505,46 @@ export const apiPatchOutsourcingPaymentDetail = async (
     });
 };
 
+export const apiPatchOutsourcingPaymentDetail_updateRetainage = async (
+  id: string,
+  body: TupdateOutsourcingPaymentDetailDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing-payment-detail/${id}`;
+
+  try {
+    const {
+      data: { outsourcingPaymentId },
+    } = await axi.patch<ToutsourcingPaymentDetailDto>(api, body);
+
+    if (!outsourcingPaymentId) {
+      throw new Error('apiPatchOutsourcingPaymentDetail_updateRetainage: 沒有外包計價單id');
+    }
+
+    const { data: detailArr } = await apiGetOutsourcingPaymentDetail(outsourcingPaymentId);
+    const outsourcingPayment = await apiGetOutsourcingPayment_id(outsourcingPaymentId);
+
+    const retainage = detailArr
+      .reduce((total_d, { outsourcingTotal }) => {
+        return total_d.add(outsourcingTotal);
+      }, new Decimal(0))
+      .mul(0.1)
+      .toDecimalPlaces(0)
+      .toNumber();
+
+    const body_outsourcingPayment: TupdateOutsourcingPaymentDto = {
+      date: outsourcingPayment.date,
+      retainage,
+    };
+    await apiPatchOutsourcingPayment(outsourcingPaymentId, body_outsourcingPayment);
+  } catch (error) {
+    const err = error as AxiosError;
+    callAlert && myAlert.err({ title: '更新保留金失敗', content: JSON.stringify(err.message) });
+
+    return Promise.reject(err);
+  }
+};
+
 // 結清外包計價單(須提醒使用者，此動作不可逆)
 export const apiClearDebt = async (
   outsourcingPaymentId: string,
@@ -411,4 +566,130 @@ export const apiClearDebt = async (
 
       return Promise.reject(error);
     });
+};
+
+export const apiPostOutsourcingPaymentDetail = async (
+  outsourcingPaymentId: string,
+  body: TcreateOutsourcingPaymentDetailDto,
+  { callAlert = true }: { callAlert?: boolean } = {}
+) => {
+  const api = `/outsourcing-payment/${outsourcingPaymentId}/detail`;
+
+  return axi
+    .post(api, body)
+    .then((res) => res.data)
+    .catch((error) => {
+      const err = error as AxiosError;
+
+      callAlert &&
+        myAlert.err({
+          title: '新增外包計價明細失敗',
+          content: err.message,
+        });
+
+      return Promise.reject(err);
+    });
+};
+
+// ===========================================================================
+
+const apiKit_outsourcingPayment = (
+  //
+  id?: string,
+  { params_get }: { params_get?: Tparams } = {}
+) => {
+  //
+  const get = async () => {
+    if (!id) {
+      return;
+    }
+
+    return await apiGetOutsourcingPayment_id(id, params_get)
+      .then(async (outsourcingPayment) => {
+        const attachments = await apiGetOutsourcingPaymentAttachments(id);
+
+        return {
+          outsourcingPayment,
+          attachments,
+        };
+      })
+      .catch((err) => {
+        console.error(err);
+
+        return Promise.reject(err);
+      });
+  };
+
+  const patch = async ({
+    body,
+    attachmentArr,
+    attachmentIdArr_willDelete = [],
+  }: {
+    body: TupdateOutsourcingPaymentDto;
+    attachmentArr: FormData[];
+    attachmentIdArr_willDelete?: string[];
+  }) => {
+    if (!id) {
+      myAlert.err({ title: '沒有id' });
+
+      return;
+    }
+
+    let isSomeAttachmentPostFail = false;
+    let isSomeAttachmentDeleteFail = false;
+
+    try {
+      const newOutsourcintPayment = await apiPatchOutsourcingPayment(id, body);
+
+      for (const formData of attachmentArr) {
+        await apiPostOutsourcingPaymentAttachments(id, formData).catch((err) => {
+          console.error(err);
+          isSomeAttachmentPostFail = true;
+        });
+      }
+
+      for (const fileId of attachmentIdArr_willDelete) {
+        await apiDeleteOutsourcingPaymentAttachments(id, fileId).catch((err) => {
+          console.error(err);
+          isSomeAttachmentDeleteFail = true;
+        });
+      }
+
+      return {
+        newOutsourcintPayment,
+        isSomeAttachmentPostFail,
+        isSomeAttachmentDeleteFail,
+      };
+    } catch (error) {
+      return Promise.reject(error);
+    }
+    //
+  };
+
+  const submit = async () => {
+    if (!id) {
+      myAlert.err({ title: '沒有id' });
+
+      return;
+    }
+
+    return await apiPatchOutsourcingPaymentSubmit(id, { showAlert: false });
+  };
+
+  const review = async (body: { reviewResult: boolean }) => {
+    if (!id) {
+      myAlert.err({ title: '沒有id' });
+
+      return;
+    }
+
+    return await apiPatchOutsourcingPaymentReview(id, body);
+  };
+
+  return {
+    get,
+    patch,
+    submit,
+    review,
+  };
 };

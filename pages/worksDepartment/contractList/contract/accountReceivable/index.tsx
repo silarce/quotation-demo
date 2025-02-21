@@ -61,6 +61,8 @@ import { AxiosError } from 'axios';
 
 import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
 
+import PdfTemplate_accountReceivable from 'components/page/worksDepartment/contracList/contract/accountReceivable/pdfTemplate';
+
 // ========================================================================
 
 type Tquery = {
@@ -611,6 +613,8 @@ export default function AccountReceivable({
         <br />
         <br />
         <br />
+
+        {/* <PdfTemplate_accountReceivable visible={true} /> */}
       </div>
     </SubLayer>
   );
