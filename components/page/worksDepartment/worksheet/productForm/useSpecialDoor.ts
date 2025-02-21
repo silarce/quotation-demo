@@ -153,6 +153,11 @@ type Tstate_specialDoor = {
   headBoxSizeO: `${number}` | '';
   headBoxSizeP: `${number}` | '';
   headBoxSizeQ: `${number}` | '';
+
+  // 骨架
+  skeleton: string;
+  // 上遮板
+  upperMask: boolean;
 };
 
 // MARK:useSpecialDoor
@@ -280,6 +285,9 @@ const useSpecialDoor = ({
         headBoxSizeP: state_specialDoor.headBoxSizeP || null,
         headBoxSizeQ: state_specialDoor.headBoxSizeQ || null,
         hasWheel: state_specialDoor.hasWheel,
+
+        skeleton: state_specialDoor.skeleton,
+        upperMask: state_specialDoor.upperMask,
       };
 
       return contractProductItem;
@@ -400,6 +408,9 @@ const useDefaultState_specialDoor = ({
       headBoxSizeQ: `${quotationProductItem.headBoxSizeQ ?? ''}` as `${number}` | '',
       //
       sprocketWheelModel: quotationProductItem.sprocketWheelModel ?? '',
+
+      skeleton: quotationProductItem.skeleton ?? '',
+      upperMask: !!quotationProductItem.upperMask,
     };
 
     return defaultState;
@@ -485,6 +496,9 @@ const emptyState_specialDoor = (): Tstate_specialDoor => {
     headBoxSizeQ: '',
     //
     sprocketWheelModel: '',
+
+    skeleton: '',
+    upperMask: false,
   };
 
   return state;

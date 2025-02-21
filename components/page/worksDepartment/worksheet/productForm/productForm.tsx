@@ -59,6 +59,7 @@ const options_horsepower = optionsCreator_horsePower();
 const options_motorVendor = optionsCreator_motorVender();
 const options_motorLockBox = optionsCreator_motorLockBox();
 const options_closingtype = optionsCreator_closingType();
+const options_front = optionsCreator_front();
 
 const opttions_motorSupportStand = [
   { value: 'true', label: '有' },
@@ -2480,6 +2481,8 @@ type Tstate_specialProd_headBox = {
   headBoxSizeO: `${number}` | '';
   headBoxSizeP: `${number}` | '';
   headBoxSizeQ: `${number}` | '';
+
+  upperMask: boolean;
 };
 
 function Form_specialProd_headBox({
@@ -2491,11 +2494,9 @@ function Form_specialProd_headBox({
     isIntegratedHeadBox,
     boxB,
     boxD,
-
     hasWheel,
     headBoxCover,
     headBoxTopCover,
-
     headBoxSizeX,
     headBoxSizeY,
     headBoxSizeM,
@@ -2503,6 +2504,8 @@ function Form_specialProd_headBox({
     headBoxSizeO,
     headBoxSizeP,
     headBoxSizeQ,
+
+    upperMask,
   },
   setState,
   disabled,
@@ -2533,6 +2536,32 @@ function Form_specialProd_headBox({
               onChange: (e) => {
                 if (e.target.validity.valid) {
                   setState((prev) => ({ ...prev, headBoxThickness: e.target.value as `${number}` }));
+                }
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="正面"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_front,
+              isSearchable: true,
+
+              value: findOption({
+                value: headBoxFront,
+                options: options_front,
+              }),
+              onChange: (options) => {
+                const value = options?.value ?? '';
+                setState((prev) => ({ ...prev, headBoxFront: value }));
+              },
+              onInputChange: (value, action) => {
+                if (action.action === 'input-change') {
+                  setState((prev) => ({ ...prev, headBoxFront: value }));
                 }
               },
             },
@@ -2611,6 +2640,24 @@ function Form_specialProd_headBox({
               onChange: (option) => {
                 const value = (option?.value ?? 'none') as Tworksheet['headBox']['headBoxCover'];
                 setState((prev) => ({ ...prev, headBoxCover: value }));
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="上遮"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              options: options_boolean,
+              value: findOption({
+                options: options_boolean,
+                value: String(upperMask),
+              }),
+              onChange: (option) => {
+                const value = (option?.value ?? 'false') as 'true' | 'false';
+                setState((prev) => ({ ...prev, upperMask: value === 'true' }));
               },
             },
           }}
@@ -3049,10 +3096,11 @@ function Form_specialProd_sidePlate({
 // MARK:Form_specailProd_other
 type Tstate_specialProd_other = {
   isULGuideRail: boolean;
+  skeleton: string;
 };
 
 function Form_specailProd_other({
-  state: { isULGuideRail },
+  state: { isULGuideRail, skeleton },
   setState,
   disabled,
 }: {
@@ -3075,6 +3123,19 @@ function Form_specailProd_other({
               onChange: (option) => {
                 const value = option?.value === 'true';
                 setState({ isULGuideRail: value });
+              },
+            },
+          }}
+        />
+        <InputSel
+          {...basicConfig}
+          caption="骨架"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              value: skeleton,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                setState({ skeleton: e.target.value });
               },
             },
           }}
