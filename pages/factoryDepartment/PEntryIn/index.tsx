@@ -705,7 +705,7 @@ export default function PEntryIn() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = nowtrayname;
             const trayCommand = "100";
@@ -727,7 +727,7 @@ export default function PEntryIn() {
             setIsLoading(true);
 
             // 設定基礎參數
-            const baseURL = setting.env === "prod" ? ip : "https://localhost:44383/WareHouse/";
+            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
             const deviceName = "Device1";
             const trayNumber = nowtrayname;
             const trayCommand = "200";
@@ -1412,10 +1412,12 @@ export default function PEntryIn() {
                                         />
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && called === true) ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && called === true) ? '' : 'none'}` }}> */}
+                                        <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity) ? '' : 'none'}` }}>
                                             <button className={scss.redbtn} onClick={() => { handleaddquantity() }}>確認入庫</button>
                                         </span>
-                                        <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || called === false) ? '' : 'none'}` }}>
+                                        {/* <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || called === false) ? '' : 'none'}` }}> */}
+                                        <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity) ? '' : 'none'}` }}>
                                             <button className={scss.disabledbtn}>確認入庫</button>
                                         </span>
                                     </div>
@@ -1500,7 +1502,8 @@ export default function PEntryIn() {
                                         <InputSel
                                             {...inputSelProps}
                                             caption="入庫數量"
-                                            disabled={(called === true && nowentryqty < nowquantity) ? false : true}
+                                            // disabled={(called === true && nowentryqty < nowquantity) ? false : true}
+                                            disabled={(nowentryqty < nowquantity) ? false : true}
                                             inputProps={{
                                                 props: {
                                                     type: "number",
