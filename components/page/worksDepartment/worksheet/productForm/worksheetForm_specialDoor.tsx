@@ -4,6 +4,7 @@ import {
   Form_specialProduct_ABCD,
   Form_specialProduct_motor,
   Form_specialProd_headBox,
+  Form_specialProd_roller,
 } from 'components/page/worksDepartment/worksheet/productForm/productForm';
 import {
   Container,
@@ -55,6 +56,7 @@ const WorksheetForm_specialDoor = ({
           <Form_specialProduct_ABCD {...props} />
           <Form_specialProduct_motor {...props} />
           <Form_specialProd_headBox {...props} />
+          <Form_specialProd_roller {...props} />
         </FormGrid>
       </div>
     </Container>

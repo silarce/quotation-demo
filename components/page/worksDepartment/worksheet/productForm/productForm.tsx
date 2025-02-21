@@ -2487,64 +2487,6 @@ function Form_specialProd_headBox({
   setState: TsetState<Tstate_specialProd_headBox>;
   disabled: boolean | undefined;
 }) {
-  // const {
-  //   //
-  //   headBox,
-  //   getOptions_material_stable,
-  //   isIntegratedHeadBox,
-  //   getOptions_headBoxThickness,
-  //   isSpecialProd,
-
-  //   headBoxCover,
-  //   headBoxTopCover,
-  //   hasWheel,
-  //   headBoxSizeX,
-  //   headBoxSizeY,
-  //   headBoxSizeM,
-  //   headBoxSizeN,
-  //   headBoxSizeO,
-  //   headBoxSizeP,
-  //   headBoxSizeQ,
-  //   setHeadBoxCover,
-  //   setBoxTopCover,
-  //   setHasWheel,
-  //   setBoxXYMNOPQ,
-  //   getHeadBoxImage,
-
-  //   boxB,
-  //   boxD,
-  // } = useWorksheet(
-  //   useShallow((state) => ({
-  //     headBox: state.headBox,
-  //     isIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox(),
-  //     getOptions_material_stable: state.getOptions_material_stable,
-  //     getOptions_headBoxThickness: state.getOptions_headBoxThickness,
-  //     isSpecialProd: state.getIsSpecialProd(),
-  //     generalSpec: state.generalSpec, // 用於更新getOptions
-  //     avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-
-  //     headBoxCover: state.headBox.headBoxCover,
-  //     headBoxTopCover: state.headBox.headBoxTopCover,
-  //     hasWheel: state.headBox.hasWheel,
-  //     headBoxSizeX: state.headBox.headBoxSizeX,
-  //     headBoxSizeY: state.headBox.headBoxSizeY,
-  //     headBoxSizeM: state.headBox.headBoxSizeM,
-  //     headBoxSizeN: state.headBox.headBoxSizeN,
-  //     headBoxSizeO: state.headBox.headBoxSizeO,
-  //     headBoxSizeP: state.headBox.headBoxSizeP,
-  //     headBoxSizeQ: state.headBox.headBoxSizeQ,
-  //     setHeadBoxCover: state.headBox.setHeadBoxCover,
-  //     setBoxTopCover: state.headBox.setBoxTopCover,
-  //     setHasWheel: state.headBox.setHasWheel,
-  //     setBoxXYMNOPQ: state.headBox.setBoxXYMNOPQ,
-  //     getHeadBoxImage: state.headBox.getHeadBoxImage,
-
-  //     boxB: state.ABCD.boxB,
-  //     boxD: state.ABCD.boxD,
-  //   }))
-  // );
-
-  // const { url1, url2, url3, url4 } = getHeadBoxImage();
   const url1 = getSvgUrl1({ isIntegratedHeadBox, hasWheel });
   const url2 = getSvgUrl2({ isIntegratedHeadBox, hasWheel });
   const url3 = getSvgUrl3({ headBoxTopCover });
@@ -2803,6 +2745,48 @@ function Form_specialProd_headBox({
   );
 }
 
+// MARK:Form_specialProd_roller
+
+type Tstate_specialProd_roller = {
+  diameter: `${number}` | '';
+};
+
+function Form_specialProd_roller({
+  state: { diameter },
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_roller;
+  setState: TsetState<Tstate_specialProd_roller>;
+  disabled: boolean | undefined;
+}) {
+  return (
+    <div>
+      <p className={scss.caption}>●捲軸</p>
+      <div className={scss.grid}>
+        <InputSel
+          {...basicConfig}
+          caption="尺寸"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              type: 'number',
+              min: 0,
+              step: 0,
+              value: diameter,
+              onChange: (e) => {
+                if (e.target.validity.valid) {
+                  setState((prev) => ({ ...prev, diameter: e.target.value as `${number}` }));
+                }
+              },
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 // ======================================================================
 
 export {
@@ -2824,6 +2808,7 @@ export {
   Form_specialProduct_ABCD,
   Form_specialProduct_motor,
   Form_specialProd_headBox,
+  Form_specialProd_roller,
 };
 
 export { WorksheetTable };
