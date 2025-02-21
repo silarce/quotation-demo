@@ -1065,6 +1065,8 @@ const useControl_pdf = ({
           headBoxCover: item.headBoxCover === 'full' ? '全遮' : item.headBoxCover === 'half' ? '半遮' : '無',
           headBoxTopCover: item.headBoxTopCover ? '有' : '無',
           hasWheel: item.hasWheel ? '有' : '無',
+          headBoxSizeB: item.boxB,
+          headBoxSizeD: item.boxD,
           headBoxSizeX: item.headBoxSizeX,
           headBoxSizeY: item.headBoxSizeY,
           headBoxSizeM: item.headBoxSizeM,
