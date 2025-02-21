@@ -171,6 +171,22 @@ const useSpecialDoor = ({
 
   const [state_specialDoor, setState_specialDoor] = useState<Tstate_specialDoor>(defaultState);
 
+  const customLabel = useMemo(() => {
+    const customLabel: {
+      [key in 'surface']: string | undefined;
+    } = {
+      surface: undefined,
+    };
+
+    const { doorModelName } = state_specialDoor;
+
+    if (doorModelName === 'W1' || doorModelName === 'W3') {
+      customLabel.surface = '面材';
+    }
+
+    return customLabel;
+  }, [state_specialDoor]);
+
   const createBody = () => {
     const itemArr = activeRecordData?.contractProductItems ?? [];
 
@@ -289,7 +305,7 @@ const useSpecialDoor = ({
     setState_specialDoor(defaultState);
   }, [defaultState, disabled]);
 
-  return { state_specialDoor, setState_specialDoor, createBody };
+  return { state_specialDoor, setState_specialDoor, createBody, customLabel };
 };
 
 // MARK:useDefaultState_specialDoor

@@ -210,7 +210,7 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  const { state_specialDoor, setState_specialDoor, createBody } = useSpecialDoor({
+  const { state_specialDoor, setState_specialDoor, createBody, customLabel } = useSpecialDoor({
     activeRecordData,
     disabled,
   });
@@ -774,6 +774,7 @@ export default function Worksheet({
                 disabled={disabled}
                 state_specialDoor={state_specialDoor}
                 setState_specialDoor={setState_specialDoor}
+                customLabel={customLabel}
               />
             )}
           </div>
@@ -804,24 +805,27 @@ export default function Worksheet({
 
 // MARK:TheWorksheetForm
 const TheWorksheetForm = ({
-  //
   activeRecordData,
   reqPatchWorkSheet,
   disabled,
   activeWorksheetId,
   activeWorksheetOriginalAccessories,
-
+  //
   state_specialDoor,
   setState_specialDoor,
+  customLabel,
 }: {
   activeRecordData: TworksheetRecordDto_addition | undefined;
   reqPatchWorkSheet: () => void;
   disabled: boolean;
   activeWorksheetId: string | undefined;
   activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[];
-
+  //
   state_specialDoor: Tstate_specialDoor;
   setState_specialDoor: React.Dispatch<React.SetStateAction<Tstate_specialDoor>>;
+  customLabel: {
+    surface?: string;
+  };
 }) => {
   const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
 
@@ -863,6 +867,7 @@ const TheWorksheetForm = ({
         state_specialDoor={state_specialDoor}
         setState_specialDoor={setState_specialDoor}
         onConfirm={reqPatchWorkSheet}
+        customLabel={customLabel}
       />
     );
   }

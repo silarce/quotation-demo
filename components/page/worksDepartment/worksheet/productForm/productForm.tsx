@@ -2083,10 +2083,12 @@ const Form_specialProd_basic = ({
   },
   setState,
   disabled,
+  customLabel_surface,
 }: {
   state: Tstate_specialProd_basic;
   setState: TsetState<Tstate_specialProd_basic>;
   disabled: boolean;
+  customLabel_surface?: React.ReactNode;
 }) => {
   return (
     <div>
@@ -2171,7 +2173,7 @@ const Form_specialProd_basic = ({
         />
         <InputSel
           {...basicConfig}
-          caption="表面"
+          caption={customLabel_surface ?? '表面'}
           disabled={disabled}
           inputProps={{
             props: {
