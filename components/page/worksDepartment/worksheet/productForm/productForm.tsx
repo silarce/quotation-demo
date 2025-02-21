@@ -2062,6 +2062,7 @@ type Tstate_specialProd_basic = {
   materialName: string;
   materialSurface: string;
   isAntiTyphoon: boolean;
+  closingType: string;
 };
 
 const Form_specialProd_basic = ({
@@ -2076,6 +2077,7 @@ const Form_specialProd_basic = ({
     materialName,
     materialSurface,
     isAntiTyphoon,
+    closingType,
   },
   setState,
   disabled,
@@ -2131,6 +2133,27 @@ const Form_specialProd_basic = ({
             },
           }}
         />
+
+        <InputSel
+          {...basicConfig}
+          caption="淨高(h)"
+          disabled={disabled}
+          inputProps={{
+            props: {
+              type: 'number',
+              min: 0,
+              step: 1,
+              value: height,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                if (e.target.validity.valid) {
+                  const value = e.target.value as `${number}`;
+                  setState((prev) => ({ ...prev, height: value }));
+                }
+              },
+            },
+          }}
+        />
+
         <InputSel
           {...basicConfig}
           caption="材質"
@@ -2157,25 +2180,7 @@ const Form_specialProd_basic = ({
             },
           }}
         />
-        <InputSel
-          {...basicConfig}
-          caption="淨高(h)"
-          disabled={disabled}
-          inputProps={{
-            props: {
-              type: 'number',
-              min: 0,
-              step: 1,
-              value: height,
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                if (e.target.validity.valid) {
-                  const value = e.target.value as `${number}`;
-                  setState((prev) => ({ ...prev, height: value }));
-                }
-              },
-            },
-          }}
-        />
+
         <InputSel
           {...basicConfig}
           caption="防颱"
@@ -2189,6 +2194,21 @@ const Form_specialProd_basic = ({
               onChange: (strArr) => {
                 const isAntiTyphoon = strArr.includes('isAntiTyphoon');
                 setState((prev) => ({ ...prev, isAntiTyphoon }));
+              },
+            },
+          }}
+        />
+
+        <InputSel
+          {...basicConfig}
+          caption="開閉方式"
+          disabled={disabled}
+          selectProps={{
+            props: {
+              value: findOption({ value: String(closingType), options: optionsCreator_boolean() }),
+              options: optionsCreator_boolean(),
+              onChange: (option) => {
+                setState((prev) => ({ ...prev, closingType: option?.value ?? '' }));
               },
             },
           }}
