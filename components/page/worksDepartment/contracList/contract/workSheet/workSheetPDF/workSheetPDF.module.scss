@@ -46,3 +46,33 @@ $fontText: 25px;
   justify-content: space-between;
   gap: 4px;
 }
+
+// =========================================================================
+
+.table2 {
+  display: grid;
+  grid-auto-flow: row dense;
+  // grid-auto-rows: 30px;
+  // grid-auto-columns: 100px;
+  grid-template-columns: repeat(auto-fill, auto 120px) 120px 120px;
+  height: 270px;
+  border-top: solid 2px black;
+
+  > * {
+    border: solid 1px black;
+    font-size: 16px;
+
+    // &:nth-of-type(n) {
+    //   width: 120px;
+    // }
+    // &:nth-of-type(2n) {
+    //   width: 100px;
+    // }
+
+    &.caption {
+      > span {
+        font-weight: 800;
+      }
+    }
+  }
+}

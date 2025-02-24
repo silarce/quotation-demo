@@ -53,11 +53,6 @@ type Tcontrol = {
     headBoxSizeQ: React.ReactNode;
     hasWheel: React.ReactNode;
 
-    // imgUrl1: string | null;
-    // imgUrl2: string | null;
-    // imgUrl3: string | null;
-    // imgUrl4: string | null;
-
     svgString1: string | null;
     svgString2: string | null;
     svgString3: string | null;
