@@ -8,3 +8,11 @@
   gap: 36px 145px;
   width: 845px;
 }
+
+.select {
+  z-index: 3;
+}
+
+.inValid {
+  background-color: theme("colors.warning") !important;
+}

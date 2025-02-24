@@ -37,10 +37,13 @@
 
 .inputInTable {
   background-color: transparent;
-  text-align: center;
   border-bottom: solid 1px transparent;
+  width: 100%;
   &.enabled {
     border-color: black;
+  }
+  &.textRight {
+    text-align: right;
   }
 }
 

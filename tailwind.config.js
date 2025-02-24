@@ -1,4 +1,4 @@
-import { blue,green } from '@ant-design/colors';
+import { blue,green,orange } from '@ant-design/colors';
 
 
 module.exports = {
@@ -22,6 +22,7 @@ module.exports = {
         success: "#08f366",
         pass: "#008000",
         ok:green[0],
+        warning:orange[1],
         antdBlue:{
           // DEFAULT: blue.primary, // 沒有DEFAULT的效果以後再研究
           primary: blue.primary,
