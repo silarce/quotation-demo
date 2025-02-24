@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 
 // component
 import Miku_frontend_table01, { Tcontrol_table01 } from 'components/otherProject/miku-frontend/Table01';
+import Table_specialDoor, { Tprops_table_specialDoor } from './table_specialDoor';
 
 // gear
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
@@ -36,6 +37,7 @@ type Tcontrol = {
     shippingDate: string;
   };
   itemArr: Tcontrol_table01[];
+  specialItemArr: Tprops_table_specialDoor[];
 };
 
 export type { Tcontrol as Tcontrol_workSheetPDF_01 };
@@ -53,8 +55,10 @@ export default function WorkSheetPDF({
   // ---------------------------------------------------------------------
 
   const itemArr = control.itemArr;
+  const specialItemArr = control.specialItemArr;
 
   const chunkedList = _.chunk(itemArr, 3);
+  const chunkedList_specialItem = _.chunk(specialItemArr, 2);
 
   // ---------------------------------------------------------------------
 
@@ -182,32 +186,10 @@ export default function WorkSheetPDF({
               id="report"
             >
               <div>
-                <div className="text-2xl text-center pt-5 mb-1 relative">
-                  <span>工作表</span>
-                  <span className="absolute right-0">
-                    {index + 1} / {chunkedList.length} 頁
-                  </span>
-                </div>
+                <Title page={index + 1} pageCount={chunkedList.length} />
+                <Info {...control.info} />
 
-                <table className={classNames('w-full mb-1', scss.infoTable)}>
-                  <tbody>
-                    <tr>
-                      <td>合約編號: {control.info.contractNumber}</td>
-                      <td>客戶名稱: {control.info.customerName}</td>
-                      <td>開單日期: {control.info.billingDate}</td>
-                    </tr>
-                    <tr>
-                      <td>工程名稱: {control.info.projectName}</td>
-                      <td>聯絡人: {control.info.contactPerson}</td>
-                      <td>出貨日期: {control.info.shippingDate}</td>
-                    </tr>
-                    <tr>
-                      <td colSpan={3}>{`工程地點: ${control.info.projectAddress}`}</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                {/* <div className={scss.itemGrid}>
+                <div className={scss.itemGrid}>
                   {itemArr.map((control_item, index) => {
                     return (
                       <Fragment key={index}>
@@ -215,357 +197,89 @@ export default function WorkSheetPDF({
                       </Fragment>
                     );
                   })}
-                </div> */}
-
-                <Table_specialDoor />
-                <Table_specialDoor />
+                </div>
               </div>
             </div>
           </div>
         );
       })}
+      {/*  */}
+      {chunkedList_specialItem.map((specialItemArr, index) => {
+        return (
+          <div key={index}>
+            {index !== 0 && <hr className=" border-black" />}
+
+            <div
+              //
+              ref={(ele) => (refPdf.current[index] = ele)}
+              className={scss.container}
+              id="report"
+            >
+              <div>
+                <Title page={index + 1} pageCount={chunkedList.length} />
+                <Info {...control.info} />
+
+                {specialItemArr.map((specialItem, index) => {
+                  return <Table_specialDoor key={index} {...specialItem} />;
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/*  */}
     </Modal>
   );
 }
 
 // =====================================================================
 
-const Table_specialDoor = () => {
+const Title = ({ page, pageCount }: { page: React.ReactNode; pageCount: React.ReactNode }) => {
   return (
-    <div className={scss.table2}>
-      {/* C1 */}
-      <div className={classNames(scss.c1, scss.s2, scss.caption, scss.partRight)}>
-        <span>SJ-302</span>
-      </div>
-
-      {keyArr_basic.map((key) => {
-        return (
-          <Fragment key={key}>
-            <div className={classNames(scss.c1)}>
-              <span>{config[key].label}</span>
-            </div>
-            <div className={classNames(scss.c2, scss.partRight)}>
-              <span>value</span>
-            </div>
-          </Fragment>
-        );
-      })}
-
-      {/* C2 */}
-      <div className={classNames(scss.c3, scss.s2, scss.caption, scss.partRight)}>
-        <span>尺寸</span>
-      </div>
-
-      {keyArr_size.map((key) => {
-        return (
-          <Fragment key={key}>
-            <div className={classNames(scss.c3)}>
-              <span>{config[key].label}</span>
-            </div>
-            <div className={classNames(scss.c4, scss.partRight)}>
-              <span>value</span>
-            </div>
-          </Fragment>
-        );
-      })}
-
-      {/* 填空 */}
-      <div className={classNames(scss.c1, scss.s4, scss.partRight)} />
-
-      {/* C3 */}
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
-        <span>{'電動機(東元)'}</span>
-      </div>
-
-      <div className={classNames(scss.c5)}>
-        <span>電供</span>
-      </div>
-      <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
-      </div>
-      <div className={classNames(scss.c5)}>
-        <span>馬力數</span>
-      </div>
-      <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
-      </div>
-
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
-        <span>門軌</span>
-      </div>
-
-      <div className={classNames(scss.c5)}>
-        <span>門軌形式</span>
-      </div>
-      <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
-      </div>
-
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
-        <span>捲軸</span>
-      </div>
-
-      <div className={classNames(scss.c5)}>
-        <span>捲軸尺寸</span>
-      </div>
-      <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
-      </div>
-
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
-        <span>鏈齒輪</span>
-      </div>
-
-      <div className={classNames(scss.c5)}>
-        <span>鏈齒輪番號</span>
-      </div>
-      <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
-      </div>
-
-      {/* C7 */}
-      <div className={classNames(scss.c7, scss.s6, scss.caption)}>
-        <span>捲箱</span>
-      </div>
-
-      {keyArr_headBox.map((key, index) => {
-        const { label } = config[key];
-
-        const [className_label, className_value] = (() => {
-          if (index >= keyArr_headBox.length / 2) {
-            return [scss.c9, scss.c10];
-          }
-
-          return [scss.c7, scss.c8];
-        })();
-
-        return (
-          <Fragment key={key}>
-            <div className={classNames(className_label)}>
-              <span>{label}</span>
-            </div>
-            <div className={classNames(className_value)}>
-              <span>{'value'}</span>
-            </div>
-          </Fragment>
-        );
-      })}
-
-      {/* 填空 */}
-      <div className={classNames(scss.c7, scss.s4)} />
-
-      {/*  */}
-      <div className={classNames(scss.c11, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
-      <div className={classNames(scss.c11, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
-      <div className={classNames(scss.c12, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
-      <div className={classNames(scss.c12, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
-
-      {/*  */}
+    <div className="text-2xl text-center pt-5 mb-1 relative">
+      <span>工作表</span>
+      <span className="absolute right-0">
+        {page} / {pageCount} 頁
+      </span>
     </div>
   );
 };
 
-interface Tprops {
-  doorModelNamer: React.ReactNode;
-
-  itemName: React.ReactNode;
-  qty: React.ReactNode;
-  materialName: React.ReactNode;
-  materialSurface: React.ReactNode;
-  closingType: React.ReactNode;
-  isAntiTyphoon: React.ReactNode;
-  skeleton: React.ReactNode;
-  //
-  fullWidth: React.ReactNode;
-  height: React.ReactNode;
-  WG: React.ReactNode;
-  gapA: React.ReactNode;
-  gapC: React.ReactNode;
-  BD: React.ReactNode;
-  fullHeight: React.ReactNode;
-  //
-  isIntegratedHeadBox: React.ReactNode;
-  upperMask: React.ReactNode;
-  hasWheel: React.ReactNode;
-  headBoxCover: React.ReactNode;
-  headBoxTopCover: React.ReactNode;
-  headBoxSizeO: React.ReactNode;
-  headBoxSizeP: React.ReactNode;
-  headBoxSizeQ: React.ReactNode;
-  headBoxSizeX: React.ReactNode;
-  headBoxSizeY: React.ReactNode;
-  headBoxSizeM: React.ReactNode;
-  headBoxSizeN: React.ReactNode;
-  boxB: React.ReactNode;
-  boxD: React.ReactNode;
-}
-
-type TconfigKeys = keyof Pick<
-  Tprops,
-  | 'itemName'
-  | 'qty'
-  | 'materialName'
-  | 'materialSurface'
-  | 'closingType'
-  | 'isAntiTyphoon'
-  | 'skeleton'
-  | 'fullWidth'
-  | 'height'
-  | 'WG'
-  | 'gapA'
-  | 'gapC'
-  | 'BD'
-  | 'fullHeight'
-  | 'isIntegratedHeadBox'
-  | 'upperMask'
-  | 'hasWheel'
-  | 'headBoxCover'
-  | 'headBoxTopCover'
-  | 'headBoxSizeO'
-  | 'headBoxSizeP'
-  | 'headBoxSizeQ'
-  | 'headBoxSizeX'
-  | 'headBoxSizeY'
-  | 'headBoxSizeM'
-  | 'headBoxSizeN'
-  | 'boxB'
-  | 'boxD'
->;
-
-const keyArr_basic = Array.from(
-  new Set<TconfigKeys>([
-    'itemName',
-    'qty',
-    'materialName',
-    'materialSurface',
-    'closingType',
-    'isAntiTyphoon',
-    'skeleton',
-  ])
-);
-
-const keyArr_size = Array.from(new Set<TconfigKeys>(['fullWidth', 'height', 'WG', 'gapA', 'gapC', 'BD', 'fullHeight']));
-
-const keyArr_headBox = Array.from(
-  new Set<TconfigKeys>([
-    'isIntegratedHeadBox',
-    'hasWheel',
-    'upperMask',
-    'boxB',
-    'boxD',
-    'headBoxSizeM',
-    'headBoxSizeN',
-
-    'headBoxCover',
-    'headBoxTopCover',
-    'headBoxSizeO',
-    'headBoxSizeP',
-    'headBoxSizeQ',
-    'headBoxSizeX',
-    'headBoxSizeY',
-  ])
-);
-
-type TconfigItem = {
-  label: string;
-};
-
-const config: Record<TconfigKeys, TconfigItem> = {
-  // 基本資料
-  itemName: {
-    label: '型號',
-  },
-  qty: {
-    label: '數量',
-  },
-  materialName: {
-    label: '材質',
-  },
-  materialSurface: {
-    label: '表面',
-  },
-  closingType: {
-    label: '開閉方式',
-  },
-  isAntiTyphoon: {
-    label: '防颱勾',
-  },
-  skeleton: {
-    label: '骨架',
-  },
-  // 尺寸
-
-  fullWidth: {
-    label: '全寬',
-  },
-  height: {
-    label: '淨高',
-  },
-  WG: {
-    label: 'W+G',
-  },
-  gapA: {
-    label: '  機械縫 A',
-  },
-  gapC: {
-    label: '機械縫 C',
-  },
-  BD: {
-    label: '支板尺寸 B*D',
-  },
-  fullHeight: {
-    label: '捲門全高 H',
-  },
-
-  // 捲箱
-  isIntegratedHeadBox: {
-    label: '型式',
-  },
-  upperMask: {
-    label: '上遮',
-  },
-  hasWheel: {
-    label: '擋輪',
-  },
-  headBoxCover: {
-    label: '前遮',
-  },
-  headBoxTopCover: {
-    label: '上蓋',
-  },
-  headBoxSizeO: {
-    label: 'sizeO',
-  },
-  headBoxSizeP: {
-    label: 'sizeP',
-  },
-  headBoxSizeQ: {
-    label: 'sizeQ',
-  },
-  headBoxSizeX: {
-    label: 'sizeX',
-  },
-  headBoxSizeY: {
-    label: 'sizeY',
-  },
-  headBoxSizeM: {
-    label: 'sizeM',
-  },
-  headBoxSizeN: {
-    label: 'sizeN',
-  },
-  boxB: {
-    label: 'sizeB',
-  },
-  boxD: {
-    label: 'sizeD',
-  },
+const Info = ({
+  contractNumber,
+  customerName,
+  billingDate,
+  projectName,
+  contactPerson,
+  shippingDate,
+  projectAddress,
+}: {
+  contractNumber: React.ReactNode;
+  customerName: React.ReactNode;
+  billingDate: React.ReactNode;
+  projectName: React.ReactNode;
+  contactPerson: React.ReactNode;
+  shippingDate: React.ReactNode;
+  projectAddress: React.ReactNode;
+}) => {
+  return (
+    <table className={classNames('w-full mb-1', scss.infoTable)}>
+      <tbody>
+        <tr>
+          <td>合約編號: {contractNumber}</td>
+          <td>客戶名稱: {customerName}</td>
+          <td>開單日期: {billingDate}</td>
+        </tr>
+        <tr>
+          <td>工程名稱: {projectName}</td>
+          <td>聯絡人: {contactPerson}</td>
+          <td>出貨日期: {shippingDate}</td>
+        </tr>
+        <tr>
+          <td colSpan={3}>{`工程地點: ${projectAddress}`}</td>
+        </tr>
+      </tbody>
+    </table>
+  );
 };

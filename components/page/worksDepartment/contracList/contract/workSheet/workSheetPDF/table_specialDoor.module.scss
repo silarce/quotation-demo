@@ -1,0 +1,46 @@
+.table2 {
+  display: grid;
+  grid-auto-flow: row dense;
+  grid-auto-rows: 30px;
+  // grid-auto-columns: 1fr 100px;
+  // grid-template-columns: repeat(auto-fill, 140px 130px) 120px 120px;
+  grid-template-columns: repeat(5, 1fr 100px) 120px 120px;
+  height: 270px;
+  border-top: solid 2px black;
+  border-left: solid 1px black;
+
+  > * {
+    border-right: solid 1px black;
+    border-bottom: solid 1px black;
+    font-size: 16px;
+    padding: 1px 3px;
+
+    &.partRight {
+      border-right: solid 2px black;
+    }
+
+    &.caption {
+      background-color: rgb(209, 213, 219);
+      > span {
+        font-weight: 800;
+      }
+    }
+  }
+
+  // .s必須在下面.c的上面，不然.s會被蓋掉
+  @for $i from 2 through 6 {
+    > .s#{$i} {
+      grid-column: span $i / span $i;
+    }
+  }
+
+  @for $i from 1 through 12 {
+    > .c#{$i} {
+      grid-column-start: $i;
+    }
+  }
+
+  .r4 {
+    grid-row: span 4 / span 4;
+  }
+}
