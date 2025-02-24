@@ -38,6 +38,18 @@ interface Tprops_table_specialDoor {
   headBoxSizeN: React.ReactNode;
   boxB: React.ReactNode;
   boxD: React.ReactNode;
+  //
+  motorVendor: React.ReactNode;
+  electricSupply: React.ReactNode;
+  horsepower: React.ReactNode;
+  guideRailType: React.ReactNode;
+  diameter: React.ReactNode;
+  sprocketWheelModel: React.ReactNode;
+  //
+  headBoxImg1: React.ReactNode;
+  headBoxImg2: React.ReactNode;
+  headBoxImg3: React.ReactNode;
+  headBoxImg4: React.ReactNode;
 }
 
 type TconfigKeys = keyof Pick<
@@ -134,13 +146,13 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>電供</span>
       </div>
       <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
+        <span>{props.electricSupply}</span>
       </div>
       <div className={classNames(scss.c5)}>
         <span>馬力數</span>
       </div>
       <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
+        <span>{props.horsepower}</span>
       </div>
 
       <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
@@ -151,7 +163,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>門軌形式</span>
       </div>
       <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
+        <span>{props.guideRailType}</span>
       </div>
 
       <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
@@ -162,7 +174,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>捲軸尺寸</span>
       </div>
       <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
+        <span>{props.diameter}</span>
       </div>
 
       <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
@@ -173,7 +185,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>鏈齒輪番號</span>
       </div>
       <div className={classNames(scss.c6, scss.partRight)}>
-        <span>test</span>
+        <span>{props.sprocketWheelModel}</span>
       </div>
 
       {/* C7 */}
@@ -209,18 +221,10 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
       <div className={classNames(scss.c7, scss.s4)} />
 
       {/*  */}
-      <div className={classNames(scss.c11, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
-      <div className={classNames(scss.c11, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
-      <div className={classNames(scss.c12, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
-      <div className={classNames(scss.c12, scss.r4)}>
-        <span>{'圖'}</span>
-      </div>
+      <div className={classNames(scss.c11, scss.r4, scss.imgCell)}>{props.headBoxImg1}</div>
+      <div className={classNames(scss.c11, scss.r4, scss.imgCell)}>{props.headBoxImg2}</div>
+      <div className={classNames(scss.c12, scss.r4, scss.imgCell)}>{props.headBoxImg3}</div>
+      <div className={classNames(scss.c12, scss.r4, scss.imgCell)}>{props.headBoxImg4}</div>
 
       {/*  */}
     </div>

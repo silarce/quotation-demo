@@ -1303,9 +1303,20 @@ const createPdfSpecialItem = ({
     headBoxSizeN,
     boxB,
     boxD,
+
+    //
+    motorVendor,
+    horsepower,
+    guideRailType,
+    diameter,
+    sprocketWheelModel,
+    motorPhase,
+    motorVoltage,
   } = item;
 
-  // const phaseVoltage = `${lookup_motorPhase[String(motorPhase) as '1' | '3'] ?? ''} ${motorVoltage}V`;
+  const phase = motorPhase ? lookup_motorPhase[String(motorPhase) as '1' | '3'] : '';
+  const voltage = motorVoltage ? `${motorVoltage}V` : '';
+  const electricSupply = `${phase} ${voltage}`;
 
   const {
     headBox1: url_headBox1,
@@ -1318,6 +1329,11 @@ const createPdfSpecialItem = ({
     headBoxTopCover: !!headBoxTopCover,
     headBoxCover: headBoxCover,
   });
+
+  const headBoxSvgString1 = assetDict[url_headBox1.name || 'null'] || null;
+  const headBoxSvgString2 = assetDict[url_headBox2.name || 'null'] || null;
+  const headBoxSvgString3 = assetDict[url_headBoxTopCover.name || 'null'] || null;
+  const headBoxSvgString4 = assetDict[url_headBoxCover.name || 'null'] || null;
 
   const specialItem: Tcontrol_workSheetPDF_01['specialItemArr'][number] = {
     doorModelName,
@@ -1349,6 +1365,17 @@ const createPdfSpecialItem = ({
     headBoxSizeN,
     boxB,
     boxD,
+    //
+    motorVendor,
+    electricSupply,
+    horsepower,
+    guideRailType,
+    diameter,
+    sprocketWheelModel,
+    headBoxImg1: headBoxSvgString1 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString1 }} /> : null,
+    headBoxImg2: headBoxSvgString2 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString2 }} /> : null,
+    headBoxImg3: headBoxSvgString3 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString3 }} /> : null,
+    headBoxImg4: headBoxSvgString4 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString4 }} /> : null,
   };
 
   return specialItem;
