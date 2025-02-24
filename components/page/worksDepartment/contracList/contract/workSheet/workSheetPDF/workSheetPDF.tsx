@@ -60,6 +60,12 @@ export default function WorkSheetPDF({
   const chunkedList = _.chunk(itemArr, 3);
   const chunkedList_specialItem = _.chunk(specialItemArr, 2);
 
+  const pageCount = chunkedList.length + chunkedList_specialItem.length;
+
+  const page_specialItem = (indexNumber: number) => {
+    return indexNumber + chunkedList.length;
+  };
+
   // ---------------------------------------------------------------------
 
   const refPdf = useRef<(HTMLDivElement | null)[]>([]);
@@ -186,7 +192,7 @@ export default function WorkSheetPDF({
               id="report"
             >
               <div>
-                <Title page={index + 1} pageCount={chunkedList.length} />
+                <Title page={index + 1} pageCount={pageCount} />
                 <Info {...control.info} />
 
                 <div className={scss.itemGrid}>
@@ -216,7 +222,7 @@ export default function WorkSheetPDF({
               id="report"
             >
               <div>
-                <Title page={index + 1} pageCount={chunkedList.length} />
+                <Title page={page_specialItem(index + 1)} pageCount={pageCount} />
                 <Info {...control.info} />
 
                 {specialItemArr.map((specialItem, index) => {

@@ -96,7 +96,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
     <div className={scss.table2}>
       {/* C1 */}
       <div className={classNames(scss.c1, scss.s2, scss.caption, scss.partRight)}>
-        <span>SJ-302</span>
+        <span>{props.doorModelName}</span>
       </div>
 
       {keyArr_basic.map((key) => {
@@ -139,7 +139,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
 
       {/* C3 */}
       <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
-        <span>{'電動機(東元)'}</span>
+        <span>{`電動機(${props.motorVendor})`}</span>
       </div>
 
       <div className={classNames(scss.c5)}>

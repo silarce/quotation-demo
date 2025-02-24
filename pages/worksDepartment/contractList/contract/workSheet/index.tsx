@@ -1267,14 +1267,6 @@ const createPdfSpecialItem = ({
   const qty = contractProductItems.length;
 
   const {
-    // motorVoltage,
-    // motorPhase,
-
-    // isIntegratedHeadBox,
-    // hasWheel,
-    // headBoxTopCover,
-    // headBoxCover,
-    // doorModelNamer,
     doorModelName,
     itemName,
 
@@ -1366,7 +1358,7 @@ const createPdfSpecialItem = ({
     boxB,
     boxD,
     //
-    motorVendor,
+    motorVendor: motorVendor ?? '',
     electricSupply,
     horsepower,
     guideRailType,
