@@ -207,7 +207,7 @@ export default function WorkSheetPDF({
                   </tbody>
                 </table>
 
-                <div className={scss.itemGrid}>
+                {/* <div className={scss.itemGrid}>
                   {itemArr.map((control_item, index) => {
                     return (
                       <Fragment key={index}>
@@ -215,10 +215,10 @@ export default function WorkSheetPDF({
                       </Fragment>
                     );
                   })}
-                </div>
+                </div> */}
 
-                {/* <Pdf2 />
-                <Pdf2 /> */}
+                <Table_specialDoor />
+                <Table_specialDoor />
               </div>
             </div>
           </div>
@@ -230,170 +230,113 @@ export default function WorkSheetPDF({
 
 // =====================================================================
 
-const Pdf2 = () => {
+const Table_specialDoor = () => {
   return (
     <div className={scss.table2}>
       {/* C1 */}
-      <div className={classNames('col-start-1 col-span-2', scss.caption)}>
+      <div className={classNames(scss.c1, scss.s2, scss.caption, scss.partRight)}>
         <span>SJ-302</span>
       </div>
 
-      <div className={classNames('col-start-1')}>
-        <span>型號</span>
-      </div>
-      <div className={classNames('col-start-2')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-1')}>
-        <span>數量</span>
-      </div>
-      <div className={classNames('col-start-2')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-1')}>
-        <span>材質</span>
-      </div>
-      <div className={classNames('col-start-2')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-1')}>
-        <span>表面</span>
-      </div>
-      <div className={classNames('col-start-2')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-1')}>
-        <span>開閉方式</span>
-      </div>
-      <div className={classNames('col-start-2')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-1')}>
-        <span>防颱勾</span>
-      </div>
-      <div className={classNames('col-start-2')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-1')}>
-        <span>骨架</span>
-      </div>
-
-      <div className={classNames('col-start-2')}>
-        <span>test</span>
-      </div>
+      {keyArr_basic.map((key) => {
+        return (
+          <Fragment key={key}>
+            <div className={classNames(scss.c1)}>
+              <span>{config[key].label}</span>
+            </div>
+            <div className={classNames(scss.c2, scss.partRight)}>
+              <span>value</span>
+            </div>
+          </Fragment>
+        );
+      })}
 
       {/* C2 */}
-      <div className={classNames('col-start-3 col-span-2', scss.caption)}>
+      <div className={classNames(scss.c3, scss.s2, scss.caption, scss.partRight)}>
         <span>尺寸</span>
       </div>
 
-      <div className={classNames('col-start-3')}>
-        <span>全寬</span>
-      </div>
-      <div className={classNames('col-start-4')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-3')}>
-        <span>淨高</span>
-      </div>
-      <div className={classNames('col-start-4')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-3')}>
-        <span>W+G</span>
-      </div>
-      <div className={classNames('col-start-4')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-3')}>
-        <span>機械縫 A</span>
-      </div>
-      <div className={classNames('col-start-4')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-3')}>
-        <span>機械縫 C</span>
-      </div>
-      <div className={classNames('col-start-4')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-3')}>
-        <span>支板尺寸 B*D ()</span>
-      </div>
-      <div className={classNames('col-start-4')}>
-        <span>test</span>
-      </div>
-      <div className={classNames('col-start-3')}>
-        <span>捲門全高 H</span>
-      </div>
-      <div className={classNames('col-start-4')}>
-        <span>test</span>
-      </div>
+      {keyArr_size.map((key) => {
+        return (
+          <Fragment key={key}>
+            <div className={classNames(scss.c3)}>
+              <span>{config[key].label}</span>
+            </div>
+            <div className={classNames(scss.c4, scss.partRight)}>
+              <span>value</span>
+            </div>
+          </Fragment>
+        );
+      })}
+
+      {/* 填空 */}
+      <div className={classNames(scss.c1, scss.s4, scss.partRight)} />
+
       {/* C3 */}
-      <div className={classNames('col-start-5 col-span-2', scss.caption)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
         <span>{'電動機(東元)'}</span>
       </div>
 
-      <div className={classNames('col-start-5')}>
+      <div className={classNames(scss.c5)}>
         <span>電供</span>
       </div>
-      <div className={classNames('col-start-6')}>
+      <div className={classNames(scss.c6, scss.partRight)}>
         <span>test</span>
       </div>
-      <div className={classNames('col-start-5')}>
+      <div className={classNames(scss.c5)}>
         <span>馬力數</span>
       </div>
-      <div className={classNames('col-start-6')}>
+      <div className={classNames(scss.c6, scss.partRight)}>
         <span>test</span>
       </div>
 
-      <div className={classNames('col-start-5 col-span-2', scss.caption)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
         <span>門軌</span>
       </div>
 
-      <div className={classNames('col-start-5')}>
+      <div className={classNames(scss.c5)}>
         <span>門軌形式</span>
       </div>
-      <div className={classNames('col-start-6')}>
+      <div className={classNames(scss.c6, scss.partRight)}>
         <span>test</span>
       </div>
 
-      <div className={classNames('col-start-5 col-span-2', scss.caption)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
         <span>捲軸</span>
       </div>
 
-      <div className={classNames('col-start-5')}>
+      <div className={classNames(scss.c5)}>
         <span>捲軸尺寸</span>
       </div>
-      <div className={classNames('col-start-6')}>
+      <div className={classNames(scss.c6, scss.partRight)}>
         <span>test</span>
       </div>
 
-      <div className={classNames('col-start-5 col-span-2', scss.caption)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
         <span>鏈齒輪</span>
       </div>
 
-      <div className={classNames('col-start-5')}>
+      <div className={classNames(scss.c5)}>
         <span>鏈齒輪番號</span>
       </div>
-      <div className={classNames('col-start-6')}>
+      <div className={classNames(scss.c6, scss.partRight)}>
         <span>test</span>
       </div>
 
       {/* C7 */}
-      <div className={classNames('col-start-7 col-span-6', scss.caption)}>
+      <div className={classNames(scss.c7, scss.s6, scss.caption)}>
         <span>捲箱</span>
       </div>
 
-      {keyArr_headBox_set.map((key, index) => {
-        const { label } = config_headBox[key];
+      {keyArr_headBox.map((key, index) => {
+        const { label } = config[key];
 
         const [className_label, className_value] = (() => {
-          if (index >= keyArr_headBox_set.length / 2) {
-            return ['col-start-9', 'col-start-10'];
+          if (index >= keyArr_headBox.length / 2) {
+            return [scss.c9, scss.c10];
           }
 
-          return ['col-start-7', 'col-start-8'];
+          return [scss.c7, scss.c8];
         })();
 
         return (
@@ -408,16 +351,20 @@ const Pdf2 = () => {
         );
       })}
 
-      <div className={classNames('col-start-11 row-span-4')}>
+      {/* 填空 */}
+      <div className={classNames(scss.c7, scss.s4)} />
+
+      {/*  */}
+      <div className={classNames(scss.c11, scss.r4)}>
         <span>{'圖'}</span>
       </div>
-      <div className={classNames('col-start-11 row-span-4')}>
+      <div className={classNames(scss.c11, scss.r4)}>
         <span>{'圖'}</span>
       </div>
-      <div className={classNames('col-start-12 row-span-4')}>
+      <div className={classNames(scss.c12, scss.r4)}>
         <span>{'圖'}</span>
       </div>
-      <div className={classNames('col-start-12 row-span-4')}>
+      <div className={classNames(scss.c12, scss.r4)}>
         <span>{'圖'}</span>
       </div>
 
@@ -426,26 +373,57 @@ const Pdf2 = () => {
   );
 };
 
-// const keyArr_headBox = [
-//   'isIntegratedHeadBox',
-//   'upperMask',
-//   'hasWheel',
-//   'headBoxCover',
-//   'headBoxTopCover',
-//   'headBoxSizeO',
-//   'headBoxSizeP',
-//   'headBoxSizeQ',
-//   'headBoxSizeX',
-//   'headBoxSizeY',
-//   'headBoxSizeM',
-//   'headBoxSizeN',
-// ] as const;
+interface Tprops {
+  doorModelNamer: React.ReactNode;
 
-type TconfigItem = {
-  label: string;
-};
+  itemName: React.ReactNode;
+  qty: React.ReactNode;
+  materialName: React.ReactNode;
+  materialSurface: React.ReactNode;
+  closingType: React.ReactNode;
+  isAntiTyphoon: React.ReactNode;
+  skeleton: React.ReactNode;
+  //
+  fullWidth: React.ReactNode;
+  height: React.ReactNode;
+  WG: React.ReactNode;
+  gapA: React.ReactNode;
+  gapC: React.ReactNode;
+  BD: React.ReactNode;
+  fullHeight: React.ReactNode;
+  //
+  isIntegratedHeadBox: React.ReactNode;
+  upperMask: React.ReactNode;
+  hasWheel: React.ReactNode;
+  headBoxCover: React.ReactNode;
+  headBoxTopCover: React.ReactNode;
+  headBoxSizeO: React.ReactNode;
+  headBoxSizeP: React.ReactNode;
+  headBoxSizeQ: React.ReactNode;
+  headBoxSizeX: React.ReactNode;
+  headBoxSizeY: React.ReactNode;
+  headBoxSizeM: React.ReactNode;
+  headBoxSizeN: React.ReactNode;
+  boxB: React.ReactNode;
+  boxD: React.ReactNode;
+}
 
-type TconfigKeys_headBox =
+type TconfigKeys = keyof Pick<
+  Tprops,
+  | 'itemName'
+  | 'qty'
+  | 'materialName'
+  | 'materialSurface'
+  | 'closingType'
+  | 'isAntiTyphoon'
+  | 'skeleton'
+  | 'fullWidth'
+  | 'height'
+  | 'WG'
+  | 'gapA'
+  | 'gapC'
+  | 'BD'
+  | 'fullHeight'
   | 'isIntegratedHeadBox'
   | 'upperMask'
   | 'hasWheel'
@@ -459,9 +437,95 @@ type TconfigKeys_headBox =
   | 'headBoxSizeM'
   | 'headBoxSizeN'
   | 'boxB'
-  | 'boxD';
+  | 'boxD'
+>;
 
-const config_headBox: Record<TconfigKeys_headBox, TconfigItem> = {
+const keyArr_basic = Array.from(
+  new Set<TconfigKeys>([
+    'itemName',
+    'qty',
+    'materialName',
+    'materialSurface',
+    'closingType',
+    'isAntiTyphoon',
+    'skeleton',
+  ])
+);
+
+const keyArr_size = Array.from(new Set<TconfigKeys>(['fullWidth', 'height', 'WG', 'gapA', 'gapC', 'BD', 'fullHeight']));
+
+const keyArr_headBox = Array.from(
+  new Set<TconfigKeys>([
+    'isIntegratedHeadBox',
+    'hasWheel',
+    'upperMask',
+    'boxB',
+    'boxD',
+    'headBoxSizeM',
+    'headBoxSizeN',
+
+    'headBoxCover',
+    'headBoxTopCover',
+    'headBoxSizeO',
+    'headBoxSizeP',
+    'headBoxSizeQ',
+    'headBoxSizeX',
+    'headBoxSizeY',
+  ])
+);
+
+type TconfigItem = {
+  label: string;
+};
+
+const config: Record<TconfigKeys, TconfigItem> = {
+  // 基本資料
+  itemName: {
+    label: '型號',
+  },
+  qty: {
+    label: '數量',
+  },
+  materialName: {
+    label: '材質',
+  },
+  materialSurface: {
+    label: '表面',
+  },
+  closingType: {
+    label: '開閉方式',
+  },
+  isAntiTyphoon: {
+    label: '防颱勾',
+  },
+  skeleton: {
+    label: '骨架',
+  },
+  // 尺寸
+
+  fullWidth: {
+    label: '全寬',
+  },
+  height: {
+    label: '淨高',
+  },
+  WG: {
+    label: 'W+G',
+  },
+  gapA: {
+    label: '  機械縫 A',
+  },
+  gapC: {
+    label: '機械縫 C',
+  },
+  BD: {
+    label: '支板尺寸 B*D',
+  },
+  fullHeight: {
+    label: '捲門全高 H',
+  },
+
+  // 捲箱
   isIntegratedHeadBox: {
     label: '型式',
   },
@@ -505,23 +569,3 @@ const config_headBox: Record<TconfigKeys_headBox, TconfigItem> = {
     label: 'sizeD',
   },
 };
-
-const keyArr_headBox_set = Array.from(
-  new Set<TconfigKeys_headBox>([
-    'isIntegratedHeadBox',
-    'hasWheel',
-    'upperMask',
-    'boxB',
-    'boxD',
-    'headBoxSizeM',
-    'headBoxSizeN',
-
-    'headBoxCover',
-    'headBoxTopCover',
-    'headBoxSizeO',
-    'headBoxSizeP',
-    'headBoxSizeQ',
-    'headBoxSizeX',
-    'headBoxSizeY',
-  ])
-);
