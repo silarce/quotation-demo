@@ -141,7 +141,7 @@ export default function AddPurchaseRequisitionList() {
     // 計算總價
     const [totalprice1, setTotalPrice1] = useState<string>("");
     const [taxprice1, setTaxPrice1] = useState<string>("");
-    const [totalpayprice1, setTotalPayPrice1] = useState<string>(""); 
+    const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
 
     //#endregion
 
@@ -388,7 +388,9 @@ export default function AddPurchaseRequisitionList() {
             supplieraddress: null,
             supplierphone: null,
             suppliercontact: null,
-            supplierfax: null
+            supplierfax: null,
+            create_at:'',
+            create_by:userInfo?.employee?.id
         };
 
         // 將空資料新增進陣列
@@ -586,7 +588,7 @@ export default function AddPurchaseRequisitionList() {
 
     return (
         <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={"新增"+pagename+"單"} panelList={panelList}
+            <PageHeader02 tag={"新增" + pagename + "單"} panelList={panelList}
                 customeRight={[
                     <>
                         <button
@@ -655,7 +657,7 @@ export default function AddPurchaseRequisitionList() {
                                                 },
                                             }}
                                         />
-                                        <InputSel
+                                        {/* <InputSel
                                             caption="請購類別"
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
@@ -683,10 +685,8 @@ export default function AddPurchaseRequisitionList() {
                                                         : null,
                                                 },
                                             }}
-                                        />
-                                        {/* <button onClick={() => { alert("OK") }}>
-                                            ...
-                                        </button> */}
+                                        /> */}
+
                                     </div>
                                     <div>
                                         <InputSel

@@ -43,6 +43,8 @@ import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
 import { Panel } from 'components/global/myAntd/collapse';
+import { position } from 'html2canvas/dist/types/css/property-descriptors/position';
+import zIndex from '@mui/material/styles/zIndex';
 
 type Tquery = {
     wareHouseId: string | undefined;
@@ -411,6 +413,7 @@ export default function AddPurchaseOrderList() {
 
             // 設置篩選後的資料
             setFilteredData2(responseData);
+            setFilteredData4(responseData);
 
         } catch (error: any) {
             setError(error.message);
@@ -487,7 +490,9 @@ export default function AddPurchaseOrderList() {
             supplieraddress: null,
             supplierphone: null,
             suppliercontact: null,
-            supplierfax: null
+            supplierfax: null,
+            create_at: '',
+            create_by: userInfo?.employee?.id
         };
 
         // 將空資料新增進陣列
@@ -687,26 +692,44 @@ export default function AddPurchaseOrderList() {
     const [customerbar, setCustomerbar] = useState(false);
     const [countyOptions, setCountyOptions] = useState<string[]>([]);
     const [filteredData2, setFilteredData2] = useState<any[]>([]);
+    const [filteredData4, setFilteredData4] = useState<any[]>([]);
     const [filters, setFilters] = useState({
         county: '',
         name: '',
-        contact: ''
+        contact: '',
+        customer_number: ''
     });
-
 
 
     // 根據篩選條件更新資料
     useEffect(() => {
         const filtered = customerdata.filter(item =>
             (filters.county === '' || item.county === filters.county) &&
-            (filters.name === '' || item.name.includes(filters.name)) &&
-            (filters.contact === '' || item.contact.includes(filters.contact))
+            (filters.name === '' || item.name.toLowerCase().includes(filters.name.toLowerCase())) &&
+            (filters.contact === '' || item.contact.toLowerCase().includes(filters.contact.toLowerCase())) &&
+            (filters.customer_number === '' || item.customer_number.toLowerCase().includes(filters.customer_number.toLowerCase()))
         );
         setFilteredData2(filtered);
-    }, [filters]);
+    }, [filters, customerdata]); // 加上 customerdata 確保資料變化時觸發
 
+
+    // 手key輸入過濾
     useEffect(() => {
-        setFilteredData2(
+        setFilteredData4(
+            customerdata.filter(
+                (item) =>
+                    (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+                    (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+            )
+        );
+    }, [supplieridin, suppliernamein]); // 當 supplieridin 或 suppliernamein 變化時觸發
+
+    //#endregion
+
+
+    // 手key輸入過濾
+    useEffect(() => {
+        setFilteredData4(
             customerdata.filter(
                 (item) =>
                     (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
@@ -1089,7 +1112,7 @@ export default function AddPurchaseOrderList() {
                                         borderRadius: '4px',
                                     }}
                                 >
-                                    {(suppliernamein || supplieridin) && filteredData2.length > 0 && isFilterVisible && (
+                                    {(suppliernamein || supplieridin) && filteredData4.length > 0 && isFilterVisible && (
                                         <div
                                             style={{
                                                 position: 'absolute',
@@ -1105,7 +1128,7 @@ export default function AddPurchaseOrderList() {
                                                 overflowY: 'auto',
                                             }}
                                         >
-                                            {filteredData2.map((_item, index) => (
+                                            {filteredData4.map((_item, index) => (
                                                 <div
                                                     key={index}
                                                     onClick={() => {
@@ -1729,14 +1752,24 @@ export default function AddPurchaseOrderList() {
                     visible={customerbar}
                     onCancel={() => setCustomerbar(false)}
                     width="1010px"
-                    closable={false} // 移除右上角的叉叉
+                    closable={true}
                     style={{ top: 150 }}
-                    bodyStyle={{ padding: 0, height: '500px', overflowY: 'auto' }}
-                    title={
-                        <>
-
-                            {/* 篩選區域 */}
-                            <div style={{ display: 'flex', gap: '10px', padding: '10px', alignItems: 'center', fontSize: '16px' }}>
+                    bodyStyle={{ padding: '0px', height: '500px', overflowY: 'auto' }}
+                    title={<>廠商查詢</>}
+                    footer={null}
+                >
+                    <div style={{ padding: '0px 20px' }}>
+                        {/* 篩選區域 - 固定在頂部 */}
+                        <div
+                            style={{
+                                position: 'sticky',
+                                top: 0, // 固定在 Modal 內容區的頂部
+                                zIndex: 10, // 確保不會被其他內容蓋住
+                                background: '#fff', // 設置背景，避免滾動時透視
+                                padding: '10px 0', // 增加一點內邊距，美觀調整
+                            }}
+                        >
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '16px' }}>
                                 {/* 縣市篩選 */}
                                 <select
                                     value={filters.county}
@@ -1749,7 +1782,15 @@ export default function AddPurchaseOrderList() {
                                     ))}
                                 </select>
 
-                                {/* 公司名稱篩選 */}
+                                {/* 廠商編號篩選 */}
+                                <input
+                                    type="text"
+                                    placeholder="輸入廠商編號"
+                                    value={filters.customer_number}
+                                    onChange={(e) => setFilters({ ...filters, customer_number: e.target.value })}
+                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                                />
+                                {/* 廠商名稱篩選 */}
                                 <input
                                     type="text"
                                     placeholder="輸入公司名稱"
@@ -1757,57 +1798,47 @@ export default function AddPurchaseOrderList() {
                                     onChange={(e) => setFilters({ ...filters, name: e.target.value })}
                                     style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
                                 />
-
-                                {/* 聯絡人篩選 */}
-                                <input
-                                    type="text"
-                                    placeholder="輸入聯絡人名稱"
-                                    value={filters.contact}
-                                    onChange={(e) => setFilters({ ...filters, contact: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
-                                />
                             </div>
-                        </>
-                    }
-                    footer={null}
-                >
 
+                            {/* 資料列表 */}
+                            <div className={scss.thead21}>
+                                <span>編號</span>
+                                <span>名稱</span>
+                                <span>地址</span>
+                                <span></span>
+                            </div>
+                        </div>
 
-                    {/* 資料列表 */}
-                    <div className={scss.thead21}>
-                        <span>名稱</span>
-                        <span>地址</span>
-                        <span>統編</span>
-                        <span></span>
+                        {filteredData2 && (
+                            filteredData2.map((_item, index) => (
+                                <CellWithBar
+                                    key={index}
+                                    className={scss.panelHeader21}
+                                    onClick={() => {
+                                        setSuppliernamein(_item.name || '');
+                                        setSupplieraddressin(
+                                            (_item.county || '') + (_item.district || '') + (_item.address || '')
+                                        );
+                                        setSupplierphonein(_item.phone || '');
+                                        setSuppliertaxidin(_item.tax_id || '');
+                                        setSupplieridin(_item.customer_number || '');
+                                        setSupplierfaxin(_item.fax || '');
+                                        setSuppliercontactin(_item.contact || '');
+                                        setSupplieruuidin(_item.id || '');
+                                        setCustomerbar(false);
+                                    }}
+                                >
+                                    <div className={scss.row01}>
+                                        <span>{_item.customer_number}</span>
+                                        <span>{_item.name}</span>
+                                        <span>{_item.county}{_item.district}{_item.address}</span>
+                                    </div>
+                                </CellWithBar>
+                            ))
+                        )}
                     </div>
-                    {filteredData2 && (
-                        filteredData2.map((_item: any, index: number) => (
-                            <CellWithBar key={index} className={scss.panelHeader21}
-                                onClick={() => {
-                                    setSuppliernamein(_item.name || ''); // 預設為空字串
-                                    setSupplieraddressin(
-                                        (_item.county || '') + (_item.district || '') + (_item.address || '')
-                                    );
-                                    setSupplierphonein(_item.phone || '');
-                                    setSuppliertaxidin(_item.tax_id || '');
-                                    setSupplieridin(_item.customer_number || '');
-                                    setSupplierfaxin(_item.fax || '');
-                                    setSuppliercontactin(_item.contact || '');
-                                    setSupplieruuidin(_item.id || '');
-                                    setCustomerbar(false);
-                                }}>
-                                <div className={scss.row01}>
-                                    <span>{_item.name}</span>
-                                    <span>{_item.county}{_item.district}{_item.address}</span>
-                                    <span>{_item.contact}</span>
-                                    <span>{_item.review_person}</span>
-                                    <span>{_item.review_memo}</span>
-                                </div>
-                            </CellWithBar>
-                        ))
-                    )}
                 </Modal>
-            </div>
+            </div >
         </SubLayer >
 
     )

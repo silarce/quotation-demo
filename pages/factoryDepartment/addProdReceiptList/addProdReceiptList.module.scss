@@ -847,7 +847,7 @@ div.panelHeader15 {
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 415px 415px 100px 30px;
+  grid-template-columns: 100px 300px 400px  30px;
   // gap: 5px;
   height: 40px;
   padding: 0px 20px;
@@ -890,7 +890,7 @@ div.panelHeader21 {
 
   .row01 {
       display: grid;
-      grid-template-columns:415px 415px 100px 30px;
+      grid-template-columns:100px 300px 400px  30px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }

@@ -603,6 +603,12 @@ export default function AddTray() {
 
         const newchildwidth = parseInt(value); // 新的 childwidth
 
+        // 確保 data12 中有資料
+        if (!data12 || data12.length === 0) {
+            console.error("data12 is empty or undefined");
+            return;
+        }
+
         // 取得 data12 的第一筆資料
         const firstItem = data12[0];
 
@@ -610,63 +616,69 @@ export default function AddTray() {
         const newDataItem = {
             id: "",
             whpname: "",
-            whid: firstItem.widthdata.whid,
+            whid: firstItem?.widthdata?.whid || "",
             volume: 0,
             spec: "",
             trayid: null,
-            length: firstItem.widthdata.length, // 使用相同的 length
-            width: firstItem.widthdata.width, // 使用相同的 width
-            // childlength: firstItem.widthdata.childlength+1, // 繼續使用相同的 childlength
+            length: firstItem?.widthdata?.length || 0, // 使用相同的 length
+            width: firstItem?.widthdata?.width || 0, // 使用相同的 width
             childlength: parseInt((currentchildlength ?? 0).toString()),
             childwidth: newchildwidth, // 使用新的 childwidth
             materialnumber: '',
             batchnumber: '',
             unit: '',
             quantity: 0,
-            whname: firstItem.widthdata.whname,
-            trayname: firstItem.widthdata.trayname,
+            whname: firstItem?.widthdata?.whname || "",
+            trayname: firstItem?.widthdata?.trayname || "",
             color: "#FFFFFF", // 預設顏色
             productname: null,
             productspec: null,
             productid: null,
         };
 
-        // 將新的資料加入到 data12 的索引 0 的 childtraylayoutmodel
+        // 更新 data12 的 state
         setData12(prevData12 => {
+            // 確保 prevData12 存在
+            if (!prevData12 || prevData12.length === 0) return prevData12;
+
             const updatedData = [...prevData12];
 
-            // 確保 childtraylayoutmodel 存在
-            if (!updatedData[0].widthdata.childtraylayoutmodel) {
-                updatedData[0].widthdata.childtraylayoutmodel = [];
+            // 確保 widthdata 存在
+            const widthdata = updatedData[0]?.widthdata;
+            if (!widthdata) {
+                console.error("widthdata is missing in the first item");
+                return updatedData;
             }
 
-            // 取出 childtraylayoutmodel 中的第一筆資料
-            let firstChildTrayLayout = updatedData[0].widthdata.childtraylayoutmodel[parseInt(currentchildlength) - 1];
+            // 確保 childtraylayoutmodel 存在
+            if (!widthdata.childtraylayoutmodel) {
+                widthdata.childtraylayoutmodel = [];
+            }
 
+            // 取出 childtraylayoutmodel 中對應 childlength 的資料
+            const childIndex = parseInt(currentchildlength) - 1;
+            const firstChildTrayLayout = widthdata.childtraylayoutmodel[childIndex];
 
+            // 如果 childIndex 超出範圍，初始化一個新的 childtraylayout
             if (!firstChildTrayLayout) {
-                // 如果 firstChildTrayLayout 不存在，可以初始化為一個空物件
-                firstChildTrayLayout = {};
-              }
-              
-              // 確保 childwidthdata 存在
-              if (!firstChildTrayLayout.childwidthdata) {
-                firstChildTrayLayout.childwidthdata = [];
-              }
-            // // 確保 childwidthdata 存在
-            // if (!firstChildTrayLayout?.childwidthdata) {
-            //     firstChildTrayLayout.childwidthdata = [];
-            // }
+                widthdata.childtraylayoutmodel[childIndex] = { childwidthdata: [] };
+            }
+
+            // 確保 childwidthdata 存在
+            const childTray = widthdata.childtraylayoutmodel[childIndex];
+            if (!childTray.childwidthdata) {
+                childTray.childwidthdata = [];
+            }
 
             // 檢查是否已存在相同的 childwidthdata
-            const exists = firstChildTrayLayout.childwidthdata.some((item: any) =>
+            const exists = childTray.childwidthdata.some((item: any) =>
                 item.childwidth === newDataItem.childwidth &&
                 item.length === newDataItem.length // 可以根據需要檢查其他字段
             );
 
             // 如果不存在，則添加新的 childwidthdata
             if (!exists) {
-                firstChildTrayLayout.childwidthdata.push(newDataItem);
+                childTray.childwidthdata.push(newDataItem);
             }
 
             return updatedData; // 返回更新後的資料
