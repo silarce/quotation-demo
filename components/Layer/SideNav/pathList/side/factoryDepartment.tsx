@@ -16,6 +16,13 @@ export default function SidePatFactoryDepartment() {
                     label: '單據管理',
                     erpFeature: devPass,
                     list: [
+                        // {
+                        //     label: '工單對應',
+                        //     path: path + '/poMapping',
+                        //     query: {
+                        //     },
+                        //     erpFeature: [fac],
+                        // },
                         {
                             label: '客戶列表',
                             path: path + '/customerQueryList',
@@ -28,11 +35,6 @@ export default function SidePatFactoryDepartment() {
 
                             //     return false;
                             // },
-                            erpFeature: [fac],
-                        },
-                        {
-                            label: '新增請購',
-                            path: path + '/addPurchaseRequisitionList',
                             erpFeature: [fac],
                         },
                         {
@@ -220,7 +222,7 @@ export default function SidePatFactoryDepartment() {
                                     return true;
                                 } else if (pathname === '/factoryDepartment/wareHouseList') {
                                     return true;
-                                } else if (pathname === '/factoryDepartment/editWHPosition') {
+                                } else if (pathname === '/factoryDepartment/trayDetail') {
                                     return true;
                                 }
 

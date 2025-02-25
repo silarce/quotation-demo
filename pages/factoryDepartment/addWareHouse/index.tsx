@@ -148,7 +148,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
             const conditionModel = {
                 whname: whname,
                 position: position,
-                create_by: create_by,
+                create_by: userInfo?.employee?.id,
                 created_at: localTime,
                 url: url,
                 type: selectedValue,
