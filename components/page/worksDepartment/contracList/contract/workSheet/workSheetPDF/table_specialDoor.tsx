@@ -105,7 +105,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         return (
           <Fragment key={key}>
             <div className={classNames(scss.c1)}>
-              <span>{config[key].label}</span>
+              <span>{config_specialDoor[key].label}</span>
             </div>
             <div className={classNames(scss.c2, scss.partRight)}>
               <span>{value}</span>
@@ -125,7 +125,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         return (
           <Fragment key={key}>
             <div className={classNames(scss.c3)}>
-              <span>{config[key].label}</span>
+              <span>{config_specialDoor[key].label}</span>
             </div>
             <div className={classNames(scss.c4, scss.partRight)}>
               <span>{value}</span>
@@ -194,7 +194,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
       </div>
 
       {keyArr_headBox.map((key, index) => {
-        const { label } = config[key];
+        const { label } = config_specialDoor[key];
         const value = props[key];
 
         const [className_label, className_value] = (() => {
@@ -267,7 +267,7 @@ const keyArr_headBox = Array.from(
   ])
 );
 
-const config: Record<TconfigKeys, TconfigItem> = {
+const config_specialDoor: Record<TconfigKeys, TconfigItem> = {
   // 基本資料
   itemName: {
     label: '型號',

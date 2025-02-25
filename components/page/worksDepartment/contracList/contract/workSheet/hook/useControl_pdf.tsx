@@ -37,13 +37,14 @@ const useControl_pdf = ({
   control_profile: Tcontrol_profile;
   latestRecordArr: TworksheetRecordDto[];
 }) => {
-  const { doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
+  const { isReady, parseDoorModelSort } = useGlobal_doorModel();
 
   const { assetDict, updatePath } = useGetAssetDict<string>();
 
   const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
     const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
     const specialItemArr: Tcontrol_workSheetPDF_01['specialItemArr'] = [];
+    const w1w3ItemArr: Tcontrol_workSheetPDF_01['w1w3ItemArr'] = [];
 
     latestRecordArr.forEach((record) => {
       if (!record.contractProductItems) {
@@ -52,21 +53,27 @@ const useControl_pdf = ({
 
       const item = record.contractProductItems[0];
 
-      const isSpecialDoor = checkIsSpecialDoor(item.doorModelName);
+      const doorModelSort = parseDoorModelSort(item.doorModelName);
 
-      if (!isSpecialDoor) {
+      if (doorModelSort === 'normal') {
         const control_item = createPdfItem({
           contractProductItems: record.contractProductItems,
           assetDict,
         });
 
         workSheetPDF_01_itemArr.push(control_item);
-      } else {
+      } else if (doorModelSort === 'special') {
         const control_item = createPdfSpecialItem({
           contractProductItems: record.contractProductItems,
           assetDict,
         });
         specialItemArr.push(control_item);
+      } else if (doorModelSort === 'w1w3') {
+        const control_item = createPdfSpecialItem({
+          contractProductItems: record.contractProductItems,
+          assetDict,
+        });
+        w1w3ItemArr.push(control_item);
       }
     });
 
@@ -84,6 +91,7 @@ const useControl_pdf = ({
       },
       itemArr: workSheetPDF_01_itemArr,
       specialItemArr,
+      w1w3ItemArr,
     };
 
     let totalQty_PDF_02 = 0;
@@ -112,7 +120,7 @@ const useControl_pdf = ({
     control_profile,
     latestRecordArr,
     assetDict,
-    doorModelDict,
+    isReady,
   ]);
 
   useEffect(() => {

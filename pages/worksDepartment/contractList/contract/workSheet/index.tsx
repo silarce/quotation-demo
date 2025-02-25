@@ -774,24 +774,9 @@ const TheWorksheetForm = ({
   activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[];
   onConfirm: (body: TupdateWorkSheet | undefined | null) => void;
 }) => {
-  const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
+  const { parseDoorModelSort } = useGlobal_doorModel();
 
-  const doorModelSort = (() => {
-    const doorModelName = activeRecordData?.contractProductItems?.[0].doorModelName;
-    const isSpecialDoor = !!doorModelName && checkIsSpecialDoor(doorModelName);
-
-    let doorModelSort: 'normal' | 'special' | 'w1w3';
-
-    if (doorModelName === 'W1' || doorModelName === 'W3') {
-      doorModelSort = 'w1w3';
-    } else if (isSpecialDoor) {
-      doorModelSort = 'special';
-    } else {
-      doorModelSort = 'normal';
-    }
-
-    return doorModelSort;
-  })();
+  const doorModelSort = parseDoorModelSort(activeRecordData?.contractProductItems?.[0].doorModelName ?? 'undefined');
 
   // -------------------------------------------------------------------------------------
 
@@ -853,7 +838,7 @@ const TheWorksheetForm = ({
 
   // -------------------------------------------------------------------------
 
-  if (!doorModelDict) {
+  if (doorModelSort === undefined) {
     return null;
   }
 

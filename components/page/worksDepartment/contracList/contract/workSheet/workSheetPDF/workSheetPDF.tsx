@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from 'react';
+import React, { useRef, Fragment } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import html2canvas from 'html2canvas';
@@ -7,6 +7,7 @@ import jsPDF from 'jspdf';
 // component
 import Miku_frontend_table01, { Tcontrol_table01 } from 'components/otherProject/miku-frontend/Table01';
 import Table_specialDoor, { Tprops_table_specialDoor } from './table_specialDoor';
+import Table_w1w3, { Tprops_table_w1w3 } from './table_w1w3';
 
 // gear
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
@@ -16,9 +17,6 @@ import Modal from 'antd/lib/modal/Modal';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-
-// api
-import { apiGetAssets } from 'js/api/api_product';
 
 import scss from './workSheetPDF.module.scss';
 
@@ -38,6 +36,7 @@ type Tcontrol = {
   };
   itemArr: Tcontrol_table01[];
   specialItemArr: Tprops_table_specialDoor[];
+  w1w3ItemArr: Tprops_table_w1w3[];
 };
 
 export type { Tcontrol as Tcontrol_workSheetPDF_01 };
@@ -56,14 +55,20 @@ export default function WorkSheetPDF({
 
   const itemArr = control.itemArr;
   const specialItemArr = control.specialItemArr;
+  const w1w3ItemArr = control.w1w3ItemArr;
 
   const chunkedList = _.chunk(itemArr, 3);
   const chunkedList_specialItem = _.chunk(specialItemArr, 2);
+  const chunkedList_w1w3Item = _.chunk(w1w3ItemArr, 12);
 
-  const pageCount = chunkedList.length + chunkedList_specialItem.length;
+  const pageCount = chunkedList.length + chunkedList_specialItem.length + chunkedList_w1w3Item.length;
 
   const page_specialItem = (indexNumber: number) => {
     return indexNumber + chunkedList.length;
+  };
+
+  const page_w1w3Item = (indexNumber: number) => {
+    return indexNumber + chunkedList.length + chunkedList_specialItem.length;
   };
 
   // ---------------------------------------------------------------------
@@ -126,42 +131,6 @@ export default function WorkSheetPDF({
     doc.save(`工作表${control.info.contractNumber}.pdf`);
     showRootLoading(false);
   };
-
-  // ---------------------------------------------------------------------
-
-  // const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
-
-  // const getSvg = async ({ fileName }: { fileName: string }) => {
-  //   if (svgList[fileName] === null) {
-  //     return;
-  //   }
-
-  //   if (svgList[fileName] === 'isLoading') {
-  //     return;
-  //   }
-
-  //   if (!!svgList[fileName]) {
-  //     return;
-  //   }
-
-  //   try {
-  //     svgList[fileName] = 'isLoading';
-
-  //     const svg = await apiGetAssets(fileName);
-
-  //     if (svg) {
-  //       setSvgList((list) => ({
-  //         ...list,
-  //         [fileName]: svg,
-  //       }));
-  //     }
-  //   } catch (error) {
-  //     setSvgList((list) => ({
-  //       ...list,
-  //       [fileName]: null,
-  //     }));
-  //   }
-  // };
 
   // ---------------------------------------------------------------------
   return (
@@ -228,6 +197,26 @@ export default function WorkSheetPDF({
                 {specialItemArr.map((specialItem, index) => {
                   return <Table_specialDoor key={index} {...specialItem} />;
                 })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {chunkedList_w1w3Item.map((w1w3Item, index) => {
+        return (
+          <div key={index}>
+            {index !== 0 && <hr className=" border-black" />}
+
+            <div
+              //
+              ref={(ele) => (refPdf.current[index] = ele)}
+              className={scss.container}
+              id="report"
+            >
+              <div>
+                <Title page={page_w1w3Item(index + 1)} pageCount={pageCount} />
+                <Info {...control.info} />
+                <Table_w1w3 key={index} itemArr={w1w3Item} />
               </div>
             </div>
           </div>
