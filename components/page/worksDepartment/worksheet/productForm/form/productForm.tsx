@@ -57,7 +57,7 @@ const options_doorType = optionsCreator_quoteType();
 
 // ==============================================================================
 
-export default function WorksheetForm({
+function WorksheetForm({
   reqPatchWorkSheet = () => {},
   disabled = false,
   uploadButton = true,
@@ -1953,7 +1953,10 @@ const Table_bottomBar = () => {
 // =====================================================================
 // =====================================================================
 
+export default WorksheetForm;
+
 export {
+  WorksheetTable,
   Form_product_location,
   Form_product_basic,
   Form_product_ABCD,
@@ -1967,5 +1970,3 @@ export {
   Form_product_accessories,
   Form_product_other,
 };
-
-export { WorksheetTable };
