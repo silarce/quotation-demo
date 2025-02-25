@@ -34,6 +34,7 @@ import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpl
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import {
+  TupdateWorkSheet,
   TcreateWorksheetDto,
   TworksheetRecordDto_addition,
   apiPostWorkSheet,
@@ -71,10 +72,7 @@ import WorksheetForm from 'components/page/worksDepartment/contracList/contract/
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
-import {
-  useSpecialDoor,
-  Tstate_specialDoor,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
+import { useSpecialDoor } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
 
 import WorksheetForm_specialDoor from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/specialProdForm';
 
@@ -90,8 +88,6 @@ type Tquery = {
   activedProdId?: string | undefined;
   activeRecordId?: string | undefined;
 };
-
-// ====================================================================
 
 // MARK: START
 // ====================================================================
@@ -182,27 +178,6 @@ export default function Worksheet({
 
   const activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[] = activedProd?.items?.[0].accessories ?? [];
 
-  const worksheetExport = useWorksheet(
-    useShallow((state) => ({
-      worksheetId: state.worksheetId,
-      getUpdateWorkSheetItemArr: state.getUpdateWorkSheetItemArr,
-      getFloorLocations: state.getFloorLocations,
-    }))
-  );
-
-  const isSpecialDoor = (() => {
-    const doorModelName = activeRecordData?.contractProductItems?.[0].doorModelName;
-
-    return doorModelName ? checkIsSpecialDoor(doorModelName) : true;
-  })();
-
-  // -------------------------------------------------------------------------
-
-  const { state_specialDoor, setState_specialDoor, createBody, customLabel } = useSpecialDoor({
-    activeRecordData,
-    disabled,
-  });
-
   // -------------------------------------------------------------------------
 
   // region REQ
@@ -276,7 +251,7 @@ export default function Worksheet({
     }
   };
 
-  const reqPatchWorkSheet = async () => {
+  const reqPatchWorkSheet = async (body: TupdateWorkSheet | undefined | null) => {
     const document_status = activeRecordData!.addition?.reviewArr?.[0].document_status;
     const worksheetId = worksheetData?.id;
 
@@ -285,29 +260,6 @@ export default function Worksheet({
 
       return;
     }
-
-    console.log(isSpecialDoor);
-
-    const body = (() => {
-      if (isSpecialDoor) {
-        return createBody();
-      } else {
-        const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
-        const floorLocations = worksheetExport.getFloorLocations();
-
-        if (!contractProductItems || !floorLocations) {
-          console.error(contractProductItems);
-          console.error(floorLocations);
-
-          return null;
-        }
-
-        return {
-          contractProductItems,
-          floorLocations,
-        };
-      }
-    })();
 
     if (!body) {
       myAlert.err({ title: '工作表資料有誤' });
@@ -758,11 +710,11 @@ export default function Worksheet({
                 activeRecordData={activeRecordData}
                 activeWorksheetId={activeWorksheetId}
                 activeWorksheetOriginalAccessories={activeWorksheetOriginalAccessories}
-                reqPatchWorkSheet={reqPatchWorkSheet}
                 disabled={disabled}
-                state_specialDoor={state_specialDoor}
-                setState_specialDoor={setState_specialDoor}
-                customLabel={customLabel}
+                onConfirm={reqPatchWorkSheet}
+                // state_specialDoor={state_specialDoor}
+                // setState_specialDoor={setState_specialDoor}
+                // customLabel={customLabel}
               />
             )}
           </div>
@@ -790,39 +742,84 @@ export default function Worksheet({
 // ====================================================================
 // ====================================================================
 // ====================================================================
+// ====================================================================
+
+const polyfillContractProductItems = (pre_contractProductItems: TquotationProductItemDto[]) => {
+  const contractProductItems = pre_contractProductItems.map((item) => {
+    return {
+      ...item,
+      gapA: item.gapA ?? '0',
+      gapC: item.gapC ?? '0',
+      boxD: item.boxD ?? 0,
+      thickness: item.thickness ?? '0',
+    };
+  });
+
+  return contractProductItems;
+};
+// ==========================================================================
 
 // MARK:TheWorksheetForm
 const TheWorksheetForm = ({
   activeRecordData,
-  reqPatchWorkSheet,
   disabled,
   activeWorksheetId,
   activeWorksheetOriginalAccessories,
-  //
-  state_specialDoor,
-  setState_specialDoor,
-  customLabel,
+  onConfirm,
 }: {
   activeRecordData: TworksheetRecordDto_addition | undefined;
-  reqPatchWorkSheet: () => void;
   disabled: boolean;
-  activeWorksheetId: string | undefined;
+  activeWorksheetId: string | undefined | null;
   activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[];
-  //
-  state_specialDoor: Tstate_specialDoor;
-  setState_specialDoor: React.Dispatch<React.SetStateAction<Tstate_specialDoor>>;
-  customLabel: {
-    surface?: string;
-  };
+  onConfirm: (body: TupdateWorkSheet | undefined | null) => void;
 }) => {
   const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
 
   const doorModelName = activeRecordData?.contractProductItems?.[0].doorModelName;
   const isSpecialDoor = !!doorModelName && checkIsSpecialDoor(doorModelName);
+  // -------------------------------------------------------------------------------------
 
-  const init = useWorksheet((state) => state.init);
+  const { state_specialDoor, setState_specialDoor, createBody, customLabel } = useSpecialDoor({
+    activeRecordData,
+    disabled,
+  });
 
-  // zustand 狀態
+  const worksheetExport = useWorksheet(
+    useShallow((state) => ({
+      worksheetId: state.worksheetId,
+      getUpdateWorkSheetItemArr: state.getUpdateWorkSheetItemArr,
+      getFloorLocations: state.getFloorLocations,
+      init: state.init,
+    }))
+  );
+
+  // -------------------------------------------------------------------------------------
+
+  const theOnConfirm = () => {
+    const body = (() => {
+      if (isSpecialDoor) {
+        return createBody();
+      } else {
+        const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
+        const floorLocations = worksheetExport.getFloorLocations();
+
+        if (!contractProductItems || !floorLocations) {
+          console.error(contractProductItems);
+          console.error(floorLocations);
+
+          return null;
+        }
+
+        return {
+          contractProductItems,
+          floorLocations,
+        };
+      }
+    })();
+
+    onConfirm(body);
+  };
+
   useEffect(() => {
     if (isSpecialDoor) {
       return;
@@ -831,7 +828,7 @@ const TheWorksheetForm = ({
     if (disabled && activeRecordData) {
       const contractProductItems = activeRecordData.contractProductItems;
 
-      init({
+      worksheetExport.init({
         worksheetId: activeWorksheetId!,
         itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
         contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
@@ -854,27 +851,11 @@ const TheWorksheetForm = ({
         disabled={disabled}
         state_specialDoor={state_specialDoor}
         setState_specialDoor={setState_specialDoor}
-        onConfirm={reqPatchWorkSheet}
+        onConfirm={theOnConfirm}
         customLabel={customLabel}
       />
     );
   }
 
-  return <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />;
-};
-
-// ====================================================================
-
-const polyfillContractProductItems = (pre_contractProductItems: TquotationProductItemDto[]) => {
-  const contractProductItems = pre_contractProductItems.map((item) => {
-    return {
-      ...item,
-      gapA: item.gapA ?? '0',
-      gapC: item.gapC ?? '0',
-      boxD: item.boxD ?? 0,
-      thickness: item.thickness ?? '0',
-    };
-  });
-
-  return contractProductItems;
+  return <WorksheetForm reqPatchWorkSheet={theOnConfirm} disabled={disabled} />;
 };
