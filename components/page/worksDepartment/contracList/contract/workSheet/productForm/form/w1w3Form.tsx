@@ -1,3 +1,5 @@
+import { useMemo, useEffect, useCallback } from 'react';
+
 import classNames from 'classnames';
 
 // component;
@@ -62,11 +64,15 @@ const WorksheetForm_w1w3 = ({
   state_specialDoor,
   setState_specialDoor,
   onConfirm,
+  invalidKeyArr,
+  readonlyKeyArr,
 }: {
   disabled: boolean;
   state_specialDoor: Tstate_specialDoor;
   setState_specialDoor: React.Dispatch<React.SetStateAction<Tstate_specialDoor>>;
   onConfirm: () => void;
+  invalidKeyArr: (keyof Tstate_specialDoor)[];
+  readonlyKeyArr: (keyof Tstate_specialDoor)[];
 }) => {
   type TsetStateAction = Partial<Tstate_specialDoor> | ((prev: Tstate_specialDoor) => Partial<Tstate_specialDoor>);
 
@@ -76,6 +82,16 @@ const WorksheetForm_w1w3 = ({
       ...(typeof action === 'function' ? action(prev) : action),
     }));
   };
+
+  const { isClosingTypeValid, isClosingTypeReadOnly } = useMemo(() => {
+    const isClosingTypeValid = !invalidKeyArr.includes('closingType');
+    const isClosingTypeReadOnly = readonlyKeyArr.includes('closingType');
+
+    return {
+      isClosingTypeValid,
+      isClosingTypeReadOnly,
+    };
+  }, [invalidKeyArr, readonlyKeyArr]);
 
   const props = {
     state: state_specialDoor,
@@ -91,7 +107,11 @@ const WorksheetForm_w1w3 = ({
       </div>
       <div>
         <Section>設定產品基本規格：</Section>
-        <Form_specialProd_basic {...props} />
+        <Form_specialProd_basic
+          {...props}
+          isClosingTypeValid={isClosingTypeValid}
+          isClosingTypeReadOnly={isClosingTypeReadOnly}
+        />
       </div>
 
       <div className={classNames('relative', disabled && 'hidden')}>
@@ -120,11 +140,15 @@ const Form_specialProd_basic = ({
   setState,
   disabled,
   customLabel_surface,
+  isClosingTypeValid,
+  isClosingTypeReadOnly,
 }: {
   state: Tstate_specialProd_w1w3;
   setState: TsetState<Tstate_specialProd_w1w3>;
   disabled: boolean;
   customLabel_surface?: React.ReactNode;
+  isClosingTypeValid: boolean;
+  isClosingTypeReadOnly: boolean;
 }) => {
   const value_electricSupply = createElectricSupply({
     motorVoltage,
@@ -232,13 +256,20 @@ const Form_specialProd_basic = ({
         <InputSel
           {...basicConfig}
           caption="開閉方式"
-          disabled={disabled}
+          disabled={isClosingTypeReadOnly ? true : disabled}
+          className={classNames(!isClosingTypeValid && scss.inValid)}
+          captionClassName={classNames(!isClosingTypeValid && scss.inValid)}
           selectProps={{
             props: {
               value: findOption({ value: String(closingType), options: options_closingtype }),
               options: options_closingtype,
               onChange: (option) => {
                 setState((prev) => ({ ...prev, closingType: option?.value ?? '' }));
+              },
+              classNames: {
+                singleValue(props) {
+                  return classNames(classNames(!isClosingTypeValid && scss.inValid));
+                },
               },
             },
           }}

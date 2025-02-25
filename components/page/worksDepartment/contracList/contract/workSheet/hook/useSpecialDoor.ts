@@ -10,8 +10,9 @@ type Tstate_specialDoor = {
   readonly quoteType: string;
   // 門型
   readonly doorModelName: string;
-
   readonly qty: number;
+
+  //
 
   // L(mm)全寬
   fullWidth: `${number}` | '';
@@ -176,20 +177,27 @@ const useSpecialDoor = ({
 
   const [state_specialDoor, setState_specialDoor] = useState<Tstate_specialDoor>(defaultState);
 
-  const customLabel = useMemo(() => {
-    const customLabel: {
-      [key in 'surface']: string | undefined;
-    } = {
-      surface: undefined,
-    };
+  const { invalidKeyArr, readonlyKeyArr, isValid } = useMemo(() => {
+    const invalidKeyArr: (keyof Tstate_specialDoor)[] = [];
+    const readonlyKeyArr: (keyof Tstate_specialDoor)[] = [];
 
-    const { doorModelName } = state_specialDoor;
+    const { doorModelName, closingType } = state_specialDoor;
 
-    if (doorModelName === 'W1' || doorModelName === 'W3') {
-      customLabel.surface = '面材';
+    if (doorModelName === 'W3') {
+      if (closingType === '電動') {
+        readonlyKeyArr.push('closingType');
+      } else {
+        invalidKeyArr.push('closingType');
+      }
     }
 
-    return customLabel;
+    const isValid = invalidKeyArr.length === 0;
+
+    return {
+      invalidKeyArr,
+      readonlyKeyArr,
+      isValid,
+    };
   }, [state_specialDoor]);
 
   const createBody = () => {
@@ -313,7 +321,7 @@ const useSpecialDoor = ({
     setState_specialDoor(defaultState);
   }, [defaultState, disabled]);
 
-  return { state_specialDoor, setState_specialDoor, createBody, customLabel };
+  return { state_specialDoor, setState_specialDoor, createBody, invalidKeyArr, readonlyKeyArr, isValid };
 };
 
 // MARK:useDefaultState_specialDoor

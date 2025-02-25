@@ -780,7 +780,14 @@ const TheWorksheetForm = ({
 
   // -------------------------------------------------------------------------------------
 
-  const { state_specialDoor, setState_specialDoor, createBody, customLabel } = useSpecialDoor({
+  const {
+    state_specialDoor,
+    setState_specialDoor,
+    createBody,
+    invalidKeyArr,
+    readonlyKeyArr,
+    isValid: isValid_specialProd,
+  } = useSpecialDoor({
     activeRecordData,
     disabled,
   });
@@ -814,6 +821,10 @@ const TheWorksheetForm = ({
           floorLocations,
         };
       } else {
+        if (isValid_specialProd === false) {
+          return null;
+        }
+
         return createBody();
       }
     })();
@@ -849,6 +860,8 @@ const TheWorksheetForm = ({
         state_specialDoor={state_specialDoor}
         setState_specialDoor={setState_specialDoor}
         onConfirm={theOnConfirm}
+        invalidKeyArr={invalidKeyArr}
+        readonlyKeyArr={readonlyKeyArr}
       />
     );
   }
@@ -860,7 +873,6 @@ const TheWorksheetForm = ({
         state_specialDoor={state_specialDoor}
         setState_specialDoor={setState_specialDoor}
         onConfirm={theOnConfirm}
-        customLabel={customLabel}
       />
     );
   }

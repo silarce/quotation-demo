@@ -171,3 +171,8 @@
     background-color: rgba(0, 0, 0, 0.3);
   }
 }
+
+.inValid {
+  color: white;
+  background-color: theme("colors.danger");
+}

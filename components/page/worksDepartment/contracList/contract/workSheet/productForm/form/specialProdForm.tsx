@@ -62,15 +62,11 @@ const WorksheetForm_specialDoor = ({
   state_specialDoor,
   setState_specialDoor,
   onConfirm,
-  customLabel,
 }: {
   disabled: boolean;
   state_specialDoor: Tstate_specialDoor;
   setState_specialDoor: React.Dispatch<React.SetStateAction<Tstate_specialDoor>>;
   onConfirm: () => void;
-  customLabel?: {
-    surface?: React.ReactNode;
-  };
 }) => {
   type TsetStateAction = Partial<Tstate_specialDoor> | ((prev: Tstate_specialDoor) => Partial<Tstate_specialDoor>);
 
@@ -95,7 +91,7 @@ const WorksheetForm_specialDoor = ({
       </div>
       <div>
         <Section>設定產品基本規格：</Section>
-        <Form_specialProd_basic {...props} customLabel_surface={customLabel?.surface} />
+        <Form_specialProd_basic {...props} />
       </div>
       <MainFormWrapper>
         <Section>設定產品細部規格：</Section>
@@ -230,12 +226,10 @@ const Form_specialProd_basic = ({
   },
   setState,
   disabled,
-  customLabel_surface,
 }: {
   state: Tstate_specialProd_basic;
   setState: TsetState<Tstate_specialProd_basic>;
   disabled: boolean;
-  customLabel_surface?: React.ReactNode;
 }) => {
   return (
     <div>
@@ -320,7 +314,7 @@ const Form_specialProd_basic = ({
         />
         <InputSel
           {...basicConfig}
-          caption={customLabel_surface ?? '表面'}
+          caption={'表面'}
           disabled={disabled}
           inputProps={{
             props: {
