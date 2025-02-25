@@ -1462,27 +1462,40 @@ export default function AddQReqList() {
     const [customerbar, setCustomerbar] = useState(false);
     const [countyOptions, setCountyOptions] = useState<string[]>([]);
     const [filteredData2, setFilteredData2] = useState<any[]>([]);
+    const [filteredData4, setFilteredData4] = useState<any[]>([]);
     const [filters, setFilters] = useState({
         county: '',
         name: '',
-        contact: ''
+        contact: '',
+        customer_number: ''
     });
 
-    useEffect(() => {
-        setIsFilterVisible(true);
-    }, [suppliernamein])
 
     // 根據篩選條件更新資料
     useEffect(() => {
         const filtered = customerdata.filter(item =>
             (filters.county === '' || item.county === filters.county) &&
-            (filters.name === '' || item.name.includes(filters.name)) &&
-            (filters.contact === '' || item.contact.includes(filters.contact))
+            (filters.name === '' || item.name.toLowerCase().includes(filters.name.toLowerCase())) &&
+            (filters.contact === '' || item.contact.toLowerCase().includes(filters.contact.toLowerCase())) &&
+            (filters.customer_number === '' || item.customer_number.toLowerCase().includes(filters.customer_number.toLowerCase()))
         );
         setFilteredData2(filtered);
-    }, [filters]);
+    }, [filters, customerdata]); // 加上 customerdata 確保資料變化時觸發
+
+
+    // 手key輸入過濾
+    useEffect(() => {
+        setFilteredData4(
+            customerdata.filter(
+                (item) =>
+                    (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+                    (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+            )
+        );
+    }, [supplieridin, suppliernamein]); // 當 supplieridin 或 suppliernamein 變化時觸發
 
     //#endregion
+
 
     //#region  ===========【請購帶入功能區】
     const [prbar, setPrbar] = useState(false);
@@ -1653,19 +1666,19 @@ export default function AddQReqList() {
                                 </div>
                                 <div className={scss.head_content2}>
                                     <div>
-                                        {/* <InputSel
+                                        <InputSel
                                             {...inputSelProps}
-                                            caption="廠商1統編"
+                                            caption="廠商1編碼"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
+                                                    value: supplieridin,
+                                                    onChange: (e) => { setSupplieridin(e.target.value) }
                                                 },
                                             }}
-                                        /> */}
+                                        />
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商1名稱"
@@ -1724,8 +1737,8 @@ export default function AddQReqList() {
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: supplierfaxin,
-                                                    onChange: (e) => { setSupplierfaxin(e.target.value) }
+                                                    value: suppliercontactin,
+                                                    onChange: (e) => { setSuppliercontactin(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1770,19 +1783,19 @@ export default function AddQReqList() {
                                         />
                                     </div>
                                     <div>
-                                        {/* <InputSel
+                                        <InputSel
                                             {...inputSelProps}
-                                            caption="廠商2統編"
+                                            caption="廠商2編號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxid2in,
-                                                    onChange: (e) => { setSuppliertaxid2in(e.target.value) }
+                                                    value: supplierid2in,
+                                                    onChange: (e) => { setSupplierid2in(e.target.value) }
                                                 },
                                             }}
-                                        /> */}
+                                        />
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商2名稱"
@@ -1841,8 +1854,8 @@ export default function AddQReqList() {
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: supplierfax2in,
-                                                    onChange: (e) => { setSupplierfax2in(e.target.value) }
+                                                    value: suppliercontact2in,
+                                                    onChange: (e) => { setSuppliercontact2in(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -1874,7 +1887,7 @@ export default function AddQReqList() {
                                         </button>
                                     </div>
                                     <div>
-                                        {/* <InputSel
+                                        <InputSel
                                             {...inputSelProps}
                                             caption="廠商3統編"
                                             captionStyle={{ fontSize: '18px' }}
@@ -1882,11 +1895,11 @@ export default function AddQReqList() {
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: suppliertaxid3in,
-                                                    onChange: (e) => { setSuppliertaxid3in(e.target.value) }
+                                                    value: supplierid3in,
+                                                    onChange: (e) => { setSupplierid3in(e.target.value) }
                                                 },
                                             }}
-                                        /> */}
+                                        />
                                         <InputSel
                                             {...inputSelProps}
                                             caption="廠商3名稱"
@@ -1945,8 +1958,8 @@ export default function AddQReqList() {
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
-                                                    value: supplierfax3in,
-                                                    onChange: (e) => { setSupplierfax3in(e.target.value) }
+                                                    value: suppliercontact3in,
+                                                    onChange: (e) => { setSuppliercontact3in(e.target.value) }
                                                 },
                                             }}
                                         />
@@ -2842,14 +2855,24 @@ export default function AddQReqList() {
                     visible={customerbar}
                     onCancel={() => setCustomerbar(false)}
                     width="1010px"
-                    closable={false} // 移除右上角的叉叉
+                    closable={true}
                     style={{ top: 150 }}
-                    bodyStyle={{ padding: 0, height: '500px', overflowY: 'auto' }}
-                    title={
-                        <>
-
-                            {/* 篩選區域 */}
-                            <div style={{ display: 'flex', gap: '10px', padding: '10px', alignItems: 'center', fontSize: '16px' }}>
+                    bodyStyle={{ padding: '0px', height: '500px', overflowY: 'auto' }}
+                    title={<>廠商查詢</>}
+                    footer={null}
+                >
+                    <div style={{ padding: '0px 20px' }}>
+                        {/* 篩選區域 - 固定在頂部 */}
+                        <div
+                            style={{
+                                position: 'sticky',
+                                top: 0, // 固定在 Modal 內容區的頂部
+                                zIndex: 10, // 確保不會被其他內容蓋住
+                                background: '#fff', // 設置背景，避免滾動時透視
+                                padding: '10px 0', // 增加一點內邊距，美觀調整
+                            }}
+                        >
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '16px' }}>
                                 {/* 縣市篩選 */}
                                 <select
                                     value={filters.county}
@@ -2862,7 +2885,15 @@ export default function AddQReqList() {
                                     ))}
                                 </select>
 
-                                {/* 公司名稱篩選 */}
+                                {/* 廠商編號篩選 */}
+                                <input
+                                    type="text"
+                                    placeholder="輸入廠商編號"
+                                    value={filters.customer_number}
+                                    onChange={(e) => setFilters({ ...filters, customer_number: e.target.value })}
+                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                                />
+                                {/* 廠商名稱篩選 */}
                                 <input
                                     type="text"
                                     placeholder="輸入公司名稱"
@@ -2870,80 +2901,66 @@ export default function AddQReqList() {
                                     onChange={(e) => setFilters({ ...filters, name: e.target.value })}
                                     style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
                                 />
-
-                                {/* 聯絡人篩選 */}
-                                <input
-                                    type="text"
-                                    placeholder="輸入聯絡人名稱"
-                                    value={filters.contact}
-                                    onChange={(e) => setFilters({ ...filters, contact: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
-                                />
                             </div>
-                        </>
-                    }
-                    footer={null}
-                >
 
+                            {/* 資料列表 */}
+                            <div className={scss.thead21}>
+                                <span>編號</span>
+                                <span>名稱</span>
+                                <span>地址</span>
+                                <span></span>
+                            </div>
+                        </div>
 
-                    {/* 資料列表 */}
-                    <div className={scss.thead21}>
-                        <span>名稱</span>
-                        <span>地址</span>
-                        <span>統編</span>
-                        <span></span>
+                        {filteredData2 && (
+                            filteredData2.map((_item, index) => (
+                                <CellWithBar
+                                    key={index}
+                                    className={scss.panelHeader21}
+                                    onClick={() => {
+                                        const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
+
+                                        if (currentsupplier === 1) {
+                                            setSuppliernamein(safeValue(_item.name));
+                                            setSupplieraddressin(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                            setSupplierphonein(safeValue(_item.phone));
+                                            setSuppliertaxidin(safeValue(_item.tax_id));
+                                            setSupplieridin(safeValue(_item.customer_number));
+                                            setSupplierfaxin(safeValue(_item.fax));
+                                            setSuppliercontactin(safeValue(_item.contact));
+                                            setSupplieruuidin(safeValue(_item.id));
+                                        } else if (currentsupplier === 2) {
+                                            setSuppliername2in(safeValue(_item.name));
+                                            setSupplieraddress2in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                            setSupplierphone2in(safeValue(_item.phone));
+                                            setSuppliertaxid2in(safeValue(_item.tax_id));
+                                            setSupplierid2in(safeValue(_item.customer_number));
+                                            setSupplierfax2in(safeValue(_item.fax));
+                                            setSuppliercontact2in(safeValue(_item.contact));
+                                            setSupplieruuid2in(safeValue(_item.id));
+                                        } else if (currentsupplier === 3) {
+                                            setSuppliername3in(safeValue(_item.name));
+                                            setSupplieraddress3in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
+                                            setSupplierphone3in(safeValue(_item.phone));
+                                            setSuppliertaxid3in(safeValue(_item.tax_id));
+                                            setSupplierid3in(safeValue(_item.customer_number));
+                                            setSupplierfax3in(safeValue(_item.fax));
+                                            setSuppliercontact3in(safeValue(_item.contact));
+                                            setSupplieruuid3in(safeValue(_item.id));
+                                        }
+
+                                        setCustomerbar(false);
+                                    }}
+                                >
+                                    <div className={scss.row01}>
+                                        <span>{_item.customer_number}</span>
+                                        <span>{_item.name}</span>
+                                        <span>{_item.county}{_item.district}{_item.address}</span>
+                                    </div>
+                                </CellWithBar>
+                            ))
+                        )}
                     </div>
-                    {filteredData2 && (
-                        filteredData2.map((_item: any, index: number) => (
-                            <CellWithBar
-                                key={index}
-                                className={scss.panelHeader21}
-                                onClick={() => {
-                                    const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
-
-                                    if (currentsupplier === 1) {
-                                        setSuppliernamein(safeValue(_item.name));
-                                        setSupplieraddressin(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                        setSupplierphonein(safeValue(_item.phone));
-                                        setSuppliertaxidin(safeValue(_item.tax_id));
-                                        setSupplieridin(safeValue(_item.customer_number));
-                                        setSupplierfaxin(safeValue(_item.fax));
-                                        setSuppliercontactin(safeValue(_item.contact));
-                                        setSupplieruuidin(safeValue(_item.id));
-                                    } else if (currentsupplier === 2) {
-                                        setSuppliername2in(safeValue(_item.name));
-                                        setSupplieraddress2in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                        setSupplierphone2in(safeValue(_item.phone));
-                                        setSuppliertaxid2in(safeValue(_item.tax_id));
-                                        setSupplierid2in(safeValue(_item.customer_number));
-                                        setSupplierfax2in(safeValue(_item.fax));
-                                        setSuppliercontact2in(safeValue(_item.contact));
-                                        setSupplieruuid2in(safeValue(_item.id));
-                                    } else if (currentsupplier === 3) {
-                                        setSuppliername3in(safeValue(_item.name));
-                                        setSupplieraddress3in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                        setSupplierphone3in(safeValue(_item.phone));
-                                        setSuppliertaxid3in(safeValue(_item.tax_id));
-                                        setSupplierid3in(safeValue(_item.customer_number));
-                                        setSupplierfax3in(safeValue(_item.fax));
-                                        setSuppliercontact3in(safeValue(_item.contact));
-                                        setSupplieruuid3in(safeValue(_item.id));
-                                    }
-
-                                    setCustomerbar(false);
-                                }}
-                            >
-                                <div className={scss.row01}>
-                                    <span>{_item.name || ''}</span>
-                                    <span>{`${_item.county || ''}${_item.district || ''}${_item.address || ''}`}</span>
-                                    <span>{_item.contact || ''}</span>
-                                    <span>{_item.review_person || ''}</span>
-                                    <span>{_item.review_memo || ''}</span>
-                                </div>
-                            </CellWithBar>
-                        ))
-                    )}
-
                 </Modal>
             </div>
         </SubLayer >
