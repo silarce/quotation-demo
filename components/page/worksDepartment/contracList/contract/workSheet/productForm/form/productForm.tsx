@@ -12,7 +12,7 @@ import {
   Section,
   MainFormWrapper,
   FormGrid,
-} from 'components/page/worksDepartment/worksheet/productForm/productFormLayout';
+} from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/productFormLayout';
 
 // css
 import scss from './productForm.module.scss';
@@ -21,7 +21,10 @@ import scss from './productForm.module.scss';
 import { TdoorModelInfoDto } from 'js/api/dtoTypes';
 
 // zustand
-import { useWorksheet, Tworksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import {
+  useWorksheet,
+  Tworksheet,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
 
 import {
