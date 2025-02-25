@@ -50,6 +50,27 @@ const inputNumberProps = {
   step: 0,
 };
 
+// ========================================================================
+
+const createElectricSupply = ({
+  motorPhase,
+  motorVoltage,
+}: {
+  motorPhase: number | null;
+  motorVoltage: number | null;
+}) => {
+  let value_electricSupply = {
+    value: JSON.stringify({ motorPhase, motorVoltage }),
+    label: `${motorPhase === 1 ? '單' : motorPhase === 3 ? '三' : motorPhase}相 ${motorVoltage}V`,
+  };
+
+  if (!motorVoltage && !motorPhase) {
+    value_electricSupply = { value: JSON.stringify({ motorPhase: null, motorVoltage: null }), label: '無' };
+  }
+
+  return value_electricSupply;
+};
+
 const getHeadBoxSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
   let url: null | string = null;
 
@@ -108,6 +129,7 @@ const getHeadBoxSvgUrl4 = ({
 
   return url;
 };
+// ========================================================================
 
 export {
   options_motorSupportStand,
@@ -120,6 +142,7 @@ export {
   getHeadBoxSvgUrl2,
   getHeadBoxSvgUrl3,
   getHeadBoxSvgUrl4,
+  createElectricSupply,
 };
 
 export type { TsetStateAction, TsetState };

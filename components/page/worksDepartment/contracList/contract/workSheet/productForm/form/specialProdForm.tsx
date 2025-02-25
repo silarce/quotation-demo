@@ -31,6 +31,7 @@ import {
   getHeadBoxSvgUrl2,
   getHeadBoxSvgUrl3,
   getHeadBoxSvgUrl4,
+  createElectricSupply,
 } from './shared';
 
 import { findOption } from 'js/utils/options/findOption';
@@ -483,14 +484,10 @@ function Form_specialProduct_motor({
   setState: TsetState<Tprops_specialProduct_motor>;
   disabled: boolean | undefined;
 }) {
-  let value_electricSupply = {
-    value: JSON.stringify({ motorPhase, motorVoltage }),
-    label: `${motorPhase === 1 ? '單' : motorPhase === 3 ? '三' : motorPhase}相 ${motorVoltage}V`,
-  };
-
-  if (!motorVoltage && !motorPhase) {
-    value_electricSupply = { value: JSON.stringify({ motorPhase: null, motorVoltage: null }), label: '無' };
-  }
+  const value_electricSupply = createElectricSupply({
+    motorVoltage,
+    motorPhase,
+  });
 
   const value_horsepower = findOption({ value: horsepower, options: options_horsepower });
   const value_motorVendor = findOption({ value: motorVendor, options: options_motorVendor });

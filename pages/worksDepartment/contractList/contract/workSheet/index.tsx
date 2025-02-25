@@ -75,6 +75,7 @@ import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 import { useSpecialDoor } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
 
 import WorksheetForm_specialDoor from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/specialProdForm';
+import WorksheetForm_w1w3 from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/w1w3Form';
 
 import { useControl_pdf } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_pdf';
 import { useControl_profile } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_profile';
@@ -775,8 +776,23 @@ const TheWorksheetForm = ({
 }) => {
   const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
 
-  const doorModelName = activeRecordData?.contractProductItems?.[0].doorModelName;
-  const isSpecialDoor = !!doorModelName && checkIsSpecialDoor(doorModelName);
+  const doorModelSort = (() => {
+    const doorModelName = activeRecordData?.contractProductItems?.[0].doorModelName;
+    const isSpecialDoor = !!doorModelName && checkIsSpecialDoor(doorModelName);
+
+    let doorModelSort: 'normal' | 'special' | 'w1w3';
+
+    if (doorModelName === 'W1' || doorModelName === 'W3') {
+      doorModelSort = 'w1w3';
+    } else if (isSpecialDoor) {
+      doorModelSort = 'special';
+    } else {
+      doorModelSort = 'normal';
+    }
+
+    return doorModelSort;
+  })();
+
   // -------------------------------------------------------------------------------------
 
   const { state_specialDoor, setState_specialDoor, createBody, customLabel } = useSpecialDoor({
@@ -797,15 +813,13 @@ const TheWorksheetForm = ({
 
   const theOnConfirm = () => {
     const body = (() => {
-      if (isSpecialDoor) {
-        return createBody();
-      } else {
+      if (doorModelSort === 'normal') {
         const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
         const floorLocations = worksheetExport.getFloorLocations();
 
         if (!contractProductItems || !floorLocations) {
-          console.error(contractProductItems);
-          console.error(floorLocations);
+          console.error('contractProductItems', contractProductItems);
+          console.error('floorLocations', floorLocations);
 
           return null;
         }
@@ -814,6 +828,8 @@ const TheWorksheetForm = ({
           contractProductItems,
           floorLocations,
         };
+      } else {
+        return createBody();
       }
     })();
 
@@ -821,11 +837,7 @@ const TheWorksheetForm = ({
   };
 
   useEffect(() => {
-    if (isSpecialDoor) {
-      return;
-    }
-
-    if (disabled && activeRecordData) {
+    if (doorModelSort == 'normal' && disabled && activeRecordData) {
       const contractProductItems = activeRecordData.contractProductItems;
 
       worksheetExport.init({
@@ -837,7 +849,7 @@ const TheWorksheetForm = ({
         originalAccessories: activeWorksheetOriginalAccessories,
       });
     }
-  }, [activeRecordData, disabled, isSpecialDoor]);
+  }, [activeRecordData, disabled, doorModelSort]);
 
   // -------------------------------------------------------------------------
 
@@ -845,7 +857,18 @@ const TheWorksheetForm = ({
     return null;
   }
 
-  if (isSpecialDoor) {
+  if (doorModelSort === 'w1w3') {
+    return (
+      <WorksheetForm_w1w3
+        disabled={disabled}
+        state_specialDoor={state_specialDoor}
+        setState_specialDoor={setState_specialDoor}
+        onConfirm={theOnConfirm}
+      />
+    );
+  }
+
+  if (doorModelSort === 'special') {
     return (
       <WorksheetForm_specialDoor
         disabled={disabled}
