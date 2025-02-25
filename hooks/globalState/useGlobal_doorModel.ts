@@ -22,6 +22,7 @@ type TdoorModelList = {
   doorModelArr: undefined | null | TdoorModelInfoDto[];
   doorModelDict: undefined | null | TdoorModelDict;
   checkIsSpecialDoor: (doorModelName: string) => boolean;
+  parseDoorModelSort: (doorModelName: string) => undefined | 'normal' | 'special' | 'w1w3';
   update: () => void;
 };
 
@@ -60,6 +61,41 @@ const useDoorModel_prime = create<TdoorModelList>()(
           });
       };
 
+      const checkIsSpecialDoor = (doorModelName: string) => {
+        let isSpecial = true;
+        const doorModelDir = get().doorModelDict;
+
+        if (doorModelDir && doorModelName in doorModelDir) {
+          isSpecial = false;
+        }
+
+        if (doorModelName === 'W2') {
+          isSpecial = true;
+        }
+
+        return isSpecial;
+      };
+
+      const parseDoorModelSort = (doorModelName: string) => {
+        if (!get().isReady) {
+          return undefined;
+        }
+
+        const isSpecialDoor = !!doorModelName && checkIsSpecialDoor(doorModelName);
+
+        let doorModelSort: 'normal' | 'special' | 'w1w3';
+
+        if (doorModelName === 'W1' || doorModelName === 'W3') {
+          doorModelSort = 'w1w3';
+        } else if (isSpecialDoor) {
+          doorModelSort = 'special';
+        } else {
+          doorModelSort = 'normal';
+        }
+
+        return doorModelSort;
+      };
+
       //
       const doorModelList: TdoorModelList = {
         raw: undefined,
@@ -67,20 +103,8 @@ const useDoorModel_prime = create<TdoorModelList>()(
         doorModelArr: undefined,
         isReady: false,
         update,
-        checkIsSpecialDoor: (doorModelName: string) => {
-          let isSpecial = true;
-          const doorModelDir = get().doorModelDict;
-
-          if (doorModelDir && doorModelName in doorModelDir) {
-            isSpecial = false;
-          }
-
-          if (doorModelName === 'W2') {
-            isSpecial = true;
-          }
-
-          return isSpecial;
-        },
+        checkIsSpecialDoor,
+        parseDoorModelSort,
       };
 
       return doorModelList;
