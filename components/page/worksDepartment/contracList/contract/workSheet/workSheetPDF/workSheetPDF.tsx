@@ -59,7 +59,7 @@ export default function WorkSheetPDF({
 
   const chunkedList = _.chunk(itemArr, 3);
   const chunkedList_specialItem = _.chunk(specialItemArr, 2);
-  const chunkedList_w1w3Item = _.chunk(w1w3ItemArr, 12);
+  const chunkedList_w1w3Item = _.chunk(w1w3ItemArr, 6);
 
   const pageCount = chunkedList.length + chunkedList_specialItem.length + chunkedList_w1w3Item.length;
 
