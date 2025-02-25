@@ -100,7 +100,7 @@ export default function WareHouseList() {
 
 
     const panelList: TpanelList = [
-        { searchGroup },
+        // { searchGroup },
         {
             type: 'addButton',
             label: '新增倉庫',
