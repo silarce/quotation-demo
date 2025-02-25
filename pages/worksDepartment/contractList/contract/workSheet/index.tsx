@@ -13,9 +13,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-import WorkSheetProfile, {
-  Tcontrol_profile,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
+import WorkSheetProfile from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
 
 import ProductCard, {
   Tcontrol_productCard,
@@ -26,12 +24,8 @@ import RecordList, {
   Trecord,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/recordList';
 
-import WorkSheetPDF, {
-  Tcontrol_workSheetPDF_01,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
-import WorkSheetPDF_02, {
-  Tcontrol_workSheetPDF_02,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
+import WorkSheetPDF from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
+import WorkSheetPDF_02 from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -49,36 +43,28 @@ import {
   useApiGetWorksheetRecord_id,
 } from 'js/api/api_engineering';
 
-import { useApiGetProdDoorModels, useGetAssetDict, apiGetAsset } from 'js/api/api_product';
-
 // hook
-import { TquotationProductItemDto_old } from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/useWorksheet';
+import { TquotationProductItemDto_old } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useWorksheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
-import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
-import { lookup_motorPhase, getProductHeadBoxImgUrl } from 'config/product/lookup';
 
 // css
 import scss from './workSheet.module.scss';
 
 // type
 import type {
-  TengineeringContactDto,
   TquotationProductItemDto,
   TerpFeatureDto,
   TquotationProductAccessoryDto,
   TworksheetRecordDto,
-  TquotationProductComponentDto,
   TworksheetDto,
   TuserDto,
 } from 'js/api/dtoTypes';
 import type { TworksheetDto_addition } from 'js/api/api_engineering';
 
 // zustand // hook
-import { useWorksheet } from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/useWorksheet';
+import { useWorksheet } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
 import WorksheetForm from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/productForm';
 
@@ -88,9 +74,12 @@ import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 import {
   useSpecialDoor,
   Tstate_specialDoor,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/useSpecialDoor';
+} from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
 
 import WorksheetForm_specialDoor from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/specialProdForm';
+
+import { useControl_pdf } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_pdf';
+import { useControl_profile } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_profile';
 
 // ====================================================================
 
@@ -100,10 +89,6 @@ type Tquery = {
   activeWorksheetId?: string | undefined;
   activedProdId?: string | undefined;
   activeRecordId?: string | undefined;
-};
-
-type TcomponentList = {
-  [key: string]: TquotationProductComponentDto | undefined;
 };
 
 // ====================================================================
@@ -880,75 +865,6 @@ const TheWorksheetForm = ({
 
 // ====================================================================
 
-// MARK:useControl_profile
-
-const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
-  const control_profile = useMemo(() => {
-    const {
-      //
-      projectName = '',
-      projectContent = '',
-      projectNumber = '',
-      projectPrincipal = '',
-      constructionSitePrincipalContactNumber = '',
-      constructionSiteFaxNumber = '',
-      constructionSiteContactNumber = '',
-      contractor = '',
-      contractorPrincipal = '',
-      contractorContactNumber = '',
-      contractorFaxNumber = '',
-      county = '',
-      district = '',
-      address = '',
-    } = engineeringContact ?? {};
-
-    const control_profile: Tcontrol_profile = {
-      projectName: {
-        value: projectName,
-      },
-      projectContent: {
-        value: projectContent,
-      },
-      // 有空時把key改成projectPhoneNumber
-      projectNumber: {
-        // value: profile.projectNumber,
-        value: constructionSiteContactNumber,
-      },
-      projectFaxNumber: {
-        value: constructionSiteFaxNumber,
-      },
-      projectPerson: {
-        value: projectPrincipal,
-      },
-      projectPersonNumber: {
-        value: constructionSitePrincipalContactNumber,
-      },
-      allAddress: {
-        value: `${county}${district}${address}`,
-      },
-      engineeringNumber: {
-        value: projectNumber,
-      },
-      contractor: {
-        value: contractor,
-      },
-      principal: {
-        value: contractorPrincipal,
-      },
-      contactNumber: {
-        value: contractorContactNumber,
-      },
-      faxNumber: {
-        value: contractorFaxNumber,
-      },
-    };
-
-    return control_profile;
-  }, [engineeringContact]);
-
-  return control_profile;
-};
-
 const polyfillContractProductItems = (pre_contractProductItems: TquotationProductItemDto[]) => {
   const contractProductItems = pre_contractProductItems.map((item) => {
     return {
@@ -961,417 +877,4 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
   });
 
   return contractProductItems;
-};
-
-// MARK:useControl_pdf
-const useControl_pdf = ({
-  contractNumber,
-  customerName,
-  contactPerson,
-  control_profile,
-  latestRecordArr,
-}: {
-  contractNumber: string;
-  customerName: string;
-  contactPerson: string;
-  control_profile: Tcontrol_profile;
-  latestRecordArr: TworksheetRecordDto[];
-}) => {
-  const { doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
-
-  const { assetDict, updatePath } = useGetAssetDict<string>();
-
-  const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
-    const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
-    const specialItemArr: Tcontrol_workSheetPDF_01['specialItemArr'] = [];
-
-    latestRecordArr.forEach((record) => {
-      if (!record.contractProductItems) {
-        return;
-      }
-
-      const item = record.contractProductItems[0];
-
-      const isSpecialDoor = checkIsSpecialDoor(item.doorModelName);
-
-      if (!isSpecialDoor) {
-        const control_item = createPdfItem({
-          contractProductItems: record.contractProductItems,
-          assetDict,
-        });
-
-        workSheetPDF_01_itemArr.push(control_item);
-      } else {
-        const control_item = createPdfSpecialItem({
-          contractProductItems: record.contractProductItems,
-          assetDict,
-        });
-        specialItemArr.push(control_item);
-      }
-    });
-
-    const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
-      info: {
-        contractNumber: contractNumber,
-        projectName: control_profile.projectName.value,
-        projectAddress: control_profile.allAddress.value,
-        customerName: customerName,
-        contactPerson: contactPerson,
-        // 開單日
-        billingDate: getTaiwanDateStr(new Date().toISOString()) ?? '', // 未知
-        // 出貨日
-        shippingDate: '', // 未知
-      },
-      itemArr: workSheetPDF_01_itemArr,
-      specialItemArr,
-    };
-
-    let totalQty_PDF_02 = 0;
-    workSheetPDF_01_itemArr.forEach((item) => {
-      totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
-    });
-    const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
-      info: {
-        projectName: control_profile.projectName.value,
-        totalQty: String(totalQty_PDF_02),
-      },
-      itemArr: workSheetPDF_01_itemArr,
-    };
-
-    return {
-      control_workSheetPDF_01,
-      control_workSheetPDF_02,
-    };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    //
-    contractNumber,
-    customerName,
-    contactPerson,
-    control_profile,
-    latestRecordArr,
-    assetDict,
-    doorModelDict,
-  ]);
-
-  useEffect(() => {
-    latestRecordArr.forEach((record) => {
-      if (!record.contractProductItems) {
-        return;
-      }
-
-      const item = record.contractProductItems[0];
-
-      const { headBox1, headBox2, headBoxTopCover, headBoxCover } = getProductHeadBoxImgUrl({
-        isIntegratedHeadBox: !!item.isIntegratedHeadBox,
-        hasWheel: !!item.hasWheel,
-        headBoxTopCover: !!item.headBoxTopCover,
-        headBoxCover: item.headBoxCover,
-      });
-
-      const parameter: Parameters<typeof updatePath>[0] = {};
-      headBox1.url && headBox1.name && (parameter[headBox1.name] = headBox1.url);
-      headBox2.url && headBox2.name && (parameter[headBox2.name] = headBox2.url);
-      headBoxTopCover.url && headBoxTopCover.name && (parameter[headBoxTopCover.name] = headBoxTopCover.url);
-      headBoxCover.url && headBoxCover.name && (parameter[headBoxCover.name] = headBoxCover.url);
-
-      item.guideRail && (parameter[item.guideRail] = `door-track/${item.guideRail}`);
-
-      updatePath(parameter);
-    });
-  }, [latestRecordArr]);
-
-  return {
-    control_workSheetPDF_01,
-    control_workSheetPDF_02,
-  };
-};
-
-// ===========================================================================
-
-// MARK:createPdfItem
-const createPdfItem = ({
-  contractProductItems,
-  assetDict,
-}: {
-  contractProductItems: TquotationProductItemDto[];
-  assetDict: Record<string, string>;
-}) => {
-  const item = contractProductItems[0];
-  const qty = contractProductItems.length;
-
-  const {
-    motorVoltage,
-    motorPhase,
-    components,
-    accessories,
-
-    isIntegratedHeadBox,
-    hasWheel,
-    headBoxTopCover,
-    headBoxCover,
-  } = item;
-
-  const phaseVoltage = `${lookup_motorPhase[String(motorPhase) as '1' | '3'] ?? ''} ${motorVoltage}V`;
-
-  const {
-    headBox1: url_headBox1,
-    headBox2: url_headBox2,
-    headBoxTopCover: url_headBoxTopCover,
-    headBoxCover: url_headBoxCover,
-  } = getProductHeadBoxImgUrl({
-    isIntegratedHeadBox: !!isIntegratedHeadBox,
-    hasWheel: !!hasWheel,
-    headBoxTopCover: !!headBoxTopCover,
-    headBoxCover: headBoxCover,
-  });
-
-  const componentList = (() => {
-    const list: TcomponentList = {};
-    components.forEach((component) => {
-      list[component.type] = component;
-    });
-
-    return list;
-  })();
-
-  const acceNameArr = accessories.map((acce) => acce.name);
-
-  const material = (() => {
-    if (item.doorModelName !== 'SJ-305D') {
-      return componentList.slat?.material ?? '';
-    } else if (componentList.slat?.material === 'SST管1.0T' || componentList.slat?.material === '內SST管外SST管1.0T') {
-      return 'SST';
-    } else {
-      return componentList.slat?.material ?? '';
-    }
-  })();
-
-  const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
-    itemName: item.itemName,
-    size: {
-      qty: `${qty}`,
-      doorModelName: item.doorModelName,
-      fullWidth: String(item.fullWidth),
-      height: String(item.height),
-      WG: String(item.WG),
-      gapA: item.gapA ?? '0',
-      gapC: item.gapC ?? '0',
-      /**支版尺寸 boxB*boxD */
-      BD: `${item.boxB}*${item.boxD}`,
-      /**捲門全高 */
-      fullHeight: String(calcFullHeight({ height: Number(item.height), boxB: item.boxB })),
-      weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
-    },
-    roller: {
-      diameter: item.diameter ? `${item.diameter}"` : '', // 要有 " 符號，代表吋
-      bearingInnerDiameter: item.bearingInnerDiameter ?? '',
-      bearingName: item.bearingName ?? '',
-      bearingHousingTotalLength: item.bearingHousingTotalLength ?? '',
-      bearingHousingSize: String(item.bearingHousingSize ?? ''),
-    },
-    headBox: {
-      angleIronQty: String(item.headBoxAngleIronQuantity ?? ''),
-      angleIronSize: String(
-        calcAngleIronSize({
-          WG: Number(item.WG),
-          gapA: Number(item.gapA),
-          gapC: Number(item.gapC),
-        })
-      ),
-      // form: sheet.headBoxForm_str,
-      form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
-      surface: componentList.headBox?.materialSurface ?? '',
-
-      headBoxCover: item.headBoxCover === 'full' ? '全遮' : item.headBoxCover === 'half' ? '半遮' : '無',
-      headBoxTopCover: item.headBoxTopCover ? '有' : '無',
-      hasWheel: item.hasWheel ? '有' : '無',
-      headBoxSizeB: item.boxB,
-      headBoxSizeD: item.boxD,
-      headBoxSizeX: item.headBoxSizeX,
-      headBoxSizeY: item.headBoxSizeY,
-      headBoxSizeM: item.headBoxSizeM,
-      headBoxSizeN: item.headBoxSizeN,
-      headBoxSizeO: item.headBoxSizeO,
-      headBoxSizeP: item.headBoxSizeP,
-      headBoxSizeQ: item.headBoxSizeQ,
-      // imgUrl1: url_headBox1.url,
-      // imgUrl2: url_headBox2.url,
-      // imgUrl3: url_headBoxTopCover.url,
-      // imgUrl4: url_headBoxCover.url,
-
-      svgString1: assetDict[url_headBox1.name || 'null'] || null,
-      svgString2: assetDict[url_headBox2.name || 'null'] || null,
-      svgString3: assetDict[url_headBoxTopCover.name || 'null'] || null,
-      svgString4: assetDict[url_headBoxCover.name || 'null'] || null,
-    },
-    doorPiece: {
-      material: material,
-      surface: componentList.slat?.materialSurface ?? '',
-      thickness: item.thickness ?? '',
-      slatLength: String(item.slatLength ?? '0'),
-      slatCount: String(item.slatCount ?? '0'),
-      antyTyphoonHook: item.isAntiTyphoon ? '有' : '無',
-    },
-    motor: {
-      vendor: item.motorVendor ?? '',
-      /**相數加電壓 */
-      phaseVoltage: phaseVoltage,
-      horsepower: item.horsepower,
-      direction: '', // 未知 // 在廠務部工作表 電動機方向
-    },
-    guideRail: {
-      form: item.isAntiTyphoon ? '防颱' : '一般',
-      material: componentList.guideRail?.material ?? '',
-      guideRailLength: String(item.guideRailLength ?? ''),
-      guideRailName: item.guideRail ?? '',
-      icon: item?.guideRail
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item?.guideRail}`
-        : undefined,
-      antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
-      bendStraight: item.guideRailType ?? '',
-      surface: componentList.guideRail?.materialSurface ?? '',
-      dangerSvg: assetDict[item?.guideRail || 'null'] || undefined,
-    },
-    chainCog: {
-      sprocketWheelModel: item.sprocketWheelModel ?? '',
-      sprocketWheelTeethNumber: item.sprocketWheelTeethNumber ?? '',
-      bearingInnerDiameter: item.bearingInnerDiameter ?? '',
-      teethQuantity: '', // 未知 // 在廠務部工作表 齒數
-      centerDistance: '', // 未知 // 在廠務部工作表 中心距
-      eyesQuantity: '', // 未知 // 在廠務部工作表 目數
-    },
-    base: {
-      material: componentList.bottomBar?.material ?? '',
-      guideRailsOpening: String(item.guideRailsOpening ?? ''),
-      surface: componentList.bottomBar?.materialSurface ?? '', // 未知 在廠務部工作表
-    },
-    sidePlate: {
-      direction: item.sidePlateDirection ?? '',
-      bigSidePlate: `${item.boxB}*${item.boxD}`,
-      smallSidePlate: `${item.boxB}*${item.boxB}`,
-    },
-    memo: acceNameArr.length > 0 ? acceNameArr.join('、') : '',
-  };
-
-  return control_item;
-};
-
-// MARK:createPdfSpecialItem
-const createPdfSpecialItem = ({
-  contractProductItems,
-  assetDict,
-}: {
-  contractProductItems: TquotationProductItemDto[];
-  assetDict: Record<string, string>;
-}) => {
-  const item = contractProductItems[0];
-  const qty = contractProductItems.length;
-
-  const {
-    doorModelName,
-    itemName,
-
-    materialName,
-    materialSurface,
-    closingType,
-    isAntiTyphoon,
-    skeleton,
-    fullWidth,
-    height,
-    WG,
-    gapA,
-    gapC,
-
-    isIntegratedHeadBox,
-    upperMask,
-    hasWheel,
-    headBoxCover,
-    headBoxTopCover,
-    headBoxSizeO,
-    headBoxSizeP,
-    headBoxSizeQ,
-    headBoxSizeX,
-    headBoxSizeY,
-    headBoxSizeM,
-    headBoxSizeN,
-    boxB,
-    boxD,
-
-    //
-    motorVendor,
-    horsepower,
-    guideRailType,
-    diameter,
-    sprocketWheelModel,
-    motorPhase,
-    motorVoltage,
-  } = item;
-
-  const phase = motorPhase ? lookup_motorPhase[String(motorPhase) as '1' | '3'] : '';
-  const voltage = motorVoltage ? `${motorVoltage}V` : '';
-  const electricSupply = `${phase} ${voltage}`;
-
-  const {
-    headBox1: url_headBox1,
-    headBox2: url_headBox2,
-    headBoxTopCover: url_headBoxTopCover,
-    headBoxCover: url_headBoxCover,
-  } = getProductHeadBoxImgUrl({
-    isIntegratedHeadBox: !!isIntegratedHeadBox,
-    hasWheel: !!hasWheel,
-    headBoxTopCover: !!headBoxTopCover,
-    headBoxCover: headBoxCover,
-  });
-
-  const headBoxSvgString1 = assetDict[url_headBox1.name || 'null'] || null;
-  const headBoxSvgString2 = assetDict[url_headBox2.name || 'null'] || null;
-  const headBoxSvgString3 = assetDict[url_headBoxTopCover.name || 'null'] || null;
-  const headBoxSvgString4 = assetDict[url_headBoxCover.name || 'null'] || null;
-
-  const specialItem: Tcontrol_workSheetPDF_01['specialItemArr'][number] = {
-    doorModelName,
-    itemName,
-    qty,
-    materialName,
-    materialSurface,
-    closingType,
-    isAntiTyphoon: isAntiTyphoon ? '有' : '無',
-    skeleton,
-    fullWidth: fullWidth + ' mm',
-    height: height + ' mm',
-    WG: WG + ' mm',
-    gapA: gapA !== null ? gapA + ' mm' : null,
-    gapC: gapC !== null ? gapC + ' mm' : null,
-    BD: `${boxB}*${boxD ?? 0}`,
-    fullHeight: String(calcFullHeight({ height: Number(height), boxB: boxB })) + ' mm',
-    isIntegratedHeadBox: isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
-    upperMask: upperMask ? '有' : '無',
-    hasWheel: hasWheel ? '有' : '無',
-    headBoxCover: headBoxCover === 'full' ? '全遮' : item.headBoxCover === 'half' ? '半遮' : '無',
-    headBoxTopCover: headBoxTopCover ? '有' : '無',
-    headBoxSizeO: headBoxSizeO !== null ? headBoxSizeO + ' mm' : null,
-    headBoxSizeP: headBoxSizeP !== null ? headBoxSizeP + ' mm' : null,
-    headBoxSizeQ: headBoxSizeQ !== null ? headBoxSizeQ + ' mm' : null,
-    headBoxSizeX: headBoxSizeX !== null ? headBoxSizeX + ' mm' : null,
-    headBoxSizeY: headBoxSizeY !== null ? headBoxSizeY + ' mm' : null,
-    headBoxSizeM: headBoxSizeM !== null ? headBoxSizeM + ' mm' : null,
-    headBoxSizeN: headBoxSizeN !== null ? headBoxSizeN + ' mm' : null,
-    boxB: boxB !== null ? boxB + ' mm' : null,
-    boxD: boxD !== null ? boxD + ' mm' : null,
-    //
-    motorVendor: motorVendor ?? '',
-    electricSupply,
-    horsepower,
-    guideRailType,
-    diameter: diameter !== null ? diameter + '"' : null,
-    sprocketWheelModel,
-    headBoxImg1: headBoxSvgString1 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString1 }} /> : null,
-    headBoxImg2: headBoxSvgString2 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString2 }} /> : null,
-    headBoxImg3: headBoxSvgString3 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString3 }} /> : null,
-    headBoxImg4: headBoxSvgString4 ? <div dangerouslySetInnerHTML={{ __html: headBoxSvgString4 }} /> : null,
-  };
-
-  return specialItem;
 };

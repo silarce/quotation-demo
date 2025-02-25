@@ -16,7 +16,7 @@ import scss from './productForm.module.scss';
 
 // type
 import { TupdateContractProductItemDto, TquotationProductItemDto } from 'js/api/dtoTypes';
-import type { Tstate_specialDoor } from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/useSpecialDoor';
+import type { Tstate_specialDoor } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
 
 import {
   TsetState,
