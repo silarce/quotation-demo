@@ -155,7 +155,6 @@ export default function WareHouse({ userGrade }: { userGrade: number }) {
 
 
     const panelList: TpanelList = [
-        { searchGroup },
         // status === 'Contracting' ? attatchBtn : null,
         {
             type: 'addButton',

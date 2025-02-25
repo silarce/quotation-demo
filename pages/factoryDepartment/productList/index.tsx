@@ -1670,7 +1670,7 @@ export default function ProductList() {
                                 物料清單
                             </span>
                         </div>
-                        <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
+                        <div style={{ top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                             <InputSel
                                 {...inputSelProps}
                                 caption="物料筆數"
