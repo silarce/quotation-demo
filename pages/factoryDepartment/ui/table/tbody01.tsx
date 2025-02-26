@@ -24,7 +24,6 @@ import { setting } from '../../wareHouseList/index';
 import moment from 'moment';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import icon_fc_add from 'public/image/icon/fc_add.svg';
-import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
 import { first } from 'lodash';
 
 type TBodyItemContent = {};
