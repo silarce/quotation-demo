@@ -106,27 +106,25 @@ type TquotationProductItemDto_old = Omit<TquotationProductItemDto, 'components'>
   components: TquotationProductComponentDto_old[];
 };
 
-type TavalibleComponentIdList = {
-  slat: string;
-  bottomBar: string;
-  guideRail: string;
-  sidePlate: string;
-  roller: string;
-  motor: string;
-  motorAccessories: string;
-  headBox: string;
-};
+type TavalibleComponentIdList =
+  | {
+      slat: string;
+      bottomBar: string;
+      guideRail: string;
+      sidePlate: string;
+      roller: string;
+      motor: string;
+      motorAccessories: string;
+      headBox: string;
+    }
+  | {
+      slat: string;
+      bottomBar: string;
+      guideRail: string;
+      middlePillar: string;
+      backBone: string;
+    };
 
-// type TcreateComponentList = {
-//   slat: TcreateQuotationProductComponentDto;
-//   bottomBar: TcreateQuotationProductComponentDto;
-//   guideRail: TcreateQuotationProductComponentDto;
-//   sidePlate: TcreateQuotationProductComponentDto;
-//   roller: TcreateQuotationProductComponentDto;
-//   motor: TcreateQuotationProductComponentDto;
-//   motorAccessories: TcreateQuotationProductComponentDto;
-//   headBox: TcreateQuotationProductComponentDto;
-// };
 type TcreateComponentList = {
   slat: TcreateQuotationProductComponentDto_old;
   bottomBar: TcreateQuotationProductComponentDto_old;
@@ -1632,18 +1630,15 @@ const useWorksheet = create<Tworksheet>(
       // const isSpecialProd = getIsSpecialProd();
 
       // headBox, slat, guideRail, bottomBar
+      const doorModelName = basicSpec.doorModelName;
 
-      if (
-        // !isSpecialProd &&
-        // (!headBox.material ||
-        //   !headBox.surface ||
-        //   !slat.material ||
-        //   !slat.surface ||
-        //   !guideRail.material ||
-        //   !guideRail.surface ||
-        //   !bottomBar.material ||
-        //   !bottomBar.surface)
+      if (doorModelName === 'W2') {
+        if (!slat.material || !guideRail.material || !bottomBar.material) {
+          myAlert.warning({ title: '請確認所有的材質與表面都已選取' });
 
+          return;
+        }
+      } else if (
         !headBox.material ||
         !headBox.surface ||
         !slat.material ||
@@ -1679,6 +1674,23 @@ const useWorksheet = create<Tworksheet>(
         // ______________________________________________________________________
         // ______________________________________________________________________
         if (avalibleComponents) {
+          if (doorModelName === 'W2') {
+            const middlePillarId = avalibleComponents.middlePillar?.[0].id;
+            const backBoneId = avalibleComponents.backBone?.[0].id;
+
+            if (!middlePillarId || !backBoneId) {
+              return null;
+            }
+
+            return {
+              slat: avalibleComponents.slats[0].id,
+              bottomBar: avalibleComponents.bottomBars[0].id,
+              guideRail: avalibleComponents.guideRails[0].id,
+              middlePillar: middlePillarId,
+              backBone: backBoneId,
+            };
+          }
+
           return avalibleComponentFilter({
             avalibleComponentList: avalibleComponents,
             //
@@ -1721,7 +1733,19 @@ const useWorksheet = create<Tworksheet>(
         return;
       }
 
-      const componentIdListEntries = Object.entries(avalibleComponentIdList ?? {});
+      console.log('3');
+      // const componentIdListEntries = Object.entries(avalibleComponentIdList ?? {});
+      const componentIdListEntries = (() => {
+        if (doorModelName === 'W2') {
+          return [
+            ['slat', slat.material],
+            ['guideRail', guideRail.material],
+            ['bottomBar', bottomBar.material],
+          ];
+        } else {
+          return Object.entries(avalibleComponentIdList ?? {});
+        }
+      })();
 
       // ______________________________________________________________________
       // ______________________________________________________________________
@@ -1747,7 +1771,7 @@ const useWorksheet = create<Tworksheet>(
 
       const { slatLength } = (await get().reqGeneralSpec('WG')) ?? {};
 
-      if (!slatLength) {
+      if (!slatLength && doorModelName !== 'W2') {
         myAlert.warning({ title: '取得門片長度失敗' });
 
         return;
@@ -1843,9 +1867,9 @@ const useWorksheet = create<Tworksheet>(
       const { boxB } = ABCD;
 
       const area = calcProductArea({
-        height: Number(height),
-        fullWidth: Number(fullWidth),
-        boxb: new Decimal(boxB).div(1000).toNumber(),
+        height: Number(height || 0),
+        fullWidth: Number(fullWidth || 0),
+        boxb: new Decimal(boxB || 0).div(1000).toNumber(),
       });
 
       const volume = calcProductVolume(Number(area));
@@ -2624,14 +2648,6 @@ const takeGenerateDoorProductBom = ({
     thickness: guideRail.guideRailThickness,
   };
 
-  const body_headBox: TgenerateDoorProductBomDto_ComponentInfo = {
-    id: avalibleComponentIdList.headBox,
-    material: headBox.material || '',
-    // materialSurface: (reduceMaterialSurface(headBox.surface) || null) as TmaterialSurface,
-    materialSurface: (headBox.surface || null) as TmaterialSurface,
-    isPainted: false,
-  };
-
   const body_bottomBar: TgenerateDoorProductBomDto_ComponentInfo = {
     id: avalibleComponentIdList.bottomBar,
     material: bottomBar.material || '',
@@ -2642,29 +2658,70 @@ const takeGenerateDoorProductBom = ({
     isPainted: false,
   };
 
-  const body_sidePlate: TgenerateDoorProductBomDto_ComponentInfo = {
-    id: avalibleComponentIdList.sidePlate,
-    material: '黑鐵',
-    isPainted: false,
-  };
+  const body_headBox: TgenerateDoorProductBomDto_ComponentInfo | undefined =
+    'headBox' in avalibleComponentIdList
+      ? {
+          id: avalibleComponentIdList.headBox,
+          material: headBox.material || '',
+          // materialSurface: (reduceMaterialSurface(headBox.surface) || null) as TmaterialSurface,
+          materialSurface: (headBox.surface || null) as TmaterialSurface,
+          isPainted: false,
+        }
+      : undefined;
 
-  const body_roller: TgenerateDoorProductBomDto_ComponentInfo = {
-    id: avalibleComponentIdList.roller,
-    material: '黑鐵',
-    isPainted: false,
-  };
+  const body_sidePlate: TgenerateDoorProductBomDto_ComponentInfo | undefined =
+    'sidePlate' in avalibleComponentIdList
+      ? {
+          id: avalibleComponentIdList.sidePlate,
+          material: '黑鐵',
+          isPainted: false,
+        }
+      : undefined;
 
-  const body_motor: TgenerateDoorProductBomDto_ComponentInfo = {
-    id: avalibleComponentIdList.motor,
-    material: '黑鐵',
-    isPainted: false,
-  };
+  const body_roller: TgenerateDoorProductBomDto_ComponentInfo | undefined =
+    'roller' in avalibleComponentIdList
+      ? {
+          id: avalibleComponentIdList.roller,
+          material: '黑鐵',
+          isPainted: false,
+        }
+      : undefined;
 
-  const body_motorAccessory: TgenerateDoorProductBomDto_ComponentInfo = {
-    id: avalibleComponentIdList.motorAccessories,
-    material: '其他',
-    isPainted: false,
-  };
+  const body_motor: TgenerateDoorProductBomDto_ComponentInfo | undefined =
+    'motor' in avalibleComponentIdList
+      ? {
+          id: avalibleComponentIdList.motor,
+          material: '黑鐵',
+          isPainted: false,
+        }
+      : undefined;
+
+  const body_motorAccessory: TgenerateDoorProductBomDto_ComponentInfo | undefined =
+    'motorAccessories' in avalibleComponentIdList
+      ? {
+          id: avalibleComponentIdList.motorAccessories,
+          material: '其他',
+          isPainted: false,
+        }
+      : undefined;
+
+  const body_backBone: TgenerateDoorProductBomDto_ComponentInfo | undefined =
+    'backBone' in avalibleComponentIdList
+      ? {
+          id: avalibleComponentIdList.backBone,
+          material: '其他',
+          isPainted: false,
+        }
+      : undefined;
+
+  const body_middlePillar: TgenerateDoorProductBomDto_ComponentInfo | undefined =
+    'middlePillar' in avalibleComponentIdList
+      ? {
+          id: avalibleComponentIdList.middlePillar,
+          material: '其他',
+          isPainted: false,
+        }
+      : undefined;
 
   return {
     doorSpec,
@@ -2676,6 +2733,8 @@ const takeGenerateDoorProductBom = ({
     roller: body_roller,
     motor: body_motor,
     motorAccessories: body_motorAccessory,
+    backBone: body_backBone,
+    middlePillar: body_middlePillar,
   };
 
   //

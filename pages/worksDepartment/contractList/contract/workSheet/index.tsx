@@ -833,7 +833,7 @@ const TheWorksheetForm = ({
   };
 
   useEffect(() => {
-    if (doorModelSort == 'normal' && disabled && activeRecordData) {
+    if (doorModelSort === 'normal' && disabled && activeRecordData) {
       const contractProductItems = activeRecordData.contractProductItems;
 
       worksheetExport.init({
