@@ -172,12 +172,15 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
             }
             const data = await response.json();
             // setData(data);
-            router.push({
-                pathname: `/factoryDepartment/wareHouseList`,
-                query: {
-                    type: 'WareHouse',
-                }
-            });
+            if (response.ok) {
+                myAlert.success({title:'新增成功'});
+                router.push({
+                    pathname: `/factoryDepartment/wareHouseList`,
+                    query: {
+                        type: 'WareHouse',
+                    }
+                });
+            }
 
         } catch (error: any) {
             setError(error.message);
