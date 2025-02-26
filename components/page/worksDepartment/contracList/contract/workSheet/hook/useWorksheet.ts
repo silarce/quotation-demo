@@ -1557,9 +1557,9 @@ const useWorksheet = create<Tworksheet>(
       );
 
       await update_availableComponents();
-      const option_electricSupply = getOptions_electricSupply()[0];
-      const option_headBoxThickness = getOptions_headBoxThickness()[0];
-      const option_guideRailThickness = getOptions_guideRailThickness()[0];
+      const option_electricSupply = getOptions_electricSupply()[0] as Toption | undefined;
+      const option_headBoxThickness = getOptions_headBoxThickness()[0] as Toption | undefined;
+      const option_guideRailThickness = getOptions_guideRailThickness()[0] as Toption | undefined;
       const options_guideRail = getOptions_guideRail()[0] as Toption | undefined;
       const { options_angleIron, options_plate } = getOptions_bottomBarAngleIronAndPlate();
 
@@ -1582,13 +1582,13 @@ const useWorksheet = create<Tworksheet>(
       }
 
       set(
-        produce((state) => {
-          state.motor.motorVoltage = (option_electricSupply.voltage ?? '') as string;
-          state.motor.motorPhase = (option_electricSupply.phase ?? '') as string;
-          state.headBox.headBoxThickness = option_headBoxThickness.value;
-          state.guideRail.guideRailThickness = option_guideRailThickness.value;
-          state.bottomBar.bottomBarAngleIron = options_angleIron[0].value;
-          state.bottomBar.bottomBarPlate = options_plate[0].value;
+        produce<Tworksheet>((state) => {
+          state.motor.motorVoltage = (option_electricSupply?.voltage ?? '') as string;
+          state.motor.motorPhase = (option_electricSupply?.phase ?? '') as string;
+          state.headBox.headBoxThickness = option_headBoxThickness?.value ?? '';
+          state.guideRail.guideRailThickness = option_guideRailThickness?.value ?? '';
+          state.bottomBar.bottomBarAngleIron = (options_angleIron[0] as Toption | undefined)?.value ?? '';
+          state.bottomBar.bottomBarPlate = (options_plate[0] as Toption | undefined)?.value ?? '';
 
           state.shouldCalcData = false;
         })
