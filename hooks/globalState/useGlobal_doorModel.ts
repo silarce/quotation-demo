@@ -85,7 +85,7 @@ const useDoorModel_prime = create<TdoorModelList>()(
 
         let doorModelSort: 'normal' | 'special' | 'w13456';
 
-        if (/^W[123456]$/.test(doorModelName)) {
+        if (/^W[13456]$/.test(doorModelName)) {
           doorModelSort = 'w13456';
         } else if (isSpecialDoor) {
           doorModelSort = 'special';
