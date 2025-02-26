@@ -5,7 +5,7 @@ const findOption = ({ value, options }: { value: string; options: Toption[] }) =
     return null;
   }
 
-  return options.find((option) => option.value === value) ?? { value: value, label: value };
+  return options.find((option) => option.value === value) ?? { value: String(value), label: String(value) };
 };
 
 export { findOption };

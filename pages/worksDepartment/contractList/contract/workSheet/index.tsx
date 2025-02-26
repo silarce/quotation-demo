@@ -13,22 +13,19 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-import WorkSheetProfile, {
-  Tcontrol_profile,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
+import WorkSheetProfile from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetProfile';
 
 import ProductCard, {
   Tcontrol_productCard,
   TworksheetIntro,
-} from 'components/page/worksDepartment/worksheet/productCard';
-import RecordList, { Tcontrol_recordList, Trecord } from 'components/page/worksDepartment/worksheet/recordList';
+} from 'components/page/worksDepartment/contracList/contract/workSheet/productCard';
+import RecordList, {
+  Tcontrol_recordList,
+  Trecord,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/recordList';
 
-import WorkSheetPDF, {
-  Tcontrol_workSheetPDF_01,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
-import WorkSheetPDF_02, {
-  Tcontrol_workSheetPDF_02,
-} from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
+import WorkSheetPDF from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF';
+import WorkSheetPDF_02 from 'components/page/worksDepartment/contracList/contract/workSheet/workSheetPDF/workSheetPDF_02';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -37,48 +34,51 @@ import InputModal, { TinputModalProps } from 'components/global/gear/modal/simpl
 // api
 import { useGetContract_id, useGetContract_id_finalProductItem } from 'js/api/api_quotation';
 import {
+  TupdateWorkSheet,
   TcreateWorksheetDto,
+  TworksheetRecordDto_addition,
   apiPostWorkSheet,
   apiDeleteWorksheet,
-  useGetWorksheet_id,
   apiPatchWorkSheetProducts,
+  useGetWorksheet_id,
   useApiGetWorksheetRecord_id,
 } from 'js/api/api_engineering';
 
-import { useApiGetProdDoorModels, useGetAssetDict, apiGetAsset } from 'js/api/api_product';
-
 // hook
-import { TquotationProductItemDto_old } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import { TquotationProductItemDto_old } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useWorksheet';
 
 // utils
 import { downloadExcel } from 'components/page/worksDepartment/contracList/contract/workSheet/downloadExcel';
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
-import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
-import { lookup_motorPhase, getProductHeadBoxImgUrl } from 'config/product/lookup';
 
 // css
 import scss from './workSheet.module.scss';
 
 // type
 import type {
-  TengineeringContactDto,
   TquotationProductItemDto,
   TerpFeatureDto,
   TquotationProductAccessoryDto,
   TworksheetRecordDto,
-  TquotationProductComponentDto,
   TworksheetDto,
   TuserDto,
 } from 'js/api/dtoTypes';
 import type { TworksheetDto_addition } from 'js/api/api_engineering';
 
 // zustand // hook
-import { useWorksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import { useWorksheet } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
-import WorksheetForm from './WorksheetForm';
+import WorksheetForm from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/productForm';
 
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
+
+import { useSpecialDoor } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
+
+import WorksheetForm_specialDoor from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/specialProdForm';
+import WorksheetForm_w13456 from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/w13456Form';
+
+import { useControl_pdf } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_pdf';
+import { useControl_profile } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_profile';
 
 // ====================================================================
 
@@ -90,6 +90,7 @@ type Tquery = {
   activeRecordId?: string | undefined;
 };
 
+// MARK: START
 // ====================================================================
 
 export default function Worksheet({
@@ -102,6 +103,8 @@ export default function Worksheet({
   userInfo: TuserDto;
 }) {
   const { req_reviewBack, req_backThanAdd } = useGlobal_review();
+
+  const { isReady, doorModelDict, checkIsSpecialDoor } = useGlobal_doorModel();
 
   // ----------------------------------------------------------------
   const ref_main = useRef<HTMLDivElement>(null!);
@@ -135,8 +138,6 @@ export default function Worksheet({
   const [isShowPdf, setIsShowPdf] = useState(false);
   const [isShowPdf02, setIsShowPdf02] = useState(false);
 
-  // -------------------------------------------------------------------------
-
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
   // -------------------------------------------------------------------------
@@ -146,24 +147,18 @@ export default function Worksheet({
       'engineeringContact',
       'worksheet.latestRecord.reviewSalesEmployee',
       'worksheet.latestRecord.reviewManagerEmployee',
+
       'worksheet.latestRecord.contractProductItems.components',
       'worksheet.latestRecord.contractProductItems.accessories',
     ],
     addintion_latestRecordReview: true,
   });
-  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
-  const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
-
-  // ________________________________________________________________________
-  // ________________________________________________________________________
 
   const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId, {
     recordsWithReview: true,
   });
 
-  const { doorModelList, update: update_doorModel, checkIsSpecialDoor } = useApiGetProdDoorModels();
-
-  // -------------------------------------------------------------------------
+  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
 
   const {
     data: activeRecordData,
@@ -171,6 +166,8 @@ export default function Worksheet({
     isLoading: isLoading_activeRecord,
     clear: clear_activeRecord,
   } = useApiGetWorksheetRecord_id(activeRecordId, { addition_reviewArr: true });
+
+  const { engineeringContact, worksheet: worksheetArr = [] } = contract ?? {};
 
   const activedProd = useMemo(() => {
     return finalProduct.find((prod) => prod.id === activedProdId);
@@ -180,17 +177,7 @@ export default function Worksheet({
 
   // -------------------------------------------------------------------------
 
-  const init = useWorksheet((state) => state.init);
-
-  const worksheetExport = useWorksheet(
-    useShallow((state) => ({
-      worksheetId: state.worksheetId,
-      getUpdateWorkSheetItemArr: state.getUpdateWorkSheetItemArr,
-      getFloorLocations: state.getFloorLocations,
-    }))
-  );
-
-  // -------------------------------------------------------------------------
+  // region REQ
 
   const refreshData = async () => {
     return Promise.all([
@@ -261,33 +248,36 @@ export default function Worksheet({
     }
   };
 
-  const reqPatchWorkSheet = async () => {
+  const reqPatchWorkSheet = async (body: TupdateWorkSheet | undefined | null) => {
     const document_status = activeRecordData!.addition?.reviewArr?.[0].document_status;
+    const worksheetId = worksheetData?.id;
 
-    const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
-    const floorLocations = worksheetExport.getFloorLocations();
+    if (!worksheetId) {
+      myAlert.err({ title: '工作表ID不存在' });
 
-    if (contractProductItems && floorLocations) {
-      const body = {
-        contractProductItems,
-        floorLocations,
-      };
+      return;
+    }
 
-      try {
-        setIsLoading(true);
-        await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
+    if (!body) {
+      myAlert.err({ title: '工作表資料有誤' });
 
-        if (document_status === '審核中' || document_status === '駁回') {
-          await req_reviewBack(activeRecordData!.id, { showSuccess: false });
-        }
+      return;
+    }
 
-        await refreshData();
-        setDisabled(true);
-        ref_main.current.scrollIntoView();
-      } catch (error) {
-      } finally {
-        setIsLoading(false);
+    try {
+      setIsLoading(true);
+      await apiPatchWorkSheetProducts(worksheetId, body);
+
+      if (document_status === '審核中' || document_status === '駁回') {
+        await req_reviewBack(activeRecordData!.id, { showSuccess: false });
       }
+
+      await refreshData();
+      setDisabled(true);
+      ref_main.current.scrollIntoView();
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -317,68 +307,21 @@ export default function Worksheet({
   };
 
   // -------------------------------------------------------------------------
-
-  // MARK: useEffect
-
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      await Promise.all([
-        //
-        update_contract(),
-        update_finalProduce(),
-        update_doorModel(),
-      ]);
-      setIsLoading(false);
-    })();
-  }, [contractId]);
-
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
-      await update_worksheetData();
-      setIsLoading(false);
-    })();
-  }, [activeWorksheetId]);
-
-  useEffect(() => {
-    if (activeRecordId) {
-      update_activeRecord();
-    } else {
-      clear_activeRecord();
-    }
-  }, [activeRecordId]);
-
-  // zustand 狀態
-  useEffect(() => {
-    if (disabled && activeRecordData) {
-      const contractProductItems = activeRecordData.contractProductItems;
-
-      init({
-        worksheetId: activeWorksheetId!,
-        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
-        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
-        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
-        qty: contractProductItems?.length ?? 0,
-        originalAccessories: activeWorksheetOriginalAccessories,
-      });
-    }
-  }, [activeRecordData, disabled]);
-
-  // -------------------------------------------------------------------------
+  // region control
   const control_profile = useControl_profile(engineeringContact);
+  // ________________________________________________________________________
+  // ________________________________________________________________________
 
-  // -------------------------------------------------------------------------
   const { control_productCardArr, latestRecordArr } = useMemo(() => {
-    if (!doorModelList) {
-      return {
-        control_productCardArr: [],
-        latestRecordArr: [],
-      };
-    }
-
     const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
     const latestRecordArr: TworksheetRecordDto[] = [];
+
+    if (!doorModelDict) {
+      return {
+        control_productCardArr,
+        latestRecordArr,
+      };
+    }
 
     const worksheetList: { [id: string]: TworksheetDto } = {};
 
@@ -420,7 +363,11 @@ export default function Worksheet({
 
         latestRecordArr.push(latestRecord);
 
-        const { contractProductItems, addition: { reviewArr } = {} } = latestRecord;
+        const {
+          contractProductItems,
+
+          addition: { reviewArr } = {},
+        } = latestRecord;
 
         const contractProductItem = contractProductItems?.[0];
 
@@ -490,8 +437,6 @@ export default function Worksheet({
         return intro;
       });
 
-      // ----------------------
-
       control_productCardArr.push({
         id: prod.id,
         itemName: prod.itemName,
@@ -530,13 +475,11 @@ export default function Worksheet({
       });
     });
 
-    return { control_productCardArr, latestRecordArr, doorModelList };
+    return { control_productCardArr, latestRecordArr, doorModelDict };
     //
   }, [activeWorksheetId, finalProduct, worksheetArr]);
-
-  // ___________________________________________________________________________
-  // ___________________________________________________________________________
-
+  // ________________________________________________________________________
+  // ________________________________________________________________________
   const control_recordList: Tcontrol_recordList = useMemo(() => {
     const records = _.sortBy(worksheetData?.records, 'version').reverse();
 
@@ -593,6 +536,8 @@ export default function Worksheet({
 
     return { recordArr };
   }, [worksheetData]);
+  // ________________________________________________________________________
+  // ________________________________________________________________________
 
   const { control_workSheetPDF_01, control_workSheetPDF_02 } = useControl_pdf({
     contractNumber: contract?.contractNumber ?? '',
@@ -603,6 +548,8 @@ export default function Worksheet({
   });
 
   // -------------------------------------------------------------------------
+
+  // region panelList
 
   let panelList_notAllow: TpanelList = [
     {
@@ -626,7 +573,6 @@ export default function Worksheet({
       type: 'redButton',
       label: '送審',
       onClick: () => {
-        // setShowReviewerSelector(true);
         const { destroy } = ReviewFlowSelector.open2({
           userId,
           onConfirm: ({ reviewFlowId, purpose }) => {
@@ -685,7 +631,40 @@ export default function Worksheet({
   ];
 
   const panelList = disabled ? panelList_notAllow : panelList_allow;
-  // -----------------------------------------------------------------
+
+  // -----------------------------------------------------------------------
+
+  // MARK: useEffect
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      await Promise.all([
+        //
+        update_contract(),
+        update_finalProduce(),
+        // update_doorModel(),
+      ]);
+      setIsLoading(false);
+    })();
+  }, [contractId]);
+
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
+      await update_worksheetData();
+      setIsLoading(false);
+    })();
+  }, [activeWorksheetId]);
+
+  useEffect(() => {
+    if (activeRecordId) {
+      update_activeRecord();
+    } else {
+      clear_activeRecord();
+    }
+  }, [activeRecordId]);
+
   // -----------------------------------------------------------------------
 
   // MARK: RENDER
@@ -721,7 +700,19 @@ export default function Worksheet({
           {/* targetSheet */}
           <div className={classNames(scss.right)}>
             {activeWorksheetId && !activeRecordData && <RecordList control={control_recordList} />}
-            {activeRecordData && <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />}
+            {/* {activeRecordData && <WorksheetForm reqPatchWorkSheet={reqPatchWorkSheet} disabled={disabled} />} */}
+            {activeRecordData && (
+              <TheWorksheetForm
+                activeRecordData={activeRecordData}
+                activeWorksheetId={activeWorksheetId}
+                activeWorksheetOriginalAccessories={activeWorksheetOriginalAccessories}
+                disabled={disabled}
+                onConfirm={reqPatchWorkSheet}
+                // state_specialDoor={state_specialDoor}
+                // setState_specialDoor={setState_specialDoor}
+                // customLabel={customLabel}
+              />
+            )}
           </div>
           {/* right */}
         </div>
@@ -743,87 +734,11 @@ export default function Worksheet({
   );
 }
 
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-
-const useControl_profile = (engineeringContact: TengineeringContactDto | undefined | null): Tcontrol_profile => {
-  const control_profile = useMemo(() => {
-    const {
-      //
-      projectName = '',
-      projectContent = '',
-      projectNumber = '',
-      projectPrincipal = '',
-      constructionSitePrincipalContactNumber = '',
-      constructionSiteFaxNumber = '',
-      constructionSiteContactNumber = '',
-      contractor = '',
-      contractorPrincipal = '',
-      contractorContactNumber = '',
-      contractorFaxNumber = '',
-      county = '',
-      district = '',
-      address = '',
-    } = engineeringContact ?? {};
-
-    const control_profile: Tcontrol_profile = {
-      projectName: {
-        value: projectName,
-      },
-      projectContent: {
-        value: projectContent,
-      },
-      // 有空時把key改成projectPhoneNumber
-      projectNumber: {
-        // value: profile.projectNumber,
-        value: constructionSiteContactNumber,
-      },
-      projectFaxNumber: {
-        value: constructionSiteFaxNumber,
-      },
-      projectPerson: {
-        value: projectPrincipal,
-      },
-      projectPersonNumber: {
-        value: constructionSitePrincipalContactNumber,
-      },
-      allAddress: {
-        value: `${county}${district}${address}`,
-      },
-      engineeringNumber: {
-        value: projectNumber,
-      },
-      contractor: {
-        value: contractor,
-      },
-      principal: {
-        value: contractorPrincipal,
-      },
-      contactNumber: {
-        value: contractorContactNumber,
-      },
-      faxNumber: {
-        value: contractorFaxNumber,
-      },
-    };
-
-    return control_profile;
-  }, [engineeringContact]);
-
-  return control_profile;
-};
+// MARK:END
+// ====================================================================
+// ====================================================================
+// ====================================================================
+// ====================================================================
 
 const polyfillContractProductItems = (pre_contractProductItems: TquotationProductItemDto[]) => {
   const contractProductItems = pre_contractProductItems.map((item) => {
@@ -838,270 +753,124 @@ const polyfillContractProductItems = (pre_contractProductItems: TquotationProduc
 
   return contractProductItems;
 };
+// ==========================================================================
 
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-// ===========================================================================
-
-type TcomponentList = {
-  [key: string]: TquotationProductComponentDto | undefined;
-};
-
-const useControl_pdf = ({
-  //
-  contractNumber,
-  customerName,
-  contactPerson,
-  control_profile,
-  latestRecordArr,
+// MARK:TheWorksheetForm
+const TheWorksheetForm = ({
+  activeRecordData,
+  disabled,
+  activeWorksheetId,
+  activeWorksheetOriginalAccessories,
+  onConfirm,
 }: {
-  contractNumber: string;
-  customerName: string;
-  contactPerson: string;
-  control_profile: Tcontrol_profile;
-  latestRecordArr: TworksheetRecordDto[];
+  activeRecordData: TworksheetRecordDto_addition | undefined;
+  disabled: boolean;
+  activeWorksheetId: string | undefined | null;
+  activeWorksheetOriginalAccessories: TquotationProductAccessoryDto[];
+  onConfirm: (body: TupdateWorkSheet | undefined | null) => void;
 }) => {
-  const { assetDict, updatePath } = useGetAssetDict<string>();
+  const { parseDoorModelSort } = useGlobal_doorModel();
 
-  const { control_workSheetPDF_01, control_workSheetPDF_02 } = useMemo(() => {
-    const workSheetPDF_01_itemArr: Tcontrol_workSheetPDF_01['itemArr'] = [];
+  const doorModelSort = parseDoorModelSort(activeRecordData?.contractProductItems?.[0].doorModelName ?? 'undefined');
 
-    latestRecordArr.forEach((record) => {
-      if (!record.contractProductItems) {
-        return;
-      }
+  // -------------------------------------------------------------------------------------
 
-      const item = record.contractProductItems[0];
+  const {
+    state_specialDoor,
+    setState_specialDoor,
+    createBody,
+    invalidKeyArr,
+    readonlyKeyArr,
+    isValid: isValid_specialProd,
+  } = useSpecialDoor({
+    activeRecordData,
+    disabled,
+  });
 
-      const { motorVoltage, motorPhase, components, accessories } = item;
+  const worksheetExport = useWorksheet(
+    useShallow((state) => ({
+      worksheetId: state.worksheetId,
+      getUpdateWorkSheetItemArr: state.getUpdateWorkSheetItemArr,
+      getFloorLocations: state.getFloorLocations,
+      init: state.init,
+    }))
+  );
 
-      const componentList = (() => {
-        const list: TcomponentList = {};
-        components.forEach((component) => {
-          list[component.type] = component;
-        });
+  // -------------------------------------------------------------------------------------
 
-        return list;
-      })();
+  const theOnConfirm = () => {
+    const body = (() => {
+      if (doorModelSort === 'normal') {
+        const contractProductItems = worksheetExport.getUpdateWorkSheetItemArr();
+        const floorLocations = worksheetExport.getFloorLocations();
 
-      const acceNameArr = accessories.map((acce) => acce.name);
+        if (!contractProductItems || !floorLocations) {
+          console.error('contractProductItems', contractProductItems);
+          console.error('floorLocations', floorLocations);
 
-      const phaseVoltage = `${lookup_motorPhase[String(motorPhase) as '1' | '3'] ?? ''} ${motorVoltage}V`;
-
-      const material = (() => {
-        if (item.doorModelName !== 'SJ-305D') {
-          return componentList.slat?.material ?? '';
-        } else if (
-          componentList.slat?.material === 'SST管1.0T' ||
-          componentList.slat?.material === '內SST管外SST管1.0T'
-        ) {
-          return 'SST';
-        } else {
-          return componentList.slat?.material ?? '';
+          return null;
         }
-      })();
 
-      const {
-        headBox1: url_headBox1,
-        headBox2: url_headBox2,
-        headBoxTopCover: url_headBoxTopCover,
-        headBoxCover: url_headBoxCover,
-      } = getProductHeadBoxImgUrl({
-        isIntegratedHeadBox: !!item.isIntegratedHeadBox,
-        hasWheel: !!item.hasWheel,
-        headBoxTopCover: !!item.headBoxTopCover,
-        headBoxCover: item.headBoxCover,
-      });
+        return {
+          contractProductItems,
+          floorLocations,
+        };
+      } else {
+        if (isValid_specialProd === false) {
+          return null;
+        }
 
-      const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
-        itemName: item.itemName,
-        size: {
-          qty: String(record.contractProductItems.length ?? 0),
-          doorModelName: item.doorModelName,
-          fullWidth: String(item.fullWidth),
-          height: String(item.height),
-          WG: String(item.WG),
-          gapA: item.gapA ?? '0',
-          gapC: item.gapC ?? '0',
-          /**支版尺寸 boxB*boxD */
-          BD: `${item.boxB}*${item.boxD}`,
-          /**捲門全高 */
-          fullHeight: String(calcFullHeight({ height: Number(item.height), boxB: item.boxB })),
-          weightConversion: '', // 未知 // 重量換算 沒有在任一表單顯示
-        },
-        roller: {
-          diameter: item.diameter ? `${item.diameter}"` : '', // 要有 " 符號，代表吋
-          bearingInnerDiameter: item.bearingInnerDiameter ?? '',
-          bearingName: item.bearingName ?? '',
-          bearingHousingTotalLength: item.bearingHousingTotalLength ?? '',
-          bearingHousingSize: String(item.bearingHousingSize ?? ''),
-        },
-        headBox: {
-          angleIronQty: String(item.headBoxAngleIronQuantity ?? ''),
-          angleIronSize: String(
-            calcAngleIronSize({
-              WG: Number(item.WG),
-              gapA: Number(item.gapA),
-              gapC: Number(item.gapC),
-            })
-          ),
-          // form: sheet.headBoxForm_str,
-          form: item.isIntegratedHeadBox ? '一體式捲箱' : '捲箱 + 機箱',
-          surface: componentList.headBox?.materialSurface ?? '',
+        return createBody();
+      }
+    })();
 
-          headBoxCover: item.headBoxCover === 'full' ? '全遮' : item.headBoxCover === 'half' ? '半遮' : '無',
-          headBoxTopCover: item.headBoxTopCover ? '有' : '無',
-          hasWheel: item.hasWheel ? '有' : '無',
-          headBoxSizeX: item.headBoxSizeX,
-          headBoxSizeY: item.headBoxSizeY,
-          headBoxSizeM: item.headBoxSizeM,
-          headBoxSizeN: item.headBoxSizeN,
-          headBoxSizeO: item.headBoxSizeO,
-          headBoxSizeP: item.headBoxSizeP,
-          headBoxSizeQ: item.headBoxSizeQ,
-          // imgUrl1: url_headBox1.url,
-          // imgUrl2: url_headBox2.url,
-          // imgUrl3: url_headBoxTopCover.url,
-          // imgUrl4: url_headBoxCover.url,
-
-          svgString1: assetDict[url_headBox1.name || 'null'] || null,
-          svgString2: assetDict[url_headBox2.name || 'null'] || null,
-          svgString3: assetDict[url_headBoxTopCover.name || 'null'] || null,
-          svgString4: assetDict[url_headBoxCover.name || 'null'] || null,
-        },
-        doorPiece: {
-          material: material,
-          surface: componentList.slat?.materialSurface ?? '',
-          thickness: item.thickness ?? '',
-          slatLength: String(item.slatLength ?? '0'),
-          slatCount: String(item.slatCount ?? '0'),
-          antyTyphoonHook: item.isAntiTyphoon ? '有' : '無',
-        },
-        motor: {
-          vendor: item.motorVendor ?? '',
-          /**相數加電壓 */
-          phaseVoltage: phaseVoltage,
-          horsepower: item.horsepower,
-          direction: '', // 未知 // 在廠務部工作表 電動機方向
-        },
-        guideRail: {
-          form: item.isAntiTyphoon ? '防颱' : '一般',
-          material: componentList.guideRail?.material ?? '',
-          guideRailLength: String(item.guideRailLength ?? ''),
-          guideRailName: item.guideRail ?? '',
-          icon: item?.guideRail
-            ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${item?.guideRail}`
-            : undefined,
-          antiTyphoonHook: '-50', // 未知 // 在廠務部工作表
-          bendStraight: item.guideRailType ?? '',
-          surface: componentList.guideRail?.materialSurface ?? '',
-          dangerSvg: assetDict[item?.guideRail || 'null'] || undefined,
-        },
-        chainCog: {
-          sprocketWheelModel: item.sprocketWheelModel ?? '',
-          sprocketWheelTeethNumber: item.sprocketWheelTeethNumber ?? '',
-          bearingInnerDiameter: item.bearingInnerDiameter ?? '',
-          teethQuantity: '', // 未知 // 在廠務部工作表 齒數
-          centerDistance: '', // 未知 // 在廠務部工作表 中心距
-          eyesQuantity: '', // 未知 // 在廠務部工作表 目數
-        },
-        base: {
-          material: componentList.bottomBar?.material ?? '',
-          guideRailsOpening: String(item.guideRailsOpening ?? ''),
-          surface: componentList.bottomBar?.materialSurface ?? '', // 未知 在廠務部工作表
-        },
-        sidePlate: {
-          direction: item.sidePlateDirection ?? '',
-          bigSidePlate: `${item.boxB}*${item.boxD}`,
-          smallSidePlate: `${item.boxB}*${item.boxB}`,
-        },
-        memo: acceNameArr.length > 0 ? acceNameArr.join('、') : '',
-      };
-      workSheetPDF_01_itemArr.push(control_item);
-    });
-
-    const control_workSheetPDF_01: Tcontrol_workSheetPDF_01 = {
-      info: {
-        contractNumber: contractNumber,
-        projectName: control_profile.projectName.value,
-        projectAddress: control_profile.allAddress.value,
-        customerName: customerName,
-        contactPerson: contactPerson,
-        // 開單日
-        billingDate: getTaiwanDateStr(new Date().toISOString()) ?? '', // 未知
-        // 出貨日
-        shippingDate: '', // 未知
-      },
-      itemArr: workSheetPDF_01_itemArr,
-    };
-
-    let totalQty_PDF_02 = 0;
-    workSheetPDF_01_itemArr.forEach((item) => {
-      totalQty_PDF_02 = totalQty_PDF_02 + Number(item.size.qty);
-    });
-    const control_workSheetPDF_02: Tcontrol_workSheetPDF_02 = {
-      info: {
-        projectName: control_profile.projectName.value,
-        totalQty: String(totalQty_PDF_02),
-      },
-      itemArr: workSheetPDF_01_itemArr,
-    };
-
-    return {
-      control_workSheetPDF_01,
-      control_workSheetPDF_02,
-    };
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    //
-    contractNumber,
-    customerName,
-    contactPerson,
-    control_profile,
-    latestRecordArr,
-    assetDict,
-  ]);
+    onConfirm(body);
+  };
 
   useEffect(() => {
-    latestRecordArr.forEach((record) => {
-      if (!record.contractProductItems) {
-        return;
-      }
+    if (doorModelSort === 'normal' && disabled && activeRecordData) {
+      const contractProductItems = activeRecordData.contractProductItems;
 
-      const item = record.contractProductItems[0];
-
-      const { headBox1, headBox2, headBoxTopCover, headBoxCover } = getProductHeadBoxImgUrl({
-        isIntegratedHeadBox: !!item.isIntegratedHeadBox,
-        hasWheel: !!item.hasWheel,
-        headBoxTopCover: !!item.headBoxTopCover,
-        headBoxCover: item.headBoxCover,
+      worksheetExport.init({
+        worksheetId: activeWorksheetId!,
+        itemIdArr: contractProductItems?.map((item) => item.id) ?? [],
+        contractProductItem: contractProductItems?.[0] as TquotationProductItemDto_old,
+        contractProductItemArr: (contractProductItems ?? []) as TquotationProductItemDto_old[],
+        qty: contractProductItems?.length ?? 0,
+        originalAccessories: activeWorksheetOriginalAccessories,
       });
+    }
+  }, [activeRecordData, disabled, doorModelSort]);
 
-      const parameter: Parameters<typeof updatePath>[0] = {};
-      headBox1.url && headBox1.name && (parameter[headBox1.name] = headBox1.url);
-      headBox2.url && headBox2.name && (parameter[headBox2.name] = headBox2.url);
-      headBoxTopCover.url && headBoxTopCover.name && (parameter[headBoxTopCover.name] = headBoxTopCover.url);
-      headBoxCover.url && headBoxCover.name && (parameter[headBoxCover.name] = headBoxCover.url);
+  // -------------------------------------------------------------------------
 
-      item.guideRail && (parameter[item.guideRail] = `door-track/${item.guideRail}`);
+  if (doorModelSort === undefined) {
+    return null;
+  }
 
-      updatePath(parameter);
-    });
-  }, [latestRecordArr]);
+  if (doorModelSort === 'w13456') {
+    return (
+      <WorksheetForm_w13456
+        disabled={disabled}
+        state_specialDoor={state_specialDoor}
+        setState_specialDoor={setState_specialDoor}
+        onConfirm={theOnConfirm}
+        invalidKeyArr={invalidKeyArr}
+        readonlyKeyArr={readonlyKeyArr}
+      />
+    );
+  }
 
-  return {
-    control_workSheetPDF_01,
-    control_workSheetPDF_02,
-  };
+  if (doorModelSort === 'special') {
+    return (
+      <WorksheetForm_specialDoor
+        disabled={disabled}
+        state_specialDoor={state_specialDoor}
+        setState_specialDoor={setState_specialDoor}
+        onConfirm={theOnConfirm}
+      />
+    );
+  }
+
+  return <WorksheetForm reqPatchWorkSheet={theOnConfirm} disabled={disabled} />;
 };

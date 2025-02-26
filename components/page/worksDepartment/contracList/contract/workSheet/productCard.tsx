@@ -51,8 +51,8 @@ export default function ProductCard({ control }: { control: Tcontrol }) {
           <button
             className={classNames(
               scss.btn,
-              control.isSpecialDoor && 'invisible',
-              control.isSpecialDoor === undefined && 'invisible',
+              // control.isSpecialDoor && 'invisible',
+              // control.isSpecialDoor === undefined && 'invisible',
               !control.onSeparateClick && 'invisible'
             )}
             onClick={control.onSeparateClick}

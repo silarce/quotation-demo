@@ -38,9 +38,6 @@ import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
 import { Modal } from 'antd';
 
 import Quotation from 'pages/domestic/quotationList/quotation';
-import PurchaseRequisitionList from 'pages/factoryDepartment/purchaseRequisitionList';
-import PurchaseOrderList from 'pages/factoryDepartment/purchaseOrderList';
-import ProdReceiptList from 'pages/factoryDepartment/prodReceiptList';
 import SalarySettlement from 'pages/accounting/salarySettlement';
 import BonusPayout from 'pages/accounting/bonusPayout';
 import Worksheet from 'pages/worksDepartment/contractList/contract/workSheet';
@@ -1422,11 +1419,8 @@ export default function ReviewList() {
                   {/* 當頁面加載完成後顯示內容 */}
                   {isPageLoaded ? (
                     <div>
-                      {/* {reviewtype === '請購單' && <PurchaseRequisitionList key={theKey} />} */}
                       {reviewtype === '請購單' && <PRequisitionDetail key={theKey} />}
-                      {/* {reviewtype === '採購單' && <PurchaseOrderList key={theKey} />} */}
                       {reviewtype === '採購單' && <POrderDetail key={theKey} />}
-                      {/* {reviewtype === '進貨單' && <ProdReceiptList key={theKey} />} */}
                       {reviewtype === '進貨單' && <PReceiptDetail key={theKey} />}
                       {reviewtype === '報價單' && <Quotation key={theKey} />}
                       {reviewtype === '薪資單' && <SalarySettlement key={theKey} />}
