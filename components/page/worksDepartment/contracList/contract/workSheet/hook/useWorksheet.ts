@@ -1227,9 +1227,7 @@ const useWorksheet = create<Tworksheet>(
           })
         );
 
-        // if (!get().getIsSpecialProd()) {
-        //   get().update_availableComponents();
-        // }
+        get().update_availableComponents();
       }
     }, // init
     //
