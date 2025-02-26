@@ -78,6 +78,8 @@ export default function WareHouseList() {
     const urlRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const noteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
     const selectRefs = useRef<(HTMLSelectElement | null)[]>([]);
+    const whnameRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
+
 
     const searchTargetList = [
         {
@@ -185,7 +187,8 @@ export default function WareHouseList() {
                 id: item.id,
                 note: item.note,
                 employee_id: userInfo?.employee?.id,
-                type: item.type
+                type: item.type,
+                whname: item.whname
             };
 
             var inputModel = {
@@ -425,7 +428,28 @@ export default function WareHouseList() {
                                             <img src={icon_cancel2.src} alt="add" style={{ width: '30px', height: '20px' }} />
                                         </button>
                                     </span>
-                                    <span>{_item.whname}</span>
+                                    <span>
+                                        <input
+                                            ref={whnameRefs.current[index]}
+                                            style={{
+                                                backgroundColor: 'transparent',
+                                                borderBottom: editlist && editlistindex === index ? '1px solid gray' : 'none',
+                                                width: '100%'
+                                            }}
+                                            readOnly={!(editlist && editlistindex === index)}
+                                            type={editlist && editlistindex === index ? "text" : "text"}
+                                            value={editlist && editlistindex === index ? _item.whname : _item.whname}
+                                            onChange={(e) => {
+                                                const newData = [...data];
+                                                const newWhname = e.target.value;
+                                                newData[index] = {
+                                                    ...newData[index],
+                                                    whname: editlist ? newWhname : newWhname
+                                                };
+                                                setData(newData);
+                                            }}
+                                        />
+                                    </span>
                                     <span style={{ textAlign: 'left' }}>
                                         <select
                                             ref={(el) => (selectRefs.current[index] = el)} // 正確對應到 HTMLSelectElement
