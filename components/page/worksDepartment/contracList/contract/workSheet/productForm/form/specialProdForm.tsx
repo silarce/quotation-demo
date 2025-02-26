@@ -208,10 +208,19 @@ type Tstate_specialProd_basic = {
   materialSurface: string;
   isAntiTyphoon: boolean;
   closingType: string;
+  doorModelName_whole: () => string;
 };
 
 const Form_specialProd_basic = ({
-  state: {
+  state,
+  setState,
+  disabled,
+}: {
+  state: Tstate_specialProd_basic;
+  setState: TsetState<Tstate_specialProd_basic>;
+  disabled: boolean;
+}) => {
+  const {
     itemName,
     quoteType,
     doorModelName,
@@ -223,20 +232,20 @@ const Form_specialProd_basic = ({
     materialSurface,
     isAntiTyphoon,
     closingType,
-  },
-  setState,
-  disabled,
-}: {
-  state: Tstate_specialProd_basic;
-  setState: TsetState<Tstate_specialProd_basic>;
-  disabled: boolean;
-}) => {
+  } = state;
+
   return (
     <div>
       <div className={scss.grid}>
         <InputSel {...basicConfig} disabled={true} caption="報價別" node={quoteType} showBaseline="invisible" />
         <InputSel {...basicConfig} disabled={true} caption="項目" node={itemName} showBaseline="invisible" />
-        <InputSel {...basicConfig} caption="門型" disabled={true} node={doorModelName} showBaseline="invisible" />
+        <InputSel
+          {...basicConfig}
+          caption="門型"
+          disabled={true}
+          node={state.doorModelName_whole()}
+          showBaseline="invisible"
+        />
         <InputSel {...basicConfig} caption="數量" disabled={true} node={qty} showBaseline="invisible" />
 
         <InputSel

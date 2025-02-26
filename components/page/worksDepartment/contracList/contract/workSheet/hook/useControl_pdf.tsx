@@ -14,6 +14,7 @@ import type { TquotationProductItemDto, TworksheetRecordDto, TquotationProductCo
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
 import { lookup_motorPhase, getProductHeadBoxImgUrl } from 'config/product/lookup';
+import { doorModelDict } from 'js/utils/options/productOptions';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 // ==============================================================================
@@ -221,6 +222,7 @@ const createPdfItem = ({
     size: {
       qty: `${qty}`,
       doorModelName: item.doorModelName,
+      // doorModelName: doorModelDict[item.doorModelName]?.label ?? '', // 格子不夠大
       fullWidth: String(item.fullWidth),
       height: String(item.height),
       WG: String(item.WG),
@@ -399,7 +401,7 @@ const createPdfSpecialItem = ({
   const headBoxSvgString4 = assetDict[url_headBoxCover.name || 'null'] || null;
 
   const specialItem: Tcontrol_workSheetPDF_01['specialItemArr'][number] = {
-    doorModelName,
+    doorModelName: doorModelDict[doorModelName]?.label ?? doorModelName,
     itemName,
     qty,
     materialName,

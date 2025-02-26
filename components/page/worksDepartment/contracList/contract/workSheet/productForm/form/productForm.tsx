@@ -297,7 +297,8 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           disabled={true}
           showBaseline="invisible"
           caption="門型"
-          node={basicSpec.doorModelName}
+          // node={basicSpec.doorModelName}
+          node={basicSpec.doorModelName_whole()}
           // selectProps={{
           //   props: {
           //     options: isSpecialProd ? [] : getOptions_doorModelInfo(),

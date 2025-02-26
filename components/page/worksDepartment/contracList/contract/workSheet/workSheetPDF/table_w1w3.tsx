@@ -92,7 +92,7 @@ const config: Record<TconfigKeys, TconfigItem> = {
   doorModelName: {
     label: '門型',
     style: {
-      width: 120,
+      width: 150,
     },
   },
   itemName: {

@@ -52,6 +52,7 @@ type Tstate_specialProd_w1w3 = {
   motorVoltage: 110 | 380 | null;
   motorPhase: 1 | 3 | null;
   skeleton: string;
+  doorModelName_whole: () => string;
 };
 
 // ===============================================================================================================
@@ -124,19 +125,7 @@ const WorksheetForm_w1w3 = ({
 };
 
 const Form_specialProd_basic = ({
-  state: {
-    itemName,
-    quoteType,
-    doorModelName,
-    qty,
-    fullWidth,
-    height,
-    materialSurface,
-    closingType,
-    motorVoltage,
-    motorPhase,
-    skeleton,
-  },
+  state,
   setState,
   disabled,
   customLabel_surface,
@@ -150,6 +139,20 @@ const Form_specialProd_basic = ({
   isClosingTypeValid: boolean;
   isClosingTypeReadOnly: boolean;
 }) => {
+  const {
+    itemName,
+    quoteType,
+    doorModelName,
+    qty,
+    fullWidth,
+    height,
+    materialSurface,
+    closingType,
+    motorVoltage,
+    motorPhase,
+    skeleton,
+  } = state;
+
   const value_electricSupply = createElectricSupply({
     motorVoltage,
     motorPhase,
@@ -160,7 +163,13 @@ const Form_specialProd_basic = ({
       <div className={scss.grid}>
         <InputSel {...basicConfig} disabled={true} caption="報價別" node={quoteType} showBaseline="invisible" />
         <InputSel {...basicConfig} disabled={true} caption="項目" node={itemName} showBaseline="invisible" />
-        <InputSel {...basicConfig} caption="門型" disabled={true} node={doorModelName} showBaseline="invisible" />
+        <InputSel
+          {...basicConfig}
+          caption="門型"
+          disabled={true}
+          node={state.doorModelName_whole()}
+          showBaseline="invisible"
+        />
         <InputSel {...basicConfig} caption="數量" disabled={true} node={qty} showBaseline="invisible" />
 
         <InputSel

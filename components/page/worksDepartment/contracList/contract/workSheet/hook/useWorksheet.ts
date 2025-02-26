@@ -62,6 +62,7 @@ import {
   optionsCreator_quoteType,
   lookup_sprocketWheelModel_gearNumberAndChainQty,
   optionsCreator_componentMaterial_01,
+  doorModelDict,
 } from 'js/utils/options/productOptions';
 import { lookup_motorPhase } from 'config/product/lookup';
 
@@ -195,6 +196,7 @@ type Tworksheet = {
     isAntiTyphoon: boolean;
     area: string;
     volume: string; // 才數
+    doorModelName_whole: () => string;
 
     setBasicSpec_quoteType: (value: string) => void;
     setBasicSpec_doorModelName: (value: string) => void;
@@ -529,6 +531,11 @@ const useWorksheet = create<Tworksheet>(
       isAntiTyphoon: false,
       area: '',
       volume: '',
+      doorModelName_whole: () => {
+        const doorModelName = get().basicSpec.doorModelName;
+
+        return doorModelDict[doorModelName]?.label ?? doorModelName;
+      },
 
       setBasicSpec_quoteType: (value) => {
         get().setDoorModelInfo(undefined);

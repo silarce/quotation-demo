@@ -3,6 +3,8 @@ import { useState, useMemo, useEffect } from 'react';
 import type { TquotationProductItemDto, TupdateContractProductItemDto } from 'js/api/dtoTypes';
 import type { TworksheetRecordDto_addition, TupdateWorkSheet } from 'js/api/api_engineering';
 
+import { doorModelDict } from 'js/utils/options/productOptions';
+
 type Tstate_specialDoor = {
   // 項目名
   readonly itemName: string;
@@ -11,6 +13,8 @@ type Tstate_specialDoor = {
   // 門型
   readonly doorModelName: string;
   readonly qty: number;
+
+  doorModelName_whole: () => string;
 
   //
 
@@ -346,6 +350,16 @@ const useDefaultState_specialDoor = ({
       doorModelName: quotationProductItem.doorModelName,
       qty: qty,
 
+      doorModelName_whole() {
+        if (!this) {
+          console.error('這個函數使用了this，請正確操作');
+        }
+
+        const doorModelName = this.doorModelName;
+
+        return doorModelDict[doorModelName]?.label ?? doorModelName;
+      },
+
       fullWidth: `${quotationProductItem.fullWidth}`,
       WG: `${quotationProductItem.WG}`,
       height: `${quotationProductItem.height}`,
@@ -433,6 +447,11 @@ const emptyState_specialDoor = (): Tstate_specialDoor => {
     quoteType: '',
     doorModelName: '',
     qty: 0,
+    doorModelName_whole() {
+      const doorModelName = this.doorModelName;
+
+      return doorModelDict[doorModelName]?.label ?? doorModelName;
+    },
 
     fullWidth: '',
     WG: '',
