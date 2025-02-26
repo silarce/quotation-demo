@@ -69,9 +69,9 @@ const useDoorModel_prime = create<TdoorModelList>()(
           isSpecial = false;
         }
 
-        if (doorModelName === 'W2') {
-          isSpecial = true;
-        }
+        // if (doorModelName === 'W2') {
+        //   isSpecial = true;
+        // }
 
         return isSpecial;
       };
