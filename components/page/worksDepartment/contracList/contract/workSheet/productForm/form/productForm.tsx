@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Checkbox, Radio } from 'antd';
 
 // gear
-import InputSel, { TinputSelProps, TinputProps, TselectProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps, TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import {
   Container,
@@ -16,9 +16,6 @@ import {
 
 // css
 import scss from './productForm.module.scss';
-
-// type
-import { TdoorModelInfoDto } from 'js/api/dtoTypes';
 
 // zustand
 import {
@@ -55,8 +52,6 @@ import {
   getHeadBoxSvgUrl3,
   getHeadBoxSvgUrl4,
 } from './shared';
-
-const options_doorType = optionsCreator_quoteType();
 
 // ==============================================================================
 
@@ -1157,8 +1152,9 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
 // =====================================================================
 // MARK:slat
 function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
-  const { slat, getOptions_material } = useWorksheet(
+  const { doorModelName, slat, getOptions_material } = useWorksheet(
     useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
       slat: state.slat,
       getOptions_material: state.getOptions_material,
       generalSpec: state.generalSpec, // 用於更新getOptions
@@ -1184,20 +1180,22 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         />
-        <InputSel
-          {...basicConfig}
-          caption="表面"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              value: { value: slat.surface, label: slat.surface },
-              options: optionsCreator_surface(),
-              onChange: (option) => {
-                slat.setSlat_str({ key: 'surface', value: option?.value ?? '' });
+        {doorModelName !== 'W2' && (
+          <InputSel
+            {...basicConfig}
+            caption="表面"
+            disabled={disabled}
+            selectProps={{
+              props: {
+                value: { value: slat.surface, label: slat.surface },
+                options: optionsCreator_surface(),
+                onChange: (option) => {
+                  slat.setSlat_str({ key: 'surface', value: option?.value ?? '' });
+                },
               },
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -1207,7 +1205,7 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
 // MARK:guideRail
 function Form_product_guideRail({ disabled }: { disabled: boolean | undefined }) {
   const {
-    //
+    doorModelName,
     guideRail,
     hasSilencingStrip,
     getOptions_material_stable,
@@ -1215,6 +1213,7 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
     getOptions_guideRail,
   } = useWorksheet(
     useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
       guideRail: state.guideRail,
       hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
       getOptions_material_stable: state.getOptions_material_stable,
@@ -1290,23 +1289,25 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           }}
         />
 
-        <InputSel
-          {...basicConfig}
-          caption="表面"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              options: optionsCreator_surface(),
-              value: {
-                value: guideRail.surface,
-                label: guideRail.surface,
+        {doorModelName !== 'W2' && (
+          <InputSel
+            {...basicConfig}
+            caption="表面"
+            disabled={disabled}
+            selectProps={{
+              props: {
+                options: optionsCreator_surface(),
+                value: {
+                  value: guideRail.surface,
+                  label: guideRail.surface,
+                },
+                onChange: (option) => {
+                  guideRail.setGuideRail_str({ key: 'surface', value: option?.value ?? '' });
+                },
               },
-              onChange: (option) => {
-                guideRail.setGuideRail_str({ key: 'surface', value: option?.value ?? '' });
-              },
-            },
-          }}
-        />
+            }}
+          />
+        )}
 
         <InputSel
           //
@@ -1323,8 +1324,6 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           selectProps={{
             props: {
               options: optionsCreator_bendStright(),
-              // isSearchable: isSpecialProd,
-
               value: {
                 value: guideRail.guideRailType,
                 label: guideRail.guideRailType,
@@ -1332,53 +1331,50 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
               onChange: (option) => {
                 guideRail.setGuideRail_str({ key: 'guideRailType', value: option?.value ?? '' });
               },
-              // onInputChange: (value, action) => {
-              //   if (action.action === 'input-change') {
-              //     guideRail.setGuideRail_str({ key: 'guideRailType', value });
-              //   }
-              // },
             },
           }}
         />
 
         <div>{/* 這個div是為了將下一個InputSel推到下一行 */}</div>
-        <InputSel
-          {...basicConfig}
-          caption="形式"
-          disabled={disabled}
-          selectProps={{
-            withIcon: true,
-            props: {
-              className: scss.inputSelWithIcon,
+        {doorModelName !== 'W2' && (
+          <InputSel
+            {...basicConfig}
+            caption="形式"
+            disabled={disabled}
+            selectProps={{
+              withIcon: true,
+              props: {
+                className: scss.inputSelWithIcon,
 
-              options: getOptions_guideRail(),
-              value: {
-                value: guideRail.guideRail,
-                // label: guideRail.guideRail,
-                label: '',
-                icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail.guideRail}`,
+                options: getOptions_guideRail(),
+                value: {
+                  value: guideRail.guideRail,
+                  // label: guideRail.guideRail,
+                  label: '',
+                  icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail.guideRail}`,
+                },
+                onChange: (option) => {
+                  const value = option?.value ?? '';
+                  const hasSilencingStrip = option?.hasSilencingStrip as boolean;
+                  let thickness = (option?.thickness ?? '') as string;
+                  const width = (option?.width ?? 0) as number;
+                  const opening = option?.opening as string;
+
+                  thickness = thickness.replace('t', '');
+
+                  guideRail.setGuideRail({
+                    //
+                    guideRail: value,
+                    opening,
+                    thickness,
+                    width,
+                    hasSilencingStrip,
+                  });
+                },
               },
-              onChange: (option) => {
-                const value = option?.value ?? '';
-                const hasSilencingStrip = option?.hasSilencingStrip as boolean;
-                let thickness = (option?.thickness ?? '') as string;
-                const width = (option?.width ?? 0) as number;
-                const opening = option?.opening as string;
-
-                thickness = thickness.replace('t', '');
-
-                guideRail.setGuideRail({
-                  //
-                  guideRail: value,
-                  opening,
-                  thickness,
-                  width,
-                  hasSilencingStrip,
-                });
-              },
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -1387,8 +1383,9 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
 // =====================================================================
 // MARK:bottomBar
 function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined }) {
-  const { bottomBar, getOptions_material_stable, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
+  const { doorModelName, bottomBar, getOptions_material_stable, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
     useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
       bottomBar: state.bottomBar,
       getOptions_material_stable: state.getOptions_material_stable,
       getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
@@ -1417,47 +1414,67 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
             },
           }}
         />
-        <InputSel
-          {...basicConfig}
-          caption="角鐵材質"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              options: options_angleIron,
 
-              value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
-              onChange: (option) => {
-                bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
-              },
-              onInputChange: (value, action) => {
-                if (action.action === 'input-change') {
-                  bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value });
-                }
-              },
-            },
-          }}
-        />
+        {doorModelName !== 'W2' && (
+          <>
+            <InputSel
+              {...basicConfig}
+              caption="角鐵材質"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  options: options_angleIron,
 
-        <InputSel
-          {...basicConfig}
-          caption="底座板材質"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              options: options_plate,
+                  value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
+                  onChange: (option) => {
+                    bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
+                  },
+                  onInputChange: (value, action) => {
+                    if (action.action === 'input-change') {
+                      bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value });
+                    }
+                  },
+                },
+              }}
+            />
 
-              value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
-              onChange: (option) => {
-                bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
-              },
-              onInputChange: (value, action) => {
-                if (action.action === 'input-change') {
-                  bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value });
-                }
-              },
-            },
-          }}
-        />
+            <InputSel
+              {...basicConfig}
+              caption="底座板材質"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  options: options_plate,
+
+                  value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
+                  onChange: (option) => {
+                    bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
+                  },
+                  onInputChange: (value, action) => {
+                    if (action.action === 'input-change') {
+                      bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value });
+                    }
+                  },
+                },
+              }}
+            />
+            <InputSel
+              {...basicConfig}
+              caption="表面"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  value: { value: bottomBar.surface, label: bottomBar.surface },
+                  options: optionsCreator_surface(),
+                  onChange: (option) => {
+                    bottomBar.setBottomBar_str({ key: 'surface', value: option?.value ?? '' });
+                  },
+                },
+              }}
+            />
+          </>
+        )}
+
         <InputSel
           {...basicConfig}
           caption="類型"
@@ -1474,20 +1491,6 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
                 if (action.action === 'input-change') {
                   bottomBar.setBottomBar_str({ key: 'bottomBar', value });
                 }
-              },
-            },
-          }}
-        />
-        <InputSel
-          {...basicConfig}
-          caption="表面"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              value: { value: bottomBar.surface, label: bottomBar.surface },
-              options: optionsCreator_surface(),
-              onChange: (option) => {
-                bottomBar.setBottomBar_str({ key: 'surface', value: option?.value ?? '' });
               },
             },
           }}
