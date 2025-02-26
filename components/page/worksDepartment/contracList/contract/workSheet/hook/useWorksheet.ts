@@ -465,11 +465,11 @@ const useWorksheet = create<Tworksheet>(
     shouldCalcData: false,
     shouldCalcData2: false,
 
-    getIsSpecialProd: () => {
-      const isSpecial = !options_doorType.some((option) => option.value === get().basicSpec.quoteType);
+    // getIsSpecialProd: () => {
+    //   const isSpecial = !options_doorType.some((option) => option.value === get().basicSpec.quoteType);
 
-      return isSpecial;
-    },
+    //   return isSpecial;
+    // },
 
     //
     calcTarget: 'fullWidth',
@@ -598,10 +598,10 @@ const useWorksheet = create<Tworksheet>(
       },
       setBasicSpec_fullWidth: (str) => {
         set(
-          produce((state) => {
+          produce<Tworksheet>((state) => {
             state.basicSpec.fullWidth = str;
 
-            if (str && !state.getIsSpecialProd()) {
+            if (str) {
               state.basicSpec.WG = '';
             }
 
@@ -615,7 +615,7 @@ const useWorksheet = create<Tworksheet>(
           produce((state) => {
             state.basicSpec.WG = str;
 
-            if (str && !state.getIsSpecialProd()) {
+            if (str) {
               state.basicSpec.fullWidth = '';
             }
 
