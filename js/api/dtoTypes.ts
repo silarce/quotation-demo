@@ -1753,6 +1753,10 @@ export type TquotationProductItemDto = {
   headBoxSizeP: `${number}` | null;
   // @ApiProperty({ nullable: true, description: '捲箱sizeQ' })
   headBoxSizeQ: `${number}` | null;
+  // 骨架
+  skeleton: string | null;
+  // 上遮
+  upperMask: boolean | null;
 };
 
 type TquotationContentDto_copy = {
@@ -3883,6 +3887,11 @@ export type TupdateContractProductItemDto = {
   // @IsNullable()
   // @IsOptional()
   hasWheel?: boolean | null;
+
+  // 骨架
+  skeleton: string | null;
+  // 上遮
+  upperMask: boolean | null;
 
   // @ApiProperty({ type: QuotationProductDto, description: '主產品' })
   // product: QuotationProductDto;

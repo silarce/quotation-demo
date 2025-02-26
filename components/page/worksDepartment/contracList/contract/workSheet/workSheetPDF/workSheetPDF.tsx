@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment } from 'react';
+import React, { useRef, Fragment } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import html2canvas from 'html2canvas';
@@ -6,6 +6,8 @@ import jsPDF from 'jspdf';
 
 // component
 import Miku_frontend_table01, { Tcontrol_table01 } from 'components/otherProject/miku-frontend/Table01';
+import Table_specialDoor, { Tprops_table_specialDoor } from './table_specialDoor';
+import Table_w1w3, { Tprops_table_w1w3 } from './table_w1w3';
 
 // gear
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
@@ -15,9 +17,6 @@ import Modal from 'antd/lib/modal/Modal';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-
-// api
-import { apiGetAssets } from 'js/api/api_product';
 
 import scss from './workSheetPDF.module.scss';
 
@@ -36,6 +35,8 @@ type Tcontrol = {
     shippingDate: string;
   };
   itemArr: Tcontrol_table01[];
+  specialItemArr: Tprops_table_specialDoor[];
+  w1w3ItemArr: Tprops_table_w1w3[];
 };
 
 export type { Tcontrol as Tcontrol_workSheetPDF_01 };
@@ -53,8 +54,22 @@ export default function WorkSheetPDF({
   // ---------------------------------------------------------------------
 
   const itemArr = control.itemArr;
+  const specialItemArr = control.specialItemArr;
+  const w1w3ItemArr = control.w1w3ItemArr;
 
   const chunkedList = _.chunk(itemArr, 3);
+  const chunkedList_specialItem = _.chunk(specialItemArr, 2);
+  const chunkedList_w1w3Item = _.chunk(w1w3ItemArr, 6);
+
+  const pageCount = chunkedList.length + chunkedList_specialItem.length + chunkedList_w1w3Item.length;
+
+  const page_specialItem = (indexNumber: number) => {
+    return indexNumber + chunkedList.length;
+  };
+
+  const page_w1w3Item = (indexNumber: number) => {
+    return indexNumber + chunkedList.length + chunkedList_specialItem.length;
+  };
 
   // ---------------------------------------------------------------------
 
@@ -118,42 +133,6 @@ export default function WorkSheetPDF({
   };
 
   // ---------------------------------------------------------------------
-
-  // const [svgList, setSvgList] = useState<{ [key: string]: string | undefined | null }>({});
-
-  // const getSvg = async ({ fileName }: { fileName: string }) => {
-  //   if (svgList[fileName] === null) {
-  //     return;
-  //   }
-
-  //   if (svgList[fileName] === 'isLoading') {
-  //     return;
-  //   }
-
-  //   if (!!svgList[fileName]) {
-  //     return;
-  //   }
-
-  //   try {
-  //     svgList[fileName] = 'isLoading';
-
-  //     const svg = await apiGetAssets(fileName);
-
-  //     if (svg) {
-  //       setSvgList((list) => ({
-  //         ...list,
-  //         [fileName]: svg,
-  //       }));
-  //     }
-  //   } catch (error) {
-  //     setSvgList((list) => ({
-  //       ...list,
-  //       [fileName]: null,
-  //     }));
-  //   }
-  // };
-
-  // ---------------------------------------------------------------------
   return (
     <Modal
       //
@@ -182,39 +161,11 @@ export default function WorkSheetPDF({
               id="report"
             >
               <div>
-                <div className="text-2xl text-center pt-5 mb-1 relative">
-                  <span>工作表</span>
-                  <span className="absolute right-0">
-                    {index + 1} / {chunkedList.length} 頁
-                  </span>
-                </div>
-
-                <table className={classNames('w-full mb-1', scss.infoTable)}>
-                  <tbody>
-                    <tr>
-                      <td>合約編號: {control.info.contractNumber}</td>
-                      <td>客戶名稱: {control.info.customerName}</td>
-                      <td>開單日期: {control.info.billingDate}</td>
-                    </tr>
-                    <tr>
-                      <td>工程名稱: {control.info.projectName}</td>
-                      <td>聯絡人: {control.info.contactPerson}</td>
-                      <td>出貨日期: {control.info.shippingDate}</td>
-                    </tr>
-                    <tr>
-                      <td colSpan={3}>{`工程地點: ${control.info.projectAddress}`}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <Title page={index + 1} pageCount={pageCount} />
+                <Info {...control.info} />
 
                 <div className={scss.itemGrid}>
                   {itemArr.map((control_item, index) => {
-                    // const guideRailName = control_item.guideRail.guideRailName;
-                    // getSvg({ fileName: guideRailName });
-
-                    // const svgString = svgList[`${guideRailName}`] ?? '';
-                    // control_item.guideRail.dangerSvg = svgString;
-
                     return (
                       <Fragment key={index}>
                         <Miku_frontend_table01 control={control_item} />
@@ -227,8 +178,103 @@ export default function WorkSheetPDF({
           </div>
         );
       })}
+      {/*  */}
+      {chunkedList_specialItem.map((specialItemArr, index) => {
+        return (
+          <div key={index}>
+            {index !== 0 && <hr className=" border-black" />}
+
+            <div
+              //
+              ref={(ele) => (refPdf.current[index] = ele)}
+              className={scss.container}
+              id="report"
+            >
+              <div>
+                <Title page={page_specialItem(index + 1)} pageCount={pageCount} />
+                <Info {...control.info} />
+
+                {specialItemArr.map((specialItem, index) => {
+                  return <Table_specialDoor key={index} {...specialItem} />;
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+      {chunkedList_w1w3Item.map((w1w3Item, index) => {
+        return (
+          <div key={index}>
+            {index !== 0 && <hr className=" border-black" />}
+
+            <div
+              //
+              ref={(ele) => (refPdf.current[index] = ele)}
+              className={scss.container}
+              id="report"
+            >
+              <div>
+                <Title page={page_w1w3Item(index + 1)} pageCount={pageCount} />
+                <Info {...control.info} />
+                <Table_w1w3 key={index} itemArr={w1w3Item} />
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
+      {/*  */}
     </Modal>
   );
 }
 
 // =====================================================================
+
+const Title = ({ page, pageCount }: { page: React.ReactNode; pageCount: React.ReactNode }) => {
+  return (
+    <div className="text-2xl text-center pt-5 mb-1 relative">
+      <span>工作表</span>
+      <span className="absolute right-0">
+        {page} / {pageCount} 頁
+      </span>
+    </div>
+  );
+};
+
+const Info = ({
+  contractNumber,
+  customerName,
+  billingDate,
+  projectName,
+  contactPerson,
+  shippingDate,
+  projectAddress,
+}: {
+  contractNumber: React.ReactNode;
+  customerName: React.ReactNode;
+  billingDate: React.ReactNode;
+  projectName: React.ReactNode;
+  contactPerson: React.ReactNode;
+  shippingDate: React.ReactNode;
+  projectAddress: React.ReactNode;
+}) => {
+  return (
+    <table className={classNames('w-full mb-1', scss.infoTable)}>
+      <tbody>
+        <tr>
+          <td>合約編號: {contractNumber}</td>
+          <td>客戶名稱: {customerName}</td>
+          <td>開單日期: {billingDate}</td>
+        </tr>
+        <tr>
+          <td>工程名稱: {projectName}</td>
+          <td>聯絡人: {contactPerson}</td>
+          <td>出貨日期: {shippingDate}</td>
+        </tr>
+        <tr>
+          <td colSpan={3}>{`工程地點: ${projectAddress}`}</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+};
