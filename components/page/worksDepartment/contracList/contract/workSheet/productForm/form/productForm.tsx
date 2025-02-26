@@ -5,51 +5,144 @@ import Image from 'next/image';
 import { Checkbox, Radio } from 'antd';
 
 // gear
-import InputSel, { TinputSelProps, TinputProps, TselectProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps, TinputProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import {
+  Container,
+  Section,
+  MainFormWrapper,
+  FormGrid,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/productFormLayout';
 
 // css
 import scss from './productForm.module.scss';
 
-// type
-import { TdoorModelInfoDto } from 'js/api/dtoTypes';
-
 // zustand
-import { useWorksheet, Tworksheet } from 'components/page/worksDepartment/worksheet/productForm/useWorksheet';
+import {
+  useWorksheet,
+  Tworksheet,
+} from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useWorksheet';
 import { useShallow } from 'zustand/react/shallow';
 
 import {
-  // optionsCreator_motorSupply,
-  // optionsCreator_horsePower,
   optionsCreator_motorSupportStand,
   optionsCreator_motorLockBox,
-  optionsCreator_chainType,
   optionsCreator_direction,
   optionsCreator_isIntegratedHeadBox,
   optionsCreator_surface,
   optionsCreator_front,
-  // optionsCreator_rollerSpec,
-  // optionsCreator_boolean,
   optionsCreator_bottomBar_2,
   optionsCreator_bendStright,
   optionsCreator_quoteType,
   optionsCreator_boolean,
   optionsCreator_sprocketWheelModel,
   optionsCreator_bearingName,
-
-  //
 } from 'js/utils/options/productOptions';
 
 // utils
 import { findOption } from 'js/utils/options/findOption';
 
-import img_husky from 'public/image/test/husky.svg';
+import {
+  options_boolean,
+  options_前遮,
+  basicConfig,
+  inputNumberProps,
+  getHeadBoxSvgUrl1,
+  getHeadBoxSvgUrl2,
+  getHeadBoxSvgUrl3,
+  getHeadBoxSvgUrl4,
+} from './shared';
 
-// =====================================================================
+// ==============================================================================
 
-const options_doorType = optionsCreator_quoteType();
+function WorksheetForm({
+  reqPatchWorkSheet = () => {},
+  disabled = false,
+  uploadButton = true,
+}: {
+  reqPatchWorkSheet?: () => void;
+  disabled?: boolean;
+  uploadButton?: boolean;
+}) {
+  const { doorModelName, calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
+    useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
+      shouldCalcData: state.shouldCalcData,
+      shouldCalcData2: state.shouldCalcData2,
+      calcData_2: state.calcData_2,
+    }))
+  );
 
-// =====================================================================
+  const jsx = (() => {
+    if (doorModelName === 'W2') {
+      return (
+        <>
+          <Form_product_slat disabled={disabled} />
+          <Form_product_guideRail disabled={disabled} />
+          <Form_product_bottomBar disabled={disabled} />
+          <Form_product_other disabled={disabled} />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Form_product_motor disabled={disabled} />
+        <Form_product_headBox disabled={disabled} />
+        <Form_product_roller disabled={disabled} />
+        <Form_product_slat disabled={disabled} />
+        <Form_product_guideRail disabled={disabled} />
+        <Form_product_bottomBar disabled={disabled} />
+        <Form_product_sidePlate disabled={disabled} />
+        <Form_product_other disabled={disabled} />
+      </>
+    );
+  })();
+
+  return (
+    <Container>
+      <div>
+        <Section>位置與編號：</Section>
+        <Form_product_location disabled={disabled} />
+      </div>
+      <div>
+        <Section>設定產品基本規格：</Section>
+        <Form_product_basic disabled={disabled} />
+      </div>
+      <MainFormWrapper>
+        <Section>設定產品細部規格：</Section>
+        <FormGrid>
+          <Form_product_ABCD disabled={disabled} />
+          {jsx}
+        </FormGrid>
+        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
+      </MainFormWrapper>
+      <div>
+        <Form_product_accessories disabled={disabled} />
+      </div>
+      <div className={classNames('relative', disabled && 'hidden')}>
+        <MyButton_v2 px="px32" className={classNames('block m-auto')} onClick={calcData_2}>
+          取得剩餘資料
+        </MyButton_v2>
+        <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
+      </div>
+      <div className="relative">
+        <WorksheetTable />
+        {shouldCalcData2 && <div className={scss.cover}></div>}
+      </div>
+      {uploadButton && (
+        <div className={classNames('relative', disabled && 'hidden')}>
+          <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
+            確認上傳
+          </MyButton_v2>
+          <div className={classNames(scss.cover, !shouldCalcData2 && 'hidden')}></div>
+        </div>
+      )}
+    </Container>
+  );
+}
+
+// ==============================================================================
 
 // MARK: location
 function Form_product_location({ disabled }: { disabled: boolean | undefined }) {
@@ -158,7 +251,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
     calcData,
     isAntiTyphoonLock,
     getOptions_doorModelInfo,
-    isSpecialProd,
+    // isSpecialProd,
     calcTarget,
     setCalcTarget,
   } = useWorksheet(
@@ -170,7 +263,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       calcData: state.calcData,
       isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
       getOptions_doorModelInfo: state.getOptions_doorModelInfo,
-      isSpecialProd: state.getIsSpecialProd(),
+      // isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
       calcTarget: state.calcTarget,
@@ -185,18 +278,20 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       <div className={scss.grid}>
         <InputSel
           {...basicConfig}
-          disabled={disabled}
+          disabled={true}
+          showBaseline="invisible"
           caption="報價別"
-          selectProps={{
-            props: {
-              value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
-              options: options_doorType,
-              isSearchable: true,
-              onChange: (options) => {
-                basicSpec.setBasicSpec_quoteType(options?.value ?? '');
-              },
-            },
-          }}
+          node={basicSpec.quoteType}
+          // selectProps={{
+          //   props: {
+          //     value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
+          //     options: options_doorType,
+          //     isSearchable: true,
+          //     onChange: (options) => {
+          //       basicSpec.setBasicSpec_quoteType(options?.value ?? '');
+          //     },
+          //   },
+          // }}
         />
         <div></div>
         <InputSel
@@ -214,31 +309,34 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
         />
         <InputSel
           {...basicConfig}
+          disabled={true}
+          showBaseline="invisible"
           caption="門型"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              options: isSpecialProd ? [] : getOptions_doorModelInfo(),
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
+          // node={basicSpec.doorModelName}
+          node={basicSpec.doorModelName_whole()}
+          // selectProps={{
+          //   props: {
+          //     options: isSpecialProd ? [] : getOptions_doorModelInfo(),
+          //     isSearchable: isSpecialProd,
+          //     menuIsOpen: isSpecialProd ? false : undefined,
 
-              value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
-              onChange: (option) => {
-                if (isSpecialProd) {
-                  // setDoorModelInfo(undefined);
-                  basicSpec.setBasicSpec_doorModelName(option?.value ?? '');
-                } else {
-                  const obj = option?.obj as TdoorModelInfoDto;
-                  setDoorModelInfo(obj);
-                }
-              },
-              onInputChange: (value, action) => {
-                if (action.action === 'input-change') {
-                  basicSpec.setBasicSpec_doorModelName(value);
-                }
-              },
-            },
-          }}
+          //     value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
+          //     onChange: (option) => {
+          //       if (isSpecialProd) {
+          //         // setDoorModelInfo(undefined);
+          //         basicSpec.setBasicSpec_doorModelName(option?.value ?? '');
+          //       } else {
+          //         const obj = option?.obj as TdoorModelInfoDto;
+          //         setDoorModelInfo(obj);
+          //       }
+          //     },
+          //     onInputChange: (value, action) => {
+          //       if (action.action === 'input-change') {
+          //         basicSpec.setBasicSpec_doorModelName(value);
+          //       }
+          //     },
+          //   },
+          // }}
         />
         <InputSel
           {...basicConfig}
@@ -289,9 +387,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
-              options: isSpecialProd ? [] : getOptions_material(),
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
+              options: getOptions_material(),
               value: { value: basicSpec.material, label: basicSpec.material },
               onChange: (option) => {
                 basicSpec.setBasicSpec_material(option?.value ?? '');
@@ -447,18 +543,16 @@ function Form_product_ABCD({ disabled }: { disabled: boolean | undefined }) {
 // MARK: motor
 
 function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
-  const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply, isSpecialProd } =
-    useWorksheet(
-      useShallow((state) => ({
-        motor: state.motor,
-        getOptions_horsepower: state.getOptions_horsepower,
-        getOptions_motorVendor: state.getOptions_motorVendor,
-        getOptions_electricSupply: state.getOptions_electricSupply,
-        isSpecialProd: state.getIsSpecialProd(),
-        generalSpec: state.generalSpec, // 用於更新getOptions
-        avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-      }))
-    );
+  const { motor, getOptions_horsepower, getOptions_motorVendor, getOptions_electricSupply } = useWorksheet(
+    useShallow((state) => ({
+      motor: state.motor,
+      getOptions_horsepower: state.getOptions_horsepower,
+      getOptions_motorVendor: state.getOptions_motorVendor,
+      getOptions_electricSupply: state.getOptions_electricSupply,
+      generalSpec: state.generalSpec, // 用於更新getOptions
+      avalibleComponent: state.avalibleComponents, // 用於更新getOptions
+    }))
+  );
 
   return (
     <div>
@@ -490,11 +584,7 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
           disabled={disabled}
           selectProps={{
             props: {
-              // menuIsOpen: true,
-
               options: getOptions_horsepower(),
-              isSearchable: isSpecialProd,
-
               value: { value: motor.horsepower, label: motor.horsepower },
               onChange: (option) => {
                 motor.setMotor_str({ key: 'horsepower', value: option?.value ?? '' });
@@ -514,9 +604,6 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
           selectProps={{
             props: {
               options: getOptions_motorVendor(),
-              isSearchable: isSpecialProd,
-              // menuIsOpen: false,
-
               value: { value: motor.vendor, label: motor.vendor },
               onChange: (option) => {
                 motor.setMotor_str({ key: 'vendor', value: option?.value ?? '' });
@@ -568,7 +655,6 @@ function Form_product_motor({ disabled }: { disabled: boolean | undefined }) {
             props: {
               options: optionsCreator_motorLockBox(),
               value: { value: motor.motorLockBox, label: motor.motorLockBox },
-              isSearchable: isSpecialProd,
               onChange: (option) => {
                 motor.setMotor_str({ key: 'motorLockBox', value: option?.value ?? '' });
               },
@@ -606,7 +692,6 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     getOptions_material_stable,
     isIntegratedHeadBox,
     getOptions_headBoxThickness,
-    isSpecialProd,
 
     headBoxCover,
     headBoxTopCover,
@@ -622,7 +707,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     setBoxTopCover,
     setHasWheel,
     setBoxXYMNOPQ,
-    getHeadBoxImage,
+    // getHeadBoxImage,
 
     boxB,
     boxD,
@@ -632,7 +717,6 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
       isIntegratedHeadBox: state.headBox.getIsIntegratedHeadBox(),
       getOptions_material_stable: state.getOptions_material_stable,
       getOptions_headBoxThickness: state.getOptions_headBoxThickness,
-      isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       avalibleComponent: state.avalibleComponents, // 用於更新getOptions
 
@@ -650,14 +734,23 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
       setBoxTopCover: state.headBox.setBoxTopCover,
       setHasWheel: state.headBox.setHasWheel,
       setBoxXYMNOPQ: state.headBox.setBoxXYMNOPQ,
-      getHeadBoxImage: state.headBox.getHeadBoxImage,
+      // getHeadBoxImage: state.headBox.getHeadBoxImage,
 
       boxB: state.ABCD.boxB,
       boxD: state.ABCD.boxD,
     }))
   );
 
-  const { url1, url2, url3, url4 } = getHeadBoxImage();
+  const url1 = getHeadBoxSvgUrl1({
+    isIntegratedHeadBox: isIntegratedHeadBox === 'true',
+    hasWheel: hasWheel === 'true',
+  });
+  const url2 = getHeadBoxSvgUrl2({
+    isIntegratedHeadBox: isIntegratedHeadBox === 'true',
+    hasWheel: hasWheel === 'true',
+  });
+  const url3 = getHeadBoxSvgUrl3({ headBoxTopCover: headBoxTopCover === 'true' });
+  const url4 = getHeadBoxSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
 
   return (
     <div>
@@ -667,7 +760,6 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           {...basicConfig}
           caption="材質"
           disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               options: getOptions_material_stable(),
@@ -685,8 +777,6 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           selectProps={{
             props: {
               options: getOptions_headBoxThickness(),
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
 
               value: { value: headBox.headBoxThickness, label: headBox.headBoxThickness + 'T' },
               onChange: (options) => {
@@ -710,7 +800,6 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           {...basicConfig}
           caption="表面"
           disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: headBox.surface, label: headBox.surface },
@@ -728,7 +817,6 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
           selectProps={{
             props: {
               options: optionsCreator_front(),
-              isSearchable: isSpecialProd,
 
               value: { value: headBox.headBoxFront, label: headBox.headBoxFront },
               onChange: (options) => {
@@ -1007,11 +1095,11 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
 // =====================================================================
 // MARK:roller
 function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
-  const { roller, getOptions_diameter, diameter, isSpecialProd } = useWorksheet(
+  const { roller, getOptions_diameter, diameter } = useWorksheet(
     useShallow((state) => ({
       roller: state.roller,
       getOptions_diameter: state.getOptions_diameter,
-      isSpecialProd: state.getIsSpecialProd(),
+
       avalibleComponent: state.avalibleComponents, // 用於更新getOptions
       diameter: state.roller.getDiameter(),
     }))
@@ -1028,8 +1116,6 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
           selectProps={{
             props: {
               options: getOptions_diameter(),
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
 
               value: { value: diameter, label: diameter },
               onChange: (option) => {
@@ -1066,11 +1152,11 @@ function Form_product_roller({ disabled }: { disabled: boolean | undefined }) {
 // =====================================================================
 // MARK:slat
 function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
-  const { slat, getOptions_material, isSpecialProd } = useWorksheet(
+  const { doorModelName, slat, getOptions_material } = useWorksheet(
     useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
       slat: state.slat,
       getOptions_material: state.getOptions_material,
-      isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -1084,7 +1170,6 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
           {...basicConfig}
           caption="材質"
           disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: slat.material, label: slat.material },
@@ -1095,21 +1180,22 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
             },
           }}
         />
-        <InputSel
-          {...basicConfig}
-          caption="表面"
-          disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
-          selectProps={{
-            props: {
-              value: { value: slat.surface, label: slat.surface },
-              options: optionsCreator_surface(),
-              onChange: (option) => {
-                slat.setSlat_str({ key: 'surface', value: option?.value ?? '' });
+        {doorModelName !== 'W2' && (
+          <InputSel
+            {...basicConfig}
+            caption="表面"
+            disabled={disabled}
+            selectProps={{
+              props: {
+                value: { value: slat.surface, label: slat.surface },
+                options: optionsCreator_surface(),
+                onChange: (option) => {
+                  slat.setSlat_str({ key: 'surface', value: option?.value ?? '' });
+                },
               },
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -1119,21 +1205,21 @@ function Form_product_slat({ disabled }: { disabled: boolean | undefined }) {
 // MARK:guideRail
 function Form_product_guideRail({ disabled }: { disabled: boolean | undefined }) {
   const {
-    //
+    doorModelName,
     guideRail,
     hasSilencingStrip,
     getOptions_material_stable,
     getOptions_guideRailThickness,
     getOptions_guideRail,
-    isSpecialProd,
   } = useWorksheet(
     useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
       guideRail: state.guideRail,
       hasSilencingStrip: state.guideRail.getHasSilencingStrip(),
       getOptions_material_stable: state.getOptions_material_stable,
       getOptions_guideRailThickness: state.getOptions_guideRailThickness,
       getOptions_guideRail: state.getOptions_guideRail,
-      isSpecialProd: state.getIsSpecialProd(),
+
       generalSpec: state.generalSpec, // 用於更新getOptions
       avalibleComponent: state.avalibleComponents, // 用於更新getOptions
       doorModelInfo: state.doorModelInfo, // 用於更新getOptions
@@ -1141,29 +1227,14 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
   );
 
   const props_hasSilencingStrip: TinputSelProps = (() => {
-    if (!isSpecialProd) {
-      const inputProps: TinputProps = {
-        props: {
-          readOnly: true,
-          value: hasSilencingStrip,
-        },
-      };
+    const inputProps: TinputProps = {
+      props: {
+        readOnly: true,
+        value: hasSilencingStrip,
+      },
+    };
 
-      return { inputProps };
-    } else {
-      const selectProps: TselectProps = {
-        props: {
-          value: { value: '_', label: hasSilencingStrip },
-          options: optionsCreator_boolean(),
-          onChange: (option) => {
-            const value_bool = option?.value === 'true';
-            guideRail.setGuideRail_hasSilencingStrip(value_bool);
-          },
-        },
-      };
-
-      return { selectProps };
-    }
+    return { inputProps };
   })();
 
   return (
@@ -1174,7 +1245,6 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           {...basicConfig}
           caption="材質"
           disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               options: getOptions_material_stable(),
@@ -1196,8 +1266,6 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           selectProps={{
             props: {
               options: getOptions_guideRailThickness(),
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
 
               value: {
                 value: guideRail.guideRailThickness,
@@ -1221,24 +1289,25 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           }}
         />
 
-        <InputSel
-          {...basicConfig}
-          caption="表面"
-          disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
-          selectProps={{
-            props: {
-              options: optionsCreator_surface(),
-              value: {
-                value: guideRail.surface,
-                label: guideRail.surface,
+        {doorModelName !== 'W2' && (
+          <InputSel
+            {...basicConfig}
+            caption="表面"
+            disabled={disabled}
+            selectProps={{
+              props: {
+                options: optionsCreator_surface(),
+                value: {
+                  value: guideRail.surface,
+                  label: guideRail.surface,
+                },
+                onChange: (option) => {
+                  guideRail.setGuideRail_str({ key: 'surface', value: option?.value ?? '' });
+                },
               },
-              onChange: (option) => {
-                guideRail.setGuideRail_str({ key: 'surface', value: option?.value ?? '' });
-              },
-            },
-          }}
-        />
+            }}
+          />
+        )}
 
         <InputSel
           //
@@ -1255,8 +1324,6 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
           selectProps={{
             props: {
               options: optionsCreator_bendStright(),
-              // isSearchable: isSpecialProd,
-
               value: {
                 value: guideRail.guideRailType,
                 label: guideRail.guideRailType,
@@ -1264,55 +1331,50 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
               onChange: (option) => {
                 guideRail.setGuideRail_str({ key: 'guideRailType', value: option?.value ?? '' });
               },
-              // onInputChange: (value, action) => {
-              //   if (action.action === 'input-change') {
-              //     guideRail.setGuideRail_str({ key: 'guideRailType', value });
-              //   }
-              // },
             },
           }}
         />
 
         <div>{/* 這個div是為了將下一個InputSel推到下一行 */}</div>
-        <InputSel
-          {...basicConfig}
-          caption="形式"
-          disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
-          // wrapperStyle={{ height: '60px' }}
-          selectProps={{
-            withIcon: true,
-            props: {
-              className: scss.inputSelWithIcon,
+        {doorModelName !== 'W2' && (
+          <InputSel
+            {...basicConfig}
+            caption="形式"
+            disabled={disabled}
+            selectProps={{
+              withIcon: true,
+              props: {
+                className: scss.inputSelWithIcon,
 
-              options: getOptions_guideRail(),
-              value: {
-                value: guideRail.guideRail,
-                // label: guideRail.guideRail,
-                label: '',
-                icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail.guideRail}`,
+                options: getOptions_guideRail(),
+                value: {
+                  value: guideRail.guideRail,
+                  // label: guideRail.guideRail,
+                  label: '',
+                  icon: `${process.env.NEXT_PUBLIC_API_BASE_URL}/products/assets/door-track/${guideRail.guideRail}`,
+                },
+                onChange: (option) => {
+                  const value = option?.value ?? '';
+                  const hasSilencingStrip = option?.hasSilencingStrip as boolean;
+                  let thickness = (option?.thickness ?? '') as string;
+                  const width = (option?.width ?? 0) as number;
+                  const opening = option?.opening as string;
+
+                  thickness = thickness.replace('t', '');
+
+                  guideRail.setGuideRail({
+                    //
+                    guideRail: value,
+                    opening,
+                    thickness,
+                    width,
+                    hasSilencingStrip,
+                  });
+                },
               },
-              onChange: (option) => {
-                const value = option?.value ?? '';
-                const hasSilencingStrip = option?.hasSilencingStrip as boolean;
-                let thickness = (option?.thickness ?? '') as string;
-                const width = (option?.width ?? 0) as number;
-                const opening = option?.opening as string;
-
-                thickness = thickness.replace('t', '');
-
-                guideRail.setGuideRail({
-                  //
-                  guideRail: value,
-                  opening,
-                  thickness,
-                  width,
-                  hasSilencingStrip,
-                });
-              },
-            },
-          }}
-        />
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -1321,12 +1383,12 @@ function Form_product_guideRail({ disabled }: { disabled: boolean | undefined })
 // =====================================================================
 // MARK:bottomBar
 function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined }) {
-  const { bottomBar, getOptions_material_stable, getOptions_bottomBarAngleIronAndPlate, isSpecialProd } = useWorksheet(
+  const { doorModelName, bottomBar, getOptions_material_stable, getOptions_bottomBarAngleIronAndPlate } = useWorksheet(
     useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
       bottomBar: state.bottomBar,
       getOptions_material_stable: state.getOptions_material_stable,
       getOptions_bottomBarAngleIronAndPlate: state.getOptions_bottomBarAngleIronAndPlate,
-      isSpecialProd: state.getIsSpecialProd(),
       generalSpec: state.generalSpec, // 用於更新getOptions
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
     }))
@@ -1342,7 +1404,6 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           {...basicConfig}
           caption="材質"
           disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
           selectProps={{
             props: {
               value: { value: bottomBar.material, label: bottomBar.material },
@@ -1353,51 +1414,67 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
             },
           }}
         />
-        <InputSel
-          {...basicConfig}
-          caption="角鐵材質"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              options: options_angleIron,
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
 
-              value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
-              onChange: (option) => {
-                bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
-              },
-              onInputChange: (value, action) => {
-                if (action.action === 'input-change') {
-                  bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value });
-                }
-              },
-            },
-          }}
-        />
+        {doorModelName !== 'W2' && (
+          <>
+            <InputSel
+              {...basicConfig}
+              caption="角鐵材質"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  options: options_angleIron,
 
-        <InputSel
-          {...basicConfig}
-          caption="底座板材質"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              options: options_plate,
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
+                  value: { value: bottomBar.bottomBarAngleIron, label: bottomBar.bottomBarAngleIron },
+                  onChange: (option) => {
+                    bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value: option?.value ?? '' });
+                  },
+                  onInputChange: (value, action) => {
+                    if (action.action === 'input-change') {
+                      bottomBar.setBottomBar_str({ key: 'bottomBarAngleIron', value });
+                    }
+                  },
+                },
+              }}
+            />
 
-              value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
-              onChange: (option) => {
-                bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
-              },
-              onInputChange: (value, action) => {
-                if (action.action === 'input-change') {
-                  bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value });
-                }
-              },
-            },
-          }}
-        />
+            <InputSel
+              {...basicConfig}
+              caption="底座板材質"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  options: options_plate,
+
+                  value: { value: bottomBar.bottomBarPlate, label: bottomBar.bottomBarPlate },
+                  onChange: (option) => {
+                    bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value: option?.value ?? '' });
+                  },
+                  onInputChange: (value, action) => {
+                    if (action.action === 'input-change') {
+                      bottomBar.setBottomBar_str({ key: 'bottomBarPlate', value });
+                    }
+                  },
+                },
+              }}
+            />
+            <InputSel
+              {...basicConfig}
+              caption="表面"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  value: { value: bottomBar.surface, label: bottomBar.surface },
+                  options: optionsCreator_surface(),
+                  onChange: (option) => {
+                    bottomBar.setBottomBar_str({ key: 'surface', value: option?.value ?? '' });
+                  },
+                },
+              }}
+            />
+          </>
+        )}
+
         <InputSel
           {...basicConfig}
           caption="類型"
@@ -1405,7 +1482,6 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
           selectProps={{
             props: {
               options: optionsCreator_bottomBar_2(),
-              isSearchable: isSpecialProd,
 
               value: findOption({ value: bottomBar.bottomBar, options: optionsCreator_bottomBar_2() }),
               onChange: (option) => {
@@ -1419,21 +1495,6 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
             },
           }}
         />
-        <InputSel
-          {...basicConfig}
-          caption="表面"
-          disabled={disabled}
-          className={classNames(isSpecialProd && scss.forbidden)}
-          selectProps={{
-            props: {
-              value: { value: bottomBar.surface, label: bottomBar.surface },
-              options: optionsCreator_surface(),
-              onChange: (option) => {
-                bottomBar.setBottomBar_str({ key: 'surface', value: option?.value ?? '' });
-              },
-            },
-          }}
-        />
       </div>
     </div>
   );
@@ -1442,12 +1503,11 @@ function Form_product_bottomBar({ disabled }: { disabled: boolean | undefined })
 // =====================================================================
 // MARK:sidePlate
 function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined }) {
-  const { sidePlate, bearingName, sprocketWheelModel, isSpecialProd } = useWorksheet(
+  const { sidePlate, bearingName, sprocketWheelModel } = useWorksheet(
     useShallow((state) => ({
       sidePlate: state.sidePlate,
       bearingName: state.sidePlate.getBearingName(),
       sprocketWheelModel: state.sidePlate.getSprocketWheelModel(),
-      isSpecialProd: state.getIsSpecialProd(),
     }))
   );
 
@@ -1461,8 +1521,6 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
           disabled={disabled}
           selectProps={{
             props: {
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
               value: { value: bearingName, label: bearingName },
               options: optionsCreator_bearingName(),
               onChange: (option) => {
@@ -1483,8 +1541,6 @@ function Form_product_sidePlate({ disabled }: { disabled: boolean | undefined })
           disabled={disabled}
           selectProps={{
             props: {
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
               value: { value: sprocketWheelModel, label: sprocketWheelModel },
               options: optionsCreator_sprocketWheelModel(),
               onChange: (option) => {
@@ -1867,55 +1923,12 @@ const Table_bottomBar = () => {
 // =====================================================================
 // =====================================================================
 // =====================================================================
+// =====================================================================
 
-// MARK:basicConfig
-const basicConfig: TinputSelProps = {
-  wrapperStyle: { gap: '10px', height: 'fit-content' },
-  captionStyle: { width: '100px' },
-  captionSize: '18',
-  captionColor: 'main',
-  fontSize: '18',
-  showBaseline: 'always',
-  hrClassName: classNames(scss.inputSel_hr, scss.plus),
-};
-
-const inputNumberProps = {
-  type: 'number',
-  min: 0,
-  step: 0,
-};
-
-// ======================================================================
-
-const options_boolean = [
-  {
-    value: 'false',
-    label: '無',
-  },
-  {
-    value: 'true',
-    label: '有',
-  },
-];
-
-const options_前遮 = [
-  {
-    value: 'none',
-    label: '無',
-  },
-  {
-    value: 'half',
-    label: '半遮',
-  },
-  {
-    value: 'full',
-    label: '全遮',
-  },
-];
-
-// ======================================================================
+export default WorksheetForm;
 
 export {
+  WorksheetTable,
   Form_product_location,
   Form_product_basic,
   Form_product_ABCD,
@@ -1928,7 +1941,4 @@ export {
   Form_product_sidePlate,
   Form_product_accessories,
   Form_product_other,
-  //
 };
-
-export { WorksheetTable };

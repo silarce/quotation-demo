@@ -42,6 +42,10 @@ type Tcontrol = {
 
     headBoxCover: React.ReactNode;
     headBoxTopCover: React.ReactNode;
+    hasWheel: React.ReactNode;
+    upperMask: React.ReactNode;
+    headBoxSizeB: React.ReactNode;
+    headBoxSizeD: React.ReactNode;
     headBoxSizeX: React.ReactNode;
     headBoxSizeY: React.ReactNode;
     headBoxSizeM: React.ReactNode;
@@ -49,12 +53,6 @@ type Tcontrol = {
     headBoxSizeO: React.ReactNode;
     headBoxSizeP: React.ReactNode;
     headBoxSizeQ: React.ReactNode;
-    hasWheel: React.ReactNode;
-
-    // imgUrl1: string | null;
-    // imgUrl2: string | null;
-    // imgUrl3: string | null;
-    // imgUrl4: string | null;
 
     svgString1: string | null;
     svgString2: string | null;
@@ -229,15 +227,16 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
           <C.TableContent2 label="檔輪" value={headBox.hasWheel} />
           <C.TableContent2 label="前遮" value={headBox.headBoxCover} />
           <C.TableContent2 label="上蓋" value={headBox.headBoxTopCover} />
-          <C.TableContent2 label="sizeB" value={'sizeB'} />
-          <C.TableContent2 label="sizeD" value={'sizeD'} />
-          <C.TableContent2 label="sizeX" value={'sizeX'} />
-          <C.TableContent2 label="sizeY" value={'sizeY'} />
-          <C.TableContent2 label="sizeM" value={'sizeM'} />
-          <C.TableContent2 label="sizeN" value={'sizeN'} />
-          <C.TableContent2 label="sizeO" value={'sizeO'} />
-          <C.TableContent2 label="sizeP" value={'sizeP'} />
-          <C.TableContent2 label="sizeQ" value={'sizeQ'} />
+          <C.TableContent2 label="上遮" value={headBox.upperMask} />
+          <C.TableContent2 label="sizeB" value={headBox.headBoxSizeB} />
+          <C.TableContent2 label="sizeD" value={headBox.headBoxSizeD} />
+          <C.TableContent2 label="sizeX" value={headBox.headBoxSizeX} />
+          <C.TableContent2 label="sizeY" value={headBox.headBoxSizeY} />
+          <C.TableContent2 label="sizeM" value={headBox.headBoxSizeM} />
+          <C.TableContent2 label="sizeN" value={headBox.headBoxSizeN} />
+          <C.TableContent2 label="sizeO" value={headBox.headBoxSizeO} />
+          <C.TableContent2 label="sizeP" value={headBox.headBoxSizeP} />
+          <C.TableContent2 label="sizeQ" value={headBox.headBoxSizeQ} />
           {/* <hr className="border-black" /> */}
         </section>
         <hr className="col-span-2 border-black border-b-4 border-t-0" />
