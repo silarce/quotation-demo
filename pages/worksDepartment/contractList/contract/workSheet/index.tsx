@@ -147,11 +147,7 @@ export default function Worksheet({
       'engineeringContact',
       'worksheet.latestRecord.reviewSalesEmployee',
       'worksheet.latestRecord.reviewManagerEmployee',
-      // 為了使用useControl_pdf，在useGetContract_id的populate中
-      // 設置了
-      // 'worksheet.latestRecord.contractProductItems.components'
-      // 'worksheet.latestRecord.contractProductItems.accessories'
-      // 未來可能會有效能的問題
+
       'worksheet.latestRecord.contractProductItems.components',
       'worksheet.latestRecord.contractProductItems.accessories',
     ],
@@ -270,7 +266,6 @@ export default function Worksheet({
 
     try {
       setIsLoading(true);
-      // await apiPatchWorkSheetProducts(worksheetExport.worksheetId, body);
       await apiPatchWorkSheetProducts(worksheetId, body);
 
       if (document_status === '審核中' || document_status === '駁回') {

@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useCallback } from 'react';
+import { useMemo } from 'react';
 
 import classNames from 'classnames';
 
@@ -11,26 +11,16 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import {
   Container,
   Section,
-  MainFormWrapper,
-  FormGrid,
 } from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/productFormLayout';
 
 // css
 import scss from './productForm.module.scss';
 
 // type
-import { TupdateContractProductItemDto, TquotationProductItemDto } from 'js/api/dtoTypes';
+
 import type { Tstate_specialDoor } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
 
-import {
-  TsetState,
-  //
-  options_electricSupply,
-  options_boolean,
-  basicConfig,
-  inputNumberProps,
-  createElectricSupply,
-} from './shared';
+import { TsetState, options_electricSupply, basicConfig, createElectricSupply } from './shared';
 
 import { optionsCreator_closingType } from 'js/utils/options/productOptions';
 import { findOption } from 'js/utils/options/findOption';
@@ -59,6 +49,7 @@ type Tstate_specialProd_w1w3 = {
 
 // W1是扇形水閘門
 // W3是電動油壓水閘門
+// W1 W3 W4 W5 W6 是水閘門系列
 
 const WorksheetForm_w13456 = ({
   disabled,
@@ -142,7 +133,7 @@ const Form_specialProd_basic = ({
   const {
     itemName,
     quoteType,
-    doorModelName,
+    // doorModelName,
     qty,
     fullWidth,
     height,

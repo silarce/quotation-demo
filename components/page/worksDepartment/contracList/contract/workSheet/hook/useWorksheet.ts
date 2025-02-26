@@ -6,8 +6,6 @@ import { AxiosError } from 'axios';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { optionsCreator_motorVender, optionsCreator_horsePower } from 'js/utils/options/productOptions';
-
 import { create } from 'zustand';
 // 使用 immer middleware會使typescript不正確的判斷型別，導致型別錯誤(實際上沒錯)
 // import { immer } from 'zustand/middleware/immer';
@@ -80,8 +78,6 @@ import {
 } from 'hooks/quotation/componentFilters';
 
 // =====================================================================
-const options_doorType = optionsCreator_quoteType();
-// =====================================================================
 
 // region TYPE
 
@@ -141,7 +137,7 @@ type Tworksheet = {
   contractProductItemArr_ori: TquotationProductItemDto_old[] | undefined;
   doorModelInfoList: { [key: string]: TdoorModelInfoDto } | undefined;
   doorModelInfo: TdoorModelInfoDto | undefined;
-  // componentList: { [key in TdoorComponentType]: TquotationProductComponentDto } | undefined;
+
   componentList: { [key in TdoorComponentType_old]: TupdateQuotationProductComponentDto_old } | undefined;
   accessories: TquotationProductAccessoryDto[];
 
@@ -153,16 +149,12 @@ type Tworksheet = {
   // 會在init與calcData取得
   avalibleComponents: TdoorComponentListDto | undefined;
 
-  // options_accessories: Toption[];
   originalAccessories: TquotationProductAccessoryDto[];
   //
   worksheetId: string;
   itemIdArr: string[];
   qty: number;
-  // isAntiTyphoonLock: boolean;
   getIsAntiTyphoonLock: () => boolean;
-
-  // getIsSpecialProd: () => boolean; // 特殊門現在由另一個hook與UI處理
 
   shouldCalcData: boolean;
   shouldCalcData2: boolean;
@@ -170,15 +162,12 @@ type Tworksheet = {
 
   calcTarget: 'fullWidth' | 'WG';
   setCalcTarget: (value: 'fullWidth' | 'WG') => void;
-  // calcFullWidth: () => `${number}`;
-  // calcWG: () => `${number}`;
   //
   locationArea: string;
   setLocationArea: (value: string) => void;
   floor: string;
   setFloor: (value: string) => void;
   serialNumberArr: string[];
-  // setSerialNumberArr: (value: string[]) => void;
   setSerialNumber: (props: { index: number; value: string }) => void;
 
   //
@@ -295,13 +284,6 @@ type Tworksheet = {
         | 'headBoxSizeQ';
       value: `${number}` | '';
     }) => void;
-
-    // getHeadBoxImage: () => {
-    //   url1: string | null;
-    //   url2: string | null;
-    //   url3: string | null;
-    //   url4: string | null;
-    // };
   };
 
   roller: {
@@ -461,15 +443,8 @@ const useWorksheet = create<Tworksheet>(
     worksheetId: '',
     itemIdArr: [],
     qty: 0,
-    // isAntiTyphoonLock: true,
     shouldCalcData: false,
     shouldCalcData2: false,
-
-    // getIsSpecialProd: () => {
-    //   const isSpecial = !options_doorType.some((option) => option.value === get().basicSpec.quoteType);
-
-    //   return isSpecial;
-    // },
 
     //
     calcTarget: 'fullWidth',
@@ -477,8 +452,6 @@ const useWorksheet = create<Tworksheet>(
       set(
         produce((state) => {
           state.calcTarget = value;
-          // state.basicSpec.fullWidth = '';
-          // state.basicSpec.WG = '';
         })
       );
     },
@@ -502,13 +475,7 @@ const useWorksheet = create<Tworksheet>(
       );
     },
     serialNumberArr: [],
-    // setSerialNumberArr: (serialNumberArr) => {
-    //   set(
-    //     produce((state) => {
-    //       state.serialNumberArr = serialNumberArr;
-    //     })
-    //   );
-    // },
+
     setSerialNumber: ({ index, value }) => {
       set(
         produce((state) => {
@@ -819,24 +786,6 @@ const useWorksheet = create<Tworksheet>(
           })
         );
       },
-      // getHeadBoxImage: () => {
-      //   const {
-      //     isIntegratedHeadBox,
-      //     hasWheel: _hasWheel,
-      //     headBoxTopCover: _headBoxTopCover,
-      //     headBoxCover,
-      //   } = get().headBox;
-
-      //   const hasWheel = _hasWheel === 'true';
-      //   const headBoxTopCover = _headBoxTopCover === 'true';
-
-      //   return {
-      //     url1: getSvgUrl1({ isIntegratedHeadBox, hasWheel }),
-      //     url2: getSvgUrl2({ isIntegratedHeadBox, hasWheel }),
-      //     url3: getSvgUrl3({ headBoxTopCover }),
-      //     url4: getSvgUrl4({ headBoxCover }),
-      //   };
-      // },
     },
 
     roller: {
@@ -911,7 +860,7 @@ const useWorksheet = create<Tworksheet>(
         hasSilencingStrip,
         width,
         opening,
-        thickness,
+        // thickness,
       }) => {
         set(
           produce<Tworksheet>((state) => {
@@ -1194,20 +1143,14 @@ const useWorksheet = create<Tworksheet>(
         const { serialNumber, floor, locationArea } = contractProductItem;
 
         const generalSpec = (await get().reqGeneralSpec()) ?? cre_EmptyGeneralSpec();
-        // const generalSpec = get().getIsSpecialProd()
-        //   ? cre_EmptyGeneralSpec()
-        //   : (await get().reqGeneralSpec()) ?? cre_EmptyGeneralSpec();
 
         generalSpec.bearingHousingSize = contractProductItem.bearingHousingSize ?? -1;
         generalSpec.bearingHousingTotalLength = Number(contractProductItem.bearingHousingTotalLength ?? -1);
         generalSpec.bearingInnerDiameter = contractProductItem.bearingInnerDiameter ?? '';
         generalSpec.bearingName = contractProductItem.bearingName ?? '';
-        // generalSpec.defaultMotorIndex = contractProductItem.defaultMotorIndex;
-        // generalSpec.density = contractProductItem.density;
         generalSpec.diameter = Number(contractProductItem.diameter ?? 0);
         generalSpec.gapA = Number(contractProductItem.gapA);
         generalSpec.gapC = Number(contractProductItem.gapC);
-        // generalSpec.motors = contractProductItem.motors;
         generalSpec.gearNumber = contractProductItem.gearNumber ?? '';
         generalSpec.sprocketWheelModel = contractProductItem.sprocketWheelModel ?? '';
         generalSpec.sprocketWheelTeethNumber = contractProductItem.sprocketWheelTeethNumber ?? '';
@@ -1267,17 +1210,9 @@ const useWorksheet = create<Tworksheet>(
     getOptions_bottomBarAngleIronAndPlate: () =>
       getOptions_bottomBarAngleIronAndPlate(get().basicSpec.doorModelName as TdoorModel),
     getOptions_horsepower: () => {
-      // if (get().getIsSpecialProd()) {
-      //   return optionsCreator_horsePower();
-      // }
-
       return getOptions_horsepower(get().avalibleComponents?.motors ?? []);
     },
     getOptions_motorVendor: () => {
-      // if (get().getIsSpecialProd()) {
-      //   return optionsCreator_motorVender();
-      // }
-
       return getOptions_motorVendor(get().avalibleComponents?.motors ?? []);
     },
     getOptions_electricSupply: () => getOptions_electricSupply(get().avalibleComponents?.motors ?? []),
@@ -1324,13 +1259,6 @@ const useWorksheet = create<Tworksheet>(
         isAntiTyphoon: get().basicSpec.isAntiTyphoon,
       };
 
-      // if (body.fullWidth) {
-      //   body.WG = undefined;
-      // } else if (body.WG) {
-      //   body.fullWidth = undefined;
-      // } else if (!body.fullWidth && !body.WG) {
-      //   body.fullWidth = 0;
-      // }
       if (calcTarget === 'fullWidth') {
         body.WG = undefined;
       } else if (calcTarget === 'WG') {
@@ -1355,8 +1283,6 @@ const useWorksheet = create<Tworksheet>(
     },
     // MARK:update_generalSpec
     update_generalSpec: async () => {
-      // const { calcTarget } = get();
-
       const generalSpec = await get().reqGeneralSpec();
       set(
         produce<Tworksheet>((state) => {
@@ -1420,7 +1346,7 @@ const useWorksheet = create<Tworksheet>(
       const {
         calcTarget,
         basicSpec,
-        // getIsSpecialProd,
+
         update_generalSpec,
         update_availableComponents,
         getOptions_electricSupply,
@@ -1429,10 +1355,7 @@ const useWorksheet = create<Tworksheet>(
         getOptions_guideRail,
         getOptions_bottomBarAngleIronAndPlate,
         guideRail,
-        generalSpec,
       } = get();
-
-      // const isSpecialProd = getIsSpecialProd();
 
       if (!basicSpec.material || !basicSpec.doorModelName || !basicSpec.quoteType) {
         myAlert.warning({
@@ -1456,66 +1379,34 @@ const useWorksheet = create<Tworksheet>(
       // ___________________________________________________________________
       // ___________________________________________________________________
 
-      const material = (() => {
-        if (basicSpec.doorModelName === 'SJ-305D') {
-          const sst304 = optionsCreator_componentMaterial_01().find((option) => {
-            return option.value.includes('304');
-          });
+      // const material = (() => {
+      //   if (basicSpec.doorModelName === 'SJ-305D') {
+      //     const sst304 = optionsCreator_componentMaterial_01().find((option) => {
+      //       return option.value.includes('304');
+      //     });
 
-          return sst304?.value ?? '';
-        }
+      //     return sst304?.value ?? '';
+      //   }
 
-        return basicSpec.material;
-      })();
+      //   return basicSpec.material;
+      // })();
 
       set(
         produce<Tworksheet>((state) => {
-          // if (!isSpecialProd) {
-          //   state.headBox.material = material;
-          //   state.slat.material = basicSpec.material;
-          //   state.guideRail.material = material;
-          //   state.bottomBar.material = material;
-          // } else
-          {
-            state.headBox.material = '';
-            state.slat.material = '';
-            state.guideRail.material = '';
-            state.bottomBar.material = '';
-            state.headBox.surface = '';
-            state.slat.surface = '';
-            state.guideRail.surface = '';
-            state.bottomBar.surface = '';
-            state.guideRail.guideRail = '';
-          }
+          state.headBox.material = '';
+          state.slat.material = '';
+          state.guideRail.material = '';
+          state.bottomBar.material = '';
+          state.headBox.surface = '';
+          state.slat.surface = '';
+          state.guideRail.surface = '';
+          state.bottomBar.surface = '';
+          state.guideRail.guideRail = '';
         })
       );
 
       // _____________________________________________________________________
       // _____________________________________________________________________
-
-      // if (getIsSpecialProd()) {
-      //   set(
-      //     produce((state) => {
-      //       state.shouldCalcData = false;
-      //       state.headBox.headBoxThickness = '';
-      //     })
-      //   );
-
-      //   return;
-      // }
-
-      // _____________________________________________________________________
-      // _____________________________________________________________________
-
-      // set(
-      //   produce((state) => {
-      //     const basicSpec = state.basicSpec;
-
-      //     if (basicSpec.fullWidth) {
-      //       basicSpec.WG = '';
-      //     }
-      //   })
-      // );
 
       await update_generalSpec();
 
@@ -1600,20 +1491,15 @@ const useWorksheet = create<Tworksheet>(
     }, // clacData
 
     // MARK:calcData_2
-    // 預計把取得component與bom的處理寫在這邊
-    // 過濾出適配的component並帶入，然後取得bom資料後帶入
     calcData_2: async () => {
       const worksheet = get();
 
       const {
-        //
-        // getIsSpecialProd,
         updateSlatCount,
-        // componentList,
+
         avalibleComponents,
-        //
         generalSpec,
-        //
+
         ABCD,
         basicSpec,
         motor,
@@ -1622,12 +1508,8 @@ const useWorksheet = create<Tworksheet>(
         slat,
         guideRail,
         bottomBar,
-        // sidePlate,
-        //
       } = worksheet;
-      // const isSpecialProd = getIsSpecialProd();
 
-      // headBox, slat, guideRail, bottomBar
       const doorModelName = basicSpec.doorModelName;
 
       if (doorModelName === 'W2') {
@@ -1650,19 +1532,6 @@ const useWorksheet = create<Tworksheet>(
 
         return;
       }
-
-      // ______________________________________________________________________
-      // ______________________________________________________________________
-      // 特殊門的處理
-      // if (isSpecialProd) {
-      //   set(
-      //     produce((state) => {
-      //       state.shouldCalcData2 = false;
-      //     })
-      //   );
-
-      //   return;
-      // }
 
       // ______________________________________________________________________
       // ______________________________________________________________________
@@ -1700,9 +1569,9 @@ const useWorksheet = create<Tworksheet>(
             guideRailThickness: guideRail.guideRailThickness as `${number}`,
             hasSilencingStrip: guideRail.hasSilencingStrip,
             guideRail: guideRail.guideRail,
-            // warning =======================================================
-            isUL: false, // 要新增isUL的欄位
-            // warning =======================================================
+
+            isUL: false,
+
             //
             horsepower: motor.horsepower,
             gearNumber: generalSpec?.gearNumber ?? 'undefined',
@@ -1731,19 +1600,7 @@ const useWorksheet = create<Tworksheet>(
         return;
       }
 
-      console.log('3');
-      // const componentIdListEntries = Object.entries(avalibleComponentIdList ?? {});
-      const componentIdListEntries = (() => {
-        if (doorModelName === 'W2') {
-          return [
-            ['slat', slat.material],
-            ['guideRail', guideRail.material],
-            ['bottomBar', bottomBar.material],
-          ];
-        } else {
-          return Object.entries(avalibleComponentIdList ?? {});
-        }
-      })();
+      const componentIdListEntries = Object.entries(avalibleComponentIdList ?? {});
 
       // ______________________________________________________________________
       // ______________________________________________________________________
@@ -1942,7 +1799,7 @@ const useWorksheet = create<Tworksheet>(
         contractProductItemArr_ori,
         componentList,
         accessories,
-        // itemIdArr,
+
         shouldCalcData,
         shouldCalcData2,
 
@@ -1962,13 +1819,9 @@ const useWorksheet = create<Tworksheet>(
         getFullWidth_mm,
         getWG_mm,
         getHeight_mm,
-        // getFullHeight_mm,
-        // getAngleIronSize_mm,
-        // getIsSpecialProd,
       } = get();
 
       const itemOri_copy = _.cloneDeep(contractProductItem_ori);
-      // const isSpecialProd = getIsSpecialProd();
 
       if (!itemOri_copy) {
         return null;
@@ -2057,8 +1910,7 @@ const useWorksheet = create<Tworksheet>(
         bearingInnerDiameter: generalSpec.bearingInnerDiameter || null,
         bearingName: generalSpec.bearingName || null,
         diameter: String(generalSpec.diameter) || null,
-        // gapA: generalSpec.gapA,
-        // gapC: generalSpec.gapC,
+
         gearNumber: generalSpec.gearNumber || null,
         sprocketWheelModel: generalSpec.sprocketWheelModel || null,
         sprocketWheelTeethNumber: generalSpec.sprocketWheelTeethNumber || null,
@@ -2095,10 +1947,6 @@ const useWorksheet = create<Tworksheet>(
         const { id: itemId, components: oldComponentArr } = item;
 
         const newComponent = (() => {
-          // if (isSpecialProd) {
-          //   return [];
-          // }
-
           if (oldComponentArr.length === 0) {
             return Object.values(componentList_copy ?? {});
           }
@@ -2632,7 +2480,6 @@ const takeGenerateDoorProductBom = ({
   const body_slat: TgenerateDoorProductBomDto_ComponentInfo = {
     id: avalibleComponentIdList.slat,
     material: slat.material || '',
-    // materialSurface: (reduceMaterialSurface(slat.surface) || null) as TmaterialSurface,
     materialSurface: (slat.surface || null) as TmaterialSurface,
     isPainted: false,
   };
@@ -2640,7 +2487,6 @@ const takeGenerateDoorProductBom = ({
   const body_guideRail: TgenerateDoorProductBomDto_ComponentInfo = {
     id: avalibleComponentIdList.guideRail,
     material: guideRail.material || '',
-    // materialSurface: (reduceMaterialSurface(guideRail.surface) || null) as TmaterialSurface,
     materialSurface: (guideRail.surface || null) as TmaterialSurface,
     isPainted: false,
     thickness: guideRail.guideRailThickness,
@@ -2661,7 +2507,6 @@ const takeGenerateDoorProductBom = ({
       ? {
           id: avalibleComponentIdList.headBox,
           material: headBox.material || '',
-          // materialSurface: (reduceMaterialSurface(headBox.surface) || null) as TmaterialSurface,
           materialSurface: (headBox.surface || null) as TmaterialSurface,
           isPainted: false,
         }
@@ -2738,13 +2583,13 @@ const takeGenerateDoorProductBom = ({
   //
 };
 
-const reduceMaterialSurface = (materialSurface: string) => {
-  if (materialSurface === '烤漆' || materialSurface === '氟碳') {
-    materialSurface = '2B';
-  }
+// const reduceMaterialSurface = (materialSurface: string) => {
+//   if (materialSurface === '烤漆' || materialSurface === '氟碳') {
+//     materialSurface = '2B';
+//   }
 
-  return materialSurface;
-};
+//   return materialSurface;
+// };
 
 const calcFullWidth_M = ({ gapA: gapA_mm, gapC: gapC_mm, WG: WG_M }: { gapA: number; gapC: number; WG: number }) => {
   const fullWidth_M = new Decimal(WG_M) //
@@ -2777,61 +2622,6 @@ const calcWG_M = ({
 };
 
 const lookup_sprocketWheelChains_electricMotorChainType = [undefined, '單排', '雙排'];
-
-// const getSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-//   let url: null | string = null;
-
-//   if (isIntegratedHeadBox && hasWheel) {
-//     url = createAssetUrl('head-box', '一體式有檔輪.svg');
-//   } else if (isIntegratedHeadBox && !hasWheel) {
-//     url = createAssetUrl('head-box', '一體式無檔輪.svg');
-//   } else if (!isIntegratedHeadBox && hasWheel) {
-//     url = createAssetUrl('head-box', '機加捲有檔輪.svg');
-//   } else if (!isIntegratedHeadBox && !hasWheel) {
-//     url = createAssetUrl('head-box', '機加捲無檔輪.svg');
-//   }
-
-//   return url as string;
-// };
-
-// const getSvgUrl2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-//   let url: null | string = null;
-
-//   // 阿不是都一樣...?給我的判斷條件長這樣那就這樣吧
-//   if (isIntegratedHeadBox && hasWheel) {
-//     url = createAssetUrl('head-box', '機械箱.svg');
-//   } else if (isIntegratedHeadBox && !hasWheel) {
-//     url = createAssetUrl('head-box', '機械箱.svg');
-//   } else if (!isIntegratedHeadBox && hasWheel) {
-//     url = createAssetUrl('head-box', '機械箱.svg');
-//   } else if (!isIntegratedHeadBox && !hasWheel) {
-//     url = createAssetUrl('head-box', '機械箱.svg');
-//   }
-
-//   return url as string;
-// };
-
-// const getSvgUrl3 = ({ headBoxTopCover }: { headBoxTopCover: boolean }) => {
-//   let url: null | string = null;
-
-//   if (headBoxTopCover) {
-//     url = createAssetUrl('head-box', '上蓋.svg');
-//   }
-
-//   return url;
-// };
-
-// const getSvgUrl4 = ({ headBoxCover }: { headBoxCover: Tworksheet['headBox']['headBoxCover'] }) => {
-//   let url: null | string = null;
-
-//   if (headBoxCover === 'half') {
-//     url = createAssetUrl('head-box', '前遮半.svg');
-//   } else if (headBoxCover === 'full') {
-//     url = createAssetUrl('head-box', '前遮全.svg');
-//   }
-
-//   return url;
-// };
 
 // =====================================================================
 export { useWorksheet };
