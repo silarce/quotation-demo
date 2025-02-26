@@ -164,7 +164,7 @@ type Tworksheet = {
   // isAntiTyphoonLock: boolean;
   getIsAntiTyphoonLock: () => boolean;
 
-  getIsSpecialProd: () => boolean;
+  // getIsSpecialProd: () => boolean; // 特殊門現在由另一個hook與UI處理
 
   shouldCalcData: boolean;
   shouldCalcData2: boolean;
@@ -1195,10 +1195,10 @@ const useWorksheet = create<Tworksheet>(
       if (contractProductItem) {
         const { serialNumber, floor, locationArea } = contractProductItem;
 
-        // const generalSpec = await get().reqGeneralSpec();
-        const generalSpec = get().getIsSpecialProd()
-          ? cre_EmptyGeneralSpec()
-          : (await get().reqGeneralSpec()) ?? cre_EmptyGeneralSpec();
+        const generalSpec = (await get().reqGeneralSpec()) ?? cre_EmptyGeneralSpec();
+        // const generalSpec = get().getIsSpecialProd()
+        //   ? cre_EmptyGeneralSpec()
+        //   : (await get().reqGeneralSpec()) ?? cre_EmptyGeneralSpec();
 
         generalSpec.bearingHousingSize = contractProductItem.bearingHousingSize ?? -1;
         generalSpec.bearingHousingTotalLength = Number(contractProductItem.bearingHousingTotalLength ?? -1);
@@ -1229,9 +1229,9 @@ const useWorksheet = create<Tworksheet>(
           })
         );
 
-        if (!get().getIsSpecialProd()) {
-          get().update_availableComponents();
-        }
+        // if (!get().getIsSpecialProd()) {
+        //   get().update_availableComponents();
+        // }
       }
     }, // init
     //
@@ -1271,16 +1271,16 @@ const useWorksheet = create<Tworksheet>(
     getOptions_bottomBarAngleIronAndPlate: () =>
       getOptions_bottomBarAngleIronAndPlate(get().basicSpec.doorModelName as TdoorModel),
     getOptions_horsepower: () => {
-      if (get().getIsSpecialProd()) {
-        return optionsCreator_horsePower();
-      }
+      // if (get().getIsSpecialProd()) {
+      //   return optionsCreator_horsePower();
+      // }
 
       return getOptions_horsepower(get().avalibleComponents?.motors ?? []);
     },
     getOptions_motorVendor: () => {
-      if (get().getIsSpecialProd()) {
-        return optionsCreator_motorVender();
-      }
+      // if (get().getIsSpecialProd()) {
+      //   return optionsCreator_motorVender();
+      // }
 
       return getOptions_motorVendor(get().avalibleComponents?.motors ?? []);
     },
@@ -1424,7 +1424,7 @@ const useWorksheet = create<Tworksheet>(
       const {
         calcTarget,
         basicSpec,
-        getIsSpecialProd,
+        // getIsSpecialProd,
         update_generalSpec,
         update_availableComponents,
         getOptions_electricSupply,
@@ -1436,7 +1436,7 @@ const useWorksheet = create<Tworksheet>(
         generalSpec,
       } = get();
 
-      const isSpecialProd = getIsSpecialProd();
+      // const isSpecialProd = getIsSpecialProd();
 
       if (!basicSpec.material || !basicSpec.doorModelName || !basicSpec.quoteType) {
         myAlert.warning({
@@ -1474,12 +1474,13 @@ const useWorksheet = create<Tworksheet>(
 
       set(
         produce<Tworksheet>((state) => {
-          if (!isSpecialProd) {
-            state.headBox.material = material;
-            state.slat.material = basicSpec.material;
-            state.guideRail.material = material;
-            state.bottomBar.material = material;
-          } else {
+          // if (!isSpecialProd) {
+          //   state.headBox.material = material;
+          //   state.slat.material = basicSpec.material;
+          //   state.guideRail.material = material;
+          //   state.bottomBar.material = material;
+          // } else
+          {
             state.headBox.material = '';
             state.slat.material = '';
             state.guideRail.material = '';
@@ -1496,16 +1497,16 @@ const useWorksheet = create<Tworksheet>(
       // _____________________________________________________________________
       // _____________________________________________________________________
 
-      if (getIsSpecialProd()) {
-        set(
-          produce((state) => {
-            state.shouldCalcData = false;
-            state.headBox.headBoxThickness = '';
-          })
-        );
+      // if (getIsSpecialProd()) {
+      //   set(
+      //     produce((state) => {
+      //       state.shouldCalcData = false;
+      //       state.headBox.headBoxThickness = '';
+      //     })
+      //   );
 
-        return;
-      }
+      //   return;
+      // }
 
       // _____________________________________________________________________
       // _____________________________________________________________________
@@ -1610,7 +1611,7 @@ const useWorksheet = create<Tworksheet>(
 
       const {
         //
-        getIsSpecialProd,
+        // getIsSpecialProd,
         updateSlatCount,
         // componentList,
         avalibleComponents,
@@ -1628,20 +1629,29 @@ const useWorksheet = create<Tworksheet>(
         // sidePlate,
         //
       } = worksheet;
-      const isSpecialProd = getIsSpecialProd();
+      // const isSpecialProd = getIsSpecialProd();
 
       // headBox, slat, guideRail, bottomBar
 
       if (
-        !isSpecialProd &&
-        (!headBox.material ||
-          !headBox.surface ||
-          !slat.material ||
-          !slat.surface ||
-          !guideRail.material ||
-          !guideRail.surface ||
-          !bottomBar.material ||
-          !bottomBar.surface)
+        // !isSpecialProd &&
+        // (!headBox.material ||
+        //   !headBox.surface ||
+        //   !slat.material ||
+        //   !slat.surface ||
+        //   !guideRail.material ||
+        //   !guideRail.surface ||
+        //   !bottomBar.material ||
+        //   !bottomBar.surface)
+
+        !headBox.material ||
+        !headBox.surface ||
+        !slat.material ||
+        !slat.surface ||
+        !guideRail.material ||
+        !guideRail.surface ||
+        !bottomBar.material ||
+        !bottomBar.surface
       ) {
         myAlert.warning({ title: '請確認所有的材質與表面都已選取' });
 
@@ -1649,41 +1659,17 @@ const useWorksheet = create<Tworksheet>(
       }
 
       // ______________________________________________________________________
-
-      // 計算fullWidth或WG
-      // 沒有必要，在calcData與編輯gapA或gapC時就計算了
-      // set(
-      //   produce<Tworksheet>((state) => {
-      //     const calcTarget = state.calcTarget;
-
-      //     if (calcTarget === 'fullWidth') {
-      //       state.basicSpec.WG = calcWG_M({
-      //         fullWidth_M: Number(state.basicSpec.fullWidth),
-      //         gapA: state.generalSpec?.gapA ?? 0,
-      //         gapC: state.generalSpec?.gapC ?? 0,
-      //       }).toString();
-      //     } else if (calcTarget === 'WG') {
-      //       state.basicSpec.fullWidth = calcFullWidth_M({
-      //         WG: Number(state.basicSpec.WG),
-      //         gapA: state.generalSpec?.gapA ?? 0,
-      //         gapC: state.generalSpec?.gapC ?? 0,
-      //       }).toString();
-      //     }
-      //   })
-      // );
-
-      // ______________________________________________________________________
       // ______________________________________________________________________
       // 特殊門的處理
-      if (isSpecialProd) {
-        set(
-          produce((state) => {
-            state.shouldCalcData2 = false;
-          })
-        );
+      // if (isSpecialProd) {
+      //   set(
+      //     produce((state) => {
+      //       state.shouldCalcData2 = false;
+      //     })
+      //   );
 
-        return;
-      }
+      //   return;
+      // }
 
       // ______________________________________________________________________
       // ______________________________________________________________________
@@ -1956,11 +1942,11 @@ const useWorksheet = create<Tworksheet>(
         getHeight_mm,
         // getFullHeight_mm,
         // getAngleIronSize_mm,
-        getIsSpecialProd,
+        // getIsSpecialProd,
       } = get();
 
       const itemOri_copy = _.cloneDeep(contractProductItem_ori);
-      const isSpecialProd = getIsSpecialProd();
+      // const isSpecialProd = getIsSpecialProd();
 
       if (!itemOri_copy) {
         return null;
@@ -2087,9 +2073,9 @@ const useWorksheet = create<Tworksheet>(
         const { id: itemId, components: oldComponentArr } = item;
 
         const newComponent = (() => {
-          if (isSpecialProd) {
-            return [];
-          }
+          // if (isSpecialProd) {
+          //   return [];
+          // }
 
           if (oldComponentArr.length === 0) {
             return Object.values(componentList_copy ?? {});
