@@ -257,6 +257,7 @@ const createPdfItem = ({
       headBoxCover: item.headBoxCover === 'full' ? '全遮' : item.headBoxCover === 'half' ? '半遮' : '無',
       headBoxTopCover: item.headBoxTopCover ? '有' : '無',
       hasWheel: item.hasWheel ? '有' : '無',
+      upperMask: item.upperMask ? '有' : '無',
       headBoxSizeB: item.boxB,
       headBoxSizeD: item.boxD,
       headBoxSizeX: item.headBoxSizeX,

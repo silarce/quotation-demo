@@ -42,6 +42,8 @@ type Tcontrol = {
 
     headBoxCover: React.ReactNode;
     headBoxTopCover: React.ReactNode;
+    hasWheel: React.ReactNode;
+    upperMask: React.ReactNode;
     headBoxSizeB: React.ReactNode;
     headBoxSizeD: React.ReactNode;
     headBoxSizeX: React.ReactNode;
@@ -51,7 +53,6 @@ type Tcontrol = {
     headBoxSizeO: React.ReactNode;
     headBoxSizeP: React.ReactNode;
     headBoxSizeQ: React.ReactNode;
-    hasWheel: React.ReactNode;
 
     svgString1: string | null;
     svgString2: string | null;
@@ -226,6 +227,7 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
           <C.TableContent2 label="檔輪" value={headBox.hasWheel} />
           <C.TableContent2 label="前遮" value={headBox.headBoxCover} />
           <C.TableContent2 label="上蓋" value={headBox.headBoxTopCover} />
+          <C.TableContent2 label="上遮" value={headBox.upperMask} />
           <C.TableContent2 label="sizeB" value={headBox.headBoxSizeB} />
           <C.TableContent2 label="sizeD" value={headBox.headBoxSizeD} />
           <C.TableContent2 label="sizeX" value={headBox.headBoxSizeX} />
