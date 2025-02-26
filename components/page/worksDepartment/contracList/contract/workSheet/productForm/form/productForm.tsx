@@ -69,13 +69,40 @@ function WorksheetForm({
   disabled?: boolean;
   uploadButton?: boolean;
 }) {
-  const { calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
+  const { doorModelName, calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
     useShallow((state) => ({
+      doorModelName: state.basicSpec.doorModelName,
       shouldCalcData: state.shouldCalcData,
       shouldCalcData2: state.shouldCalcData2,
       calcData_2: state.calcData_2,
     }))
   );
+
+  const jsx = (() => {
+    if (doorModelName === 'W2') {
+      return (
+        <>
+          <Form_product_slat disabled={disabled} />
+          <Form_product_guideRail disabled={disabled} />
+          <Form_product_bottomBar disabled={disabled} />
+          <Form_product_other disabled={disabled} />
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Form_product_motor disabled={disabled} />
+        <Form_product_headBox disabled={disabled} />
+        <Form_product_roller disabled={disabled} />
+        <Form_product_slat disabled={disabled} />
+        <Form_product_guideRail disabled={disabled} />
+        <Form_product_bottomBar disabled={disabled} />
+        <Form_product_sidePlate disabled={disabled} />
+        <Form_product_other disabled={disabled} />
+      </>
+    );
+  })();
 
   return (
     <Container>
@@ -91,14 +118,7 @@ function WorksheetForm({
         <Section>設定產品細部規格：</Section>
         <FormGrid>
           <Form_product_ABCD disabled={disabled} />
-          <Form_product_motor disabled={disabled} />
-          <Form_product_headBox disabled={disabled} />
-          <Form_product_roller disabled={disabled} />
-          <Form_product_slat disabled={disabled} />
-          <Form_product_guideRail disabled={disabled} />
-          <Form_product_bottomBar disabled={disabled} />
-          <Form_product_sidePlate disabled={disabled} />
-          <Form_product_other disabled={disabled} />
+          {jsx}
         </FormGrid>
         <div className={classNames(scss.cover, !shouldCalcData && 'hidden')}></div>
       </MainFormWrapper>
