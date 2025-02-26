@@ -69,7 +69,7 @@ const useControl_pdf = ({
           assetDict,
         });
         specialItemArr.push(control_item);
-      } else if (doorModelSort === 'w1w3') {
+      } else if (doorModelSort === 'w13456') {
         const control_item = createPdfSpecialItem({
           contractProductItems: record.contractProductItems,
           assetDict,

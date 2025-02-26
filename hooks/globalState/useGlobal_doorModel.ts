@@ -22,7 +22,7 @@ type TdoorModelList = {
   doorModelArr: undefined | null | TdoorModelInfoDto[];
   doorModelDict: undefined | null | TdoorModelDict;
   checkIsSpecialDoor: (doorModelName: string) => boolean;
-  parseDoorModelSort: (doorModelName: string) => undefined | 'normal' | 'special' | 'w1w3';
+  parseDoorModelSort: (doorModelName: string) => undefined | 'normal' | 'special' | 'w13456';
   update: () => void;
 };
 
@@ -83,10 +83,10 @@ const useDoorModel_prime = create<TdoorModelList>()(
 
         const isSpecialDoor = !!doorModelName && checkIsSpecialDoor(doorModelName);
 
-        let doorModelSort: 'normal' | 'special' | 'w1w3';
+        let doorModelSort: 'normal' | 'special' | 'w13456';
 
-        if (doorModelName === 'W1' || doorModelName === 'W3') {
-          doorModelSort = 'w1w3';
+        if (/^W[123456]$/.test(doorModelName)) {
+          doorModelSort = 'w13456';
         } else if (isSpecialDoor) {
           doorModelSort = 'special';
         } else {

@@ -60,7 +60,7 @@ type Tstate_specialProd_w1w3 = {
 // W1是扇形水閘門
 // W3是電動油壓水閘門
 
-const WorksheetForm_w1w3 = ({
+const WorksheetForm_w13456 = ({
   disabled,
   state_specialDoor,
   setState_specialDoor,
@@ -288,4 +288,4 @@ const Form_specialProd_basic = ({
   );
 };
 
-export default WorksheetForm_w1w3;
+export default WorksheetForm_w13456;
