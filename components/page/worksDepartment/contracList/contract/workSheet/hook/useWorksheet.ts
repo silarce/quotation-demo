@@ -1560,16 +1560,26 @@ const useWorksheet = create<Tworksheet>(
       const option_electricSupply = getOptions_electricSupply()[0];
       const option_headBoxThickness = getOptions_headBoxThickness()[0];
       const option_guideRailThickness = getOptions_guideRailThickness()[0];
-      const options_guideRail = getOptions_guideRail()[0];
+      const options_guideRail = getOptions_guideRail()[0] as Toption | undefined;
       const { options_angleIron, options_plate } = getOptions_bottomBarAngleIronAndPlate();
 
-      guideRail.setGuideRail({
-        guideRail: options_guideRail.value,
-        hasSilencingStrip: options_guideRail.hasSilencingStrip as boolean,
-        width: options_guideRail.width as number,
-        opening: options_guideRail.opening as string,
-        thickness: options_guideRail.thickness as string,
-      });
+      if (options_guideRail) {
+        guideRail.setGuideRail({
+          guideRail: options_guideRail.value,
+          hasSilencingStrip: options_guideRail.hasSilencingStrip as boolean,
+          width: options_guideRail.width as number,
+          opening: options_guideRail.opening as string,
+          thickness: options_guideRail.thickness as string,
+        });
+      } else {
+        guideRail.setGuideRail({
+          guideRail: '',
+          hasSilencingStrip: false,
+          width: 0,
+          opening: '',
+          thickness: '',
+        });
+      }
 
       set(
         produce((state) => {
