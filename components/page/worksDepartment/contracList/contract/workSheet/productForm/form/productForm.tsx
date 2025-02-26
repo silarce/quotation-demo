@@ -263,18 +263,20 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       <div className={scss.grid}>
         <InputSel
           {...basicConfig}
-          disabled={disabled}
+          disabled={true}
+          showBaseline="invisible"
           caption="報價別"
-          selectProps={{
-            props: {
-              value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
-              options: options_doorType,
-              isSearchable: true,
-              onChange: (options) => {
-                basicSpec.setBasicSpec_quoteType(options?.value ?? '');
-              },
-            },
-          }}
+          node={basicSpec.quoteType}
+          // selectProps={{
+          //   props: {
+          //     value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
+          //     options: options_doorType,
+          //     isSearchable: true,
+          //     onChange: (options) => {
+          //       basicSpec.setBasicSpec_quoteType(options?.value ?? '');
+          //     },
+          //   },
+          // }}
         />
         <div></div>
         <InputSel
@@ -292,31 +294,33 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
         />
         <InputSel
           {...basicConfig}
+          disabled={true}
+          showBaseline="invisible"
           caption="門型"
-          disabled={disabled}
-          selectProps={{
-            props: {
-              options: isSpecialProd ? [] : getOptions_doorModelInfo(),
-              isSearchable: isSpecialProd,
-              menuIsOpen: isSpecialProd ? false : undefined,
+          node={basicSpec.doorModelName}
+          // selectProps={{
+          //   props: {
+          //     options: isSpecialProd ? [] : getOptions_doorModelInfo(),
+          //     isSearchable: isSpecialProd,
+          //     menuIsOpen: isSpecialProd ? false : undefined,
 
-              value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
-              onChange: (option) => {
-                if (isSpecialProd) {
-                  // setDoorModelInfo(undefined);
-                  basicSpec.setBasicSpec_doorModelName(option?.value ?? '');
-                } else {
-                  const obj = option?.obj as TdoorModelInfoDto;
-                  setDoorModelInfo(obj);
-                }
-              },
-              onInputChange: (value, action) => {
-                if (action.action === 'input-change') {
-                  basicSpec.setBasicSpec_doorModelName(value);
-                }
-              },
-            },
-          }}
+          //     value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
+          //     onChange: (option) => {
+          //       if (isSpecialProd) {
+          //         // setDoorModelInfo(undefined);
+          //         basicSpec.setBasicSpec_doorModelName(option?.value ?? '');
+          //       } else {
+          //         const obj = option?.obj as TdoorModelInfoDto;
+          //         setDoorModelInfo(obj);
+          //       }
+          //     },
+          //     onInputChange: (value, action) => {
+          //       if (action.action === 'input-change') {
+          //         basicSpec.setBasicSpec_doorModelName(value);
+          //       }
+          //     },
+          //   },
+          // }}
         />
         <InputSel
           {...basicConfig}
