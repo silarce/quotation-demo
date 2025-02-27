@@ -17,18 +17,16 @@ import Layer from 'components/Layer/Layer';
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // api
 import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
 import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 
-// i18n
-import { useTranslation } from 'react-i18next';
-
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+
+import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 
 // -----------------------------------------------------------------------------------
 // 全域 css
@@ -89,8 +87,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
   useGlobalErrorCatcher();
-
-  const { i18n } = useTranslation();
 
   // ----------------------------------------------------------------------------
 
@@ -247,77 +243,8 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   );
 }
 
-// =============================================================
-
-const useGlobalErrorCatcher = () => {
-  const erroEventHandler = useCallback((event: ErrorEvent) => {
-    // const errorJson = JSON.stringify(event.error, Object.getOwnPropertyNames(event.error));
-
-    // event幾乎都是不可枚舉property，所以要手動把需要的東西取出來
-    const obj = {
-      colno: event.colno,
-      lineno: event.lineno,
-      filename: event.filename,
-      // currentTarget: event.currentTarget, // 全都是不可枚舉property，無法取得
-      // target: event.target, // 全都是不可枚舉property，無法取得
-      error: {
-        message: event.error.message,
-        stack: event.error.stack,
-      },
-    };
-
-    const onBtnClick = async () => {
-      try {
-        const objJson = JSON.stringify(obj);
-
-        await navigator.clipboard.writeText(objJson);
-      } catch (error) {
-        myAlert.err({ title: '複製錯誤資訊失敗' });
-      }
-    };
-
-    myAlert.err({
-      title: '發生非預期錯誤',
-      props: {
-        okText: '關閉',
-        maskClosable: false,
-        content: <Foo onBtnClick={onBtnClick} />,
-        closable: true,
-      },
-    });
-  }, []);
-
-  useEffect(() => {
-    window.removeEventListener('error', erroEventHandler);
-    window.addEventListener('error', erroEventHandler);
-  }, []);
-};
-
-const Foo = ({ onBtnClick }: { onBtnClick?: () => void }) => {
-  return (
-    <div>
-      <p className="whitespace-pre-wrap text-left">
-        {`
-請依以下步驟操作
-1. 點擊"複製錯誤訊息"按鈕
-2. 回到電腦桌面，右鍵新增文字文件
-3. 右鍵貼上並儲存
-4. 請關閉這個提示，然後將整個畫面截圖
-5. 將截圖與文字文件一起傳給開發人員
-        `}
-      </p>
-      <p>感謝您的配合</p>
-      <br />
-      <MyButton_v2 onClick={onBtnClick} label="複製錯誤訊息" />
-      <br />
-      <br />
-    </div>
-  );
-};
-
 // =======================================================================
 
-// wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 declare global {
   interface ObjectConstructor {
     clearAndAssign<T extends Record<string, any>>(target: T, source: T): void;
@@ -334,24 +261,9 @@ Object.clearAndAssign = function <T extends Record<string, any>>(target: T, sour
   Object.assign(target, source);
 };
 
-// 測試
-// type Tfoo = {
-//   a: string;
-//   b?: string;
-// };
-// const foo: Tfoo = { a: 'a', b: 'b' };
-// const bar: Tfoo = { a: 'A' };
-// const foo2 = foo;
-// console.log(foo);
-// Object.clearAndAssign(foo, bar);
-// console.log(foo);
-// console.log(foo === foo2);
-
-// wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-
 // =======================================================================
 
-export type { NextPageWithLayout, TappContext, TmyPageProps };
-// export default MyApp;
 export default MyApp;
+
+export type { NextPageWithLayout, TappContext, TmyPageProps };
 export { AppContext };
