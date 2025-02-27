@@ -170,7 +170,7 @@ export type {
   TupdateIncomeBillSettlementFormDto,
 } from './dtoTypes';
 
-export type { TinvouceCheckResult, TworksheetDto_addition };
+export type { TinvouceCheckResult, TworksheetDto_addition, TworksheetRecordDto_addition };
 
 type TgetEngineeringContact = {
   data: TengineeringContactDto[];
