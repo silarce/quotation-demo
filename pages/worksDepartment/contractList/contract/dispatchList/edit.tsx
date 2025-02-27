@@ -456,7 +456,7 @@ export default function EditDispatchList() {
       dispatchDate: dispatchDate ?? '',
       workerEmployee: workerEmployee ?? [],
       projectName: contract?.content.projectName ?? '',
-      projectNumber: contract?.content.quotationNumber ?? '',
+      projectNumber: contract?.contractNumber ?? '',
       contractor: engineeringContact.contractor,
       contractorContactPerson: contractorContactPerson ?? '',
       county: county ?? '',
@@ -692,8 +692,9 @@ export default function EditDispatchList() {
       address = '',
       warrantyDate,
       tasks = '',
-      pointContactPerson = '',
-      pointContactNumber = '',
+      // pointContactPerson = '',
+      // pointContactNumber = '',
+      pointContact,
 
       projectSiteContactPerson = '',
       projectSiteContactPersonNumber = '',
@@ -701,11 +702,14 @@ export default function EditDispatchList() {
 
     const wholeAddress = `${county}${district}${address}`;
 
+    const contactPerson = pointContact?.[0]?.name + '\n' + pointContact?.[0]?.phone;
+
     const data_pdf: Tdata_pdf = {
       idNumber: dispatching?.idNumber ?? '',
       customerName: contract?.content.projectName ?? '',
       phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
-      contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
+      // contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
+      contactPerson,
       address: wholeAddress,
       projectNumber: contract?.contractNumber ?? '',
       warrantyPeriod: (warrantyDate ? getTaiwanDateStr(warrantyDate) : '') || '',

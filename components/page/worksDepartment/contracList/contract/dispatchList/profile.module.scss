@@ -1,13 +1,13 @@
 .profile {
   display: grid;
-  grid-template-columns: 845px 500px;
+  grid-template-columns: 900px 550px;
   justify-content: space-between;
 }
 
 .left {
   display: grid;
-  grid-template-columns: 350px 350px;
-  gap: 20px;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 20px 50px;
   justify-content: space-between;
 }
 .right {
@@ -24,4 +24,8 @@
 .iconBtn {
   width: 20px;
   height: 20px;
+}
+
+.foo {
+  word-break: break-all;
 }
