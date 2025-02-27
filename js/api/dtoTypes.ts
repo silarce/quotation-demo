@@ -4309,6 +4309,7 @@ export type TaccountsReceivableDto = {
   totalOtherFee: string;
   //
   warrantyDate: string | null; // 保固日期
+  warrantyPeriod: `${number}` | null; // 保固時長
 };
 
 export type TupdateAccountReceivableDto = Partial<
@@ -4324,6 +4325,7 @@ export type TupdateAccountReceivableDto = Partial<
     | 'unpaidPayment'
     //
     | 'warrantyDate'
+    | 'warrantyPeriod'
   >
 >;
 

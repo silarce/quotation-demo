@@ -107,7 +107,7 @@ export default function EditDispatch({
         <textarea
           disabled={disabled}
           className={scss.textarea}
-          placeholder="請輸入工作內容"
+          placeholder=""
           value={tasks.value}
           onChange={(e) => tasks.onChange(e.target.value)}
         />
@@ -191,7 +191,7 @@ export default function EditDispatch({
       <textarea
         disabled={disabled}
         className={scss.textarea}
-        placeholder="請輸入待辦事項"
+        placeholder=""
         value={note.value}
         onChange={(e) => note.onChange(e.target.value)}
       />

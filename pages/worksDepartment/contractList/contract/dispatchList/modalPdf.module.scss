@@ -1,6 +1,9 @@
 .bodyWrapper {
   margin-top: 20px;
   border: solid 1px theme("colors.border");
+  * {
+    font-family: Microsoft JhengHei !important;
+  }
 }
 .body {
   // width: 600px;
@@ -208,16 +211,13 @@
 }
 
 .c11_content {
-  align-items: flex-start;
-  // display: block;
-
   // display: -webkit-box;
   // -webkit-box-orient: vertical;
   // -webkit-line-clamp: 16;
   // overflow: hidden;
-
+  display: block;
+  min-height: 100%;
   white-space: pre-wrap;
-
   line-height: unset;
   font-size: 20px;
   letter-spacing: 1px;
