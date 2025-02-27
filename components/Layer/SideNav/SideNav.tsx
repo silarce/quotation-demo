@@ -32,91 +32,93 @@ export default function SideNav() {
   // -------------------------------------------------------------------
 
   return (
-    <div className={classNames(style.container, 'relative')}>
-      {linkList?.list.map((item, index) => {
-        const { label, path, list, erpFeature, otherPermissions, activeChecker } = item;
+    <div className={style.wrapper}>
+      <div className={classNames(style.sideNav, 'relative')}>
+        {linkList?.list.map((item, index) => {
+          const { label, path, list, erpFeature, otherPermissions, activeChecker } = item;
 
-        let isActive = pathname.startsWith(path ?? 'undefined');
+          let isActive = pathname.startsWith(path ?? 'undefined');
 
-        if (activeChecker) {
-          isActive = activeChecker({ router });
-        }
+          if (activeChecker) {
+            isActive = activeChecker({ router });
+          }
 
-        let isPassed = false;
-        isPassed = checkErpFeature({ erpFeature, userErpFeature });
+          let isPassed = false;
+          isPassed = checkErpFeature({ erpFeature, userErpFeature });
 
-        if (isPassed && otherPermissions) {
-          isPassed = checkOtherPermissions({ userInfo, otherPermissions });
-        }
+          if (isPassed && otherPermissions) {
+            isPassed = checkOtherPermissions({ userInfo, otherPermissions });
+          }
 
-        if (!isPassed) {
-          return null;
-        }
+          if (!isPassed) {
+            return null;
+          }
 
-        if (path) {
-          return (
-            <Link className={classNames(style.option, isActive && style.active)} href={path} key={index}>
-              {label}
-            </Link>
-          );
-        }
+          if (path) {
+            return (
+              <Link className={classNames(style.option, isActive && style.active)} href={path} key={index}>
+                {label}
+              </Link>
+            );
+          }
 
-        if (list) {
-          return (
-            <Collapse
-              key={index}
-              className={style.collapse}
-              defaultActiveKey={[linkList.defaultCollapse || '0']}
-              ghost
-              onChange={() => { }}
-            >
-              <Panel header={label} key={`${index}`}>
-                <ul>
-                  {list.map((item, index) => {
-                    const {
-                      //
-                      label,
-                      path,
-                      erpFeature,
-                      query,
-                      otherPermissions,
-                      exception,
-                      activeChecker,
-                    } = item;
+          if (list) {
+            return (
+              <Collapse
+                key={index}
+                className={style.collapse}
+                defaultActiveKey={[linkList.defaultCollapse || '0']}
+                ghost
+              >
+                <Panel header={label} key={`${index}`}>
+                  <ul>
+                    {list.map((item, index) => {
+                      const {
+                        //
+                        label,
+                        path,
+                        erpFeature,
+                        query,
+                        otherPermissions,
+                        exception,
+                        activeChecker,
+                      } = item;
 
-                    let isActive = pathname.startsWith(path);
+                      let isActive = pathname.startsWith(path);
 
-                    if (activeChecker) {
-                      isActive = activeChecker({ router });
-                    } else if (query) {
-                      isActive = _.isMatch(routerQuery, query ?? {});
-                    }
+                      if (activeChecker) {
+                        isActive = activeChecker({ router });
+                      } else if (query) {
+                        isActive = _.isMatch(routerQuery, query ?? {});
+                      }
 
-                    const href = { pathname: path, query };
+                      const href = { pathname: path, query };
 
-                    let isPassed = false;
-                    isPassed = checkErpFeature({ erpFeature, userErpFeature });
+                      let isPassed = false;
+                      isPassed = checkErpFeature({ erpFeature, userErpFeature });
 
-                    if (isPassed && otherPermissions) {
-                      isPassed = checkOtherPermissions({ userInfo, otherPermissions, exception });
-                    }
+                      if (isPassed && otherPermissions) {
+                        isPassed = checkOtherPermissions({ userInfo, otherPermissions, exception });
+                      }
 
-                    if (!isPassed) {
-                      return null;
-                    }
+                      if (!isPassed) {
+                        return null;
+                      }
 
-                    return (
-                      <li className={classNames({ [style.active]: isActive })} key={index}>
-                        <Link href={href}>{label}</Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </Panel>
-            </Collapse>
-          );
-        }
-      })}
+                      return (
+                        <li className={classNames({ [style.active]: isActive })} key={index}>
+                          <Link href={href}>{label}</Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Panel>
+              </Collapse>
+            );
+          }
+        })}
+      </div>
+      <div>　v{process.env.DEPLOY_TIME}</div>
     </div>
   );
 }
