@@ -21,7 +21,13 @@ type TselectBarDateProps = Omit<TselectBarProps, 'selectPropsArr'> & {
 };
 
 // ==========================================================================
-const useYearMonth_options = () => {
+const useYearMonth_options = ({
+  emptyYearOption = false,
+  emptyMonthOption = false,
+}: {
+  emptyYearOption?: boolean;
+  emptyMonthOption?: boolean;
+} = {}) => {
   const m_now = moment();
   const thisYear = m_now.year();
   const thisMonth = m_now.month() + 1;
@@ -34,8 +40,10 @@ const useYearMonth_options = () => {
       return { label: year_tw.toString(), value: year.toString() };
     });
 
+    emptyYearOption && yearOptionArr.unshift({ label: '不拘', value: '' });
+
     return yearOptionArr;
-  }, [thisYear]);
+  }, [thisYear, emptyYearOption]);
 
   const monthOptionArr = useMemo(() => {
     const monthOptionArr = Array.from({ length: 12 }, (_, i) => {
@@ -44,8 +52,10 @@ const useYearMonth_options = () => {
       return { label: month.toString(), value: month.toString() };
     });
 
+    emptyMonthOption && monthOptionArr.unshift({ label: '不拘', value: '' });
+
     return monthOptionArr;
-  }, []);
+  }, [emptyMonthOption]);
 
   const thisYear_tw = thisYear - 1911;
 
@@ -84,11 +94,21 @@ const useYearMonth_selectBar_query = ({
         value,
         options: yearOptionArr ?? [],
         onChange: (option) => {
-          if (typeof option?.value === 'string') {
+          const value = option?.value;
+
+          if (value) {
             router.replace({
               query: {
                 ...query,
                 year: option.value,
+              },
+            });
+          } else {
+            router.replace({
+              query: {
+                ...query,
+                year: undefined,
+                month: undefined,
               },
             });
           }
@@ -103,14 +123,13 @@ const useYearMonth_selectBar_query = ({
         value: month,
         options: monthOptionArr ?? [],
         onChange: (option) => {
-          if (typeof option?.value === 'string') {
-            router.replace({
-              query: {
-                ...query,
-                month: option.value,
-              },
-            });
-          }
+          const value = option?.value;
+          router.replace({
+            query: {
+              ...query,
+              month: value,
+            },
+          });
         },
       },
       placeholder: '選擇月份',
