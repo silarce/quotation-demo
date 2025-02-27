@@ -87,11 +87,11 @@ const useYearMonth_selectBar_query = ({
   };
 
   const selectPropsArr: TselectPropsArr = useMemo(() => {
-    const value = yearOptionArr?.find((option) => String(option.value) === String(year)) || year;
+    const value_year = yearOptionArr?.find((option) => String(option.value) === String(year)) || year;
 
     const selectProps_year: TselectPropsArr[number] = {
       selectProps: {
-        value,
+        value: value_year,
         options: yearOptionArr ?? [],
         onChange: (option) => {
           const value = option?.value;
@@ -114,7 +114,7 @@ const useYearMonth_selectBar_query = ({
           }
         },
       },
-      placeholder: '選擇年份',
+      placeholder: '年份',
       boxStyle: { width: '140px' },
     };
 
@@ -122,6 +122,7 @@ const useYearMonth_selectBar_query = ({
       selectProps: {
         value: month,
         options: monthOptionArr ?? [],
+
         onChange: (option) => {
           const value = option?.value;
           router.replace({
@@ -132,8 +133,9 @@ const useYearMonth_selectBar_query = ({
           });
         },
       },
-      placeholder: '選擇月份',
+      placeholder: '月份',
       boxStyle: { width: '140px' },
+      disabled: !year,
     };
 
     const selectPropsArr: TselectPropsArr = [];
