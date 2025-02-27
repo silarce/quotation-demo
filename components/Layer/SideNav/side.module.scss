@@ -1,16 +1,25 @@
 @use "styles/theme01" as *;
 
-.container {
+.wrapper {
+  display: grid;
+  grid-template-rows: auto 30px;
+  gap: 10px;
+  height: 100%;
+  overflow: hidden;
+  background-color: $bgc01;
+  @screen laptop {
+    display: none;
+  }
+}
+
+.sideNav {
   padding: 39px 28px;
+  padding-bottom: 0;
   display: grid;
   grid-gap: 30px;
   align-content: start;
   height: 100%;
-  background-color: $bgc01;
   overflow: auto;
-  @screen laptop {
-    display: none;
-  }
 }
 
 .collapse {
