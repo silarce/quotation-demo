@@ -1,6 +1,9 @@
 .bodyWrapper {
   margin-top: 20px;
   border: solid 1px theme("colors.border");
+  * {
+    font-family: Microsoft JhengHei !important;
+  }
 }
 .body {
   // width: 600px;
