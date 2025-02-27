@@ -456,7 +456,7 @@ export default function EditDispatchList() {
       dispatchDate: dispatchDate ?? '',
       workerEmployee: workerEmployee ?? [],
       projectName: contract?.content.projectName ?? '',
-      projectNumber: contract?.content.quotationNumber ?? '',
+      projectNumber: contract?.contractNumber ?? '',
       contractor: engineeringContact.contractor,
       contractorContactPerson: contractorContactPerson ?? '',
       county: county ?? '',

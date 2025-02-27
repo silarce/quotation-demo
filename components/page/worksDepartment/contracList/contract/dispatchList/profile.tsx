@@ -20,7 +20,7 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 // css
 import scss from './profile.module.scss';
 
-import { IconRemoveCircle, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
+import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // ============================================================================
 type TcontrolItem = {
@@ -420,13 +420,13 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
 
 const config_inputSel: TinputSelProps = {
   captionColor: 'main',
-  captionStyle: { width: 180 },
+  captionStyle: { width: 120 },
   showBaseline: 'auto',
 };
 
 const config_inputSel_readOnly: TinputSelProps = {
   captionColor: 'main',
-  captionStyle: { width: 180 },
+  captionStyle: { width: 120 },
   showBaseline: 'invisible',
   disabled: true,
 };

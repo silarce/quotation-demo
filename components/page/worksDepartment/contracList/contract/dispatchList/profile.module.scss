@@ -1,13 +1,13 @@
 .profile {
   display: grid;
-  grid-template-columns: 845px 500px;
+  grid-template-columns: 800px 550px;
   justify-content: space-between;
 }
 
 .left {
   display: grid;
-  grid-template-columns: 350px 350px;
-  gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 100px;
   justify-content: space-between;
 }
 .right {
