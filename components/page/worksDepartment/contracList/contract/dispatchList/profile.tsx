@@ -134,27 +134,20 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           {...config_inputSel_readOnly}
           className="col-span-2"
           caption="工程名稱"
-          disabled={true}
           node={<span className={'break-all'}>{control.projectName}</span>}
         />
 
         <InputSel
-          caption="工程編號"
           {...config_inputSel_readOnly}
-          nodeBoxProps={{
-            className: 'self-start',
-          }}
-          node={control.projectNumber}
+          className="col-span-2"
+          caption="工程編號"
+          node={<span className={'break-all'}>{control.projectNumber}</span>}
         />
         <InputSel
-          caption="承包商"
           {...config_inputSel_readOnly}
-          inputProps={{
-            props: {
-              placeholder: '承包商',
-              defaultValue: control.contractor,
-            },
-          }}
+          caption="承包商"
+          className="col-span-2"
+          node={<span className={'break-all'}>{control.contractor}</span>}
         />
 
         <InputSel
@@ -186,11 +179,13 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           {...config_inputSel}
           inputProps={{
             props: {
+              placeholder: '',
               value: control.constructionSiteContactNumber.value,
               onChange: control.constructionSiteContactNumber.onChange,
             },
           }}
         />
+
         <InputSel
           caption="保固日期"
           {...config_inputSel_readOnly}
