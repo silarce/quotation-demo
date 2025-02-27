@@ -22,10 +22,12 @@ export default function WarrantyDate({ accountReceivable, reqPatchAccountReceiva
   const [disabled, setDisabled] = useState(true);
 
   const [state_warrantyDate, setState_warrantyDate] = useState<Moment | null>(null);
+  const [state_warrantyPeriod, setState_warrantyPeriod] = useState<`${number}` | ''>('');
 
   const onConfirm = async () => {
     const body: TupdateAccountReceivableDto = {
       warrantyDate: state_warrantyDate ? state_warrantyDate.toISOString() : null,
+      warrantyPeriod: state_warrantyPeriod || null,
       //
       pendingTasks: accountReceivable.pendingTasks,
       finalPayment: accountReceivable.finalPayment || '0',
@@ -40,19 +42,39 @@ export default function WarrantyDate({ accountReceivable, reqPatchAccountReceiva
   };
 
   useEffect(() => {
-    const v = accountReceivable.warrantyDate ? moment(accountReceivable.warrantyDate) : null;
-    setState_warrantyDate(v);
-  }, [accountReceivable.warrantyDate, disabled]);
+    const warrantyDate = accountReceivable.warrantyDate ? moment(accountReceivable.warrantyDate) : null;
+    const warrantyPeriod = accountReceivable.warrantyPeriod || '';
+    setState_warrantyDate(warrantyDate);
+    setState_warrantyPeriod(warrantyPeriod);
+  }, [accountReceivable.warrantyDate, accountReceivable.warrantyPeriod, disabled]);
 
   return (
-    <div className={classNames('flex items-end gap-2', className)}>
+    <div
+      className={classNames(
+        // 'flex items-end gap-3',
+        'border border-border w-fit p-3',
+        className
+      )}
+    >
+      <div className="flex items-center gap-2">
+        <IconEdit
+          className={scss.icon}
+          isActive={!disabled}
+          onClick={() => {
+            setDisabled(!disabled);
+          }}
+        />
+        <IconCheck02 className={classNames(scss.icon, disabled && 'hidden')} onClick={onConfirm} />
+      </div>
+
       <InputSel
         wrapperStyle={{ width: '300px' }}
         caption="保固日期"
         disabled={disabled}
-        // showBaseline="auto"
+        showBaseline="auto"
         datePickerProps={{
           props: {
+            placeholder: '未設置',
             value: state_warrantyDate,
             onChange: (date) => {
               setState_warrantyDate(date);
@@ -61,14 +83,26 @@ export default function WarrantyDate({ accountReceivable, reqPatchAccountReceiva
         }}
       />
 
-      <IconEdit
-        className={scss.icon}
-        isActive={!disabled}
-        onClick={() => {
-          setDisabled(!disabled);
+      <br />
+
+      <InputSel
+        wrapperStyle={{ width: '300px' }}
+        caption="保固年數"
+        disabled={disabled}
+        showBaseline="auto"
+        inputProps={{
+          props: {
+            placeholder: '未設置',
+            type: 'number',
+            min: 0,
+            step: 1,
+            value: state_warrantyPeriod,
+            onChange: (e) => {
+              e.target.validity.valid && setState_warrantyPeriod(e.target.value as `${number}` | '');
+            },
+          },
         }}
       />
-      <IconCheck02 className={classNames(scss.icon, disabled && 'hidden')} onClick={onConfirm} />
     </div>
   );
 }

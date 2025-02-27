@@ -40,8 +40,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // ============================================================================
 
 type Tquery = {
-  year: string;
-  month: string;
+  year: `${number}` | '' | undefined;
+  month: `${number}` | '' | undefined;
   keyword: string;
 };
 
@@ -55,7 +55,10 @@ type TreqPatchReceiptCashedDate = (
 // MARK:START
 
 export default function BillCashingDetailList() {
-  const { thisYear, thisMonth, yearOptionArr, monthOptionArr } = useYearMonth_options();
+  const { thisYear, thisMonth, yearOptionArr, monthOptionArr } = useYearMonth_options({
+    emptyYearOption: true,
+    emptyMonthOption: true,
+  });
 
   const router = useRouter();
   const query = router.query as Tquery;
@@ -69,6 +72,19 @@ export default function BillCashingDetailList() {
   // --------------------------------------------------------------------------
 
   const params: Tparams = useMemo(() => {
+    const [insertDateGte, insertDateLte] = year
+      ? [
+          moment()
+            .set({ year: Number(year), month: Number(month || 1) - 1 })
+            .startOf('month')
+            .toISOString(),
+          moment()
+            .set({ year: Number(year), month: Number(month || 12) - 1 })
+            .endOf('month')
+            .toISOString(),
+        ]
+      : [];
+
     const params: Tparams = {
       sort: 'exchangeFrom.sheetNumber',
       populate: [
@@ -81,14 +97,8 @@ export default function BillCashingDetailList() {
           $eq: '票據',
         },
         insertDate: {
-          $gte: moment()
-            .set({ year: Number(year), month: Number(month) - 1 })
-            .startOf('month')
-            .toISOString(),
-          $lte: moment()
-            .set({ year: Number(year), month: Number(month) - 1 })
-            .endOf('month')
-            .toISOString(),
+          $gte: insertDateGte,
+          $lte: insertDateLte,
         },
         $or: [
           {

@@ -13,6 +13,7 @@ interface TselectBarProps {
     placeholder?: string;
     boxStyle?: CSSProperties;
     selectProps: TselectProps;
+    disabled?: boolean | undefined;
   }[];
   disabled?: boolean | undefined;
   style?: CSSProperties;
@@ -28,7 +29,7 @@ export default function SelectBar({ selectPropsArr, disabled, style, className, 
   return (
     <div className={classNames(scss.selectBar, className)}>
       {selectPropsArr.map((props, index) => {
-        const { boxStyle, selectProps, placeholder } = props;
+        const { boxStyle, selectProps, placeholder, disabled: disabled_item } = props;
         const { selClassNames } = selectProps;
 
         // __________________________________________________
@@ -51,7 +52,7 @@ export default function SelectBar({ selectPropsArr, disabled, style, className, 
             <InputSel
               placeholder={placeholder}
               showBaseline="invisible"
-              disabled={disabled}
+              disabled={disabled || disabled_item}
               selectProps={{
                 menuPortalTarget,
                 ...selectProps,
