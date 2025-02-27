@@ -217,29 +217,11 @@ export default function CompanyInfo() {
     },
   ];
 
-  // const foo = undefined;
-
-  // // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // // @ts-ignore
-  // foo.a = b;
-
   // ------------------------------------------------------------------------
   return (
     <SubLayer>
       <PageHeader02 tag="公司資料" panelList={editable ? panalList02 : panalList01} />
       <div className={scss.body}>
-        <button
-          onClick={() => {
-            const foo = undefined;
-
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            foo.a = b;
-          }}
-        >
-          ERROR TEST
-        </button>
-
         {/* logo */}
         <div className={classNames(scss.logoBox)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
