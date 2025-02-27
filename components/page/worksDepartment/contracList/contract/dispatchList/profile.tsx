@@ -89,8 +89,7 @@ type Tcontrol = {
 
   pointContactPerson: TcontrolItem_option;
   pointContactNumber: TcontrolItem;
-  //
-  // pointContractPersonOptions: Toption[];
+
   pointContractPersonOptions: (Toption & { phoneNumber: string })[];
 
   projectSiteContactPerson: TcontrolItem_option;
@@ -132,6 +131,33 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
     <div className={scss.profile}>
       <div className={scss.left}>
         <InputSel
+          {...config_inputSel_readOnly}
+          className="col-span-2"
+          caption="工程名稱"
+          disabled={true}
+          node={<span className={'break-all'}>{control.projectName}</span>}
+        />
+
+        <InputSel
+          caption="工程編號"
+          {...config_inputSel_readOnly}
+          nodeBoxProps={{
+            className: 'self-start',
+          }}
+          node={control.projectNumber}
+        />
+        <InputSel
+          caption="承包商"
+          {...config_inputSel_readOnly}
+          inputProps={{
+            props: {
+              placeholder: '承包商',
+              defaultValue: control.contractor,
+            },
+          }}
+        />
+
+        <InputSel
           caption="派工單號"
           disabled={disabled}
           {...config_inputSel}
@@ -153,45 +179,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
-        <InputSel caption="工程名稱" {...config_inputSel_readOnly} disabled={true} node={control.projectName} />
-        <InputSel
-          caption="工程編號"
-          {...config_inputSel_readOnly}
-          nodeBoxProps={{
-            className: 'self-start',
-          }}
-          node={control.projectNumber}
-        />
-        <InputSel
-          caption="承包商"
-          {...config_inputSel_readOnly}
-          inputProps={{
-            props: {
-              placeholder: '承包商',
-              defaultValue: control.contractor,
-            },
-          }}
-        />
-        {/* <InputSel
-          caption="承包商聯絡人"
-          disabled={disabled}
-          {...config_inputSel}
-          inputProps={{
-            props: {
-              value: control.contractorContactPerson.value,
-              onChange: control.contractorContactPerson.onChange,
-            },
-          }}
-        /> */}
-        {/* <InputSel
-          caption="地址"
-          {...config_inputSel_readOnly}
-          inputProps={{
-            props: {
-              defaultValue: control.allAddress,
-            },
-          }}
-        /> */}
+
         <InputSel
           caption="工地電話"
           disabled={disabled}
@@ -213,78 +201,6 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             },
           }}
         />
-        {/* <InputSel
-          caption="完工聯絡人"
-          disabled={disabled}
-          {...config_inputSel}
-          inputProps={{
-            props: {
-              value: control.finalContactPerson.value,
-              onChange: control.finalContactPerson.onChange,
-            },
-          }}
-        /> */}
-
-        {/* <InputSel
-          caption="工地現場聯絡人"
-          disabled={disabled}
-          {...config_inputSel}
-          selectProps={{
-            props: {
-              isSearchable: true,
-              options: control.pointContractPersonOptions,
-              value: control.projectSiteContactPerson
-                ? { label: control.projectSiteContactPerson.value, value: control.projectSiteContactPerson.value }
-                : null,
-              onChange: (option) => {
-                control.projectSiteContactPerson.onChange(option as Toption_pointContactPerson | null);
-              },
-            },
-          }}
-        /> */}
-
-        {/* <InputSel
-          caption="工地現場聯絡人電話"
-          disabled={disabled}
-          {...config_inputSel}
-          inputProps={{
-            props: {
-              value: control.projectSiteContactPersonNumber.value,
-              onChange: control.projectSiteContactPersonNumber.onChange,
-            },
-          }}
-        /> */}
-
-        <div />
-        {/* <InputSel
-          caption="接洽人"
-          disabled={disabled}
-          {...config_inputSel}
-          selectProps={{
-            props: {
-              isSearchable: true,
-              options: control.pointContractPersonOptions,
-              value: control.pointContactPerson
-                ? { label: control.pointContactPerson.value, value: control.pointContactPerson.value }
-                : null,
-              onChange: (option) => {
-                control.pointContactPerson.onChange(option as Toption_pointContactPerson | null);
-              },
-            },
-          }}
-        /> */}
-
-        {/* <InputSel
-          caption="接洽人電話"
-          disabled={disabled}
-          {...config_inputSel}
-          inputProps={{
-            props: {
-              value: control.pointContactNumber.value,
-              onChange: control.pointContactNumber.onChange,
-            },
-          }}
-        /> */}
 
         {/*  */}
         <AddressBar
@@ -420,13 +336,13 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
 
 const config_inputSel: TinputSelProps = {
   captionColor: 'main',
-  captionStyle: { width: 120 },
+  captionStyle: { width: 100 },
   showBaseline: 'auto',
 };
 
 const config_inputSel_readOnly: TinputSelProps = {
   captionColor: 'main',
-  captionStyle: { width: 120 },
+  captionStyle: { width: 100 },
   showBaseline: 'invisible',
   disabled: true,
 };
