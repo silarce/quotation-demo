@@ -2,7 +2,8 @@
 // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
 CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
-const moment = require('moment');
+// const moment = require('moment');
+const moment = require('moment-timezone');
 
 
 // =====================================================
@@ -17,7 +18,7 @@ const nextConfig = {
     // domains: ["sanjeou-erp-be.caprover.credot-web.com"],
   },
   env: {
-    DEPLOY_TIME: moment().format("YYYY-MM-DD hh:mm:ss"), // 設置部屬時間為環境變數
+    DEPLOY_TIME: moment().tz("Asia/Taipei").format("YYYY-MM-DD hh:mm:ss"), // 設置部屬時間為環境變數
   },
 };
 
