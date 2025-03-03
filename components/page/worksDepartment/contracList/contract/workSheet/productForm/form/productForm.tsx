@@ -741,14 +741,20 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     }))
   );
 
-  const url1 = getHeadBoxSvgUrl1({
-    isIntegratedHeadBox: isIntegratedHeadBox === 'true',
-    hasWheel: hasWheel === 'true',
-  });
-  const url2 = getHeadBoxSvgUrl2({
-    isIntegratedHeadBox: isIntegratedHeadBox === 'true',
-    hasWheel: hasWheel === 'true',
-  });
+  const isIsIntegratedHeadBoxValid = isIntegratedHeadBox === '一體式捲箱' || isIntegratedHeadBox === '捲箱加機箱';
+
+  const url1 = isIsIntegratedHeadBoxValid
+    ? getHeadBoxSvgUrl1({
+        isIntegratedHeadBox: isIntegratedHeadBox === '一體式捲箱',
+        hasWheel: hasWheel === 'true',
+      })
+    : isIntegratedHeadBox;
+  const url2 = isIsIntegratedHeadBoxValid
+    ? getHeadBoxSvgUrl2({
+        isIntegratedHeadBox: isIntegratedHeadBox === '一體式捲箱',
+        hasWheel: hasWheel === 'true',
+      })
+    : isIntegratedHeadBox;
   const url3 = getHeadBoxSvgUrl3({ headBoxTopCover: headBoxTopCover === 'true' });
   const url4 = getHeadBoxSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
 
@@ -940,14 +946,10 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
         />
 
         <div className={scss.headBoxImgContainer}>
-          <div>{url1 && <Image src={url1} alt="" width={243} height={243} />}</div>
-          <div>{url2 && <Image src={url2} alt="" width={243} height={243} />}</div>
+          <div>{url1 && <Image src={url1} alt={url1} width={243} height={243} />}</div>
+          <div>{url2 && <Image src={url2} alt={url2} width={243} height={243} />}</div>
           <div>{url3 && <Image src={url3} alt="上蓋" width={243} height={243} />}</div>
           <div>{url4 && <Image src={url4} alt="前遮" width={243} height={243} />}</div>
-          {/* <div className="">{url1 && <Image src={img_husky} alt="" />}</div>
-          <div className="">{url2 && <Image src={img_husky} alt="" />}</div>
-          <div className="">{url3 && <Image src={img_husky} alt="上蓋" />}</div>
-          <div>{url4 && <Image src={img_husky} alt="前遮" />}</div> */}
         </div>
 
         <div className="grid gap-[25px] content-start">
