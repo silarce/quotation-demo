@@ -25,7 +25,7 @@ interface Tprops_table_specialDoor {
   fullHeight: React.ReactNode;
   //
   isIntegratedHeadBox: React.ReactNode;
-  upperMask: React.ReactNode;
+  // upperMask: React.ReactNode;
   hasWheel: React.ReactNode;
   headBoxCover: React.ReactNode;
   headBoxTopCover: React.ReactNode;
@@ -69,7 +69,7 @@ type TconfigKeys = keyof Pick<
   | 'BD'
   | 'fullHeight'
   | 'isIntegratedHeadBox'
-  | 'upperMask'
+  // | 'upperMask'
   | 'hasWheel'
   | 'headBoxCover'
   | 'headBoxTopCover'
@@ -193,24 +193,36 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>捲箱</span>
       </div>
 
-      {keyArr_headBox.map((key, index) => {
+      {keyArr_headBox_left.map((key, index) => {
         const { label } = config_specialDoor[key];
         const value = props[key];
 
-        const [className_label, className_value] = (() => {
-          if (index >= keyArr_headBox.length / 2) {
-            return [scss.c9, scss.c10];
-          }
+        return (
+          <Fragment key={key}>
+            <div className={classNames(scss.c7)}>
+              <span>{label}</span>
+            </div>
+            <div className={classNames(scss.c8)}>
+              <span>{value}</span>
+            </div>
+          </Fragment>
+        );
+      })}
 
-          return [scss.c7, scss.c8];
-        })();
+      {/* 填空 */}
+      <div className={classNames(scss.c7)} />
+      <div className={classNames(scss.c8)} />
+
+      {keyArr_headBox_right.map((key, index) => {
+        const { label } = config_specialDoor[key];
+        const value = props[key];
 
         return (
           <Fragment key={key}>
-            <div className={classNames(className_label)}>
+            <div className={classNames(scss.c9)}>
               <span>{label}</span>
             </div>
-            <div className={classNames(className_value)}>
+            <div className={classNames(scss.c10)}>
               <span>{value}</span>
             </div>
           </Fragment>
@@ -247,16 +259,19 @@ const keyArr_basic = Array.from(
 
 const keyArr_size = Array.from(new Set<TconfigKeys>(['fullWidth', 'height', 'WG', 'gapA', 'gapC', 'BD', 'fullHeight']));
 
-const keyArr_headBox = Array.from(
+const keyArr_headBox_left = Array.from(
   new Set<TconfigKeys>([
     'isIntegratedHeadBox',
     'hasWheel',
-    'upperMask',
+    // 'upperMask',
     'boxB',
     'boxD',
     'headBoxSizeM',
     'headBoxSizeN',
-
+  ])
+);
+const keyArr_headBox_right = Array.from(
+  new Set<TconfigKeys>([
     'headBoxCover',
     'headBoxTopCover',
     'headBoxSizeO',
@@ -318,9 +333,9 @@ const config_specialDoor: Record<TconfigKeys, TconfigItem> = {
   isIntegratedHeadBox: {
     label: '型式',
   },
-  upperMask: {
-    label: '上遮',
-  },
+  // upperMask: {
+  //   label: '上遮',
+  // },
   hasWheel: {
     label: '擋輪',
   },

@@ -161,8 +161,8 @@ type Tstate_specialDoor = {
 
   // 骨架
   skeleton: string;
-  // 上遮板
-  upperMask: boolean;
+  // 上蓋
+  // upperMask: boolean;
 };
 
 // MARK:useSpecialDoor
@@ -299,7 +299,7 @@ const useSpecialDoor = ({
         hasWheel: state_specialDoor.hasWheel,
 
         skeleton: state_specialDoor.skeleton,
-        upperMask: state_specialDoor.upperMask,
+        // upperMask: state_specialDoor.upperMask,
       };
 
       return contractProductItem;
@@ -432,7 +432,7 @@ const useDefaultState_specialDoor = ({
       sprocketWheelModel: quotationProductItem.sprocketWheelModel ?? '',
 
       skeleton: quotationProductItem.skeleton ?? '',
-      upperMask: !!quotationProductItem.upperMask,
+      // upperMask: !!quotationProductItem.upperMask,
     };
 
     return defaultState;
@@ -525,7 +525,7 @@ const emptyState_specialDoor = (): Tstate_specialDoor => {
     sprocketWheelModel: '',
 
     skeleton: '',
-    upperMask: false,
+    // upperMask: false,
   };
 
   return state;

@@ -1346,7 +1346,8 @@ const useData = () => {
 
   const { iterativeContractProductArr, prodArr } = useMemo(() => {
     const arr = Object.values(iterativeContractProductDict);
-    const prodArr = content?.products ? [...content.products] : [];
+    let prodArr = content?.products ? [...content.products] : [];
+    prodArr = _.sortBy(prodArr, 'order');
 
     let parsedProdArr = prodArr.map((_prod) => {
       const prod = { ..._prod, addition: {} } as TprodSource;
