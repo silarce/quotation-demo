@@ -35,8 +35,32 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
     unit: null,
     code: null,
   },
+  // {
+  //   category: '智慧型（含主機）+ 發訊器',
+  //   itemName: '鎖盒',
+  //   subItemName: undefined,
+  //   quantity: null,
+  //   unit: null,
+  //   code: null,
+  // },
+  // {
+  //   category: '智慧型（含主機）+ 發射器',
+  //   itemName: '鎖盒',
+  //   subItemName: undefined,
+  //   quantity: null,
+  //   unit: null,
+  //   code: null,
+  // },
+  // {
+  //   category: '智慧型（含主機）+ 發訊器 + 發射器',
+  //   itemName: '鎖盒',
+  //   subItemName: undefined,
+  //   quantity: null,
+  //   unit: null,
+  //   code: null,
+  // },
   {
-    category: '智慧型（含主機）+ 發訊器',
+    category: '電子式',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -44,15 +68,7 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
     code: null,
   },
   {
-    category: '智慧型（含主機）+ 發射器',
-    itemName: '鎖盒',
-    subItemName: undefined,
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '智慧型（含主機）+ 發訊器 + 發射器',
+    category: '防爆式',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -172,6 +188,14 @@ const defaultStateArr_押扣: Tstate_electronicItem[] = [
     unit: null,
     code: null,
   },
+  {
+    itemName: '押扣',
+    subItemName: undefined,
+    category: '三點式(遮煙)',
+    quantity: null,
+    unit: null,
+    code: null,
+  },
 ];
 
 const defaultStateArr_消防備品: Tstate_electronicItem[] = [
@@ -250,8 +274,8 @@ const defaultStateArr_紅外線: Tstate_electronicItem[] = [
 const defaultStateArr = [
   ...defaultStateArr_鎖盒,
   ...defaultStateArr_鎖匙,
-  ...defaultStateArr_控制箱盤,
   ...defaultStateArr_押扣,
+  ...defaultStateArr_控制箱盤,
   ...defaultStateArr_消防備品,
   ...defaultStateArr_主機,
   ...defaultStateArr_紅外線,
