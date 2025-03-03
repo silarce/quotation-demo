@@ -807,6 +807,9 @@ function Form_specialProd_headBox({
             },
           }}
         /> */}
+
+        <br />
+
         <InputSel
           {...basicConfig}
           caption="上蓋"
