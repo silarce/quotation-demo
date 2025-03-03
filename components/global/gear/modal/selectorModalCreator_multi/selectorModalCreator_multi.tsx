@@ -210,7 +210,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     // ------------------------------------------------------------------------
 
-    const { data: data_department, update: update_department, isLoading } = useDepartments();
+    const { data: data_department, update: update_department, isLoading } = useDepartments({ pageSize: 99999 });
 
     const options_department = useMemo(() => {
       if (!data_department) {
