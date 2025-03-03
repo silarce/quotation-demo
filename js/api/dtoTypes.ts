@@ -3452,6 +3452,7 @@ export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
   TcreateElectronicSuppliesRequirementRecordDto,
   'operationDate' | 'storageManagementPersonnelId' | 'doorType' | 'quantity'
 > & {
+  id?: string;
   requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
 };
 

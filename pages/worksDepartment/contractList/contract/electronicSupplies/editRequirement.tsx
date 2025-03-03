@@ -182,6 +182,10 @@ export default function EditRequirementRecord() {
     };
 
     if (requirementRecordId) {
+      body.requirementRecordDetails = (
+        body as TupdateElectronicSuppliesRequirementRecordDto
+      ).requirementRecordDetails.filter((detail) => !(!detail.id && !detail.quantity));
+
       await apiPatchElectronicSuppliesRequirementRecord(requirementRecordId, body).then(async () => {
         await update_requirementRecord();
         setDisabled(true);
@@ -331,15 +335,15 @@ export default function EditRequirementRecord() {
       //
     });
 
-    // 若不是新增而是編輯
-    if (!isNew) {
-      // 將defaultStateList中所有沒有id的item刪掉
-      for (const [key, value] of Object.entries(defaultStateList)) {
-        if (!value.id) {
-          delete defaultStateList[key];
-        }
-      }
-    }
+    // // 若不是新增而是編輯
+    // if (!isNew) {
+    //   // 將defaultStateList中所有沒有id的item刪掉
+    //   for (const [key, value] of Object.entries(defaultStateList)) {
+    //     if (!value.id) {
+    //       delete defaultStateList[key];
+    //     }
+    //   }
+    // }
 
     let stateInfo = createEmptyStateInfo();
 
