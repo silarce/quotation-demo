@@ -137,6 +137,30 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
     unit: null,
     code: null,
   },
+  {
+    category: '彈射門控制箱_HP _V(大同/東元)',
+    itemName: '控制箱/盤',
+    subItemName: '捲門/水閘門',
+    quantity: null,
+    unit: null,
+    code: null,
+  },
+  {
+    category: 'UPS不斷電系統 1HP',
+    itemName: '控制箱/盤',
+    subItemName: '捲門/水閘門',
+    quantity: null,
+    unit: null,
+    code: null,
+  },
+  {
+    category: 'UPS不斷電系統 1/2HP',
+    itemName: '控制箱/盤',
+    subItemName: '捲門/水閘門',
+    quantity: null,
+    unit: null,
+    code: null,
+  },
 ];
 
 const defaultStateArr_押扣: Tstate_electronicItem[] = [
