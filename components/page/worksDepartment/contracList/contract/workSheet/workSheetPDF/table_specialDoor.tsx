@@ -25,7 +25,7 @@ interface Tprops_table_specialDoor {
   fullHeight: React.ReactNode;
   //
   isIntegratedHeadBox: React.ReactNode;
-  upperMask: React.ReactNode;
+  // upperMask: React.ReactNode;
   hasWheel: React.ReactNode;
   headBoxCover: React.ReactNode;
   headBoxTopCover: React.ReactNode;
@@ -69,7 +69,7 @@ type TconfigKeys = keyof Pick<
   | 'BD'
   | 'fullHeight'
   | 'isIntegratedHeadBox'
-  | 'upperMask'
+  // | 'upperMask'
   | 'hasWheel'
   | 'headBoxCover'
   | 'headBoxTopCover'
@@ -251,7 +251,7 @@ const keyArr_headBox = Array.from(
   new Set<TconfigKeys>([
     'isIntegratedHeadBox',
     'hasWheel',
-    'upperMask',
+    // 'upperMask',
     'boxB',
     'boxD',
     'headBoxSizeM',
@@ -318,9 +318,9 @@ const config_specialDoor: Record<TconfigKeys, TconfigItem> = {
   isIntegratedHeadBox: {
     label: '型式',
   },
-  upperMask: {
-    label: '上遮',
-  },
+  // upperMask: {
+  //   label: '上遮',
+  // },
   hasWheel: {
     label: '擋輪',
   },

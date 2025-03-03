@@ -627,7 +627,7 @@ type Tstate_specialProd_headBox = {
   headBoxSizeP: `${number}` | '';
   headBoxSizeQ: `${number}` | '';
 
-  upperMask: boolean;
+  // upperMask: boolean;
 };
 
 function Form_specialProd_headBox({
@@ -650,7 +650,7 @@ function Form_specialProd_headBox({
     headBoxSizeP,
     headBoxSizeQ,
 
-    upperMask,
+    // upperMask,
   },
   setState,
   disabled,
@@ -789,7 +789,7 @@ function Form_specialProd_headBox({
             },
           }}
         />
-        <InputSel
+        {/* <InputSel
           {...basicConfig}
           caption="上遮"
           disabled={disabled}
@@ -806,7 +806,7 @@ function Form_specialProd_headBox({
               },
             },
           }}
-        />
+        /> */}
         <InputSel
           {...basicConfig}
           caption="上蓋"
