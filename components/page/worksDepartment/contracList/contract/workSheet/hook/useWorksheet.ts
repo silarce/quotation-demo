@@ -759,6 +759,10 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.headBox.headBoxCover = value;
+
+            if (state.headBox.headBoxCover === 'none') {
+              state.headBox.headBoxSizeM = '0';
+            }
           })
         );
       },
@@ -767,6 +771,10 @@ const useWorksheet = create<Tworksheet>(
         set(
           produce((state) => {
             state.headBox.headBoxTopCover = value;
+
+            if (state.headBox.headBoxTopCover === 'false') {
+              state.headBox.headBoxSizeN = '0';
+            }
           })
         );
       },
