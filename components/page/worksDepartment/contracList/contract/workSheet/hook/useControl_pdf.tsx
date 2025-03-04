@@ -262,15 +262,12 @@ const createPdfItem = ({
       headBoxSizeD: item.boxD,
       headBoxSizeX: item.headBoxSizeX,
       headBoxSizeY: item.headBoxSizeY,
-      headBoxSizeM: item.headBoxSizeM,
-      headBoxSizeN: item.headBoxSizeN,
       headBoxSizeO: item.headBoxSizeO,
       headBoxSizeP: item.headBoxSizeP,
       headBoxSizeQ: item.headBoxSizeQ,
-      // imgUrl1: url_headBox1.url,
-      // imgUrl2: url_headBox2.url,
-      // imgUrl3: url_headBoxTopCover.url,
-      // imgUrl4: url_headBoxCover.url,
+      headBoxSizeM:
+        (item.headBoxCover === 'none' || !item.headBoxCover) && !Number(item.headBoxSizeM) ? '無' : item.headBoxSizeM,
+      headBoxSizeN: !item.headBoxTopCover && !Number(item.headBoxSizeN) ? '無' : item.headBoxSizeN,
 
       svgString1: assetDict[url_headBox1.name || 'null'] || null,
       svgString2: assetDict[url_headBox2.name || 'null'] || null,
