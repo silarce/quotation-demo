@@ -1755,7 +1755,7 @@ export type TquotationProductItemDto = {
   headBoxSizeQ: `${number}` | null;
   // 骨架
   skeleton: string | null;
-  // 上遮
+  // 上遮 // 棄用
   upperMask: boolean | null;
 };
 
@@ -3891,8 +3891,8 @@ export type TupdateContractProductItemDto = {
 
   // 骨架
   skeleton: string | null;
-  // 上遮
-  upperMask: boolean | null;
+  // 上遮 // 棄用
+  upperMask?: boolean | null;
 
   // @ApiProperty({ type: QuotationProductDto, description: '主產品' })
   // product: QuotationProductDto;

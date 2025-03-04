@@ -53,17 +53,17 @@ import {
   getHeadBoxSvgUrl4,
 } from './shared';
 
+import type { TdoorModelInfoDto } from 'js/api/dtoTypes';
+
 // ==============================================================================
 
-function WorksheetForm({
-  reqPatchWorkSheet = () => {},
-  disabled = false,
-  uploadButton = true,
-}: {
-  reqPatchWorkSheet?: () => void;
-  disabled?: boolean;
-  uploadButton?: boolean;
-}) {
+const options_doorType = optionsCreator_quoteType();
+
+// ==============================================================================
+
+function WorksheetForm(props: { reqPatchWorkSheet?: () => void; disabled?: boolean; calcOnly?: boolean }) {
+  const { reqPatchWorkSheet = () => {}, disabled, calcOnly = false } = props;
+
   const { doorModelName, calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
     useShallow((state) => ({
       doorModelName: state.basicSpec.doorModelName,
@@ -107,7 +107,7 @@ function WorksheetForm({
       </div>
       <div>
         <Section>設定產品基本規格：</Section>
-        <Form_product_basic disabled={disabled} />
+        <Form_product_basic disabled={disabled} calcOnly={calcOnly} />
       </div>
       <MainFormWrapper>
         <Section>設定產品細部規格：</Section>
@@ -130,7 +130,7 @@ function WorksheetForm({
         <WorksheetTable />
         {shouldCalcData2 && <div className={scss.cover}></div>}
       </div>
-      {uploadButton && (
+      {!calcOnly && (
         <div className={classNames('relative', disabled && 'hidden')}>
           <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
             確認上傳
@@ -217,32 +217,7 @@ function Form_product_location({ disabled }: { disabled: boolean | undefined }) 
 
 // MARK: basic
 
-function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
-  // --------------------------------------------------
-
-  // const {
-  //   //
-  //   basicSpec,
-  //   setDoorModelInfo,
-  //   getOptions_material,
-  //   calcData,
-  //   isAntiTyphoonLock,
-  //   getOptions_doorModelInfo,
-  //   isSpecialProd,
-  // } = useWorksheet(
-  //   useShallow((state) => ({
-  //     doorModelInfo: state.doorModelInfo,
-  //     basicSpec: state.basicSpec,
-  //     setDoorModelInfo: state.setDoorModelInfo,
-  //     getOptions_material: state.getOptions_material,
-  //     calcData: state.calcData,
-  //     isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
-  //     getOptions_doorModelInfo: state.getOptions_doorModelInfo,
-  //     isSpecialProd: state.getIsSpecialProd(),
-  //     generalSpec: state.generalSpec, // 用於更新getOptions
-  //     // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-  //   }))
-  // );
+function Form_product_basic({ disabled, calcOnly }: { disabled: boolean | undefined; calcOnly?: boolean }) {
   const {
     //
     basicSpec,
@@ -254,6 +229,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
     // isSpecialProd,
     calcTarget,
     setCalcTarget,
+    // options_doorType,
   } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
@@ -268,32 +244,66 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
       calcTarget: state.calcTarget,
       setCalcTarget: state.setCalcTarget,
+      // options_doorType: state.getOptions_doorModelInfo(),
+      // options_type:state.getOptions
     }))
   );
+
+  // ---------------------------------------------------------------------
+
+  const props_quoteType: TinputSelProps = calcOnly
+    ? {
+        disabled: false,
+        selectProps: {
+          props: {
+            value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
+            options: options_doorType,
+            isSearchable: true,
+            onChange: (options) => {
+              basicSpec.setBasicSpec_quoteType(options?.value ?? '');
+            },
+          },
+        },
+      }
+    : {
+        disabled: true,
+        node: basicSpec.quoteType,
+        showBaseline: 'invisible',
+      };
+
+  const props_doorModelName: TinputSelProps = calcOnly
+    ? {
+        disabled: false,
+        selectProps: {
+          props: {
+            options: getOptions_doorModelInfo(),
+            value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
+            onChange: (option) => {
+              const obj = option?.obj as TdoorModelInfoDto;
+              setDoorModelInfo(obj);
+            },
+            onInputChange: (value, action) => {
+              if (action.action === 'input-change') {
+                basicSpec.setBasicSpec_doorModelName(value);
+              }
+            },
+          },
+        },
+      }
+    : {
+        disabled: true,
+        node: basicSpec.doorModelName_whole(),
+        showBaseline: 'invisible',
+      };
 
   // ---------------------------------------------------------------------
 
   return (
     <div>
       <div className={scss.grid}>
-        <InputSel
-          {...basicConfig}
-          disabled={true}
-          showBaseline="invisible"
-          caption="報價別"
-          node={basicSpec.quoteType}
-          // selectProps={{
-          //   props: {
-          //     value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
-          //     options: options_doorType,
-          //     isSearchable: true,
-          //     onChange: (options) => {
-          //       basicSpec.setBasicSpec_quoteType(options?.value ?? '');
-          //     },
-          //   },
-          // }}
-        />
-        <div></div>
+        <InputSel {...basicConfig} {...props_quoteType} caption="報價別" />
+        <br />
+        <InputSel {...basicConfig} {...props_doorModelName} caption="門型" />
         <InputSel
           {...basicConfig}
           disabled={disabled}
@@ -306,37 +316,6 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
               },
             },
           }}
-        />
-        <InputSel
-          {...basicConfig}
-          disabled={true}
-          showBaseline="invisible"
-          caption="門型"
-          // node={basicSpec.doorModelName}
-          node={basicSpec.doorModelName_whole()}
-          // selectProps={{
-          //   props: {
-          //     options: isSpecialProd ? [] : getOptions_doorModelInfo(),
-          //     isSearchable: isSpecialProd,
-          //     menuIsOpen: isSpecialProd ? false : undefined,
-
-          //     value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
-          //     onChange: (option) => {
-          //       if (isSpecialProd) {
-          //         // setDoorModelInfo(undefined);
-          //         basicSpec.setBasicSpec_doorModelName(option?.value ?? '');
-          //       } else {
-          //         const obj = option?.obj as TdoorModelInfoDto;
-          //         setDoorModelInfo(obj);
-          //       }
-          //     },
-          //     onInputChange: (value, action) => {
-          //       if (action.action === 'input-change') {
-          //         basicSpec.setBasicSpec_doorModelName(value);
-          //       }
-          //     },
-          //   },
-          // }}
         />
         <InputSel
           {...basicConfig}
@@ -741,16 +720,72 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     }))
   );
 
-  const url1 = getHeadBoxSvgUrl1({
-    isIntegratedHeadBox: isIntegratedHeadBox === 'true',
-    hasWheel: hasWheel === 'true',
-  });
-  const url2 = getHeadBoxSvgUrl2({
-    isIntegratedHeadBox: isIntegratedHeadBox === 'true',
-    hasWheel: hasWheel === 'true',
-  });
+  const isIsIntegratedHeadBoxValid = isIntegratedHeadBox === '一體式捲箱' || isIntegratedHeadBox === '捲箱加機箱';
+
+  const url1 = isIsIntegratedHeadBoxValid
+    ? getHeadBoxSvgUrl1({
+        isIntegratedHeadBox: isIntegratedHeadBox === '一體式捲箱',
+        hasWheel: hasWheel === 'true',
+      })
+    : isIntegratedHeadBox;
+  const url2 = isIsIntegratedHeadBoxValid
+    ? getHeadBoxSvgUrl2({
+        isIntegratedHeadBox: isIntegratedHeadBox === '一體式捲箱',
+        hasWheel: hasWheel === 'true',
+      })
+    : isIntegratedHeadBox;
   const url3 = getHeadBoxSvgUrl3({ headBoxTopCover: headBoxTopCover === 'true' });
   const url4 = getHeadBoxSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
+
+  const props_sizeM: TinputSelProps =
+    headBoxCover === 'none' && headBoxSizeM === '0'
+      ? {
+          node: '無',
+          disabled: true,
+          showBaseline: 'invisible',
+        }
+      : {
+          disabled,
+          inputProps: {
+            props: {
+              ...inputNumberProps,
+              value: headBoxSizeM,
+              onChange: (e) => {
+                if (!e.target.validity.valid) {
+                  return;
+                }
+
+                const value = e.target.value as `${number}`;
+                setBoxXYMNOPQ({ key: 'headBoxSizeM', value: value });
+              },
+            },
+          },
+        };
+
+  const props_sizeN: TinputSelProps =
+    headBoxTopCover === 'false' && headBoxSizeN === '0'
+      ? {
+          node: '無',
+          disabled: true,
+          showBaseline: 'invisible',
+        }
+      : {
+          disabled,
+          inputProps: {
+            props: {
+              ...inputNumberProps,
+              value: headBoxSizeN,
+              onChange: (e) => {
+                if (!e.target.validity.valid) {
+                  return;
+                }
+
+                const value = e.target.value as `${number}`;
+                setBoxXYMNOPQ({ key: 'headBoxSizeN', value: value });
+              },
+            },
+          },
+        };
 
   return (
     <div>
@@ -940,14 +975,10 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
         />
 
         <div className={scss.headBoxImgContainer}>
-          <div>{url1 && <Image src={url1} alt="" width={243} height={243} />}</div>
-          <div>{url2 && <Image src={url2} alt="" width={243} height={243} />}</div>
+          <div>{url1 && <Image src={url1} alt={url1} width={243} height={243} />}</div>
+          <div>{url2 && <Image src={url2} alt={url2} width={243} height={243} />}</div>
           <div>{url3 && <Image src={url3} alt="上蓋" width={243} height={243} />}</div>
           <div>{url4 && <Image src={url4} alt="前遮" width={243} height={243} />}</div>
-          {/* <div className="">{url1 && <Image src={img_husky} alt="" />}</div>
-          <div className="">{url2 && <Image src={img_husky} alt="" />}</div>
-          <div className="">{url3 && <Image src={img_husky} alt="上蓋" />}</div>
-          <div>{url4 && <Image src={img_husky} alt="前遮" />}</div> */}
         </div>
 
         <div className="grid gap-[25px] content-start">
@@ -991,44 +1022,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
               },
             }}
           />
-          <InputSel
-            {...basicConfig}
-            caption="SizeM"
-            disabled={disabled}
-            inputProps={{
-              props: {
-                ...inputNumberProps,
-                value: headBoxSizeM,
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
 
-                  const value = e.target.value as `${number}`;
-                  setBoxXYMNOPQ({ key: 'headBoxSizeM', value: value });
-                },
-              },
-            }}
-          />
-          <InputSel
-            {...basicConfig}
-            caption="SizeN"
-            disabled={disabled}
-            inputProps={{
-              props: {
-                ...inputNumberProps,
-                value: headBoxSizeN,
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
-
-                  const value = e.target.value as `${number}`;
-                  setBoxXYMNOPQ({ key: 'headBoxSizeN', value: value });
-                },
-              },
-            }}
-          />
           <InputSel
             {...basicConfig}
             caption="SizeO"
@@ -1086,6 +1080,8 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
               },
             }}
           />
+          <InputSel {...basicConfig} {...props_sizeM} caption="SizeM" />
+          <InputSel {...basicConfig} {...props_sizeN} caption="SizeN" />
         </div>
       </div>
     </div>

@@ -627,7 +627,7 @@ type Tstate_specialProd_headBox = {
   headBoxSizeP: `${number}` | '';
   headBoxSizeQ: `${number}` | '';
 
-  upperMask: boolean;
+  // upperMask: boolean;
 };
 
 function Form_specialProd_headBox({
@@ -650,7 +650,7 @@ function Form_specialProd_headBox({
     headBoxSizeP,
     headBoxSizeQ,
 
-    upperMask,
+    // upperMask,
   },
   setState,
   disabled,
@@ -731,7 +731,8 @@ function Form_specialProd_headBox({
             },
           }}
         />
-
+        <br />
+        <br />
         <InputSel
           {...basicConfig}
           caption="形式"
@@ -789,7 +790,7 @@ function Form_specialProd_headBox({
             },
           }}
         />
-        <InputSel
+        {/* <InputSel
           {...basicConfig}
           caption="上遮"
           disabled={disabled}
@@ -806,7 +807,8 @@ function Form_specialProd_headBox({
               },
             },
           }}
-        />
+        /> */}
+
         <InputSel
           {...basicConfig}
           caption="上蓋"
@@ -870,40 +872,7 @@ function Form_specialProd_headBox({
               },
             }}
           />
-          <InputSel
-            {...basicConfig}
-            caption="SizeM"
-            disabled={disabled}
-            inputProps={{
-              props: {
-                ...inputNumberProps,
-                value: headBoxSizeM,
-                onChange: (e) => {
-                  if (e.target.validity.valid) {
-                    const value = e.target.value as `${number}`;
-                    setState((prev) => ({ ...prev, headBoxSizeM: value }));
-                  }
-                },
-              },
-            }}
-          />
-          <InputSel
-            {...basicConfig}
-            caption="SizeN"
-            disabled={disabled}
-            inputProps={{
-              props: {
-                ...inputNumberProps,
-                value: headBoxSizeN,
-                onChange: (e) => {
-                  if (e.target.validity.valid) {
-                    const value = e.target.value as `${number}`;
-                    setState((prev) => ({ ...prev, headBoxSizeN: value }));
-                  }
-                },
-              },
-            }}
-          />
+
           <InputSel
             {...basicConfig}
             caption="SizeO"
@@ -950,6 +919,41 @@ function Form_specialProd_headBox({
                   if (e.target.validity.valid) {
                     const value = e.target.value as `${number}`;
                     setState((prev) => ({ ...prev, headBoxSizeQ: value }));
+                  }
+                },
+              },
+            }}
+          />
+
+          <InputSel
+            {...basicConfig}
+            caption="SizeM"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeM,
+                onChange: (e) => {
+                  if (e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeM: value }));
+                  }
+                },
+              },
+            }}
+          />
+          <InputSel
+            {...basicConfig}
+            caption="SizeN"
+            disabled={disabled}
+            inputProps={{
+              props: {
+                ...inputNumberProps,
+                value: headBoxSizeN,
+                onChange: (e) => {
+                  if (e.target.validity.valid) {
+                    const value = e.target.value as `${number}`;
+                    setState((prev) => ({ ...prev, headBoxSizeN: value }));
                   }
                 },
               },
