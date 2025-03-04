@@ -265,7 +265,8 @@ const createPdfItem = ({
       headBoxSizeO: item.headBoxSizeO,
       headBoxSizeP: item.headBoxSizeP,
       headBoxSizeQ: item.headBoxSizeQ,
-      headBoxSizeM: item.headBoxCover === 'none' && !Number(item.headBoxSizeM) ? '無' : item.headBoxSizeM,
+      headBoxSizeM:
+        (item.headBoxCover === 'none' || !item.headBoxCover) && !Number(item.headBoxSizeM) ? '無' : item.headBoxSizeM,
       headBoxSizeN: !item.headBoxTopCover && !Number(item.headBoxSizeN) ? '無' : item.headBoxSizeN,
 
       svgString1: assetDict[url_headBox1.name || 'null'] || null,
