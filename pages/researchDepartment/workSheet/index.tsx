@@ -21,7 +21,7 @@ export default function Research() {
 
   return (
     <div className="overflow-auto h-full">
-      <WorksheetForm uploadButton={false} />
+      <WorksheetForm calcOnly={true} />
     </div>
   );
 }

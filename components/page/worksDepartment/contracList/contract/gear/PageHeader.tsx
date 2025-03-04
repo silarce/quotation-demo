@@ -74,12 +74,15 @@ export default function PageHeader({
       feature.name === erpFeaturesLookup['worksDepartment'] ||
       feature.name === erpFeaturesLookup['accountsReceivable'] ||
       feature.name === erpFeaturesLookup['worksDepartment_worksheet'] ||
-      feature.name === erpFeaturesLookup['worksDepartment_deliveryList']
+      feature.name === erpFeaturesLookup['worksDepartment_deliveryList'] ||
+      feature.name === erpFeaturesLookup['worksDepartment_readonly']
     );
   });
 
   const domesticPass = erpFeature?.some((feature) => {
-    return feature.name === erpFeaturesLookup['domestic'];
+    return (
+      feature.name === erpFeaturesLookup['domestic'] || feature.name === erpFeaturesLookup['worksDepartment_readonly']
+    );
   });
 
   // -------------------------------------------------------------

@@ -53,17 +53,17 @@ import {
   getHeadBoxSvgUrl4,
 } from './shared';
 
+import type { TdoorModelInfoDto } from 'js/api/dtoTypes';
+
 // ==============================================================================
 
-function WorksheetForm({
-  reqPatchWorkSheet = () => {},
-  disabled = false,
-  uploadButton = true,
-}: {
-  reqPatchWorkSheet?: () => void;
-  disabled?: boolean;
-  uploadButton?: boolean;
-}) {
+const options_doorType = optionsCreator_quoteType();
+
+// ==============================================================================
+
+function WorksheetForm(props: { reqPatchWorkSheet?: () => void; disabled?: boolean; calcOnly?: boolean }) {
+  const { reqPatchWorkSheet = () => {}, disabled, calcOnly = false } = props;
+
   const { doorModelName, calcData_2, shouldCalcData, shouldCalcData2 } = useWorksheet(
     useShallow((state) => ({
       doorModelName: state.basicSpec.doorModelName,
@@ -107,7 +107,7 @@ function WorksheetForm({
       </div>
       <div>
         <Section>設定產品基本規格：</Section>
-        <Form_product_basic disabled={disabled} />
+        <Form_product_basic disabled={disabled} calcOnly={calcOnly} />
       </div>
       <MainFormWrapper>
         <Section>設定產品細部規格：</Section>
@@ -130,7 +130,7 @@ function WorksheetForm({
         <WorksheetTable />
         {shouldCalcData2 && <div className={scss.cover}></div>}
       </div>
-      {uploadButton && (
+      {!calcOnly && (
         <div className={classNames('relative', disabled && 'hidden')}>
           <MyButton_v2 px="px32" className="block m-auto " onClick={reqPatchWorkSheet}>
             確認上傳
@@ -217,32 +217,7 @@ function Form_product_location({ disabled }: { disabled: boolean | undefined }) 
 
 // MARK: basic
 
-function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
-  // --------------------------------------------------
-
-  // const {
-  //   //
-  //   basicSpec,
-  //   setDoorModelInfo,
-  //   getOptions_material,
-  //   calcData,
-  //   isAntiTyphoonLock,
-  //   getOptions_doorModelInfo,
-  //   isSpecialProd,
-  // } = useWorksheet(
-  //   useShallow((state) => ({
-  //     doorModelInfo: state.doorModelInfo,
-  //     basicSpec: state.basicSpec,
-  //     setDoorModelInfo: state.setDoorModelInfo,
-  //     getOptions_material: state.getOptions_material,
-  //     calcData: state.calcData,
-  //     isAntiTyphoonLock: state.getIsAntiTyphoonLock(),
-  //     getOptions_doorModelInfo: state.getOptions_doorModelInfo,
-  //     isSpecialProd: state.getIsSpecialProd(),
-  //     generalSpec: state.generalSpec, // 用於更新getOptions
-  //     // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
-  //   }))
-  // );
+function Form_product_basic({ disabled, calcOnly }: { disabled: boolean | undefined; calcOnly?: boolean }) {
   const {
     //
     basicSpec,
@@ -254,6 +229,7 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
     // isSpecialProd,
     calcTarget,
     setCalcTarget,
+    // options_doorType,
   } = useWorksheet(
     useShallow((state) => ({
       doorModelInfo: state.doorModelInfo,
@@ -268,31 +244,64 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
       // avalibleComponent: state.avalibleComponents, // 用於更新getOptions
       calcTarget: state.calcTarget,
       setCalcTarget: state.setCalcTarget,
+      // options_doorType: state.getOptions_doorModelInfo(),
+      // options_type:state.getOptions
     }))
   );
+
+  // ---------------------------------------------------------------------
+
+  const props_quoteType: TinputSelProps = calcOnly
+    ? {
+        disabled: false,
+        selectProps: {
+          props: {
+            value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
+            options: options_doorType,
+            isSearchable: true,
+            onChange: (options) => {
+              basicSpec.setBasicSpec_quoteType(options?.value ?? '');
+            },
+          },
+        },
+      }
+    : {
+        disabled: true,
+        node: basicSpec.quoteType,
+        showBaseline: 'invisible',
+      };
+
+  const props_doorModelName: TinputSelProps = calcOnly
+    ? {
+        disabled: false,
+        selectProps: {
+          props: {
+            options: getOptions_doorModelInfo(),
+            value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
+            onChange: (option) => {
+              const obj = option?.obj as TdoorModelInfoDto;
+              setDoorModelInfo(obj);
+            },
+            onInputChange: (value, action) => {
+              if (action.action === 'input-change') {
+                basicSpec.setBasicSpec_doorModelName(value);
+              }
+            },
+          },
+        },
+      }
+    : {
+        disabled: true,
+        node: basicSpec.doorModelName_whole(),
+        showBaseline: 'invisible',
+      };
 
   // ---------------------------------------------------------------------
 
   return (
     <div>
       <div className={scss.grid}>
-        <InputSel
-          {...basicConfig}
-          disabled={true}
-          showBaseline="invisible"
-          caption="報價別"
-          node={basicSpec.quoteType}
-          // selectProps={{
-          //   props: {
-          //     value: { value: basicSpec.quoteType, label: basicSpec.quoteType },
-          //     options: options_doorType,
-          //     isSearchable: true,
-          //     onChange: (options) => {
-          //       basicSpec.setBasicSpec_quoteType(options?.value ?? '');
-          //     },
-          //   },
-          // }}
-        />
+        <InputSel {...basicConfig} {...props_quoteType} caption="報價別" />
         <div></div>
         <InputSel
           {...basicConfig}
@@ -309,11 +318,12 @@ function Form_product_basic({ disabled }: { disabled: boolean | undefined }) {
         />
         <InputSel
           {...basicConfig}
-          disabled={true}
-          showBaseline="invisible"
+          {...props_doorModelName}
+          // disabled={true}
+          // showBaseline="invisible"
           caption="門型"
           // node={basicSpec.doorModelName}
-          node={basicSpec.doorModelName_whole()}
+          // node={basicSpec.doorModelName_whole()}
           // selectProps={{
           //   props: {
           //     options: isSpecialProd ? [] : getOptions_doorModelInfo(),
