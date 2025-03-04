@@ -302,7 +302,8 @@ function Form_product_basic({ disabled, calcOnly }: { disabled: boolean | undefi
     <div>
       <div className={scss.grid}>
         <InputSel {...basicConfig} {...props_quoteType} caption="報價別" />
-        <div></div>
+        <br />
+        <InputSel {...basicConfig} {...props_doorModelName} caption="門型" />
         <InputSel
           {...basicConfig}
           disabled={disabled}
@@ -315,38 +316,6 @@ function Form_product_basic({ disabled, calcOnly }: { disabled: boolean | undefi
               },
             },
           }}
-        />
-        <InputSel
-          {...basicConfig}
-          {...props_doorModelName}
-          // disabled={true}
-          // showBaseline="invisible"
-          caption="門型"
-          // node={basicSpec.doorModelName}
-          // node={basicSpec.doorModelName_whole()}
-          // selectProps={{
-          //   props: {
-          //     options: isSpecialProd ? [] : getOptions_doorModelInfo(),
-          //     isSearchable: isSpecialProd,
-          //     menuIsOpen: isSpecialProd ? false : undefined,
-
-          //     value: { value: basicSpec.doorModelName, label: basicSpec.doorModelName },
-          //     onChange: (option) => {
-          //       if (isSpecialProd) {
-          //         // setDoorModelInfo(undefined);
-          //         basicSpec.setBasicSpec_doorModelName(option?.value ?? '');
-          //       } else {
-          //         const obj = option?.obj as TdoorModelInfoDto;
-          //         setDoorModelInfo(obj);
-          //       }
-          //     },
-          //     onInputChange: (value, action) => {
-          //       if (action.action === 'input-change') {
-          //         basicSpec.setBasicSpec_doorModelName(value);
-          //       }
-          //     },
-          //   },
-          // }}
         />
         <InputSel
           {...basicConfig}
@@ -768,6 +737,56 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
   const url3 = getHeadBoxSvgUrl3({ headBoxTopCover: headBoxTopCover === 'true' });
   const url4 = getHeadBoxSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
 
+  const props_sizeM: TinputSelProps =
+    headBoxCover === 'none' && headBoxSizeM === '0'
+      ? {
+          node: '無',
+          disabled: true,
+          showBaseline: 'invisible',
+        }
+      : {
+          disabled,
+          inputProps: {
+            props: {
+              ...inputNumberProps,
+              value: headBoxSizeM,
+              onChange: (e) => {
+                if (!e.target.validity.valid) {
+                  return;
+                }
+
+                const value = e.target.value as `${number}`;
+                setBoxXYMNOPQ({ key: 'headBoxSizeM', value: value });
+              },
+            },
+          },
+        };
+
+  const props_sizeN: TinputSelProps =
+    headBoxTopCover === 'false' && headBoxSizeN === '0'
+      ? {
+          node: '無',
+          disabled: true,
+          showBaseline: 'invisible',
+        }
+      : {
+          disabled,
+          inputProps: {
+            props: {
+              ...inputNumberProps,
+              value: headBoxSizeN,
+              onChange: (e) => {
+                if (!e.target.validity.valid) {
+                  return;
+                }
+
+                const value = e.target.value as `${number}`;
+                setBoxXYMNOPQ({ key: 'headBoxSizeN', value: value });
+              },
+            },
+          },
+        };
+
   return (
     <div>
       <p className={scss.caption}>●捲箱</p>
@@ -1003,44 +1022,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
               },
             }}
           />
-          <InputSel
-            {...basicConfig}
-            caption="SizeM"
-            disabled={disabled}
-            inputProps={{
-              props: {
-                ...inputNumberProps,
-                value: headBoxSizeM,
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
 
-                  const value = e.target.value as `${number}`;
-                  setBoxXYMNOPQ({ key: 'headBoxSizeM', value: value });
-                },
-              },
-            }}
-          />
-          <InputSel
-            {...basicConfig}
-            caption="SizeN"
-            disabled={disabled}
-            inputProps={{
-              props: {
-                ...inputNumberProps,
-                value: headBoxSizeN,
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
-
-                  const value = e.target.value as `${number}`;
-                  setBoxXYMNOPQ({ key: 'headBoxSizeN', value: value });
-                },
-              },
-            }}
-          />
           <InputSel
             {...basicConfig}
             caption="SizeO"
@@ -1098,6 +1080,8 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
               },
             }}
           />
+          <InputSel {...basicConfig} {...props_sizeM} caption="SizeM" />
+          <InputSel {...basicConfig} {...props_sizeN} caption="SizeN" />
         </div>
       </div>
     </div>
