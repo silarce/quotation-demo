@@ -244,16 +244,16 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
         {/*  */}
       </div>
 
-      <section className="border-l-4 border-r-4 border-b-4 border-black h-20">
+      <section className="border-l-4 border-r-4 border-b-4 border-black h-[170px]">
         <div className="px-1">
           備註：
           {memo}
         </div>
       </section>
 
-      <section className="border-l-4 border-r-4 border-b-4 border-black h-24">
+      {/* <section className="border-l-4 border-r-4 border-b-4 border-black h-24">
         <div className="px-1"></div>
-      </section>
+      </section> */}
     </div>
   );
 }
