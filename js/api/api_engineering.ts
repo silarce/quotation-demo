@@ -72,7 +72,7 @@ import type {
   TcreateElectronicSuppliesPickupRecordDto,
   TupdateElectronicSuppliesPickupRecordDto,
   TcreateElectronicSuppliesRequirementRecordDto,
-
+  TelectronicSuppliesRequirementRecordDetail,
   //
   TupdateAccountReceivableAccountantDto,
   TcreateElectronicSuppliesRecordDetailDto,
@@ -560,6 +560,16 @@ export const apiPatchElectronicSuppliesRequirementRecord = (
 
       return Promise.reject(err);
     });
+};
+
+// 取得合約的預設送電備品
+export const apiGetDefaultElectronicSuppliesRequirement = async (contractId: string) => {
+  const api = '/engineering/electronic-supplies/worksheet-to-create';
+  const params = {
+    contractId,
+  };
+
+  return axi.get<TelectronicSuppliesRequirementRecordDetail[]>(api, { params }).then(({ data }) => data);
 };
 
 const apiGetElectronicSuppliesPickupRecord_id = (id: string) => {

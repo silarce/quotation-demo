@@ -3395,6 +3395,11 @@ export type TelectronicSuppliesRequirementRecordDetailDto = {
   note: string | null;
 };
 
+export type TelectronicSuppliesRequirementRecordDetail = Pick<
+  TelectronicSuppliesRequirementRecordDetailDto,
+  'requirementRecordId' | 'itemName' | 'category' | 'quantity' | 'code' | 'note' | 'unit'
+>;
+
 export type TcreateElectronicSuppliesRecordDetailDto = Pick<
   TelectronicSuppliesRequirementRecordDetailDto,
   'itemName' | 'category' | 'quantity' | 'unit'

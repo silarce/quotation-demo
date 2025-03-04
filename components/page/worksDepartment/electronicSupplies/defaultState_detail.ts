@@ -9,10 +9,10 @@ type Tstate_electronicItem = {
   quantity: number | null;
   unit: string | null;
   code: string | null;
-  // code: string | null;
+
+  // itemName為'控制箱/盤'時，subItemName為'捲門/水閘門'，其他為null或undefined
   subItemName?: null | '捲門/水閘門';
 };
-// itemName為'控制箱/盤'時，subItemName為'捲門/水閘門'，其他為null或undefined
 
 type Tstate_info = {
   date: Moment | null;
