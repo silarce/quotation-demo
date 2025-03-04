@@ -232,11 +232,11 @@ export default function Miku_frontend_table01({ control }: { control: Tcontrol }
           <C.TableContent2 label="sizeD" value={headBox.headBoxSizeD} />
           <C.TableContent2 label="sizeX" value={headBox.headBoxSizeX} />
           <C.TableContent2 label="sizeY" value={headBox.headBoxSizeY} />
-          <C.TableContent2 label="sizeM" value={headBox.headBoxSizeM} />
-          <C.TableContent2 label="sizeN" value={headBox.headBoxSizeN} />
           <C.TableContent2 label="sizeO" value={headBox.headBoxSizeO} />
           <C.TableContent2 label="sizeP" value={headBox.headBoxSizeP} />
           <C.TableContent2 label="sizeQ" value={headBox.headBoxSizeQ} />
+          <C.TableContent2 label="sizeM" value={headBox.headBoxSizeM} />
+          <C.TableContent2 label="sizeN" value={headBox.headBoxSizeN} />
           {/* <hr className="border-black" /> */}
         </section>
         <hr className="col-span-2 border-black border-b-4 border-t-0" />
