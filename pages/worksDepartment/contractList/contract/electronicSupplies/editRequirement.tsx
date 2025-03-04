@@ -68,7 +68,7 @@ type TstateList = {
 
 // ==================================================================
 
-const SelectorGroup = selectModalCreator_multi<['employee']>({
+const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment']>({
   selectorArr: [
     // {
     //   key: 'employee',
@@ -77,7 +77,7 @@ const SelectorGroup = selectModalCreator_multi<['employee']>({
     //   limit: 1,
     // },
     {
-      key: 'employee',
+      key: 'employee_factoryDepartment',
       caption: '備料人員',
       tip: '單選',
       limit: 1,
