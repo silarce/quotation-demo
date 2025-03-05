@@ -136,6 +136,7 @@ export default function ElectronicSupplies() {
   const panelList = usePanelList({
     // reqCreateRequirementRecordFromIWorksheet,
     reqUpdateElectronicSupplies,
+    electronicSuppliesId,
   });
 
   // ------------------------------------------------------------------
@@ -223,9 +224,11 @@ export default function ElectronicSupplies() {
 const usePanelList = ({
   // reqCreateRequirementRecordFromIWorksheet,
   reqUpdateElectronicSupplies,
+  electronicSuppliesId,
 }: {
   // reqCreateRequirementRecordFromIWorksheet: () => void;
   reqUpdateElectronicSupplies: () => void;
+  electronicSuppliesId: string | null | undefined;
 }) => {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -244,19 +247,21 @@ const usePanelList = ({
   const panelList_supplyList: TpanelList = [];
   //
   const panelList_pickupRecord: TpanelList = [
-    {
-      type: 'addButton',
-      label: '新增領取單',
-      onClick: () =>
-        router.push({
-          pathname: `${router.pathname}/editPickup`,
-          // query,
-          query: {
-            ...query,
-            contractId: contractId, // 確保要有contractId
-          },
-        }),
-    },
+    electronicSuppliesId
+      ? {
+          type: 'addButton',
+          label: '新增領取單',
+          onClick: () =>
+            router.push({
+              pathname: `${router.pathname}/editPickup`,
+              // query,
+              query: {
+                ...query,
+                contractId: contractId, // 確保要有contractId
+              },
+            }),
+        }
+      : null,
   ];
   //
   const panelList_requirementRecord: TpanelList = [
@@ -290,7 +295,17 @@ const usePanelList = ({
     requirementRecord: panelList_requirementRecord,
   };
 
-  return listName ? list[listName] : [];
+  const panelArr = listName ? list[listName] : [];
+
+  // if (!electronicSuppliesId) {
+  //   panelArr.unshift({
+  //     type: 'redButton',
+  //     label: '產生送電備品列表',
+  //     onClick: reqUpdateElectronicSupplies,
+  //   });
+  // }
+
+  return panelArr;
 };
 
 // ============================================================================
