@@ -38,8 +38,8 @@ import RequirementRecord from 'components/page/worksDepartment/electronicSupplie
 import Profile, { TdoorQtySubTotalList } from 'components/page/worksDepartment/electronicSupplies/profile';
 
 // gear
-
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
@@ -122,6 +122,11 @@ export default function ElectronicSupplies() {
   //   await apiPostElectronicSupplies({ contractId }).then(update);
   // };
 
+  // 預計用來更新送電備品列表，待api製作出來
+  const reqUpdateElectronicSupplies = async () => {
+    myAlert.notify.info({ message: '功能製作中' });
+  };
+
   // ------------------------------------------------------------------
 
   // MARK: PROPS
@@ -129,7 +134,8 @@ export default function ElectronicSupplies() {
   const { doorModalQtyList, doorQtyTotal } = useCalcDoorModal(worksheet ?? []);
 
   const panelList = usePanelList({
-    //  reqCreateRequirementRecordFromIWorksheet
+    // reqCreateRequirementRecordFromIWorksheet,
+    reqUpdateElectronicSupplies,
   });
 
   // ------------------------------------------------------------------
@@ -214,10 +220,12 @@ export default function ElectronicSupplies() {
 
 // region HOOK
 
-const usePanelList = ({}: //
-// reqCreateRequirementRecordFromIWorksheet,
-{
+const usePanelList = ({
+  // reqCreateRequirementRecordFromIWorksheet,
+  reqUpdateElectronicSupplies,
+}: {
   // reqCreateRequirementRecordFromIWorksheet: () => void;
+  reqUpdateElectronicSupplies: () => void;
 }) => {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -225,7 +233,13 @@ const usePanelList = ({}: //
 
   // ------------------------------------------------------------------------
   //
-  const panelList_itemList: TpanelList = [];
+  const panelList_itemList: TpanelList = [
+    // {
+    //   type: 'myButton',
+    //   label: '更新送電備品列表',
+    //   onClick: reqUpdateElectronicSupplies,
+    // },
+  ];
   //
   const panelList_supplyList: TpanelList = [];
   //
