@@ -18,7 +18,7 @@ const nextConfig = {
     // domains: ["sanjeou-erp-be.caprover.credot-web.com"],
   },
   env: {
-    DEPLOY_TIME: moment().tz("Asia/Taipei").format("YYYY-MM-DD hh:mm:ss"), // 設置部屬時間為環境變數
+    DEPLOY_TIME: moment().tz("Asia/Taipei").format("YYYY-MM-DD HH:mm:ss"), // 設置部屬時間為環境變數
   },
 };
 

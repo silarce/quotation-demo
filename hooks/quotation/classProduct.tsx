@@ -2563,6 +2563,10 @@ class Class_product {
   }
 
   set quotationDiscount(v) {
+    if (this._quotationDiscount === v) {
+      return;
+    }
+
     this._quotationDiscount = v;
 
     if (this.isSpecialProd) {

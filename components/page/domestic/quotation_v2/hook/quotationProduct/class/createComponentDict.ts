@@ -2,7 +2,6 @@ import type { TdoorComponentListDto } from 'js/api/dtoTypes';
 
 import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/componentFilter';
 
-import { ClassProd_base } from './prod/classProd_base';
 import type { Tdata_componentDict } from '../type';
 
 import { ClassProd } from './prod/classProd_remake';
