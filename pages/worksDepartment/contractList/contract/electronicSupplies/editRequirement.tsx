@@ -229,7 +229,13 @@ export default function EditRequirementRecord() {
       return state;
     });
 
-    // setState_electronicItemList(state_electronicItemArr);
+    const list = _.keyBy(state_electronicItemArr, 'category');
+    const { defaultStateList } = createDefaultState();
+
+    setState_electronicItemList({
+      ...defaultStateList,
+      ...list,
+    });
   };
 
   // ------------------------------------------------------------------
@@ -481,7 +487,9 @@ export default function EditRequirementRecord() {
           />
 
           <div>
-            <SquareBtn sharp="mini">重置為預設需求單</SquareBtn>
+            <SquareBtn sharp="mini" onClick={reqGetDefaultElectronicSuppliesRequirement}>
+              重置為預設需求單
+            </SquareBtn>
           </div>
         </div>
         {/* table */}

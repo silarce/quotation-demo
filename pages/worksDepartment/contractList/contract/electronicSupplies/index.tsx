@@ -117,9 +117,10 @@ export default function ElectronicSupplies() {
 
   // region REQUEST
 
-  const reqCreateRequirementRecordFromIWorksheet = async () => {
-    await apiPostElectronicSupplies({ contractId }).then(update);
-  };
+  // 棄用
+  // const reqCreateRequirementRecordFromIWorksheet = async () => {
+  //   await apiPostElectronicSupplies({ contractId }).then(update);
+  // };
 
   // ------------------------------------------------------------------
 
@@ -127,7 +128,9 @@ export default function ElectronicSupplies() {
 
   const { doorModalQtyList, doorQtyTotal } = useCalcDoorModal(worksheet ?? []);
 
-  const panelList = usePanelList({ reqCreateRequirementRecordFromIWorksheet });
+  const panelList = usePanelList({
+    //  reqCreateRequirementRecordFromIWorksheet
+  });
 
   // ------------------------------------------------------------------
 
@@ -211,11 +214,10 @@ export default function ElectronicSupplies() {
 
 // region HOOK
 
-const usePanelList = ({
-  //
-  reqCreateRequirementRecordFromIWorksheet,
-}: {
-  reqCreateRequirementRecordFromIWorksheet: () => void;
+const usePanelList = ({}: //
+// reqCreateRequirementRecordFromIWorksheet,
+{
+  // reqCreateRequirementRecordFromIWorksheet: () => void;
 }) => {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -244,11 +246,11 @@ const usePanelList = ({
   ];
   //
   const panelList_requirementRecord: TpanelList = [
-    {
-      type: 'addButton',
-      label: '自動產生需求單',
-      onClick: reqCreateRequirementRecordFromIWorksheet,
-    },
+    // {
+    //   type: 'addButton',
+    //   label: '自動產生需求單',
+    //   onClick: reqCreateRequirementRecordFromIWorksheet,
+    // },
     {
       type: 'addButton',
       label: '新增需求單',
