@@ -9,30 +9,10 @@ import { TstateProd } from '../../type';
 import { TnodeConfig } from './config';
 import {
   TdoorModelInfoDto,
-  //
   TdoorGeneralSpecsDto,
-  //
   TdoorComponentListDto,
-  TdoorSlatDto,
-  TdoorBottomBarDto,
-  TdoorGuideRailDto,
-  TdoorSidePlateDto,
-  TdoorRollerDto,
-  TdoorMotorDto,
-  TdoorMotorAccessoriesDto,
-  TdoorHeadBoxDto,
-  TdoorMiddlePillarDto,
-  TdoorBackBoneDto,
-
-  //
   TdoorModel,
-  //
-  TgenerateDoorProductBomDto_DoorSpec,
-  TgenerateDoorProductBomDto_ComponentInfo,
-  //
-  TmaterialSurface,
   TdoorComponentType,
-  //
   TdoorAccessoryDto,
 } from 'js/api/dtoTypes';
 
@@ -41,21 +21,14 @@ import type { TclassComponentDict } from '../../useQuotationProduct';
 import { createAssetUrl } from 'js/api/api_product';
 
 // utils
-import { checkIsFloat } from 'js/utils/checkValue';
 import {
   calcProductArea,
   calcProductVolume,
   calcProductWG_withWAndG,
   calcProductFullWidth,
   calcW,
-  calcW_2,
-  // findBDoptions,
-  calcFullHeight,
-  calcAngleIronSize,
   calcProductWG,
 } from 'js/utils/product/calc';
-
-// import * as componentFilter from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/componentFilter';
 
 import { createComponentDict } from '../createComponentDict';
 
@@ -65,22 +38,8 @@ import {
   optionsCreator_surface_onlyPaint,
   optionsCreator_surface_sst,
   optionsCreator_surface_galvanizedSteelPlate,
-  // optionsCreator_doorModel,
-  // optionsCreator_bottomBarAngleIron,
-  // optionsCreator_bottomBarPlate,
-  // optionsCreator_bottomBarAngleIron_303A,
-  // optionsCreator_bottomBarPlate_303A,
-  // optionsCreator_bottomBarAngleIron_303AS,
-  // optionsCreator_bottomBarPlate_303AS,
-  // optionsCreator_boxB_SJ302,
-  // optionsCreator_boxB_SJ303A,
-  // optionsCreator_boxB_SJ312,
-  // optionsCreator_boxB_SJ305D,
   optionsCreator_horsePower,
-  // optionsCreator_quoteType,
   lookup_options_bottomBarAngleIronAndPlate,
-  // optionsCreator_doorModelName,
-  // lookup_quoteType_doorModelName,
 } from 'js/utils/options/productOptions';
 
 import { checkIsSST, checkIsGalvanized, fixedToFloat3 } from '../library';
@@ -102,11 +61,10 @@ import {
 
 import { Class_accessory } from '../accessory/classAccessory';
 
-import type { Tdata_componentDict, TstateAccessoryData, Tdata_accessoryDict } from '../../type';
+import type { Tdata_componentDict, Tdata_accessoryDict } from '../../type';
 
 import { lookup_hpToGapAGapC, lookup_distributionBoxPrice } from 'config/product/lookup';
-import TheadItem from 'components/page/domestic/quotation/quotationProduct/dndThead/theadItem';
-import { Tstate_accountant } from 'components/wholePage/collection';
+
 import { calcAllPrice, calcPriceDiscount_percent } from '../../method/calcProd';
 
 import {
@@ -123,7 +81,6 @@ interface Tprops_constructor {
   setStateProd: React.Dispatch<React.SetStateAction<TstateProd>>;
   nodeConfig: TnodeConfig;
   quotationDiscount: number | `${number}`;
-  // onPordTotalChange: (total: number, oldTotal: number) => void;
   onPordTotalChange: () => void;
 }
 
@@ -141,8 +98,6 @@ const doorModelNameLookup: {
 };
 // ================================================================================
 
-// const doorModelNameArr = Object.keys(doorModelNameLookup) as TdoorModel[];
-
 // 在子類別中，可以透過customizeNodeConfig方法來覆寫nodeConfig
 // 務必要先進行深拷貝，避免影響到原本的nodeConfig
 const customizeNodeConfig = ({ nodeConfig }: { nodeConfig: TnodeConfig }) => {
@@ -159,44 +114,6 @@ const customizeNodeConfig = ({ nodeConfig }: { nodeConfig: TnodeConfig }) => {
 
   return config;
 };
-
-// ================================================================================
-
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
-
-// ================================================================================
-// ================================================================================
-// ================================================================================
-// ================================================================================
 
 // MARK:ClassProd
 class ClassProd {
