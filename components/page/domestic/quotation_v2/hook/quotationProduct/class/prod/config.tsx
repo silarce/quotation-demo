@@ -15,15 +15,6 @@ import {
   // InputSel_prod_memo_select,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
-import {
-  lookup_classProd,
-  // Interface_ClassProd_base,
-  // Interface_ClassProd_base2,
-  // Interface_ClassProd_prime,
-  Interface_ClassProd_special,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/lookup_classProd';
-import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from '../component/classComponent_base';
-
 import { ClassProd } from './classProd_remake';
 
 import {
