@@ -384,6 +384,8 @@ export default function EditRequirementRecord() {
         doorModelName: data_requirementRecord.doorType ?? '',
         doorQty: String(data_requirementRecord.quantity || '') as Tstate_info['doorQty'],
       };
+    } else {
+      stateInfo.date = moment();
     }
 
     setState_electronicItemList(defaultStateList);
