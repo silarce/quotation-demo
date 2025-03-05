@@ -435,7 +435,7 @@ export default function EditElectronicSuppliesPickup({
             className="global_tip_must"
             caption="領取日期"
             {...config_inputSel}
-            disabled={true}
+            disabled={disabled}
             datePickerProps={{
               props: {
                 value: state_info.date,

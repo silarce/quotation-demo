@@ -324,7 +324,7 @@ const createDefaultState = () => {
 };
 
 const createEmptyStateInfo = (): Tstate_info => ({
-  date: moment(),
+  date: null,
   indexNumber: '',
   picker: undefined,
   preparer: undefined,
