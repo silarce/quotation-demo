@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Decimal from 'decimal.js';
-import _, { remove } from 'lodash';
-import { nanoid } from 'nanoid';
+import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -9,48 +8,16 @@ import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import { useDebounce } from 'hooks/useDebounce';
 
-import type {
-  TquotationContentDto,
-  // TquotationProductDto,
-  // TquotationProductComponentDto,
-  // TquotationProductAccessoryDto,
-  // TcreateQuotationProductDto,
-  // TcreateQuotationProductComponentDto,
-  // TcreateQuotationProductAccessoryDto,
-} from 'js/api/dtoTypes';
+import type { TquotationContentDto } from 'js/api/dtoTypes';
 
 // -------------------------------------------------------------------------------
 
 // type
-import type {
-  TstateProd,
-  TsetProd,
-  //
-  // TstateProdData,
-  TstateProdDict,
-  //
-  // TstateComponentData,
-  // TcomponentRawDataDict,
-  Tdata_componentDict,
-  TsetComponent,
-  //
-  TstateAccessoryData,
-  TsetAccessory,
-} from './type';
+import type { TstateProd, TstateProdDict, TsetComponent, TsetAccessory } from './type';
 
 import { ClassProd } from './class/prod/classProd_remake';
 
-import {
-  TconfigItem,
-  TcellKey,
-  TnodeConfig,
-
-  //
-  defaultKeyArr,
-  createNodeConfig_prime,
-  nodeConfig_origin,
-  //
-} from './class/prod/config';
+import { TcellKey, TnodeConfig, defaultKeyArr, createNodeConfig_prime, nodeConfig_origin } from './class/prod/config';
 
 import {
   //
@@ -77,9 +44,8 @@ import {
   createNodeConfig_component,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
-import { Interface_ClassAccessory, Class_accessory } from './class/accessory/classAccessory';
+import { Class_accessory } from './class/accessory/classAccessory';
 import {
-  TconfigItem_accessory,
   TnodeConfig_accessory,
   TcellKey_accessory,
   defaultKeyArr_accessory,
@@ -87,24 +53,13 @@ import {
 } from './class/accessory/config';
 
 // hook
-import {
-  useDefaultState_prodDict,
-  //  createEmptyStateProd
-} from './useDefaultState_prodDict';
+import { useDefaultState_prodDict } from './useDefaultState_prodDict';
 
 // method
-// import { formatProdStateToBody } from './method/formatProdStateToBody';
-// import { createClassComponentDict } from './method/createClassComponentDict';
-// import { createAccessoryDict } from './method/createAccessoryDict';
 import { calcProductBody as _calcProductBody } from './method/calcProductBody';
 
 import {
-  //
-  // calcProdTotalPrice,
-  // w注意 calcAndRenewAllProdPrice_sideEffect有副作用
-  calcAndRenewAllProdPrice_sideEffect,
   calcAndRenewAllProdPrice,
-  calcPriceDiscount_percent,
   calcProdAllTotal as the_calcProdAllTotal,
   calcProdRemain,
   calcProdDeductedPrice,
@@ -112,12 +67,11 @@ import {
 import {
   calcProdSummary,
   doorModelSummery_reduceModified as calcDoorModelSummery_reduceModified,
-  TdoorModelSummeryItem,
 } from './method/calcProdSummary';
 
 import { kit_createClass, useActivedClass } from './method/kit_createClass';
 
-import type { TquotationProductDto, TquotationProductDto_addition } from 'js/api/api_quotation';
+import type { TquotationProductDto } from 'js/api/api_quotation';
 
 // ================================================================================
 
@@ -284,6 +238,10 @@ const useQuotationProduct = ({
     stateProdDict_iterative: defaultState_iterativeProdDict.stateProdDict,
   });
 
+  // useEffect(() => {
+  //   console.log(defaultState_prodDict);
+  // }, [defaultState_prodDict]);
+
   // 深拷貝，避免在編輯state_prodDict內的物件時影響原始的defaultState
   const defaultState_copy = useMemo(() => {
     return _.cloneDeep(defaultState_prodDict);
@@ -307,6 +265,12 @@ const useQuotationProduct = ({
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
+
+  useEffect(() => {
+    if (state_prodDict['d630c1be-c96a-46f9-bdd9-40d333295397']) {
+      console.log(state_prodDict['d630c1be-c96a-46f9-bdd9-40d333295397'].data_prod.price);
+    }
+  }, [state_prodDict]);
 
   const [state_iterativeProdDict, setState_iterativeProdDict] = useState<TstateProdDict>(
     defaultState_iterative_copy.stateProdDict
@@ -677,21 +641,16 @@ const useQuotationProduct = ({
   }, [disabled, defaultQuotationDiscount]);
 
   useEffect(() => {
-    // if (disabled) {
-    //   return;
-    // }
+    if (disabled) {
+      return;
+    }
 
     const newState_prodDict = calcAndRenewAllProdPrice({
       prodDict: state_prodDict,
-      // 因為state_quotationDiscount更及時
-      // 所以用state_quotationDiscount而不用debounced_state_quotationDiscount
-      // 但其實用debounced_state_quotationDiscount是完全一樣的阿....
-      quotationDiscount: state_quotationDiscount,
+      quotationDiscount: debounced_state_quotationDiscount,
     });
 
     setState_prodDict(newState_prodDict);
-
-    // calcAndRenewAllProdPrice
   }, [debounced_state_quotationDiscount]);
 
   useEffect(() => {
@@ -827,10 +786,7 @@ const useQuotationProduct = ({
 
 // ================================================================================
 
-// ================================================================================
-
 export type {
-  // TuseQuotationProductInstance,
   Tinstance_useQuotationProduct,
   TstateProd,
   TclassComponentDict,
@@ -841,10 +797,6 @@ export type {
   TsetComponent,
   TsetAccessory,
   TclassPsuedoComponentDict,
-  // TstateProdDict,
-  // TclassComponentDict,
-  // TclassPsuedoComponentDict,
-  // TclassAccessoryDict,
   TprodSource,
 };
 export { useQuotationProduct, ClassProd };
