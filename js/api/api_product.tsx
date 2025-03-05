@@ -105,7 +105,7 @@ export function useGetAssetDict<ASSET = unknown>(
 
     for (const key in state_pathDict) {
       if (!state_diff[key]) {
-        return;
+        continue;
       }
 
       const path = state_pathDict[key];
