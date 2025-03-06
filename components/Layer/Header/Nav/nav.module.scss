@@ -15,6 +15,7 @@
 }
 
 .link {
+  position: relative;
   padding-bottom: 15px;
   border-bottom: solid 4px transparent;
   &.active {
@@ -41,11 +42,14 @@
   :global(.ant-scroll-number-only-unit) {
     color: white;
   }
-}
 
-.badge {
-  color: white;
-  position: absolute;
-  top: -5px;
-  right: -5px;
+  .badge {
+    color: white;
+    position: absolute;
+    // top: -15px;
+    // right: -15px;
+    top: -5px;
+    right: 0px;
+    transform: translate(50%, -50%);
+  }
 }
