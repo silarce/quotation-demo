@@ -28,9 +28,10 @@ import {
   //
   apiPostElectronicSuppliesRequirementRecord,
   apiPatchElectronicSuppliesRequirementRecord,
-  apiGetDefaultElectronicSuppliesRequirement,
+  // apiGetDefaultElectronicSuppliesRequirementData,
   //
   useGetElectronicSuppliesRequirementRecord_id,
+  useGetDefaultElectronicSuppliesRequirementData,
 } from 'js/api/api_engineering';
 import { useApiGetProdDoorModels } from 'js/api/api_product';
 
@@ -116,7 +117,15 @@ export default function EditRequirementRecord() {
     autoUpdate: !isNew,
   });
 
-  const { electronicSuppliesId } = data_contract ?? {};
+  // const { electronicSuppliesId } = data_contract ?? {};
+
+  const {
+    isFetching,
+    // update,
+    defaultElectronicSuppliesRequirementArr,
+    worksheetIdArr,
+    electronicSuppliesId,
+  } = useGetDefaultElectronicSuppliesRequirementData(contractId);
 
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
@@ -167,7 +176,10 @@ export default function EditRequirementRecord() {
       });
     }
 
-    const body: TcreateElectronicSuppliesRequirementRecordDto & TupdateElectronicSuppliesRequirementRecordDto = {
+    const body: Pick<
+      TcreateElectronicSuppliesRequirementRecordDto,
+      'operationDate' | 'storageManagementPersonnelId' | 'doorType' | 'requirementRecordDetails' | 'quantity'
+    > = {
       operationDate: date!.toISOString(),
       storageManagementPersonnelId: preparer!.id,
       doorType: doorModelName || null,
@@ -191,7 +203,13 @@ export default function EditRequirementRecord() {
         return;
       }
 
-      await apiPostElectronicSuppliesRequirementRecord(electronicSuppliesId, body).then(async (reqData) => {
+      const body_create: TcreateElectronicSuppliesRequirementRecordDto = {
+        ...body,
+        electronicSuppliesId,
+        worksheetIds: worksheetIdArr ?? [],
+      };
+
+      await apiPostElectronicSuppliesRequirementRecord(electronicSuppliesId, body_create).then(async (reqData) => {
         const requirementRecordId = reqData.id;
         router.replace({
           query: { ...router.query, requirementRecordId },
@@ -200,21 +218,10 @@ export default function EditRequirementRecord() {
         setDisabled(true);
       });
     }
-
-    // .catch(() => {});
   };
 
   const reqGetDefaultElectronicSuppliesRequirement = async () => {
-    if (!contractId) {
-      myAlert.err({ title: '沒有contractId' });
-      console.error('url沒有contractId');
-
-      return;
-    }
-
-    const res = await apiGetDefaultElectronicSuppliesRequirement(contractId);
-
-    const state_electronicItemArr = res.map((item) => {
+    const state_electronicItemArr = (defaultElectronicSuppliesRequirementArr ?? []).map((item) => {
       const subItemName = item.category === '控制箱/盤' ? '捲門/水閘門' : null;
 
       const state: Tstate_electronicItem = {

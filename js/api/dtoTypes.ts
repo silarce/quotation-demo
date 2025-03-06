@@ -3395,10 +3395,14 @@ export type TelectronicSuppliesRequirementRecordDetailDto = {
   note: string | null;
 };
 
-export type TelectronicSuppliesRequirementRecordDetail = Pick<
-  TelectronicSuppliesRequirementRecordDetailDto,
-  'requirementRecordId' | 'itemName' | 'category' | 'quantity' | 'code' | 'note' | 'unit'
->;
+export type TelectronicSuppliesRequirementRecordDetail = {
+  data: Pick<
+    TelectronicSuppliesRequirementRecordDetailDto,
+    'requirementRecordId' | 'itemName' | 'category' | 'quantity' | 'code' | 'note' | 'unit'
+  >[];
+  worksheetIds: string[];
+  electronicSuppliesId: string;
+};
 
 export type TcreateElectronicSuppliesRecordDetailDto = Pick<
   TelectronicSuppliesRequirementRecordDetailDto,
@@ -3451,6 +3455,9 @@ export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
   storageManagementPersonnelId: string;
   requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
   quantity: string | null;
+  // 工作表id
+  worksheetIds: string[];
+  electronicSuppliesId: string;
 };
 
 export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
@@ -3459,6 +3466,8 @@ export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
 > & {
   id?: string;
   requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
+  // 工作表id
+  // worksheetIds?: string[];
 };
 
 // PickupRecord系列為領料單

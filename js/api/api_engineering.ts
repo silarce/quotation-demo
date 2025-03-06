@@ -563,13 +563,58 @@ export const apiPatchElectronicSuppliesRequirementRecord = (
 };
 
 // 取得合約的預設送電備品
-export const apiGetDefaultElectronicSuppliesRequirement = async (contractId: string) => {
+export const apiGetDefaultElectronicSuppliesRequirementData = async (contractId: string) => {
   const api = '/engineering/electronic-supplies/worksheet-to-create';
   const params = {
     contractId,
   };
 
-  return axi.get<TelectronicSuppliesRequirementRecordDetail[]>(api, { params }).then(({ data }) => data);
+  return axi
+    .get<TelectronicSuppliesRequirementRecordDetail>(api, { params })
+    .then(({ data }) => data)
+    .catch((error) => Promise.reject(error));
+};
+
+export const useGetDefaultElectronicSuppliesRequirementData = (
+  contractId: string | undefined | null,
+  { autoUpdate = true, callAlert = true } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDetail>();
+
+  const update = async () => {
+    if (!contractId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetDefaultElectronicSuppliesRequirementData(contractId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+      callAlert && myAlert.err({ title: '取得預設送電備品需求單失敗', content: err.message });
+      setRes(undefined);
+
+      return error;
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [contractId]);
+
+  return {
+    isFetching,
+    update,
+
+    defaultElectronicSuppliesRequirementArr: res?.data,
+    worksheetIdArr: res?.worksheetIds,
+    electronicSuppliesId: res?.electronicSuppliesId,
+  };
 };
 
 const apiGetElectronicSuppliesPickupRecord_id = (id: string) => {
