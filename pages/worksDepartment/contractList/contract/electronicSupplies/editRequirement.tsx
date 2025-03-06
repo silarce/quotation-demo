@@ -205,7 +205,6 @@ export default function EditRequirementRecord() {
 
       const body_create: TcreateElectronicSuppliesRequirementRecordDto = {
         ...body,
-        electronicSuppliesId,
         worksheetIds: worksheetIdArr ?? [],
       };
 

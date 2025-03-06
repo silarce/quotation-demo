@@ -3457,7 +3457,6 @@ export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
   quantity: string | null;
   // 工作表id
   worksheetIds: string[];
-  electronicSuppliesId: string;
 };
 
 export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
