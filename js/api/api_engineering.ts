@@ -564,13 +564,10 @@ export const apiPatchElectronicSuppliesRequirementRecord = (
 
 // 取得合約的預設送電備品
 export const apiGetDefaultElectronicSuppliesRequirementData = async (contractId: string) => {
-  const api = '/engineering/electronic-supplies/worksheet-to-create';
-  const params = {
-    contractId,
-  };
+  const api = `/engineering/electronic-supplies/worksheet-to-create/${contractId}`;
 
   return axi
-    .get<TelectronicSuppliesRequirementRecordDetail>(api, { params })
+    .get<TelectronicSuppliesRequirementRecordDetail>(api)
     .then(({ data }) => data)
     .catch((error) => Promise.reject(error));
 };
