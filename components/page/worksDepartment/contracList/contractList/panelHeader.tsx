@@ -1,5 +1,6 @@
 import { MouseEvent } from 'react';
 import classNames from 'classnames';
+import Link, { LinkProps } from 'next/link';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -36,19 +37,22 @@ type TtheadInfo = {
 };
 
 // ===============================================================
+
 export type { TtheadInfo };
 
 // ===============================================================
 export default function PanelHeader({
   contract,
   isActive,
-  onIconDetailClick,
+  // onIconDetailClick,
+  detailLinkProps,
   onClick,
   viewRef,
 }: {
   contract: TtheadInfo;
   isActive: boolean;
-  onIconDetailClick: (e: MouseEvent) => void;
+  // onIconDetailClick: (e: MouseEvent) => void;
+  detailLinkProps: LinkProps;
   onClick?: () => void;
   viewRef?: (node?: Element | null | undefined) => void | undefined;
 }) {
@@ -83,7 +87,12 @@ export default function PanelHeader({
         <span>{doorQty}</span>
         <span>{budgetAmount}</span> */}
         <div>
-          <IconDetail onClick={onIconDetailClick} />
+          <Link
+            //  href={detailHref}
+            {...detailLinkProps}
+          >
+            <IconDetail />
+          </Link>
         </div>
       </div>
       {/* row02 */}
