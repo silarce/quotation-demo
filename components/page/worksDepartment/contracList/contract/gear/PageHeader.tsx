@@ -7,7 +7,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
 
 import { AppContext } from 'pages/_app';
-import { erpFeaturesLookup, swappedErpFeaturesLookup } from 'components/Layer/SideNav/pathList/type';
+import { erpFeaturesLookup } from 'components/Layer/SideNav/pathList/type';
 
 // globalState
 import { useUrlHistory } from 'hooks/globalState/useUrlHistory';
@@ -21,20 +21,6 @@ export type { TpanelList };
 // ========================================================
 
 const documentType: TdocType = '保固書';
-
-const {
-  //
-  BasicDataCreation,
-  HRAuthoritySetup,
-  legacyContractIntegration,
-  domestic,
-  statisticsTable,
-  worksDepartment,
-  accountsReceivable,
-  accountingDepartment,
-  worksDepartment_worksheet,
-  worksDepartment_deliveryList,
-} = erpFeaturesLookup;
 
 // ========================================================
 export default function PageHeader({
@@ -52,6 +38,11 @@ export default function PageHeader({
 }) {
   const { erpFeature } = useContext(AppContext);
   const history_contractList = useUrlHistory((state) => state.contractList);
+
+  if (!history_contractList.pathname) {
+    history_contractList.pathname = '/worksDepartment/contractList';
+    history_contractList.query = undefined;
+  }
 
   const router = useRouter();
   const query = router.query as {

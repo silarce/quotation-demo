@@ -134,29 +134,57 @@ function ContractList_pre(
           const { contractId } = item;
           const isActive = activeContractId === contractId;
 
-          const handleIconDetailClick = (e: MouseEvent) => {
-            e.stopPropagation();
-            router.replace({
-              query: {
-                ...router.query,
-                activeContractId: contractId,
-                activeContractPage: item.page,
-              },
-            });
+          // const handleIconDetailClick = (e: MouseEvent) => {
+          //   e.stopPropagation();
+          //   router.replace({
+          //     query: {
+          //       ...router.query,
+          //       activeContractId: contractId,
+          //       activeContractPage: item.page,
+          //     },
+          //   });
 
-            history_contractList.set({
-              pathname: router.pathname,
-              query: {
-                ...router.query,
-                activeContractId: contractId,
-                activeContractPage: String(item.page),
-              },
-            });
+          //   history_contractList.set({
+          //     pathname: router.pathname,
+          //     query: {
+          //       ...router.query,
+          //       activeContractId: contractId,
+          //       activeContractPage: String(item.page),
+          //     },
+          //   });
 
-            router.push({
+          //   router.push({
+          //     pathname: targetUrl,
+          //     query: { contractId, version: 1 },
+          //   });
+          // };
+
+          const detailLinkProps: Parameters<typeof PanelHeader>[0]['detailLinkProps'] = {
+            onClick: (e) => {
+              e.stopPropagation();
+              // 在這裡執行replace是為了保留當前狀態使返回上這一頁時可以直接滾動到該資料
+              router.replace({
+                query: {
+                  ...router.query,
+                  activeContractId: contractId,
+                  activeContractPage: item.page,
+                },
+              });
+
+              history_contractList.set({
+                pathname: router.pathname,
+                query: {
+                  ...router.query,
+                  activeContractId: contractId,
+                  activeContractPage: String(item.page),
+                },
+              });
+            },
+
+            href: {
               pathname: targetUrl,
               query: { contractId, version: 1 },
-            });
+            },
           };
 
           const theViewRef = index <= 3 ? viewRef_top : index > contractArr.length - 3 ? viewRef : undefined;
@@ -172,7 +200,8 @@ function ContractList_pre(
                   viewRef={theViewRef}
                   contract={item}
                   isActive={isActive}
-                  onIconDetailClick={handleIconDetailClick}
+                  // onIconDetailClick={handleIconDetailClick}
+                  detailLinkProps={detailLinkProps}
                 />
               }
             >

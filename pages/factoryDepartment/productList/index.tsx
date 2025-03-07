@@ -1654,22 +1654,7 @@ export default function ProductList() {
                 <div className={scss.right}>
 
                     <div className={scss.content} style={{ overflowY: 'auto' }}>
-                        <div
-                            style={{ paddingBottom: '18px' }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                物料清單
-                            </span>
-                        </div>
+                        
                         <div style={{ top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                             <InputSel
                                 {...inputSelProps}

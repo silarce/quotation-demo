@@ -90,8 +90,6 @@ const useGlobal_review = create<Tglobal_review>()(
           FilterConditions: JSON.stringify(conditionModel),
         };
 
-        console.log(JSON.stringify(inputModel));
-
         const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
         const response = await fetch(`${theSetting.apipath}/Review/GetReview?${queryParams}`);
@@ -101,10 +99,6 @@ const useGlobal_review = create<Tglobal_review>()(
         }
 
         const data = await response.json();
-
-        // setData(data);
-        // setSearchdata(data);
-        console.log(data);
 
         update(data || null);
 
