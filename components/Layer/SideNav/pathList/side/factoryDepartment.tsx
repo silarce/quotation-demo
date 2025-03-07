@@ -125,14 +125,6 @@ export default function SidePatFactoryDepartment() {
                             },
                             erpFeature: [fac],
                         },
-                        {
-                            label: '工單對應',
-                            path: path + '/poMapping',
-                            query: {
-                                type: 'poMapping',
-                            },
-                            erpFeature: [fac],
-                        },
                     ],
                 },
                 {
