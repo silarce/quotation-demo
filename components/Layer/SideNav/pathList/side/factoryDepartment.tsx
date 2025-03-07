@@ -16,13 +16,6 @@ export default function SidePatFactoryDepartment() {
                     label: '單據管理',
                     erpFeature: devPass,
                     list: [
-                        // {
-                        //     label: '工單對應',
-                        //     path: path + '/poMapping',
-                        //     query: {
-                        //     },
-                        //     erpFeature: [fac],
-                        // },
                         {
                             label: '客戶列表',
                             path: path + '/customerQueryList',
@@ -132,7 +125,14 @@ export default function SidePatFactoryDepartment() {
                             },
                             erpFeature: [fac],
                         },
-
+                        {
+                            label: '工單對應',
+                            path: path + '/poMapping',
+                            query: {
+                                type: 'poMapping',
+                            },
+                            erpFeature: [fac],
+                        },
                     ],
                 },
                 {
