@@ -651,6 +651,14 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單位</span>
         <span>更新日期</span>
         <span>建立人員</span>
+        <span>是否開工單</span>
+        <span>工作表代號</span>
+        <span>規格來源(欄位)</span>
+        <span>規格公式</span>
+        <span>規格內容</span>
+        <span>規格單位</span>
+        <span>數量來源(欄位或數值)</span>
+        <span>數量公式</span>
         <span></span>
       </div>
     )
