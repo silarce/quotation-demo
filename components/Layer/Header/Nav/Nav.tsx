@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { Badge } from 'antd';
 
 // css
-import styled from './nav.module.scss';
+import scss from './nav.module.scss';
 
 // 路由表
 import {
@@ -30,14 +30,14 @@ export default function Nav() {
   const pathname = router.pathname;
 
   return (
-    <div className={styled.container}>
+    <div className={scss.container}>
       {topPathList.map((item, index) => {
         const { icon, path, href, hrefList, label, subLabel, erpFeature } = item;
         const reg = new RegExp(`^${path}`);
-        let active = reg.test(pathname) ? styled.active : '';
+        let active = reg.test(pathname) ? scss.active : '';
 
         if (path === '/') {
-          active = pathname === path ? styled.active : '';
+          active = pathname === path ? scss.active : '';
         }
 
         const isPassed = checkErpFeature({ erpFeature, userErpFeature });
@@ -71,11 +71,16 @@ export default function Nav() {
 
         if (isDocumentManagement) {
           return (
-            <Link className={`${styled.link} ${active} relative`} href={theHref} key={index}>
+            <Link className={`${scss.link} ${active} relative`} href={theHref} key={index}>
               <Image src={icon} alt={label + subLabel} />
               <span>{label}</span>
-              {subLabel && <span>{subLabel}</span>}
-              <Badge key={index} className={styled.badge} count={reviewQty} offset={[10, -7]}></Badge>
+              {/* {subLabel && <span>{subLabel}</span>} */}
+              <Badge
+                key={index}
+                className={scss.badge}
+                count={reviewQty}
+                // offset={[10, -7]}
+              ></Badge>
             </Link>
           );
         }
@@ -92,7 +97,7 @@ export default function Nav() {
         // }
 
         return (
-          <Link className={`${styled.link} ${active}`} href={theHref} key={index}>
+          <Link className={`${scss.link} ${active}`} href={theHref} key={index}>
             <Image src={icon} alt={label + subLabel} />
             <span>{label}</span>
             {subLabel && <span>{subLabel}</span>}

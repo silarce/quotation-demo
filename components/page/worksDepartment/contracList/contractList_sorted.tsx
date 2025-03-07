@@ -1,10 +1,14 @@
-import { useState, useEffect, MouseEvent } from 'react';
+import {
+  useState,
+  useEffect,
+  //  MouseEvent
+} from 'react';
 import classNames from 'classnames';
 
 import { useRouter } from 'next/router';
 
 // components
-import Thead from './contractList/thead';
+// import Thead from './contractList/thead';
 import PanelHeader, { TtheadInfo } from './contractList/panelHeader';
 import PanelBody, { Tdetail } from './contractList/panelBody';
 
@@ -172,12 +176,22 @@ const List = ({
         const { contractId } = item;
         const isActive = contractId === targetContractId;
 
-        const openQuotation = (e: MouseEvent) => {
-          e.stopPropagation();
-          router.push({
+        // const openQuotation = (e: MouseEvent) => {
+        //   e.stopPropagation();
+        //   router.push({
+        //     pathname: '/worksDepartment/contractList/contract/workContactDoc',
+        //     query: { contractId, version: 1 },
+        //   });
+        // };
+
+        const detailLinkProps: Parameters<typeof PanelHeader>[0]['detailLinkProps'] = {
+          onClick(e) {
+            e.stopPropagation();
+          },
+          href: {
             pathname: '/worksDepartment/contractList/contract/workContactDoc',
             query: { contractId, version: 1 },
-          });
+          },
         };
 
         const detailArr = createContractDetailArr(contractId);
@@ -191,7 +205,8 @@ const List = ({
                 //
                 contract={item}
                 isActive={isActive}
-                onIconDetailClick={openQuotation}
+                // onIconDetailClick={openQuotation}
+                detailLinkProps={detailLinkProps}
                 onClick={() => {
                   //
                   if (isActive) {
