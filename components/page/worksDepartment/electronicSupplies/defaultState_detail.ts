@@ -18,7 +18,7 @@ type Tstate_electronicItem = {
   // // idName?: string;
 
   inputCategory?: () => Promise<string>;
-  categoryValue: string;
+  categoryParam: string;
 };
 
 type Tstate_info = {
@@ -37,7 +37,7 @@ type Tstate_info = {
 const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   {
     category: '智慧型（含主機）',
-    categoryValue: '智慧型（含主機）',
+    categoryParam: '智慧型（含主機）',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -70,7 +70,7 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   // },
   {
     category: '電子式',
-    categoryValue: '電子式',
+    categoryParam: '電子式',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -79,7 +79,7 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   },
   {
     category: '防爆式',
-    categoryValue: '防爆式',
+    categoryParam: '防爆式',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -88,7 +88,7 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   },
   {
     category: '面板式',
-    categoryValue: '面板式',
+    categoryParam: '面板式',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -97,7 +97,7 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   },
   {
     category: '埋入式',
-    categoryValue: '埋入式',
+    categoryParam: '埋入式',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -106,7 +106,7 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   },
   {
     category: '外露式',
-    categoryValue: '外露式',
+    categoryParam: '外露式',
     itemName: '鎖盒',
     subItemName: undefined,
     quantity: null,
@@ -118,7 +118,7 @@ const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
 const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
   {
     category: '鎖號',
-    categoryValue: '鎖號',
+    categoryParam: '鎖號',
     itemName: '鎖匙',
     subItemName: undefined,
     quantity: null,
@@ -140,7 +140,7 @@ const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
   },
   {
     category: '特殊鎖號',
-    categoryValue: '特殊鎖號',
+    categoryParam: '特殊鎖號',
     itemName: '鎖匙',
     subItemName: undefined,
     quantity: null,
@@ -152,7 +152,7 @@ const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
 const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
   {
     category: '3HP馬達控制箱(380V)',
-    categoryValue: '3HP馬達控制箱(380V)',
+    categoryParam: '3HP馬達控制箱(380V)',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
@@ -161,7 +161,7 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
   },
   {
     category: '2HP馬達控制箱(380V)',
-    categoryValue: '2HP馬達控制箱(380V)',
+    categoryParam: '2HP馬達控制箱(380V)',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
@@ -170,7 +170,7 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
   },
   {
     category: '3HP馬達控制箱(220V)',
-    categoryValue: '3HP馬達控制箱(220V)',
+    categoryParam: '3HP馬達控制箱(220V)',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
@@ -179,7 +179,7 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
   },
   {
     category: '2HP馬達控制箱(220V)',
-    categoryValue: '2HP馬達控制箱(220V)',
+    categoryParam: '2HP馬達控制箱(220V)',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
@@ -191,7 +191,7 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
     // categoryValue category: '彈射門控制箱_HP _V(大同/東元)',
     category: '彈射門控制箱',
     // categoryValue: '彈射門控制箱 HP  V ',
-    categoryValue: '彈射門控制箱',
+    categoryParam: '彈射門控制箱',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
@@ -225,7 +225,7 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
   },
   {
     category: 'UPS不斷電系統 1HP',
-    categoryValue: 'UPS不斷電系統 1HP',
+    categoryParam: 'UPS不斷電系統 1HP',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
@@ -234,7 +234,7 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
   },
   {
     category: 'UPS不斷電系統 1/2HP',
-    categoryValue: 'UPS不斷電系統 1/2HP',
+    categoryParam: 'UPS不斷電系統 1/2HP',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
@@ -248,7 +248,7 @@ const defaultStateArr_押扣: Tstate_electronicItem[] = [
     itemName: '押扣',
     subItemName: undefined,
     category: '三點式(一般)',
-    categoryValue: '三點式(一般)',
+    categoryParam: '三點式(一般)',
     quantity: null,
     unit: null,
     code: null,
@@ -257,7 +257,7 @@ const defaultStateArr_押扣: Tstate_electronicItem[] = [
     itemName: '押扣',
     subItemName: undefined,
     category: '三點式(遮煙)',
-    categoryValue: '三點式(遮煙)',
+    categoryParam: '三點式(遮煙)',
     quantity: null,
     unit: null,
     code: null,
@@ -269,7 +269,7 @@ const defaultStateArr_消防備品: Tstate_electronicItem[] = [
     itemName: '消防備品',
     subItemName: undefined,
     category: '煙感器',
-    categoryValue: '煙感器',
+    categoryParam: '煙感器',
     quantity: null,
     unit: null,
     code: null,
@@ -278,7 +278,7 @@ const defaultStateArr_消防備品: Tstate_electronicItem[] = [
     itemName: '消防備品',
     subItemName: undefined,
     category: '中繼器 1φ 220v',
-    categoryValue: '中繼器 1φ 220v',
+    categoryParam: '中繼器 1φ 220v',
     quantity: null,
     unit: null,
     code: null,
@@ -287,7 +287,7 @@ const defaultStateArr_消防備品: Tstate_electronicItem[] = [
     itemName: '消防備品',
     subItemName: undefined,
     category: '中繼器 3φ 380v',
-    categoryValue: '中繼器 3φ 380v',
+    categoryParam: '中繼器 3φ 380v',
     quantity: null,
     unit: null,
     code: null,
@@ -299,7 +299,7 @@ const defaultStateArr_主機: Tstate_electronicItem[] = [
     itemName: '主機',
     subItemName: undefined,
     category: '遙控器（1:2）+ 障感器',
-    categoryValue: '遙控器（1:2）+ 障感器',
+    categoryParam: '遙控器（1:2）+ 障感器',
     quantity: null,
     unit: null,
     code: null,
@@ -308,7 +308,7 @@ const defaultStateArr_主機: Tstate_electronicItem[] = [
     itemName: '主機',
     subItemName: undefined,
     category: '遙控器（1:2）',
-    categoryValue: '遙控器（1:2）',
+    categoryParam: '遙控器（1:2）',
     quantity: null,
     unit: null,
     code: 'A',
@@ -317,7 +317,7 @@ const defaultStateArr_主機: Tstate_electronicItem[] = [
     itemName: '主機',
     subItemName: undefined,
     category: '障感器',
-    categoryValue: '障感器',
+    categoryParam: '障感器',
     quantity: null,
     unit: null,
     code: null,
@@ -329,7 +329,7 @@ const defaultStateArr_紅外線: Tstate_electronicItem[] = [
     itemName: '紅外線',
     subItemName: undefined,
     category: '反射式',
-    categoryValue: '反射式',
+    categoryParam: '反射式',
     quantity: null,
     unit: null,
     code: 'E',
@@ -338,7 +338,7 @@ const defaultStateArr_紅外線: Tstate_electronicItem[] = [
     itemName: '紅外線',
     subItemName: undefined,
     category: '對照式',
-    categoryValue: '對照式',
+    categoryParam: '對照式',
     quantity: null,
     unit: null,
     code: null,

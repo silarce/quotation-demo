@@ -239,7 +239,7 @@ const useStateToGroup = ({
 }: {
   stateArr: Tstate_electronicItem[];
   handler_editItemQty: (key: string, qty: number) => void;
-  handler_editCategoryValue: (props: { key: string; categoryValue: string }) => void;
+  handler_editCategoryValue: (props: { key: string; categoryParam: string }) => void;
   disabled: boolean;
 }) => {
   return useMemo(() => {
@@ -248,7 +248,7 @@ const useStateToGroup = ({
     } = {};
 
     stateArr.forEach((item) => {
-      const { itemName, category, categoryValue, quantity, subItemName, inputCategory } = item;
+      const { itemName, category, categoryParam: categoryValue, quantity, subItemName, inputCategory } = item;
 
       if (!list[itemName]) {
         list[itemName] = {
@@ -265,7 +265,7 @@ const useStateToGroup = ({
             className={classNames(disabled && 'invisible')}
             onClick={async () => {
               const categoryValue = await inputCategory();
-              handler_editCategoryValue({ key: category, categoryValue });
+              handler_editCategoryValue({ key: category, categoryParam: categoryValue });
             }}
           />
         </span>

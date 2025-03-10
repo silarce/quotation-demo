@@ -3393,6 +3393,8 @@ export type TelectronicSuppliesRequirementRecordDetailDto = {
   unit: string | null;
   code: string | null;
   note: string | null;
+
+  categoryParam?: string;
 };
 
 export type TelectronicSuppliesRequirementRecordDetail = {
@@ -3409,6 +3411,7 @@ export type TcreateElectronicSuppliesRecordDetailDto = Pick<
   'itemName' | 'category' | 'quantity' | 'unit'
 > & {
   code: string | null;
+  categoryParam: string;
 };
 
 export type TupdateElectronicSuppliesRecordDetailDto = TcreateElectronicSuppliesRecordDetailDto & {
@@ -3520,6 +3523,8 @@ export type TelectronicSuppliesPickupRecordDetailDto = {
   unit: string | null;
   //
   code: string | null;
+  //
+  categoryParam?: string;
 };
 
 export type TcreateElectronicSuppliesPickupRecordDto = Pick<
@@ -3528,6 +3533,7 @@ export type TcreateElectronicSuppliesPickupRecordDto = Pick<
 > & {
   requirementRecordId: string | null;
   pickupRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
+  categoryParam: string;
 };
 
 export type TupdateElectronicSuppliesPickupRecordDto = Partial<

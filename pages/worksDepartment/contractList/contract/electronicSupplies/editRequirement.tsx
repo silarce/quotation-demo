@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
+import classNames from 'classnames';
 
 import moment from 'moment';
 
@@ -125,7 +126,9 @@ export default function EditRequirementRecord() {
     defaultElectronicSuppliesRequirementArr,
     worksheetIdArr,
     electronicSuppliesId,
-  } = useGetDefaultElectronicSuppliesRequirementData(contractId);
+  } = useGetDefaultElectronicSuppliesRequirementData(contractId, {
+    autoUpdate: isNew,
+  });
 
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
@@ -156,7 +159,7 @@ export default function EditRequirementRecord() {
     let requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[] = Object.values(
       state_electronicItemList
     ).map((item) => {
-      const { id, category, itemName, quantity, unit, code, subItemName } = item;
+      const { id, category, itemName, quantity, unit, code, subItemName, categoryParam } = item;
 
       return {
         // 必須要送id，若id為undefined將會新增一筆detail
@@ -167,6 +170,7 @@ export default function EditRequirementRecord() {
         quantity,
         unit,
         code,
+        categoryParam,
       };
     });
 
@@ -225,7 +229,7 @@ export default function EditRequirementRecord() {
 
       const state: Tstate_electronicItem = {
         category: item.category,
-        categoryValue: item.category,
+        categoryParam: item.category,
         itemName: item.itemName,
         quantity: item.quantity,
         unit: item.unit ?? null,
@@ -261,13 +265,13 @@ export default function EditRequirementRecord() {
     });
   };
 
-  const editCategoryValue = ({ key, categoryValue }: { key: string; categoryValue: string }) => {
+  const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
     setState_electronicItemList((state) => {
       return {
         ...state,
         [key]: {
           ...state[key],
-          categoryValue,
+          categoryParam: categoryParam,
         },
       };
     });
@@ -368,11 +372,8 @@ export default function EditRequirementRecord() {
 
     const { requirementRecordDetails = [] } = data_requirementRecord ?? {};
 
-    // 其實沒有必要用orderDetailArr排序
-    // requirementRecordDetails = orderDetailArr({ detailArr: requirementRecordDetails });
-
     requirementRecordDetails?.forEach((detail) => {
-      const { id: detailId, category, itemName, quantity, unit, code } = detail;
+      const { id: detailId, category, itemName, quantity, unit, code, categoryParam } = detail;
 
       defaultStateList[category] = {
         ...defaultStateList[category], // 可能是undefined // 會將subItemName帶入
@@ -382,20 +383,11 @@ export default function EditRequirementRecord() {
         quantity,
         unit,
         code,
+        categoryParam: categoryParam ?? '',
       };
 
       //
     });
-
-    // // 若不是新增而是編輯
-    // if (!isNew) {
-    //   // 將defaultStateList中所有沒有id的item刪掉
-    //   for (const [key, value] of Object.entries(defaultStateList)) {
-    //     if (!value.id) {
-    //       delete defaultStateList[key];
-    //     }
-    //   }
-    // }
 
     let stateInfo = createEmptyStateInfo();
 
@@ -514,7 +506,11 @@ export default function EditRequirementRecord() {
           />
 
           <div>
-            <SquareBtn sharp="mini" onClick={reqGetDefaultElectronicSuppliesRequirement}>
+            <SquareBtn
+              className={classNames((!isNew || disabled) && 'invisible')}
+              sharp="mini"
+              onClick={reqGetDefaultElectronicSuppliesRequirement}
+            >
               重置為預設送電備品
             </SquareBtn>
           </div>

@@ -262,7 +262,7 @@ export default function EditElectronicSuppliesPickup({
         ...state,
         [key]: {
           ...state[key],
-          categoryValue,
+          categoryParam: categoryValue,
         },
       };
     });
@@ -290,7 +290,7 @@ export default function EditElectronicSuppliesPickup({
       if (!list[category]) {
         list[category] = {
           category,
-          categoryValue: category,
+          categoryParam: category,
           itemName,
           quantity: quantity || 0,
           unit,
