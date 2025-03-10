@@ -32,7 +32,8 @@ type Tstate_info = {
 
 // ==================================================================
 
-// w category應該會是唯一的，並且之後會用category作為key
+// w category應該會是唯一的，並且之後會用category作為識別id
+// 某天竟然說category要可以編輯。新增可編輯的categoryValue作為欄位的文字，category一樣作為識別id使用
 const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   {
     category: '智慧型（含主機）',
