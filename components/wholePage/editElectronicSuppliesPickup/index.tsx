@@ -153,6 +153,7 @@ export default function EditElectronicSuppliesPickup({
         quantity,
         unit,
         code,
+        categoryParam: categoryParam ?? '',
       };
 
       //
