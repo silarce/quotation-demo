@@ -235,10 +235,12 @@ const useStateToGroup = ({
   stateArr,
   handler_editItemQty,
   handler_editCategoryValue,
+  disabled,
 }: {
   stateArr: Tstate_electronicItem[];
   handler_editItemQty: (key: string, qty: number) => void;
   handler_editCategoryValue: (props: { key: string; categoryValue: string }) => void;
+  disabled: boolean;
 }) => {
   return useMemo(() => {
     const list: {
@@ -260,6 +262,7 @@ const useStateToGroup = ({
         <span className="flex gap-1">
           {categoryValue}
           <IconEdit
+            className={classNames(disabled && 'invisible')}
             onClick={async () => {
               const categoryValue = await inputCategory();
               handler_editCategoryValue({ key: category, categoryValue });

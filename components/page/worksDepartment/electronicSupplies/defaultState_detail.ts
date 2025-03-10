@@ -200,9 +200,21 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
       const str = await new Promise<string>((resolve) => {
         const { destroy } = myAlert.input({
           title: '彈射門控制箱',
+          props_input: [
+            {
+              caption: 'HP',
+            },
+            {
+              caption: '電壓',
+            },
+            {
+              caption: '馬達廠商',
+            },
+          ],
           onConfirm: (value) => {
+            const [hp, voltage, motorVendor] = value;
+            resolve(`彈射門控制箱 ${hp}HP ${voltage}V ${motorVendor}`);
             destroy();
-            resolve('彈射門控制箱 : ' + value);
           },
         });
       });

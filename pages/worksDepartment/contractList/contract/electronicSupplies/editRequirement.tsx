@@ -279,6 +279,7 @@ export default function EditRequirementRecord() {
     stateArr: Object.values(state_electronicItemList),
     handler_editItemQty: editItemQty,
     handler_editCategoryValue: editCategoryValue,
+    disabled,
   });
 
   // ------------------------------------------------------------------
@@ -476,6 +477,7 @@ export default function EditRequirementRecord() {
               props: {
                 placeholder: '',
                 value: state_info.preparer?.chName ?? '',
+                readOnly: true,
               },
             }}
           />
@@ -531,9 +533,6 @@ export default function EditRequirementRecord() {
         showModal={showSelector}
         defaultSeletedDataArrArr={defaultSeletedDataArrArr}
         onConfirm={(arr) => {
-          // const picker = arr[0][0] as TemployeeDto | undefined;
-          // const preparer = arr[1][0] as TemployeeDto | undefined;
-
           const preparer = arr[0][0] as TemployeeDto | undefined;
 
           setState_info((state) => ({

@@ -311,6 +311,7 @@ export default function EditElectronicSuppliesPickup({
     stateArr: Object.values(state_electronicItemList),
     handler_editItemQty: editItemQty,
     handler_editCategoryValue: editCategoryValue,
+    disabled,
   });
   //
   // Object.values(state_electronicItemList),
