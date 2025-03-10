@@ -143,7 +143,7 @@ export default function EditElectronicSuppliesPickup({
     pickupRecordDetails = orderDetailArr({ detailArr: pickupRecordDetails });
 
     pickupRecordDetails.forEach((detail) => {
-      const { id, category, itemName, quantity, unit, code } = detail;
+      const { id, category, itemName, quantity, unit, code, categoryParam } = detail;
 
       list[category] = {
         ...list[category], // 可能是undefined // 會將subItemName帶入
@@ -187,7 +187,7 @@ export default function EditElectronicSuppliesPickup({
     let pickupRecordDetails: (TcreateElectronicSuppliesRecordDetailDto & { id?: string })[] = Object.values(
       state_electronicItemList
     ).map((item) => {
-      const { id, category, itemName, quantity, unit, code, subItemName } = item;
+      const { id, category, itemName, quantity, unit, code, subItemName, categoryParam } = item;
       const detail = {
         // 必須要送id，若id為undefined將會新增一筆detail
         // 預期:新增時每一筆資料都沒有id、編輯時每一筆資料都有id，
@@ -197,6 +197,7 @@ export default function EditElectronicSuppliesPickup({
         quantity,
         unit,
         code,
+        categoryParam,
       };
 
       return detail;
@@ -213,7 +214,6 @@ export default function EditElectronicSuppliesPickup({
       preparationEmployeeId: state_info.preparer!.id,
       doorModel: state_info.doorModelName!,
       requirementRecordId: requirementRecordId || null,
-
       pickupRecordDetails,
       totalQuantity: Number(state_info.doorQty || 0),
     };
@@ -256,13 +256,13 @@ export default function EditElectronicSuppliesPickup({
     });
   };
 
-  const editCategoryValue = ({ key, categoryValue }: { key: string; categoryValue: string }) => {
+  const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
     setState_electronicItemList((state) => {
       return {
         ...state,
         [key]: {
           ...state[key],
-          categoryParam: categoryValue,
+          categoryParam: categoryParam,
         },
       };
     });
@@ -283,14 +283,14 @@ export default function EditElectronicSuppliesPickup({
     const list: { [key: string]: Tstate_electronicItem } = {};
 
     detailArr.forEach((detail) => {
-      const { category, itemName, quantity, unit, code } = detail;
+      const { category, itemName, quantity, unit, code, categoryParam } = detail;
 
       const subItemName = itemName === '控制箱/盤' ? '捲門/水閘門' : undefined;
 
       if (!list[category]) {
         list[category] = {
           category,
-          categoryParam: category,
+          categoryParam: categoryParam ?? '',
           itemName,
           quantity: quantity || 0,
           unit,

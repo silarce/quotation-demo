@@ -3533,7 +3533,6 @@ export type TcreateElectronicSuppliesPickupRecordDto = Pick<
 > & {
   requirementRecordId: string | null;
   pickupRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
-  categoryParam: string;
 };
 
 export type TupdateElectronicSuppliesPickupRecordDto = Partial<

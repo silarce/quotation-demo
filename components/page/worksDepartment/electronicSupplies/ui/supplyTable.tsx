@@ -248,7 +248,7 @@ const useStateToGroup = ({
     } = {};
 
     stateArr.forEach((item) => {
-      const { itemName, category, categoryParam: categoryValue, quantity, subItemName, inputCategory } = item;
+      const { itemName, category, categoryParam, quantity, subItemName, inputCategory } = item;
 
       if (!list[itemName]) {
         list[itemName] = {
@@ -260,7 +260,7 @@ const useStateToGroup = ({
 
       const theCategory = inputCategory ? (
         <span className="flex gap-1">
-          {categoryValue}
+          {categoryParam}
           <IconEdit
             className={classNames(disabled && 'invisible')}
             onClick={async () => {
@@ -270,7 +270,7 @@ const useStateToGroup = ({
           />
         </span>
       ) : (
-        category
+        categoryParam || category
       );
 
       list[itemName].rowArr.push({
