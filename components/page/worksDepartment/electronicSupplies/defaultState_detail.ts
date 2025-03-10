@@ -214,7 +214,12 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
           ],
           onConfirm: (value) => {
             const [hp, voltage, motorVendor] = value;
-            resolve(`彈射門控制箱 ${hp}HP ${voltage}V ${motorVendor}`);
+            let str = '彈射門控制箱';
+            hp && (str += ` ${hp}HP`);
+            voltage && (str += ` ${voltage}V`);
+            motorVendor && (str += ` ${motorVendor}`);
+
+            resolve(str);
             destroy();
           },
         });
