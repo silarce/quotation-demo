@@ -422,7 +422,7 @@ export default function EditElectronicSuppliesPickup({
       {CustomPageHeader && <CustomPageHeader disabled={disabled} />}
       {!CustomPageHeader && (
         <PageHeader
-          returnBtn={disabled}
+          showReturnBtn={disabled}
           panelList={panelList}
           contractNumber={data_contract?.contractNumber ?? '---'}
         />

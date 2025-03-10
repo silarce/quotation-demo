@@ -673,7 +673,7 @@ export default function Worksheet({
     <SubLayer isLoading_all={isLoading}>
       {!isReadonly && (
         <PageHeader
-          returnBtn={disabled}
+          showReturnBtn={disabled}
           panelList={panelList}
           contractNumber={engineeringContact?.contractNumber ?? ''}
         />

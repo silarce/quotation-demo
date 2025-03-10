@@ -816,7 +816,7 @@ export default function EditDispatchList() {
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader returnBtn={disabled} panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
+      <PageHeader showReturnBtn={disabled} panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
 
       <div className={scss.body}>
         <Profile disabled={theDiasbled} control={control_profile} />

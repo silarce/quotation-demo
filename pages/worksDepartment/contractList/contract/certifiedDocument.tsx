@@ -51,7 +51,7 @@ export default function CertifiedDocument_page() {
   return (
     <SubLayer>
       <PageHeader
-        returnBtn={!editCertifiedDocument}
+        showReturnBtn={!editCertifiedDocument}
         panelList={compositionPanelList}
         contractNumber={contract?.engineeringContact?.contractNumber ?? ''}
       />

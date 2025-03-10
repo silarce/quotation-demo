@@ -333,7 +333,7 @@ export default function Edit() {
   return (
     <SubLayer isLoading_all={isFectching} isLoading_subLayer={isFetching_contract || isFetching_rootMemorandum}>
       <PageHeader
-        returnBtn={!(isNew || isReply)}
+        showReturnBtn={!(isNew || isReply)}
         panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}
       />

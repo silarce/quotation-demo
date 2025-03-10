@@ -366,7 +366,11 @@ export default function EditRequirementRecord() {
     <SubLayer
     // isLoading_subLayer={isFetching_requirementRecord} api回應很快，不需要
     >
-      <PageHeader returnBtn={disabled} panelList={panelList} contractNumber={data_contract?.contractNumber ?? '---'} />
+      <PageHeader
+        showReturnBtn={disabled}
+        panelList={panelList}
+        contractNumber={data_contract?.contractNumber ?? '---'}
+      />
 
       <div className={scss.container}>
         {/* info */}

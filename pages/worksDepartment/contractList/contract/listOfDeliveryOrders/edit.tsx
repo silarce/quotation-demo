@@ -492,9 +492,9 @@ export default function Edit({
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        returnBtn={isReadonly ? false : disabled}
+        showReturnBtn={isReadonly ? false : disabled}
         panelList={isReadonly ? undefined : panelList}
-        tagCallback={tagCallback}
+        createTagLable={tagCallback}
         contractNumber={contract?.content.quotationNumber}
         linkForbidden={isReadonly}
       />

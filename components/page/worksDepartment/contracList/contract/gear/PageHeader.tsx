@@ -24,19 +24,18 @@ const documentType: TdocType = '保固書';
 
 // ========================================================
 export default function PageHeader({
-  tagCallback,
   panelList = [],
   contractNumber = '未取得',
-  returnBtn = true,
+  createTagLable,
+  showReturnBtn = true,
   linkForbidden,
 }: {
-  tagCallback?: (contractId: string) => string;
   panelList?: TpanelList;
   contractNumber?: string;
-  returnBtn?: boolean;
+  createTagLable?: (contractId: string) => string;
+  showReturnBtn?: boolean;
   linkForbidden?: boolean;
 }) {
-  const { erpFeature } = useContext(AppContext);
   const history_contractList = useUrlHistory((state) => state.contractList);
 
   if (!history_contractList.pathname) {
@@ -49,16 +48,57 @@ export default function PageHeader({
     contractId: string | undefined;
     version: string | undefined;
   };
+  const { contractId } = query as {
+    contractId: string | undefined;
+    version: string | undefined;
+  };
+
+  // -------------------------------------------------------------
+
+  const tag = (createTagLable && createTagLable(contractId ?? '')) || `合約編號 ${contractNumber}`;
+
+  const linkList = useLink();
+
+  if (showReturnBtn) {
+    panelList = [
+      ...panelList,
+      {
+        type: 'myButton',
+        label: '返回合約列表',
+        onClick: () => {
+          router.push(history_contractList);
+        },
+      },
+    ];
+  }
+
+  return (
+    <div>
+      {/* 上面的 */}
+      <PageHeader02 tag={tag} panelList={panelList} />
+      {/* 下面的 */}
+      {!linkForbidden && <PageHeaderFlex01 linkList={linkList} />}
+    </div>
+  );
+}
+
+// ====================================================================
+
+// MARK:useLink
+const useLink = () => {
+  const { erpFeature } = useContext(AppContext);
+
+  const router = useRouter();
+  const query = router.query as {
+    contractId: string | undefined;
+    version: string | undefined;
+  };
   const { contractId, version } = query as {
     contractId: string | undefined;
     version: string | undefined;
   };
 
   const isShowAccountReceivable = !!erpFeature?.find((item) => item.name === '應收帳款');
-  // worksDepartment
-  // accountsReceivable
-  // worksDepartment_worksheet
-  // worksDepartment_deliveryList
 
   const pass = erpFeature?.some((feature) => {
     return (
@@ -78,14 +118,13 @@ export default function PageHeader({
 
   // -------------------------------------------------------------
 
-  const tag = (tagCallback && tagCallback(contractId ?? '')) || `合約編號 ${contractNumber}`;
-
   const pathHead = `/worksDepartment/contractList/contract`;
 
   const linkList_pass = [
     isShowAccountReceivable
       ? {
           label: '合約',
+          // disabled: !isShowAccountReceivable,
           disabled: !isShowAccountReceivable,
           href: {
             pathname: `${pathHead}/contractTable`,
@@ -263,27 +302,5 @@ export default function PageHeader({
 
   const linkList = pass ? linkList_pass : domesticPass ? linkList_domestic : [];
 
-  if (returnBtn) {
-    panelList = [
-      ...panelList,
-      {
-        type: 'myButton',
-        label: '返回合約列表',
-        onClick: () => {
-          router.push(history_contractList);
-        },
-      },
-    ];
-  }
-
-  return (
-    <div>
-      {/* 上面的 */}
-      <PageHeader02 tag={tag} panelList={panelList} />
-      {/* 下面的 */}
-      {!linkForbidden && <PageHeaderFlex01 linkList={linkList} />}
-    </div>
-  );
-}
-
-// ====================================================================
+  return linkList;
+};
