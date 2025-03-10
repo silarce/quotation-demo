@@ -113,6 +113,12 @@ export default function ElectronicSupplies() {
     requirementRecords = [],
   } = data_electronicSupplies ?? {};
 
+  const isAllowAddRequirement = useMemo(() => {
+    return (worksheet ?? []).some((item) => {
+      return item.isAlreadyToElectronicSupplies === false && item.isAbandoned === false;
+    });
+  }, [worksheet]);
+
   // ------------------------------------------------------------------
 
   // region REQUEST
@@ -137,6 +143,7 @@ export default function ElectronicSupplies() {
     // reqCreateRequirementRecordFromIWorksheet,
     reqUpdateElectronicSupplies,
     electronicSuppliesId,
+    isAllowAddRequirement,
   });
 
   // ------------------------------------------------------------------
@@ -225,10 +232,12 @@ const usePanelList = ({
   // reqCreateRequirementRecordFromIWorksheet,
   reqUpdateElectronicSupplies,
   electronicSuppliesId,
+  isAllowAddRequirement,
 }: {
   // reqCreateRequirementRecordFromIWorksheet: () => void;
   reqUpdateElectronicSupplies: () => void;
   electronicSuppliesId: string | null | undefined;
+  isAllowAddRequirement: boolean;
 }) => {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -270,19 +279,21 @@ const usePanelList = ({
     //   label: '自動產生需求單',
     //   onClick: reqCreateRequirementRecordFromIWorksheet,
     // },
-    {
-      type: 'addButton',
-      label: '新增需求單',
-      onClick: () =>
-        router.push({
-          pathname: `${router.pathname}/editRequirement`,
-          // query,
-          query: {
-            ...query,
-            contractId: contractId, // 確保要有contractId
-          },
-        }),
-    },
+    isAllowAddRequirement
+      ? {
+          type: 'addButton',
+          label: '新增需求單',
+          onClick: () =>
+            router.push({
+              pathname: `${router.pathname}/editRequirement`,
+              // query,
+              query: {
+                ...query,
+                contractId: contractId, // 確保要有contractId
+              },
+            }),
+        }
+      : null,
   ];
 
   //
