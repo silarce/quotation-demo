@@ -496,7 +496,7 @@ export default function EditRequirementRecord() {
 
           <div>
             <SquareBtn sharp="mini" onClick={reqGetDefaultElectronicSuppliesRequirement}>
-              重置為預設需求單
+              重置為預設送電備品
             </SquareBtn>
           </div>
         </div>
