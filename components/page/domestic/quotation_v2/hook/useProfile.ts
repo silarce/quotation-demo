@@ -175,7 +175,9 @@ const createProps_profileForm = ({
         : async () => {
             const { destroy } = myAlert.input({
               title: '更新追蹤狀態',
-              isTextArea: true,
+              props_input: {
+                isTextArea: true,
+              },
               width: 1000,
               onConfirm: async (v) => {
                 const res = await reqPatchTrackProgressOrProjectProgress({ trackProgress: v });
@@ -198,7 +200,9 @@ const createProps_profileForm = ({
         : async () => {
             const { destroy } = myAlert.input({
               title: '更新工地進度',
-              isTextArea: true,
+              props_input: {
+                isTextArea: true,
+              },
               width: 1000,
               onConfirm: async (v) => {
                 const res = await reqPatchTrackProgressOrProjectProgress({ projectProgress: v });
