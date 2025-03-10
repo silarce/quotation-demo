@@ -225,6 +225,7 @@ export default function EditRequirementRecord() {
 
       const state: Tstate_electronicItem = {
         category: item.category,
+        categoryValue: item.category,
         itemName: item.itemName,
         quantity: item.quantity,
         unit: item.unit ?? null,
@@ -260,9 +261,25 @@ export default function EditRequirementRecord() {
     });
   };
 
+  const editCategoryValue = ({ key, categoryValue }: { key: string; categoryValue: string }) => {
+    setState_electronicItemList((state) => {
+      return {
+        ...state,
+        [key]: {
+          ...state[key],
+          categoryValue,
+        },
+      };
+    });
+  };
+
   // ------------------------------------------------------------------
 
-  const groupArr = useStateToGroup(Object.values(state_electronicItemList), editItemQty);
+  const groupArr = useStateToGroup({
+    stateArr: Object.values(state_electronicItemList),
+    handler_editItemQty: editItemQty,
+    handler_editCategoryValue: editCategoryValue,
+  });
 
   // ------------------------------------------------------------------
 

@@ -256,6 +256,18 @@ export default function EditElectronicSuppliesPickup({
     });
   };
 
+  const editCategoryValue = ({ key, categoryValue }: { key: string; categoryValue: string }) => {
+    setState_electronicItemList((state) => {
+      return {
+        ...state,
+        [key]: {
+          ...state[key],
+          categoryValue,
+        },
+      };
+    });
+  };
+
   const replaceState = () => {
     let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
 
@@ -278,6 +290,7 @@ export default function EditElectronicSuppliesPickup({
       if (!list[category]) {
         list[category] = {
           category,
+          categoryValue: category,
           itemName,
           quantity: quantity || 0,
           unit,
@@ -294,7 +307,14 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  const groupArr = useStateToGroup(Object.values(state_electronicItemList), editItemQty);
+  const groupArr = useStateToGroup({
+    stateArr: Object.values(state_electronicItemList),
+    handler_editItemQty: editItemQty,
+    handler_editCategoryValue: editCategoryValue,
+  });
+  //
+  // Object.values(state_electronicItemList),
+  // editItemQty
 
   // ------------------------------------------------------------------
   // region PROPS

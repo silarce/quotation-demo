@@ -12,6 +12,8 @@ import scss from './supplyTable.module.scss';
 // type
 import type { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
+import { IconEdit } from 'public/image/icon/svgComponent/svgIcons';
+
 // ==================================================================
 
 // 先簡單處理，真的有效能問題再用memo
@@ -24,7 +26,7 @@ type Tgroup = {
   subItemName?: string | null;
   rowArr: {
     // 種類
-    category: string;
+    category: React.ReactNode;
     valueArr: {
       value?: string;
       onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -229,18 +231,22 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
 
 // region HOOK
 
-const useStateToGroup = (
-  //
-  stateArr: Tstate_electronicItem[],
-  handler_editItemQty: (key: string, qty: number) => void
-) => {
+const useStateToGroup = ({
+  stateArr,
+  handler_editItemQty,
+  handler_editCategoryValue,
+}: {
+  stateArr: Tstate_electronicItem[];
+  handler_editItemQty: (key: string, qty: number) => void;
+  handler_editCategoryValue: (props: { key: string; categoryValue: string }) => void;
+}) => {
   return useMemo(() => {
     const list: {
       [key: string]: Tgroup;
     } = {};
 
     stateArr.forEach((item) => {
-      const { itemName, category, quantity, subItemName } = item;
+      const { itemName, category, categoryValue, quantity, subItemName, inputCategory } = item;
 
       if (!list[itemName]) {
         list[itemName] = {
@@ -250,8 +256,22 @@ const useStateToGroup = (
         };
       }
 
+      const theCategory = inputCategory ? (
+        <span className="flex gap-1">
+          {categoryValue}
+          <IconEdit
+            onClick={async () => {
+              const categoryValue = await inputCategory();
+              handler_editCategoryValue({ key: category, categoryValue });
+            }}
+          />
+        </span>
+      ) : (
+        category
+      );
+
       list[itemName].rowArr.push({
-        category,
+        category: theCategory,
         valueArr: [
           {
             value: String(quantity || '0'),
