@@ -10,10 +10,13 @@ import MyButton_v2, { TmyBtn } from '../../button/myButton_v2';
 
 // css
 import style from './alertModals.module.scss';
+import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-align';
 
 // ==================================================
 
 type TbtnPropsArr = TmyBtn[];
+
+type Tprops_input = { caption?: string; isTextArea?: boolean } & React.InputHTMLAttributes<HTMLInputElement>;
 
 // ==================================================
 
@@ -250,26 +253,25 @@ const ModalClear = (props?: ModalFuncProps) => {
 
 // ====================================================
 
-const ModalInut = ({
-  onConfirm,
-  isTextArea,
-  defaultValue,
-  placeholder,
-  width = 'auto',
+function ModalInput<P extends Tprops_input | Tprops_input[] = Tprops_input>({
   props_input,
+  onConfirm,
+  width = 'auto',
   className,
+  captionStyle = { width: '100px', textAlign: 'left' },
   ...rest
 }: {
-  title?: string | number;
-  props?: ModalFuncProps;
-  className?: string;
-  width?: React.CSSProperties['width'];
-  onConfirm?: (value: string) => void;
-  isTextArea?: boolean;
+  props_input?: P;
+  onConfirm?: (value: P extends Tprops_input[] ? string[] : string) => void;
   defaultValue?: string;
   placeholder?: string;
-  props_input?: React.InputHTMLAttributes<HTMLInputElement>;
-}) => {
+  width?: React.CSSProperties['width'];
+  className?: string;
+  captionStyle?: React.CSSProperties;
+
+  title?: string | number;
+  props?: ModalFuncProps;
+}) {
   const modal = Modal.confirm({
     icon: <></>,
     ...modalProps,
@@ -285,22 +287,53 @@ const ModalInut = ({
     ...rest,
   });
 
+  // const captionStyle: React.CSSProperties = { width: '100px', textAlign: 'left' };
+
+  const props_inputArr = Array.isArray(props_input) ? props_input : [props_input];
+
   modal.update({
     content: (
-      <Input
+      <form
         className={'mt-10'}
-        isTextArea={isTextArea}
-        placeholder={placeholder}
-        defaultValue={defaultValue}
-        onConfirm={onConfirm}
-        onCancel={modal.destroy}
-        props_input={props_input}
-      />
+        onSubmit={(e) => {
+          e.preventDefault();
+          // Input裡面有設name:"input"
+          const raw = e.currentTarget['input'] as RadioNodeList | HTMLInputElement;
+
+          let value: string | string[] = raw.value;
+
+          if (length in raw) {
+            value = Array.from(raw as RadioNodeList).map((item) => (item as HTMLInputElement).value);
+          }
+
+          onConfirm?.(value as P extends Tprops_input[] ? string[] : string);
+        }}
+      >
+        <div className="grid gap-2">
+          {props_inputArr.map((props_input, index) => {
+            return <Input key={index} captionStyle={captionStyle} props_input={props_input} />;
+          })}
+        </div>
+
+        <div className="flex gap-8 mt-10 justify-center">
+          <MyButton_v2
+            theme="danger"
+            buttonProps={{
+              htmlType: 'submit',
+            }}
+          >
+            確認
+          </MyButton_v2>
+          <MyButton_v2 onClick={modal.destroy}>取消</MyButton_v2>
+        </div>
+      </form>
     ),
   });
 
   return modal;
-};
+}
+
+// ====================================================
 
 // ====================================================
 
@@ -316,32 +349,18 @@ const BtnBar = ({ btnPropsArr }: { btnPropsArr: TbtnPropsArr }) => {
 
 // ====================================================
 
-const Input = ({
-  isTextArea,
-  placeholder,
-  defaultValue,
-  onConfirm,
-  onCancel,
-  className,
-  props_input,
-}: {
-  isTextArea?: boolean;
-  placeholder?: string;
-  defaultValue?: string;
-  onConfirm?: (value: string) => void;
-  onCancel?: () => void;
-  className?: string;
-  props_input?: React.InputHTMLAttributes<HTMLInputElement>;
-}) => {
+const Input = ({ props_input, captionStyle }: { props_input?: Tprops_input; captionStyle: React.CSSProperties }) => {
   const inputSelProps: TinputSelProps = (() => {
-    if (isTextArea) {
+    if (props_input?.isTextArea) {
       return {
+        captionStyle,
+        caption: props_input.caption,
         showBaseline: 'invisible',
         textareaProps: {
           allowNewLineByUser: true,
           props: {
-            defaultValue,
-            placeholder,
+            defaultValue: props_input?.defaultValue,
+            placeholder: props_input?.placeholder,
             name: 'input',
             minRows: 5,
             maxRows: 5,
@@ -351,11 +370,13 @@ const Input = ({
       };
     } else {
       return {
+        captionStyle,
+        caption: props_input?.caption,
         inputProps: {
           props: {
-            placeholder,
+            // placeholder,
             ...props_input,
-            defaultValue,
+            // defaultValue,
             name: 'input',
           },
         },
@@ -363,29 +384,7 @@ const Input = ({
     }
   })();
 
-  return (
-    <form
-      className={className}
-      onSubmit={(e) => {
-        e.preventDefault();
-        const value = e.currentTarget['input'].value;
-        onConfirm?.(value);
-      }}
-    >
-      <InputSel {...inputSelProps} />
-      <div className="flex gap-8 mt-10 justify-center">
-        <MyButton_v2
-          theme="danger"
-          buttonProps={{
-            htmlType: 'submit',
-          }}
-        >
-          確認
-        </MyButton_v2>
-        <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
-      </div>
-    </form>
-  );
+  return <InputSel {...inputSelProps} />;
 };
 
 // ====================================================
@@ -400,7 +399,7 @@ const myAlert = {
   destroyAll: Modal.destroyAll,
   btnBar: ModalBtnBar,
   clear: ModalClear,
-  input: ModalInut,
+  input: ModalInput,
   notify: {
     open: notification.open,
     close: notification.close,

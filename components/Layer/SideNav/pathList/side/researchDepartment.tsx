@@ -12,6 +12,16 @@ export default function SidePathResearch (){
                     path: path + '/workSheet',
                     erpFeature: devPass,
                 },
+                {
+                    label: '物料維護',
+                    path: path + '/productListForResearch',
+                    erpFeature: devPass,
+                },
+                {
+                    label: 'BOM維護',
+                    path: path + '/bomListForResearch',
+                    erpFeature: devPass,
+                },
             ],
         };
     })()

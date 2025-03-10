@@ -1358,7 +1358,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
                     title: '追蹤進度',
                     placeholder: '追蹤進度',
                     defaultValue: state_profile.trackProgress,
-                    isTextArea: true,
+                    props_input: {
+                      isTextArea: true,
+                    },
                     width: 656,
                     onConfirm: async (v) => {
                       const res = await reqPatchQuotationContent_id_progress({
@@ -1394,7 +1396,9 @@ function TheQuotation({ router }: { router: NextRouter }) {
                     title: '工程進度',
                     placeholder: '工程進度',
                     defaultValue: state_profile.projectProgress,
-                    isTextArea: true,
+                    props_input: {
+                      isTextArea: true,
+                    },
                     width: 656,
                     onConfirm: async (v) => {
                       const res = await reqPatchQuotationContent_id_progress({

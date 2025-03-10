@@ -247,9 +247,11 @@ export default function WareHouseList() {
 
     const getTrayByWareHouse = (item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) => {
         handleRowClick(item.id)
-        router.push({
-            pathname: `/factoryDepartment/trayList`,
-            query: {
+        switch (item.type) {
+            case '立體倉庫':
+            router.push({
+                pathname: `/factoryDepartment/trayList`,
+                query: {
                 type: 'Tray',
                 whid: item.id,
                 whname1: item.whname,
@@ -259,8 +261,32 @@ export default function WareHouseList() {
                 traytransfer: traytransfer,
                 whnamecalled: whnamecalled,
                 firstin: 1
-            },
-        });
+                },
+            });
+            break;
+            case '一般倉庫':
+            // router.push({
+            //     pathname: `/factoryDepartment/noTrayList`,
+            // });
+            router.push({
+                pathname: `/factoryDepartment/trayList`,
+                query: {
+                type: 'Tray',
+                whid: item.id,
+                whname1: item.whname,
+                url: url,
+                traycalled: traycalled,
+                traycalledname: traycalledname,
+                traytransfer: traytransfer,
+                whnamecalled: whnamecalled,
+                firstin: 1
+                },
+            });
+            break;
+            default:
+            break;
+        }
+
     }
 
     const GetWareHouseType = async () => {

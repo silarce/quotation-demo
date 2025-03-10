@@ -76,6 +76,17 @@ export default function BomList() {
     const [handinputmaterial, setHandinputmaterial] = useState<string>("");
     const [handinputsurface, setHandinputsurface] = useState<string>("");
 
+    //工單部分
+    const [handinputenable, setHandinputenable] = useState<boolean>(true);
+    const [handinputworksheetnumber, setHandinputworksheetnumber] = useState<string>("");
+    const [handinputcolumnofspeconqpi, setHandinputcolumnofspeconqpi] = useState<string>("");
+    const [handinputspecformula, setHandinputspecformula] = useState<string>("");
+    const [handinputspecstr, setHandinputspecstr] = useState<string>("");
+    const [handinputspecunit, setHandinputspecunit] = useState<string>("");
+    const [handinputfmlquantity, setHandinputfmlquantity] = useState<string>("");
+
+    const [handinputquantityformula, setHandinputquantityformula] = useState<string>("");
+
 
     //#endregion
 
@@ -90,6 +101,23 @@ export default function BomList() {
         }
     }, []);
 
+
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    useEffect(() => {
+        // 定義事件處理器
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        // 在元件掛載時設置事件監聽器
+        window.addEventListener('resize', handleResize);
+
+        // 在元件卸載時移除事件監聽器
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []); // 空依賴陣列確保只在掛載和卸載時運行
     //#endregion
 
     //#region =============【上功能列】===============================================================================
@@ -198,11 +226,12 @@ export default function BomList() {
             // setIsLoading(false);
         }
     };
-    const RemoveBomDetail = async (id: any) => {
+    const RemoveBomDetail = async (id: any, item: any) => {
         try {
             // setIsLoading(true);
             const conditionModel = {
-                id: id
+                id: id,
+                data: item
             };
 
 
@@ -253,7 +282,7 @@ export default function BomList() {
             // setIsLoading(true);
             const conditionModel = {
                 data: item,
-                username: userInfo?.username,
+                username: userInfo?.employee?.id,
                 id: item.id
             };
 
@@ -393,7 +422,16 @@ export default function BomList() {
                 quantity: handinputquantity,
                 unit: handinputunit,
                 spec: handinputspec,
-                create_by: userInfo?.username,
+                create_by: userInfo?.employee?.id,
+                worksheet_number: handinputworksheetnumber,
+                columnofspeconqpi: handinputcolumnofspeconqpi,
+                spec_formula: handinputspecformula,
+                fml_quantity: handinputfmlquantity,
+                quantity_formula: handinputquantityformula,
+                spec_str: handinputspecstr,
+                spec_unit: handinputspecunit,
+                enable: handinputenable,
+                note: handinputnote,
             };
 
             const conditionModel = {
@@ -570,6 +608,15 @@ export default function BomList() {
     const [editlistindex, setEditlistindex] = useState<number>(0);
     const [originaleditlistdata, setOriginaleditlistdata] = useState<any[]>([]);
     const quantityRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const worksheet_numberRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const spec_formulaRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const columnofspeconqpiRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const fml_quantityRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const quantity_formulaRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const spec_strRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const spec_unitRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+    const enableRefs = useRef(bomdata.map(() => createRef<HTMLInputElement>()));
+
     // 組件編輯
     const handleEdit = async (index: any) => {
         if (editlist === true) {
@@ -594,7 +641,7 @@ export default function BomList() {
                 onOk: () => {
                     const updatedData = bomdata.filter((_, i) => i !== index);
                     setBomdata(updatedData);
-                    RemoveBomDetail(item.id);
+                    RemoveBomDetail(item.id, item);
                 }
             }
         });
@@ -754,23 +801,8 @@ export default function BomList() {
 
                 ]}
             />
-            <div
-                style={{ paddingBottom: '18px' }}
-            >
-                <span
-                    style={{
-                        height: '50px',
-                        backgroundColor: '#f5f5f5',
-                        display: 'flex',
-                        justifyContent: 'center', // 水平置中
-                        alignItems: 'center',     // 垂直置中
-                        fontSize: '18px'
-                    }}
-                >
-                    物料清單
-                </span>
-            </div>
-            <div className={scss.body}>
+
+            <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.content}>
                     <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
                         <InputSel
@@ -1081,6 +1113,165 @@ export default function BomList() {
                                             <span>{_item.unit}</span>
                                             <span>{getTaiwanDateStr(_item.update_at)}</span>
                                             <span>{_item.update_by}</span>
+                                            <span>
+                                                {/* 確保 _item.enable 以布林值呈現 */}
+                                                <input
+                                                    ref={enableRefs.current[index]}
+                                                    type="checkbox"
+                                                    checked={_item.enable === true || _item.enable === "true"} // 確保只在 true 或 "true" 時勾選
+                                                    disabled={!(index === editlistindex && editlist === true)} // 只有在編輯模式下可修改
+                                                    onChange={(e) => {
+                                                        const newEnableValue = e.target.checked; // checkbox 的 true/false 值
+                                                        setBomdata((prevData) => {
+                                                            const newData = [...prevData];
+                                                            newData[index] = {
+                                                                ...newData[index],
+                                                                enable: newEnableValue, // 確保 enable 是布林值
+                                                            };
+                                                            return newData;
+                                                        });
+                                                    }}
+                                                    style={{
+                                                        backgroundColor: 'transparent',
+                                                        width: '20px', // checkbox 不需要太寬，可調整
+                                                        height: '20px'
+                                                    }}
+                                                />
+                                            </span>
+
+                                            <span>
+                                                <input
+                                                    ref={worksheet_numberRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.worksheet_number !== undefined ? _item.worksheet_number : ''}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newWorksheet_number = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            worksheet_number: newWorksheet_number,
+                                                        };
+                                                        setBomdata(newData);
+                                                        // handleChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={columnofspeconqpiRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.columnofspeconqpi !== undefined ? _item.columnofspeconqpi : ''}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newColumnofspeconqpi = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            columnofspeconqpi: newColumnofspeconqpi,
+                                                        };
+                                                        setBomdata(newData);
+                                                        // handleChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={spec_formulaRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    // style={{ backgroundColor: 'transparent', borderBottom: "1px solid black", width: '80px' }}
+                                                    type="text"
+                                                    value={_item.spec_formula !== undefined ? _item.spec_formula : ''}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newSpec_formula = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            spec_formula: newSpec_formula,
+                                                        };
+                                                        setBomdata(newData);
+                                                        // handleChange(index, "quantity", e.target.value);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={spec_strRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    type="text"
+                                                    value={_item.spec_str !== undefined ? _item.spec_str : 1}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newSpec_str = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            spec_str: newSpec_str,
+                                                        };
+                                                        setBomdata(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={spec_unitRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    type="text"
+                                                    value={_item.spec_unit !== undefined ? _item.spec_unit : 1}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newSpec_unit = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            spec_unit: newSpec_unit,
+                                                        };
+                                                        setBomdata(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={fml_quantityRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    type="text"
+                                                    value={_item.fml_quantity !== undefined ? _item.fml_quantity : 1}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newFml_quantity = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            fml_quantity: newFml_quantity,
+                                                        };
+                                                        setBomdata(newData);
+                                                    }}
+                                                />
+                                            </span>
+                                            <span>
+                                                <input
+                                                    ref={quantity_formulaRefs.current[index]}
+                                                    style={{ backgroundColor: 'transparent', borderBottom: ((index === editlistindex && editlist === true) ? "1px solid black" : ""), width: '100%' }}
+                                                    type="text"
+                                                    value={_item.quantity_formula !== undefined ? _item.quantity_formula : 1}
+                                                    readOnly={!(index === editlistindex && editlist === true)}
+                                                    onChange={(e) => {
+                                                        const newData = [...bomdata];
+                                                        const newQuantity_formula = e.target.value;
+                                                        newData[index] = {
+                                                            ...newData[index],
+                                                            quantity_formula: newQuantity_formula,
+                                                        };
+                                                        setBomdata(newData);
+                                                    }}
+                                                />
+                                            </span>
+
                                             <span></span>
                                         </div>
                                     </CellWithBar>
@@ -1177,10 +1368,99 @@ export default function BomList() {
                                     />
                                 </div>
                                 <div>
-                                    {/* &nbsp;&nbsp;
-                                    <button onClick={() => handleClearHandKey()} style={{ display: handinputproductid || handinputname || handinputspec || handinputquantity || handinputunit || handinputnote ? '' : 'none' }}>
-                                        <img src={icon_clear.src} alt="clear" style={{ width: '30px', height: '20px' }} />
-                                    </button> */}
+                                    <input
+                                        type="text"
+                                        placeholder=' '
+                                        readOnly
+                                        value=''
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder=' '
+                                        readOnly
+                                        value=''
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="checkbox"
+                                        checked={handinputenable} // 控制勾選狀態
+                                        disabled={!edithandkey} // 只有 edithandkey 為 true 時可編輯
+                                        onChange={(e) => setHandinputenable(e.target.checked)} // 更新狀態
+                                        style={{
+                                            display: `${edithandkey ? '' : 'none'}`,
+                                            backgroundColor: 'transparent',
+                                            width: '20px', // ch
+                                            height: '20px'
+                                        }} // 保留顯示/隱藏邏輯
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='工作表代號'
+                                        value={handinputworksheetnumber}
+                                        onChange={(e) => setHandinputworksheetnumber(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='規格來源'
+                                        value={handinputcolumnofspeconqpi}
+                                        onChange={(e) => setHandinputcolumnofspeconqpi(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='規格公式'
+                                        value={handinputspecformula}
+                                        onChange={(e) => setHandinputspecformula(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='規格內容'
+                                        value={handinputspecstr}
+                                        onChange={(e) => setHandinputspecstr(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='規格單位'
+                                        value={handinputspecunit}
+                                        onChange={(e) => setHandinputspecunit(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='數量來源'
+                                        value={handinputfmlquantity}
+                                        onChange={(e) => setHandinputfmlquantity(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        placeholder='數量公式'
+                                        value={handinputquantityformula}
+                                        onChange={(e) => setHandinputquantityformula(e.target.value)}
+                                        style={{ width: '100%', display: `${edithandkey ? '' : 'none'}` }}
+                                    />
                                 </div>
                             </div>
 
