@@ -109,12 +109,12 @@ function PreWorkContactDoc_component(
     contract,
     engineeringContactId,
     onStateChange,
-    isOnlyControlContactInfo = false,
+    readonly = false,
   }: {
     contract: TquotationContractDto | undefined;
     engineeringContactId: string | undefined | null;
     onStateChange?: TonStateChange;
-    isOnlyControlContactInfo?: boolean;
+    readonly?: boolean;
   },
   ref: React.ForwardedRef<unknown>
 ) {
@@ -321,7 +321,7 @@ function PreWorkContactDoc_component(
   const control_profile = useControl_profile({
     profile,
     profileChange,
-    isOnlyControlContactInfo,
+    readonly,
     showPattern,
     hasPattern,
     shouldHasPattern,
@@ -468,11 +468,7 @@ function PreWorkContactDoc_component(
 
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
-            <TextListEditor_v2
-              label={'備註'}
-              disabled={disabled || isOnlyControlContactInfo}
-              stringObj={control_anno}
-            />
+            <TextListEditor_v2 label={'備註'} disabled={disabled || readonly} stringObj={control_anno} />
           </div>
         </div>
         {/* 工程圖表資料 */}
@@ -738,7 +734,7 @@ const useContactPersonsArr = ({
 const useControl_profile = ({
   profile,
   profileChange,
-  isOnlyControlContactInfo,
+  readonly,
   showPattern,
   hasPattern,
   shouldHasPattern,
@@ -750,7 +746,7 @@ const useControl_profile = ({
 }: {
   profile: Tprofile | undefined;
   profileChange: (key: keyof Tprofile, v: string) => void;
-  isOnlyControlContactInfo: boolean;
+  readonly: boolean;
   showPattern: () => void;
   hasPattern: ReturnType<typeof useHasPattern>['hasPattern'];
   shouldHasPattern: ReturnType<typeof useHasPattern>['shouldHasPattern'];
@@ -768,14 +764,14 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('paymentStatus', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       projectName: {
         value: profile?.projectName ?? '',
         onChange: (v) => {
           profileChange('projectName', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       /**工程內容 */
       projectContent: {
@@ -783,11 +779,11 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('projectContent', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       // 工程圖表
       projectPattern: {
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
         onCaptionClick: showPattern,
         statusArr: [
           {
@@ -850,7 +846,7 @@ const useControl_profile = ({
       addressBarProps: {
         inputSelProps: {
           caption: '工程地點',
-          disabled: isOnlyControlContactInfo,
+          disabled: readonly,
         },
         addressProps: {
           zipCode: {
@@ -860,7 +856,7 @@ const useControl_profile = ({
           },
           county: {
             props: {
-              isDisabled: disabled || isOnlyControlContactInfo,
+              isDisabled: disabled || readonly,
               value: profile?.county ? { value: profile.county, label: profile.county } : null,
               onChange: (option) => {
                 const value = option ? option.value : '';
@@ -873,7 +869,7 @@ const useControl_profile = ({
           district: {
             easyValue: profile?.district ?? null,
             props: {
-              isDisabled: disabled || isOnlyControlContactInfo,
+              isDisabled: disabled || readonly,
               value: profile?.district ? { value: profile.district, label: profile.district } : null,
               onChange: (option) => {
                 if (!option) {
@@ -888,7 +884,7 @@ const useControl_profile = ({
           },
           address: {
             props: {
-              disabled: disabled || isOnlyControlContactInfo,
+              disabled: disabled || readonly,
               value: profile?.address ?? '',
               onChange: (e) => {
                 profileChange('address', e.target.value);
@@ -904,7 +900,7 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('projectPrincipal', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       /**工程負責人聯絡電話 */
       projectPersonNumber: {
@@ -912,14 +908,14 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('constructionSitePrincipalContactNumber', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       projectFaxNumber: {
         value: profile?.constructionSiteFaxNumber ?? '',
         onChange: (v) => {
           profileChange('constructionSiteFaxNumber', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       /**工地電話 */
       projectNumber: {
@@ -927,7 +923,7 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('constructionSiteContactNumber', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
 
       //
@@ -938,7 +934,7 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('projectNumber', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       /**承包商 */
       contractor: {
@@ -946,7 +942,7 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('contractor', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       /**負責人 */
       principal: {
@@ -954,7 +950,7 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('contractorPrincipal', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       /**公司電話 */
       contactNumber: {
@@ -962,14 +958,14 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('contractorContactNumber', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       faxNumber: {
         value: profile?.contractorFaxNumber ?? '',
         onChange: (v) => {
           profileChange('contractorFaxNumber', v);
         },
-        disabled: isOnlyControlContactInfo,
+        disabled: readonly,
       },
       //
       contactPersons: {
@@ -979,15 +975,7 @@ const useControl_profile = ({
     };
 
     return control_profile;
-  }, [
-    profile,
-    isOnlyControlContactInfo,
-    hasPattern,
-    shouldHasPattern,
-    engineeringContact,
-    disabled,
-    contactPersonsArr,
-  ]);
+  }, [profile, readonly, hasPattern, shouldHasPattern, engineeringContact, disabled, contactPersonsArr]);
 };
 
 // ================================================================================

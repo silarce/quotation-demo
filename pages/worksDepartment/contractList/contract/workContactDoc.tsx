@@ -138,7 +138,7 @@ export default function WorkContactDoc() {
           contract={contract}
           engineeringContactId={engineeringContactId}
           onStateChange={onWorkContactStateChange}
-          isOnlyControlContactInfo={true}
+          readonly={true}
         />
       </div>
     </SubLayer>
