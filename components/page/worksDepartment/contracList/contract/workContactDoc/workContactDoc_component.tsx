@@ -98,8 +98,6 @@ type TstateContact = {
   contactNumber: string;
 };
 
-export type { TimperativeHandle, TonStateChange };
-
 // ============================================================================
 
 const WorkContactDoc_component = forwardRef(PreWorkContactDoc_component);
@@ -115,7 +113,7 @@ function PreWorkContactDoc_component(
   }: {
     contract: TquotationContractDto | undefined;
     engineeringContactId: string | undefined | null;
-    onStateChange: TonStateChange;
+    onStateChange?: TonStateChange;
     isOnlyControlContactInfo?: boolean;
   },
   ref: React.ForwardedRef<unknown>
@@ -467,6 +465,7 @@ function PreWorkContactDoc_component(
             isShowDndBtn={false}
             isDisplayInPage="worksDepartment"
           />
+
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
             <TextListEditor_v2
@@ -542,14 +541,10 @@ const checkStatus = ({
 // region HOOK
 
 const useProfile = () => {
-  const [profile, setProfile] = useState<Tprofile>();
+  const [profile, setProfile] = useState<Tprofile>(emptyProfile());
 
   const profileChange = (key: keyof Tprofile, v: string) => {
     setProfile((profile) => {
-      if (!profile) {
-        return;
-      }
-
       const newProfile = { ...profile };
       newProfile[key] = v;
 
@@ -690,7 +685,7 @@ const useControl_anno = ({
     };
 
     return control_anno;
-  }, []);
+  }, [annoArr]);
 };
 
 const useContactPersonsArr = ({
@@ -737,7 +732,7 @@ const useContactPersonsArr = ({
     });
 
     return contactPersonsArr;
-  }, []);
+  }, [contactArr]);
 };
 
 const useControl_profile = ({
@@ -984,8 +979,39 @@ const useControl_profile = ({
     };
 
     return control_profile;
-  }, []);
+  }, [
+    profile,
+    isOnlyControlContactInfo,
+    hasPattern,
+    shouldHasPattern,
+    engineeringContact,
+    disabled,
+    contactPersonsArr,
+  ]);
 };
 
 // ================================================================================
+
+const emptyProfile = (): Tprofile => ({
+  paymentStatus: '',
+  projectName: '',
+  projectContent: '',
+  zipCode: '',
+  county: '',
+  district: '',
+  address: '',
+  projectPrincipal: '',
+  constructionSitePrincipalContactNumber: '',
+  constructionSiteFaxNumber: '',
+  constructionSiteContactNumber: '',
+  projectNumber: '',
+  contractor: '',
+  contractorPrincipal: '',
+  contractorContactNumber: '',
+  contractorFaxNumber: '',
+});
+
+// ================================================================================
+
+export type { TimperativeHandle, TonStateChange, Tprofile, TshouldPatternList, TstateContact };
 export default WorkContactDoc_component;
