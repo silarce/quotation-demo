@@ -99,7 +99,8 @@ export type { TimperativeHandle, TonStateChange };
 
 const WorkContactDoc_component = forwardRef(PreWorkContactDoc_component);
 
-// _________________________________________
+// MARK:START
+
 function PreWorkContactDoc_component(
   {
     contract,
@@ -114,11 +115,6 @@ function PreWorkContactDoc_component(
   },
   ref: React.ForwardedRef<unknown>
 ) {
-  // const { userInfo } = useContext(AppContext);
-
-  // let isReviewer_worker = false;
-  // let isReviewer_manager = false;
-
   // ---------------------------------------------------------------------------
 
   const router = useRouter();
@@ -128,8 +124,8 @@ function PreWorkContactDoc_component(
   const [isLoading, setIsLoading] = useState(false);
 
   const [showAnnoSelector, setShowAnnoSelector] = useState(false);
-
   const [isShowPattern, setIsShowPattern] = useState(false);
+  const [pdfModalVisible, setPdfModalVisible] = useState(false);
 
   const showPattern = () => {
     setDisabled(true);
@@ -151,19 +147,6 @@ function PreWorkContactDoc_component(
   /**data裡只會有一筆資料 */
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
-  useEffect(() => {
-    (async () => {
-      try {
-        await update_engineeringContact();
-      } catch (error) {
-        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
-      }
-    })();
-  }, [contractId, engineeringContactId]);
-
-  // engineeringContact?.reviewWorkerEmployee?.id === userInfo?.employee?.id && (isReviewer_worker = true);
-
-  // engineeringContact?.reviewManagerEmployee?.id === userInfo?.employee?.id && (isReviewer_manager = true);
 
   // ---------------------------------------------------------------------------
 
@@ -232,220 +215,48 @@ function PreWorkContactDoc_component(
 
   // ---------------------------------------------------------------------------
 
-  // ---------------------------------------------------------------------------
+  const { profile, setProfile, profileChange } = useProfile();
+  const { contactArr, setContactArr, onAddClick } = useContactArr();
+  const { annoArr, setAnnoArr, onConfirm_anno } = useAnnoArr();
+  const { shouldHasPattern, setShouldHasPattern, hasPattern, setHasPattern, onPatternChange, editShouldHasPattern } =
+    useHasPattern();
 
-  useEffect(() => {
-    onStateChange &&
-      onStateChange({
-        disabled,
-        isLoading,
-        isShowPattern,
-        contractNumber: engineeringContact?.contractNumber ?? '',
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, isLoading, isShowPattern, engineeringContact?.contractNumber]);
+  // ----------------------------------------------------------------------------
+  // region API
 
-  // ---------------------------------------------------------------------------
-
-  const [shouldHasPattern, setShouldHasPattern] = useState<TshouldPatternList>({
-    // signature: false,
-    floor: false,
-    detail: false,
-    color: false,
-    construction: false,
-    design: false,
-  });
-
-  const [hasPattern, setHasPattern] = useState<ThasPattern>({
-    hasFloor: false,
-    hasDetail: false,
-    hasColor: false,
-    hasConstruction: false,
-    hasDesign: false,
-  });
-
-  const onPatternChange = (hasPattern: ThasPattern) => {
-    setHasPattern(hasPattern);
-  };
-
-  const editShouldHasPattern = (bool: boolean, key: keyof TshouldPatternList) => {
-    setShouldHasPattern((state) => {
-      return {
-        ...state,
-        [key]: bool,
-      };
-    });
-  };
-
-  useEffect(() => {
-    const {
-      // shouldHasSignature,
-      shouldHasColor,
-      shouldHasConstruction,
-      shouldHasDetail,
-      shouldHasFloor,
-      shouldHasDesign,
-    } = engineeringContact ?? {};
-
-    setShouldHasPattern({
-      floor: shouldHasFloor ?? false,
-      detail: shouldHasDetail ?? false,
-      color: shouldHasColor ?? false,
-      construction: shouldHasConstruction ?? false,
-      design: shouldHasDesign ?? false,
-    });
-  }, [engineeringContact]);
-
-  // const patternReviewStatus: TpatternReviewStatus = useMemo(() => {
-  //   const {
-  //     reviewWorkerEmployee,
-  //     reviewManagerEmployee,
-
-  //     detailToWorkerAt = null,
-  //     detailWorkerReviewedAt = null,
-  //     detailToManagerAt = null,
-  //     detailManagerReviewedAt = null,
-
-  //     designToWorkerAt = null,
-  //     designWorkerReviewedAt = null,
-  //     designToManagerAt = null,
-  //     designManagerReviewedAt = null,
-
-  //     floorToWorkerAt = null,
-  //     floorWorkerReviewedAt = null,
-  //     floorToManagerAt = null,
-  //     floorManagerReviewedAt = null,
-
-  //     constructionToWorkerAt = null,
-  //     constructionWorkerReviewedAt = null,
-  //     constructionToManagerAt = null,
-  //     constructionManagerReviewedAt = null,
-
-  //     colorToWorkerAt = null,
-  //     colorWorkerReviewedAt = null,
-  //     colorToManagerAt = null,
-  //     colorManagerReviewedAt = null,
-  //   } = engineeringContact ?? {};
-
-  //   return {
-  //     salesName: contract?.content.reviewSalesEmployee?.chName ?? '',
-  //     workerName: reviewWorkerEmployee?.chName ?? '',
-  //     managerName: reviewManagerEmployee?.chName ?? '',
-  //     pattern: {
-  //       color: {
-  //         colorToWorkerAt,
-  //         colorWorkerReviewedAt,
-  //         colorToManagerAt,
-  //         colorManagerReviewedAt,
-  //       },
-  //       construction: {
-  //         constructionToWorkerAt,
-  //         constructionWorkerReviewedAt,
-  //         constructionToManagerAt,
-  //         constructionManagerReviewedAt,
-  //       },
-  //       detail: {
-  //         detailToWorkerAt,
-  //         detailWorkerReviewedAt,
-  //         detailToManagerAt,
-  //         detailManagerReviewedAt,
-  //       },
-  //       floor: {
-  //         floorToWorkerAt,
-  //         floorWorkerReviewedAt,
-  //         floorToManagerAt,
-  //         floorManagerReviewedAt,
-  //       },
-  //       design: {
-  //         designToWorkerAt,
-  //         designWorkerReviewedAt,
-  //         designToManagerAt,
-  //         designManagerReviewedAt,
-  //       },
-  //     },
-  //   };
-  // }, [engineeringContact]);
-
-  // ---------------------------------------------------------------------------
-
-  const [profile, setProfile] = useState<Tprofile>();
-
-  const profileChange = (key: keyof Tprofile, v: string) => {
-    setProfile((profile) => {
-      if (!profile) {
-        return;
-      }
-
-      const newProfile = { ...profile };
-      newProfile[key] = v;
-
-      return newProfile;
-    });
-  };
-
-  // ---------------------------------------------------------------------------
-
-  const [annoArr, setAnnoArr] = useState<string[]>([]);
-
-  const control_anno: Tcontroll_textListEditor = {
-    stringArr: annoArr,
-    editString: (index, v) => {
-      setAnnoArr((arr) => {
-        const newAnnoArr = [...arr];
-        newAnnoArr[index] = v;
-
-        return newAnnoArr;
-      });
-    },
-    delString: (index) => {
-      setAnnoArr((arr) => {
-        const newAnnoArr = [...arr];
-        newAnnoArr.splice(index, 1);
-
-        return newAnnoArr;
-      });
-    },
-    addString: (v) => {
-      setAnnoArr((arr) => {
-        const newAnnoArr = [...arr];
-        newAnnoArr.push(v);
-
-        return newAnnoArr;
-      });
-    },
-    showSelector: () => setShowAnnoSelector(true),
-  };
-
-  const onConfirm_anno = (v: TgetAnnotation['data']) => {
-    const vArr = v.map((item) => item.description);
-
-    if (!vArr[0]) {
-      vArr[0] = '';
+  const reqPatch = async () => {
+    if (!profile || !engineeringContact) {
+      return;
     }
 
-    setAnnoArr((arr) => {
-      const newAnnoArr = [...arr];
-      newAnnoArr.push(...vArr);
+    const body: TupdateEngineeringContactDto = {
+      ...profile,
+      annotations: annoArr,
+      contactInfo: contactArr,
 
-      return newAnnoArr;
-    });
+      shouldHasColor: shouldHasPattern.color,
+      shouldHasConstruction: shouldHasPattern.construction,
+      shouldHasDetail: shouldHasPattern.detail,
+      shouldHasFloor: shouldHasPattern.floor,
+      shouldHasDesign: shouldHasPattern.design,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPatchEngineeringContact(engineeringContact.id, body);
+      await update_engineeringContact();
+      setDisabled(true);
+    } catch (error) {
+      myAlert.err({ title: '更新工程聯絡單失敗' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // ---------------------------------------------------------------------------
-  const [contactArr, setContactArr] = useState<{ contactPerson: string; contactNumber: string }[]>([]);
+  // ----------------------------------------------------------------------------
+  // region FUNCTION
 
-  const onAddClick = () => {
-    setContactArr((arr) => {
-      const newArr = [...arr];
-      newArr.push({ contactPerson: '', contactNumber: '' });
-
-      return newArr;
-    });
-  };
-
-  // ---------------------------------------------------------------------------
-
-  const reSet = () => {
+  const reset = () => {
     if (!engineeringContact) {
       return;
     }
@@ -500,21 +311,38 @@ function PreWorkContactDoc_component(
     });
   };
 
-  useEffect(() => {
-    if (!engineeringContact) {
-      return;
-    }
+  // ----------------------------------------------------------------------------
 
-    reSet();
-  }, [engineeringContact]);
+  // region PROPS
 
-  useEffect(() => {
-    if (disabled) {
-      reSet();
-    }
-  }, [disabled]);
+  const control_anno: Tcontroll_textListEditor = {
+    stringArr: annoArr,
+    editString: (index, v) => {
+      setAnnoArr((arr) => {
+        const newAnnoArr = [...arr];
+        newAnnoArr[index] = v;
 
-  // ---------------------------------------------------------------------------
+        return newAnnoArr;
+      });
+    },
+    delString: (index) => {
+      setAnnoArr((arr) => {
+        const newAnnoArr = [...arr];
+        newAnnoArr.splice(index, 1);
+
+        return newAnnoArr;
+      });
+    },
+    addString: (v) => {
+      setAnnoArr((arr) => {
+        const newAnnoArr = [...arr];
+        newAnnoArr.push(v);
+
+        return newAnnoArr;
+      });
+    },
+    showSelector: () => setShowAnnoSelector(true),
+  };
 
   const contactPersonsArr: Tcontroll_profile['contactPersons']['arr'] = contactArr.map((item, index) => {
     return {
@@ -768,39 +596,6 @@ function PreWorkContactDoc_component(
     },
   };
 
-  // ----------------------------------------------------------------------------
-
-  const reqPatch = async () => {
-    if (!profile || !engineeringContact) {
-      return;
-    }
-
-    const body: TupdateEngineeringContactDto = {
-      ...profile,
-      annotations: annoArr,
-      contactInfo: contactArr,
-
-      shouldHasColor: shouldHasPattern.color,
-      shouldHasConstruction: shouldHasPattern.construction,
-      shouldHasDetail: shouldHasPattern.detail,
-      shouldHasFloor: shouldHasPattern.floor,
-      shouldHasDesign: shouldHasPattern.design,
-    };
-
-    try {
-      setIsLoading(true);
-      await apiPatchEngineeringContact(engineeringContact.id, body);
-      await update_engineeringContact();
-      setDisabled(true);
-    } catch (error) {
-      myAlert.err({ title: '更新工程聯絡單失敗' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ----------------------------------------------------------------------------
-
   // 把金額隱藏
   const filteredProdKeyArr = prodKeyArr.filter((key) => {
     if (key === 'price' || key === 'dualPrice' || key === 'unitPrice' || key === 'totalPrice') {
@@ -820,9 +615,60 @@ function PreWorkContactDoc_component(
 
   // ----------------------------------------------------------------------------
 
-  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  // region useEffect
+
+  useEffect(() => {
+    onStateChange &&
+      onStateChange({
+        disabled,
+        isLoading,
+        isShowPattern,
+        contractNumber: engineeringContact?.contractNumber ?? '',
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, isLoading, isShowPattern, engineeringContact?.contractNumber]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await update_engineeringContact();
+      } catch (error) {
+        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
+      }
+    })();
+  }, [contractId, engineeringContactId]);
+
+  useEffect(() => {
+    const { shouldHasColor, shouldHasConstruction, shouldHasDetail, shouldHasFloor, shouldHasDesign } =
+      engineeringContact ?? {};
+
+    setShouldHasPattern({
+      floor: shouldHasFloor ?? false,
+      detail: shouldHasDetail ?? false,
+      color: shouldHasColor ?? false,
+      construction: shouldHasConstruction ?? false,
+      design: shouldHasDesign ?? false,
+    });
+  }, [engineeringContact]);
+
+  useEffect(() => {
+    if (!engineeringContact) {
+      return;
+    }
+
+    reset();
+  }, [engineeringContact]);
+
+  useEffect(() => {
+    if (disabled) {
+      reset();
+    }
+  }, [disabled]);
 
   // ----------------------------------------------------------------------------
+
+  // MARK:RENDER
+
   return (
     <div>
       <PdfModal
@@ -885,7 +731,6 @@ function PreWorkContactDoc_component(
           <ProjectPattern
             engineeringContactId={engineeringContactId}
             onPatternChange={onPatternChange}
-            // patternReviewStatus={patternReviewStatus}
             onSubmitSuccess={update_engineeringContact}
             onReviewSuccess={update_engineeringContact}
             onDeleteSuccess={update_engineeringContact}
@@ -896,8 +741,6 @@ function PreWorkContactDoc_component(
               shouldHasFloor: !!engineeringContact?.shouldHasFloor,
               shouldHasDesign: !!engineeringContact?.shouldHasDesign,
             }}
-            // isReviewer_worker={isReviewer_worker}
-            // isReviewer_manager={isReviewer_manager}
           />
         </div>
       </div>
@@ -914,8 +757,14 @@ function PreWorkContactDoc_component(
   );
 }
 
+// MARK: END
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
 const checkStatus = ({
-  //
   review_status,
 }: {
   review_status:
@@ -938,4 +787,116 @@ const checkStatus = ({
   };
 };
 
+// ================================================================================
+
+// region HOOK
+
+const useProfile = () => {
+  const [profile, setProfile] = useState<Tprofile>();
+
+  const profileChange = (key: keyof Tprofile, v: string) => {
+    setProfile((profile) => {
+      if (!profile) {
+        return;
+      }
+
+      const newProfile = { ...profile };
+      newProfile[key] = v;
+
+      return newProfile;
+    });
+  };
+
+  return {
+    profile,
+    setProfile,
+    profileChange,
+  };
+};
+
+const useContactArr = () => {
+  const [contactArr, setContactArr] = useState<{ contactPerson: string; contactNumber: string }[]>([]);
+
+  const onAddClick = () => {
+    setContactArr((arr) => {
+      const newArr = [...arr];
+      newArr.push({ contactPerson: '', contactNumber: '' });
+
+      return newArr;
+    });
+  };
+
+  return {
+    contactArr,
+    setContactArr,
+    onAddClick,
+  };
+};
+
+const useAnnoArr = () => {
+  const [annoArr, setAnnoArr] = useState<string[]>([]);
+
+  const onConfirm_anno = (v: TgetAnnotation['data']) => {
+    const vArr = v.map((item) => item.description);
+
+    if (!vArr[0]) {
+      vArr[0] = '';
+    }
+
+    setAnnoArr((arr) => {
+      const newAnnoArr = [...arr];
+      newAnnoArr.push(...vArr);
+
+      return newAnnoArr;
+    });
+  };
+
+  return {
+    annoArr,
+    setAnnoArr,
+    onConfirm_anno,
+  };
+};
+
+const useHasPattern = () => {
+  const [shouldHasPattern, setShouldHasPattern] = useState<TshouldPatternList>({
+    floor: false,
+    detail: false,
+    color: false,
+    construction: false,
+    design: false,
+  });
+
+  const [hasPattern, setHasPattern] = useState<ThasPattern>({
+    hasFloor: false,
+    hasDetail: false,
+    hasColor: false,
+    hasConstruction: false,
+    hasDesign: false,
+  });
+
+  const onPatternChange = (hasPattern: ThasPattern) => {
+    setHasPattern(hasPattern);
+  };
+
+  const editShouldHasPattern = (bool: boolean, key: keyof TshouldPatternList) => {
+    setShouldHasPattern((state) => {
+      return {
+        ...state,
+        [key]: bool,
+      };
+    });
+  };
+
+  return {
+    shouldHasPattern,
+    setShouldHasPattern,
+    hasPattern,
+    setHasPattern,
+    onPatternChange,
+    editShouldHasPattern,
+  };
+};
+
+// ================================================================================
 export default WorkContactDoc_component;
