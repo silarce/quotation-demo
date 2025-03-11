@@ -112,14 +112,15 @@ function PreWorkContactDoc_component(
     contract,
     engineeringContactId,
     onStateChange,
-    readonly = false,
+    onlyAllowEditContact = false,
     showProd = true,
     showUploadPatternBtn = true,
   }: {
     contract: TquotationContractDto | undefined;
     engineeringContactId: string | undefined | null;
     onStateChange?: TonStateChange;
-    readonly?: boolean;
+    // 只允許編輯聯絡人
+    onlyAllowEditContact?: boolean;
     showProd?: boolean;
     showUploadPatternBtn?: boolean;
   },
@@ -372,7 +373,7 @@ function PreWorkContactDoc_component(
   const control_profile = useControl_profile({
     profile,
     profileChange,
-    readonly,
+    readonly: onlyAllowEditContact,
     showPattern,
     hasPattern,
     shouldHasPattern,
@@ -525,7 +526,7 @@ function PreWorkContactDoc_component(
 
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
-            <TextListEditor_v2 label={'備註'} disabled={disabled || readonly} stringObj={control_anno} />
+            <TextListEditor_v2 label={'備註'} disabled={disabled || onlyAllowEditContact} stringObj={control_anno} />
           </div>
         </div>
         {/* 工程圖表資料 */}

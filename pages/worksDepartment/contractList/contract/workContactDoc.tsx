@@ -126,7 +126,6 @@ export default function WorkContactDoc() {
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        //
         showReturnBtn={!(isShowPattern || !disabled)}
         panelList={panelList}
         contractNumber={workContactContractNumber}
@@ -138,7 +137,7 @@ export default function WorkContactDoc() {
           contract={contract}
           engineeringContactId={engineeringContactId}
           onStateChange={onWorkContactStateChange}
-          readonly={true}
+          onlyAllowEditContact={true}
         />
       </div>
     </SubLayer>
