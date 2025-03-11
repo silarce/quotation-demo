@@ -51,6 +51,8 @@ export default function WorkContactDoc() {
     preBuiltPopulate: 'worksDepartment02',
   });
   const engineeringContactId = contract?.engineeringContactId;
+  // 是否為跳過合約生成的工程聯絡單
+  const contactThatSkipContract = !contract?.subContracts.length;
 
   // ---------------------------------------------------------------------------
 
@@ -64,31 +66,14 @@ export default function WorkContactDoc() {
     })();
   }, [contractId]);
 
-  // ---------------------------------------------------------------------------
-
-  // const reqCreateWorkSheet = async () => {
-  //   if (!contractId) {
-  //     return myAlert.info({ title: '無合約id', content: '請回到工務部合約列表再次選擇合約' });
-  //   }
-
-  //   try {
-  //     setIsLoading(true);
-  //     await apiPostWorkSheet({ contractId });
-  //     myAlert.success({ title: '產生工作表成功' });
-  //   } catch (error) {
-  //     const err = error as Error;
-
-  //     myAlert.info({ title: '產生工作表失敗', content: err.message });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   // ----------------------------------------------------------------------------
   const panelList_01: TpanelList = [
-    // contract?.worksheetId ? null : { type: 'myButton', label: '產生工作表', onClick: reqCreateWorkSheet },
     { type: 'myButton', label: '匯出工程聯絡單', onClick: () => ref_workContact.current.openPdf() },
-    { type: 'myButton', label: '編輯聯絡人', onClick: () => ref_workContact.current.setDisabled(false) },
+    {
+      type: 'myButton',
+      label: contactThatSkipContract ? '編輯' : '編輯聯絡人',
+      onClick: () => ref_workContact.current.setDisabled(false),
+    },
   ];
   const panelList_02: TpanelList = [
     {
@@ -137,7 +122,9 @@ export default function WorkContactDoc() {
           contract={contract}
           engineeringContactId={engineeringContactId}
           onStateChange={onWorkContactStateChange}
-          onlyAllowEditContact={true}
+          onlyAllowEditContact={!contactThatSkipContract}
+          showProd={!contactThatSkipContract}
+          showPatternPanel={!contactThatSkipContract}
         />
       </div>
     </SubLayer>

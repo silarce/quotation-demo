@@ -114,7 +114,7 @@ function PreWorkContactDoc_component(
     onStateChange,
     onlyAllowEditContact = false,
     showProd = true,
-    showUploadPatternBtn = true,
+    showPatternPanel = true,
   }: {
     contract: TquotationContractDto | undefined;
     engineeringContactId: string | undefined | null;
@@ -122,7 +122,7 @@ function PreWorkContactDoc_component(
     // 只允許編輯聯絡人
     onlyAllowEditContact?: boolean;
     showProd?: boolean;
-    showUploadPatternBtn?: boolean;
+    showPatternPanel?: boolean;
   },
   ref: React.ForwardedRef<unknown>
 ) {
@@ -489,7 +489,7 @@ function PreWorkContactDoc_component(
       <div>
         {/* 工程聯絡單 */}
         <div className={classNames(isShowPattern && 'hidden', 'px-12')}>
-          <Profile controll={control_profile} disabled={disabled} showUploadPatternBtn={showUploadPatternBtn} />
+          <Profile controll={control_profile} disabled={disabled} showPatternPanel={showPatternPanel} />
           {/* <WorkProject /> */}
 
           {showProd && (

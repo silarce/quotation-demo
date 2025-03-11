@@ -45,7 +45,7 @@ export default function CreateWorkContactDoc() {
           contract={undefined}
           engineeringContactId={undefined}
           showProd={false}
-          showUploadPatternBtn={false}
+          showPatternPanel={false}
         />
       </div>
     </SubLayer>
