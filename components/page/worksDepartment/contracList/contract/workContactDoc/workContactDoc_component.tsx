@@ -274,8 +274,14 @@ function PreWorkContactDoc_component(
       setIsLoading(true);
       await apiPostEngineeringContactIndependent(body);
 
-      // 還沒決定要push到哪去
-      // router.push();
+      // api沒有回應contractId，先註解
+      // router.push({
+      //   pathname: '/worksDepartment/contractList/contract/workContactDoc',
+      //   query: {
+      //     contractId,
+      //     version: '1',
+      //   },
+      // });
 
       setDisabled(true);
     } catch (error) {
