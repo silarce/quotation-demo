@@ -1,16 +1,12 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 import WorkContactDoc_component, {
   TimperativeHandle,
-  TonStateChange,
-  Tprofile,
-  TshouldPatternList,
-  TstateContact,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/workContactDoc_component';
 
 export default function CreateWorkContactDoc() {
@@ -21,8 +17,11 @@ export default function CreateWorkContactDoc() {
   const panelList: TpanelList = [
     {
       type: 'myButton',
-      label: '上傳',
-      onClick: () => {},
+      label: '建立',
+      onClick: () => {
+        // w 用這個api建立的工程聯絡單，會建立一個contract並把工程聯絡單放在該contract下
+        ref.current.reqPost();
+      },
     },
     {
       type: 'myButton',
@@ -37,7 +36,7 @@ export default function CreateWorkContactDoc() {
 
   return (
     <SubLayer>
-      <PageHeader02 panelList={panelList} />
+      <PageHeader02 tag="新建工程聯絡單(無合約)" panelList={panelList} />
 
       <div>
         <WorkContactDoc_component
@@ -45,6 +44,8 @@ export default function CreateWorkContactDoc() {
           ref={ref}
           contract={undefined}
           engineeringContactId={undefined}
+          showProd={false}
+          showUploadPatternBtn={false}
         />
       </div>
     </SubLayer>

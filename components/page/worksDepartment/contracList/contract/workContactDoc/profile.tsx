@@ -88,7 +88,16 @@ type Tcontroll = {
 export type { Tcontroll, TprojectPatternStatus };
 
 // ==================================================
-export default function Profile({ disabled, controll }: { disabled?: boolean; controll: Tcontroll }) {
+export default function Profile({
+  //
+  disabled,
+  controll,
+  showUploadPatternBtn = true,
+}: {
+  disabled?: boolean;
+  controll: Tcontroll;
+  showUploadPatternBtn?: boolean;
+}) {
   const {
     paymentStatus,
     projectName,
@@ -127,9 +136,11 @@ export default function Profile({ disabled, controll }: { disabled?: boolean; co
             {...inputStyle01}
           />
           <div className={classNames(scss.projectPatternBtnBox)}>
-            <button className={scss.btn} onClick={controll.projectPattern.onCaptionClick}>
-              <span>工程圖表資料</span>
-            </button>
+            {showUploadPatternBtn && (
+              <button className={scss.btn} onClick={controll.projectPattern.onCaptionClick}>
+                <span>工程圖表資料</span>
+              </button>
+            )}
 
             <div className={scss.statusBar}>
               {controll.projectPattern.statusArr.map((item, index) => {

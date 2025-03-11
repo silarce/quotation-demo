@@ -34,8 +34,10 @@ import {
   TengineeringContactDto,
   TupdateEngineeringContactDto,
   TengineeringContactAttachmentType,
+  TcreateEngineeringContactIndependent,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
+  apiPostEngineeringContactIndependent,
 } from 'js/api/api_engineering';
 
 import { TquotationProductDto, TquotationContractDto } from 'js/api/api_quotation';
@@ -84,6 +86,7 @@ type TonStateChange = (props: {
 
 type TimperativeHandle = {
   reqPatch: () => Promise<void>;
+  reqPost: () => Promise<void>;
   closePattern: () => void;
   setDisabled: (state: boolean) => void;
   openPdf: () => void;
@@ -110,11 +113,15 @@ function PreWorkContactDoc_component(
     engineeringContactId,
     onStateChange,
     readonly = false,
+    showProd = true,
+    showUploadPatternBtn = true,
   }: {
     contract: TquotationContractDto | undefined;
     engineeringContactId: string | undefined | null;
     onStateChange?: TonStateChange;
     readonly?: boolean;
+    showProd?: boolean;
+    showUploadPatternBtn?: boolean;
   },
   ref: React.ForwardedRef<unknown>
 ) {
@@ -212,7 +219,7 @@ function PreWorkContactDoc_component(
   // region API
 
   const reqPatch = async () => {
-    if (!profile || !engineeringContact) {
+    if (!engineeringContact) {
       return;
     }
 
@@ -232,6 +239,44 @@ function PreWorkContactDoc_component(
       setIsLoading(true);
       await apiPatchEngineeringContact(engineeringContact.id, body);
       await update_engineeringContact();
+      setDisabled(true);
+    } catch (error) {
+      myAlert.err({ title: '更新工程聯絡單失敗' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // w 用這個api建立的工程聯絡單，會建立一個contract並把工程聯絡單放在該contract下
+  const reqPost = async () => {
+    // apiPostEngineeringContactIndependent
+
+    if (!profile.projectNumber) {
+      myAlert.info({ title: '請填寫工程編號' });
+
+      return;
+    }
+
+    const body: TcreateEngineeringContactIndependent = {
+      ...profile,
+      contractNumber: profile.projectNumber,
+      annotations: annoArr,
+      contactInfo: contactArr,
+
+      shouldHasColor: shouldHasPattern.color,
+      shouldHasConstruction: shouldHasPattern.construction,
+      shouldHasDetail: shouldHasPattern.detail,
+      shouldHasFloor: shouldHasPattern.floor,
+      shouldHasDesign: shouldHasPattern.design,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPostEngineeringContactIndependent(body);
+
+      // 還沒決定要push到哪去
+      // router.push();
+
       setDisabled(true);
     } catch (error) {
       myAlert.err({ title: '更新工程聯絡單失敗' });
@@ -403,10 +448,12 @@ function PreWorkContactDoc_component(
 
   // ----------------------------------------------------------------------------
 
+  // MARK:useImperativeHandle
   useImperativeHandle(
     ref,
     (): TimperativeHandle => ({
       reqPatch,
+      reqPost,
       closePattern: () => setIsShowPattern(false),
       setDisabled,
       openPdf: () => setPdfModalVisible(true),
@@ -435,36 +482,40 @@ function PreWorkContactDoc_component(
       <div>
         {/* 工程聯絡單 */}
         <div className={classNames(isShowPattern && 'hidden', 'px-12')}>
-          <Profile controll={control_profile} disabled={disabled} />
+          <Profile controll={control_profile} disabled={disabled} showUploadPatternBtn={showUploadPatternBtn} />
           {/* <WorkProject /> */}
 
-          <Table_prod
-            disabled={true}
-            prodList={productList}
-            prodCellConfig={prodCellConfig}
-            prodKeyArr={filteredProdKeyArr}
-            changeProdKeyArr={changeProdKeyArr}
-            addProd={() => {}}
-            setTargetProd={() => {}}
-            // panelBox="easyBox"
-            panelBox="emptyBox"
-            emptyBlockWidth="40px"
-            rowHeight="h60"
-            isShowDndBtn={false}
-            discountRate={''} // 報價單總折數
-            changeDiscountRate={(v) => {}}
-            hiddenQtyZero={true}
-          />
-          <Table_others
-            disabled={disabled}
-            list={othersList}
-            cellConfig={othersCellConfig}
-            keyArr={filteredOthersKeyArr}
-            changeKeyArr={() => {}}
-            add={() => {}}
-            isShowDndBtn={false}
-            isDisplayInPage="worksDepartment"
-          />
+          {showProd && (
+            <>
+              <Table_prod
+                disabled={true}
+                prodList={productList}
+                prodCellConfig={prodCellConfig}
+                prodKeyArr={filteredProdKeyArr}
+                changeProdKeyArr={changeProdKeyArr}
+                addProd={() => {}}
+                setTargetProd={() => {}}
+                // panelBox="easyBox"
+                panelBox="emptyBox"
+                emptyBlockWidth="40px"
+                rowHeight="h60"
+                isShowDndBtn={false}
+                discountRate={''} // 報價單總折數
+                changeDiscountRate={(v) => {}}
+                hiddenQtyZero={true}
+              />
+              <Table_others
+                disabled={disabled}
+                list={othersList}
+                cellConfig={othersCellConfig}
+                keyArr={filteredOthersKeyArr}
+                changeKeyArr={() => {}}
+                add={() => {}}
+                isShowDndBtn={false}
+                isDisplayInPage="worksDepartment"
+              />
+            </>
+          )}
 
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
