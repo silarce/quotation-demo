@@ -673,7 +673,7 @@ export const apiPostElectronicSuppliesPickupRecord = (id: string, body: TcreateE
   const api = `/engineering/electronic-supplies/${id}/pickup-record`;
 
   return axi
-    .post<TelectronicSuppliesPickupRecordDto>(api, body)
+    .post<TelectronicSuppliesPickupRecordDto[]>(api, body)
     .then(({ data }) => data)
     .catch((error: AxiosError<TapiError>) => {
       myAlert.err({

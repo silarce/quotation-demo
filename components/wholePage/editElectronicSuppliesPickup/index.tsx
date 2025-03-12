@@ -220,25 +220,21 @@ export default function EditElectronicSuppliesPickup({
     };
 
     if (isNew) {
-      await apiPostElectronicSuppliesPickupRecord(data_electronicSupplies.id, body).then(async (res) => {
-        router.replace({
-          query: {
-            ...query,
-            pickupRecordId: res.id,
-          },
-        });
-        setDisabled(true);
-      });
-    } else if (!data_pickup?.id) {
+      await apiPostElectronicSuppliesPickupRecord(data_electronicSupplies.id, body);
+      router.back();
+
+      return;
+    }
+
+    if (!data_pickup?.id) {
       myAlert.err({ title: '沒有領取單id' });
 
       return;
-    } else {
-      await apiPatchElectronicSuppliesPickupRecord(data_pickup.id, body).then(async () => {
-        await update_pickup();
-        setDisabled(true);
-      });
     }
+
+    await apiPatchElectronicSuppliesPickupRecord(data_pickup.id, body);
+    await update_pickup();
+    setDisabled(true);
   };
 
   // ------------------------------------------------------------------
