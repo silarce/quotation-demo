@@ -18,9 +18,17 @@ export default function CreateWorkContactDoc() {
     {
       type: 'myButton',
       label: '建立',
-      onClick: () => {
+      onClick: async () => {
         // w 用這個api建立的工程聯絡單，會建立一個contract並把工程聯絡單放在該contract下
-        ref.current.reqPost();
+        const { contractNumber } = (await ref.current.reqPost()) ?? {};
+
+        // api沒有回應contractId，因此只能跳轉到列表
+        router.push({
+          pathname: '/worksDepartment/contractList',
+          query: {
+            keyWord: contractNumber,
+          },
+        });
       },
     },
     {
@@ -40,7 +48,6 @@ export default function CreateWorkContactDoc() {
 
       <div>
         <WorkContactDoc_component
-          //
           ref={ref}
           contract={undefined}
           engineeringContactId={undefined}

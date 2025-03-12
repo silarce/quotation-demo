@@ -86,7 +86,7 @@ type TonStateChange = (props: {
 
 type TimperativeHandle = {
   reqPatch: () => Promise<void>;
-  reqPost: () => Promise<void>;
+  reqPost: () => Promise<{ contractNumber: string } | void>;
   closePattern: () => void;
   setDisabled: (state: boolean) => void;
   openPdf: () => void;
@@ -249,9 +249,7 @@ function PreWorkContactDoc_component(
   };
 
   // w 用這個api建立的工程聯絡單，會建立一個contract並把工程聯絡單放在該contract下
-  const reqPost = async () => {
-    // apiPostEngineeringContactIndependent
-
+  const reqPost: TimperativeHandle['reqPost'] = async () => {
     if (!profile.projectNumber) {
       myAlert.info({ title: '請填寫工程編號' });
 
@@ -275,16 +273,12 @@ function PreWorkContactDoc_component(
       setIsLoading(true);
       await apiPostEngineeringContactIndependent(body);
 
-      // api沒有回應contractId，先註解
-      // router.push({
-      //   pathname: '/worksDepartment/contractList/contract/workContactDoc',
-      //   query: {
-      //     contractId,
-      //     version: '1',
-      //   },
-      // });
-
       setDisabled(true);
+
+      return {
+        contractNumber: profile.projectNumber,
+      };
+      // api沒有回應contractId，先註解
     } catch (error) {
       myAlert.err({ title: '更新工程聯絡單失敗' });
     } finally {
