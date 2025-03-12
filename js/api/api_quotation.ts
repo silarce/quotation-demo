@@ -669,6 +669,7 @@ export const useContract_infinite = ({ customParams }: { customParams?: Tparams 
     } catch (error) {
       myAlert.err({ title: '取得合約資料失敗' });
       console.log(error);
+      init();
     } finally {
       setIsloading(false);
       setIsLoadingPage1(false);
