@@ -12,13 +12,7 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import { Select, SelectProps } from 'antd';
 
 // component
-import SupplyTable, {
-  Tgroup,
-  Tprops_cell,
-  Tprops_cell_input,
-  //
-  useStateToGroup,
-} from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
+import SupplyTable, { useStateToGroup } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -29,12 +23,10 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import {
   TcreateElectronicSuppliesPickupRecordDto,
-  TupdateElectronicSuppliesPickupRecordDto,
   TcreateElectronicSuppliesRecordDetailDto,
   //
   useGetElectronicSuppliesPickupRecord_id,
   useElectronicSupplies_id,
-  useGetElectronicSuppliesRequirementRecord_id,
   //
   apiPostElectronicSuppliesPickupRecord,
   apiPatchElectronicSuppliesPickupRecord,
@@ -107,17 +99,12 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
-    // customPopulate: [
-    //   //
-    //   'engineeringContact',
-    // ],
-  });
+  const { data: data_contract, update: update_contract } = useGetContract_id(contractId);
 
   const {
     data: data_pickup,
     update: update_pickup,
-    isFetching,
+    // isFetching,
   } = useGetElectronicSuppliesPickupRecord_id(pickupRecordId);
 
   const { electronicSuppliesId } = data_contract ?? {};
@@ -125,8 +112,8 @@ export default function EditElectronicSuppliesPickup({
 
   const {
     data: data_electronicSupplies,
-    update: update_electronicSupplies,
-    isFetching: isFetching_electronicSupplies,
+    // update: update_electronicSupplies,
+    // isFetching: isFetching_electronicSupplies,
   } = useElectronicSupplies_id(electronicSuppliesId, {
     params_cover: {
       populate: ['requirementRecords.requirementRecordDetails'],
