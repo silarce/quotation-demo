@@ -266,7 +266,7 @@ function ReviewForm({
     const contractNumber = data_contract?.contractNumber ?? '';
 
     const content = data_contract?.content || data_quotation?.latestContent || data_quotationContent;
-    const quotationId = data_contract?.quotation.id || data_quotation?.id;
+    const quotationId = data_contract?.quotation?.id || data_quotation?.id;
 
     const defaultPaymentRatioArr = content ? createDefaultPaymentRatio(content) : undefined;
 

@@ -1830,7 +1830,7 @@ type TquotationContentDto_copy = {
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];
 
-  verifyForm: TquotationVerifyFormDto;
+  verifyForm: TquotationVerifyFormDto | undefined;
   // 失件
   isLost: boolean;
 };
@@ -1939,7 +1939,7 @@ export type TquotationContentDto = {
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];
 
-  verifyForm: TquotationVerifyFormDto;
+  verifyForm?: TquotationVerifyFormDto | undefined;
 
   // // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
   // // ! 所以只設需要拿的東西
@@ -2382,7 +2382,7 @@ export type TquotationContractDto = {
   deliveryDate: string | null; // date
   paymentMethods: TpaymentMethodDto[];
   verifyForm: TquotationVerifyFormDto;
-  quotation: TquotationDto;
+  quotation?: TquotationDto;
   content: TquotationContentDto;
   // attachedToContract: TquotationContractDto; // 上一份追加減合約
   // attachedContract: TquotationContractDto; // 下一份追加減合約
