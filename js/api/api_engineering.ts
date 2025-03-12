@@ -103,6 +103,12 @@ type TelectronicSuppliesRequirementRecordDto_addition = TelectronicSuppliesRequi
   };
 };
 
+type TelectronicSuppliesPickupRecordDto_addition = TelectronicSuppliesPickupRecordDto & {
+  addition: {
+    doorTypeArr: string[] | null;
+  };
+};
+
 export type {
   TapiError,
   Tparams,
@@ -515,9 +521,9 @@ export const useGetElectronicSuppliesRequirementRecord_id = (
 
       if (doorType) {
         try {
-          doorTypeArr = JSON.parse(doorType ?? '');
+          doorTypeArr = JSON.parse(doorType);
         } catch (error) {
-          doorTypeArr = [doorType ?? ''];
+          doorTypeArr = [doorType];
         }
       }
 
@@ -662,7 +668,7 @@ export const useGetElectronicSuppliesPickupRecord_id = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TelectronicSuppliesPickupRecordDto>();
+  const [res, setRes] = useState<TelectronicSuppliesPickupRecordDto_addition>();
 
   const update = async () => {
     if (!pickupRecordId) {
@@ -673,7 +679,25 @@ export const useGetElectronicSuppliesPickupRecord_id = (
 
     try {
       const res = await apiGetElectronicSuppliesPickupRecord_id(pickupRecordId);
-      setRes(res);
+      const doorType = res.doorModel;
+      let doorTypeArr: string[] | null = null;
+
+      if (doorType) {
+        try {
+          doorTypeArr = JSON.parse(doorType);
+        } catch (error) {
+          doorTypeArr = [doorType];
+        }
+      }
+
+      const res_addition: TelectronicSuppliesPickupRecordDto_addition = {
+        ...res,
+        addition: {
+          doorTypeArr,
+        },
+      };
+
+      setRes(res_addition);
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '取得送電備品領料單失敗', content: err.message });

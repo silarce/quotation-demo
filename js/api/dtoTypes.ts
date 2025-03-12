@@ -3445,7 +3445,7 @@ export type TelectronicSuppliesRequirementRecordDto = {
   storageManagementPersonnelId: string | null;
   // 備料人員
   storageManagementPersonnelEmployee: TemployeeDto;
-  // 門型
+  // 門型  // string或是JSON字串string[]
   doorType: string | null;
   // 樘數
   quantity: string | null;
@@ -3486,7 +3486,7 @@ export type TelectronicSuppliesPickupRecordDto = {
   action: TelectronicSuppliesAction;
   // 領取/退回日期
   operationDate: string;
-  // 門型
+  // 門型 // string或是JSON字串string[]
   doorModel: string;
   // 總樘數
   totalQuantity: number;

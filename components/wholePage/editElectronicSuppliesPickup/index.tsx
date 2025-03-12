@@ -9,7 +9,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // antd
-import { Select, SelectProps } from 'antd';
+import { Select as AntdSelect, SelectProps } from 'antd';
 
 // component
 import SupplyTable, { useStateToGroup } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
@@ -200,7 +200,8 @@ export default function EditElectronicSuppliesPickup({
       takeOffEmployeeId: state_info.picker!.id,
       action: '領取',
       preparationEmployeeId: state_info.preparer!.id,
-      doorModel: state_info.doorModelName!,
+      // doorModel: state_info.doorModelName!,
+      doorModel: JSON.stringify(state_info.doorModelName),
       requirementRecordId: requirementRecordId || null,
       pickupRecordDetails,
       totalQuantity: Number(state_info.doorQty || 0),
@@ -255,6 +256,7 @@ export default function EditElectronicSuppliesPickup({
   const replaceState = () => {
     let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
 
+    // 預期只會有一個
     requirementRecords = requirementRecords.filter((record) => {
       return requirementRecordId?.includes(record.id);
     });
@@ -286,7 +288,23 @@ export default function EditElectronicSuppliesPickup({
       }
     });
 
+    const dooprTypeArr = (() => {
+      const doorType = requirementRecords[0].doorType;
+      let arr: string[] = [];
+
+      if (doorType) {
+        try {
+          arr = JSON.parse(doorType);
+        } catch (error) {
+          arr = [doorType];
+        }
+      }
+
+      return arr;
+    })();
+
     setState_electronicItemList(list);
+    setState_info((state) => ({ ...state, doorModelName: dooprTypeArr }));
   };
 
   // ------------------------------------------------------------------
@@ -406,7 +424,8 @@ export default function EditElectronicSuppliesPickup({
         indexNumber: data_pickup.number || '',
         picker: data_pickup.preparationEmployee || undefined,
         preparer: data_pickup.takeOffEmployee || undefined,
-        doorModelName: data_pickup.doorModel ?? '',
+        // doorModelName: data_pickup.doorModel ?? '',
+        doorModelName: data_pickup.addition.doorTypeArr ?? [],
         doorQty: String(data_pickup.totalQuantity ?? '') as Tstate_info['doorQty'],
       };
     }
@@ -490,7 +509,7 @@ export default function EditElectronicSuppliesPickup({
               },
             }}
           />
-          <InputSel
+          {/* <InputSel
             className="global_tip_must"
             caption="門型"
             {...config_inputSel}
@@ -505,7 +524,7 @@ export default function EditElectronicSuppliesPickup({
                 },
               },
             }}
-          />
+          /> */}
           <InputSel
             caption="樘數"
             {...config_inputSel}
@@ -521,11 +540,32 @@ export default function EditElectronicSuppliesPickup({
               },
             }}
           />
+
+          <InputSel
+            className="global_tip_must col-span-2"
+            caption="門型"
+            {...config_inputSel}
+            disabled={disabled}
+            showBaseline="invisible"
+            node={
+              <AntdSelect
+                className="w-full"
+                mode="multiple"
+                allowClear
+                disabled={disabled}
+                value={state_info.doorModelName}
+                onChange={(arr: string[]) => {
+                  setState_info((state) => ({ ...state, doorModelName: arr }));
+                }}
+                options={options_doorModel}
+              />
+            }
+          />
         </div>
 
         {isNew && (
           <div className={classNames(scss.selectBar, disabled && 'invisible')}>
-            <Select
+            <AntdSelect
               placeholder="請選擇需求單"
               size="large"
               // className="w-96"
