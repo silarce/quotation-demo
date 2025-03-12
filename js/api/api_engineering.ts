@@ -83,6 +83,7 @@ import type {
   TcreateIncomeBillSettlementFormDto,
   TupdateIncomeBillSettlementFormDto,
 } from './dtoTypes';
+import { resolveMx } from 'dns';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
 
@@ -107,6 +108,11 @@ type TelectronicSuppliesPickupRecordDto_addition = TelectronicSuppliesPickupReco
   addition: {
     doorTypeArr: string[] | null;
   };
+};
+
+type TelectronicSuppliesDto_addition = Omit<TelectronicSuppliesDto, 'pickupRecords' | 'requirementRecords'> & {
+  pickupRecords?: TelectronicSuppliesPickupRecordDto_addition[];
+  requirementRecords?: TelectronicSuppliesRequirementRecordDto_addition[];
 };
 
 export type {
@@ -180,9 +186,17 @@ export type {
   TincomeBillSerialSettlementFormReviewRecordDto,
   TcreateIncomeBillSettlementFormDto,
   TupdateIncomeBillSettlementFormDto,
+  //
 } from './dtoTypes';
 
-export type { TinvouceCheckResult, TworksheetDto_addition, TworksheetRecordDto_addition };
+export type {
+  TinvouceCheckResult,
+  TworksheetDto_addition,
+  TworksheetRecordDto_addition,
+  TelectronicSuppliesDto_addition,
+  TelectronicSuppliesRequirementRecordDto_addition,
+  TelectronicSuppliesPickupRecordDto_addition,
+};
 
 type TgetEngineeringContact = {
   data: TengineeringContactDto[];
@@ -438,7 +452,7 @@ const apiGetElectronicSupplies_id = (id: string, { params_cover }: { params_cove
   }
 
   return axi
-    .get(api, { params })
+    .get<TelectronicSuppliesDto>(api, { params })
     .then(({ data }) => data)
     .catch((error) => {
       return Promise.reject(error);
@@ -450,7 +464,7 @@ export const useElectronicSupplies_id = (
   { params_cover }: { params_cover?: Tparams } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TelectronicSuppliesDto>();
+  const [res, setRes] = useState<TelectronicSuppliesDto_addition>();
 
   const update = async () => {
     if (!id) {
@@ -461,7 +475,42 @@ export const useElectronicSupplies_id = (
 
     try {
       const res = await apiGetElectronicSupplies_id(id, { params_cover });
-      setRes(res);
+      const { pickupRecords, requirementRecords } = res;
+
+      const pickupRecords_addition: TelectronicSuppliesPickupRecordDto_addition[] | undefined = pickupRecords?.map(
+        (record) => {
+          const doorType = record.doorModel;
+          const doorTypeArr = doorType ? jsonStrArrToStrArr(doorType) : null;
+
+          return {
+            ...record,
+            addition: {
+              doorTypeArr,
+            },
+          };
+        }
+      );
+
+      const requirementRecords_addition: TelectronicSuppliesRequirementRecordDto_addition[] | undefined =
+        requirementRecords?.map((record) => {
+          const doorType = record.doorType;
+          const doorTypeArr = doorType ? jsonStrArrToStrArr(doorType) : null;
+
+          return {
+            ...record,
+            addition: {
+              doorTypeArr,
+            },
+          };
+        });
+
+      const res_addition: TelectronicSuppliesDto_addition = {
+        ...res,
+        pickupRecords: pickupRecords_addition,
+        requirementRecords: requirementRecords_addition,
+      };
+
+      setRes(res_addition);
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '取得送電備品失敗', content: err.message });
@@ -520,11 +569,7 @@ export const useGetElectronicSuppliesRequirementRecord_id = (
       let doorTypeArr: string[] | null = null;
 
       if (doorType) {
-        try {
-          doorTypeArr = JSON.parse(doorType);
-        } catch (error) {
-          doorTypeArr = [doorType];
-        }
+        doorTypeArr = jsonStrArrToStrArr(doorType);
       }
 
       const res_addition: TelectronicSuppliesRequirementRecordDto_addition = {
@@ -683,11 +728,7 @@ export const useGetElectronicSuppliesPickupRecord_id = (
       let doorTypeArr: string[] | null = null;
 
       if (doorType) {
-        try {
-          doorTypeArr = JSON.parse(doorType);
-        } catch (error) {
-          doorTypeArr = [doorType];
-        }
+        doorTypeArr = jsonStrArrToStrArr(doorType);
       }
 
       const res_addition: TelectronicSuppliesPickupRecordDto_addition = {
@@ -2403,4 +2444,13 @@ export const apiPatchIncomeBillSerialSettlementForm = async (id: string, body: T
 
       return Promise.reject(err);
     });
+};
+
+// 使用前先確保JSON字串的內容是陣列
+const jsonStrArrToStrArr = (str: string) => {
+  try {
+    return JSON.parse(str) as string[];
+  } catch (error) {
+    return [str] as string[];
+  }
 };

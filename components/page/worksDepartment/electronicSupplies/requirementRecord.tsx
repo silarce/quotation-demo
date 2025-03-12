@@ -13,6 +13,7 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import type { TelectronicSuppliesRequirementRecordDto } from 'js/api/dtoTypes';
+import type { TelectronicSuppliesRequirementRecordDto_addition } from 'js/api/api_engineering';
 
 type Tquery = {
   contractId: string | undefined;
@@ -24,7 +25,7 @@ export default function RequirementRecord({
   requirementRecords,
 }: {
   className?: string;
-  requirementRecords: TelectronicSuppliesRequirementRecordDto[];
+  requirementRecords: TelectronicSuppliesRequirementRecordDto_addition[];
 }) {
   const router = useRouter();
   const { contractId } = router.query as Tquery;
@@ -56,6 +57,7 @@ export default function RequirementRecord({
         doorType,
         storageManagementPersonnelEmployee,
         number: idNumber,
+        addition: { doorTypeArr },
       } = item;
 
       return {
@@ -74,7 +76,7 @@ export default function RequirementRecord({
           },
           {
             ...configList.doorModelName,
-            children: doorType,
+            children: doorTypeArr?.join('、'),
           },
           {
             ...configList.qty,
@@ -131,27 +133,33 @@ const keysArr = [
 const configList: { [key: string]: Tconfig_table } = {
   idNumber: {
     label: '需求單號',
-    flex: '150px',
+    // flex: '150px',
+    width: 150,
   },
   date: {
     label: '新增日期',
-    flex: '20%',
+    // flex: '20%',
+    width: 150,
   },
   requestEmployee: {
     label: '新增人員',
-    flex: '20%',
+    // flex: '20%',
+    width: 150,
   },
   doorModelName: {
     label: '門型',
-    flex: '20%',
+    flex: 'auto',
+    justifyContent: 'flex-start',
   },
   qty: {
     label: '樘數',
-    flex: '20%',
+    // flex: '20%',
+    width: 80,
   },
   materialHandler: {
     label: '備料人員',
-    flex: '20%',
+    // flex: '20%',
+    width: 150,
   },
   btn: {
     width: 100,
