@@ -97,6 +97,12 @@ type TworksheetDto_addition = TworksheetDto & {
   records: TworksheetRecordDto_addition[];
 };
 
+type TelectronicSuppliesRequirementRecordDto_addition = TelectronicSuppliesRequirementRecordDto & {
+  addition: {
+    doorTypeArr: string[] | null;
+  };
+};
+
 export type {
   TapiError,
   Tparams,
@@ -493,7 +499,7 @@ export const useGetElectronicSuppliesRequirementRecord_id = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDto>();
+  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDto_addition>();
 
   const update = async () => {
     if (!requirementRecordId) {
@@ -504,7 +510,25 @@ export const useGetElectronicSuppliesRequirementRecord_id = (
 
     try {
       const res = await apiGetElectronicSuppliesRequirementRecord_id(requirementRecordId);
-      setRes(res);
+      const doorType = res.doorType;
+      let doorTypeArr: string[] | null = null;
+
+      if (doorType) {
+        try {
+          doorTypeArr = JSON.parse(doorType ?? '');
+        } catch (error) {
+          doorTypeArr = [doorType ?? ''];
+        }
+      }
+
+      const res_addition: TelectronicSuppliesRequirementRecordDto_addition = {
+        ...res,
+        addition: {
+          doorTypeArr,
+        },
+      };
+
+      setRes(res_addition);
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '取得送電備品需求單失敗', content: err.message });
