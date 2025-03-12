@@ -12,7 +12,6 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import type { TelectronicSuppliesRequirementRecordDto } from 'js/api/dtoTypes';
 import type { TelectronicSuppliesRequirementRecordDto_addition } from 'js/api/api_engineering';
 
 type Tquery = {
@@ -52,9 +51,9 @@ export default function RequirementRecord({
         id,
         operationDate,
         agentEmployee,
-        requirementRecordDetails = [],
+        // requirementRecordDetails = [],
         quantity,
-        doorType,
+        // doorType,
         storageManagementPersonnelEmployee,
         number: idNumber,
         addition: { doorTypeArr },
@@ -133,17 +132,14 @@ const keysArr = [
 const configList: { [key: string]: Tconfig_table } = {
   idNumber: {
     label: '需求單號',
-    // flex: '150px',
     width: 150,
   },
   date: {
     label: '新增日期',
-    // flex: '20%',
     width: 150,
   },
   requestEmployee: {
     label: '新增人員',
-    // flex: '20%',
     width: 150,
   },
   doorModelName: {
@@ -153,12 +149,10 @@ const configList: { [key: string]: Tconfig_table } = {
   },
   qty: {
     label: '樘數',
-    // flex: '20%',
     width: 80,
   },
   materialHandler: {
     label: '備料人員',
-    // flex: '20%',
     width: 150,
   },
   btn: {

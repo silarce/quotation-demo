@@ -56,7 +56,7 @@ export default function PickupRecord({
         totalQuantity,
         // action,
         // pickupRecordDetails = [],
-        doorModel,
+        // doorModel,
         preparationEmployee,
         number: idNumber,
         addition: { doorTypeArr },
@@ -78,7 +78,6 @@ export default function PickupRecord({
           },
           {
             ...configList.doorModelName,
-            // children: doorModel,
             children: doorTypeArr?.join('、'),
           },
           {
@@ -141,12 +140,10 @@ const configList: { [key: string]: Tconfig_table } = {
   },
   date: {
     label: '領料日期',
-    // flex: '20%',
     width: 150,
   },
   ingredientTechnician: {
     label: '領料人員',
-    // flex: '20%',
     width: 150,
   },
   doorModelName: {
@@ -156,12 +153,10 @@ const configList: { [key: string]: Tconfig_table } = {
   },
   qty: {
     label: '樘數',
-    // flex: '20%',
     width: 80,
   },
   materialHandler: {
     label: '備料人員',
-    // flex: '20%',
     width: 150,
   },
   btn: {

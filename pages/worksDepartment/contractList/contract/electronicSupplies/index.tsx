@@ -1,28 +1,6 @@
-// 東元的馬達 才會用到"馬達控制箱" 要依照他的馬力數和電供
-// 如果有"防颱滑動支撐中柱" 就要寫其他有幾隻
-// 如果有"遙控器(1:2)" 就要備註 什麼廠牌有幾個
-// 如果有"彈射門"的話 就會有彈射門控制箱 並依照馬達的馬力
-
-// https://github.com/San-Jeou/sanjeou-erp-fe/issues/248
 // https://github.com/San-Jeou/sanjeou-erp-fe/assets/65767828/3ab5b70e-bdda-42e4-af82-bb2ff6e2be63
 
-// 送電備品列表
-// 一個row就是一個工作表，列出其中的指定送電備品
-
-// 送電備品總料單
-// 列出所有的送電備品
-// 資料為electronicSupplies.electronicSuppliesContents
-// 表格格式為 動態 的
-
-// 送電備品料單領取歷程
-// 資料為electronicSupplies.pickupRecords
-// 表格格式為 動態 的
-
-// 送電備品需求歷程
-// 資料為electronicSupplies.requirementRecords
-// 表格格式為 靜態 的，列出設計圖上的送電備品項目
-
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -35,24 +13,17 @@ import SupplyList from 'components/page/worksDepartment/electronicSupplies/suppl
 import ItemList from 'components/page/worksDepartment/electronicSupplies/itemList';
 import PickupRecord from 'components/page/worksDepartment/electronicSupplies/pickupRecord';
 import RequirementRecord from 'components/page/worksDepartment/electronicSupplies/requirementRecord';
-import Profile, { TdoorQtySubTotalList } from 'components/page/worksDepartment/electronicSupplies/profile';
+import Profile from 'components/page/worksDepartment/electronicSupplies/profile';
 
 // gear
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import {
   //
   useGetContract_id,
-  useGetContract_id_finalProductItem,
 } from 'js/api/api_quotation';
-import {
-  //
-  apiPostElectronicSupplies,
-  useGetEngineeringContact,
-  useElectronicSupplies_id,
-} from 'js/api/api_engineering';
+import { useElectronicSupplies_id } from 'js/api/api_engineering';
 
 // css
 import scss from './electronicSupplies.module.scss';
@@ -65,10 +36,6 @@ type Tquery = {
   contractId: string;
   listName: 'itemList' | 'supplyList' | 'pickupRecord' | 'requirementRecord' | undefined;
 };
-
-// type TdoorQtySubTotalList = {
-//   [doorModelName: string]: number;
-// };
 
 // ------------------------------------------------------------------
 
@@ -87,7 +54,7 @@ export default function ElectronicSupplies() {
     ],
   });
 
-  const { engineeringContact, worksheet, electronicSuppliesId, engineeringContactId } = contract ?? {};
+  const { engineeringContact, worksheet, electronicSuppliesId } = contract ?? {};
 
   const {
     data: data_electronicSupplies,
@@ -95,11 +62,7 @@ export default function ElectronicSupplies() {
     isFetching: isFetching_electronicSupplies,
   } = useElectronicSupplies_id(electronicSuppliesId);
 
-  // const { data: data_finalProductItem, update: update_finalProductItem } =
-  //   useGetContract_id_finalProductItem(contractId);
-
   const {
-    //
     // contractNumber = '',
     projectName = '',
     // projectContent = '',
@@ -121,27 +84,11 @@ export default function ElectronicSupplies() {
 
   // ------------------------------------------------------------------
 
-  // region REQUEST
-
-  // 棄用
-  // const reqCreateRequirementRecordFromIWorksheet = async () => {
-  //   await apiPostElectronicSupplies({ contractId }).then(update);
-  // };
-
-  // 預計用來更新送電備品列表，待api製作出來
-  const reqUpdateElectronicSupplies = async () => {
-    myAlert.notify.info({ message: '功能製作中' });
-  };
-
-  // ------------------------------------------------------------------
-
   // MARK: PROPS
 
   const { doorModalQtyList, doorQtyTotal } = useCalcDoorModal(worksheet ?? []);
 
   const panelList = usePanelList({
-    // reqCreateRequirementRecordFromIWorksheet,
-    reqUpdateElectronicSupplies,
     electronicSuppliesId,
     isAllowAddRequirement,
   });
@@ -192,7 +139,6 @@ export default function ElectronicSupplies() {
 
   useEffect(() => {
     update();
-    // update_finalProductItem();
   }, []);
 
   // ------------------------------------------------------------------
@@ -229,13 +175,9 @@ export default function ElectronicSupplies() {
 // region HOOK
 
 const usePanelList = ({
-  // reqCreateRequirementRecordFromIWorksheet,
-  reqUpdateElectronicSupplies,
   electronicSuppliesId,
   isAllowAddRequirement,
 }: {
-  // reqCreateRequirementRecordFromIWorksheet: () => void;
-  reqUpdateElectronicSupplies: () => void;
   electronicSuppliesId: string | null | undefined;
   isAllowAddRequirement: boolean;
 }) => {
@@ -245,13 +187,7 @@ const usePanelList = ({
 
   // ------------------------------------------------------------------------
   //
-  const panelList_itemList: TpanelList = [
-    // {
-    //   type: 'myButton',
-    //   label: '更新送電備品列表',
-    //   onClick: reqUpdateElectronicSupplies,
-    // },
-  ];
+  const panelList_itemList: TpanelList = [];
   //
   const panelList_supplyList: TpanelList = [];
   //
@@ -263,7 +199,6 @@ const usePanelList = ({
           onClick: () =>
             router.push({
               pathname: `${router.pathname}/editPickup`,
-              // query,
               query: {
                 ...query,
                 contractId: contractId, // 確保要有contractId
@@ -274,11 +209,6 @@ const usePanelList = ({
   ];
   //
   const panelList_requirementRecord: TpanelList = [
-    // {
-    //   type: 'addButton',
-    //   label: '自動產生需求單',
-    //   onClick: reqCreateRequirementRecordFromIWorksheet,
-    // },
     isAllowAddRequirement
       ? {
           type: 'addButton',
@@ -307,14 +237,6 @@ const usePanelList = ({
   };
 
   const panelArr = listName ? list[listName] : [];
-
-  // if (!electronicSuppliesId) {
-  //   panelArr.unshift({
-  //     type: 'redButton',
-  //     label: '產生送電備品列表',
-  //     onClick: reqUpdateElectronicSupplies,
-  //   });
-  // }
 
   return panelArr;
 };
