@@ -1080,11 +1080,17 @@ export const useGetContract_id = (
     }
   };
 
+  // 是否為跳過合約生成的工程聯絡單
+  // /worksDepartment/contractList/createWorkContactDoc 這個頁面可以跳過合約產生工程聯絡單
+  // 但是在產生工程聯絡單時也會產生一個合約，而工程聯絡單就在這個不正常的合約下面
+  const contactThatSkipContract = !res?.subContracts.length && !res?.content.managerReviewedAt;
+
   return {
     data: res,
     update,
     clear: () => setRes(undefined),
     isFetching,
+    contactThatSkipContract,
   };
 };
 

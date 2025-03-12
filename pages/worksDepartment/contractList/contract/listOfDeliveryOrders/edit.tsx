@@ -99,7 +99,7 @@ export default function Edit({
   const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
   // ----------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId);
+  const { data: contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
   const engineeringContactId = contract?.engineeringContactId;
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
@@ -497,6 +497,7 @@ export default function Edit({
         createTagLable={tagCallback}
         contractNumber={contract?.content.quotationNumber}
         linkForbidden={isReadonly}
+        contactThatSkipContract={contactThatSkipContract}
       />
 
       <div>

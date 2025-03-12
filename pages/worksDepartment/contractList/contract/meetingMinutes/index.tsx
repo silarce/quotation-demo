@@ -45,7 +45,11 @@ export default function MeetingMinutes() {
 
   // ---------------------------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     preBuiltPopulate: 'worksDepartment02',
   });
   const engineeringContactId = contract?.engineeringContactId;
@@ -166,7 +170,11 @@ export default function MeetingMinutes() {
   // ---------------------------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading || meetingMinutesState?.isLoading}>
-      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
+      <PageHeader
+        panelList={panelList}
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
+      />
 
       <div>
         <MeetingMinutes_contract ref={ref} onStateChange={onMeetingMinutesStateChange} />

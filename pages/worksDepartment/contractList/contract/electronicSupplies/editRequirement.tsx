@@ -107,7 +107,11 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: data_contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     // customPopulate: [
     //   //
     //   'engineeringContact',
@@ -370,6 +374,7 @@ export default function EditRequirementRecord() {
         showReturnBtn={disabled}
         panelList={panelList}
         contractNumber={data_contract?.contractNumber ?? '---'}
+        contactThatSkipContract={contactThatSkipContract}
       />
 
       <div className={scss.container}>

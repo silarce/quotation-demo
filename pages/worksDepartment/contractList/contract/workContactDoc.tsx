@@ -47,12 +47,14 @@ export default function WorkContactDoc() {
   };
 
   // ---------------------------------------------------------------------------
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     preBuiltPopulate: 'worksDepartment02',
   });
   const engineeringContactId = contract?.engineeringContactId;
-  // 是否為跳過合約生成的工程聯絡單
-  const contactThatSkipContract = !contract?.subContracts.length;
 
   // ---------------------------------------------------------------------------
 
@@ -114,6 +116,7 @@ export default function WorkContactDoc() {
         showReturnBtn={!(isShowPattern || !disabled)}
         panelList={panelList}
         contractNumber={workContactContractNumber}
+        contactThatSkipContract={contactThatSkipContract}
       />
 
       <div>

@@ -42,7 +42,7 @@ export default function DispatchList() {
 
   // ----------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId);
+  const { data: contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
   const engineeringContactId = contract?.engineeringContactId;
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
@@ -147,7 +147,11 @@ export default function DispatchList() {
   // ----------------------------------------------------------
   return (
     <SubLayer>
-      <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
+      <PageHeader
+        panelList={panelList}
+        contractNumber={contract?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
+      />
 
       <div className={scss.body}>
         <div className={scss.profile}>

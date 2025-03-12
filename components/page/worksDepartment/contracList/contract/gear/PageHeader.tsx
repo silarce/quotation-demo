@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 // global gear
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import PageHeaderFlex01 from 'components/PageHeader/pageHeaderFlex01';
+import PageHeaderFlex01, { Tlink } from 'components/PageHeader/pageHeaderFlex01';
 
 import { AppContext } from 'pages/_app';
 import { erpFeaturesLookup } from 'components/Layer/SideNav/pathList/type';
@@ -29,12 +29,14 @@ export default function PageHeader({
   createTagLable,
   showReturnBtn = true,
   linkForbidden,
+  contactThatSkipContract,
 }: {
   panelList?: TpanelList;
   contractNumber?: string;
   createTagLable?: (contractId: string) => string;
   showReturnBtn?: boolean;
   linkForbidden?: boolean;
+  contactThatSkipContract: boolean;
 }) {
   const history_contractList = useUrlHistory((state) => state.contractList);
 
@@ -57,7 +59,7 @@ export default function PageHeader({
 
   const tag = (createTagLable && createTagLable(contractId ?? '')) || `合約編號 ${contractNumber}`;
 
-  const linkList = useLink();
+  const linkList = useLink({ contactThatSkipContract });
 
   if (showReturnBtn) {
     panelList = [
@@ -85,7 +87,7 @@ export default function PageHeader({
 // ====================================================================
 
 // MARK:useLink
-const useLink = () => {
+const useLink = ({ contactThatSkipContract }: { contactThatSkipContract: boolean | undefined }) => {
   const { erpFeature } = useContext(AppContext);
 
   const router = useRouter();
@@ -118,179 +120,38 @@ const useLink = () => {
 
   // -------------------------------------------------------------
 
-  const pathHead = `/worksDepartment/contractList/contract`;
+  const {
+    contractTable,
+    quotationVerifyForm,
+    workContactDoc,
+    workSheet,
+    outboundOrder,
+    accountReceivable,
+    dispatchList,
+    electronicSupplies,
+    meetingMinutes,
+    listOfDeliveryOrders,
+    memorandum,
+    certifiedDocument,
+  } = createLinkList({
+    isShowAccountReceivable,
+    contractId,
+    version,
+  });
 
-  const linkList_pass = [
-    isShowAccountReceivable
-      ? {
-          label: '合約',
-          // disabled: !isShowAccountReceivable,
-          disabled: !isShowAccountReceivable,
-          href: {
-            pathname: `${pathHead}/contractTable`,
-            query: {
-              contractId,
-              version,
-            },
-          },
-        }
-      : null,
-    isShowAccountReceivable
-      ? {
-          label: '合約審核表',
-          disabled: !isShowAccountReceivable,
-          href: {
-            pathname: `${pathHead}/quotationVerifyForm`,
-            query: {
-              contractId,
-              version,
-            },
-          },
-        }
-      : null,
-    {
-      label: '工程聯絡單',
-      href: {
-        pathname: `${pathHead}/workContactDoc`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-      erpFeatures: [],
-    },
-    {
-      label: '工作表',
-      // disabled: true,
-      href: {
-        pathname: `${pathHead}/workSheet`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    {
-      label: '工程管理單',
-      // disabled: true,
-      href: {
-        pathname: `${pathHead}/outboundOrder`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    isShowAccountReceivable
-      ? {
-          label: '應收帳款明細',
-          disabled: !isShowAccountReceivable,
-          href: {
-            pathname: `${pathHead}/accountReceivable`,
-            query: {
-              contractId,
-              version,
-            },
-          },
-        }
-      : null,
-
-    {
-      label: '派工單列表',
-      href: {
-        pathname: `${pathHead}/dispatchList`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    // 已送入deprecated
-    // {
-    //   label: '送電備品列表_old',
-    //   href: {
-    //     pathname: `${pathHead}/powerTransmissionSpareList`,
-    //     query: {
-    //       contractId,
-    //       version,
-    //     },
-    //   },
-    // },
-    {
-      label: '送電備品列表',
-      href: {
-        pathname: `${pathHead}/electronicSupplies`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    {
-      label: '會議記錄',
-      href: {
-        pathname: `${pathHead}/meetingMinutes`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    {
-      label: '調(退)貨單列表',
-      // disabled: true,
-      href: {
-        pathname: `${pathHead}/listOfDeliveryOrders`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    {
-      label: '備忘錄',
-      // disabled: true,
-      href: {
-        pathname: `${pathHead}/memorandum`,
-        query: {
-          contractId,
-          version,
-        },
-      },
-    },
-    {
-      label: '保固書',
-      href: {
-        pathname: `${pathHead}/certifiedDocument`,
-        query: {
-          contractId,
-          version,
-          documentType,
-        },
-      },
-    },
-    // {
-    //   label: '修繕報價',
-    //   disabled: true,
-    //   href: {
-    //     pathname: `${pathHead}/undefined`,
-    //     query: {
-    //       contractId,
-    //       version,
-    //     },
-    //   },
-    // },
-    // {
-    //   label: '證明書/保固書',
-    //   disabled: true,
-    //   href: {
-    //     pathname: `${pathHead}/undefined`,
-    //     query: {
-    //       contractId,
-    //       version,
-    //     },
-    //   },
-    // },
+  const linkList_pass: (Tlink | null)[] = [
+    isShowAccountReceivable && !contactThatSkipContract ? contractTable : null,
+    isShowAccountReceivable && !contactThatSkipContract ? quotationVerifyForm : null,
+    workContactDoc,
+    !contactThatSkipContract ? workSheet : null,
+    !contactThatSkipContract ? outboundOrder : null,
+    isShowAccountReceivable && !contactThatSkipContract ? accountReceivable : null,
+    !contactThatSkipContract ? dispatchList : null,
+    electronicSupplies,
+    !contactThatSkipContract ? meetingMinutes : null,
+    listOfDeliveryOrders,
+    !contactThatSkipContract ? memorandum : null,
+    !contactThatSkipContract ? certifiedDocument : null,
   ];
 
   const linkList_domestic = linkList_pass.reduce((arr, item) => {
@@ -303,4 +164,170 @@ const useLink = () => {
   const linkList = pass ? linkList_pass : domesticPass ? linkList_domestic : [];
 
   return linkList;
+};
+
+const createLinkList = ({
+  isShowAccountReceivable,
+  contractId,
+  version,
+}: {
+  isShowAccountReceivable: boolean | undefined;
+  contractId: string | undefined;
+  version: string | undefined;
+}) => {
+  const pathHead = `/worksDepartment/contractList/contract`;
+
+  const contractTable: Tlink = {
+    label: '合約',
+    disabled: !isShowAccountReceivable,
+    href: {
+      pathname: `${pathHead}/contractTable`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const quotationVerifyForm: Tlink = {
+    label: '合約審核表',
+    disabled: !isShowAccountReceivable,
+    href: {
+      pathname: `${pathHead}/quotationVerifyForm`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const workContactDoc: Tlink = {
+    label: '工程聯絡單',
+    href: {
+      pathname: `${pathHead}/workContactDoc`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const workSheet: Tlink = {
+    label: '工作表',
+    // disabled: true,
+    href: {
+      pathname: `${pathHead}/workSheet`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const outboundOrder: Tlink = {
+    label: '工程管理單',
+    // disabled: true,
+    href: {
+      pathname: `${pathHead}/outboundOrder`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const accountReceivable: Tlink = {
+    label: '應收帳款明細',
+    disabled: !isShowAccountReceivable,
+    href: {
+      pathname: `${pathHead}/accountReceivable`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const dispatchList: Tlink = {
+    label: '派工單列表',
+    href: {
+      pathname: `${pathHead}/dispatchList`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const electronicSupplies: Tlink = {
+    label: '送電備品列表',
+    href: {
+      pathname: `${pathHead}/electronicSupplies`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const meetingMinutes: Tlink = {
+    label: '會議記錄',
+    href: {
+      pathname: `${pathHead}/meetingMinutes`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const listOfDeliveryOrders: Tlink = {
+    label: '調(退)貨單列表',
+    href: {
+      pathname: `${pathHead}/listOfDeliveryOrders`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const memorandum: Tlink = {
+    label: '備忘錄',
+    // disabled: true,
+    href: {
+      pathname: `${pathHead}/memorandum`,
+      query: {
+        contractId,
+        version,
+      },
+    },
+  };
+
+  const certifiedDocument: Tlink = {
+    label: '保固書',
+    href: {
+      pathname: `${pathHead}/certifiedDocument`,
+      query: {
+        contractId,
+        version,
+        documentType,
+      },
+    },
+  };
+
+  return {
+    contractTable,
+    quotationVerifyForm,
+    workContactDoc,
+    workSheet,
+    outboundOrder,
+    accountReceivable,
+    dispatchList,
+    electronicSupplies,
+    meetingMinutes,
+    listOfDeliveryOrders,
+    memorandum,
+    certifiedDocument,
+  };
 };

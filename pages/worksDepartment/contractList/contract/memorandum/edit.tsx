@@ -149,6 +149,7 @@ export default function Edit() {
     data: contract,
     update: update_contract,
     isFetching: isFetching_contract,
+    contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: ['engineeringContact'],
   });
@@ -336,6 +337,7 @@ export default function Edit() {
         showReturnBtn={!(isNew || isReply)}
         panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
       />
       {/* pt-[1px]是為了處理 margin collapse */}
       <div className={'pt-[1px]'}>

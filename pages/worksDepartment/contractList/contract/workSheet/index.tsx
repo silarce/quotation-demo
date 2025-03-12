@@ -141,7 +141,11 @@ export default function Worksheet({
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
   // -------------------------------------------------------------------------
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     customPopulate: [
       'content.customer',
       'engineeringContact',
@@ -676,6 +680,7 @@ export default function Worksheet({
           showReturnBtn={disabled}
           panelList={panelList}
           contractNumber={engineeringContact?.contractNumber ?? ''}
+          contactThatSkipContract={contactThatSkipContract}
         />
       )}
 
