@@ -26,7 +26,8 @@ type Tstate_info = {
   indexNumber: string;
   picker: TemployeeDto | undefined;
   preparer: TemployeeDto | undefined;
-  doorModelName: string | undefined;
+  // doorModelName: string | undefined;
+  doorModelName: string[];
   doorQty: `${number}` | '';
 };
 
@@ -407,7 +408,7 @@ const createEmptyStateInfo = (): Tstate_info => ({
   indexNumber: '',
   picker: undefined,
   preparer: undefined,
-  doorModelName: undefined,
+  doorModelName: [],
   doorQty: '',
 });
 

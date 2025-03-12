@@ -12,6 +12,9 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 // component
 import SupplyTable, { useStateToGroup } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
 
+// antd
+import { Select as AntdSelect } from 'antd';
+
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
@@ -103,17 +106,12 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
-    // customPopulate: [
-    //   //
-    //   'engineeringContact',
-    // ],
-  });
+  const { data: data_contract, update: update_contract } = useGetContract_id(contractId);
 
   const {
     data: data_requirementRecord,
     update: update_requirementRecord,
-    isFetching: isFetching_requirementRecord,
+    // isFetching: isFetching_requirementRecord,
   } = useGetElectronicSuppliesRequirementRecord_id(requirementRecordId, {
     autoUpdate: !isNew,
   });
@@ -121,7 +119,7 @@ export default function EditRequirementRecord() {
   // const { electronicSuppliesId } = data_contract ?? {};
 
   const {
-    isFetching,
+    // isFetching,
     // update,
     defaultElectronicSuppliesRequirementArr,
     worksheetIdArr,
@@ -186,7 +184,9 @@ export default function EditRequirementRecord() {
     > = {
       operationDate: date!.toISOString(),
       storageManagementPersonnelId: preparer!.id,
-      doorType: doorModelName || null,
+      // doorType: doorModelName || null,
+      doorType: JSON.stringify(doorModelName),
+      // doorType: JSON.stringify(['AAA', 'BBB', 'CCC']),
       requirementRecordDetails,
       quantity: doorQty ? String(doorQty || 0) : null,
     };
@@ -397,7 +397,8 @@ export default function EditRequirementRecord() {
         indexNumber: data_requirementRecord.number ?? '',
         picker: undefined,
         preparer: data_requirementRecord.storageManagementPersonnelEmployee || undefined,
-        doorModelName: data_requirementRecord.doorType ?? '',
+        // doorModelName: data_requirementRecord.doorType ?? '',
+        doorModelName: data_requirementRecord.addition.doorTypeArr ?? [],
         doorQty: String(data_requirementRecord.quantity || '') as Tstate_info['doorQty'],
       };
     } else {
@@ -473,7 +474,7 @@ export default function EditRequirementRecord() {
               },
             }}
           />
-          <InputSel
+          {/* <InputSel
             className="global_tip_must"
             caption="門型"
             {...config_inputSel}
@@ -488,7 +489,7 @@ export default function EditRequirementRecord() {
                 },
               },
             }}
-          />
+          /> */}
           <InputSel
             caption="樘數"
             {...config_inputSel}
@@ -503,6 +504,27 @@ export default function EditRequirementRecord() {
                 },
               },
             }}
+          />
+
+          <InputSel
+            className="global_tip_must col-span-2"
+            caption="門型"
+            {...config_inputSel}
+            disabled={disabled}
+            showBaseline="invisible"
+            node={
+              <AntdSelect
+                className="w-full"
+                mode="multiple"
+                allowClear
+                disabled={disabled}
+                value={state_info.doorModelName}
+                onChange={(arr: string[]) => {
+                  setState_info((state) => ({ ...state, doorModelName: arr }));
+                }}
+                options={options_doorModel}
+              />
+            }
           />
 
           <div>
