@@ -71,7 +71,15 @@ const createElectricSupply = ({
   return value_electricSupply;
 };
 
-const getHeadBoxSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
+const getHeadBoxSvgUrl1 = ({
+  isIntegratedHeadBox,
+  hasWheel,
+  sizeB,
+}: {
+  isIntegratedHeadBox: boolean;
+  hasWheel: boolean;
+  sizeB: number;
+}) => {
   let url: null | string = null;
 
   if (isIntegratedHeadBox && hasWheel) {
@@ -79,9 +87,17 @@ const getHeadBoxSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHead
   } else if (isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '一體式無檔輪.svg');
   } else if (!isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '機加捲有檔輪.svg');
+    // url = createAssetUrl('head-box', '機加捲有檔輪.svg');
+    url =
+      sizeB > 630
+        ? createAssetUrl('head-box', '機加捲大於630無檔輪.svg')
+        : createAssetUrl('head-box', '機加捲小於630無檔輪.svg');
   } else if (!isIntegratedHeadBox && !hasWheel) {
-    url = createAssetUrl('head-box', '機加捲無檔輪.svg');
+    // url = createAssetUrl('head-box', '機加捲無檔輪.svg');
+    url =
+      sizeB > 630
+        ? createAssetUrl('head-box', '機加捲大於630有檔輪.svg')
+        : createAssetUrl('head-box', '機加捲小於630有檔輪.svg');
   }
 
   return url as string;

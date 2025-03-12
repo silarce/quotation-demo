@@ -726,6 +726,7 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
     ? getHeadBoxSvgUrl1({
         isIntegratedHeadBox: isIntegratedHeadBox === '一體式捲箱',
         hasWheel: hasWheel === 'true',
+        sizeB: Number(boxB || 0),
       })
     : isIntegratedHeadBox;
   const url2 = isIsIntegratedHeadBoxValid

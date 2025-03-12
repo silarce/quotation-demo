@@ -659,7 +659,7 @@ function Form_specialProd_headBox({
   setState: TsetState<Tstate_specialProd_headBox>;
   disabled: boolean | undefined;
 }) {
-  const url1 = getHeadBoxSvgUrl1({ isIntegratedHeadBox, hasWheel });
+  const url1 = getHeadBoxSvgUrl1({ isIntegratedHeadBox, hasWheel, sizeB: Number(boxB || 0) });
   const url2 = getHeadBoxSvgUrl2({ isIntegratedHeadBox, hasWheel });
   const url3 = getHeadBoxSvgUrl3({ headBoxTopCover });
   const url4 = getHeadBoxSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
