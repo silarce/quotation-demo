@@ -267,26 +267,26 @@ export default function WareHouseList() {
             });
             break;
             case '一般倉庫':
-            // router.push({
-            //     pathname: `/factoryDepartment/noTrayList`,
-            //     query:{
-            //         item: JSON.stringify(item),
-            //     }
-            // });
             router.push({
-                pathname: `/factoryDepartment/trayList`,
-                query: {
-                type: 'Tray',
-                whid: item.id,
-                whname1: item.whname,
-                url: url,
-                traycalled: traycalled,
-                traycalledname: traycalledname,
-                traytransfer: traytransfer,
-                whnamecalled: whnamecalled,
-                firstin: 1
-                },
+                pathname: `/factoryDepartment/noTrayList`,
+                query:{
+                    item: JSON.stringify(item),
+                }
             });
+            // router.push({
+            //     pathname: `/factoryDepartment/trayList`,
+            //     query: {
+            //     type: 'Tray',
+            //     whid: item.id,
+            //     whname1: item.whname,
+            //     url: url,
+            //     traycalled: traycalled,
+            //     traycalledname: traycalledname,
+            //     traytransfer: traytransfer,
+            //     whnamecalled: whnamecalled,
+            //     firstin: 1
+            //     },
+            // });
             break;
             default:
             break;
