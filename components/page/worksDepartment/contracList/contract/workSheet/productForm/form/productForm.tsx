@@ -47,10 +47,10 @@ import {
   options_前遮,
   basicConfig,
   inputNumberProps,
-  getHeadBoxSvgUrl1,
-  getHeadBoxSvgUrl2,
-  getHeadBoxSvgUrl3,
-  getHeadBoxSvgUrl4,
+  getSvgUrl_headBox1,
+  getSvgUrl_headBox2,
+  getSvgUrl_headBoxTopCover,
+  getSvgUrl_headBoxCover,
 } from './shared';
 
 import type { TdoorModelInfoDto } from 'js/api/dtoTypes';
@@ -723,20 +723,21 @@ function Form_product_headBox({ disabled }: { disabled: boolean | undefined }) {
   const isIsIntegratedHeadBoxValid = isIntegratedHeadBox === '一體式捲箱' || isIntegratedHeadBox === '捲箱加機箱';
 
   const url1 = isIsIntegratedHeadBoxValid
-    ? getHeadBoxSvgUrl1({
+    ? getSvgUrl_headBox1({
         isIntegratedHeadBox: isIntegratedHeadBox === '一體式捲箱',
         hasWheel: hasWheel === 'true',
         sizeB: Number(boxB || 0),
-      })
+      }).url
     : isIntegratedHeadBox;
+
   const url2 = isIsIntegratedHeadBoxValid
-    ? getHeadBoxSvgUrl2({
+    ? getSvgUrl_headBox2({
         isIntegratedHeadBox: isIntegratedHeadBox === '一體式捲箱',
         hasWheel: hasWheel === 'true',
-      })
+      }).url
     : isIntegratedHeadBox;
-  const url3 = getHeadBoxSvgUrl3({ headBoxTopCover: headBoxTopCover === 'true' });
-  const url4 = getHeadBoxSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
+  const url3 = getSvgUrl_headBoxTopCover({ headBoxTopCover: headBoxTopCover === 'true' }).url;
+  const url4 = getSvgUrl_headBoxCover({ headBoxCover: headBoxCover ?? 'none' }).url;
 
   const props_sizeM: TinputSelProps =
     headBoxCover === 'none' && headBoxSizeM === '0'
