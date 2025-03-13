@@ -89,6 +89,7 @@ type TtypeLookup = {
   outsourcing: Exclude<(typeof props_outsourcing)['dataType'], undefined>;
   employee: Exclude<(typeof props_employee)['dataType'], undefined>;
   employee_worksDepartment: Exclude<(typeof props_employee_worksDepartment)['dataType'], undefined>;
+  employee_factoryDepartment: Exclude<(typeof props_employee_factoryDepartment)['dataType'], undefined>;
   dailyReport_workers_item: Exclude<(typeof props_dailyReport_workers_item)['dataType'], undefined>;
   engineeringContact: Exclude<(typeof props_engineeringContact)['dataType'], undefined>;
   annotation: Exclude<(typeof props_annotation)['dataType'], undefined>;
@@ -210,7 +211,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     // ------------------------------------------------------------------------
 
-    const { data: data_department, update: update_department, isLoading } = useDepartments();
+    const { data: data_department, update: update_department, isLoading } = useDepartments({ pageSize: 99999 });
 
     const options_department = useMemo(() => {
       if (!data_department) {
@@ -649,6 +650,35 @@ const props_employee_worksDepartment: TselectorProps<TemployeeDto> = {
   filter: (strArr) => {
     return {
       'jobs.department.name': { $eq: '工務部' },
+      $or: [
+        {
+          idNumber: { $eq: strArr[0] },
+        },
+        {
+          chName: { $contains: strArr[0] },
+        },
+      ],
+    };
+  },
+};
+
+// MARK:props_employee_factoryDepartment
+const props_employee_factoryDepartment: TselectorProps<TemployeeDto> = {
+  ...props_employee,
+
+  searchInputSelPropsArr: [
+    {
+      wrapperStyle: { width: 150 },
+      inputProps: {
+        props: {
+          placeholder: '完整編號、姓名...',
+        },
+      },
+    },
+  ],
+  filter: (strArr) => {
+    return {
+      'jobs.department.name': { $eq: '廠務部' },
       $or: [
         {
           idNumber: { $eq: strArr[0] },
@@ -1359,6 +1389,7 @@ const propsLookup = {
   outsourcing: () => _.cloneDeep(props_outsourcing),
   employee: () => _.cloneDeep(props_employee),
   employee_worksDepartment: () => _.cloneDeep(props_employee_worksDepartment),
+  employee_factoryDepartment: () => _.cloneDeep(props_employee_factoryDepartment),
   dailyReport_workers_item: () => _.cloneDeep(props_dailyReport_workers_item),
   engineeringContact: () => _.cloneDeep(props_engineeringContact),
   annotation: () => _.cloneDeep(props_annotation),

@@ -3430,6 +3430,17 @@ export type TelectronicSuppliesRequirementRecordDetailDto = {
   unit: string | null;
   code: string | null;
   note: string | null;
+
+  categoryParam?: string;
+};
+
+export type TelectronicSuppliesRequirementRecordDetail = {
+  data: Pick<
+    TelectronicSuppliesRequirementRecordDetailDto,
+    'requirementRecordId' | 'itemName' | 'category' | 'quantity' | 'code' | 'note' | 'unit'
+  >[];
+  worksheetIds: string[];
+  electronicSuppliesId: string;
 };
 
 export type TcreateElectronicSuppliesRecordDetailDto = Pick<
@@ -3437,6 +3448,7 @@ export type TcreateElectronicSuppliesRecordDetailDto = Pick<
   'itemName' | 'category' | 'quantity' | 'unit'
 > & {
   code: string | null;
+  categoryParam: string;
 };
 
 export type TupdateElectronicSuppliesRecordDetailDto = TcreateElectronicSuppliesRecordDetailDto & {
@@ -3470,7 +3482,7 @@ export type TelectronicSuppliesRequirementRecordDto = {
   storageManagementPersonnelId: string | null;
   // 備料人員
   storageManagementPersonnelEmployee: TemployeeDto;
-  // 門型
+  // 門型  // string或是JSON字串string[]
   doorType: string | null;
   // 樘數
   quantity: string | null;
@@ -3483,13 +3495,18 @@ export type TcreateElectronicSuppliesRequirementRecordDto = Pick<
   storageManagementPersonnelId: string;
   requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[];
   quantity: string | null;
+  // 工作表id
+  worksheetIds: string[];
 };
 
 export type TupdateElectronicSuppliesRequirementRecordDto = Pick<
   TcreateElectronicSuppliesRequirementRecordDto,
   'operationDate' | 'storageManagementPersonnelId' | 'doorType' | 'quantity'
 > & {
+  id?: string;
   requirementRecordDetails: TupdateElectronicSuppliesRecordDetailDto[];
+  // 工作表id
+  // worksheetIds?: string[];
 };
 
 // PickupRecord系列為領料單
@@ -3506,7 +3523,7 @@ export type TelectronicSuppliesPickupRecordDto = {
   action: TelectronicSuppliesAction;
   // 領取/退回日期
   operationDate: string;
-  // 門型
+  // 門型 // string或是JSON字串string[]
   doorModel: string;
   // 總樘數
   totalQuantity: number;
@@ -3543,6 +3560,8 @@ export type TelectronicSuppliesPickupRecordDetailDto = {
   unit: string | null;
   //
   code: string | null;
+  //
+  categoryParam?: string;
 };
 
 export type TcreateElectronicSuppliesPickupRecordDto = Pick<

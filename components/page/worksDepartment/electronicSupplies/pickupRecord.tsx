@@ -12,7 +12,7 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-import type { TelectronicSuppliesPickupRecordDto } from 'js/api/dtoTypes';
+import type { TelectronicSuppliesPickupRecordDto_addition } from 'js/api/api_engineering';
 
 // ==================================================================
 
@@ -26,7 +26,7 @@ export default function PickupRecord({
   pickupRecords,
 }: {
   className?: string;
-  pickupRecords: TelectronicSuppliesPickupRecordDto[];
+  pickupRecords: TelectronicSuppliesPickupRecordDto_addition[];
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -56,9 +56,10 @@ export default function PickupRecord({
         totalQuantity,
         // action,
         // pickupRecordDetails = [],
-        doorModel,
+        // doorModel,
         preparationEmployee,
         number: idNumber,
+        addition: { doorTypeArr },
       } = item;
 
       return {
@@ -77,7 +78,7 @@ export default function PickupRecord({
           },
           {
             ...configList.doorModelName,
-            children: doorModel,
+            children: doorTypeArr?.join('、'),
           },
           {
             ...configList.qty,
@@ -139,23 +140,24 @@ const configList: { [key: string]: Tconfig_table } = {
   },
   date: {
     label: '領料日期',
-    flex: '20%',
+    width: 150,
   },
   ingredientTechnician: {
     label: '領料人員',
-    flex: '20%',
+    width: 150,
   },
   doorModelName: {
     label: '門型',
-    flex: '20%',
+    flex: 'auto',
+    justifyContent: 'flex-start',
   },
   qty: {
     label: '樘數',
-    flex: '20%',
+    width: 80,
   },
   materialHandler: {
     label: '備料人員',
-    flex: '20%',
+    width: 150,
   },
   btn: {
     width: 100,
