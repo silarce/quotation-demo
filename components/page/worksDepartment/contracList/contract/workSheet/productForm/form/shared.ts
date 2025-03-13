@@ -110,25 +110,21 @@ const getSvgUrl_headBox1 = ({
   return { url, name };
 };
 
-const getSvgUrl_headBox2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
+const getSvgUrl_headBox2 = ({
+  isIntegratedHeadBox,
+  hasWheel,
+}: {
+  isIntegratedHeadBox: boolean;
+  // 沒用到了，但不想去改引數
+  hasWheel?: boolean;
+}) => {
   let url;
   let name;
 
-  // 阿不是都一樣...?給我的判斷條件長這樣那就這樣吧
-  if (isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '機械箱.svg');
-    name = '機械箱';
-  } else if (isIntegratedHeadBox && !hasWheel) {
+  if (!isIntegratedHeadBox) {
     url = createAssetUrl('head-box', '機械箱.svg');
     name = '機械箱';
   }
-  // else if (!isIntegratedHeadBox && hasWheel) {
-  //   url = createAssetUrl('head-box', '機械箱.svg');
-  //   name = '機械箱';
-  // } else if (!isIntegratedHeadBox && !hasWheel) {
-  //   url = createAssetUrl('head-box', '機械箱.svg');
-  //   name = '機械箱';
-  // }
 
   return { url, name };
 };
