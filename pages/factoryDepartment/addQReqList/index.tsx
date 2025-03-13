@@ -1486,13 +1486,29 @@ export default function AddQReqList() {
     // 手key輸入過濾
     useEffect(() => {
         setFilteredData4(
-            customerdata.filter(
-                (item) =>
-                    (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
-                    (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
-            )
+            customerdata.filter((item) => {
+                if (currentsupplier === 1) {
+                    return (
+                        (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+                        (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+                    );
+                }
+                if (currentsupplier === 2) {
+                    return (
+                        (!supplierid2in || (item?.customer_number && item.customer_number.toLowerCase().includes(supplierid2in.toLowerCase()))) &&
+                        (!suppliername2in || (item?.name && item.name.toLowerCase().includes(suppliername2in.toLowerCase())))
+                    );
+                }
+                if (currentsupplier === 3) {
+                    return (
+                        (!supplierid3in || (item?.customer_number && item.customer_number.toLowerCase().includes(supplierid3in.toLowerCase()))) &&
+                        (!suppliername3in || (item?.name && item.name.toLowerCase().includes(suppliername3in.toLowerCase())))
+                    );
+                }
+                return false; // 預設不符合條件的情況
+            })
         );
-    }, [supplieridin, suppliernamein]); // 當 supplieridin 或 suppliernamein 變化時觸發
+    }, [supplieridin, suppliernamein, supplierid2in, suppliername2in, supplierid3in, suppliername3in, currentsupplier, customerdata]); 
 
     //#endregion
 
@@ -1668,14 +1684,19 @@ export default function AddQReqList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商1編碼"
+                                            caption="廠商1編號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
                                                     value: supplieridin,
-                                                    onChange: (e) => { setSupplieridin(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setCurrentSupplier(1);
+                                                        setSupplieridin(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -1692,14 +1713,9 @@ export default function AddQReqList() {
                                                     onChange: (e) => {
                                                         const value = e.target.value;
                                                         setCurrentSupplier(1);
-                                                        setSuppliernamein(value);
-                                                        setFilters({ ...filters, name: value });
-                                                        setFilteredData2(
-                                                            data.filter((item) =>
-                                                                item.name.toLowerCase().includes(value.toLowerCase())
-                                                            )
-                                                        );
-                                                    }
+                                                        setSuppliernamein(value); // 僅更新 suppliernamein
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -1792,7 +1808,12 @@ export default function AddQReqList() {
                                             inputProps={{
                                                 props: {
                                                     value: supplierid2in,
-                                                    onChange: (e) => { setSupplierid2in(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setCurrentSupplier(2);
+                                                        setSupplierid2in(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -1809,14 +1830,9 @@ export default function AddQReqList() {
                                                     onChange: (e) => {
                                                         const value = e.target.value;
                                                         setCurrentSupplier(2);
-                                                        setSuppliername2in(value);
-                                                        setFilters({ ...filters, name: value });
-                                                        setFilteredData2(
-                                                            data.filter((item) =>
-                                                                item.name.toLowerCase().includes(value.toLowerCase())
-                                                            )
-                                                        );
-                                                    }
+                                                        setSuppliername2in(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -1889,14 +1905,19 @@ export default function AddQReqList() {
                                     <div>
                                         <InputSel
                                             {...inputSelProps}
-                                            caption="廠商3統編"
+                                            caption="廠商3編號"
                                             captionStyle={{ fontSize: '18px' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
                                             disabled={!isEditing}
                                             inputProps={{
                                                 props: {
                                                     value: supplierid3in,
-                                                    onChange: (e) => { setSupplierid3in(e.target.value) }
+                                                    onChange: (e) => {
+                                                        const value = e.target.value;
+                                                        setCurrentSupplier(3);
+                                                        setSupplierid3in(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -1913,14 +1934,9 @@ export default function AddQReqList() {
                                                     onChange: (e) => {
                                                         const value = e.target.value;
                                                         setCurrentSupplier(3);
-                                                        setSuppliername3in(value);
-                                                        setFilters({ ...filters, name: value });
-                                                        setFilteredData2(
-                                                            data.filter((item) =>
-                                                                item.name.toLowerCase().includes(value.toLowerCase())
-                                                            )
-                                                        );
-                                                    }
+                                                        setSuppliername3in(value); // 僅更新 supplieridin
+                                                        setIsFilterVisible(true);  // 隱藏篩選區域
+                                                    },
                                                 },
                                             }}
                                         />
@@ -2002,7 +2018,7 @@ export default function AddQReqList() {
                                         borderRadius: '4px',
                                     }}
                                 >
-                                    {filters.name && filteredData2.length > 0 && isFilterVisible && (
+                                    {(suppliernamein || supplieridin || suppliername2in || supplierid2in || suppliername3in || supplierid3in) && filteredData4.length > 0 && isFilterVisible && (
                                         <div
                                             style={{
                                                 position: 'absolute',
@@ -2018,42 +2034,56 @@ export default function AddQReqList() {
                                                 overflowY: 'auto',
                                             }}
                                         >
-                                            {filteredData2.map((_item, index) => (
+                                            {filteredData4.map((_item, index) => (
                                                 <div
                                                     key={index}
                                                     onClick={() => {
-
-                                                        const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
-
                                                         if (currentsupplier === 1) {
-                                                            setSuppliernamein(safeValue(_item.name));
-                                                            setSupplieraddressin(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                                            setSupplierphonein(safeValue(_item.phone));
-                                                            setSuppliertaxidin(safeValue(_item.tax_id));
-                                                            setSupplieridin(safeValue(_item.customer_number));
-                                                            setSupplierfaxin(safeValue(_item.fax));
-                                                            setSuppliercontactin(safeValue(_item.contact));
-                                                            setSupplieruuidin(safeValue(_item.id));
+                                                            setSuppliernamein(_item.name || '');
+                                                            setSupplieraddressin(
+                                                                (_item.county || '') +
+                                                                (_item.district || '') +
+                                                                (_item.address || '')
+                                                            );
+                                                            setSupplierphonein(_item.phone || '');
+                                                            setSuppliertaxidin(_item.tax_id || '');
+                                                            setSupplieridin(_item.customer_number || '');
+                                                            setSupplierfaxin(_item.fax || '');
+                                                            setSuppliercontactin(_item.contact || '');
+                                                            setSupplieruuidin(_item.id || '');
+                                                            setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                            setIsFilterVisible(false);
                                                         } else if (currentsupplier === 2) {
-                                                            setSuppliername2in(safeValue(_item.name));
-                                                            setSupplieraddress2in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                                            setSupplierphone2in(safeValue(_item.phone));
-                                                            setSuppliertaxid2in(safeValue(_item.tax_id));
-                                                            setSupplierid2in(safeValue(_item.customer_number));
-                                                            setSupplierfax2in(safeValue(_item.fax));
-                                                            setSuppliercontact2in(safeValue(_item.contact));
-                                                            setSupplieruuid2in(safeValue(_item.id));
+                                                            setSuppliername2in(_item.name || '');
+                                                            setSupplieraddress2in(
+                                                                (_item.county || '') +
+                                                                (_item.district || '') +
+                                                                (_item.address || '')
+                                                            );
+                                                            setSupplierphone2in(_item.phone || '');
+                                                            setSuppliertaxid2in(_item.tax_id || '');
+                                                            setSupplierid2in(_item.customer_number || '');
+                                                            setSupplierfax2in(_item.fax || '');
+                                                            setSuppliercontact2in(_item.contact || '');
+                                                            setSupplieruuid2in(_item.id || '');
+                                                            setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                            setIsFilterVisible(false);
                                                         } else if (currentsupplier === 3) {
-                                                            setSuppliername3in(safeValue(_item.name));
-                                                            setSupplieraddress3in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                                            setSupplierphone3in(safeValue(_item.phone));
-                                                            setSuppliertaxid3in(safeValue(_item.tax_id));
-                                                            setSupplierid3in(safeValue(_item.customer_number));
-                                                            setSupplierfax3in(safeValue(_item.fax));
-                                                            setSuppliercontact3in(safeValue(_item.contact));
-                                                            setSupplieruuid3in(safeValue(_item.id));
+                                                            setSuppliername3in(_item.name || '');
+                                                            setSupplieraddress3in(
+                                                                (_item.county || '') +
+                                                                (_item.district || '') +
+                                                                (_item.address || '')
+                                                            );
+                                                            setSupplierphone3in(_item.phone || '');
+                                                            setSuppliertaxid3in(_item.tax_id || '');
+                                                            setSupplierid3in(_item.customer_number || '');
+                                                            setSupplierfax3in(_item.fax || '');
+                                                            setSuppliercontact3in(_item.contact || '');
+                                                            setSupplieruuid3in(_item.id || '');
+                                                            setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                                            setIsFilterVisible(false);
                                                         }
-                                                        setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
                                                     }}
                                                     style={{
                                                         padding: '10px',
