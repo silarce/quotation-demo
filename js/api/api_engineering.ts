@@ -73,7 +73,7 @@ import type {
   TcreateElectronicSuppliesPickupRecordDto,
   TupdateElectronicSuppliesPickupRecordDto,
   TcreateElectronicSuppliesRequirementRecordDto,
-
+  TelectronicSuppliesRequirementRecordDetail,
   //
   TupdateAccountReceivableAccountantDto,
   TcreateElectronicSuppliesRecordDetailDto,
@@ -84,6 +84,7 @@ import type {
   TcreateIncomeBillSettlementFormDto,
   TupdateIncomeBillSettlementFormDto,
 } from './dtoTypes';
+import { resolveMx } from 'dns';
 
 type TinvouceCheckResult = 'pass' | 'notPass' | undefined;
 
@@ -96,6 +97,23 @@ type TworksheetRecordDto_addition = TworksheetRecordDto & {
 type TworksheetDto_addition = TworksheetDto & {
   latestRecord: TworksheetRecordDto_addition;
   records: TworksheetRecordDto_addition[];
+};
+
+type TelectronicSuppliesRequirementRecordDto_addition = TelectronicSuppliesRequirementRecordDto & {
+  addition: {
+    doorTypeArr: string[] | null;
+  };
+};
+
+type TelectronicSuppliesPickupRecordDto_addition = TelectronicSuppliesPickupRecordDto & {
+  addition: {
+    doorTypeArr: string[] | null;
+  };
+};
+
+type TelectronicSuppliesDto_addition = Omit<TelectronicSuppliesDto, 'pickupRecords' | 'requirementRecords'> & {
+  pickupRecords?: TelectronicSuppliesPickupRecordDto_addition[];
+  requirementRecords?: TelectronicSuppliesRequirementRecordDto_addition[];
 };
 
 export type {
@@ -170,9 +188,17 @@ export type {
   TincomeBillSerialSettlementFormReviewRecordDto,
   TcreateIncomeBillSettlementFormDto,
   TupdateIncomeBillSettlementFormDto,
+  //
 } from './dtoTypes';
 
-export type { TinvouceCheckResult, TworksheetDto_addition, TworksheetRecordDto_addition };
+export type {
+  TinvouceCheckResult,
+  TworksheetDto_addition,
+  TworksheetRecordDto_addition,
+  TelectronicSuppliesDto_addition,
+  TelectronicSuppliesRequirementRecordDto_addition,
+  TelectronicSuppliesPickupRecordDto_addition,
+};
 
 type TgetEngineeringContact = {
   data: TengineeringContactDto[];
@@ -440,7 +466,7 @@ const apiGetElectronicSupplies_id = (id: string, { params_cover }: { params_cove
   }
 
   return axi
-    .get(api, { params })
+    .get<TelectronicSuppliesDto>(api, { params })
     .then(({ data }) => data)
     .catch((error) => {
       return Promise.reject(error);
@@ -452,7 +478,7 @@ export const useElectronicSupplies_id = (
   { params_cover }: { params_cover?: Tparams } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TelectronicSuppliesDto>();
+  const [res, setRes] = useState<TelectronicSuppliesDto_addition>();
 
   const update = async () => {
     if (!id) {
@@ -463,7 +489,42 @@ export const useElectronicSupplies_id = (
 
     try {
       const res = await apiGetElectronicSupplies_id(id, { params_cover });
-      setRes(res);
+      const { pickupRecords, requirementRecords } = res;
+
+      const pickupRecords_addition: TelectronicSuppliesPickupRecordDto_addition[] | undefined = pickupRecords?.map(
+        (record) => {
+          const doorType = record.doorModel;
+          const doorTypeArr = doorType ? jsonStrArrToStrArr(doorType) : null;
+
+          return {
+            ...record,
+            addition: {
+              doorTypeArr,
+            },
+          };
+        }
+      );
+
+      const requirementRecords_addition: TelectronicSuppliesRequirementRecordDto_addition[] | undefined =
+        requirementRecords?.map((record) => {
+          const doorType = record.doorType;
+          const doorTypeArr = doorType ? jsonStrArrToStrArr(doorType) : null;
+
+          return {
+            ...record,
+            addition: {
+              doorTypeArr,
+            },
+          };
+        });
+
+      const res_addition: TelectronicSuppliesDto_addition = {
+        ...res,
+        pickupRecords: pickupRecords_addition,
+        requirementRecords: requirementRecords_addition,
+      };
+
+      setRes(res_addition);
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '取得送電備品失敗', content: err.message });
@@ -507,7 +568,7 @@ export const useGetElectronicSuppliesRequirementRecord_id = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDto>();
+  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDto_addition>();
 
   const update = async () => {
     if (!requirementRecordId) {
@@ -518,7 +579,21 @@ export const useGetElectronicSuppliesRequirementRecord_id = (
 
     try {
       const res = await apiGetElectronicSuppliesRequirementRecord_id(requirementRecordId);
-      setRes(res);
+      const doorType = res.doorType;
+      let doorTypeArr: string[] | null = null;
+
+      if (doorType) {
+        doorTypeArr = jsonStrArrToStrArr(doorType);
+      }
+
+      const res_addition: TelectronicSuppliesRequirementRecordDto_addition = {
+        ...res,
+        addition: {
+          doorTypeArr,
+        },
+      };
+
+      setRes(res_addition);
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '取得送電備品需求單失敗', content: err.message });
@@ -576,6 +651,58 @@ export const apiPatchElectronicSuppliesRequirementRecord = (
     });
 };
 
+// 取得合約的預設送電備品
+export const apiGetDefaultElectronicSuppliesRequirementData = async (contractId: string) => {
+  const api = `/engineering/electronic-supplies/worksheet-to-create/${contractId}`;
+
+  return axi
+    .get<TelectronicSuppliesRequirementRecordDetail>(api)
+    .then(({ data }) => data)
+    .catch((error) => Promise.reject(error));
+};
+
+export const useGetDefaultElectronicSuppliesRequirementData = (
+  contractId: string | undefined | null,
+  { autoUpdate = true, callAlert = true } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TelectronicSuppliesRequirementRecordDetail>();
+
+  const update = async () => {
+    if (!contractId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    try {
+      const res = await apiGetDefaultElectronicSuppliesRequirementData(contractId);
+      setRes(res);
+    } catch (error) {
+      const err = error as AxiosError;
+      callAlert && myAlert.err({ title: '取得預設送電備品需求單失敗', content: err.message });
+      setRes(undefined);
+
+      return error;
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [contractId]);
+
+  return {
+    isFetching,
+    update,
+
+    defaultElectronicSuppliesRequirementArr: res?.data,
+    worksheetIdArr: res?.worksheetIds,
+    electronicSuppliesId: res?.electronicSuppliesId,
+  };
+};
+
 const apiGetElectronicSuppliesPickupRecord_id = (id: string) => {
   const api = `/engineering/electronic-supplies/pick-up-record/${id}`;
 
@@ -600,7 +727,7 @@ export const useGetElectronicSuppliesPickupRecord_id = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TelectronicSuppliesPickupRecordDto>();
+  const [res, setRes] = useState<TelectronicSuppliesPickupRecordDto_addition>();
 
   const update = async () => {
     if (!pickupRecordId) {
@@ -611,7 +738,21 @@ export const useGetElectronicSuppliesPickupRecord_id = (
 
     try {
       const res = await apiGetElectronicSuppliesPickupRecord_id(pickupRecordId);
-      setRes(res);
+      const doorType = res.doorModel;
+      let doorTypeArr: string[] | null = null;
+
+      if (doorType) {
+        doorTypeArr = jsonStrArrToStrArr(doorType);
+      }
+
+      const res_addition: TelectronicSuppliesPickupRecordDto_addition = {
+        ...res,
+        addition: {
+          doorTypeArr,
+        },
+      };
+
+      setRes(res_addition);
     } catch (error) {
       const err = error as AxiosError;
       myAlert.err({ title: '取得送電備品領料單失敗', content: err.message });
@@ -635,7 +776,7 @@ export const apiPostElectronicSuppliesPickupRecord = (id: string, body: TcreateE
   const api = `/engineering/electronic-supplies/${id}/pickup-record`;
 
   return axi
-    .post<TelectronicSuppliesPickupRecordDto>(api, body)
+    .post<TelectronicSuppliesPickupRecordDto[]>(api, body)
     .then(({ data }) => data)
     .catch((error: AxiosError<TapiError>) => {
       myAlert.err({
@@ -2317,4 +2458,13 @@ export const apiPatchIncomeBillSerialSettlementForm = async (id: string, body: T
 
       return Promise.reject(err);
     });
+};
+
+// 使用前先確保JSON字串的內容是陣列
+const jsonStrArrToStrArr = (str: string) => {
+  try {
+    return JSON.parse(str) as string[];
+  } catch (error) {
+    return [str] as string[];
+  }
 };

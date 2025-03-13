@@ -239,12 +239,15 @@ const configList: { [key: string]: Tconfig_table } = {
   },
   floor: {
     label: '樓層',
-    width: 60,
-    justifyContent: 'center',
+    // width: 60,
+    flex: '50%',
+    // justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   locationArea: {
     label: '區域',
-    width: 200,
+    // width: 200,
+    flex: '50%',
     justifyContent: 'flex-start',
   },
   qty: {

@@ -9,16 +9,10 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // antd
-import { Select, SelectProps } from 'antd';
+import { Select as AntdSelect, SelectProps } from 'antd';
 
 // component
-import SupplyTable, {
-  Tgroup,
-  Tprops_cell,
-  Tprops_cell_input,
-  //
-  useStateToGroup,
-} from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
+import SupplyTable, { useStateToGroup } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -29,12 +23,10 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // api
 import {
   TcreateElectronicSuppliesPickupRecordDto,
-  TupdateElectronicSuppliesPickupRecordDto,
   TcreateElectronicSuppliesRecordDetailDto,
   //
   useGetElectronicSuppliesPickupRecord_id,
   useElectronicSupplies_id,
-  useGetElectronicSuppliesRequirementRecord_id,
   //
   apiPostElectronicSuppliesPickupRecord,
   apiPatchElectronicSuppliesPickupRecord,
@@ -65,16 +57,16 @@ type TstateList = {
 
 // ==================================================================
 
-const SelectorGroup = selectModalCreator_multi<['employee', 'employee']>({
+const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment', 'employee_factoryDepartment']>({
   selectorArr: [
     {
-      key: 'employee',
+      key: 'employee_factoryDepartment',
       caption: '領料人員',
       tip: '單選',
       limit: 1,
     },
     {
-      key: 'employee',
+      key: 'employee_factoryDepartment',
       caption: '備料人員',
       tip: '單選',
       limit: 1,
@@ -107,21 +99,12 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  const {
-    data: data_contract,
-    update: update_contract,
-    contactThatSkipContract,
-  } = useGetContract_id(contractId, {
-    // customPopulate: [
-    //   //
-    //   'engineeringContact',
-    // ],
-  });
+  const { data: data_contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
 
   const {
     data: data_pickup,
     update: update_pickup,
-    isFetching,
+    // isFetching,
   } = useGetElectronicSuppliesPickupRecord_id(pickupRecordId);
 
   const { electronicSuppliesId } = data_contract ?? {};
@@ -129,8 +112,8 @@ export default function EditElectronicSuppliesPickup({
 
   const {
     data: data_electronicSupplies,
-    update: update_electronicSupplies,
-    isFetching: isFetching_electronicSupplies,
+    // update: update_electronicSupplies,
+    // isFetching: isFetching_electronicSupplies,
   } = useElectronicSupplies_id(electronicSuppliesId, {
     params_cover: {
       populate: ['requirementRecords.requirementRecordDetails'],
@@ -147,7 +130,7 @@ export default function EditElectronicSuppliesPickup({
     pickupRecordDetails = orderDetailArr({ detailArr: pickupRecordDetails });
 
     pickupRecordDetails.forEach((detail) => {
-      const { id, category, itemName, quantity, unit, code } = detail;
+      const { id, category, itemName, quantity, unit, code, categoryParam } = detail;
 
       list[category] = {
         ...list[category], // 可能是undefined // 會將subItemName帶入
@@ -157,6 +140,7 @@ export default function EditElectronicSuppliesPickup({
         quantity,
         unit,
         code,
+        categoryParam: categoryParam ?? '',
       };
 
       //
@@ -191,7 +175,7 @@ export default function EditElectronicSuppliesPickup({
     let pickupRecordDetails: (TcreateElectronicSuppliesRecordDetailDto & { id?: string })[] = Object.values(
       state_electronicItemList
     ).map((item) => {
-      const { id, category, itemName, quantity, unit, code, subItemName } = item;
+      const { id, category, itemName, quantity, unit, code, subItemName, categoryParam } = item;
       const detail = {
         // 必須要送id，若id為undefined將會新增一筆detail
         // 預期:新增時每一筆資料都沒有id、編輯時每一筆資料都有id，
@@ -201,6 +185,7 @@ export default function EditElectronicSuppliesPickup({
         quantity,
         unit,
         code,
+        categoryParam,
       };
 
       return detail;
@@ -215,33 +200,29 @@ export default function EditElectronicSuppliesPickup({
       takeOffEmployeeId: state_info.picker!.id,
       action: '領取',
       preparationEmployeeId: state_info.preparer!.id,
-      doorModel: state_info.doorModelName!,
+      // doorModel: state_info.doorModelName!,
+      doorModel: JSON.stringify(state_info.doorModelName),
       requirementRecordId: requirementRecordId || null,
-
       pickupRecordDetails,
       totalQuantity: Number(state_info.doorQty || 0),
     };
 
     if (isNew) {
-      await apiPostElectronicSuppliesPickupRecord(data_electronicSupplies.id, body).then(async (res) => {
-        router.replace({
-          query: {
-            ...query,
-            pickupRecordId: res.id,
-          },
-        });
-        setDisabled(true);
-      });
-    } else if (!data_pickup?.id) {
+      await apiPostElectronicSuppliesPickupRecord(data_electronicSupplies.id, body);
+      router.back();
+
+      return;
+    }
+
+    if (!data_pickup?.id) {
       myAlert.err({ title: '沒有領取單id' });
 
       return;
-    } else {
-      await apiPatchElectronicSuppliesPickupRecord(data_pickup.id, body).then(async () => {
-        await update_pickup();
-        setDisabled(true);
-      });
     }
+
+    await apiPatchElectronicSuppliesPickupRecord(data_pickup.id, body);
+    await update_pickup();
+    setDisabled(true);
   };
 
   // ------------------------------------------------------------------
@@ -260,9 +241,22 @@ export default function EditElectronicSuppliesPickup({
     });
   };
 
+  const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
+    setState_electronicItemList((state) => {
+      return {
+        ...state,
+        [key]: {
+          ...state[key],
+          categoryParam: categoryParam,
+        },
+      };
+    });
+  };
+
   const replaceState = () => {
     let requirementRecords = data_electronicSupplies?.requirementRecords ?? [];
 
+    // 預期只會有一個
     requirementRecords = requirementRecords.filter((record) => {
       return requirementRecordId?.includes(record.id);
     });
@@ -275,13 +269,14 @@ export default function EditElectronicSuppliesPickup({
     const list: { [key: string]: Tstate_electronicItem } = {};
 
     detailArr.forEach((detail) => {
-      const { category, itemName, quantity, unit, code } = detail;
+      const { category, itemName, quantity, unit, code, categoryParam } = detail;
 
       const subItemName = itemName === '控制箱/盤' ? '捲門/水閘門' : undefined;
 
       if (!list[category]) {
         list[category] = {
           category,
+          categoryParam: categoryParam ?? '',
           itemName,
           quantity: quantity || 0,
           unit,
@@ -293,12 +288,36 @@ export default function EditElectronicSuppliesPickup({
       }
     });
 
+    const dooprTypeArr = (() => {
+      const doorType = requirementRecords[0].doorType;
+      let arr: string[] = [];
+
+      if (doorType) {
+        try {
+          arr = JSON.parse(doorType);
+        } catch (error) {
+          arr = [doorType];
+        }
+      }
+
+      return arr;
+    })();
+
     setState_electronicItemList(list);
+    setState_info((state) => ({ ...state, doorModelName: dooprTypeArr }));
   };
 
   // ------------------------------------------------------------------
 
-  const groupArr = useStateToGroup(Object.values(state_electronicItemList), editItemQty);
+  const groupArr = useStateToGroup({
+    stateArr: Object.values(state_electronicItemList),
+    handler_editItemQty: editItemQty,
+    handler_editCategoryValue: editCategoryValue,
+    disabled,
+  });
+  //
+  // Object.values(state_electronicItemList),
+  // editItemQty
 
   // ------------------------------------------------------------------
   // region PROPS
@@ -405,7 +424,8 @@ export default function EditElectronicSuppliesPickup({
         indexNumber: data_pickup.number || '',
         picker: data_pickup.preparationEmployee || undefined,
         preparer: data_pickup.takeOffEmployee || undefined,
-        doorModelName: data_pickup.doorModel ?? '',
+        // doorModelName: data_pickup.doorModel ?? '',
+        doorModelName: data_pickup.addition.doorTypeArr ?? [],
         doorQty: String(data_pickup.totalQuantity ?? '') as Tstate_info['doorQty'],
       };
     }
@@ -440,7 +460,7 @@ export default function EditElectronicSuppliesPickup({
             className="global_tip_must"
             caption="領取日期"
             {...config_inputSel}
-            disabled={true}
+            disabled={disabled}
             datePickerProps={{
               props: {
                 value: state_info.date,
@@ -490,7 +510,7 @@ export default function EditElectronicSuppliesPickup({
               },
             }}
           />
-          <InputSel
+          {/* <InputSel
             className="global_tip_must"
             caption="門型"
             {...config_inputSel}
@@ -505,7 +525,7 @@ export default function EditElectronicSuppliesPickup({
                 },
               },
             }}
-          />
+          /> */}
           <InputSel
             caption="樘數"
             {...config_inputSel}
@@ -521,11 +541,32 @@ export default function EditElectronicSuppliesPickup({
               },
             }}
           />
+
+          <InputSel
+            className="global_tip_must col-span-2"
+            caption="門型"
+            {...config_inputSel}
+            disabled={disabled}
+            showBaseline="invisible"
+            node={
+              <AntdSelect
+                className="w-full"
+                mode="multiple"
+                allowClear
+                disabled={disabled}
+                value={state_info.doorModelName}
+                onChange={(arr: string[]) => {
+                  setState_info((state) => ({ ...state, doorModelName: arr }));
+                }}
+                options={options_doorModel}
+              />
+            }
+          />
         </div>
 
         {isNew && (
           <div className={classNames(scss.selectBar, disabled && 'invisible')}>
-            <Select
+            <AntdSelect
               placeholder="請選擇需求單"
               size="large"
               // className="w-96"
