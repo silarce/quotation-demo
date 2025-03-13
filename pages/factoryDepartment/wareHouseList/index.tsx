@@ -117,6 +117,8 @@ export default function WareHouseList() {
         },
     ];
 
+
+    //頁面進入
     useEffect(() => {
         // setting.apipath = process.env.NEXT_PUBLIC_API_NETCORE_URL || '';
         // setting.apipath = "https://localhost:44383";
@@ -267,6 +269,9 @@ export default function WareHouseList() {
             case '一般倉庫':
             // router.push({
             //     pathname: `/factoryDepartment/noTrayList`,
+            //     query:{
+            //         item: JSON.stringify(item),
+            //     }
             // });
             router.push({
                 pathname: `/factoryDepartment/trayList`,
