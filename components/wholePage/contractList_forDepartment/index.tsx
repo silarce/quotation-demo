@@ -163,7 +163,16 @@ export default function ContractList_forDepartment({ targetUrl }: { targetUrl: s
   };
   // -----------------------
 
-  const panelList: TpanelList = [{ searchGroup }];
+  const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '建立工程聯絡單',
+      onClick: () => {
+        router.push('/worksDepartment/contractList/createWorkContactDoc');
+      },
+    },
+    { searchGroup },
+  ];
 
   // ===================================================
 

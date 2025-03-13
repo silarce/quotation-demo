@@ -31,7 +31,11 @@ export default function CertifiedDocument_page() {
 
   // -------------------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     customPopulate: [
       //
       'content.customer',
@@ -51,9 +55,10 @@ export default function CertifiedDocument_page() {
   return (
     <SubLayer>
       <PageHeader
-        returnBtn={!editCertifiedDocument}
+        showReturnBtn={!editCertifiedDocument}
         panelList={compositionPanelList}
         contractNumber={contract?.engineeringContact?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
       />
 
       <div>

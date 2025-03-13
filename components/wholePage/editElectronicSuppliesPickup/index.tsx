@@ -107,7 +107,11 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: data_contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     // customPopulate: [
     //   //
     //   'engineeringContact',
@@ -422,9 +426,10 @@ export default function EditElectronicSuppliesPickup({
       {CustomPageHeader && <CustomPageHeader disabled={disabled} />}
       {!CustomPageHeader && (
         <PageHeader
-          returnBtn={disabled}
+          showReturnBtn={disabled}
           panelList={panelList}
           contractNumber={data_contract?.contractNumber ?? '---'}
+          contactThatSkipContract={contactThatSkipContract}
         />
       )}
 

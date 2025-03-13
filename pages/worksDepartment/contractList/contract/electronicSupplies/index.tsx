@@ -79,7 +79,11 @@ export default function ElectronicSupplies() {
 
   // ------------------------------------------------------------------
 
-  const { data: contract, update } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     customPopulate: [
       //
       'engineeringContact',
@@ -184,7 +188,11 @@ export default function ElectronicSupplies() {
 
   return (
     <SubLayer isLoading_subLayer={isFetching_electronicSupplies}>
-      <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? '---'} />
+      <PageHeader
+        panelList={panelList}
+        contractNumber={contract?.contractNumber ?? '---'}
+        contactThatSkipContract={contactThatSkipContract}
+      />
       <div className={scss.container}>
         <Profile
           projectNumber={projectNumber}

@@ -99,7 +99,7 @@ export default function Edit({
   const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
   // ----------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId);
+  const { data: contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
   const engineeringContactId = contract?.engineeringContactId;
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
@@ -492,11 +492,12 @@ export default function Edit({
   return (
     <SubLayer isLoading_all={isLoading}>
       <PageHeader
-        returnBtn={isReadonly ? false : disabled}
+        showReturnBtn={isReadonly ? false : disabled}
         panelList={isReadonly ? undefined : panelList}
-        tagCallback={tagCallback}
+        createTagLable={tagCallback}
         contractNumber={contract?.content.quotationNumber}
         linkForbidden={isReadonly}
+        contactThatSkipContract={contactThatSkipContract}
       />
 
       <div>

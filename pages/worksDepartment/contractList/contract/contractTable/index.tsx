@@ -103,7 +103,11 @@ export default function ContracTable({
 
   // -------------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     customPopulate: ['subContracts.content.products.rootProdductId'],
   });
   const engineeringContactId = contract?.engineeringContactId;
@@ -220,7 +224,10 @@ export default function ContracTable({
   // -------------------------------------------------------------
   return (
     <SubLayer isLoading_subLayer={isLoading}>
-      <PageHeader contractNumber={engineeringContact?.contractNumber ?? ''} />
+      <PageHeader
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
+      />
 
       <div className={scss.main}>
         <h1 className="text-9xl">施工中</h1>

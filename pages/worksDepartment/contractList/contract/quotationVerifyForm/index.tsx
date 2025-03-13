@@ -27,7 +27,11 @@ export default function QuotationVerifyForm() {
   const { contractId } = query;
 
   // ------------------------------------------------------------------------
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     customPopulate: [
       //
       'content.verifyForm',
@@ -65,6 +69,7 @@ export default function QuotationVerifyForm() {
       <PageHeader
         //  panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
       />
 
       <div className="w-[1000px]">
