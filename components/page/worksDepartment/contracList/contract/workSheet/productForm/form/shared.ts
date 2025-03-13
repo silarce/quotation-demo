@@ -121,13 +121,14 @@ const getSvgUrl_headBox2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHea
   } else if (isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
     name = '機械箱';
-  } else if (!isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '機械箱.svg');
-    name = '機械箱';
-  } else if (!isIntegratedHeadBox && !hasWheel) {
-    url = createAssetUrl('head-box', '機械箱.svg');
-    name = '機械箱';
   }
+  // else if (!isIntegratedHeadBox && hasWheel) {
+  //   url = createAssetUrl('head-box', '機械箱.svg');
+  //   name = '機械箱';
+  // } else if (!isIntegratedHeadBox && !hasWheel) {
+  //   url = createAssetUrl('head-box', '機械箱.svg');
+  //   name = '機械箱';
+  // }
 
   return { url, name };
 };
