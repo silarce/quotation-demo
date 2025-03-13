@@ -138,6 +138,7 @@ export default function OutboundOrder({
     data: contract,
     update: update_contract,
     isFetching: isFetching_contract,
+    contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: [
       //
@@ -668,7 +669,10 @@ export default function OutboundOrder({
 
   return (
     <SubLayer isLoading_all={isLoading || isFetching_contract || isFetching_finalProduct}>
-      <PageHeader contractNumber={engineeringContact?.contractNumber ?? ''} />
+      <PageHeader
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
+      />
 
       <div>
         <div className={style.outboundOrder}>

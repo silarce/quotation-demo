@@ -13,7 +13,9 @@ import type { TquotationProductItemDto, TworksheetRecordDto, TquotationProductCo
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { calcFullHeight, calcAngleIronSize } from 'js/utils/product/calc';
-import { lookup_motorPhase, getProductHeadBoxImgUrl } from 'config/product/lookup';
+import { lookup_motorPhase } from 'config/product/lookup';
+import { getProductHeadBoxImgUrl } from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/shared';
+
 import { doorModelDict } from 'js/utils/options/productOptions';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
@@ -136,7 +138,8 @@ const useControl_pdf = ({
         isIntegratedHeadBox: !!item.isIntegratedHeadBox,
         hasWheel: !!item.hasWheel,
         headBoxTopCover: !!item.headBoxTopCover,
-        headBoxCover: item.headBoxCover,
+        headBoxCover: item.headBoxCover || 'none',
+        sizeB: item.boxB,
       });
 
       const parameter: Parameters<typeof updatePath>[0] = {};
@@ -180,6 +183,7 @@ const createPdfItem = ({
     hasWheel,
     headBoxTopCover,
     headBoxCover,
+    boxB,
   } = item;
 
   const phaseVoltage = `${lookup_motorPhase[String(motorPhase) as '1' | '3'] ?? ''} ${motorVoltage}V`;
@@ -193,7 +197,8 @@ const createPdfItem = ({
     isIntegratedHeadBox: !!isIntegratedHeadBox,
     hasWheel: !!hasWheel,
     headBoxTopCover: !!headBoxTopCover,
-    headBoxCover: headBoxCover,
+    headBoxCover: headBoxCover ?? 'none',
+    sizeB: boxB,
   });
 
   const componentList = (() => {
@@ -390,7 +395,8 @@ const createPdfSpecialItem = ({
     isIntegratedHeadBox: !!isIntegratedHeadBox,
     hasWheel: !!hasWheel,
     headBoxTopCover: !!headBoxTopCover,
-    headBoxCover: headBoxCover,
+    headBoxCover: headBoxCover ?? 'none',
+    sizeB: boxB,
   });
 
   const headBoxSvgString1 = assetDict[url_headBox1.name || 'null'] || null;

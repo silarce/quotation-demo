@@ -106,7 +106,7 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id(contractId);
+  const { data: data_contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
 
   const {
     data: data_requirementRecord,
@@ -417,7 +417,12 @@ export default function EditRequirementRecord() {
     <SubLayer
     // isLoading_subLayer={isFetching_requirementRecord} api回應很快，不需要
     >
-      <PageHeader returnBtn={disabled} panelList={panelList} contractNumber={data_contract?.contractNumber ?? '---'} />
+      <PageHeader
+        showReturnBtn={disabled}
+        panelList={panelList}
+        contractNumber={data_contract?.contractNumber ?? '---'}
+        contactThatSkipContract={contactThatSkipContract}
+      />
 
       <div className={scss.container}>
         {/* info */}

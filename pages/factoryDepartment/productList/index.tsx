@@ -37,49 +37,28 @@ import icon_add2 from 'public/image/icon/fc_add2.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
+import { original } from 'immer/src/internal';
 
 type Tquery = {
     wareHouseId: string | undefined;
 };
 
 export default function ProductList() {
+    //#region ===========【頁面參數】
 
-    //路由參數
+    //#endregion
+    //#region ===========【路由參數】
     const router = useRouter();
     const {
-        firstin,
-        prodreceiptuuid,
-        prodreceiptid,
-        purchaseorderuuid,
-        purchaseorderid,
-        purchaseordercreate_at,
-        purchaseordercreate_by,
-        create_by,
-        inspected,
-        suppliername,
-        suppliertaxid,
-        supplieraddress,
-        supplierphone,
-        invoice,
-        status,
-        entrystatus,
-        paystatus,
-        note
+        firstin
     } = router.query;
 
 
-    // 路由參數排除
-    const getQueryParam = (param: any) => {
-        if (Array.isArray(param)) {
-            return param[0];
-        }
-        return param;
-    };
-
-
-    //登入者資料
+    //#endregion
+    //#region ===========【登入者】
     const { userInfo } = useContext(AppContext);
-    //資料列宣告
+    //#endregion
+    //#region ===========【變數宣告】
     const [data, setData] = useState<any[]>([]);
     const [datarestore, setDatarestore] = useState<any[]>([]);
     const [data1, setData1] = useState<any[]>([]);
@@ -121,6 +100,7 @@ export default function ProductList() {
     const [entrystatusin, setEntrystatusin] = useState<string>("");
     const [paystatusin, setPaystatusin] = useState<string>("");
     const [notein, setNotein] = useState<string>("");
+    const [productuuidin, setProductuuidin] = useState<string>("");
     const [productnamein, setProductnamein] = useState<string>("");
     const [productidin, setProductidin] = useState<string>("");
     const [productspecin, setProductspecin] = useState<string>("");
@@ -165,6 +145,7 @@ export default function ProductList() {
     const [totalpayprice, setTotalPayPrice] = useState<string>("");
 
     // 保存原始值
+    const [originalproductuuidin, setOriginalproductuuidin] = useState(productnamein);
     const [originalproductnamein, setOriginalproductnamein] = useState(productnamein);
     const [originalproductidin, setOriginalproductidin] = useState(productidin);
     const [originalproductspecin, setOriginalproductspecin] = useState(productspecin);
@@ -193,6 +174,8 @@ export default function ProductList() {
     const [handinputmaterialname, setHandinputmaterialname] = useState<string>("");
     const [handinputsurfacecodename, setHandinputsurfacecodename] = useState<string>("");
     const [handinputsurfacename, setHandinputsurfacename] = useState<string>("");
+
+    //#endregion
 
     //入庫總數
     const [totalentry, setTotalentry] = useState<string>("");
@@ -268,8 +251,12 @@ export default function ProductList() {
             setError(error.message);
         }
     };
-
-
+    //#region ===========【頁面進入】
+    useEffect(() => {
+        getProduct();
+        getProductidType();
+    }, []);
+    //#endregion
 
 
     //新增按鈕
@@ -290,7 +277,7 @@ export default function ProductList() {
     ];
     //#endregion
 
-    //#region call api
+    //#region ===========【API】
     //取進貨單主檔
     const getProduct = async () => {
         try {
@@ -366,14 +353,6 @@ export default function ProductList() {
             setIsLoading(false);
         }
     };
-
-
-    useEffect(() => {
-        getProduct();
-        getProductidType();
-    }, []);
-
-
 
     //取對應的進貨明細
     const getProdReceiptDetail = async (prodreceiptuuid: any) => {
@@ -545,6 +524,69 @@ export default function ProductList() {
         }
     };
 
+    //刪除料號
+    const Delete = async (id: any) => {
+        try {
+            const conditionModel = {
+                id: id
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/DeleteProduct`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                // 成功，顯示提示
+                myAlert.success({ title: result.message });
+                getProduct();
+                setProductuuidin('');
+                setProductnamein('');
+                setProductidin('');
+                setProductspecin('');
+                setMaterialin('');
+                setUnitin('');
+                setSurfacein('');
+                setOldProductid('');
+                setEditmain(false);
+            } else {
+                // 失敗，顯示錯誤提示
+                console.log(result.message);
+                myAlert.warning({ title: '失敗', content: result.message });
+            }
+
+
+
+
+
+        } catch (error: any) {
+            setError(error.message);
+            console.log(error.message);
+        }
+        finally {
+            // setIsLoading(false);
+        }
+    }
+
+    //#endregion
 
     //#endregion
     // 轉為進貨單，開始驗收
@@ -697,6 +739,7 @@ export default function ProductList() {
     // 主檔編輯
     const handleEdit = () => {
         // 進入編輯模式時保存原始值
+        setOriginalproductuuidin(productuuidin);
         setOriginalproductnamein(productnamein);
         setOriginalproductidin(productidin);
         setOriginalproductspecin(productspecin);
@@ -723,6 +766,7 @@ export default function ProductList() {
             </>,
             props: {
                 onOk: () => {
+                    setProductuuidin(originalproductuuidin);
                     setProductnamein(originalproductnamein);
                     setProductidin(originalproductidin);
                     setProductspecin(originalproductspecin);
@@ -837,6 +881,17 @@ export default function ProductList() {
         });
 
     };
+
+    const handleDelete = async (id: any) => {
+        myAlert.confirm({
+            title: '確定要刪除嗎?', content: null,
+            props: {
+                onOk: async () => {
+                    Delete(id);
+                }
+            }
+        })
+    }
 
 
     const filterData = () => {
@@ -969,7 +1024,7 @@ export default function ProductList() {
 
             handleRowClick(item.productid);
             console.log(item);
-
+            setProductuuidin(item.id);
             setProductnamein(item.name);
             setProductidin(item.productid);
             setProductspecin(item.spec);
@@ -1654,8 +1709,8 @@ export default function ProductList() {
                 <div className={scss.right}>
 
                     <div className={scss.content} style={{ overflowY: 'auto' }}>
-                        
-                        <div style={{ top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
+
+                        <div style={{ top: 0, left: 0, width: '100%', backgroundColor: 'white', padding: '0px 20px' }}>
                             <InputSel
                                 {...inputSelProps}
                                 caption="物料筆數"
@@ -1774,7 +1829,12 @@ export default function ProductList() {
                                             <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.minibtn} onClick={handleEdit}>
                                                 編輯
                                             </button>
-
+                                            &nbsp;
+                                            <button style={{ display: `${editmain ? 'none' : ''}` }} className={scss.miniredbtn} onClick={() => {
+                                                handleDelete(productuuidin);
+                                            }}>
+                                                刪除
+                                            </button>
                                             <button style={{ display: `${editmain ? '' : 'none'}` }} className={scss.miniredbtn} onClick={handleSave}>
                                                 儲存
                                             </button>
