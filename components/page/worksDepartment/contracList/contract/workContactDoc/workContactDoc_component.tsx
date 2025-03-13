@@ -34,8 +34,10 @@ import {
   TengineeringContactDto,
   TupdateEngineeringContactDto,
   TengineeringContactAttachmentType,
+  TcreateEngineeringContactIndependent,
   useGetEngineeringContact,
   apiPatchEngineeringContact,
+  apiPostEngineeringContactIndependent,
 } from 'js/api/api_engineering';
 
 import { TquotationProductDto, TquotationContractDto } from 'js/api/api_quotation';
@@ -84,6 +86,7 @@ type TonStateChange = (props: {
 
 type TimperativeHandle = {
   reqPatch: () => Promise<void>;
+  reqPost: () => Promise<{ contractNumber: string } | void>;
   closePattern: () => void;
   setDisabled: (state: boolean) => void;
   openPdf: () => void;
@@ -93,79 +96,63 @@ type TshouldPatternList = {
   [key in TengineeringContactAttachmentType]: boolean;
 };
 
-export type { TimperativeHandle, TonStateChange };
+type TstateContact = {
+  contactPerson: string;
+  contactNumber: string;
+};
 
 // ============================================================================
 
 const WorkContactDoc_component = forwardRef(PreWorkContactDoc_component);
 
-// _________________________________________
+// MARK:START
+
 function PreWorkContactDoc_component(
   {
     contract,
     engineeringContactId,
     onStateChange,
-    isOnlyControlContactInfo = false,
+    onlyAllowEditContact = false,
+    showProd = true,
+    showPatternPanel = true,
   }: {
     contract: TquotationContractDto | undefined;
     engineeringContactId: string | undefined | null;
-    onStateChange: TonStateChange;
-    isOnlyControlContactInfo?: boolean;
+    onStateChange?: TonStateChange;
+    // 只允許編輯聯絡人
+    onlyAllowEditContact?: boolean;
+    showProd?: boolean;
+    showPatternPanel?: boolean;
   },
   ref: React.ForwardedRef<unknown>
 ) {
-  // const { userInfo } = useContext(AppContext);
-
-  // let isReviewer_worker = false;
-  // let isReviewer_manager = false;
-
   // ---------------------------------------------------------------------------
 
   const router = useRouter();
   const { contractId } = router.query as Tquery;
-
-  const [disabled, setDisabled] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const [showAnnoSelector, setShowAnnoSelector] = useState(false);
-
-  const [isShowPattern, setIsShowPattern] = useState(false);
-
-  const showPattern = () => {
-    setDisabled(true);
-    setIsShowPattern(true);
-  };
-
-  useImperativeHandle(
-    ref,
-    (): TimperativeHandle => ({
-      reqPatch,
-      closePattern: () => setIsShowPattern(false),
-      setDisabled,
-      openPdf: () => setPdfModalVisible(true),
-    })
-  );
 
   // ---------------------------------------------------------------------------
 
   /**data裡只會有一筆資料 */
   const { data: engineeringContact, update: update_engineeringContact } =
     useGetEngineeringContact(engineeringContactId);
-  useEffect(() => {
-    (async () => {
-      try {
-        await update_engineeringContact();
-      } catch (error) {
-        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
-      }
-    })();
-  }, [contractId, engineeringContactId]);
-
-  // engineeringContact?.reviewWorkerEmployee?.id === userInfo?.employee?.id && (isReviewer_worker = true);
-
-  // engineeringContact?.reviewManagerEmployee?.id === userInfo?.employee?.id && (isReviewer_manager = true);
 
   // ---------------------------------------------------------------------------
+
+  const [disabled, setDisabled] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [showAnnoSelector, setShowAnnoSelector] = useState(false);
+  const [isShowPattern, setIsShowPattern] = useState(false);
+  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+
+  const { profile, setProfile, profileChange } = useProfile();
+  const { contactArr, setContactArr, onAddClick } = useContactArr();
+  const { annoArr, setAnnoArr, onConfirm_anno } = useAnnoArr();
+  const { shouldHasPattern, setShouldHasPattern, hasPattern, setHasPattern, onPatternChange, editShouldHasPattern } =
+    useHasPattern();
+
+  // ----------------------------------------------------------------------------
 
   const { productArr, latestQuotationDiscount } = useMemo(() => {
     const list: { [key: string]: TquotationProductDto } = {};
@@ -212,12 +199,11 @@ function PreWorkContactDoc_component(
   }, [productArr]);
 
   const {
-    //
     productList,
     prodCellConfig,
     prodKeyArr,
     changeProdKeyArr,
-    //
+
     othersKeyArr,
     othersList,
     othersCellConfig,
@@ -230,222 +216,85 @@ function PreWorkContactDoc_component(
     discount_fromData: Number(latestQuotationDiscount) || 100,
   });
 
-  // ---------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // region API
 
-  // ---------------------------------------------------------------------------
-
-  useEffect(() => {
-    onStateChange &&
-      onStateChange({
-        disabled,
-        isLoading,
-        isShowPattern,
-        contractNumber: engineeringContact?.contractNumber ?? '',
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, isLoading, isShowPattern, engineeringContact?.contractNumber]);
-
-  // ---------------------------------------------------------------------------
-
-  const [shouldHasPattern, setShouldHasPattern] = useState<TshouldPatternList>({
-    // signature: false,
-    floor: false,
-    detail: false,
-    color: false,
-    construction: false,
-    design: false,
-  });
-
-  const [hasPattern, setHasPattern] = useState<ThasPattern>({
-    hasFloor: false,
-    hasDetail: false,
-    hasColor: false,
-    hasConstruction: false,
-    hasDesign: false,
-  });
-
-  const onPatternChange = (hasPattern: ThasPattern) => {
-    setHasPattern(hasPattern);
-  };
-
-  const editShouldHasPattern = (bool: boolean, key: keyof TshouldPatternList) => {
-    setShouldHasPattern((state) => {
-      return {
-        ...state,
-        [key]: bool,
-      };
-    });
-  };
-
-  useEffect(() => {
-    const {
-      // shouldHasSignature,
-      shouldHasColor,
-      shouldHasConstruction,
-      shouldHasDetail,
-      shouldHasFloor,
-      shouldHasDesign,
-    } = engineeringContact ?? {};
-
-    setShouldHasPattern({
-      floor: shouldHasFloor ?? false,
-      detail: shouldHasDetail ?? false,
-      color: shouldHasColor ?? false,
-      construction: shouldHasConstruction ?? false,
-      design: shouldHasDesign ?? false,
-    });
-  }, [engineeringContact]);
-
-  // const patternReviewStatus: TpatternReviewStatus = useMemo(() => {
-  //   const {
-  //     reviewWorkerEmployee,
-  //     reviewManagerEmployee,
-
-  //     detailToWorkerAt = null,
-  //     detailWorkerReviewedAt = null,
-  //     detailToManagerAt = null,
-  //     detailManagerReviewedAt = null,
-
-  //     designToWorkerAt = null,
-  //     designWorkerReviewedAt = null,
-  //     designToManagerAt = null,
-  //     designManagerReviewedAt = null,
-
-  //     floorToWorkerAt = null,
-  //     floorWorkerReviewedAt = null,
-  //     floorToManagerAt = null,
-  //     floorManagerReviewedAt = null,
-
-  //     constructionToWorkerAt = null,
-  //     constructionWorkerReviewedAt = null,
-  //     constructionToManagerAt = null,
-  //     constructionManagerReviewedAt = null,
-
-  //     colorToWorkerAt = null,
-  //     colorWorkerReviewedAt = null,
-  //     colorToManagerAt = null,
-  //     colorManagerReviewedAt = null,
-  //   } = engineeringContact ?? {};
-
-  //   return {
-  //     salesName: contract?.content.reviewSalesEmployee?.chName ?? '',
-  //     workerName: reviewWorkerEmployee?.chName ?? '',
-  //     managerName: reviewManagerEmployee?.chName ?? '',
-  //     pattern: {
-  //       color: {
-  //         colorToWorkerAt,
-  //         colorWorkerReviewedAt,
-  //         colorToManagerAt,
-  //         colorManagerReviewedAt,
-  //       },
-  //       construction: {
-  //         constructionToWorkerAt,
-  //         constructionWorkerReviewedAt,
-  //         constructionToManagerAt,
-  //         constructionManagerReviewedAt,
-  //       },
-  //       detail: {
-  //         detailToWorkerAt,
-  //         detailWorkerReviewedAt,
-  //         detailToManagerAt,
-  //         detailManagerReviewedAt,
-  //       },
-  //       floor: {
-  //         floorToWorkerAt,
-  //         floorWorkerReviewedAt,
-  //         floorToManagerAt,
-  //         floorManagerReviewedAt,
-  //       },
-  //       design: {
-  //         designToWorkerAt,
-  //         designWorkerReviewedAt,
-  //         designToManagerAt,
-  //         designManagerReviewedAt,
-  //       },
-  //     },
-  //   };
-  // }, [engineeringContact]);
-
-  // ---------------------------------------------------------------------------
-
-  const [profile, setProfile] = useState<Tprofile>();
-
-  const profileChange = (key: keyof Tprofile, v: string) => {
-    setProfile((profile) => {
-      if (!profile) {
-        return;
-      }
-
-      const newProfile = { ...profile };
-      newProfile[key] = v;
-
-      return newProfile;
-    });
-  };
-
-  // ---------------------------------------------------------------------------
-
-  const [annoArr, setAnnoArr] = useState<string[]>([]);
-
-  const control_anno: Tcontroll_textListEditor = {
-    stringArr: annoArr,
-    editString: (index, v) => {
-      setAnnoArr((arr) => {
-        const newAnnoArr = [...arr];
-        newAnnoArr[index] = v;
-
-        return newAnnoArr;
-      });
-    },
-    delString: (index) => {
-      setAnnoArr((arr) => {
-        const newAnnoArr = [...arr];
-        newAnnoArr.splice(index, 1);
-
-        return newAnnoArr;
-      });
-    },
-    addString: (v) => {
-      setAnnoArr((arr) => {
-        const newAnnoArr = [...arr];
-        newAnnoArr.push(v);
-
-        return newAnnoArr;
-      });
-    },
-    showSelector: () => setShowAnnoSelector(true),
-  };
-
-  const onConfirm_anno = (v: TgetAnnotation['data']) => {
-    const vArr = v.map((item) => item.description);
-
-    if (!vArr[0]) {
-      vArr[0] = '';
+  const reqPatch = async () => {
+    if (!engineeringContact) {
+      return;
     }
 
-    setAnnoArr((arr) => {
-      const newAnnoArr = [...arr];
-      newAnnoArr.push(...vArr);
+    const body: TupdateEngineeringContactDto = {
+      ...profile,
+      annotations: annoArr,
+      contactInfo: contactArr,
 
-      return newAnnoArr;
-    });
+      shouldHasColor: shouldHasPattern.color,
+      shouldHasConstruction: shouldHasPattern.construction,
+      shouldHasDetail: shouldHasPattern.detail,
+      shouldHasFloor: shouldHasPattern.floor,
+      shouldHasDesign: shouldHasPattern.design,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPatchEngineeringContact(engineeringContact.id, body);
+      await update_engineeringContact();
+      setDisabled(true);
+    } catch (error) {
+      myAlert.err({ title: '更新工程聯絡單失敗' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // ---------------------------------------------------------------------------
-  const [contactArr, setContactArr] = useState<{ contactPerson: string; contactNumber: string }[]>([]);
+  // w 用這個api建立的工程聯絡單，會建立一個contract並把工程聯絡單放在該contract下
+  const reqPost: TimperativeHandle['reqPost'] = async () => {
+    if (!profile.projectNumber) {
+      myAlert.info({ title: '請填寫工程編號' });
 
-  const onAddClick = () => {
-    setContactArr((arr) => {
-      const newArr = [...arr];
-      newArr.push({ contactPerson: '', contactNumber: '' });
+      return;
+    }
 
-      return newArr;
-    });
+    const body: TcreateEngineeringContactIndependent = {
+      ...profile,
+      contractNumber: profile.projectNumber,
+      annotations: annoArr,
+      contactInfo: contactArr,
+
+      shouldHasColor: shouldHasPattern.color,
+      shouldHasConstruction: shouldHasPattern.construction,
+      shouldHasDetail: shouldHasPattern.detail,
+      shouldHasFloor: shouldHasPattern.floor,
+      shouldHasDesign: shouldHasPattern.design,
+    };
+
+    try {
+      setIsLoading(true);
+      await apiPostEngineeringContactIndependent(body);
+
+      setDisabled(true);
+
+      return {
+        contractNumber: profile.projectNumber,
+      };
+      // api沒有回應contractId，先註解
+    } catch (error) {
+      myAlert.err({ title: '更新工程聯絡單失敗' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // ---------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+  // region FUNCTION
 
-  const reSet = () => {
+  const showPattern = () => {
+    setDisabled(true);
+    setIsShowPattern(true);
+  };
+
+  const reset = () => {
     if (!engineeringContact) {
       return;
     }
@@ -500,306 +349,34 @@ function PreWorkContactDoc_component(
     });
   };
 
-  useEffect(() => {
-    if (!engineeringContact) {
-      return;
-    }
+  // ----------------------------------------------------------------------------
 
-    reSet();
-  }, [engineeringContact]);
+  // region PROPS
 
-  useEffect(() => {
-    if (disabled) {
-      reSet();
-    }
-  }, [disabled]);
-
-  // ---------------------------------------------------------------------------
-
-  const contactPersonsArr: Tcontroll_profile['contactPersons']['arr'] = contactArr.map((item, index) => {
-    return {
-      contactPerson: {
-        value: item.contactPerson,
-        onChange: (v) => {
-          setContactArr((arr) => {
-            const newArr = [...arr];
-            newArr[index].contactPerson = v;
-
-            return newArr;
-          });
-        },
-      },
-      contactPhone: {
-        value: item.contactNumber,
-        onChange: (v) => {
-          setContactArr((arr) => {
-            const newArr = [...arr];
-            newArr[index].contactNumber = v;
-
-            return newArr;
-          });
-        },
-      },
-      onDelClick: () => {
-        setContactArr((arr) => {
-          const newArr = [...arr];
-          newArr.splice(index, 1);
-
-          return newArr;
-        });
-      },
-    };
+  const control_anno = useControl_anno({
+    annoArr,
+    setAnnoArr,
+    setShowAnnoSelector,
   });
 
-  const controll: Tcontroll_profile = {
-    /**請款狀態 */
-    paymentStatus: {
-      value: profile?.paymentStatus ?? '',
-      onChange: (v) => {
-        profileChange('paymentStatus', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    projectName: {
-      value: profile?.projectName ?? '',
-      onChange: (v) => {
-        profileChange('projectName', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    /**工程內容 */
-    projectContent: {
-      value: profile?.projectContent ?? '',
-      onChange: (v) => {
-        profileChange('projectContent', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    // 工程圖表
-    projectPattern: {
-      disabled: isOnlyControlContactInfo,
-      onCaptionClick: showPattern,
-      statusArr: [
-        {
-          label: '簽認圖',
-          haveData: hasPattern.hasDetail,
-          shouldHaveData: shouldHasPattern.detail,
-          onCheck: (bool) => {
-            editShouldHasPattern(bool, 'detail');
-          },
-          reviewStatus: checkStatus({
-            review_status: engineeringContact?.detailStatus,
-          }),
-        },
-        {
-          label: '平面圖',
-          haveData: hasPattern.hasFloor,
-          shouldHaveData: shouldHasPattern.floor,
-          onCheck: (bool) => {
-            editShouldHasPattern(bool, 'floor');
-          },
-          reviewStatus: checkStatus({
-            review_status: engineeringContact?.floorStatus,
-          }),
-        },
-        {
-          label: '設計圖',
-          haveData: hasPattern.hasDesign,
-          shouldHaveData: shouldHasPattern.design,
-          onCheck: (bool) => {
-            editShouldHasPattern(bool, 'design');
-          },
-          reviewStatus: checkStatus({
-            review_status: engineeringContact?.designStatus,
-          }),
-        },
-        {
-          label: '施工圖',
-          haveData: hasPattern.hasConstruction,
-          shouldHaveData: shouldHasPattern.construction,
-          onCheck: (bool) => {
-            editShouldHasPattern(bool, 'construction');
-          },
-          reviewStatus: checkStatus({
-            review_status: engineeringContact?.constructionStatus,
-          }),
-        },
-        {
-          label: '色卡',
-          haveData: hasPattern.hasColor,
-          shouldHaveData: shouldHasPattern.color,
-          onCheck: (bool) => {
-            editShouldHasPattern(bool, 'color');
-          },
-          reviewStatus: checkStatus({
-            review_status: engineeringContact?.colorStatus,
-          }),
-        },
-      ],
-    },
-    addressBarProps: {
-      inputSelProps: {
-        caption: '工程地點',
-        disabled: isOnlyControlContactInfo,
-      },
-      addressProps: {
-        zipCode: {
-          props: {
-            value: profile?.zipCode ?? '',
-          },
-        },
-        county: {
-          props: {
-            isDisabled: disabled || isOnlyControlContactInfo,
-            value: profile?.county ? { value: profile.county, label: profile.county } : null,
-            onChange: (option) => {
-              const value = option ? option.value : '';
-              profileChange('county', value);
-              profileChange('district', '');
-              profileChange('zipCode', '');
-            },
-          },
-        },
-        district: {
-          easyValue: profile?.district ?? null,
-          props: {
-            isDisabled: disabled || isOnlyControlContactInfo,
-            value: profile?.district ? { value: profile.district, label: profile.district } : null,
-            onChange: (option) => {
-              if (!option) {
-                return;
-              }
+  const contactPersonsArr = useContactPersonsArr({
+    contactArr,
+    setContactArr,
+  });
 
-              const value = option ? option.value : '';
-              profileChange('district', value);
-              profileChange('zipCode', option.zipCode ?? '');
-            },
-          },
-        },
-        address: {
-          props: {
-            disabled: disabled || isOnlyControlContactInfo,
-            value: profile?.address ?? '',
-            onChange: (e) => {
-              profileChange('address', e.target.value);
-            },
-          },
-        },
-      },
-    },
-    //
-    /**工程負責人 */
-    projectPerson: {
-      value: profile?.projectPrincipal ?? '',
-      onChange: (v) => {
-        profileChange('projectPrincipal', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    /**工程負責人聯絡電話 */
-    projectPersonNumber: {
-      value: profile?.constructionSitePrincipalContactNumber ?? '',
-      onChange: (v) => {
-        profileChange('constructionSitePrincipalContactNumber', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    projectFaxNumber: {
-      value: profile?.constructionSiteFaxNumber ?? '',
-      onChange: (v) => {
-        profileChange('constructionSiteFaxNumber', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    /**工地電話 */
-    projectNumber: {
-      value: profile?.constructionSiteContactNumber ?? '',
-      onChange: (v) => {
-        profileChange('constructionSiteContactNumber', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-
-    //
-    //
-    /**工程編號 */
-    engineeringNumber: {
-      value: profile?.projectNumber ?? '',
-      onChange: (v) => {
-        profileChange('projectNumber', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    /**承包商 */
-    contractor: {
-      value: profile?.contractor ?? '',
-      onChange: (v) => {
-        profileChange('contractor', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    /**負責人 */
-    principal: {
-      value: profile?.contractorPrincipal ?? '',
-      onChange: (v) => {
-        profileChange('contractorPrincipal', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    /**公司電話 */
-    contactNumber: {
-      value: profile?.contractorContactNumber ?? '',
-      onChange: (v) => {
-        profileChange('contractorContactNumber', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    faxNumber: {
-      value: profile?.contractorFaxNumber ?? '',
-      onChange: (v) => {
-        profileChange('contractorFaxNumber', v);
-      },
-      disabled: isOnlyControlContactInfo,
-    },
-    //
-    contactPersons: {
-      onAddClick,
-      arr: contactPersonsArr,
-    },
-  };
-
-  // ----------------------------------------------------------------------------
-
-  const reqPatch = async () => {
-    if (!profile || !engineeringContact) {
-      return;
-    }
-
-    const body: TupdateEngineeringContactDto = {
-      ...profile,
-      annotations: annoArr,
-      contactInfo: contactArr,
-
-      shouldHasColor: shouldHasPattern.color,
-      shouldHasConstruction: shouldHasPattern.construction,
-      shouldHasDetail: shouldHasPattern.detail,
-      shouldHasFloor: shouldHasPattern.floor,
-      shouldHasDesign: shouldHasPattern.design,
-    };
-
-    try {
-      setIsLoading(true);
-      await apiPatchEngineeringContact(engineeringContact.id, body);
-      await update_engineeringContact();
-      setDisabled(true);
-    } catch (error) {
-      myAlert.err({ title: '更新工程聯絡單失敗' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // ----------------------------------------------------------------------------
+  const control_profile = useControl_profile({
+    profile,
+    profileChange,
+    readonly: onlyAllowEditContact,
+    showPattern,
+    hasPattern,
+    shouldHasPattern,
+    editShouldHasPattern,
+    engineeringContact,
+    disabled,
+    onAddClick,
+    contactPersonsArr,
+  });
 
   // 把金額隱藏
   const filteredProdKeyArr = prodKeyArr.filter((key) => {
@@ -820,9 +397,74 @@ function PreWorkContactDoc_component(
 
   // ----------------------------------------------------------------------------
 
-  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  // region useEffect
+
+  useEffect(() => {
+    onStateChange &&
+      onStateChange({
+        disabled,
+        isLoading,
+        isShowPattern,
+        contractNumber: engineeringContact?.contractNumber ?? '',
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, isLoading, isShowPattern, engineeringContact?.contractNumber]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await update_engineeringContact();
+      } catch (error) {
+        myAlert.err({ title: '取得工程聯絡單失敗', content: '請確認該合約是否已產生工程聯絡單' });
+      }
+    })();
+  }, [contractId, engineeringContactId]);
+
+  useEffect(() => {
+    const { shouldHasColor, shouldHasConstruction, shouldHasDetail, shouldHasFloor, shouldHasDesign } =
+      engineeringContact ?? {};
+
+    setShouldHasPattern({
+      floor: shouldHasFloor ?? false,
+      detail: shouldHasDetail ?? false,
+      color: shouldHasColor ?? false,
+      construction: shouldHasConstruction ?? false,
+      design: shouldHasDesign ?? false,
+    });
+  }, [engineeringContact]);
+
+  useEffect(() => {
+    if (!engineeringContact) {
+      return;
+    }
+
+    reset();
+  }, [engineeringContact]);
+
+  useEffect(() => {
+    if (disabled) {
+      reset();
+    }
+  }, [disabled]);
 
   // ----------------------------------------------------------------------------
+
+  // MARK:useImperativeHandle
+  useImperativeHandle(
+    ref,
+    (): TimperativeHandle => ({
+      reqPatch,
+      reqPost,
+      closePattern: () => setIsShowPattern(false),
+      setDisabled,
+      openPdf: () => setPdfModalVisible(true),
+    })
+  );
+
+  // ----------------------------------------------------------------------------
+
+  // MARK:RENDER
+
   return (
     <div>
       <PdfModal
@@ -841,43 +483,44 @@ function PreWorkContactDoc_component(
       <div>
         {/* 工程聯絡單 */}
         <div className={classNames(isShowPattern && 'hidden', 'px-12')}>
-          <Profile controll={controll} disabled={disabled} />
+          <Profile controll={control_profile} disabled={disabled} showPatternPanel={showPatternPanel} />
           {/* <WorkProject /> */}
 
-          <Table_prod
-            disabled={true}
-            prodList={productList}
-            prodCellConfig={prodCellConfig}
-            prodKeyArr={filteredProdKeyArr}
-            changeProdKeyArr={changeProdKeyArr}
-            addProd={() => {}}
-            setTargetProd={() => {}}
-            // panelBox="easyBox"
-            panelBox="emptyBox"
-            emptyBlockWidth="40px"
-            rowHeight="h60"
-            isShowDndBtn={false}
-            discountRate={''} // 報價單總折數
-            changeDiscountRate={(v) => {}}
-            hiddenQtyZero={true}
-          />
-          <Table_others
-            disabled={disabled}
-            list={othersList}
-            cellConfig={othersCellConfig}
-            keyArr={filteredOthersKeyArr}
-            changeKeyArr={() => {}}
-            add={() => {}}
-            isShowDndBtn={false}
-            isDisplayInPage="worksDepartment"
-          />
+          {showProd && (
+            <>
+              <Table_prod
+                disabled={true}
+                prodList={productList}
+                prodCellConfig={prodCellConfig}
+                prodKeyArr={filteredProdKeyArr}
+                changeProdKeyArr={changeProdKeyArr}
+                addProd={() => {}}
+                setTargetProd={() => {}}
+                // panelBox="easyBox"
+                panelBox="emptyBox"
+                emptyBlockWidth="40px"
+                rowHeight="h60"
+                isShowDndBtn={false}
+                discountRate={''} // 報價單總折數
+                changeDiscountRate={(v) => {}}
+                hiddenQtyZero={true}
+              />
+              <Table_others
+                disabled={disabled}
+                list={othersList}
+                cellConfig={othersCellConfig}
+                keyArr={filteredOthersKeyArr}
+                changeKeyArr={() => {}}
+                add={() => {}}
+                isShowDndBtn={false}
+                isDisplayInPage="worksDepartment"
+              />
+            </>
+          )}
+
           {/* <Remark /> */}
           <div className={scss.textListContainer}>
-            <TextListEditor_v2
-              label={'備註'}
-              disabled={disabled || isOnlyControlContactInfo}
-              stringObj={control_anno}
-            />
+            <TextListEditor_v2 label={'備註'} disabled={disabled || onlyAllowEditContact} stringObj={control_anno} />
           </div>
         </div>
         {/* 工程圖表資料 */}
@@ -885,7 +528,6 @@ function PreWorkContactDoc_component(
           <ProjectPattern
             engineeringContactId={engineeringContactId}
             onPatternChange={onPatternChange}
-            // patternReviewStatus={patternReviewStatus}
             onSubmitSuccess={update_engineeringContact}
             onReviewSuccess={update_engineeringContact}
             onDeleteSuccess={update_engineeringContact}
@@ -896,8 +538,6 @@ function PreWorkContactDoc_component(
               shouldHasFloor: !!engineeringContact?.shouldHasFloor,
               shouldHasDesign: !!engineeringContact?.shouldHasDesign,
             }}
-            // isReviewer_worker={isReviewer_worker}
-            // isReviewer_manager={isReviewer_manager}
           />
         </div>
       </div>
@@ -914,8 +554,14 @@ function PreWorkContactDoc_component(
   );
 }
 
+// MARK: END
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
 const checkStatus = ({
-  //
   review_status,
 }: {
   review_status:
@@ -938,4 +584,474 @@ const checkStatus = ({
   };
 };
 
+// ================================================================================
+
+// region HOOK
+
+const useProfile = () => {
+  const [profile, setProfile] = useState<Tprofile>(emptyProfile());
+
+  const profileChange = (key: keyof Tprofile, v: string) => {
+    setProfile((profile) => {
+      const newProfile = { ...profile };
+      newProfile[key] = v;
+
+      return newProfile;
+    });
+  };
+
+  return {
+    profile,
+    setProfile,
+    profileChange,
+  };
+};
+
+const useContactArr = () => {
+  const [contactArr, setContactArr] = useState<TstateContact[]>([]);
+
+  const onAddClick = () => {
+    setContactArr((arr) => {
+      const newArr = [...arr];
+      newArr.push({ contactPerson: '', contactNumber: '' });
+
+      return newArr;
+    });
+  };
+
+  return {
+    contactArr,
+    setContactArr,
+    onAddClick,
+  };
+};
+
+const useAnnoArr = () => {
+  const [annoArr, setAnnoArr] = useState<string[]>([]);
+
+  const onConfirm_anno = (v: TgetAnnotation['data']) => {
+    const vArr = v.map((item) => item.description);
+
+    if (!vArr[0]) {
+      vArr[0] = '';
+    }
+
+    setAnnoArr((arr) => {
+      const newAnnoArr = [...arr];
+      newAnnoArr.push(...vArr);
+
+      return newAnnoArr;
+    });
+  };
+
+  return {
+    annoArr,
+    setAnnoArr,
+    onConfirm_anno,
+  };
+};
+
+const useHasPattern = () => {
+  const [shouldHasPattern, setShouldHasPattern] = useState<TshouldPatternList>({
+    floor: false,
+    detail: false,
+    color: false,
+    construction: false,
+    design: false,
+  });
+
+  const [hasPattern, setHasPattern] = useState<ThasPattern>({
+    hasFloor: false,
+    hasDetail: false,
+    hasColor: false,
+    hasConstruction: false,
+    hasDesign: false,
+  });
+
+  const onPatternChange = (hasPattern: ThasPattern) => {
+    setHasPattern(hasPattern);
+  };
+
+  const editShouldHasPattern = (bool: boolean, key: keyof TshouldPatternList) => {
+    setShouldHasPattern((state) => {
+      return {
+        ...state,
+        [key]: bool,
+      };
+    });
+  };
+
+  return {
+    shouldHasPattern,
+    setShouldHasPattern,
+    hasPattern,
+    setHasPattern,
+    onPatternChange,
+    editShouldHasPattern,
+  };
+};
+
+// ================================================================================
+
+const useControl_anno = ({
+  annoArr,
+  setAnnoArr,
+  setShowAnnoSelector,
+}: {
+  annoArr: string[];
+  setAnnoArr: React.Dispatch<React.SetStateAction<string[]>>;
+  setShowAnnoSelector: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  return useMemo(() => {
+    const control_anno: Tcontroll_textListEditor = {
+      stringArr: annoArr,
+      editString: (index, v) => {
+        setAnnoArr((arr) => {
+          const newAnnoArr = [...arr];
+          newAnnoArr[index] = v;
+
+          return newAnnoArr;
+        });
+      },
+      delString: (index) => {
+        setAnnoArr((arr) => {
+          const newAnnoArr = [...arr];
+          newAnnoArr.splice(index, 1);
+
+          return newAnnoArr;
+        });
+      },
+      addString: (v) => {
+        setAnnoArr((arr) => {
+          const newAnnoArr = [...arr];
+          newAnnoArr.push(v);
+
+          return newAnnoArr;
+        });
+      },
+      showSelector: () => setShowAnnoSelector(true),
+    };
+
+    return control_anno;
+  }, [annoArr]);
+};
+
+const useContactPersonsArr = ({
+  contactArr,
+  setContactArr,
+}: {
+  contactArr: TstateContact[];
+  setContactArr: React.Dispatch<React.SetStateAction<TstateContact[]>>;
+}) => {
+  return useMemo(() => {
+    const contactPersonsArr: Tcontroll_profile['contactPersons']['arr'] = contactArr.map((item, index) => {
+      return {
+        contactPerson: {
+          value: item.contactPerson,
+          onChange: (v) => {
+            setContactArr((arr) => {
+              const newArr = [...arr];
+              newArr[index].contactPerson = v;
+
+              return newArr;
+            });
+          },
+        },
+        contactPhone: {
+          value: item.contactNumber,
+          onChange: (v) => {
+            setContactArr((arr) => {
+              const newArr = [...arr];
+              newArr[index].contactNumber = v;
+
+              return newArr;
+            });
+          },
+        },
+        onDelClick: () => {
+          setContactArr((arr) => {
+            const newArr = [...arr];
+            newArr.splice(index, 1);
+
+            return newArr;
+          });
+        },
+      };
+    });
+
+    return contactPersonsArr;
+  }, [contactArr]);
+};
+
+const useControl_profile = ({
+  profile,
+  profileChange,
+  readonly,
+  showPattern,
+  hasPattern,
+  shouldHasPattern,
+  editShouldHasPattern,
+  engineeringContact,
+  disabled,
+  onAddClick,
+  contactPersonsArr,
+}: {
+  profile: Tprofile | undefined;
+  profileChange: (key: keyof Tprofile, v: string) => void;
+  readonly: boolean;
+  showPattern: () => void;
+  hasPattern: ReturnType<typeof useHasPattern>['hasPattern'];
+  shouldHasPattern: ReturnType<typeof useHasPattern>['shouldHasPattern'];
+  editShouldHasPattern: ReturnType<typeof useHasPattern>['editShouldHasPattern'];
+  engineeringContact: TengineeringContactDto | undefined;
+  disabled: boolean;
+  onAddClick: () => void;
+  contactPersonsArr: ReturnType<typeof useContactPersonsArr>;
+}) => {
+  return useMemo(() => {
+    const control_profile: Tcontroll_profile = {
+      /**請款狀態 */
+      paymentStatus: {
+        value: profile?.paymentStatus ?? '',
+        onChange: (v) => {
+          profileChange('paymentStatus', v);
+        },
+        disabled: readonly,
+      },
+      projectName: {
+        value: profile?.projectName ?? '',
+        onChange: (v) => {
+          profileChange('projectName', v);
+        },
+        disabled: readonly,
+      },
+      /**工程內容 */
+      projectContent: {
+        value: profile?.projectContent ?? '',
+        onChange: (v) => {
+          profileChange('projectContent', v);
+        },
+        disabled: readonly,
+      },
+      // 工程圖表
+      projectPattern: {
+        disabled: readonly,
+        onCaptionClick: showPattern,
+        statusArr: [
+          {
+            label: '簽認圖',
+            haveData: hasPattern.hasDetail,
+            shouldHaveData: shouldHasPattern.detail,
+            onCheck: (bool) => {
+              editShouldHasPattern(bool, 'detail');
+            },
+            reviewStatus: checkStatus({
+              review_status: engineeringContact?.detailStatus,
+            }),
+          },
+          {
+            label: '平面圖',
+            haveData: hasPattern.hasFloor,
+            shouldHaveData: shouldHasPattern.floor,
+            onCheck: (bool) => {
+              editShouldHasPattern(bool, 'floor');
+            },
+            reviewStatus: checkStatus({
+              review_status: engineeringContact?.floorStatus,
+            }),
+          },
+          {
+            label: '設計圖',
+            haveData: hasPattern.hasDesign,
+            shouldHaveData: shouldHasPattern.design,
+            onCheck: (bool) => {
+              editShouldHasPattern(bool, 'design');
+            },
+            reviewStatus: checkStatus({
+              review_status: engineeringContact?.designStatus,
+            }),
+          },
+          {
+            label: '施工圖',
+            haveData: hasPattern.hasConstruction,
+            shouldHaveData: shouldHasPattern.construction,
+            onCheck: (bool) => {
+              editShouldHasPattern(bool, 'construction');
+            },
+            reviewStatus: checkStatus({
+              review_status: engineeringContact?.constructionStatus,
+            }),
+          },
+          {
+            label: '色卡',
+            haveData: hasPattern.hasColor,
+            shouldHaveData: shouldHasPattern.color,
+            onCheck: (bool) => {
+              editShouldHasPattern(bool, 'color');
+            },
+            reviewStatus: checkStatus({
+              review_status: engineeringContact?.colorStatus,
+            }),
+          },
+        ],
+      },
+      addressBarProps: {
+        inputSelProps: {
+          caption: '工程地點',
+          disabled: readonly,
+        },
+        addressProps: {
+          zipCode: {
+            props: {
+              value: profile?.zipCode ?? '',
+            },
+          },
+          county: {
+            props: {
+              isDisabled: disabled || readonly,
+              value: profile?.county ? { value: profile.county, label: profile.county } : null,
+              onChange: (option) => {
+                const value = option ? option.value : '';
+                profileChange('county', value);
+                profileChange('district', '');
+                profileChange('zipCode', '');
+              },
+            },
+          },
+          district: {
+            easyValue: profile?.district ?? null,
+            props: {
+              isDisabled: disabled || readonly,
+              value: profile?.district ? { value: profile.district, label: profile.district } : null,
+              onChange: (option) => {
+                if (!option) {
+                  return;
+                }
+
+                const value = option ? option.value : '';
+                profileChange('district', value);
+                profileChange('zipCode', option.zipCode ?? '');
+              },
+            },
+          },
+          address: {
+            props: {
+              disabled: disabled || readonly,
+              value: profile?.address ?? '',
+              onChange: (e) => {
+                profileChange('address', e.target.value);
+              },
+            },
+          },
+        },
+      },
+      //
+      /**工程負責人 */
+      projectPerson: {
+        value: profile?.projectPrincipal ?? '',
+        onChange: (v) => {
+          profileChange('projectPrincipal', v);
+        },
+        disabled: readonly,
+      },
+      /**工程負責人聯絡電話 */
+      projectPersonNumber: {
+        value: profile?.constructionSitePrincipalContactNumber ?? '',
+        onChange: (v) => {
+          profileChange('constructionSitePrincipalContactNumber', v);
+        },
+        disabled: readonly,
+      },
+      projectFaxNumber: {
+        value: profile?.constructionSiteFaxNumber ?? '',
+        onChange: (v) => {
+          profileChange('constructionSiteFaxNumber', v);
+        },
+        disabled: readonly,
+      },
+      /**工地電話 */
+      projectNumber: {
+        value: profile?.constructionSiteContactNumber ?? '',
+        onChange: (v) => {
+          profileChange('constructionSiteContactNumber', v);
+        },
+        disabled: readonly,
+      },
+
+      //
+      //
+      /**工程編號 */
+      engineeringNumber: {
+        value: profile?.projectNumber ?? '',
+        onChange: (v) => {
+          profileChange('projectNumber', v);
+        },
+        disabled: readonly,
+      },
+      /**承包商 */
+      contractor: {
+        value: profile?.contractor ?? '',
+        onChange: (v) => {
+          profileChange('contractor', v);
+        },
+        disabled: readonly,
+      },
+      /**負責人 */
+      principal: {
+        value: profile?.contractorPrincipal ?? '',
+        onChange: (v) => {
+          profileChange('contractorPrincipal', v);
+        },
+        disabled: readonly,
+      },
+      /**公司電話 */
+      contactNumber: {
+        value: profile?.contractorContactNumber ?? '',
+        onChange: (v) => {
+          profileChange('contractorContactNumber', v);
+        },
+        disabled: readonly,
+      },
+      faxNumber: {
+        value: profile?.contractorFaxNumber ?? '',
+        onChange: (v) => {
+          profileChange('contractorFaxNumber', v);
+        },
+        disabled: readonly,
+      },
+      //
+      contactPersons: {
+        onAddClick,
+        arr: contactPersonsArr,
+      },
+    };
+
+    return control_profile;
+  }, [profile, readonly, hasPattern, shouldHasPattern, engineeringContact, disabled, contactPersonsArr]);
+};
+
+// ================================================================================
+
+const emptyProfile = (): Tprofile => ({
+  paymentStatus: '',
+  projectName: '',
+  projectContent: '',
+  zipCode: '',
+  county: '',
+  district: '',
+  address: '',
+  projectPrincipal: '',
+  constructionSitePrincipalContactNumber: '',
+  constructionSiteFaxNumber: '',
+  constructionSiteContactNumber: '',
+  projectNumber: '',
+  contractor: '',
+  contractorPrincipal: '',
+  contractorContactNumber: '',
+  contractorFaxNumber: '',
+});
+
+// ================================================================================
+
+export type { TimperativeHandle, TonStateChange, Tprofile, TshouldPatternList, TstateContact };
 export default WorkContactDoc_component;

@@ -57,6 +57,7 @@ export default function Memorandum() {
     //
     data: contract,
     update: update_contract,
+    contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: ['engineeringContact'],
   });
@@ -287,7 +288,11 @@ export default function Memorandum() {
   // ---------------------------------------------------------------------------
   return (
     <SubLayer bodyOverflowY="scroll" isLoading_subLayer={isFetching_memorandum}>
-      <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
+      <PageHeader
+        panelList={panelList}
+        contractNumber={engineeringContact?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
+      />
       <div>
         <Wrapper_tab
           className={'m-auto'}

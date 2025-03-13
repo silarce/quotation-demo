@@ -21,6 +21,8 @@ interface Tlink {
   disabled?: boolean;
 }
 
+export type { Tlink };
+
 export default function PageHeaderFlex01({
   tagList = [],
   linkList = [],

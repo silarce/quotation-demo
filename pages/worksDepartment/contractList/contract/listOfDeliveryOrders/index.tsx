@@ -40,7 +40,7 @@ export default function ListOfDeliveryOrders() {
     pageSize: 9999,
   };
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId);
+  const { data: contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
   const { data: exchangeArr, update: update_exchange } = useGetEngineeringExchanges(customParams);
 
   useEffect(() => {
@@ -67,7 +67,11 @@ export default function ListOfDeliveryOrders() {
   // ----------------------------------------------------
   return (
     <div className={style.container}>
-      <PageHeader panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
+      <PageHeader
+        panelList={panelList}
+        contractNumber={contract?.contractNumber ?? ''}
+        contactThatSkipContract={contactThatSkipContract}
+      />
 
       <div className={`${style.mainContainer} ${style.listOfDeliveryOrders}`}>
         <div className={style.thead}>

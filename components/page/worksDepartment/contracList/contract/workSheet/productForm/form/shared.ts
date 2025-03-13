@@ -71,64 +71,123 @@ const createElectricSupply = ({
   return value_electricSupply;
 };
 
-const getHeadBoxSvgUrl1 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-  let url: null | string = null;
+const getSvgUrl_headBox1 = ({
+  isIntegratedHeadBox,
+  hasWheel,
+  sizeB,
+}: {
+  isIntegratedHeadBox: boolean;
+  hasWheel: boolean;
+  sizeB: number;
+}) => {
+  let url;
+  let name;
 
   if (isIntegratedHeadBox && hasWheel) {
     url = createAssetUrl('head-box', '一體式有檔輪.svg');
+    name = '一體式有檔輪';
   } else if (isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '一體式無檔輪.svg');
+    name = '一體式無檔輪';
   } else if (!isIntegratedHeadBox && hasWheel) {
-    url = createAssetUrl('head-box', '機加捲有檔輪.svg');
+    if (sizeB > 630) {
+      url = createAssetUrl('head-box', '機加捲大於630有檔輪.svg');
+      name = '機加捲大於630有檔輪';
+    } else {
+      url = createAssetUrl('head-box', '機加捲小於630有檔輪.svg');
+      name = '機加捲小於630有檔輪';
+    }
   } else if (!isIntegratedHeadBox && !hasWheel) {
-    url = createAssetUrl('head-box', '機加捲無檔輪.svg');
+    if (sizeB > 630) {
+      url = createAssetUrl('head-box', '機加捲大於630無檔輪.svg');
+      name = '機加捲大於630無檔輪';
+    } else {
+      url = createAssetUrl('head-box', '機加捲小於630無檔輪.svg');
+      name = '機加捲小於630無檔輪';
+    }
   }
 
-  return url as string;
+  return { url, name };
 };
 
-const getHeadBoxSvgUrl2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
-  let url: null | string = null;
+const getSvgUrl_headBox2 = ({ isIntegratedHeadBox, hasWheel }: { isIntegratedHeadBox: boolean; hasWheel: boolean }) => {
+  let url;
+  let name;
 
   // 阿不是都一樣...?給我的判斷條件長這樣那就這樣吧
   if (isIntegratedHeadBox && hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱';
   } else if (isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱';
   } else if (!isIntegratedHeadBox && hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱';
   } else if (!isIntegratedHeadBox && !hasWheel) {
     url = createAssetUrl('head-box', '機械箱.svg');
+    name = '機械箱';
   }
 
-  return url as string;
+  return { url, name };
 };
 
-const getHeadBoxSvgUrl3 = ({ headBoxTopCover }: { headBoxTopCover: boolean }) => {
-  let url: null | string = null;
+const getSvgUrl_headBoxTopCover = ({ headBoxTopCover }: { headBoxTopCover: boolean }) => {
+  let url;
+  let name;
 
   if (headBoxTopCover) {
     url = createAssetUrl('head-box', '上蓋.svg');
+    name = '上蓋';
   }
 
-  return url;
+  return { url, name };
 };
 
-const getHeadBoxSvgUrl4 = ({
+const getSvgUrl_headBoxCover = ({
   headBoxCover,
 }: {
   headBoxCover: NonNullable<TquotationProductItemDto['headBoxCover']>;
 }) => {
-  let url: null | string = null;
+  let url;
+  let name;
 
   if (headBoxCover === 'half') {
     url = createAssetUrl('head-box', '前遮半.svg');
+    name = '前遮半';
   } else if (headBoxCover === 'full') {
     url = createAssetUrl('head-box', '前遮全.svg');
+    name = '前遮全';
   }
 
-  return url;
+  return { url, name };
 };
+
+const getProductHeadBoxImgUrl = ({
+  isIntegratedHeadBox,
+  hasWheel,
+  headBoxTopCover,
+  headBoxCover,
+  sizeB,
+}: {
+  isIntegratedHeadBox: boolean;
+  hasWheel: boolean;
+  headBoxTopCover: boolean;
+  headBoxCover: NonNullable<TquotationProductItemDto['headBoxCover']>;
+  sizeB: number;
+}) => {
+  return {
+    // headBox1: getSvgUrl_headBox1({ isIntegratedHeadBox, hasWheel, sizeB }),
+    // headBox2: getSvgUrl_headBox2({ isIntegratedHeadBox, hasWheel }),
+    // headBoxTopCover: getSvgUrl_headBoxTopCover({ headBoxTopCover }),
+    // headBoxCover: getSvgUrl_headBoxCover({ headBoxCover }),
+    headBox1: getSvgUrl_headBox1({ isIntegratedHeadBox, hasWheel, sizeB }),
+    headBox2: getSvgUrl_headBox2({ isIntegratedHeadBox, hasWheel }),
+    headBoxTopCover: getSvgUrl_headBoxTopCover({ headBoxTopCover }),
+    headBoxCover: getSvgUrl_headBoxCover({ headBoxCover }),
+  };
+};
+
 // ========================================================================
 
 export {
@@ -138,10 +197,11 @@ export {
   options_前遮,
   basicConfig,
   inputNumberProps,
-  getHeadBoxSvgUrl1,
-  getHeadBoxSvgUrl2,
-  getHeadBoxSvgUrl3,
-  getHeadBoxSvgUrl4,
+  getSvgUrl_headBox1,
+  getSvgUrl_headBox2,
+  getSvgUrl_headBoxTopCover,
+  getSvgUrl_headBoxCover,
+  getProductHeadBoxImgUrl,
   createElectricSupply,
 };
 

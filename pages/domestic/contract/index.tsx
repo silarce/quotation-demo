@@ -71,6 +71,10 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         version: { $eq: 1 },
         'content.county': { $eq: county },
         'content.customer.name': { $contains: customerName },
+
+        'content.managerReviewedAt': { $notNull: true },
+        // 'content.editNotes': { $ne: '系統新增' },
+
         $or: {
           'content.projectName': { $contains: keyWord },
           contractNumber: { $contains: keyWord },
