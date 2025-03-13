@@ -1830,7 +1830,7 @@ type TquotationContentDto_copy = {
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];
 
-  verifyForm: TquotationVerifyFormDto;
+  verifyForm: TquotationVerifyFormDto | undefined;
   // 失件
   isLost: boolean;
 };
@@ -1939,7 +1939,7 @@ export type TquotationContentDto = {
   others: TquotationContentOtherDto[];
   products: TquotationProductDto[];
 
-  verifyForm: TquotationVerifyFormDto;
+  verifyForm?: TquotationVerifyFormDto | undefined;
 
   // // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
   // // ! 所以只設需要拿的東西
@@ -2382,7 +2382,7 @@ export type TquotationContractDto = {
   deliveryDate: string | null; // date
   paymentMethods: TpaymentMethodDto[];
   verifyForm: TquotationVerifyFormDto;
-  quotation: TquotationDto;
+  quotation?: TquotationDto;
   content: TquotationContentDto;
   // attachedToContract: TquotationContractDto; // 上一份追加減合約
   // attachedContract: TquotationContractDto; // 下一份追加減合約
@@ -3020,6 +3020,11 @@ export type TsubmitReviewQotuationContentDto = {
 
 // region /engineering
 
+type TcontactInfoDto = {
+  contactPerson: string;
+  contactNumber: string;
+};
+
 // 工程聯絡單
 export type TengineeringContactDto = {
   id: string;
@@ -3056,12 +3061,7 @@ export type TengineeringContactDto = {
   /**備註列表 */
   annotations: string[] | null;
   /**聯絡人列表 */
-  contactInfo:
-    | {
-        contactPerson: string;
-        contactNumber: string;
-      }[]
-    | null;
+  contactInfo: TcontactInfoDto[] | null;
   //
   contractId?: string | null;
   contract?: TquotationContractDto | null;
@@ -3147,52 +3147,38 @@ export type TengineeringContactDto = {
   // colorManagerReviewedAt: string | null; // 棄用
 };
 
-export type TupdateEngineeringContactDto = {
-  /**合約編號 */
-  contractNumber?: string;
-  /**請款狀態 */
-  paymentStatus?: string;
-  /**工程名稱 */
-  projectName?: string;
-  /**工程內容 */
-  projectContent?: string;
-  zipCode?: string | null;
-  county?: string;
-  district?: string;
-  address?: string;
-  /**工程負責人 */
-  projectPrincipal?: string;
-  /**工程負責人聯絡電話 */
-  constructionSitePrincipalContactNumber?: string;
-  constructionSiteFaxNumber?: string;
-  /**工地電話 */
-  constructionSiteContactNumber?: string;
-  /**工程編號 */
-  projectNumber: string;
-  /**承包商 */
-  contractor: string;
-  /**承包商負責人 */
-  contractorPrincipal: string;
-  /**承包商公司電話 */
-  contractorContactNumber: string;
-  /**承包商公司傳真 */
-  contractorFaxNumber: string;
-
-  /**備註列表 */
-  annotations?: string[] | null;
-
-  /**聯絡人列表 */
-  contactInfo: {
-    contactPerson: string;
-    contactNumber: string;
-  }[];
-  // 是否要有該工程圖表
-  shouldHasColor: boolean; // 色卡
-  shouldHasConstruction: boolean; // 施工圖
-  shouldHasDetail: boolean; // 大樣詳圖、簽認圖
-  shouldHasFloor: boolean; // 平面圖
-  shouldHasDesign: boolean; // 設計圖
-};
+export type TupdateEngineeringContactDto = Pick<
+  TengineeringContactDto,
+  | 'projectNumber'
+  | 'contractor'
+  | 'contractorPrincipal'
+  | 'contractorContactNumber'
+  | 'contractorFaxNumber'
+  | 'contactInfo'
+  | 'shouldHasColor'
+  | 'shouldHasConstruction'
+  | 'shouldHasDetail'
+  | 'shouldHasFloor'
+  | 'shouldHasDesign'
+> &
+  Partial<
+    Pick<
+      TengineeringContactDto,
+      | 'contractNumber'
+      | 'paymentStatus'
+      | 'projectName'
+      | 'projectContent'
+      | 'zipCode'
+      | 'county'
+      | 'district'
+      | 'address'
+      | 'projectPrincipal'
+      | 'constructionSitePrincipalContactNumber'
+      | 'constructionSiteFaxNumber'
+      | 'constructionSiteContactNumber'
+      | 'annotations'
+    >
+  >;
 
 export type TcreateEngineeringContactDto = {
   quotationId?: string | null; // 報價單ID
@@ -3206,6 +3192,57 @@ export type TsubmitEngineeringContactDto = {
 export type TreviewEngineeringContactDto = {
   attachmentType: string;
   isPass: boolean;
+};
+
+export type TcreateEngineeringContactIndependent = {
+  // @ApiProperty({ description: '合約編號' })
+  contractNumber: string;
+  // @ApiProperty({ description: '請款狀態' })
+  paymentStatus?: string | null;
+  // @ApiProperty({ description: '工程名稱' })
+  projectName: string;
+  // @ApiProperty({ description: '工程內容' })
+  projectContent?: string | null;
+  // @ApiProperty({ description: '工程地址郵遞區號' })
+  zipCode?: string | null;
+  // @ApiProperty({ description: '工程縣市' })
+  county?: string | null;
+  // @ApiProperty({ description: '工程區' })
+  district?: string | null;
+  // @ApiProperty({ description: ' 工程詳細地址' })
+  address?: string | null;
+  // @ApiProperty({ description: '工程負責人' })
+  projectPrincipal?: string | null;
+  // @ApiProperty({ description: '工地負責人聯絡電話' })
+  constructionSitePrincipalContactNumber?: string | null;
+  // @ApiProperty({ description: '工地傳真' })
+  constructionSiteFaxNumber?: string | null;
+  // @ApiProperty({ description: '工地電話' })
+  constructionSiteContactNumber?: string | null;
+  // @ApiProperty({ description: '工程編號' })
+  projectNumber: string;
+  // @ApiProperty({ description: '承包商' })
+  contractor?: string | null;
+  // @ApiProperty({ description: '承包商負責人' })
+  contractorPrincipal?: string | null;
+  // @ApiProperty({ description: '承包商公司電話' })
+  contractorContactNumber?: string | null;
+  // @ApiProperty({ description: '承包商公司傳真' })
+  contractorFaxNumber?: string | null;
+  // @ApiProperty({ description: '備註列表' })
+  annotations?: string[] | null;
+  // '聯絡資訊'
+  contactInfo?: TcontactInfoDto[];
+  // @ApiProperty({ description: '是否有施工圖' })
+  shouldHasConstruction?: boolean | null;
+  // @ApiProperty({ description: '是否有平面圖' })
+  shouldHasFloor?: boolean | null;
+  // @ApiProperty({ description: '是否有大樣詳圖' })
+  shouldHasDetail?: boolean | null;
+  // @ApiProperty({ description: '是否有色卡' })
+  shouldHasColor?: boolean | null;
+  // @ApiProperty({ description: '是否有設計圖' })
+  shouldHasDesign?: boolean | null;
 };
 
 // 派工單

@@ -21,6 +21,7 @@ import type {
   TengineeringContactDto,
   TupdateEngineeringContactDto,
   TcreateEngineeringContactDto,
+  TcreateEngineeringContactIndependent,
   TdispatchingDto,
   TcreateDispatchingDto,
   TexchangeDto,
@@ -104,6 +105,7 @@ export type {
   TengineeringContactDto,
   TupdateEngineeringContactDto,
   TcreateEngineeringContactDto,
+  TcreateEngineeringContactIndependent,
   TdispatchingDto,
   TcreateDispatchingDto,
   TexchangeDto,
@@ -257,6 +259,18 @@ export const apiPostEngineeringContact = async (body: TcreateEngineeringContactD
     .post(api, body)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err));
+};
+
+// 新建工程聯絡單
+export const apiPostEngineeringContactIndependent = async (body: TcreateEngineeringContactIndependent) => {
+  const api = '/engineering/engineering-contact/independent';
+
+  return await axi.post(api, body).catch((error) => {
+    const err = error as AxiosError<TapiError>;
+    myAlert.err({ title: '新建工程聯絡單失敗', content: err.message });
+
+    return Promise.reject(error);
+  });
 };
 
 // ------------------------------------------------------------------------

@@ -482,7 +482,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // MARK:更新報價單
   const handlePatch = () => {
     const { destroy } = myAlert.input({
-      isTextArea: true,
+      props_input: {
+        isTextArea: true,
+      },
       title: '報價單註解',
       width: 500,
       onConfirm: async (editNote) => {
@@ -509,7 +511,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // MARK:新增報價單
   const handlePost = () => {
     const { destroy } = myAlert.input({
-      isTextArea: true,
+      props_input: {
+        isTextArea: true,
+      },
       title: '報價單註解',
       width: 500,
       onConfirm: async (editNote) => {
@@ -537,7 +541,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // MARK:追加追減報價單
   const handleModify = () => {
     const { destroy } = myAlert.input({
-      isTextArea: true,
+      props_input: {
+        isTextArea: true,
+      },
       title: '報價單註解',
       width: 500,
       onConfirm: async (editNote) => {
@@ -568,7 +574,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     }
 
     const { destroy } = myAlert.input({
-      isTextArea: true,
+      props_input: {
+        isTextArea: true,
+      },
       title: '報價單註解',
       width: 500,
       onConfirm: async (editNote) => {

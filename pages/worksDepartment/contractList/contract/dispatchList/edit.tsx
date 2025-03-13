@@ -113,7 +113,11 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  const { data: contract, update: update_contract } = useGetContract_id(contractId, {
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
     customPopulate: [
       'content.customer',
       'engineeringContact',
@@ -816,7 +820,12 @@ export default function EditDispatchList() {
 
   return (
     <SubLayer isLoading_all={isLoading}>
-      <PageHeader returnBtn={disabled} panelList={panelList} contractNumber={contract?.contractNumber ?? ''} />
+      <PageHeader
+        showReturnBtn={disabled}
+        panelList={panelList}
+        contactThatSkipContract={contactThatSkipContract}
+        contractNumber={contract?.contractNumber ?? ''}
+      />
 
       <div className={scss.body}>
         <Profile disabled={theDiasbled} control={control_profile} />

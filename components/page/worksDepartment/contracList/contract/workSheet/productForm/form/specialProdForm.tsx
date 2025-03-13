@@ -27,10 +27,10 @@ import {
   options_前遮,
   basicConfig,
   inputNumberProps,
-  getHeadBoxSvgUrl1,
-  getHeadBoxSvgUrl2,
-  getHeadBoxSvgUrl3,
-  getHeadBoxSvgUrl4,
+  getSvgUrl_headBox1,
+  getSvgUrl_headBox2,
+  getSvgUrl_headBoxTopCover,
+  getSvgUrl_headBoxCover,
   createElectricSupply,
 } from './shared';
 
@@ -659,10 +659,10 @@ function Form_specialProd_headBox({
   setState: TsetState<Tstate_specialProd_headBox>;
   disabled: boolean | undefined;
 }) {
-  const url1 = getHeadBoxSvgUrl1({ isIntegratedHeadBox, hasWheel });
-  const url2 = getHeadBoxSvgUrl2({ isIntegratedHeadBox, hasWheel });
-  const url3 = getHeadBoxSvgUrl3({ headBoxTopCover });
-  const url4 = getHeadBoxSvgUrl4({ headBoxCover: headBoxCover ?? 'none' });
+  const url1 = getSvgUrl_headBox1({ isIntegratedHeadBox, hasWheel, sizeB: Number(boxB || 0) }).url;
+  const url2 = getSvgUrl_headBox2({ isIntegratedHeadBox, hasWheel }).url;
+  const url3 = getSvgUrl_headBoxTopCover({ headBoxTopCover }).url;
+  const url4 = getSvgUrl_headBoxCover({ headBoxCover: headBoxCover ?? 'none' }).url;
 
   return (
     <div>

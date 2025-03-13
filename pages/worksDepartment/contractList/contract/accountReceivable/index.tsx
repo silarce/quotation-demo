@@ -109,6 +109,7 @@ export default function AccountReceivable({
     data: contract,
     update: update_contract,
     isFetching: isFetching_contract,
+    contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: [
       'content.customer',
@@ -539,7 +540,11 @@ export default function AccountReceivable({
   if (!accountReceivable) {
     return (
       <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
-        <PageHeader panelList={panelList} contractNumber={engineeringContact?.contractNumber ?? ''} />
+        <PageHeader
+          panelList={panelList}
+          contractNumber={engineeringContact?.contractNumber ?? ''}
+          contactThatSkipContract={contactThatSkipContract}
+        />
         <EmptyMain />
       </SubLayer>
     );
@@ -547,7 +552,12 @@ export default function AccountReceivable({
 
   return (
     <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
-      {showSubPageHeader && <PageHeader contractNumber={engineeringContact?.contractNumber ?? '---'} />}
+      {showSubPageHeader && (
+        <PageHeader
+          contractNumber={engineeringContact?.contractNumber ?? '---'}
+          contactThatSkipContract={contactThatSkipContract}
+        />
+      )}
       {!showSubPageHeader && <PageHeader02 tag={`合約編號 ${engineeringContact?.contractNumber ?? '---'}`} />}
 
       <div className={scss.main}>
