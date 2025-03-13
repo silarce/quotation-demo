@@ -3877,7 +3877,11 @@ export default function PKingDetail() {
                                                 <div
                                                     key={index}
                                                     className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                    onClick={() => handleGetLayOut(_item)}
+                                                    // onClick={() => handleGetLayOut(_item)}
+                                                    onClick={()=>{
+                                                        console.log(_item);
+                                                        handleGetLayOut(_item);
+                                                    }}
                                                 >
                                                     <span>{index + 1}</span>
                                                     <span>{_item.whname}</span>
@@ -4112,7 +4116,7 @@ export default function PKingDetail() {
                                             disabled={true}
                                             inputProps={{
                                                 props: {
-                                                    value: whpquantity.toString() ? whpquantity.toString() : ' ',
+                                                    value: whpquantity?.toString() ? whpquantity?.toString() : ' ',
                                                 },
                                             }}
                                         />
