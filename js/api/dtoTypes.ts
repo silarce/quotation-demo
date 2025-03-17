@@ -3707,10 +3707,10 @@ export type TworksheetRecordDto = {
   createdAt: string;
   updatedAt: string;
 
-  // 所屬工作主表Id
-  worksheetId: string | null;
-  // 所屬工作主表
-  worksheet?: TworksheetDto;
+  // 所屬工作主表Id // 實際上沒給
+  // worksheetId: string | null;
+  // 所屬工作主表 // 即使送populate了還是沒給
+  // worksheet?: TworksheetDto;
   // 合約產品
   contractProductItems?: TquotationProductItemDto[];
   // 舊合約產品
