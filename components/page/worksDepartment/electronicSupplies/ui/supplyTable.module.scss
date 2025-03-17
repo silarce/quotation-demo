@@ -47,9 +47,9 @@
   }
   &.subItemName {
     width: 180px;
-    & + .rowWrapper .category {
-      justify-content: center;
-    }
+    // & + .rowWrapper .category {
+    //   justify-content: center;
+    // }
   }
   &.category {
     justify-content: flex-start;

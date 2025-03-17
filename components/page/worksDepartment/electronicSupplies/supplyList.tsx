@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 
 // component
-import SupplyTable, { Tgroup, Tprops_cell, Tprops_cell_input } from './ui/supplyTable';
+import SupplyTable, {
+  Tgroup,
+  // Tprops_cell, Tprops_cell_input
+} from './ui/supplyTable';
 
 // css
 import scss from './supplyList.module.scss';

@@ -804,7 +804,7 @@ export default function BomList() {
 
             <div className={scss.body} style={{ height: `${windowSize.height - 198}px` }}>
                 <div className={scss.content}>
-                    <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', zIndex: 1000, padding: '0px 20px' }}>
+                    <div style={{ position: 'sticky', top: 0, left: 0, width: '100%', backgroundColor: 'white', padding: '0px 20px' }}>
                         <InputSel
                             {...inputSelProps}
                             caption="物料筆數"

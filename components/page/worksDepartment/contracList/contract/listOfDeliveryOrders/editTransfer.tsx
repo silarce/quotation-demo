@@ -139,7 +139,6 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
                       {type === 'select' && (
                         <InputSel
                           disabled={disabled}
-                          fontSize="16"
                           selectProps={{
                             props: {
                               isSearchable: true,
