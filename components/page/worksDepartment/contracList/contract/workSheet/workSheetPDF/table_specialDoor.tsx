@@ -8,7 +8,7 @@ import scss from './table_specialDoor.module.scss';
 interface Tprops_table_specialDoor {
   doorModelName: React.ReactNode;
 
-  itemName: React.ReactNode;
+  itemName: string;
   qty: React.ReactNode;
   materialName: React.ReactNode;
   materialSurface: React.ReactNode;

@@ -38,7 +38,10 @@ const useControl_pdf = ({
   customerName: string;
   contactPerson: string;
   control_profile: Tcontrol_profile;
-  latestRecordArr: TworksheetRecordDto[];
+  latestRecordArr: (TworksheetRecordDto & {
+    parentId: string;
+    parentItemName: string;
+  })[];
 }) => {
   const { isReady, parseDoorModelSort } = useGlobal_doorModel();
 
@@ -62,6 +65,8 @@ const useControl_pdf = ({
         const control_item = createPdfItem({
           contractProductItems: record.contractProductItems,
           assetDict,
+          parentId: record.parentItemName,
+          parentItemName: record.parentItemName,
         });
 
         workSheetPDF_01_itemArr.push(control_item);
@@ -69,12 +74,16 @@ const useControl_pdf = ({
         const control_item = createPdfSpecialItem({
           contractProductItems: record.contractProductItems,
           assetDict,
+          parentId: record.parentItemName,
+          parentItemName: record.parentItemName,
         });
         specialItemArr.push(control_item);
       } else if (doorModelSort === 'w13456') {
         const control_item = createPdfSpecialItem({
           contractProductItems: record.contractProductItems,
           assetDict,
+          parentId: record.parentItemName,
+          parentItemName: record.parentItemName,
         });
         w1w3ItemArr.push(control_item);
       }
@@ -166,9 +175,13 @@ const useControl_pdf = ({
 const createPdfItem = ({
   contractProductItems,
   assetDict,
+  parentId,
+  parentItemName,
 }: {
   contractProductItems: TquotationProductItemDto[];
   assetDict: Record<string, string>;
+  parentId: string;
+  parentItemName: string;
 }) => {
   const item = contractProductItems[0];
   const qty = contractProductItems.length;
@@ -223,6 +236,10 @@ const createPdfItem = ({
   })();
 
   const control_item: Tcontrol_workSheetPDF_01['itemArr'][number] = {
+    id: item.id,
+    parentId: parentId,
+    parentItemName: parentItemName,
+
     itemName: item.itemName,
     size: {
       qty: `${qty}`,
@@ -335,9 +352,13 @@ const createPdfItem = ({
 const createPdfSpecialItem = ({
   contractProductItems,
   assetDict,
+  parentId,
+  parentItemName,
 }: {
   contractProductItems: TquotationProductItemDto[];
   assetDict: Record<string, string>;
+  parentId: string;
+  parentItemName: string;
 }) => {
   const item = contractProductItems[0];
   const qty = contractProductItems.length;
@@ -405,6 +426,10 @@ const createPdfSpecialItem = ({
   const headBoxSvgString4 = assetDict[url_headBoxCover.name || 'null'] || null;
 
   const specialItem: Tcontrol_workSheetPDF_01['specialItemArr'][number] = {
+    id: item.id,
+    parentId,
+    parentItemName,
+
     doorModelName: doorModelDict[doorModelName]?.label ?? doorModelName,
     itemName,
     qty,
