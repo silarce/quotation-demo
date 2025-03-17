@@ -1,22 +1,26 @@
-import React, { useRef, Fragment } from 'react';
+import React, { useRef, Fragment, useState, useEffect } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // component
 import Miku_frontend_table01, { Tcontrol_table01 } from 'components/otherProject/miku-frontend/Table01';
 import Table_specialDoor, { Tprops_table_specialDoor } from './table_specialDoor';
 import Table_w1w3, { Tprops_table_w1w3 } from './table_w1w3';
 
-// gear
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
-
 // antd
 import Modal from 'antd/lib/modal/Modal';
+import { Checkbox, Divider } from 'antd';
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+const CheckboxGroup = Checkbox.Group;
 
 // gear
+import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 import scss from './workSheetPDF.module.scss';
 
@@ -37,6 +41,12 @@ type Tcontrol = {
   itemArr: Tcontrol_table01[];
   specialItemArr: Tprops_table_specialDoor[];
   w1w3ItemArr: Tprops_table_w1w3[];
+};
+
+type Tstate_showedSheet = {
+  id: string;
+  parentItemName: string;
+  item: { id: string; childItemName: string; checked: boolean }[];
 };
 
 export type { Tcontrol as Tcontrol_workSheetPDF_01 };
@@ -146,6 +156,7 @@ export default function WorkSheetPDF({
       onCancel={onCancel}
     >
       <div className={scss.panelBar}>
+        <MyButton_v2 label="選擇" onClick={worksheetSelector} />
         <MyButton_v2 label="下載PDF" onClick={dlPdf} />
       </div>
 
@@ -278,3 +289,128 @@ const Info = ({
     </table>
   );
 };
+
+const worksheetSelector = () => {
+  return myAlert.clear({
+    width: 1000,
+    content: (
+      <div className="p-5">
+        <form
+          onChange={(e) => {
+            const target = e.target as HTMLInputElement;
+            console.log(target.name);
+            console.log(target.checked);
+            console.log(target.value);
+          }}
+        >
+          {/*  */}
+          <div>
+            <Checkbox
+              name="all"
+              // indeterminate={indeterminate}
+            >
+              <span className="text-xl text-main font-bold">ONE</span>
+            </Checkbox>
+          </div>
+          <div>
+            <CheckboxGroup
+              options={
+                // ['a', 'b', 'c']
+                [
+                  { value: 'a', label: 'A' },
+                  { value: 'b', label: 'B' },
+                  { value: 'c', label: 'C' },
+                ]
+              }
+            />
+          </div>
+        </form>
+        {/*  */}
+        <form
+          onChange={(e) => {
+            const target = e.target as HTMLInputElement;
+            console.log(target.name);
+            console.log(target.checked);
+          }}
+        >
+          {/*  */}
+          <hr />
+          <br />
+          <div>
+            <Checkbox
+              name="all"
+              // indeterminate={indeterminate}
+            >
+              <span className="text-xl text-main font-bold">TWO</span>
+            </Checkbox>
+          </div>
+          <div>
+            <CheckboxGroup options={['a', 'b', 'c']} />
+          </div>
+        </form>
+        <hr />
+        <br />
+        <br />
+        <SquareBtn sharp="long">確認</SquareBtn>
+      </div>
+    ),
+  });
+};
+
+const useCheckedSheet = () => {
+  const [stateArr, setStateArr] = useState<Tstate_showedSheet[]>([]);
+
+  const createKit = (parentIndex: number) => {
+    const indeterminate = stateArr[parentIndex].item.some((item) => item.checked);
+
+    const checkAll = (checked: boolean) => {
+      const newStateArr = [...stateArr];
+      newStateArr[parentIndex].item.forEach((item) => {
+        item.checked = checked;
+      });
+      setStateArr(newStateArr);
+    };
+
+    const checkItem = (index: number, checked: boolean) => {
+      const newStateArr = [...stateArr];
+      newStateArr[parentIndex].item[index].checked = checked;
+      setStateArr(newStateArr);
+    };
+
+    return {
+      indeterminate,
+      checkAll,
+      checkItem,
+    };
+  };
+
+  useEffect(() => {
+    setStateArr(fakeState);
+  }, []);
+
+  return {
+    checkedSheetArr: stateArr,
+    createKit,
+  };
+};
+
+const fakeState: Tstate_showedSheet[] = [
+  {
+    id: 'foo',
+    parentItemName: 'ONE',
+    item: [
+      { id: 'foo_1', childItemName: 'foo_1', checked: false },
+      { id: 'foo_2', childItemName: 'foo_2', checked: false },
+      { id: 'foo_3', childItemName: 'foo_3', checked: false },
+    ],
+  },
+  {
+    id: 'bar',
+    parentItemName: 'TWO',
+    item: [
+      { id: 'bar_1', childItemName: 'bar_1', checked: false },
+      { id: 'bar_2', childItemName: 'bar_2', checked: false },
+      { id: 'bar_3', childItemName: 'bar_3', checked: false },
+    ],
+  },
+];

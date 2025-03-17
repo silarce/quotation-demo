@@ -13,13 +13,10 @@ $fontText: 25px;
 }
 
 .panelBar {
+  display: flex;
+  justify-content: space-between;
   background-color: #ddd;
   padding: 10px;
-  > button {
-    display: block;
-    margin: auto;
-    margin-right: 0;
-  }
 }
 
 .container {
