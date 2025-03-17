@@ -54,7 +54,8 @@ interface Tprops_table_specialDoor {
 
 type TconfigKeys = keyof Pick<
   Tprops_table_specialDoor,
-  | 'itemName'
+  // | 'itemName'
+  | 'doorModelName'
   | 'qty'
   | 'materialName'
   | 'materialSurface'
@@ -95,8 +96,9 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
   return (
     <div className={scss.table2}>
       {/* C1 */}
-      <div className={classNames(scss.c1, scss.s2, scss.caption, scss.partRight)}>
-        <span>{props.doorModelName}</span>
+      <div className={classNames(scss.c1, scss.s2, scss.caption)}>
+        <span>{props.itemName}</span>
+        {/* <span>{props.doorModelName}</span> */}
       </div>
 
       {keyArr_basic.map((key) => {
@@ -115,7 +117,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
       })}
 
       {/* C2 */}
-      <div className={classNames(scss.c3, scss.s2, scss.caption, scss.partRight)}>
+      <div className={classNames(scss.c3, scss.s2, scss.caption)}>
         <span>尺寸</span>
       </div>
 
@@ -138,7 +140,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
       <div className={classNames(scss.c1, scss.s4, scss.partRight)} />
 
       {/* C3 */}
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption)}>
         <span>{`電動機(${props.motorVendor})`}</span>
       </div>
 
@@ -155,7 +157,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>{props.horsepower}</span>
       </div>
 
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption)}>
         <span>門軌</span>
       </div>
 
@@ -166,7 +168,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>{props.guideRailType}</span>
       </div>
 
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption)}>
         <span>捲軸</span>
       </div>
 
@@ -177,7 +179,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
         <span>{props.diameter}</span>
       </div>
 
-      <div className={classNames(scss.c5, scss.s2, scss.caption, scss.partRight)}>
+      <div className={classNames(scss.c5, scss.s2, scss.caption)}>
         <span>鏈齒輪</span>
       </div>
 
@@ -202,7 +204,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
             <div className={classNames(scss.c7)}>
               <span>{label}</span>
             </div>
-            <div className={classNames(scss.c8)}>
+            <div className={classNames(scss.c8, 'text-right')}>
               <span>{value}</span>
             </div>
           </Fragment>
@@ -213,7 +215,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
       <div className={classNames(scss.c7)} />
       <div className={classNames(scss.c8)} />
 
-      {keyArr_headBox_right.map((key, index) => {
+      {keyArr_headBox_right.map((key) => {
         const { label } = config_specialDoor[key];
         const value = props[key];
 
@@ -222,7 +224,7 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
             <div className={classNames(scss.c9)}>
               <span>{label}</span>
             </div>
-            <div className={classNames(scss.c10)}>
+            <div className={classNames(scss.c10, 'text-right')}>
               <span>{value}</span>
             </div>
           </Fragment>
@@ -247,7 +249,8 @@ const Table_specialDoor = (props: Tprops_table_specialDoor) => {
 
 const keyArr_basic = Array.from(
   new Set<TconfigKeys>([
-    'itemName',
+    // 'itemName',
+    'doorModelName',
     'qty',
     'materialName',
     'materialSurface',
@@ -284,9 +287,12 @@ const keyArr_headBox_right = Array.from(
 
 const config_specialDoor: Record<TconfigKeys, TconfigItem> = {
   // 基本資料
-  itemName: {
+  doorModelName: {
     label: '型號',
   },
+  // itemName: {
+  //   label: '型號',
+  // },
   qty: {
     label: '數量',
   },
