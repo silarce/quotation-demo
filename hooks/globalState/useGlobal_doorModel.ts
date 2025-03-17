@@ -125,3 +125,4 @@ const useGlobal_doorModel = () => {
 };
 
 export { useGlobal_doorModel, useShallow };
+export type { TdoorModelDict };

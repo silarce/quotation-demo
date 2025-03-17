@@ -4,7 +4,8 @@
   grid-auto-rows: 30px;
   // grid-auto-columns: 1fr 100px;
   // grid-template-columns: repeat(auto-fill, 140px 130px) 120px 120px;
-  grid-template-columns: repeat(5, 1fr 100px) 120px 120px;
+  // grid-template-columns: repeat(5, 1fr 150px) 120px 120px;
+  grid-template-columns: 100px 1fr repeat(4, 1fr 100px) 120px 120px;
   height: 270px;
   border-top: solid 2px black;
   border-left: solid 1px black;
@@ -17,9 +18,11 @@
 
     &.partRight {
       border-right: solid 2px black;
+      text-align: right;
     }
 
     &.caption {
+      border-right: solid 2px black;
       background-color: rgb(209, 213, 219);
       > span {
         font-weight: 800;

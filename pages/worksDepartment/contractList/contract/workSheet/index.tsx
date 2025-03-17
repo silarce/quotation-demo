@@ -61,6 +61,7 @@ import type {
   TworksheetRecordDto,
   TworksheetDto,
   TuserDto,
+  TquotationProductDto,
 } from 'js/api/dtoTypes';
 import type { TworksheetDto_addition } from 'js/api/api_engineering';
 
@@ -70,7 +71,7 @@ import { useShallow } from 'zustand/react/shallow';
 import WorksheetForm from 'components/page/worksDepartment/contracList/contract/workSheet/productForm/form/productForm';
 
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
-import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
+import { useGlobal_doorModel, TdoorModelDict } from 'hooks/globalState/useGlobal_doorModel';
 
 import { useSpecialDoor } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useSpecialDoor';
 
@@ -313,235 +314,31 @@ export default function Worksheet({
   // -------------------------------------------------------------------------
   // region control
   const control_profile = useControl_profile(engineeringContact);
+
+  const { control_productCardArr, latestRecordArr } = useProductCard({
+    doorModelDict,
+    finalProduct,
+    worksheetArr,
+    activeWorksheetId,
+    setDisabled,
+    setIsLastestRecord,
+    isReadonly,
+    reqAbandonWorkSheet,
+    setInputModalProps,
+    contractId,
+    reqPostWorkSheet,
+    checkIsSpecialDoor,
+  });
+
+  const control_recordList: Tcontrol_recordList = useRecordList({
+    worksheetData,
+    setIsLastestRecord,
+  });
+
   // ________________________________________________________________________
   // ________________________________________________________________________
 
-  const { control_productCardArr, latestRecordArr } = useMemo(() => {
-    const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
-    const latestRecordArr: TworksheetRecordDto[] = [];
-
-    if (!doorModelDict) {
-      return {
-        control_productCardArr,
-        latestRecordArr,
-      };
-    }
-
-    const worksheetList: { [id: string]: TworksheetDto } = {};
-
-    const sortedFinelProd = _.sortBy(finalProduct, 'order');
-
-    worksheetArr.forEach((worksheet) => {
-      if (worksheet.isAbandoned) {
-        return;
-      }
-
-      worksheetList[worksheet.id] = worksheet;
-    });
-
-    sortedFinelProd.forEach((prod) => {
-      const prodQty = String(prod.quantity ?? 0);
-      const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
-      const pridHeight = new Decimal(prod.height).div(1000).toString();
-
-      const prodWorkSheetList: { [key: string]: TworksheetDto_addition } = {};
-      const itemsNoWorksheet: TquotationProductItemDto[] = [];
-
-      if (prodQty === '0') {
-        return;
-      }
-
-      // ----------------------------------------------
-      prod.items?.forEach((item) => {
-        const worksheetId = item.worksheetId;
-
-        if (worksheetId && worksheetList[worksheetId]) {
-          prodWorkSheetList[worksheetId] = worksheetList[worksheetId];
-        } else {
-          itemsNoWorksheet.push(item);
-        }
-      });
-
-      const worksheetIntroArr: TworksheetIntro[] = Object.values(prodWorkSheetList).map((worksheet) => {
-        const { latestRecord } = worksheet;
-
-        latestRecordArr.push(latestRecord);
-
-        const {
-          contractProductItems,
-
-          addition: { reviewArr } = {},
-        } = latestRecord;
-
-        const contractProductItem = contractProductItems?.[0];
-
-        const width_m = new Decimal(contractProductItem?.fullWidth ?? 0).div(1000).toString();
-        const height_m = new Decimal(contractProductItem?.height ?? 0).div(1000).toString();
-
-        const reviewStatus = (() => {
-          const reviewStatus: TworksheetIntro['reviewStatus'] = {
-            label: '未送審',
-            dotColor: 'gray',
-          };
-
-          const review = reviewArr?.[0];
-
-          if (review) {
-            let currentStageIndex = Number(review.current_stage);
-            review.document_status === '核准' && (currentStageIndex = review.stages.length - 1);
-            const currentStage = review.stages[currentStageIndex];
-
-            const reviewAt_timeStamp = moment(currentStage.review_time).unix();
-            const isReviewed = reviewAt_timeStamp > 0;
-
-            reviewStatus.label = currentStage.review_person;
-            reviewStatus.dotColor = !isReviewed ? 'red' : 'green';
-          }
-
-          return reviewStatus;
-        })();
-
-        const intro: TworksheetIntro = {
-          worksheetId: worksheet.id,
-          itemName: contractProductItem?.itemName,
-          doorModelName: contractProductItem?.doorModelName,
-          width: width_m,
-          height: height_m,
-          qty: String(contractProductItems?.length),
-          isActive: activeWorksheetId === worksheet.id,
-          reviewStatus,
-          onClick: () => {
-            router.replace({
-              query: {
-                ...query,
-                activeWorksheetId: worksheet.id,
-                activedProdId: prod.id,
-                activeRecordId: undefined,
-              },
-            });
-
-            setDisabled(true);
-            setIsLastestRecord(false);
-          },
-          onDeleteClick: isReadonly
-            ? undefined
-            : () => {
-                myAlert.confirm({
-                  title: '確定刪除工作表?',
-
-                  props: {
-                    onOk: async () => {
-                      await reqAbandonWorkSheet(worksheet.id);
-                    },
-                  },
-                });
-              },
-        };
-
-        return intro;
-      });
-
-      control_productCardArr.push({
-        id: prod.id,
-        itemName: prod.itemName,
-        doorModelName: prod.doorModelName,
-        qty: prodQty,
-        width: prodWidth,
-        height: pridHeight,
-        onSeparateClick: isReadonly
-          ? undefined
-          : () => {
-              setInputModalProps({
-                title: `可分配數量${itemsNoWorksheet.length}`,
-                onConfirm: async (str) => {
-                  const qty = Number(str);
-
-                  if (qty > itemsNoWorksheet.length) {
-                    return myAlert.info({ title: '分配數量超過可分配數量' });
-                  }
-
-                  const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
-
-                  const contractProductItems = polyfillContractProductItems(pre_contractProductItems);
-
-                  const body: TcreateWorksheetDto = {
-                    contractId,
-                    contractProductItems,
-                  };
-
-                  await reqPostWorkSheet(body);
-                  setInputModalProps(undefined);
-                },
-              });
-            },
-        worksheetIntroArr,
-        isSpecialDoor: checkIsSpecialDoor(prod.doorModelName),
-      });
-    });
-
-    return { control_productCardArr, latestRecordArr, doorModelDict };
-    //
-  }, [activeWorksheetId, finalProduct, worksheetArr]);
-  // ________________________________________________________________________
-  // ________________________________________________________________________
-  const control_recordList: Tcontrol_recordList = useMemo(() => {
-    const records = _.sortBy(worksheetData?.records, 'version').reverse();
-
-    const recordArr: Trecord[] = records.map((record, index) => {
-      const {
-        contractProductItems,
-        agentEmployee, // 開立
-        addition: { reviewArr } = {},
-      } = record;
-
-      const contractProductItem = contractProductItems?.[0];
-      const {
-        //
-        itemName = '',
-        doorModelName = '',
-        fullWidth = '0',
-        height = '0',
-        materialName = '',
-        isAntiTyphoon = false,
-      } = contractProductItem ?? {};
-
-      const qty = contractProductItems?.length ?? 0;
-
-      const fullWidth_m = new Decimal(fullWidth).div(1000).toString();
-      const height_m = new Decimal(height).div(1000).toString();
-
-      const control_record: Trecord = {
-        itemName,
-        doorModel: doorModelName ?? '',
-        fullWidth: fullWidth_m,
-        height: height_m,
-        qty: String(qty),
-        material: materialName,
-        isAntiTyphoon: isAntiTyphoon ?? false,
-        agent: agentEmployee?.chName ?? '',
-        reviewFlowData: reviewArr,
-
-        onDetailClick: () => {
-          router.replace({
-            query: {
-              ...query,
-              activeRecordId: record.id,
-            },
-          });
-
-          if (index === 0) {
-            setIsLastestRecord(true);
-          }
-        },
-      };
-
-      return control_record;
-    });
-
-    return { recordArr };
-  }, [worksheetData]);
-  // ________________________________________________________________________
-  // ________________________________________________________________________
+  // MARK: control_workSheetPDF
 
   const { control_workSheetPDF_01, control_workSheetPDF_02 } = useControl_pdf({
     contractNumber: contract?.contractNumber ?? '',
@@ -878,4 +675,284 @@ const TheWorksheetForm = ({
   }
 
   return <WorksheetForm reqPatchWorkSheet={theOnConfirm} disabled={disabled} />;
+};
+
+// MARK:useProductCard
+const useProductCard = ({
+  doorModelDict,
+  finalProduct,
+  worksheetArr,
+  activeWorksheetId,
+  setDisabled,
+  setIsLastestRecord,
+  isReadonly,
+  reqAbandonWorkSheet,
+  setInputModalProps,
+  contractId,
+  reqPostWorkSheet,
+  checkIsSpecialDoor,
+}: {
+  doorModelDict: TdoorModelDict | null | undefined;
+  finalProduct: TquotationProductDto[];
+  worksheetArr: TworksheetDto[];
+  activeWorksheetId: string | undefined;
+  setDisabled: (value: React.SetStateAction<boolean>) => void;
+  setIsLastestRecord: (value: React.SetStateAction<boolean>) => void;
+  isReadonly: boolean;
+  reqAbandonWorkSheet: (worksheetId: string) => Promise<void>;
+  setInputModalProps: (value: React.SetStateAction<Pick<TinputModalProps, 'title' | 'onConfirm'> | undefined>) => void;
+  contractId: string | undefined;
+  reqPostWorkSheet: (body: TcreateWorksheetDto) => Promise<void>;
+  checkIsSpecialDoor: (doorModelName: string) => boolean;
+}) => {
+  const router = useRouter();
+  const query = router.query;
+
+  const { control_productCardArr, latestRecordArr } = useMemo(() => {
+    //
+    const control_productCardArr: (Tcontrol_productCard & { id: string })[] = [];
+    // const latestRecordArr: TworksheetRecordDto[] = [];
+    const latestRecordArr: (TworksheetRecordDto & { parentId: string; parentItemName: string })[] = [];
+    const worksheetList: { [id: string]: TworksheetDto } = {};
+
+    if (!doorModelDict) {
+      return {
+        control_productCardArr,
+        latestRecordArr,
+      };
+    }
+
+    const sortedFinelProd = _.sortBy(finalProduct, 'order');
+
+    worksheetArr.forEach((worksheet) => {
+      if (worksheet.isAbandoned) {
+        return;
+      }
+
+      worksheetList[worksheet.id] = worksheet;
+    });
+
+    sortedFinelProd.forEach((prod) => {
+      const prodQty = String(prod.quantity ?? 0);
+      const prodWidth = new Decimal(prod.fullWidth).div(1000).toString();
+      const pridHeight = new Decimal(prod.height).div(1000).toString();
+
+      const prodWorkSheetList: { [key: string]: TworksheetDto_addition } = {};
+      const itemsNoWorksheet: TquotationProductItemDto[] = [];
+
+      if (prodQty === '0') {
+        return;
+      }
+
+      // ----------------------------------------------
+      prod.items?.forEach((item) => {
+        const worksheetId = item.worksheetId;
+
+        if (worksheetId && worksheetList[worksheetId]) {
+          prodWorkSheetList[worksheetId] = worksheetList[worksheetId];
+        } else {
+          itemsNoWorksheet.push(item);
+        }
+      });
+
+      const worksheetIntroArr: TworksheetIntro[] = Object.values(prodWorkSheetList).map((worksheet) => {
+        const { latestRecord } = worksheet;
+
+        latestRecordArr.push({
+          ...latestRecord,
+          parentId: prod.id,
+          parentItemName: prod.itemName,
+        });
+
+        const {
+          contractProductItems,
+
+          addition: { reviewArr } = {},
+        } = latestRecord;
+
+        const contractProductItem = contractProductItems?.[0];
+
+        const width_m = new Decimal(contractProductItem?.fullWidth ?? 0).div(1000).toString();
+        const height_m = new Decimal(contractProductItem?.height ?? 0).div(1000).toString();
+
+        const reviewStatus = (() => {
+          const reviewStatus: TworksheetIntro['reviewStatus'] = {
+            label: '未送審',
+            dotColor: 'gray',
+          };
+
+          const review = reviewArr?.[0];
+
+          if (review) {
+            let currentStageIndex = Number(review.current_stage);
+            review.document_status === '核准' && (currentStageIndex = review.stages.length - 1);
+            const currentStage = review.stages[currentStageIndex];
+
+            const reviewAt_timeStamp = moment(currentStage.review_time).unix();
+            const isReviewed = reviewAt_timeStamp > 0;
+
+            reviewStatus.label = currentStage.review_person;
+            reviewStatus.dotColor = !isReviewed ? 'red' : 'green';
+          }
+
+          return reviewStatus;
+        })();
+
+        const intro: TworksheetIntro = {
+          worksheetId: worksheet.id,
+          itemName: contractProductItem?.itemName,
+          doorModelName: contractProductItem?.doorModelName,
+          width: width_m,
+          height: height_m,
+          qty: String(contractProductItems?.length),
+          isActive: activeWorksheetId === worksheet.id,
+          reviewStatus,
+          onClick: () => {
+            router.replace({
+              query: {
+                ...query,
+                activeWorksheetId: worksheet.id,
+                activedProdId: prod.id,
+                activeRecordId: undefined,
+              },
+            });
+
+            setDisabled(true);
+            setIsLastestRecord(false);
+          },
+          onDeleteClick: isReadonly
+            ? undefined
+            : () => {
+                myAlert.confirm({
+                  title: '確定刪除工作表?',
+
+                  props: {
+                    onOk: async () => {
+                      await reqAbandonWorkSheet(worksheet.id);
+                    },
+                  },
+                });
+              },
+        };
+
+        return intro;
+      });
+
+      control_productCardArr.push({
+        id: prod.id,
+        itemName: prod.itemName,
+        doorModelName: prod.doorModelName,
+        qty: prodQty,
+        width: prodWidth,
+        height: pridHeight,
+        onSeparateClick: isReadonly
+          ? undefined
+          : () => {
+              setInputModalProps({
+                title: `可分配數量${itemsNoWorksheet.length}`,
+                onConfirm: async (str) => {
+                  const qty = Number(str);
+
+                  if (qty > itemsNoWorksheet.length) {
+                    return myAlert.info({ title: '分配數量超過可分配數量' });
+                  }
+
+                  const pre_contractProductItems = itemsNoWorksheet.slice(0, qty);
+
+                  const contractProductItems = polyfillContractProductItems(pre_contractProductItems);
+
+                  const body: TcreateWorksheetDto = {
+                    contractId,
+                    contractProductItems,
+                  };
+
+                  await reqPostWorkSheet(body);
+                  setInputModalProps(undefined);
+                },
+              });
+            },
+        worksheetIntroArr,
+        isSpecialDoor: checkIsSpecialDoor(prod.doorModelName),
+      });
+    });
+
+    return { control_productCardArr, latestRecordArr, doorModelDict };
+    //
+  }, [activeWorksheetId, finalProduct, worksheetArr]);
+
+  return {
+    control_productCardArr,
+    latestRecordArr,
+  };
+};
+
+// MARK:useRecordList
+const useRecordList = ({
+  worksheetData,
+  setIsLastestRecord,
+}: {
+  worksheetData: TworksheetDto_addition | undefined;
+  setIsLastestRecord: (value: React.SetStateAction<boolean>) => void;
+}) => {
+  const router = useRouter();
+  const query = router.query;
+
+  const control_recordList: Tcontrol_recordList = useMemo(() => {
+    const records = _.sortBy(worksheetData?.records, 'version').reverse();
+
+    const recordArr: Trecord[] = records.map((record, index) => {
+      const {
+        contractProductItems,
+        agentEmployee, // 開立
+        addition: { reviewArr } = {},
+      } = record;
+
+      const contractProductItem = contractProductItems?.[0];
+      const {
+        //
+        itemName = '',
+        doorModelName = '',
+        fullWidth = '0',
+        height = '0',
+        materialName = '',
+        isAntiTyphoon = false,
+      } = contractProductItem ?? {};
+
+      const qty = contractProductItems?.length ?? 0;
+
+      const fullWidth_m = new Decimal(fullWidth).div(1000).toString();
+      const height_m = new Decimal(height).div(1000).toString();
+
+      const control_record: Trecord = {
+        itemName,
+        doorModel: doorModelName ?? '',
+        fullWidth: fullWidth_m,
+        height: height_m,
+        qty: String(qty),
+        material: materialName,
+        isAntiTyphoon: isAntiTyphoon ?? false,
+        agent: agentEmployee?.chName ?? '',
+        reviewFlowData: reviewArr,
+
+        onDetailClick: () => {
+          router.replace({
+            query: {
+              ...query,
+              activeRecordId: record.id,
+            },
+          });
+
+          if (index === 0) {
+            setIsLastestRecord(true);
+          }
+        },
+      };
+
+      return control_record;
+    });
+
+    return { recordArr };
+  }, [worksheetData]);
+
+  return control_recordList;
 };
