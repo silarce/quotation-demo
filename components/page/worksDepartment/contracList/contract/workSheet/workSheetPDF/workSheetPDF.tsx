@@ -21,6 +21,7 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 import scss from './workSheetPDF.module.scss';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // =====================================================================
 
@@ -56,6 +57,9 @@ type Tstate_showedSheet = {
 export type { Tcontrol as Tcontrol_workSheetPDF_01 };
 
 // =====================================================================
+
+// MARK:START
+
 export default function WorkSheetPDF({
   isShow,
   onCancel,
@@ -65,21 +69,20 @@ export default function WorkSheetPDF({
   onCancel: () => void;
   control: Tcontrol;
 }) {
+  const { itemArr, specialItemArr, w1w3ItemArr } = control;
+
+  // ---------------------------------------------------------------------
+  const refPdf = useRef<(HTMLDivElement | null)[]>([]);
+
   const [showSelector, setShowSelector] = useState(false);
 
-  // ---------------------------------------------------------------------
-
-  const itemArr = control.itemArr;
-  const specialItemArr = control.specialItemArr;
-  const w1w3ItemArr = control.w1w3ItemArr;
-  // ---------------------------------------------------------------------
-
   const { checkedSheetArr, createKit } = useCheckedSheet({
-    itemArr,
-    specialItemArr,
-    w1w3ItemArr,
+    itemArr: control.itemArr,
+    specialItemArr: control.specialItemArr,
+    w1w3ItemArr: control.w1w3ItemArr,
   });
 
+  // ---------------------------------------------------------------------
   const { chunkedList, chunkedList_specialItem, chunkedList_w1w3Item } = useMemo(() => {
     const checkedItemArr = checkedSheetArr
       .flatMap((item) => item.itemArr)
@@ -118,69 +121,14 @@ export default function WorkSheetPDF({
 
   // ---------------------------------------------------------------------
 
-  const refPdf = useRef<(HTMLDivElement | null)[]>([]);
-
-  const dlPdf = async () => {
-    if (!isShow || !refPdf.current[0]) {
-      return;
-    }
-
-    showRootLoading(true, '正在處理PDF');
-
-    // const doc = new jsPDF('l', 'px', 'a4');
-    const doc = new jsPDF({
-      orientation: 'l',
-      unit: 'px',
-      // format: 'a4',
-      format: 'a3',
-    });
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    let isFirst = true;
-    let item;
-
-    for (item of refPdf.current) {
-      if (!item) {
-        continue;
-      }
-
-      const image = await html2canvas(
-        item,
-        {
-          // scale: 5,
-          scale: 3,
-        }
-        // ,{
-        //   useCORS: true,
-        //   allowTaint: true,
-        // }
-      ).then((canvas) => {
-        const image = canvas.toDataURL('image/JPEG');
-
-        return image;
-      });
-
-      if (!isFirst) {
-        doc.addPage();
-      }
-
-      isFirst = false;
-      // 留作參考
-      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-      doc.addImage(image, 'png', 0, 0, pageWidth, pageHeight);
-    }
-
-    doc.save(`工作表${control.info.contractNumber}.pdf`);
-    showRootLoading(false);
-  };
+  refPdf.current = [];
 
   // ---------------------------------------------------------------------
+
+  // MARK:RENDER
+
   return (
     <Modal
-      //
       visible={isShow}
       footer={null}
       closable={false}
@@ -192,16 +140,22 @@ export default function WorkSheetPDF({
     >
       <div className={scss.panelBar}>
         <MyButton_v2
-          label="選擇"
+          label="選擇工作表"
           onClick={() => {
             setShowSelector(true);
-            // worksheetSelector({
-            //   checkedSheetArr,
-            //   createKit,
-            // });
           }}
         />
-        <MyButton_v2 label="下載PDF" onClick={dlPdf} />
+        <MyButton_v2
+          label="下載PDF"
+          onClick={() => {
+            // dlPdf();
+            console.log(refPdf.current);
+            dlPdf({
+              eleArr: refPdf.current,
+              pdfName: control.info.contractNumber,
+            });
+          }}
+        />
       </div>
 
       {chunkedList.map((itemArr, index) => {
@@ -209,12 +163,7 @@ export default function WorkSheetPDF({
           <div key={index}>
             {index !== 0 && <hr className=" border-black" />}
 
-            <div
-              //
-              ref={(ele) => (refPdf.current[index] = ele)}
-              className={scss.container}
-              id="report"
-            >
+            <div ref={(ele) => (refPdf.current[index] = ele)} className={scss.container}>
               <div>
                 <Title page={index + 1} pageCount={pageCount} />
                 <Info {...control.info} />
@@ -235,18 +184,15 @@ export default function WorkSheetPDF({
       })}
       {/*  */}
       {chunkedList_specialItem.map((specialItemArr, index) => {
+        const page = page_specialItem(index + 1);
+
         return (
           <div key={index}>
             {index !== 0 && <hr className=" border-black" />}
 
-            <div
-              //
-              ref={(ele) => (refPdf.current[index] = ele)}
-              className={scss.container}
-              id="report"
-            >
+            <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
               <div>
-                <Title page={page_specialItem(index + 1)} pageCount={pageCount} />
+                <Title page={page} pageCount={pageCount} />
                 <Info {...control.info} />
 
                 {specialItemArr.map((specialItem, index) => {
@@ -258,18 +204,15 @@ export default function WorkSheetPDF({
         );
       })}
       {chunkedList_w1w3Item.map((w1w3Item, index) => {
+        const page = page_w1w3Item(index + 1);
+
         return (
           <div key={index}>
             {index !== 0 && <hr className=" border-black" />}
 
-            <div
-              //
-              ref={(ele) => (refPdf.current[index] = ele)}
-              className={scss.container}
-              id="report"
-            >
+            <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
               <div>
-                <Title page={page_w1w3Item(index + 1)} pageCount={pageCount} />
+                <Title page={page} pageCount={pageCount} />
                 <Info {...control.info} />
                 <Table_w1w3 key={index} itemArr={w1w3Item} />
               </div>
@@ -280,20 +223,18 @@ export default function WorkSheetPDF({
       <ClearModal visible={showSelector} width={1000} zIndex={1001} onCancel={() => setShowSelector(false)}>
         <div className="p-5">
           {checkedSheetArr.map(({ parentId, parentItemName, itemArr: item }, index) => {
-            const { indeterminate, isAllChecked, checkAll, checkItem, renewItem, options } = createKit(index);
+            const { indeterminate, isAllChecked, checkAll, renewItem, options } = createKit(index);
 
             const value = item.filter((item) => item.checked).map((item) => item.id);
 
             return (
               <Fragment key={parentId}>
                 <div>
-                  {/*  */}
                   <div>
                     <Checkbox
                       indeterminate={indeterminate}
                       checked={isAllChecked}
                       onChange={(e) => {
-                        // console.log(e.target.checked);
                         checkAll(e.target.checked);
                       }}
                     >
@@ -323,7 +264,13 @@ export default function WorkSheetPDF({
   );
 }
 
+// MARK:END
+
 // =====================================================================
+// =====================================================================
+// =====================================================================
+
+// region COMPONENT
 
 const Title = ({ page, pageCount }: { page: React.ReactNode; pageCount: React.ReactNode }) => {
   return (
@@ -374,6 +321,7 @@ const Info = ({
   );
 };
 
+// MARK:useCheckedSheet
 const useCheckedSheet = ({
   itemArr,
   specialItemArr,
@@ -462,4 +410,55 @@ const useCheckedSheet = ({
     checkedSheetArr: stateArr,
     createKit,
   };
+};
+
+// =====================================================================
+
+// MARK:dlPdf
+const dlPdf = async ({ eleArr: eleArr, pdfName }: { eleArr: (HTMLDivElement | null)[]; pdfName?: string }) => {
+  if (eleArr.includes(null)) {
+    myAlert.err({ title: 'PDF生成失敗' });
+    console.error('eleArr', eleArr);
+
+    return;
+  }
+
+  showRootLoading(true, '正在處理PDF');
+
+  const doc = new jsPDF({
+    orientation: 'l',
+    unit: 'px',
+    format: 'a3',
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+
+  let isFirst = true;
+  let item;
+
+  for (item of eleArr) {
+    if (!item) {
+      continue;
+    }
+
+    const image = await html2canvas(item, {
+      scale: 3,
+    }).then((canvas) => {
+      const image = canvas.toDataURL('image/JPEG');
+
+      return image;
+    });
+
+    if (!isFirst) {
+      doc.addPage();
+    }
+
+    isFirst = false;
+
+    doc.addImage(image, 'png', 0, 0, pageWidth, pageHeight);
+  }
+
+  doc.save(`工作表${pdfName}.pdf`);
+  showRootLoading(false);
 };
