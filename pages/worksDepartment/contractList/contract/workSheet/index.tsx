@@ -139,6 +139,8 @@ export default function Worksheet({
   const [isShowPdf, setIsShowPdf] = useState(false);
   const [isShowPdf02, setIsShowPdf02] = useState(false);
 
+  // 資料裡面沒有property可供推斷該資料是否為最後的record，所以只能在這裡設狀態處裡
+  // 這導致直接以網址到指定工作表時isLastestRecord一定是false而無法編輯
   const [isLastestRecord, setIsLastestRecord] = useState<boolean>(false);
 
   // -------------------------------------------------------------------------
