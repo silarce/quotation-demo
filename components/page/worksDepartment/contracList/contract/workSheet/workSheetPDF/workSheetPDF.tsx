@@ -138,128 +138,130 @@ export default function WorkSheetPDF({
       wrapClassName={scss.antdModalWrapper}
       onCancel={onCancel}
     >
-      <div className={scss.panelBar}>
-        <MyButton_v2
-          label="選擇工作表"
-          onClick={() => {
-            setShowSelector(true);
-          }}
-        />
-        <MyButton_v2
-          label="下載PDF"
-          onClick={() => {
-            // dlPdf();
-            console.log(refPdf.current);
-            dlPdf({
-              eleArr: refPdf.current,
-              pdfName: control.info.contractNumber,
-            });
-          }}
-        />
-      </div>
+      <div className={scss.body}>
+        <div className={scss.panelBar}>
+          <MyButton_v2
+            label="選擇工作表"
+            onClick={() => {
+              setShowSelector(true);
+            }}
+          />
+          <MyButton_v2
+            label="下載PDF"
+            onClick={() => {
+              // dlPdf();
+              console.log(refPdf.current);
+              dlPdf({
+                eleArr: refPdf.current,
+                pdfName: control.info.contractNumber,
+              });
+            }}
+          />
+        </div>
 
-      {chunkedList.map((itemArr, index) => {
-        return (
-          <div key={index}>
-            {index !== 0 && <hr className=" border-black" />}
+        {chunkedList.map((itemArr, index) => {
+          return (
+            <div key={index}>
+              {index !== 0 && <hr className=" border-black" />}
 
-            <div ref={(ele) => (refPdf.current[index] = ele)} className={scss.container}>
-              <div>
-                <Title page={index + 1} pageCount={pageCount} />
-                <Info {...control.info} />
+              <div ref={(ele) => (refPdf.current[index] = ele)} className={scss.container}>
+                <div>
+                  <Title page={index + 1} pageCount={pageCount} />
+                  <Info {...control.info} />
 
-                <div className={scss.itemGrid}>
-                  {itemArr.map((control_item, index) => {
-                    return (
-                      <Fragment key={index}>
-                        <Miku_frontend_table01 control={control_item} />
-                      </Fragment>
-                    );
+                  <div className={scss.itemGrid}>
+                    {itemArr.map((control_item, index) => {
+                      return (
+                        <Fragment key={index}>
+                          <Miku_frontend_table01 control={control_item} />
+                        </Fragment>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        {/*  */}
+        {chunkedList_specialItem.map((specialItemArr, index) => {
+          const page = page_specialItem(index + 1);
+
+          return (
+            <div key={index}>
+              {index !== 0 && <hr className=" border-black" />}
+
+              <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
+                <div>
+                  <Title page={page} pageCount={pageCount} />
+                  <Info {...control.info} />
+
+                  {specialItemArr.map((specialItem, index) => {
+                    return <Table_specialDoor key={index} {...specialItem} />;
                   })}
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })}
-      {/*  */}
-      {chunkedList_specialItem.map((specialItemArr, index) => {
-        const page = page_specialItem(index + 1);
+          );
+        })}
+        {chunkedList_w1w3Item.map((w1w3Item, index) => {
+          const page = page_w1w3Item(index + 1);
 
-        return (
-          <div key={index}>
-            {index !== 0 && <hr className=" border-black" />}
+          return (
+            <div key={index}>
+              {index !== 0 && <hr className=" border-black" />}
 
-            <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
-              <div>
-                <Title page={page} pageCount={pageCount} />
-                <Info {...control.info} />
-
-                {specialItemArr.map((specialItem, index) => {
-                  return <Table_specialDoor key={index} {...specialItem} />;
-                })}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-      {chunkedList_w1w3Item.map((w1w3Item, index) => {
-        const page = page_w1w3Item(index + 1);
-
-        return (
-          <div key={index}>
-            {index !== 0 && <hr className=" border-black" />}
-
-            <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
-              <div>
-                <Title page={page} pageCount={pageCount} />
-                <Info {...control.info} />
-                <Table_w1w3 key={index} itemArr={w1w3Item} />
-              </div>
-            </div>
-          </div>
-        );
-      })}
-      <ClearModal visible={showSelector} width={1000} zIndex={1001} onCancel={() => setShowSelector(false)}>
-        <div className="p-5">
-          {checkedSheetArr.map(({ parentId, parentItemName, itemArr: item }, index) => {
-            const { indeterminate, isAllChecked, checkAll, renewItem, options } = createKit(index);
-
-            const value = item.filter((item) => item.checked).map((item) => item.id);
-
-            return (
-              <Fragment key={parentId}>
+              <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
                 <div>
-                  <div>
-                    <Checkbox
-                      indeterminate={indeterminate}
-                      checked={isAllChecked}
-                      onChange={(e) => {
-                        checkAll(e.target.checked);
-                      }}
-                    >
-                      <span className="text-xl text-main font-bold">{parentItemName}</span>
-                    </Checkbox>
-                  </div>
-                  <div>
-                    <CheckboxGroup
-                      value={value}
-                      options={options()}
-                      onChange={(arr) => {
-                        const valueArr = arr as string[];
-                        renewItem(valueArr);
-                      }}
-                    />
-                  </div>
+                  <Title page={page} pageCount={pageCount} />
+                  <Info {...control.info} />
+                  <Table_w1w3 key={index} itemArr={w1w3Item} />
                 </div>
-                <Divider />
-              </Fragment>
-            );
-          })}
-        </div>
-      </ClearModal>
+              </div>
+            </div>
+          );
+        })}
+        <ClearModal visible={showSelector} width={1000} zIndex={1001} onCancel={() => setShowSelector(false)}>
+          <div className="p-5">
+            {checkedSheetArr.map(({ parentId, parentItemName, itemArr: item }, index) => {
+              const { indeterminate, isAllChecked, checkAll, renewItem, options } = createKit(index);
 
-      {/*  */}
+              const value = item.filter((item) => item.checked).map((item) => item.id);
+
+              return (
+                <Fragment key={parentId}>
+                  <div>
+                    <div>
+                      <Checkbox
+                        indeterminate={indeterminate}
+                        checked={isAllChecked}
+                        onChange={(e) => {
+                          checkAll(e.target.checked);
+                        }}
+                      >
+                        <span className="text-xl text-main font-bold">{parentItemName}</span>
+                      </Checkbox>
+                    </div>
+                    <div>
+                      <CheckboxGroup
+                        value={value}
+                        options={options()}
+                        onChange={(arr) => {
+                          const valueArr = arr as string[];
+                          renewItem(valueArr);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <Divider />
+                </Fragment>
+              );
+            })}
+          </div>
+        </ClearModal>
+
+        {/*  */}
+      </div>
     </Modal>
   );
 }
