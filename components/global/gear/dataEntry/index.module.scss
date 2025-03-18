@@ -1,0 +1,165 @@
+.container {
+  position: relative;
+  display: flex;
+  // border: solid 1px black;
+  // background-color: pink;
+  // gap: 0px;
+  // align-items: flex-end;
+  // box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.captionWrapper {
+  flex: 0 0 auto;
+  border-bottom: solid 1px transparent;
+}
+
+.childrenWrapper {
+  flex: 1;
+  align-self: flex-end;
+
+  width: auto;
+  height: fit-content;
+  border-bottom: solid 1px transparent;
+  background-color: transparent;
+  > * {
+    display: block;
+  }
+
+  * {
+    background-color: transparent;
+  }
+  &.showBorder {
+    border-bottom-color: black;
+  }
+}
+
+// textarea
+.textarea {
+  width: 100%;
+}
+
+.datepicker {
+  &:global(.ant-picker) {
+    padding: 0;
+    border: 0;
+  }
+}
+.timepicker {
+  &:global(.ant-picker) {
+    padding: 0;
+    border: 0;
+  }
+}
+
+.checkbox {
+  display: flex;
+}
+
+.antdSelect,
+.antdSelect.plus,
+.antdSelect.plus.plus2 {
+  display: flex;
+  :global(.ant-select-selector) {
+    // background-color: transparent;
+    padding: unset;
+    border: unset;
+    height: unset;
+    :global(.ant-select-selection-placeholder),
+    :global(.ant-select-selection-item) {
+      line-height: unset;
+    }
+    &::after {
+      line-height: unset;
+    }
+  }
+
+  :global(.ant-select-selection-search-input) {
+    height: unset;
+  }
+
+  :global(.ant-select-arrow),
+  :global(.ant-select-clear) {
+    right: 3px;
+  }
+}
+
+// ===========================================
+
+//
+//
+// select
+.control.plus {
+  min-height: unset;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  &.disabled {
+    cursor: unset;
+  }
+}
+
+.valueContainer.plus {
+  padding: 0;
+}
+.singleValue.plus {
+  margin: 0;
+}
+.input.plus {
+  padding: 0;
+  margin: 0;
+}
+
+.indicatorsContainer.plus {
+  padding: 0;
+  [class$="indicatorContainer"] {
+    padding: 0;
+  }
+}
+
+.indicatorSeparator.plus {
+  margin: 0;
+  display: none;
+}
+
+.option.plus {
+}
+
+// ==================================================
+
+.inputSelect {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 20px;
+  > input {
+    width: 100%;
+  }
+  .container.plus {
+    position: unset;
+  }
+  .menu.plus {
+    left: 0;
+  }
+  .valueContainer.plus {
+    display: none;
+  }
+  .indicatorsContainer_inputSelect.plus {
+    cursor: pointer;
+  }
+  .indicatorSeparator_inputSelect.plus {
+    margin: 0;
+  }
+}
+// ==================================================
+.mustTip {
+  position: absolute;
+  top: -15px;
+  left: -10px;
+  color: red;
+  font-size: 25px;
+}
+
+// ==================================================
+.none,
+.none.plus {
+  display: none;
+}
