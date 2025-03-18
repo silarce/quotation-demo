@@ -5,7 +5,7 @@ import Row, { Cell } from 'components/global/gear/table/row';
 
 interface Tprops_table_w1w3 {
   doorModelName: React.ReactNode;
-  itemName: React.ReactNode;
+  itemName: string;
   qty: React.ReactNode;
   fullWidth: React.ReactNode;
   height: React.ReactNode;

@@ -153,7 +153,20 @@ const Form_specialProd_basic = ({
     <div>
       <div className={scss.grid}>
         <InputSel {...basicConfig} disabled={true} caption="報價別" node={quoteType} showBaseline="invisible" />
-        <InputSel {...basicConfig} disabled={true} caption="項目" node={itemName} showBaseline="invisible" />
+        <InputSel
+          {...basicConfig}
+          disabled={disabled}
+          caption="項目"
+          inputProps={{
+            props: {
+              value: itemName,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+                setState((prev) => ({ ...prev, itemName: value }));
+              },
+            },
+          }}
+        />
         <InputSel
           {...basicConfig}
           caption="門型"
