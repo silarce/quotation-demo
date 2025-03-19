@@ -7,7 +7,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 40px 30px 100px 100px 150px 400px 400px 100px 50px 100px 100px 250px;
+  grid-template-columns: 40px 30px 100px 100px 100px 150px 400px 400px 100px 100px 100px 50px 100px 100px 250px;
   gap: 10px; // 與 panelHeader15 的 row01 保持一致
   height: 40px;
   padding: 0px 20px;
@@ -36,26 +36,26 @@
 div.panelHeader15 {
   border-bottom: solid 1px $colorBorder01;
   padding: 15px 20px;
-
+  
   .row01,
   .row02 {
-    span {
-      font-weight: 400;
-      font-size: 16px;
+      span {
+          font-weight: 400;
+          font-size: 16px;
+        }
+        
+        .clientName,
+        .country {
+            color: $colorMain;
+        }
     }
-
-    .clientName,
-    .country {
-      color: $colorMain;
-    }
-  }
-
-  .row01 {
-    display: grid;
-    grid-template-columns: 40px 30px 100px 100px 150px 400px 400px 100px 50px 100px 100px 250px;
-    gap: 10px; // 與 head15 保持一致
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    
+    .row01 {
+        display: grid;
+        grid-template-columns: 40px 30px 100px 100px 100px 150px 400px 400px 100px 100px 100px 50px 100px 100px 250px;
+        gap: 10px; // 與 head15 保持一致
+        cursor: pointer;
+        transition: background-color 0.3s ease;
   }
 
   .selectedRow {
