@@ -1379,24 +1379,47 @@ export default function PReceiptDetail() {
 
     //更新明細資料
     const handleStringChange = (index: number, key: string, value: string) => {
-        const updatedData2 = [...data2];  // 使用淺拷貝
-        updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
-        setData2(updatedData2);  // 更新data2
-
-        if (key === 'productid' || key === 'name' || key === 'spec') {
+        const updatedData2 = [...data2]; // 淺拷貝
+        const currentItem = { ...updatedData2[index] }; // 複製當前項
+    
+        // 處理不同的欄位
+        if (key === "quantity") {
+            const newQuantity = parseFloat(value) || 0;
+            currentItem.quantity = parseFloat(newQuantity.toFixed(3)); // 保留小數點後三位
+            currentItem.totalprice = parseFloat((newQuantity * (parseFloat(currentItem.unitprice) || 0)).toFixed(3)); // 更新總價並保留小數點後三位
+        } else if (key === "unitprice") {
+            const newUnitprice = parseFloat(value) || 0;
+            currentItem.unitprice = parseFloat(newUnitprice.toFixed(3)); // 保留小數點後三位
+            currentItem.totalprice = parseFloat((newUnitprice * (parseFloat(currentItem.quantity) || 0)).toFixed(3)); // 更新總價並保留小數點後三位
+        } else if (key === "totalprice") {
+            const newTotalprice = parseFloat(value) || 0;
+            currentItem.totalprice = parseFloat(newTotalprice.toFixed(3)); // 保留小數點後三位
+            currentItem.unitprice =
+                (parseFloat(currentItem.quantity) || 0) > 0
+                    ? parseFloat((newTotalprice / (parseFloat(currentItem.quantity) || 0)).toFixed(3)) // 更新單價並保留小數點後三位
+                    : 0;
+        } else {
+            currentItem[key] = value; // 其他欄位直接更新
+        }
+    
+        updatedData2[index] = currentItem;
+        setData2(updatedData2); // 更新狀態
+    
+        // 保留過濾邏輯（productid, name, spec）
+        if (key === "productid" || key === "name" || key === "spec") {
             const filters = {
-                productid: updatedData2[index].productid?.trim().toLowerCase() || "",
-                name: updatedData2[index].name?.trim().toLowerCase() || "",
-                spec: updatedData2[index].spec?.trim().toLowerCase() || ""
+                productid: currentItem.productid?.trim().toLowerCase() || "",
+                name: currentItem.name?.trim().toLowerCase() || "",
+                spec: currentItem.spec?.trim().toLowerCase() || "",
             };
-
-            if (Object.values(filters).some(filter => filter !== "")) {
-                const filtered = data.filter(item =>
-                    (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
-                    (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
-                    (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
+            if (Object.values(filters).some((filter) => filter !== "")) {
+                const filtered = data.filter(
+                    (item) =>
+                        (!filters.productid ||
+                            item.productid?.toLowerCase().includes(filters.productid)) &&
+                        (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
+                        (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
                 );
-
                 setFilteredData(filtered);
                 setShowSuggestions(true);
             } else {
@@ -1404,6 +1427,7 @@ export default function PReceiptDetail() {
             }
         }
     };
+    
 
     //focus選中的明細
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -2085,6 +2109,9 @@ export default function PReceiptDetail() {
                                                         const value = e.target.value;
                                                         setSuppliernamein(value); // 僅更新 suppliernamein
                                                         setIsFilterVisible(true);  // 隱藏篩選區域
+                                                        setKeyword4(value);
+
+
                                                     },
                                                 },
                                             }}
@@ -2243,6 +2270,7 @@ export default function PReceiptDetail() {
                                                 <div
                                                     key={index}
                                                     onClick={() => {
+                                                        setKeyword4(_item.name || '');
                                                         setSuppliernamein(_item.name || '');
                                                         setSupplieraddressin(
                                                             (_item.county || '') +
@@ -2462,8 +2490,8 @@ export default function PReceiptDetail() {
                                                 const handleCheckboxChange = (checked: any) => {
 
                                                     if (checked) {
-                                                        // 如果 data2 非空且供應商名稱不同，顯示錯誤並中止
-                                                        if (data2.length > 0 && suppliernamein !== _item.suppliername) {
+                                                        // 如果 data2 非空且供應商名稱不同且 suppliernamein 不為空，顯示錯誤並中止
+                                                        if (data2.length > 0 && suppliernamein !== _item.suppliername && suppliernamein !== "") {
                                                             myAlert.warning({ title: "不同供應商品項" });
                                                             return;
                                                         }
@@ -2721,8 +2749,8 @@ export default function PReceiptDetail() {
                                 </div>
                                 {data2 && (
                                     data2.map((_item, index) => {
-                                        const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
-                                        _item.totalprice = Totalprice
+                                        // const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                                        // _item.totalprice = Totalprice
                                         if (_item.wantinquantity === 0) {
                                             const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.alreadyinquantity);
                                             _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
@@ -2794,17 +2822,17 @@ export default function PReceiptDetail() {
                                                         <input
                                                             ref={quantityRefs.current[index]}
                                                             style={{
-                                                                backgroundColor: 'transparent',
+                                                                backgroundColor: "transparent",
                                                                 borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
+                                                                width: "95%",
                                                             }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.quantity : Number(_item.quantity).toLocaleString()}
+                                                            type={isEditing ? "number" : "text"}
+                                                            value={
+                                                                isEditing ? _item.quantity : Number(_item.quantity).toLocaleString()
+                                                            }
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
+                                                                handleStringChange(index, "quantity", e.target.value);
                                                             }}
                                                         />
                                                     </span>
@@ -2847,25 +2875,17 @@ export default function PReceiptDetail() {
                                                         <input
                                                             ref={unitpriceRefs.current[index]}
                                                             style={{
-                                                                backgroundColor: 'transparent',
+                                                                backgroundColor: "transparent",
                                                                 borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
+                                                                width: "95%",
                                                             }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.unitprice : Number(_item.unitprice).toLocaleString()}
+                                                            type={isEditing ? "number" : "text"}
+                                                            value={
+                                                                isEditing ? _item.unitprice : Number(_item.unitprice).toLocaleString()
+                                                            }
                                                             readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                // handleStringChange(index, "unitprice", e.target.value); {/* 處理變更 */ }
-                                                                const newData = [...data2];
-                                                                const newUnitprice = e.target.value;
-                                                                newData[index] = {
-                                                                    ...newData[index],
-                                                                    unitprice: isEditing ? newUnitprice : parseFloat(newUnitprice.replace(/,/g, ''))
-
-                                                                };
-                                                                setData2(newData);
+                                                                handleStringChange(index, "unitprice", e.target.value);
                                                             }}
                                                         />
                                                     </span>
@@ -2873,18 +2893,19 @@ export default function PReceiptDetail() {
                                                         <input
                                                             ref={totalpriceRefs.current[index]}
                                                             style={{
-                                                                backgroundColor: 'transparent',
-                                                                // borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
+                                                                backgroundColor: "transparent",
+                                                                borderBottom: isEditing ? "1px solid black" : "",
+                                                                width: "95%",
                                                             }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.totalprice : Number(_item.totalprice).toLocaleString()}
-                                                            // readOnly={!isEditing}
-                                                            readOnly
+                                                            type={isEditing ? "number" : "text"}
+                                                            value={
+                                                                isEditing
+                                                                    ? _item.totalprice
+                                                                    : Number(_item.totalprice).toLocaleString()
+                                                            }
+                                                            readOnly={!isEditing}
                                                             onChange={(e) => {
-                                                                handleStringChange(index, "totalprice", e.target.value); {/* 處理變更 */ }
+                                                                handleStringChange(index, "totalprice", e.target.value);
                                                             }}
                                                         />
                                                     </span>

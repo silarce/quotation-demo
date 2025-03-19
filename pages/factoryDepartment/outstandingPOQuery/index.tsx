@@ -65,7 +65,7 @@ import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
 export default function outstandingPOQuery() {
-    const [pagename, setPagename] = useState<string>("採購未交查詢")
+    const [pagename, setPagename] = useState<string>("未交貨查詢")
     const [autoRefreshOpen, setAutoRefreshOpen] = useState<boolean>(false)
     const [autoRefresh, setAutoRefresh] = useState<number>(1)//分鐘
     //#region ===========【路由參數】
@@ -191,7 +191,7 @@ export default function outstandingPOQuery() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "價格查詢",
+                type: "未交貨查詢",
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -204,7 +204,7 @@ export default function outstandingPOQuery() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetAllQuotereqDetail?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetUnReceipt?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -394,16 +394,16 @@ export default function outstandingPOQuery() {
     const filterData = () => {
         const startDate = keywordstartdate;
         const endDate = keywordenddate;
-        const type = keyword5.trim().toLowerCase(); // 將條件轉為小寫
+        const supplierid = keyword5.trim().toLowerCase(); // 將條件轉為小寫
         const supplier = keyword1.trim().toLowerCase();
         const productid = keyword2.trim().toLowerCase();
         const name = keyword3.trim().toLowerCase();
         const spec = keyword4.trim().toLowerCase();
-    
+
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
-            !type &&
+            !supplierid &&
             !supplier &&
             !productid &&
             !name &&
@@ -411,7 +411,7 @@ export default function outstandingPOQuery() {
             setSearchdata(data);
             return;
         }
-    
+
         // 過濾資料
         let filteredData = data.filter(item => {
             const createAt = moment(item.create_at);
@@ -420,42 +420,42 @@ export default function outstandingPOQuery() {
                 : createAt.isBetween(startDate, endDate, 'days', '[]');
             return isDateInRange;
         });
-    
-        // 模糊查詢價格類別(詢價/進價)
-        if (type) {
+
+        // 模糊查詢價格類別(廠商編號)
+        if (supplierid) {
             filteredData = filteredData.filter(item =>
-                item.detail_type?.toString().toLowerCase().includes(type) // 忽略大小寫
+                item.supplierid?.toString().toLowerCase().includes(supplierid) // 忽略大小寫
             );
         }
-    
+
         // 模糊查詢單據狀態
         if (supplier) {
             filteredData = filteredData.filter(item =>
-                item.detail_suppliername?.toString().toLowerCase().includes(supplier) // 忽略大小寫
+                item.suppliername?.toString().toLowerCase().includes(supplier) // 忽略大小寫
             );
         }
-    
+
         if (productid) {
             filteredData = filteredData.filter(item =>
-                item.detail_productid?.toString().toLowerCase().includes(productid) // 忽略大小寫
+                item.productid?.toString().toLowerCase().includes(productid) // 忽略大小寫
             );
         }
-    
+
         if (name) {
             filteredData = filteredData.filter(item =>
-                item.detail_name?.toString().toLowerCase().includes(name) // 忽略大小寫
+                item.name?.toString().toLowerCase().includes(name) // 忽略大小寫
             );
         }
-    
+
         if (spec) {
             filteredData = filteredData.filter(item =>
-                item.detail_spec?.toString().toLowerCase().includes(spec) // 忽略大小寫
+                item.spec?.toString().toLowerCase().includes(spec) // 忽略大小寫
             );
         }
-    
+
         setSearchdata(filteredData);
     };
-    
+
 
     // 監聽條件變更
     useEffect(() => {
@@ -495,7 +495,7 @@ export default function outstandingPOQuery() {
                 ]}
 
                 panelList={panelList} />
-                
+
             <div
                 style={{
                     display: `${isCollapsed ? '' : 'none'}`,
@@ -509,7 +509,7 @@ export default function outstandingPOQuery() {
                     {/* 每個項目 */}
                     <div>
                         {/* 種類下拉選單 */}
-                        <label
+                        {/* <label
                             style={{
                                 fontSize: "16px",
                                 fontWeight: "bold",
@@ -536,8 +536,32 @@ export default function outstandingPOQuery() {
                             <option value="">全部</option>
                             <option value="詢價">詢價</option>
                             <option value="進價">進價</option>
-                        </select>
-
+                        </select> */}
+                        {/* 廠商編號 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            廠商編號
+                        </label>
+                        <InputSel
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            inputProps={{
+                                props: {
+                                    placeholder: '請輸入廠商編號',
+                                    style: { width: "300px", paddingLeft: '5px' },
+                                    value: keyword5,
+                                    onChange: (e) => {
+                                        setKeyword5(e.target.value)
+                                    }
+                                },
+                            }}
+                        />
                     </div>
                     <div>
                         {/* 廠商名稱 */}
@@ -777,11 +801,14 @@ export default function outstandingPOQuery() {
                         </span>
                         <span>序</span>
                         <span>單號</span>
-                        <span>日期</span>
+                        <span>建立日期</span>
+                        <span>需用日期</span>
                         <span>料號</span>
                         <span>品名</span>
                         <span>規格</span>
                         <span>數量</span>
+                        <span>已交貨</span>
+                        <span>未交數</span>
                         <span>單位</span>
                         <span>單價</span>
                         <span>總價</span>
@@ -819,7 +846,8 @@ export default function outstandingPOQuery() {
                                             onOk: () => {
                                                 router.push({
                                                     pathname:
-                                                        `${updatedItem.detail_type === "詢價" ? '/factoryDepartment/QReqDetail' : '/factoryDepartment/PReceiptDetail'}`,
+                                                        // `${updatedItem.detail_type === "詢價" ? '/factoryDepartment/QReqDetail' : '/factoryDepartment/PReceiptDetail'}`,
+                                                        `/factoryDepartment/POrderDetail`,
                                                     query: {
                                                         item: JSON.stringify(updatedItem),
                                                     },
@@ -837,24 +865,27 @@ export default function outstandingPOQuery() {
                                                 ${_item.prodentryuuid === selectedItemId ? scss.selectedRow : ''}`}
                                     >
                                         <span style={{ color: '#14256a' }}>
-                                            {_item.detail_type}
+
                                         </span>
                                         <span>{index + 1}</span>
-                                        <span>{_item.detail_main_id}</span>
-                                        <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                        <span>{_item.purchaseorderid}</span>
+                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                        <span>{getTaiwanDateStr(_item.need_date)}</span>
                                         <span>
-                                            {_item.detail_productid}
+                                            {_item.productid}
                                         </span>
                                         <span>
-                                            {_item.detail_name}
+                                            {_item.name}
                                         </span>
-                                        <span>{_item.detail_spec}</span>
-                                        <span>{Number(_item.detail_quantity).toLocaleString()}</span>
-                                        <span>{_item.detail_unit}</span>
-                                        <span style={{ color: '#ea1833' }}>{Number(_item.detail_unitprice).toLocaleString()}</span>
-                                        <span>{Number(_item.detail_totalprice).toLocaleString()}</span>
+                                        <span>{_item.spec}</span>
+                                        <span>{Number(_item.quantity).toLocaleString()}</span>
+                                        <span style={{ color: '#14256a' }}>{Number(_item.alreadyinquantity).toLocaleString()}</span>
+                                        <span style={{ color: '#ea1833' }}>{(Number(_item.quantity) - Number(_item.alreadyinquantity)).toLocaleString()}</span>
+                                        <span>{_item.unit}</span>
+                                        <span>{Number(_item.unitprice).toLocaleString()}</span>
+                                        <span>{Number(_item.totalprice).toLocaleString()}</span>
                                         <span>
-                                            {_item.detail_suppliername}
+                                            {_item.suppliername}
                                         </span>
                                     </div>
                                 </>
