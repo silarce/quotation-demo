@@ -477,16 +477,33 @@ export default function noTrayList() {
                                 }}
                             >
                                 <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
-                                    <img src={icon_search2.src} alt="search"  />
+                                    <img src={icon_add.src} alt="add" />
                                 </span>
-                                物料查詢
+                                加入物料
                             </button>
                         </span>
                     </>
                 ]}
                 customeRight={[
                     <>
-
+                        <button
+                            className={scss.shortsquarebtn}
+                            onClick={() => {
+                                myAlert.confirm({
+                                    title: `確定要返回嗎?`,
+                                    content: <>
+                                        <h1>未儲存的資料將不會保留</h1>
+                                    </>,
+                                    props: {
+                                        onOk: () => {
+                                            router.back();
+                                        }
+                                    }
+                                })
+                            }}
+                        >
+                            返回
+                        </button >
                     </>
                 ]} />
             <div style={{ display: `${productbar ? '' : 'none'}` }}>
