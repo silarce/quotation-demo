@@ -17,7 +17,7 @@ type Tstate_electronicItem = {
   // // 目前只有需要編輯category的item會用到
   // // idName?: string;
 
-  inputCategory?: () => Promise<string>;
+  // inputCategory?: () => Promise<string>;
   categoryParam: string;
 };
 
@@ -125,19 +125,19 @@ const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
     quantity: null,
     unit: null,
     code: null,
-    async inputCategory() {
-      const str = await new Promise<string>((resolve) => {
-        const { destroy } = myAlert.input({
-          title: '鎖號',
-          onConfirm: (value) => {
-            destroy();
-            resolve('鎖號 : ' + value);
-          },
-        });
-      });
+    // async inputCategory() {
+    //   const str = await new Promise<string>((resolve) => {
+    //     const { destroy } = myAlert.input({
+    //       title: '鎖號',
+    //       onConfirm: (value) => {
+    //         destroy();
+    //         resolve('鎖號 : ' + value);
+    //       },
+    //     });
+    //   });
 
-      return str;
-    },
+    //   return str;
+    // },
   },
   {
     category: '特殊鎖號',
@@ -198,36 +198,36 @@ const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
     quantity: null,
     unit: null,
     code: null,
-    async inputCategory() {
-      const str = await new Promise<string>((resolve) => {
-        const { destroy } = myAlert.input({
-          title: '彈射門控制箱',
-          props_input: [
-            {
-              caption: 'HP',
-            },
-            {
-              caption: '電壓',
-            },
-            {
-              caption: '馬達廠商',
-            },
-          ],
-          onConfirm: (value) => {
-            const [hp, voltage, motorVendor] = value;
-            let str = '彈射門控制箱';
-            hp && (str += ` ${hp}HP`);
-            voltage && (str += ` ${voltage}V`);
-            motorVendor && (str += ` ${motorVendor}`);
+    // async inputCategory() {
+    //   const str = await new Promise<string>((resolve) => {
+    //     const { destroy } = myAlert.input({
+    //       title: '彈射門控制箱',
+    //       props_input: [
+    //         {
+    //           caption: 'HP',
+    //         },
+    //         {
+    //           caption: '電壓',
+    //         },
+    //         {
+    //           caption: '馬達廠商',
+    //         },
+    //       ],
+    //       onConfirm: (value) => {
+    //         const [hp, voltage, motorVendor] = value;
+    //         let str = '彈射門控制箱';
+    //         hp && (str += ` ${hp}HP`);
+    //         voltage && (str += ` ${voltage}V`);
+    //         motorVendor && (str += ` ${motorVendor}`);
 
-            resolve(str);
-            destroy();
-          },
-        });
-      });
+    //         resolve(str);
+    //         destroy();
+    //       },
+    //     });
+    //   });
 
-      return str;
-    },
+    //   return str;
+    // },
   },
   {
     category: 'UPS不斷電系統 1HP',

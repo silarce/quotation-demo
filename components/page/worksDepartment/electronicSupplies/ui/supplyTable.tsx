@@ -248,7 +248,14 @@ const useStateToGroup = ({
     } = {};
 
     stateArr.forEach((item) => {
-      const { itemName, category, categoryParam, quantity, subItemName, inputCategory } = item;
+      const {
+        itemName,
+        category,
+        categoryParam,
+        quantity,
+        subItemName,
+        //  inputCategory
+      } = item;
 
       if (!list[itemName]) {
         list[itemName] = {
@@ -258,20 +265,21 @@ const useStateToGroup = ({
         };
       }
 
-      const theCategory = inputCategory ? (
-        <span className="flex gap-1">
-          {categoryParam}
-          <IconEdit
-            className={classNames(disabled && 'invisible')}
-            onClick={async () => {
-              const categoryValue = await inputCategory();
-              handler_editCategoryValue({ key: category, categoryParam: categoryValue });
-            }}
-          />
-        </span>
-      ) : (
-        categoryParam || category
-      );
+      // const theCategory = inputCategory ? (
+      //   <span className="flex gap-1">
+      //     {categoryParam}
+      //     <IconEdit
+      //       className={classNames(disabled && 'invisible')}
+      //       onClick={async () => {
+      //         const categoryValue = await inputCategory();
+      //         handler_editCategoryValue({ key: category, categoryParam: categoryValue });
+      //       }}
+      //     />
+      //   </span>
+      // ) : (
+      //   categoryParam || category
+      // );
+      const theCategory = categoryParam || category;
 
       list[itemName].rowArr.push({
         category: theCategory,
