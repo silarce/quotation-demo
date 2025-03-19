@@ -73,6 +73,7 @@ import {
   calcQtyModify,
   calcProdRemain,
 } from '../../method/calcProd';
+import TheadItem from 'components/global/gear/HOC/dnd/dndTable01/gear/dndThead/theadItem';
 
 // ================================================================================
 
@@ -864,8 +865,7 @@ class ClassProd {
     this.renewDistributionBoxPrice();
 
     // 取得boxD並更新state
-    const boxD = await reqGetBoxD(this);
-    this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
+    await this.updateBoxD();
 
     // 取得slatCount並更新state
     const slatCount = await reqGetSlatCount(this);
@@ -921,6 +921,13 @@ class ClassProd {
     this.state.generateDoorProductBom = bom;
 
     Object.values(this.classComponentDict).forEach((classComponent) => classComponent.onBomUpdate());
+  }
+
+  // MARK: updateBodD
+  async updateBoxD() {
+    const boxD = await reqGetBoxD(this);
+    this.data.boxD = new Decimal(boxD || 0).div(1000).toString() as `${number}`;
+    this.render();
   }
 
   // ---------------------------------------------------------------------------
@@ -1484,7 +1491,11 @@ class ClassProd {
     this.data.area = this.calcArea(this);
     this.renewInstallationFee();
 
-    this.isAllowReqChain && this.reqChain_03();
+    this.isAllowReqChain &&
+      (async () => {
+        await this.updateBoxD();
+        await this.reqChain_03();
+      })();
 
     this.render();
   }
@@ -1597,7 +1608,11 @@ class ClassProd {
     this.renewPhase();
     this.renewDistributionBoxPrice();
 
-    this.isAllowReqChain && this.reqChain_03();
+    this.isAllowReqChain &&
+      (async () => {
+        await this.updateBoxD();
+        await this.reqChain_03();
+      })();
 
     this.render();
   }

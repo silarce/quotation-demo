@@ -13,9 +13,58 @@ export default function SidePatFactoryDepartment() {
             path,
             list: [
                 {
+                    label: '報表查詢',
+                    erpFeature: devPass,
+                    list: [
+                        {
+                            label: '價格查詢',
+                            path: path + '/PriQueryList',
+                            activeChecker: ({ router }) => {
+                                const { pathname, query } = router;
+
+                                if (pathname === '/factoryDepartment/PriQueryList') {
+                                    return true;
+                                }
+
+                                return false;
+                            },
+                            erpFeature: [fac],
+                        },
+                        {
+                            label: '未交貨查詢',
+                            path: path + '/outstandingPOQuery',
+                            activeChecker: ({ router }) => {
+                                const { pathname, query } = router;
+
+                                if (pathname === '/factoryDepartment/outstandingPOQuery') {
+                                    return true;
+                                }
+
+                                return false;
+                            },
+                            erpFeature: [fac],
+                        },
+                        {
+                            label: '出入庫查詢',
+                            path: path + '/ProdInOutQueryList',
+                            activeChecker: ({ router }) => {
+                                const { pathname, query } = router;
+
+                                if (pathname === '/factoryDepartment/ProdInOutQueryList') {
+                                    return true;
+                                }
+
+                                return false;
+                            },
+                            erpFeature: [fac],
+                        },
+                    ],
+                },
+                {
                     label: '單據管理',
                     erpFeature: devPass,
                     list: [
+
                         {
                             label: '客戶列表',
                             path: path + '/customerQueryList',
@@ -30,21 +79,7 @@ export default function SidePatFactoryDepartment() {
                             // },
                             erpFeature: [fac],
                         },
-                        {
-                            label: '價格查詢',
-                            // path: path + '/quotereqList',
-                            path: path + '/PriQueryList',
-                            activeChecker: ({ router }) => {
-                                const { pathname, query } = router;
 
-                                if (pathname === '/factoryDepartment/PriQueryList') {
-                                    return true;
-                                }
-
-                                return false;
-                            },
-                            erpFeature: [fac],
-                        },
                         {
                             label: '詢價列表',
                             // path: path + '/quotereqList',
@@ -131,21 +166,7 @@ export default function SidePatFactoryDepartment() {
                     label: '倉儲管理',
                     erpFeature: devPass,
                     list: [
-                        {
-                            label: '出入庫查詢',
-                            // path: path + '/quotereqList',
-                            path: path + '/ProdInOutQueryList',
-                            activeChecker: ({ router }) => {
-                                const { pathname, query } = router;
 
-                                if (pathname === '/factoryDepartment/ProdInOutQueryList') {
-                                    return true;
-                                }
-
-                                return false;
-                            },
-                            erpFeature: [fac],
-                        },
                         {
                             label: '入庫列表',
                             path: path + '/PEntryList',

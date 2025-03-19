@@ -50,6 +50,7 @@ export default function TextListEditor_v2({
             <InputSel
               className={classNames(scss.inputSel)}
               textareaProps={{
+                allowNewLineByUser: true,
                 props: {
                   placeholder: '請輸入' + label,
                   value: memo,

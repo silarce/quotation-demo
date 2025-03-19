@@ -1,0 +1,224 @@
+.container {
+  position: relative;
+  display: flex;
+  // border: solid 1px black;
+  // background-color: pink;
+  // gap: 0px;
+  // align-items: flex-end;
+  // box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.captionWrapper {
+  flex: 0 0 auto;
+  border-bottom: solid 1px transparent;
+}
+
+.childrenWrapper {
+  flex: 1;
+  align-self: flex-end;
+
+  width: auto;
+  height: fit-content;
+  border-bottom: solid 1px transparent;
+  background-color: transparent;
+  > * {
+    display: block;
+  }
+
+  * {
+    background-color: transparent;
+  }
+  &.showBorder {
+    border-bottom-color: black;
+  }
+}
+
+// textarea
+.textarea {
+  width: 100%;
+}
+
+.datepicker {
+  &:global(.ant-picker) {
+    padding: 0;
+    border: 0;
+  }
+}
+.timepicker {
+  &:global(.ant-picker) {
+    padding: 0;
+    border: 0;
+  }
+}
+
+.checkbox {
+  display: flex;
+}
+
+.antdSelect,
+.antdSelect.plus,
+.antdSelect.plus.plus2 {
+  display: flex;
+  :global(.ant-select-selector) {
+    // background-color: transparent;
+    padding: unset;
+    border: unset;
+    height: unset;
+    :global(.ant-select-selection-placeholder),
+    :global(.ant-select-selection-item) {
+      line-height: unset;
+    }
+    &::after {
+      line-height: unset;
+    }
+  }
+
+  :global(.ant-select-selection-search-input) {
+    height: unset;
+  }
+
+  :global(.ant-select-arrow),
+  :global(.ant-select-clear) {
+    right: 3px;
+  }
+}
+
+// ===========================================
+
+//
+//
+// select
+
+.control_base {
+  min-height: unset;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  &.disabled {
+    cursor: unset;
+  }
+}
+
+.valueContainer_base {
+  padding: 0;
+}
+.singleValue_base {
+  margin: 0;
+}
+.input_base {
+  padding: 0;
+  margin: 0;
+}
+
+.indicatorsContainer_base {
+  padding: 0;
+  [class$="indicatorContainer"] {
+    padding: 0;
+  }
+}
+
+.indicatorSeparator_base {
+  margin: 0;
+  display: none;
+}
+
+.option_base {
+  cursor: pointer;
+}
+
+// .container.plus {
+//   z-index: 2;
+// }
+
+.control.plus {
+  @extend .control_base;
+}
+.valueContainer.plus {
+  @extend .valueContainer_base;
+}
+.singleValue.plus {
+  @extend .singleValue_base;
+}
+.input.plus {
+  @extend .input_base;
+}
+.indicatorsContainer.plus {
+  @extend .indicatorsContainer_base;
+}
+.indicatorSeparator.plus {
+  @extend .indicatorSeparator_base;
+}
+.option.plus {
+  @extend .option_base;
+}
+
+// ==================================================
+
+.inputSelect {
+  position: relative;
+  z-index: 0;
+  // 原本是採用grid將兩input與label分為兩邊
+  // 但是這樣會使Select的Menu長度縮短
+  // 所以採用將input覆蓋在label上的作法
+  > input {
+    position: relative;
+    z-index: 2;
+    width: calc(100% - 20px);
+  }
+  > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+  }
+}
+
+.control_inputSelect.plus {
+  @extend .control_base;
+  width: 100%;
+}
+.valueContainer_inputSelect.plus {
+  @extend .valueContainer_base;
+  visibility: hidden;
+}
+.singleValue_inputSelect.plus {
+  @extend .singleValue_base;
+  visibility: hidden;
+}
+.input_inputSelect.plus {
+  @extend .input_base;
+  visibility: hidden;
+}
+.indicatorsContainer_inputSelect.plus {
+  @extend .indicatorsContainer_base;
+  // cursor: pointer;
+}
+.indicatorSeparator_inputSelect.plus {
+  @extend .indicatorSeparator_base;
+  margin: 0;
+}
+.option_inputSelect.plus {
+  @extend .option_base;
+  background-color: transparent;
+  color: black;
+  &:hover {
+    background-color: #deebff;
+  }
+}
+
+// ==================================================
+.mustTip {
+  position: absolute;
+  top: -15px;
+  left: -10px;
+  color: red;
+  font-size: 25px;
+}
+
+// ==================================================
+.none,
+.none.plus {
+  display: none;
+}
