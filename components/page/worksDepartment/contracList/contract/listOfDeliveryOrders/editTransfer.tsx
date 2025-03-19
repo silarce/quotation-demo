@@ -173,6 +173,7 @@ const config: {
       return (
         <DataEntry>
           <DataEntry.Input
+            className="text-center"
             disabled={disabled}
             type="number"
             min={0}
