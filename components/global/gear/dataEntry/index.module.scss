@@ -122,31 +122,59 @@
 }
 
 .option.plus {
+  cursor: pointer;
 }
 
 // ==================================================
 
 .inputSelect {
   position: relative;
-  display: grid;
-  grid-template-columns: auto 20px;
+  // display: grid;
+  // grid-template-columns: auto 20px;
   > input {
+    position: relative;
+    z-index: 2;
+    // width: 100%;
+    width: calc(100% - 20px);
+    // background-color: gray;
+  }
+  > label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    // background-color: pink;
+  }
+
+  .container.plus {
+    // width: 100% !important;
+  }
+  .control.plus {
     width: 100%;
   }
-  .container.plus {
-    position: unset;
-  }
   .menu.plus {
-    left: 0;
+    // left: 0;
   }
   .valueContainer.plus {
-    display: none;
+    // width: 100% !important;
+    // display: none;
+    visibility: hidden;
   }
   .indicatorsContainer_inputSelect.plus {
     cursor: pointer;
   }
   .indicatorSeparator_inputSelect.plus {
     margin: 0;
+  }
+  .option_inputSelect {
+    background-color: transparent;
+    color: black;
+    &:hover{
+      background-color: #DEEBFF;
+
+    }
   }
 }
 // ==================================================

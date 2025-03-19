@@ -336,7 +336,7 @@ const InputSelect = ({
                 return classNames(scss.indicatorSeparator_inputSelect, scss.plus, cn?.indicatorSeparator?.(props));
               },
               option(props) {
-                return classNames(scss.option, scss.plus, cn?.option?.(props));
+                return classNames(scss.option, scss.option_inputSelect, scss.plus, cn?.option?.(props));
               },
               menu(props) {
                 return classNames(scss.menu, scss.plus, cn?.menu?.(props));
@@ -349,6 +349,79 @@ const InputSelect = ({
     </div>
   );
 };
+
+// const InputSelect = ({
+//   value,
+//   onChange,
+//   disabled,
+//   options,
+
+//   inputProps,
+//   selectProps: { classNames: cn, onChange: selectOnChange, ...selectProps } = {},
+// }: {
+//   value?: string;
+//   onChange?: (value: string) => void;
+//   disabled?: boolean;
+//   options?: rsProps<{ value: string; label: React.ReactNode }, false>['options'];
+
+//   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
+//   selectProps?: rsProps<{ value: string; label: React.ReactNode }, false>;
+// }) => {
+//   return (
+//     <div className={scss.inputSelect}>
+//       <input value={value} onChange={(e) => onChange?.(e.target.value)} readOnly={disabled} {...inputProps} />
+//       <label>
+//         {!disabled && (
+//           <ReactSelect
+//             // menuIsOpen={true}
+//             isDisabled={disabled}
+//             options={options}
+//             onChange={(option, action) => {
+//               const value = option?.value ?? '';
+//               onChange?.(value);
+//               selectOnChange?.(option, action);
+//             }}
+//             classNames={{
+//               container(props) {
+//                 return classNames(scss.container, scss.plus, cn?.container?.(props));
+//               },
+//               control(props) {
+//                 return classNames(scss.control, scss.plus, cn?.control?.(props));
+//               },
+//               valueContainer(props) {
+//                 return classNames(scss.valueContainer, scss.plus, cn?.valueContainer?.(props));
+//               },
+//               singleValue(props) {
+//                 return classNames(scss.singleValue, scss.plus, cn?.singleValue?.(props));
+//               },
+//               input(props) {
+//                 return classNames(scss.input, scss.plus, cn?.input?.(props));
+//               },
+//               indicatorsContainer(props) {
+//                 return classNames(
+//                   scss.indicatorsContainer,
+//                   !disabled && scss.indicatorsContainer_inputSelect,
+//                   scss.plus,
+//                   cn?.indicatorsContainer?.(props)
+//                 );
+//               },
+//               indicatorSeparator(props) {
+//                 return classNames(scss.indicatorSeparator_inputSelect, scss.plus, cn?.indicatorSeparator?.(props));
+//               },
+//               option(props) {
+//                 return classNames(scss.option, scss.plus, cn?.option?.(props));
+//               },
+//               menu(props) {
+//                 return classNames(scss.menu, scss.plus, cn?.menu?.(props));
+//               },
+//             }}
+//             {...selectProps}
+//           />
+//         )}
+//       </label>
+//     </div>
+//   );
+// };
 
 // =============================================================================
 const MustTip = () => {
