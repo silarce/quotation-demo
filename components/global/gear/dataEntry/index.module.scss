@@ -119,7 +119,6 @@
 
 .indicatorSeparator_base {
   margin: 0;
-  display: none;
 }
 
 .option_base {
@@ -147,6 +146,7 @@
 }
 .indicatorSeparator.plus {
   @extend .indicatorSeparator_base;
+  display: none;
 }
 .option.plus {
   @extend .option_base;
@@ -197,7 +197,6 @@
 }
 .indicatorSeparator_inputSelect.plus {
   @extend .indicatorSeparator_base;
-  margin: 0;
 }
 .option_inputSelect.plus {
   @extend .option_base;
