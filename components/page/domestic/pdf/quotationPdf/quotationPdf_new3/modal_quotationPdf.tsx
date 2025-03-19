@@ -583,11 +583,11 @@ const Bottom_pre = (
       <div className={scss.other}>
         <div className={scss.range}>
           <h2>一、報價範圍</h2>
-          <ol>
+          <ul>
             {qrArr.map((qr, index) => {
               return <li key={index}>{qr}</li>;
             })}
-          </ol>
+          </ul>
         </div>
 
         <div>
