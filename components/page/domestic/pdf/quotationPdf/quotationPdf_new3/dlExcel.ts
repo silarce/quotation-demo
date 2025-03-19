@@ -56,7 +56,8 @@ const dlExcel = async ({
 
   let qrArr_formated = _.cloneDeep(qrArr);
   qrArr_formated = qrArr_formated.map((qr, index) => {
-    return `${index + 1}. ` + qr;
+    return qr;
+    // return `${index + 1}. ` + qr;
   });
 
   if (paymentMethods.length > 4) {

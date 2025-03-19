@@ -833,35 +833,7 @@ export default function PEntryDetail() {
         }
     };
 
-    //轉換紀錄
-    const GetTransById = async (id: any) => {
-        try {
-            const conditionModel = {
-                purchaseorderid: id
-            };
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPReceiptById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const responsedata = await response.json();
-            setData3(responsedata);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-    };
 
     //#endregion
 
@@ -1908,27 +1880,33 @@ export default function PEntryDetail() {
     }
 
     const handleGetLayOut = (item: any) => {
-        GetTrayStatus(item.whid);//取得托盤呼叫狀態
-        handleRowClick(item.id);
-        setWhid(item.whid);
-        setNowwhname(item.whname);
-        setNowtrayname(item.trayname);
-        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        GetLayOut(item.whid, item.trayname, item.id)
-        if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
-            setInboxquantity(0);
-        }
-        setNowwhpositionuuid(item.id);
-        setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        setWhpname(item.name);
-        setWhpproductid(item.productid);
-        setWhpspec(item.spec);
-        setWhpquantity(item.quantity);
-        setWhid(item.whid);
-        setNowwhname(item.whname);
-        setNowtrayname(item.trayname);
-        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+        // if (item.type === '立體倉儲') {
+            GetTrayStatus(item.whid);//取得托盤呼叫狀態
+            handleRowClick(item.id);
+            setWhid(item.whid);
+            setNowwhname(item.whname);
+            setNowtrayname(item.trayname);
+            setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+            GetLayOut(item.whid, item.trayname, item.id)
+            if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
+                setInboxquantity(0);
+            }
+            setNowwhpositionuuid(item.id);
+            setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+            setWhpname(item.name);
+            setWhpproductid(item.productid);
+            setWhpspec(item.spec);
+            setWhpquantity(item.quantity);
+            setWhid(item.whid);
+            setNowwhname(item.whname);
+            setNowtrayname(item.trayname);
+            setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+        // }
+        // else{
+          // alert("目前還沒有一般儲存功能");
 
+
+        // }
     }
 
     //呼叫托盤

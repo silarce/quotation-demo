@@ -1,8 +1,7 @@
 import classNames from 'classnames';
 
 // global gear
-// import InputSel from 'components/global/gear/inputAndSel/inputSel';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import DataEntry from 'components/global/gear/dataEntry';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // icon
@@ -11,9 +10,6 @@ import addIcon from 'public/image/icon/add.svg';
 
 // css
 import style from './listOfDeliveryOrders.module.scss';
-
-// type
-import { Toption } from 'js/utils/options/options';
 
 // other
 import { optionsCreator_doorModelName } from 'js/utils/options/productOptions';
@@ -88,69 +84,14 @@ export default function EditTransfer({ disabled, controll }: { disabled: boolean
                 {indexKeys.map((key, index) => {
                   const { value, onChange } = item[key];
 
-                  const { type, width, marginRight, flex, options, center, inputType } = config[key];
+                  const { width, marginRight, flex, center, Render } = config[key];
                   const theStyle = { width, marginRight, flex };
-
-                  const onChangeInput = (v: string) => {
-                    onChange(v);
-                  };
-
-                  const onChangeSel = (option: Toption | null) => {
-                    const value = option?.value ?? '';
-
-                    onChange(value);
-                  };
 
                   const className = center ? style.center : '';
 
                   return (
                     <div className={className} key={index} style={theStyle}>
-                      {type === 'textarea' && (
-                        <InputSel
-                          disabled={disabled}
-                          textareaProps={{
-                            props: {
-                              placeholder: '',
-                              value,
-                              onChange: (e) => {
-                                onChangeInput(e.target.value);
-                              },
-                              className: style.input,
-                            },
-                          }}
-                        />
-                      )}
-                      {type === 'input' && (
-                        <InputSel
-                          disabled={disabled}
-                          inputProps={{
-                            props: {
-                              type: inputType,
-                              placeholder: '',
-                              value,
-                              onChange: (e) => {
-                                onChangeInput(e.target.value);
-                              },
-                              className: style.input,
-                            },
-                          }}
-                        />
-                      )}
-                      {type === 'select' && (
-                        <InputSel
-                          disabled={disabled}
-                          selectProps={{
-                            props: {
-                              isSearchable: true,
-                              placeholder: '',
-                              value: !value ? null : { value: value, label: value },
-                              onChange: onChangeSel,
-                              options: options ?? [],
-                            },
-                            arrowType: 'black',
-                          }}
-                        />
-                      )}
+                      <Render value={value} onChange={onChange} disabled={disabled} />
                     </div>
                   );
                 })}
@@ -184,41 +125,77 @@ const indexKeys: TindexKeys[] = ['goodsName', 'goodsSpec', 'goodsQuantity', 'rea
 const config: {
   [key in TindexKeys]: {
     label: string;
-    type: 'input' | 'select' | 'textarea';
     width: string;
     marginRight: string;
     flex?: string;
-    options?: Toption[];
     center?: boolean;
-    inputType?: 'number';
+    Render: React.FC<{ value: string; onChange: (v: string) => void; disabled: boolean }>;
   };
 } = {
   goodsName: {
     label: '物品名稱',
-    type: 'input',
     width: '120px',
     marginRight: '22px',
+    Render: ({ value, onChange, disabled }) => {
+      return (
+        <DataEntry>
+          <DataEntry.Input disabled={disabled} value={value} onChange={(e) => onChange(e.target.value)} />
+        </DataEntry>
+      );
+    },
   },
   goodsSpec: {
     label: '材質規格',
-    type: 'select',
     width: '120px',
     marginRight: '22px',
-    options: optionMaterial,
+    Render: ({ value, onChange, disabled }) => {
+      return (
+        <DataEntry>
+          <DataEntry.InputSelect
+            disabled={disabled}
+            value={value}
+            onChange={(value) => onChange(value)}
+            options={optionMaterial}
+            selectProps={{
+              menuPortalTarget: document.body,
+            }}
+          />
+        </DataEntry>
+      );
+    },
   },
   goodsQuantity: {
     label: '數量',
-    type: 'input',
     width: '45px',
     marginRight: '22px',
     center: true,
-    inputType: 'number',
+    Render: ({ value, onChange, disabled }) => {
+      return (
+        <DataEntry>
+          <DataEntry.Input
+            className="text-center"
+            disabled={disabled}
+            type="number"
+            min={0}
+            step={0}
+            value={value}
+            onChange={({ target }) => target.validity.valid && onChange(target.value)}
+          />
+        </DataEntry>
+      );
+    },
   },
   reason: {
     label: '調貨理由',
-    type: 'textarea',
     width: 'auto',
     marginRight: '0px',
     flex: 'auto',
+    Render: ({ value, onChange, disabled }) => {
+      return (
+        <DataEntry>
+          <DataEntry.Textarea disabled={disabled} value={value} onChange={(e) => onChange(e.target.value)} />
+        </DataEntry>
+      );
+    },
   },
 };

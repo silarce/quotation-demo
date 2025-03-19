@@ -46,6 +46,7 @@ export default function QuotationRemark({ disabled, label, onAddClick, onUpponAd
             <InputSel
               className={classNames(scss.inputSel)}
               textareaProps={{
+                allowNewLineByUser: true,
                 props: {
                   value,
                   onChange: (e) => onChange(e.target.value),
