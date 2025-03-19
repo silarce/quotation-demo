@@ -134,6 +134,7 @@ const EditRow = ({
               return (
                 <InputSel
                   textareaProps={{
+                    allowNewLineByUser: true,
                     value: classQuotationRange[key] ?? '',
                     onChange: (v) => {
                       classQuotationRange[key] = v;
@@ -209,7 +210,7 @@ const BodyRowGroup = ({
                     <span>{annotationAndQuotationRangeTypeLookup[type]}</span>
                   </div>
                   <div className={config['description'].className}>
-                    <span>{description}</span>
+                    <span className="whitespace-pre">{description}</span>
                   </div>
                   <div className={config['edit'].className} onClick={() => editClassRange(range)}>
                     <IconEdit />
