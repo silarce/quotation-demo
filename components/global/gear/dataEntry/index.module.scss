@@ -88,7 +88,8 @@
 //
 //
 // select
-.control.plus {
+
+.control_base {
   min-height: unset;
   border: none;
   background-color: transparent;
@@ -98,45 +99,71 @@
   }
 }
 
-.valueContainer.plus {
+.valueContainer_base {
   padding: 0;
 }
-.singleValue.plus {
+.singleValue_base {
   margin: 0;
 }
-.input.plus {
+.input_base {
   padding: 0;
   margin: 0;
 }
 
-.indicatorsContainer.plus {
+.indicatorsContainer_base {
   padding: 0;
   [class$="indicatorContainer"] {
     padding: 0;
   }
 }
 
-.indicatorSeparator.plus {
+.indicatorSeparator_base {
   margin: 0;
   display: none;
 }
 
-.option.plus {
+.option_base {
   cursor: pointer;
+}
+
+// .container.plus {
+//   z-index: 2;
+// }
+
+.control.plus {
+  @extend .control_base;
+}
+.valueContainer.plus {
+  @extend .valueContainer_base;
+}
+.singleValue.plus {
+  @extend .singleValue_base;
+}
+.input.plus {
+  @extend .input_base;
+}
+.indicatorsContainer.plus {
+  @extend .indicatorsContainer_base;
+}
+.indicatorSeparator.plus {
+  @extend .indicatorSeparator_base;
+}
+.option.plus {
+  @extend .option_base;
 }
 
 // ==================================================
 
 .inputSelect {
   position: relative;
-  // display: grid;
-  // grid-template-columns: auto 20px;
+  z-index: 0;
+  // 原本是採用grid將兩input與label分為兩邊
+  // 但是這樣會使Select的Menu長度縮短
+  // 所以採用將input覆蓋在label上的作法
   > input {
     position: relative;
     z-index: 2;
-    // width: 100%;
     width: calc(100% - 20px);
-    // background-color: gray;
   }
   > label {
     position: absolute;
@@ -145,38 +172,42 @@
     z-index: 1;
     display: block;
     width: 100%;
-    // background-color: pink;
-  }
-
-  .container.plus {
-    // width: 100% !important;
-  }
-  .control.plus {
-    width: 100%;
-  }
-  .menu.plus {
-    // left: 0;
-  }
-  .valueContainer.plus {
-    // width: 100% !important;
-    // display: none;
-    visibility: hidden;
-  }
-  .indicatorsContainer_inputSelect.plus {
-    cursor: pointer;
-  }
-  .indicatorSeparator_inputSelect.plus {
-    margin: 0;
-  }
-  .option_inputSelect {
-    background-color: transparent;
-    color: black;
-    &:hover{
-      background-color: #DEEBFF;
-
-    }
   }
 }
+
+.control_inputSelect.plus {
+  @extend .control_base;
+  width: 100%;
+}
+.valueContainer_inputSelect.plus {
+  @extend .valueContainer_base;
+  visibility: hidden;
+}
+.singleValue_inputSelect.plus {
+  @extend .singleValue_base;
+  visibility: hidden;
+}
+.input_inputSelect.plus {
+  @extend .input_base;
+  visibility: hidden;
+}
+.indicatorsContainer_inputSelect.plus {
+  @extend .indicatorsContainer_base;
+  // cursor: pointer;
+}
+.indicatorSeparator_inputSelect.plus {
+  @extend .indicatorSeparator_base;
+  margin: 0;
+}
+.option_inputSelect.plus {
+  @extend .option_base;
+  background-color: transparent;
+  color: black;
+  &:hover {
+    background-color: #deebff;
+  }
+}
+
 // ==================================================
 .mustTip {
   position: absolute;
