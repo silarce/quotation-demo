@@ -21,6 +21,7 @@ type Tpanel<A extends string> = React.FC<TpanelProps<A>>;
 interface ThookInstance {
   Render: React.FC;
   result: string;
+  clear: () => void;
 }
 
 type Tdict = {
@@ -82,7 +83,9 @@ const Container = ({
       <br />
       <p className="text-xl">種類:{result}</p>
       <br />
-      <MyButton_v2 onClick={onConfirm}>確定</MyButton_v2>
+      <MyButton_v2 className={classNames(!value && 'invisible')} onClick={onConfirm}>
+        確定
+      </MyButton_v2>
     </div>
   );
 };
@@ -99,7 +102,13 @@ const ControlBox: Tpanel<'台電控制箱'> = ({ action, onConfirm }) => {
     台電控制箱: instance_powerControlBox,
   };
 
-  const { Render, result } = dict[state] ?? {};
+  const { Render, result, clear } = dict[state] ?? {};
+
+  useEffect(() => {
+    return () => {
+      clear?.();
+    };
+  }, [state]);
 
   return (
     <Container
@@ -127,6 +136,12 @@ const usePowerControlBox = (): ThookInstance => {
   state_horsepower && (result += ` ${state_horsepower}`);
   state_brand && (result += ` ${state_brand}`);
   state_voltage && (result += ` ${state_voltage}`);
+
+  const clear = () => {
+    setState_horsepower('');
+    setState_brand('');
+    setState_voltage('');
+  };
 
   const Render = useCallback(() => {
     return (
@@ -188,6 +203,7 @@ const usePowerControlBox = (): ThookInstance => {
   return {
     Render,
     result,
+    clear,
   };
 };
 
