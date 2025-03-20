@@ -1,19 +1,23 @@
 import { useState, useEffect, useMemo, useReducer } from 'react';
 import _ from 'lodash';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+import { ControlBox } from 'components/page/worksDepartment/electronicSupplies/categoryEditor';
+
 // api
-import {
-  TcreateElectronicSuppliesRequirementRecordDto,
-  TcreateElectronicSuppliesRecordDetailDto,
-  TupdateElectronicSuppliesRequirementRecordDto,
-  //
-  apiPostElectronicSuppliesRequirementRecord,
-  apiPatchElectronicSuppliesRequirementRecord,
-  // apiGetDefaultElectronicSuppliesRequirementData,
-  //
-  useGetElectronicSuppliesRequirementRecord_id,
-  useGetDefaultElectronicSuppliesRequirementData,
-} from 'js/api/api_engineering';
+// import {
+//   TcreateElectronicSuppliesRequirementRecordDto,
+//   TcreateElectronicSuppliesRecordDetailDto,
+//   TupdateElectronicSuppliesRequirementRecordDto,
+//   //
+//   apiPostElectronicSuppliesRequirementRecord,
+//   apiPatchElectronicSuppliesRequirementRecord,
+//   // apiGetDefaultElectronicSuppliesRequirementData,
+//   //
+//   useGetElectronicSuppliesRequirementRecord_id,
+//   useGetDefaultElectronicSuppliesRequirementData,
+// } from 'js/api/api_engineering';
 
 // ==============================================================================
 
@@ -59,6 +63,7 @@ type Taction =
 
 // ==============================================================================
 
+// MARK:reducer
 const reducer = (stateDict: TstateDict, action: Taction) => {
   const copy = { ...stateDict };
   const { type, payload } = action;
@@ -117,6 +122,7 @@ const reducer = (stateDict: TstateDict, action: Taction) => {
   return copy;
 };
 
+// MARK:useElectronicSuppliesRequirement
 const useElectronicSuppliesRequirement = () => {
   const [state_electronicItemDict, dispatch] = useReducer(reducer, defaultStateDict, (initial) => _.cloneDeep(initial));
 
@@ -143,11 +149,43 @@ const useElectronicSuppliesRequirement = () => {
     }
   };
 
+  //
+
+  const addCategory = async (itemName: '控制箱/盤') => {
+    if (itemName === '控制箱/盤') {
+      const category = await addControlBox();
+      dispatch({ type: 'addCategory', payload: { category, itemName } });
+    }
+  };
+
+  //
   return {
     state_electronicItemDict,
     dispatch,
     replaceState,
+    addCategory,
   };
+};
+
+// =========================================================================
+
+const addControlBox = async () => {
+  return new Promise<string>((resolve, reject) => {
+    let category = '';
+    const { destroy } = myAlert.clear({
+      content: (
+        <ControlBox
+          action="新增"
+          onConfirm={(v) => {
+            category = v;
+            resolve(category);
+            destroy();
+          }}
+        />
+      ),
+      onCancel: () => reject(),
+    });
+  });
 };
 
 // =========================================================================

@@ -110,6 +110,7 @@ export default function EditRequirementRecord() {
     state_electronicItemDict,
     dispatch,
     replaceState: replaceState_electronicSuppliesRequirment,
+    addCategory,
   } = useElectronicSuppliesRequirement();
 
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
@@ -276,8 +277,9 @@ export default function EditRequirementRecord() {
   const groupArr = useStateToGroup({
     stateArr: Object.values(state_electronicItemDict),
     handler_editItemQty: editItemQty,
-    handler_editCategoryValue: editCategoryValue,
-    disabled,
+    addCategory,
+    // handler_editCategoryValue: editCategoryValue,
+    // disabled,
   });
 
   // ------------------------------------------------------------------
