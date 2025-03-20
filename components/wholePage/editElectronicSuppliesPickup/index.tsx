@@ -38,11 +38,16 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 import scss from './index.module.scss';
 
 import {
-  Tstate_electronicItem,
+  // Tstate_electronicItem,
   Tstate_info,
   createEmptyStateInfo,
-  orderDetailArr,
+  // orderDetailArr,
 } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+
+import {
+  Tstate_electronicItem,
+  orderDetailArr,
+} from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 // ==================================================================
 

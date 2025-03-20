@@ -42,10 +42,10 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 import { useGetContract_id } from 'js/api/api_quotation';
 
 import {
-  Tstate_electronicItem,
+  // Tstate_electronicItem,
   Tstate_info,
   createEmptyStateInfo,
-  createDefaultState,
+  // createDefaultState,
   // orderDetailArr,
 } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
@@ -58,13 +58,16 @@ import {
 } from 'js/api/dtoTypes';
 
 // ==================================================================
+
+import {
+  useElectronicSuppliesRequirement,
+  Tstate_electronicItem,
+} from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
+
+// ==================================================================
 type Tquery = {
   contractId: string | undefined;
   requirementRecordId: string | undefined;
-};
-
-type TstateList = {
-  [key: string]: Tstate_electronicItem;
 };
 
 // ==================================================================
@@ -101,7 +104,14 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
+  // const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
+
+  const {
+    state_electronicItemDict,
+    dispatch,
+    replaceState: replaceState_electronicSuppliesRequirment,
+  } = useElectronicSuppliesRequirement();
+
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
 
   // ------------------------------------------------------------------
@@ -155,7 +165,7 @@ export default function EditRequirementRecord() {
     }
 
     let requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[] = Object.values(
-      state_electronicItemList
+      state_electronicItemDict
     ).map((item) => {
       const { id, category, itemName, quantity, unit, code, subItemName, categoryParam } = item;
 
@@ -240,13 +250,7 @@ export default function EditRequirementRecord() {
       return state;
     });
 
-    const list = _.keyBy(state_electronicItemArr, 'category');
-    const { defaultStateList } = createDefaultState();
-
-    setState_electronicItemList({
-      ...defaultStateList,
-      ...list,
-    });
+    replaceState_electronicSuppliesRequirment(state_electronicItemArr);
   };
 
   // ------------------------------------------------------------------
@@ -254,33 +258,23 @@ export default function EditRequirementRecord() {
   // region FUNCTION
 
   const editItemQty = (key: string, qty: number) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          quantity: qty,
-        },
-      };
+    dispatch({
+      type: 'editQty',
+      payload: { key, qty },
     });
   };
 
   const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          categoryParam: categoryParam,
-        },
-      };
+    dispatch({
+      type: 'editCategoryParam',
+      payload: { key, categoryParam },
     });
   };
 
   // ------------------------------------------------------------------
 
   const groupArr = useStateToGroup({
-    stateArr: Object.values(state_electronicItemList),
+    stateArr: Object.values(state_electronicItemDict),
     handler_editItemQty: editItemQty,
     handler_editCategoryValue: editCategoryValue,
     disabled,
@@ -290,16 +284,11 @@ export default function EditRequirementRecord() {
 
   // region PROPS
   const defaultSeletedDataArrArr: Parameters<typeof SelectorGroup>[0]['defaultSeletedDataArrArr'] = useMemo(() => {
-    // const arr01 = [];
     const arr02 = [];
 
-    // state_info.picker && arr01.push(state_info.picker);
     state_info.preparer && arr02.push(state_info.preparer);
 
-    return [
-      // arr01,
-      arr02,
-    ];
+    return [arr02];
   }, [state_info.picker, state_info.preparer]);
 
   const panelList_disabled: TpanelList = [
@@ -368,15 +357,12 @@ export default function EditRequirementRecord() {
       return;
     }
 
-    const { defaultStateList } = createDefaultState();
-
     const { requirementRecordDetails = [] } = data_requirementRecord ?? {};
 
-    requirementRecordDetails?.forEach((detail) => {
+    const stateArr: Tstate_electronicItem[] = requirementRecordDetails?.map((detail) => {
       const { id: detailId, category, itemName, quantity, unit, code, categoryParam } = detail;
 
-      defaultStateList[category] = {
-        ...defaultStateList[category], // 可能是undefined // 會將subItemName帶入
+      return {
         id: detailId,
         category,
         itemName,
@@ -384,7 +370,7 @@ export default function EditRequirementRecord() {
         unit,
         code,
         categoryParam: categoryParam ?? '',
-      };
+      } as Tstate_electronicItem;
 
       //
     });
@@ -405,7 +391,8 @@ export default function EditRequirementRecord() {
       stateInfo.date = moment();
     }
 
-    setState_electronicItemList(defaultStateList);
+    // setState_electronicItemList(defaultStateList);
+    replaceState_electronicSuppliesRequirment(stateArr);
     setState_info(stateInfo);
   }, [disabled, data_requirementRecord]);
 

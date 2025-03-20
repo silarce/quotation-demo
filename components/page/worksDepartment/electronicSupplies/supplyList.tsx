@@ -11,7 +11,7 @@ import scss from './supplyList.module.scss';
 
 import type { TelectronicSuppliesContentDto } from 'js/api/dtoTypes';
 
-import { orderDetailArr } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+import { orderDetailArr } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 // ==================================================================
 
@@ -25,9 +25,7 @@ export default function SupplyList({
       [key: string]: Tgroup;
     } = {};
 
-    electronicSuppliesContents = orderDetailArr({ detailArr: electronicSuppliesContents });
-
-    electronicSuppliesContents.forEach((item) => {
+    orderDetailArr({ detailArr: electronicSuppliesContents }).forEach((item) => {
       const {
         //
         itemName,

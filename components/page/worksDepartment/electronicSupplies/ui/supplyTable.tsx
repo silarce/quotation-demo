@@ -10,7 +10,8 @@ import classNames from 'classnames';
 import scss from './supplyTable.module.scss';
 
 // type
-import type { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+
+import { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 import { IconEdit } from 'public/image/icon/svgComponent/svgIcons';
 
