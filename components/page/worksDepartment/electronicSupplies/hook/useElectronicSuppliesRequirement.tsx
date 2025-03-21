@@ -3,7 +3,12 @@ import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { ControlBox } from 'components/page/worksDepartment/electronicSupplies/categoryEditor';
+import {
+  TpanelProps,
+  Tpanel,
+  ControlBox,
+  LuckKey,
+} from 'components/page/worksDepartment/electronicSupplies/categoryEditor';
 
 // api
 // import {
@@ -157,14 +162,40 @@ const useElectronicSuppliesRequirement = () => {
   //
 
   const createAddCategory = (itemName: Tstate_electronicItem['itemName']) => {
-    if (itemName === '控制箱/盤') {
-      return async () => {
-        const category = await addControlBox();
-        dispatch({ type: 'addCategory', payload: { category, itemName } });
-      };
-    }
+    switch (itemName) {
+      case '控制箱/盤':
+        return () => {
+          const { destroy } = myAlert.clear({
+            content: (
+              <ControlBox
+                action="新增"
+                onConfirm={(v) => {
+                  dispatch({ type: 'addCategory', payload: { category: v, itemName } });
+                  destroy();
+                }}
+              />
+            ),
+          });
+        };
 
-    return undefined;
+      case '鎖匙':
+        return () => {
+          const { destroy } = myAlert.clear({
+            content: (
+              <LuckKey
+                action="新增"
+                onConfirm={(v) => {
+                  dispatch({ type: 'addCategory', payload: { category: v, itemName } });
+                  destroy();
+                }}
+              />
+            ),
+          });
+        };
+
+      default:
+        return undefined;
+    }
   };
 
   //
@@ -178,23 +209,21 @@ const useElectronicSuppliesRequirement = () => {
 
 // =========================================================================
 
-const addControlBox = async () => {
-  return new Promise<string>((resolve) => {
-    let category = '';
-    const { destroy } = myAlert.clear({
-      content: (
-        <ControlBox
-          action="新增"
-          onConfirm={(v) => {
-            category = v;
-            resolve(category);
-            destroy();
-          }}
-        />
-      ),
-    });
-  });
-};
+// const addControlBox = async () => {
+//   return new Promise<string>((resolve) => {
+//     const { destroy } = myAlert.clear({
+//       content: (
+//         <ControlBox
+//           action="新增"
+//           onConfirm={(v) => {
+//             resolve(v);
+//             destroy();
+//           }}
+//         />
+//       ),
+//     });
+//   });
+// };
 
 // =========================================================================
 
@@ -319,83 +348,41 @@ const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
 ];
 
 const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
-  // {
-  //   category: '3HP馬達控制箱(380V)',
-  //   categoryParam: '3HP馬達控制箱(380V)',
-  //   itemName: '控制箱/盤',
-  //   subItemName: '捲門/水閘門',
-  //   quantity: null,
-  //   unit: null,
-  //   code: null,
-  // },
-  // {
-  //   category: '2HP馬達控制箱(380V)',
-  //   categoryParam: '2HP馬達控制箱(380V)',
-  //   itemName: '控制箱/盤',
-  //   subItemName: '捲門/水閘門',
-  //   quantity: null,
-  //   unit: null,
-  //   code: null,
-  // },
-  // {
-  //   category: '3HP馬達控制箱(220V)',
-  //   categoryParam: '3HP馬達控制箱(220V)',
-  //   itemName: '控制箱/盤',
-  //   subItemName: '捲門/水閘門',
-  //   quantity: null,
-  //   unit: null,
-  //   code: null,
-  // },
-  // {
-  //   category: '2HP馬達控制箱(220V)',
-  //   categoryParam: '2HP馬達控制箱(220V)',
-  //   itemName: '控制箱/盤',
-  //   subItemName: '捲門/水閘門',
-  //   quantity: null,
-  //   unit: null,
-  //   code: null,
-  // },
   {
-    // category: '彈射門控制箱_HP _V(大同/東元)',
-    // categoryValue category: '彈射門控制箱_HP _V(大同/東元)',
-    category: '彈射門控制箱',
-    // categoryValue: '彈射門控制箱 HP  V ',
-    categoryParam: '彈射門控制箱',
+    category: '3HP馬達控制箱(380V)',
+    categoryParam: '3HP馬達控制箱(380V)',
     itemName: '控制箱/盤',
     subItemName: '捲門/水閘門',
     quantity: null,
     unit: null,
     code: null,
-    // async inputCategory() {
-    //   const str = await new Promise<string>((resolve) => {
-    //     const { destroy } = myAlert.input({
-    //       title: '彈射門控制箱',
-    //       props_input: [
-    //         {
-    //           caption: 'HP',
-    //         },
-    //         {
-    //           caption: '電壓',
-    //         },
-    //         {
-    //           caption: '馬達廠商',
-    //         },
-    //       ],
-    //       onConfirm: (value) => {
-    //         const [hp, voltage, motorVendor] = value;
-    //         let str = '彈射門控制箱';
-    //         hp && (str += ` ${hp}HP`);
-    //         voltage && (str += ` ${voltage}V`);
-    //         motorVendor && (str += ` ${motorVendor}`);
-
-    //         resolve(str);
-    //         destroy();
-    //       },
-    //     });
-    //   });
-
-    //   return str;
-    // },
+  },
+  {
+    category: '2HP馬達控制箱(380V)',
+    categoryParam: '2HP馬達控制箱(380V)',
+    itemName: '控制箱/盤',
+    subItemName: '捲門/水閘門',
+    quantity: null,
+    unit: null,
+    code: null,
+  },
+  {
+    category: '3HP馬達控制箱(220V)',
+    categoryParam: '3HP馬達控制箱(220V)',
+    itemName: '控制箱/盤',
+    subItemName: '捲門/水閘門',
+    quantity: null,
+    unit: null,
+    code: null,
+  },
+  {
+    category: '2HP馬達控制箱(220V)',
+    categoryParam: '2HP馬達控制箱(220V)',
+    itemName: '控制箱/盤',
+    subItemName: '捲門/水閘門',
+    quantity: null,
+    unit: null,
+    code: null,
   },
   {
     category: 'UPS不斷電系統 1HP',

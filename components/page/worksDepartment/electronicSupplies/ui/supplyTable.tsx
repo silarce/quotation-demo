@@ -206,7 +206,7 @@ const useStateToGroup = ({
 }: {
   stateArr: Tstate_electronicItem[];
   handler_editItemQty: (key: string, qty: number) => void;
-  createAddCategory: (itemName: Tstate_electronicItem['itemName']) => (() => Promise<void>) | undefined;
+  createAddCategory: (itemName: Tstate_electronicItem['itemName']) => (() => void) | undefined;
 }) => {
   return useMemo(() => {
     const list: {

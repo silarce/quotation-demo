@@ -106,7 +106,7 @@ const Container = ({
 
 const ControlBox: Tpanel<'台電控制箱' | '馬達控制箱' | 'UPS不斷電系統' | '彈射門控制箱'> = ({ action, onConfirm }) => {
   const title = action === '新增' ? '新增' : '編輯';
-  const [state, setState] = useState('');
+  const [state, setState] = useState(action === '新增' ? '' : action);
 
   const instance_powerControlBox = usePowerControlBox();
   const instance_motorControlBox = useMotorControlBox();
@@ -118,6 +118,43 @@ const ControlBox: Tpanel<'台電控制箱' | '馬達控制箱' | 'UPS不斷電�
     馬達控制箱: instance_motorControlBox,
     UPS不斷電系統: instance_ups,
     彈射門控制箱: instance_catapultDoorControlBox,
+  };
+
+  const options = Object.keys(dict).map((key) => ({ value: key, label: key }));
+
+  const { result, clear, render } = dict[state] ?? {};
+
+  useEffect(() => {
+    return () => {
+      clear?.();
+    };
+  }, [state]);
+
+  return (
+    <Container
+      title={title}
+      action={action}
+      result={result}
+      value={state}
+      options={options}
+      onChange={(v) => setState(v)}
+      onConfirm={() => onConfirm(result ?? '')}
+    >
+      {render}
+    </Container>
+  );
+};
+
+const LuckKey: Tpanel<'鎖號'> = ({ action, onConfirm }) => {
+  const title = action === '新增' ? '新增' : '編輯';
+  const [state, setState] = useState('');
+
+  const instance_luckNumber = useLuckNumber();
+  const instance_specialLuckNumber = useSpecialLuckNumber();
+
+  const dict: Tdict = {
+    鎖號: instance_luckNumber,
+    特殊鎖號: instance_specialLuckNumber,
   };
 
   const options = Object.keys(dict).map((key) => ({ value: key, label: key }));
@@ -269,6 +306,58 @@ const useCatapultDoorControlBox = (): ThookInstance => {
 
 // ==============================================================================
 
+const useLuckNumber = (): ThookInstance => {
+  const [state_luckNumber, setState_state_luckNumber] = useState('');
+
+  let result = '鎖號';
+  state_luckNumber && (result = `${result} : ${state_luckNumber}`);
+
+  const clear = () => {
+    setState_state_luckNumber('');
+  };
+
+  const render = (
+    <div key="catapultDoorControlBox">
+      <DataEntry caption="號碼" {...props}>
+        <DataEntry.Input onChange={(e) => setState_state_luckNumber(e.target.value)} />
+      </DataEntry>
+    </div>
+  );
+
+  return {
+    result,
+    clear,
+    render,
+  };
+};
+
+const useSpecialLuckNumber = (): ThookInstance => {
+  const [state_luckNumber, setState_state_luckNumber] = useState('');
+
+  let result = '特殊鎖號';
+  state_luckNumber && (result = `${result} : ${state_luckNumber}`);
+
+  const clear = () => {
+    setState_state_luckNumber('');
+  };
+
+  const render = (
+    <div key="catapultDoorControlBox">
+      <DataEntry caption="號碼" {...props}>
+        <DataEntry.Input onChange={(e) => setState_state_luckNumber(e.target.value)} />
+      </DataEntry>
+    </div>
+  );
+
+  return {
+    result,
+    clear,
+    render,
+  };
+};
+
+// ==============================================================================
+
 const Horsepower = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => {
   return (
     <DataEntry caption="馬力" {...props}>
@@ -295,4 +384,5 @@ const Voltage = ({ value, onChange }: { value?: string; onChange: (v: string) =>
 
 // ==============================================================================
 // ==============================================================================
-export { ControlBox };
+export { ControlBox, LuckKey };
+export type { TpanelProps, Tpanel };
