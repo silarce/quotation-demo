@@ -34,6 +34,8 @@ type Tstate_electronicItem = {
   unit: string | null;
   code: string | null;
 
+  // 目前一個itemName只會對應一個subItemName，也以這個前提製作UI元件
+  // 未來若有一個itemName對應多個subItemName，UI元件需要做修改
   // itemName為'控制箱/盤'時，subItemName為'捲門/水閘門'，其他為null或undefined
   subItemName?: null | '捲門/水閘門';
   // // 用來辨別item用的，必須為唯一值

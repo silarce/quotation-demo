@@ -117,6 +117,7 @@ const Group = ({
           {!disabled && onAddClick && <IconAddCircle className={scss.addIcon} onClick={onAddClick} />}
         </div>
       </Cell_itemName>
+
       {subItemName && <Cell_subItemName>{subItemName}</Cell_subItemName>}
 
       <div className={scss.rowWrapper}>
