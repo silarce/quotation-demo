@@ -206,7 +206,7 @@ const useStateToGroup = ({
 }: {
   stateArr: Tstate_electronicItem[];
   handler_editItemQty: (key: string, qty: number) => void;
-  createAddCategory: (itemName: Tstate_electronicItem['itemName']) => (() => void) | undefined;
+  createAddCategory?: (itemName: Tstate_electronicItem['itemName']) => (() => void) | undefined;
 }) => {
   return useMemo(() => {
     const list: {
@@ -220,7 +220,7 @@ const useStateToGroup = ({
         list[itemName] = {
           itemName,
           subItemName,
-          onAddClick: createAddCategory(itemName),
+          onAddClick: createAddCategory?.(itemName),
           rowArr: [],
         };
       }

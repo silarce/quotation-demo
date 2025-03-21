@@ -47,6 +47,7 @@ import {
 import {
   Tstate_electronicItem,
   orderDetailArr,
+  useElectronicSuppliesRequirement,
 } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 // ==================================================================
@@ -54,10 +55,6 @@ import {
 type Tquery = {
   contractId: string | undefined;
   pickupRecordId: string | undefined;
-};
-
-type TstateList = {
-  [key: string]: Tstate_electronicItem;
 };
 
 // ==================================================================
@@ -97,7 +94,14 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
+  // const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
+  const {
+    state_electronicItemDict,
+    dispatch,
+    replaceState: replaceState_electronicSuppliesRequirment,
+    createAddCategory,
+  } = useElectronicSuppliesRequirement();
+
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
 
   const [requirementRecordId, setRequirementRecordId] = useState<string>();
@@ -178,7 +182,7 @@ export default function EditElectronicSuppliesPickup({
     }
 
     let pickupRecordDetails: (TcreateElectronicSuppliesRecordDetailDto & { id?: string })[] = Object.values(
-      state_electronicItemList
+      state_electronicItemDict
     ).map((item) => {
       const { id, category, itemName, quantity, unit, code, subItemName, categoryParam } = item;
       const detail = {
@@ -235,26 +239,9 @@ export default function EditElectronicSuppliesPickup({
   // region FUNCTION
 
   const editItemQty = (key: string, qty: number) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          quantity: qty,
-        },
-      };
-    });
-  };
-
-  const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          categoryParam: categoryParam,
-        },
-      };
+    dispatch({
+      type: 'editQty',
+      payload: { key, qty },
     });
   };
 
@@ -308,21 +295,16 @@ export default function EditElectronicSuppliesPickup({
       return arr;
     })();
 
-    setState_electronicItemList(list);
+    replaceState_electronicSuppliesRequirment(list);
     setState_info((state) => ({ ...state, doorModelName: dooprTypeArr }));
   };
 
   // ------------------------------------------------------------------
 
   const groupArr = useStateToGroup({
-    stateArr: Object.values(state_electronicItemList),
+    stateArr: Object.values(state_electronicItemDict),
     handler_editItemQty: editItemQty,
-    handler_editCategoryValue: editCategoryValue,
-    disabled,
   });
-  //
-  // Object.values(state_electronicItemList),
-  // editItemQty
 
   // ------------------------------------------------------------------
   // region PROPS
@@ -440,7 +422,7 @@ export default function EditElectronicSuppliesPickup({
 
   useEffect(() => {
     if (disabled) {
-      setState_electronicItemList(defaultState);
+      replaceState_electronicSuppliesRequirment(defaultState);
     }
   }, [defaultState]);
 
