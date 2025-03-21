@@ -585,7 +585,18 @@ const DefaultItemSelector = ({
   const [stateArr, dispatch] = useReducer(reducer, arr);
 
   const onConfirm = () => {
-    _onConfirm(stateArr.filter((state) => state.checked));
+    const arr = stateArr
+      .filter((state) => state.checked)
+      .map((_item) => {
+        const { checked, ...item } = _item;
+
+        return {
+          ...item,
+          category: item.category.trim(),
+        };
+      });
+
+    _onConfirm(arr);
   };
 
   return (

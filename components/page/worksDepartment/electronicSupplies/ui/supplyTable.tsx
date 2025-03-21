@@ -13,7 +13,7 @@ import scss from './supplyTable.module.scss';
 
 import { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
-import { IconEdit, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
+import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // ==================================================================
 

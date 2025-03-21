@@ -461,8 +461,8 @@ const defaultStateArr_主機: Tstate_electronicItem[] = [
   {
     itemName: '主機',
     subItemName: undefined,
-    category: '遙控器（1:2）+ 障感器',
-    categoryParam: '遙控器（1:2）+ 障感器',
+    category: '遙控器(1:2)+ 障感器',
+    categoryParam: '遙控器(1:2)+ 障感器',
     quantity: null,
     unit: null,
     code: null,
@@ -470,8 +470,8 @@ const defaultStateArr_主機: Tstate_electronicItem[] = [
   {
     itemName: '主機',
     subItemName: undefined,
-    category: '遙控器（1:2）',
-    categoryParam: '遙控器（1:2）',
+    category: '遙控器(1:2)',
+    categoryParam: '遙控器(1:2)',
     quantity: null,
     unit: null,
     code: 'A',
