@@ -9,6 +9,18 @@ import scss from './index.module.scss';
 
 import DataEntry, { TdataEntrycontainerProps, TselectProps } from 'components/global/gear/dataEntry';
 
+import {
+  optionsCreator_horsePower,
+  optionsCreator_voltage,
+  optionsCreator_motorVender,
+} from 'js/utils/options/productOptions';
+
+// ==================================================================
+
+const options_horsePower = optionsCreator_horsePower();
+const options_voltage = optionsCreator_voltage({ withUnit: true });
+const options_motorVender = optionsCreator_motorVender();
+
 // ==================================================================
 
 interface TpanelProps<A extends string> {
@@ -19,7 +31,7 @@ interface TpanelProps<A extends string> {
 type Tpanel<A extends string> = React.FC<TpanelProps<A>>;
 
 interface ThookInstance {
-  Render: React.FC;
+  render?: React.ReactNode;
   result: string;
   clear: () => void;
 }
@@ -92,17 +104,25 @@ const Container = ({
 
 // ==================================================================
 
-const ControlBox: Tpanel<'台電控制箱'> = ({ action, onConfirm }) => {
+const ControlBox: Tpanel<'台電控制箱' | '馬達控制箱' | 'UPS不斷電系統' | '彈射門控制箱'> = ({ action, onConfirm }) => {
   const title = action === '新增' ? '新增' : '編輯';
   const [state, setState] = useState('');
 
   const instance_powerControlBox = usePowerControlBox();
+  const instance_motorControlBox = useMotorControlBox();
+  const instance_ups = useUps();
+  const instance_catapultDoorControlBox = useCatapultDoorControlBox();
 
   const dict: Tdict = {
     台電控制箱: instance_powerControlBox,
+    馬達控制箱: instance_motorControlBox,
+    UPS不斷電系統: instance_ups,
+    彈射門控制箱: instance_catapultDoorControlBox,
   };
 
-  const { Render, result, clear } = dict[state] ?? {};
+  const options = Object.keys(dict).map((key) => ({ value: key, label: key }));
+
+  const { result, clear, render } = dict[state] ?? {};
 
   useEffect(() => {
     return () => {
@@ -116,11 +136,11 @@ const ControlBox: Tpanel<'台電控制箱'> = ({ action, onConfirm }) => {
       action={action}
       result={result}
       value={state}
-      options={[{ value: '台電控制箱', label: '台電控制箱' }]}
+      options={options}
       onChange={(v) => setState(v)}
       onConfirm={() => onConfirm(result ?? '')}
     >
-      {Render && <Render />}
+      {render}
     </Container>
   );
 };
@@ -132,7 +152,7 @@ const usePowerControlBox = (): ThookInstance => {
   const [state_brand, setState_brand] = useState('');
   const [state_voltage, setState_voltage] = useState('');
 
-  let result = '台電控制箱:';
+  let result = '台電控制箱 ';
   state_horsepower && (result += ` ${state_horsepower}`);
   state_brand && (result += ` ${state_brand}`);
   state_voltage && (result += ` ${state_voltage}`);
@@ -143,71 +163,136 @@ const usePowerControlBox = (): ThookInstance => {
     setState_voltage('');
   };
 
-  const Render = useCallback(() => {
-    return (
-      <div>
-        <DataEntry caption="馬力" {...props}>
-          <DataEntry.Select
-            value={state_horsepower}
-            onChange={(v) => setState_horsepower(v)}
-            options={[
-              {
-                label: '1HP',
-                value: '1HP',
-              },
-              {
-                label: '2HP',
-                value: '2HP',
-              },
-            ]}
-          />
-        </DataEntry>
-        <br />
-        <DataEntry caption="廠牌" {...props}>
-          <DataEntry.Select
-            value={state_brand}
-            onChange={(v) => setState_brand(v)}
-            options={[
-              {
-                label: '東元',
-                value: '東元',
-              },
-              {
-                label: '大同',
-                value: '大同',
-              },
-            ]}
-          />
-        </DataEntry>
-        <br />
-        <DataEntry caption="電壓" {...props}>
-          <DataEntry.Select
-            value={state_voltage}
-            onChange={(v) => setState_voltage(v)}
-            options={[
-              {
-                label: '220V',
-                value: '220V',
-              },
-              {
-                label: '380V',
-                value: '380V',
-              },
-            ]}
-          />
-        </DataEntry>
-      </div>
-    );
-  }, [state_horsepower, state_brand, state_voltage]);
+  const render = (
+    <div key="powerControlBox">
+      <Horsepower onChange={setState_horsepower} />
+      <br />
+      <Brand onChange={setState_brand} />
+      <br />
+      <Voltage onChange={setState_voltage} />
+    </div>
+  );
 
   return {
-    Render,
+    render,
     result,
     clear,
   };
 };
 
+// MARK:useMotorControlBox
+const useMotorControlBox = (): ThookInstance => {
+  const [state_horsepower, setState_horsepower] = useState('');
+  const [state_voltage, setState_voltage] = useState('');
+
+  let result = '馬達控制箱';
+  state_horsepower && (result = `${state_horsepower}${result}`);
+  state_voltage && (result = `${result}(${state_voltage})`);
+
+  const clear = () => {
+    setState_horsepower('');
+    setState_voltage('');
+  };
+
+  const render = (
+    <div key="motorControlBox">
+      <Horsepower onChange={setState_horsepower} />
+      <br />
+      <Voltage onChange={setState_voltage} />
+    </div>
+  );
+
+  return {
+    render,
+    result,
+    clear,
+  };
+};
+
+// MARK:useUps
+const useUps = (): ThookInstance => {
+  const [state_horsepower, setState_horsepower] = useState('');
+
+  let result = 'UPS不斷電系統 ';
+  state_horsepower && (result += ` ${state_horsepower}`);
+
+  const clear = () => {
+    setState_horsepower('');
+  };
+
+  const render = (
+    <div key="ups">
+      <Horsepower onChange={setState_horsepower} />
+    </div>
+  );
+
+  return {
+    render,
+    result,
+    clear,
+  };
+};
+
+// MARK:useUps
+const useCatapultDoorControlBox = (): ThookInstance => {
+  const [state_horsepower, setState_horsepower] = useState('');
+  const [state_voltage, setState_voltage] = useState('');
+  const [state_brand, setState_brand] = useState('');
+
+  let result = '彈射門控制箱';
+  state_horsepower && (result = `${result}${state_horsepower}`);
+  state_voltage && (result = `${result} ${state_voltage}`);
+  state_brand && (result = `${result}(${state_brand})`);
+
+  const clear = () => {
+    setState_horsepower('');
+    setState_voltage('');
+    setState_brand('');
+  };
+
+  const render = (
+    <div key="catapultDoorControlBox">
+      <Horsepower onChange={setState_horsepower} />
+      <br />
+      <Brand onChange={setState_brand} />
+      <br />
+      <Voltage onChange={setState_voltage} />
+    </div>
+  );
+
+  return {
+    result,
+    clear,
+    render,
+  };
+};
+
 // ==============================================================================
+
+const Horsepower = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => {
+  return (
+    <DataEntry caption="馬力" {...props}>
+      <DataEntry.Select value={value} onChange={onChange} options={options_horsePower} />
+    </DataEntry>
+  );
+};
+
+const Brand = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => {
+  return (
+    <DataEntry caption="廠牌" {...props}>
+      <DataEntry.Select value={value} onChange={onChange} options={options_motorVender} />
+    </DataEntry>
+  );
+};
+
+const Voltage = ({ value, onChange }: { value?: string; onChange: (v: string) => void }) => {
+  return (
+    <DataEntry caption="電壓" {...props}>
+      <DataEntry.Select value={value} onChange={onChange} options={options_voltage} />
+    </DataEntry>
+  );
+};
+
 // ==============================================================================
 // ==============================================================================
 export { ControlBox };

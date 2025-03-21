@@ -94,6 +94,11 @@ const reducer = (stateDict: TstateDict, action: Taction) => {
 
     case 'addCategory': {
       const { category, itemName } = payload;
+
+      if (copy[category]) {
+        break;
+      }
+
       copy[category] = {
         itemName,
         category,
@@ -151,11 +156,15 @@ const useElectronicSuppliesRequirement = () => {
 
   //
 
-  const addCategory = async (itemName: '控制箱/盤') => {
+  const createAddCategory = (itemName: Tstate_electronicItem['itemName']) => {
     if (itemName === '控制箱/盤') {
-      const category = await addControlBox();
-      dispatch({ type: 'addCategory', payload: { category, itemName } });
+      return async () => {
+        const category = await addControlBox();
+        dispatch({ type: 'addCategory', payload: { category, itemName } });
+      };
     }
+
+    return undefined;
   };
 
   //
@@ -163,14 +172,14 @@ const useElectronicSuppliesRequirement = () => {
     state_electronicItemDict,
     dispatch,
     replaceState,
-    addCategory,
+    createAddCategory,
   };
 };
 
 // =========================================================================
 
 const addControlBox = async () => {
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<string>((resolve) => {
     let category = '';
     const { destroy } = myAlert.clear({
       content: (
@@ -183,7 +192,6 @@ const addControlBox = async () => {
           }}
         />
       ),
-      onCancel: () => reject(),
     });
   });
 };
@@ -311,42 +319,42 @@ const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
 ];
 
 const defaultStateArr_控制箱盤: Tstate_electronicItem[] = [
-  {
-    category: '3HP馬達控制箱(380V)',
-    categoryParam: '3HP馬達控制箱(380V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '2HP馬達控制箱(380V)',
-    categoryParam: '2HP馬達控制箱(380V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '3HP馬達控制箱(220V)',
-    categoryParam: '3HP馬達控制箱(220V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
-  {
-    category: '2HP馬達控制箱(220V)',
-    categoryParam: '2HP馬達控制箱(220V)',
-    itemName: '控制箱/盤',
-    subItemName: '捲門/水閘門',
-    quantity: null,
-    unit: null,
-    code: null,
-  },
+  // {
+  //   category: '3HP馬達控制箱(380V)',
+  //   categoryParam: '3HP馬達控制箱(380V)',
+  //   itemName: '控制箱/盤',
+  //   subItemName: '捲門/水閘門',
+  //   quantity: null,
+  //   unit: null,
+  //   code: null,
+  // },
+  // {
+  //   category: '2HP馬達控制箱(380V)',
+  //   categoryParam: '2HP馬達控制箱(380V)',
+  //   itemName: '控制箱/盤',
+  //   subItemName: '捲門/水閘門',
+  //   quantity: null,
+  //   unit: null,
+  //   code: null,
+  // },
+  // {
+  //   category: '3HP馬達控制箱(220V)',
+  //   categoryParam: '3HP馬達控制箱(220V)',
+  //   itemName: '控制箱/盤',
+  //   subItemName: '捲門/水閘門',
+  //   quantity: null,
+  //   unit: null,
+  //   code: null,
+  // },
+  // {
+  //   category: '2HP馬達控制箱(220V)',
+  //   categoryParam: '2HP馬達控制箱(220V)',
+  //   itemName: '控制箱/盤',
+  //   subItemName: '捲門/水閘門',
+  //   quantity: null,
+  //   unit: null,
+  //   code: null,
+  // },
   {
     // category: '彈射門控制箱_HP _V(大同/東元)',
     // categoryValue category: '彈射門控制箱_HP _V(大同/東元)',

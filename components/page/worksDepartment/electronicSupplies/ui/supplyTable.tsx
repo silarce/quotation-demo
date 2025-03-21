@@ -24,7 +24,7 @@ import { IconEdit, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons
 type Tgroup = {
   itemName: string; // 品名
   subItemName?: string | null;
-  onAddClick: () => void;
+  onAddClick: (() => void) | undefined;
   rowArr: {
     category: React.ReactNode; // 種類
     valueArr: {
@@ -114,7 +114,7 @@ const Group = ({
       <Cell_itemName>
         <div className={scss.itemNameWrapper}>
           {itemName}
-          {!disabled && <IconAddCircle className={scss.addIcon} onClick={onAddClick} />}
+          {!disabled && onAddClick && <IconAddCircle className={scss.addIcon} onClick={onAddClick} />}
         </div>
       </Cell_itemName>
       {subItemName && <Cell_subItemName>{subItemName}</Cell_subItemName>}
@@ -202,15 +202,11 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
 const useStateToGroup = ({
   stateArr,
   handler_editItemQty,
-  addCategory,
-}: // handler_editCategoryValue,
-// disabled,
-{
+  createAddCategory,
+}: {
   stateArr: Tstate_electronicItem[];
   handler_editItemQty: (key: string, qty: number) => void;
-  addCategory: (itemName: '控制箱/盤') => void;
-  // handler_editCategoryValue: (props: { key: string; categoryParam: string }) => void;
-  // disabled: boolean;
+  createAddCategory: (itemName: Tstate_electronicItem['itemName']) => (() => Promise<void>) | undefined;
 }) => {
   return useMemo(() => {
     const list: {
@@ -218,39 +214,16 @@ const useStateToGroup = ({
     } = {};
 
     stateArr.forEach((item) => {
-      const {
-        itemName,
-        category,
-        categoryParam,
-        quantity,
-        subItemName,
-        //  inputCategory
-      } = item;
+      const { itemName, category, quantity, subItemName } = item;
 
       if (!list[itemName]) {
         list[itemName] = {
           itemName,
           subItemName,
-          onAddClick: () => addCategory('控制箱/盤'),
+          onAddClick: createAddCategory(itemName),
           rowArr: [],
         };
       }
-
-      // const theCategory = inputCategory ? (
-      //   <span className="flex gap-1">
-      //     {categoryParam}
-      //     <IconEdit
-      //       className={classNames(disabled && 'invisible')}
-      //       onClick={async () => {
-      //         const categoryValue = await inputCategory();
-      //         handler_editCategoryValue({ key: category, categoryParam: categoryValue });
-      //       }}
-      //     />
-      //   </span>
-      // ) : (
-      //   categoryParam || category
-      // );
-      // const theCategory = categoryParam || category;
 
       list[itemName].rowArr.push({
         category,
