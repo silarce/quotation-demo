@@ -1,10 +1,7 @@
 import { useMemo } from 'react';
 
 // component
-import SupplyTable, {
-  Tgroup,
-  // Tprops_cell, Tprops_cell_input
-} from './ui/supplyTable';
+import SupplyTable, { Tgroup } from './ui/supplyTable';
 
 // css
 import scss from './supplyList.module.scss';
@@ -30,10 +27,6 @@ export default function SupplyList({
         //
         itemName,
         category,
-        // unit,
-        // pickUpQuantity,
-        // stayQuantity,
-        // quantity,
       } = item;
 
       const subItemName = itemName === '控制箱/盤' ? '捲門/水閘門' : undefined;

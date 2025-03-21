@@ -1,25 +1,15 @@
 import { useMemo } from 'react';
 import classNames from 'classnames';
 
-// component
-
-// gear
-// import Row from 'components/global/gear/table/row';
-
 // css
 import scss from './supplyTable.module.scss';
 
-// type
-
-import { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
-
 import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
+// type
+import { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
+
 // ==================================================================
-
-// 先簡單處理，真的有效能問題再用memo
-
-// type TrowProperty = 'pickUpQuantity' | 'stayQuantity' | 'quantity' | 'pickupRecord' | 'requirementQty';
 
 type Tgroup = {
   itemName: string; // 品名

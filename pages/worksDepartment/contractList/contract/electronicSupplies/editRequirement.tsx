@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useReducer, Fragment } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -32,7 +32,6 @@ import {
   //
   apiPostElectronicSuppliesRequirementRecord,
   apiPatchElectronicSuppliesRequirementRecord,
-  // apiGetDefaultElectronicSuppliesRequirementData,
   //
   useGetElectronicSuppliesRequirementRecord_id,
   useGetDefaultElectronicSuppliesRequirementData,
@@ -118,13 +117,10 @@ export default function EditRequirementRecord() {
 
   const { data: data_contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
 
-  const {
-    data: data_requirementRecord,
-    update: update_requirementRecord,
-    // isFetching: isFetching_requirementRecord,
-  } = useGetElectronicSuppliesRequirementRecord_id(requirementRecordId, {
-    autoUpdate: !isNew,
-  });
+  const { data: data_requirementRecord, update: update_requirementRecord } =
+    useGetElectronicSuppliesRequirementRecord_id(requirementRecordId, {
+      autoUpdate: !isNew,
+    });
 
   const { defaultElectronicSuppliesRequirementArr, worksheetIdArr, electronicSuppliesId } =
     useGetDefaultElectronicSuppliesRequirementData(contractId, {
@@ -138,14 +134,7 @@ export default function EditRequirementRecord() {
   // region REQUIREST
 
   const reqPostPatch = async () => {
-    const {
-      date,
-      // indexNumber,
-      // picker,
-      preparer,
-      doorModelName,
-      doorQty,
-    } = state_info;
+    const { date, preparer, doorModelName, doorQty } = state_info;
 
     const pass = check_stateInfo(state_info);
 
@@ -224,7 +213,10 @@ export default function EditRequirementRecord() {
     }
   };
 
-  const reqGetDefaultElectronicSuppliesRequirement = async () => {
+  // ------------------------------------------------------------------
+
+  // MARK:updateDefaultToElectronicSuppliesRequirement
+  const updateDefaultToElectronicSuppliesRequirement = async () => {
     const state_electronicItemArr = (defaultElectronicSuppliesRequirementArr ?? []).map((item) => {
       const subItemName = item.category === '控制箱/盤' ? '捲門/水閘門' : null;
 
@@ -253,29 +245,21 @@ export default function EditRequirementRecord() {
       ),
     });
   };
-
-  // ------------------------------------------------------------------
-
-  // region FUNCTION
-
-  const editItemQty = (key: string, qty: number) => {
-    dispatch({
-      type: 'editQty',
-      payload: { key, qty },
-    });
-  };
-
-  // ------------------------------------------------------------------
-
-  const groupArr = useStateToGroup({
-    stateArr: Object.values(state_electronicItemDict),
-    handler_editItemQty: editItemQty,
-    createAddCategory,
-  });
-
   // ------------------------------------------------------------------
 
   // region PROPS
+
+  const groupArr = useStateToGroup({
+    stateArr: Object.values(state_electronicItemDict),
+    handler_editItemQty: (key: string, qty: number) => {
+      dispatch({
+        type: 'editQty',
+        payload: { key, qty },
+      });
+    },
+    createAddCategory,
+  });
+
   const defaultSeletedDataArrArr: Parameters<typeof SelectorGroup>[0]['defaultSeletedDataArrArr'] = useMemo(() => {
     const arr02 = [];
 
@@ -485,7 +469,7 @@ export default function EditRequirementRecord() {
             <SquareBtn
               className={classNames((!isNew || disabled) && 'invisible')}
               sharp="mini"
-              onClick={reqGetDefaultElectronicSuppliesRequirement}
+              onClick={updateDefaultToElectronicSuppliesRequirement}
             >
               建議送電備品
             </SquareBtn>
