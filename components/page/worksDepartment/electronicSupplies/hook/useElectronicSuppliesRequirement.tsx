@@ -155,9 +155,9 @@ const useElectronicSuppliesRequirement = () => {
         return dict;
       }, {} as TstateDict);
 
-      dispatch({ type: 'replace', payload: { stateDict: { ...defaultStateDict, ...stateDict } } });
+      dispatch({ type: 'replace', payload: { stateDict: { ...state_electronicItemDict, ...stateDict } } });
     } else {
-      dispatch({ type: 'replace', payload: { stateDict: { ...defaultStateDict, ...data } } });
+      dispatch({ type: 'replace', payload: { stateDict: { ...state_electronicItemDict, ...data } } });
     }
   };
 

@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useReducer, Fragment } from 'react';
 import { useRouter } from 'next/router';
-import _ from 'lodash';
 import classNames from 'classnames';
 
 import moment from 'moment';
@@ -20,6 +19,7 @@ import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import DataEntry from 'components/global/gear/dataEntry';
 
 // css
 import scss from './editRequirement.module.scss';
@@ -42,20 +42,11 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 import { useGetContract_id } from 'js/api/api_quotation';
 
 import {
-  // Tstate_electronicItem,
   Tstate_info,
   createEmptyStateInfo,
-  // createDefaultState,
-  // orderDetailArr,
 } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
-import {
-  //
-  TemployeeDto,
-  // TelectronicSuppliesDefaultItemName,
-  // TelectronicSuppliesRequirementRecordDto,
-  // TelectronicSuppliesDefaultCategory,
-} from 'js/api/dtoTypes';
+import { TemployeeDto } from 'js/api/dtoTypes';
 
 // ==================================================================
 
@@ -70,16 +61,33 @@ type Tquery = {
   requirementRecordId: string | undefined;
 };
 
+type Taction =
+  | {
+      type: 'checked';
+      payload: {
+        index: number;
+        checked: boolean;
+      };
+    }
+  | {
+      type: 'category';
+      payload: {
+        index: number;
+        category: string;
+      };
+    }
+  | {
+      type: 'qty';
+      payload: {
+        index: number;
+        qty: number | `${number}` | '';
+      };
+    };
+
 // ==================================================================
 
 const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment']>({
   selectorArr: [
-    // {
-    //   key: 'employee',
-    //   caption: '領料人員',
-    //   tip: '單選',
-    //   limit: 1,
-    // },
     {
       key: 'employee_factoryDepartment',
       caption: '備料人員',
@@ -88,6 +96,22 @@ const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment']>({
     },
   ],
 });
+
+const config_inputSel: TinputSelProps = {
+  showBaseline: 'auto',
+  captionStyle: { width: '80px' },
+  wrapperStyle: { gap: '25px' },
+};
+
+const check_stateInfo = (state_info: Tstate_info) => {
+  let pass = true;
+
+  !state_info.date && (pass = false);
+  !state_info.preparer && (pass = false);
+  !state_info.doorModelName && (pass = false);
+
+  return pass;
+};
 
 // ==================================================================
 
@@ -103,8 +127,6 @@ export default function EditRequirementRecord() {
   const [showSelector, setShowSelector] = useState(false);
 
   // ------------------------------------------------------------------
-
-  // const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
 
   const {
     state_electronicItemDict,
@@ -127,17 +149,10 @@ export default function EditRequirementRecord() {
     autoUpdate: !isNew,
   });
 
-  // const { electronicSuppliesId } = data_contract ?? {};
-
-  const {
-    // isFetching,
-    // update,
-    defaultElectronicSuppliesRequirementArr,
-    worksheetIdArr,
-    electronicSuppliesId,
-  } = useGetDefaultElectronicSuppliesRequirementData(contractId, {
-    autoUpdate: isNew,
-  });
+  const { defaultElectronicSuppliesRequirementArr, worksheetIdArr, electronicSuppliesId } =
+    useGetDefaultElectronicSuppliesRequirementData(contractId, {
+      autoUpdate: isNew,
+    });
 
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
@@ -195,9 +210,7 @@ export default function EditRequirementRecord() {
     > = {
       operationDate: date!.toISOString(),
       storageManagementPersonnelId: preparer!.id,
-      // doorType: doorModelName || null,
       doorType: JSON.stringify(doorModelName),
-      // doorType: JSON.stringify(['AAA', 'BBB', 'CCC']),
       requirementRecordDetails,
       quantity: doorQty ? String(doorQty || 0) : null,
     };
@@ -251,7 +264,17 @@ export default function EditRequirementRecord() {
       return state;
     });
 
-    replaceState_electronicSuppliesRequirment(state_electronicItemArr);
+    const { destroy } = myAlert.clear({
+      content: (
+        <DefaultItemSelector
+          state_electronicItemArr={state_electronicItemArr}
+          onConfirm={(stateArr) => {
+            replaceState_electronicSuppliesRequirment(stateArr);
+            destroy();
+          }}
+        />
+      ),
+    });
   };
 
   // ------------------------------------------------------------------
@@ -265,22 +288,12 @@ export default function EditRequirementRecord() {
     });
   };
 
-  const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
-    dispatch({
-      type: 'editCategoryParam',
-      payload: { key, categoryParam },
-    });
-  };
-
   // ------------------------------------------------------------------
 
   const groupArr = useStateToGroup({
     stateArr: Object.values(state_electronicItemDict),
     handler_editItemQty: editItemQty,
-    // addCategory,
     createAddCategory,
-    // handler_editCategoryValue: editCategoryValue,
-    // disabled,
   });
 
   // ------------------------------------------------------------------
@@ -394,7 +407,6 @@ export default function EditRequirementRecord() {
       stateInfo.date = moment();
     }
 
-    // setState_electronicItemList(defaultStateList);
     replaceState_electronicSuppliesRequirment(stateArr);
     setState_info(stateInfo);
   }, [disabled, data_requirementRecord]);
@@ -404,9 +416,7 @@ export default function EditRequirementRecord() {
   // MARK: RENDER
 
   return (
-    <SubLayer
-    // isLoading_subLayer={isFetching_requirementRecord} api回應很快，不需要
-    >
+    <SubLayer>
       <PageHeader
         showReturnBtn={disabled}
         panelList={panelList}
@@ -442,19 +452,6 @@ export default function EditRequirementRecord() {
             inputProps={{ props: { defaultValue: state_info.indexNumber } }}
           />
 
-          {/* <InputSel
-            caption="領料人員"
-            {...confit_inputSel}
-            disabled={disabled}
-            onClick={() => setShowSelector(true)}
-            inputProps={{
-              props: {
-                placeholder: '',
-                value: state_info.picker?.chName ?? '',
-              },
-            }}
-          /> */}
-
           <InputSel
             className="global_tip_must"
             caption="備料人員"
@@ -469,22 +466,7 @@ export default function EditRequirementRecord() {
               },
             }}
           />
-          {/* <InputSel
-            className="global_tip_must"
-            caption="門型"
-            {...config_inputSel}
-            disabled={disabled}
-            selectProps={{
-              props: {
-                isSearchable: true,
-                options: options_doorModel,
-                value: { value: state_info.doorModelName ?? '', label: state_info.doorModelName ?? '' },
-                onChange: (option) => {
-                  setState_info((state) => ({ ...state, doorModelName: option?.value ?? '' }));
-                },
-              },
-            }}
-          /> */}
+
           <InputSel
             caption="樘數"
             {...config_inputSel}
@@ -528,7 +510,7 @@ export default function EditRequirementRecord() {
               sharp="mini"
               onClick={reqGetDefaultElectronicSuppliesRequirement}
             >
-              重置為預設送電備品
+              建議送電備品
             </SquareBtn>
           </div>
         </div>
@@ -550,7 +532,6 @@ export default function EditRequirementRecord() {
 
           setState_info((state) => ({
             ...state,
-            // picker,
             preparer,
           }));
         }}
@@ -566,20 +547,100 @@ export default function EditRequirementRecord() {
 
 // ==================================================================
 
-const config_inputSel: TinputSelProps = {
-  showBaseline: 'auto',
-  captionStyle: { width: '80px' },
-  wrapperStyle: { gap: '25px' },
+const reducer = (state: (Tstate_electronicItem & { checked: boolean })[], action: Taction) => {
+  const copy = [...state];
+  const { type, payload } = action;
+  const index = payload.index;
+
+  switch (type) {
+    case 'checked':
+      copy[index].checked = payload.checked;
+
+      return copy;
+    case 'category':
+      copy[index].category = payload.category;
+
+      return copy;
+
+    case 'qty':
+      copy[index].quantity = payload.qty === '' ? null : Number(payload.qty);
+
+      return copy;
+
+    default:
+      return state;
+  }
+};
+
+// MARK:DefaultItemSelector
+const DefaultItemSelector = ({
+  state_electronicItemArr,
+  onConfirm: _onConfirm,
+}: {
+  state_electronicItemArr: Tstate_electronicItem[];
+  onConfirm: (arr: Tstate_electronicItem[]) => void;
+}) => {
+  const arr = state_electronicItemArr.map((item) => ({ ...item, checked: false }));
+
+  const [stateArr, dispatch] = useReducer(reducer, arr);
+
+  const onConfirm = () => {
+    _onConfirm(stateArr.filter((state) => state.checked));
+  };
+
+  return (
+    <div className="p-5">
+      <div className="text-main text-bold text-xl">建議送電備品</div>
+      <br />
+      <div className={scss.row}>
+        <br />
+        <span className="text-bold text-lg">品名</span>
+        <span className="text-bold text-lg">種類</span>
+        <span className="text-bold text-lg">數量</span>
+        {/*  */}
+        {stateArr.map((state, index) => {
+          return (
+            <Fragment key={index}>
+              <DataEntry.Checkbox
+                value={state.checked}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'checked',
+                    payload: {
+                      index,
+                      checked: e.target.checked,
+                    },
+                  })
+                }
+              />
+              <span>{state.itemName}</span>
+              <DataEntry.Input
+                value={state.category}
+                onChange={(e) => dispatch({ type: 'category', payload: { index, category: e.target.value } })}
+              />
+              <DataEntry.Input
+                type="number"
+                min={0}
+                step={0}
+                value={state.quantity ?? ''}
+                onChange={(e) => {
+                  if (e.target.validity.valid) {
+                    dispatch({ type: 'qty', payload: { index, qty: e.target.value as `${number}` } });
+                  }
+                }}
+              />
+            </Fragment>
+          );
+        })}
+
+        {/*  */}
+      </div>
+      <br />
+      <SquareBtn sharp="long" onClick={onConfirm}>
+        確認
+      </SquareBtn>
+    </div>
+  );
 };
 
 // ==================================================================
-
-const check_stateInfo = (state_info: Tstate_info) => {
-  let pass = true;
-
-  !state_info.date && (pass = false);
-  !state_info.preparer && (pass = false);
-  !state_info.doorModelName && (pass = false);
-
-  return pass;
-};

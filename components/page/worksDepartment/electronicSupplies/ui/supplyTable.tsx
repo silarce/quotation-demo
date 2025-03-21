@@ -24,7 +24,7 @@ import { IconEdit, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons
 type Tgroup = {
   itemName: string; // 品名
   subItemName?: string | null;
-  onAddClick: (() => void) | undefined;
+  onAddClick?: (() => void) | undefined;
   rowArr: {
     category: React.ReactNode; // 種類
     valueArr: {
