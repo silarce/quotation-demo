@@ -1,34 +1,15 @@
-import { useState, useEffect, useMemo, useReducer } from 'react';
+import { useReducer } from 'react';
 import _ from 'lodash';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import {
-  TpanelProps,
-  Tpanel,
-  ControlBox,
-  LuckKey,
-} from 'components/page/worksDepartment/electronicSupplies/categoryEditor';
-
-// api
-// import {
-//   TcreateElectronicSuppliesRequirementRecordDto,
-//   TcreateElectronicSuppliesRecordDetailDto,
-//   TupdateElectronicSuppliesRequirementRecordDto,
-//   //
-//   apiPostElectronicSuppliesRequirementRecord,
-//   apiPatchElectronicSuppliesRequirementRecord,
-//   // apiGetDefaultElectronicSuppliesRequirementData,
-//   //
-//   useGetElectronicSuppliesRequirementRecord_id,
-//   useGetDefaultElectronicSuppliesRequirementData,
-// } from 'js/api/api_engineering';
+import { ControlBox, LuckKey } from 'components/page/worksDepartment/electronicSupplies/categoryEditor';
 
 // ==============================================================================
 
 type Tstate_electronicItem = {
   id?: string;
-  category: string;
+  category: string; // w category是唯一的，並且作為識別id
   itemName: string | '鎖盒' | '鎖匙' | '押扣' | '控制箱/盤' | '消防備品' | '主機' | '紅外線';
   quantity: number | null;
   unit: string | null;
@@ -38,12 +19,7 @@ type Tstate_electronicItem = {
   // 未來若有一個itemName對應多個subItemName，UI元件需要做修改
   // itemName為'控制箱/盤'時，subItemName為'捲門/水閘門'，其他為null或undefined
   subItemName?: null | '捲門/水閘門';
-  // // 用來辨別item用的，必須為唯一值
-  // // 目前只有需要編輯category的item會用到
-  // // idName?: string;
-
-  // inputCategory?: () => Promise<string>;
-  categoryParam: string;
+  categoryParam: string; // 棄用
 };
 
 type TstateDict = {
@@ -211,28 +187,8 @@ const useElectronicSuppliesRequirement = () => {
 
 // =========================================================================
 
-// const addControlBox = async () => {
-//   return new Promise<string>((resolve) => {
-//     const { destroy } = myAlert.clear({
-//       content: (
-//         <ControlBox
-//           action="新增"
-//           onConfirm={(v) => {
-//             resolve(v);
-//             destroy();
-//           }}
-//         />
-//       ),
-//     });
-//   });
-// };
-
-// =========================================================================
-
 // region defaultState
 
-// w category應該會是唯一的，並且之後會用category作為識別id
-// 某天竟然說category要可以編輯。新增可編輯的categoryValue作為欄位的文字，category一樣作為識別id使用
 // 狀態是dict，為什麼這邊要寫成陣列?因為後端給的是陣列
 const defaultStateArr_鎖盒: Tstate_electronicItem[] = [
   {
@@ -324,19 +280,6 @@ const defaultStateArr_鎖匙: Tstate_electronicItem[] = [
     quantity: null,
     unit: null,
     code: null,
-    // async inputCategory() {
-    //   const str = await new Promise<string>((resolve) => {
-    //     const { destroy } = myAlert.input({
-    //       title: '鎖號',
-    //       onConfirm: (value) => {
-    //         destroy();
-    //         resolve('鎖號 : ' + value);
-    //       },
-    //     });
-    //   });
-
-    //   return str;
-    // },
   },
   {
     category: '特殊鎖號',
