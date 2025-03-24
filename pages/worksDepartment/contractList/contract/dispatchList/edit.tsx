@@ -2,7 +2,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
-import _ from 'lodash';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -23,7 +22,6 @@ import {
   TcreateDispatchingDto,
   TdispatchingDto,
   useGetEngineeringDispatching_id,
-  useGetEngineeringContact,
   apiPostEngineeringDispatching,
   apiPatchEngineeringDispatching,
   apiDeleteEngineeringDispatching,
@@ -126,14 +124,7 @@ export default function EditDispatchList() {
     ],
   });
 
-  const {
-    //
-    engineeringContactId,
-    engineeringContact,
-    // accountReceivable,
-  } = contract ?? {};
-  // const { data: engineeringContact, update: update_engineeringContact } =
-  //   useGetEngineeringContact(engineeringContactId);
+  const { engineeringContact } = contract ?? {};
 
   const {
     data: dispatching,
@@ -390,10 +381,6 @@ export default function EditDispatchList() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractId, dispatchingId]);
-
-  // useEffect(() => {
-  //   update_engineeringContact();
-  // }, [engineeringContactId]);
 
   useEffect(() => {
     if (!engineeringContact) {
@@ -712,11 +699,14 @@ export default function EditDispatchList() {
     const wholeAddress = `${county}${district}${address}`;
 
     const contactPerson = pointContact?.[0]?.name + '\n' + pointContact?.[0]?.phone;
+    const contactPerson2 = pointContact?.[1] && pointContact?.[1]?.name + '\n' + pointContact?.[1]?.phone;
 
     const data_pdf: Tdata_pdf = {
       idNumber: dispatching?.idNumber ?? '',
       customerName: contract?.content.projectName ?? '',
-      phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
+      // phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
+      phoneNumber: contactPerson2 ?? '',
+
       // contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
       contactPerson,
       address: wholeAddress,
@@ -726,12 +716,7 @@ export default function EditDispatchList() {
     };
 
     return data_pdf;
-  }, [
-    //
-    contract,
-    engineeringContact,
-    dispatching,
-  ]);
+  }, [contract, engineeringContact, dispatching]);
 
   // MARK: panelList
   const panelList01: TpanelList = [
