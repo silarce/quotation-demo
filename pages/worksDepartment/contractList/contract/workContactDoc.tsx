@@ -50,6 +50,7 @@ export default function WorkContactDoc() {
   const {
     data: contract,
     update: update_contract,
+    isFetching,
     contactThatSkipContract,
   } = useGetContract_id(contractId, {
     preBuiltPopulate: 'worksDepartment02',
@@ -111,7 +112,7 @@ export default function WorkContactDoc() {
 
   // ----------------------------------------------------------------------------
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isFetching || isLoading}>
       <PageHeader
         showReturnBtn={!(isShowPattern || !disabled)}
         panelList={panelList}
