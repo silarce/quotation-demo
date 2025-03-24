@@ -129,7 +129,7 @@ function ModalPdf_pre({
     <>
       {/*  */}
       {/* 給開發者方便開發用的 */}
-      {/* <MyButton_v2 onClick={handleShowCellNumber}>切換顯示cell編號</MyButton_v2> */}
+      <MyButton_v2 onClick={handleShowCellNumber}>切換顯示cell編號</MyButton_v2>
       {/*  */}
 
       <MyButton_v2 onClick={dlPdf}>匯出PDF</MyButton_v2>
@@ -300,22 +300,32 @@ const Row = ({ className, children }: { className?: string; children?: React.Rea
 };
 
 const magnification = 1.2;
+// const magnification = 1.3;
 const c6c10Adjust = 40 * magnification;
 
 const c0 = 50 * magnification;
 const c00 = 50 * magnification;
 const c01 = c00 + c0;
-const c02 = 20 * magnification;
+
+// const c02 = 20 * magnification;
+const c02 = 26 * magnification;
+
 const c03 = 40 * magnification;
 const c04 = c03 + 50 * magnification;
 const c05 = c02 + c02 + c04;
 const c06 = c04 + c02 - c03 + c6c10Adjust;
 const c07 = 'auto';
 const c08 = 35 * magnification;
-const c09 = 110 * magnification;
+
+// const c09 = 110 * magnification ;
+const c09 = 90 * magnification;
+
 const c10 = c04 + c08 - c6c10Adjust;
 const c11 = c0 + c02 + c04 + c02 + c04 + c02 + c04;
 const c12 = c08 + c09;
+
+// 771
+// 1095
 
 const Cell00 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (

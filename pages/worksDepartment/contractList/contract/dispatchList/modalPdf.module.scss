@@ -132,17 +132,20 @@
   // grid-template-rows: repeat(8, minmax(38px, max-content));
   grid-auto-rows: 38px;
   align-content: space-between;
+  
 
   // max-height: 532px;
   height: 100%;
   > .cell:nth-of-type(1) {
     grid-column: span 2;
+    background-color: white;
   }
   .latest {
     position: sticky;
     bottom: 0;
     background-color: inherit;
     background-color: white;
+    // border-top: solid 1px black;
   }
 
   overflow: hidden;
