@@ -38,10 +38,8 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 import scss from './index.module.scss';
 
 import {
-  // Tstate_electronicItem,
   Tstate_info,
   createEmptyStateInfo,
-  // orderDetailArr,
 } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
 
 import {
@@ -94,12 +92,10 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  // const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
   const {
     state_electronicItemDict,
     dispatch,
     replaceState: replaceState_electronicSuppliesRequirment,
-    createAddCategory,
   } = useElectronicSuppliesRequirement();
 
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
@@ -113,21 +109,20 @@ export default function EditElectronicSuppliesPickup({
   const {
     data: data_pickup,
     update: update_pickup,
-    // isFetching,
+    isFetching: isFetching_pickup,
   } = useGetElectronicSuppliesPickupRecord_id(pickupRecordId);
 
   const { electronicSuppliesId } = data_contract ?? {};
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
-  const {
-    data: data_electronicSupplies,
-    // update: update_electronicSupplies,
-    // isFetching: isFetching_electronicSupplies,
-  } = useElectronicSupplies_id(electronicSuppliesId, {
-    params_cover: {
-      populate: ['requirementRecords.requirementRecordDetails'],
-    },
-  });
+  const { data: data_electronicSupplies, isFetching: isFetching_electronicSupplies } = useElectronicSupplies_id(
+    electronicSuppliesId,
+    {
+      params_cover: {
+        populate: ['requirementRecords.requirementRecordDetails'],
+      },
+    }
+  );
 
   // ------------------------------------------------------------------
 
@@ -209,7 +204,6 @@ export default function EditElectronicSuppliesPickup({
       takeOffEmployeeId: state_info.picker!.id,
       action: '領取',
       preparationEmployeeId: state_info.preparer!.id,
-      // doorModel: state_info.doorModelName!,
       doorModel: JSON.stringify(state_info.doorModelName),
       requirementRecordId: requirementRecordId || null,
       pickupRecordDetails,
@@ -411,7 +405,6 @@ export default function EditElectronicSuppliesPickup({
         indexNumber: data_pickup.number || '',
         picker: data_pickup.preparationEmployee || undefined,
         preparer: data_pickup.takeOffEmployee || undefined,
-        // doorModelName: data_pickup.doorModel ?? '',
         doorModelName: data_pickup.addition.doorTypeArr ?? [],
         doorQty: String(data_pickup.totalQuantity ?? '') as Tstate_info['doorQty'],
       };
@@ -429,7 +422,7 @@ export default function EditElectronicSuppliesPickup({
   // ------------------------------------------------------------------
   // MARK: RENDER
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching_pickup || isFetching_electronicSupplies}>
       {CustomPageHeader && <CustomPageHeader disabled={disabled} />}
       {!CustomPageHeader && (
         <PageHeader
@@ -497,22 +490,7 @@ export default function EditElectronicSuppliesPickup({
               },
             }}
           />
-          {/* <InputSel
-            className="global_tip_must"
-            caption="門型"
-            {...config_inputSel}
-            disabled={disabled}
-            selectProps={{
-              props: {
-                isSearchable: true,
-                options: options_doorModel,
-                value: { value: state_info.doorModelName ?? '', label: state_info.doorModelName ?? '' },
-                onChange: (option) => {
-                  setState_info((state) => ({ ...state, doorModelName: option?.value ?? '' }));
-                },
-              },
-            }}
-          /> */}
+
           <InputSel
             caption="樘數"
             {...config_inputSel}

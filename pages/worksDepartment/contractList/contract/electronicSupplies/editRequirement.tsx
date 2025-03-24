@@ -115,17 +115,29 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
+  const {
+    data: data_contract,
+    update: update_contract,
+    contactThatSkipContract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id(contractId);
 
-  const { data: data_requirementRecord, update: update_requirementRecord } =
-    useGetElectronicSuppliesRequirementRecord_id(requirementRecordId, {
-      autoUpdate: !isNew,
-    });
+  const {
+    data: data_requirementRecord,
+    update: update_requirementRecord,
+    isFetching: isFetching_requirementRecord,
+  } = useGetElectronicSuppliesRequirementRecord_id(requirementRecordId, {
+    autoUpdate: !isNew,
+  });
 
-  const { defaultElectronicSuppliesRequirementArr, worksheetIdArr, electronicSuppliesId } =
-    useGetDefaultElectronicSuppliesRequirementData(contractId, {
-      autoUpdate: isNew,
-    });
+  const {
+    defaultElectronicSuppliesRequirementArr,
+    worksheetIdArr,
+    electronicSuppliesId,
+    isFetching: isFetching_defaultElectronicSuppliesRequirement,
+  } = useGetDefaultElectronicSuppliesRequirementData(contractId, {
+    autoUpdate: isNew,
+  });
 
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
@@ -377,7 +389,11 @@ export default function EditRequirementRecord() {
   // MARK: RENDER
 
   return (
-    <SubLayer>
+    <SubLayer
+      isLoading_subLayer={
+        isFetching_contract || isFetching_requirementRecord || isFetching_defaultElectronicSuppliesRequirement
+      }
+    >
       <PageHeader
         showReturnBtn={disabled}
         panelList={panelList}
