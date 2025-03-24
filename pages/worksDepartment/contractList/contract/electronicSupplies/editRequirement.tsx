@@ -36,9 +36,10 @@ import {
   useGetElectronicSuppliesRequirementRecord_id,
   useGetDefaultElectronicSuppliesRequirementData,
 } from 'js/api/api_engineering';
-import { useApiGetProdDoorModels } from 'js/api/api_product';
-
+// import { useApiGetProdDoorModels } from 'js/api/api_product';
 import { useGetContract_id } from 'js/api/api_quotation';
+
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import {
   Tstate_info,
@@ -139,7 +140,8 @@ export default function EditRequirementRecord() {
     autoUpdate: isNew,
   });
 
-  const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
+  const { formatOptions } = useGlobal_doorModel();
+  const options_doorModel = formatOptions();
 
   // ------------------------------------------------------------------
 
@@ -334,10 +336,6 @@ export default function EditRequirementRecord() {
   // region useEffect
 
   useEffect(() => {
-    update_doorModelList();
-  }, []);
-
-  useEffect(() => {
     update_contract();
   }, [contractId]);
 
@@ -476,7 +474,7 @@ export default function EditRequirementRecord() {
                 onChange={(arr: string[]) => {
                   setState_info((state) => ({ ...state, doorModelName: arr }));
                 }}
-                options={options_doorModel}
+                options={options_doorModel ?? []}
               />
             }
           />
