@@ -1,4 +1,4 @@
-import { useState, useRef, Fragment, forwardRef, useEffect } from 'react';
+import { useState, useRef, Fragment, forwardRef, useEffect, useReducer } from 'react';
 import classNames from 'classnames';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -63,14 +63,7 @@ function ModalPdf_pre({
   const [isContentOverflow, setIsContentOverflow] = useState(false);
   const [showWarning, setShowWarning] = useState(true);
 
-  const [renderCount, setRenderCount] = useState(0);
-
-  // 將isShowCellNumber設為true即可在畫面上看到格子的編號
-  // 方便開發時調整格子的樣式或排版
-  const handleShowCellNumber = () => {
-    isShowCellNumber = !isShowCellNumber;
-    setRenderCount((state) => state + 1);
-  };
+  const testBtn = useTestBtn();
 
   // ------------------------------------------------------------------------
 
@@ -129,7 +122,8 @@ function ModalPdf_pre({
     <>
       {/*  */}
       {/* 給開發者方便開發用的 */}
-      <MyButton_v2 onClick={handleShowCellNumber}>切換顯示cell編號</MyButton_v2>
+      {/* 需要調整格子寬度時就取消註解按下按鈕 */}
+      {testBtn}
       {/*  */}
 
       <MyButton_v2 onClick={dlPdf}>匯出PDF</MyButton_v2>
@@ -324,9 +318,6 @@ const c10 = c04 + c08 - c6c10Adjust;
 const c11 = c0 + c02 + c04 + c02 + c04 + c02 + c04;
 const c12 = c08 + c09;
 
-// 771
-// 1095
-
 const Cell00 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (
     <div className={classNames(scss.cell, className)} style={{ width: c00 }}>
@@ -456,4 +447,28 @@ const SpanArr = ({ str }: { str: string }) => {
       })}
     </>
   );
+};
+
+// 將isShowCellNumber設為true即可在畫面上看到格子的編號
+// 方便開發時調整格子的樣式或排版
+// 需要注意的是isShowCellNumber是寫在這個檔案的變數，不是react狀態
+// isShowCellNumber預期只在開發時可能改變，所以在產出環境沒有影響
+const useTestBtn = () => {
+  const [_, setForceRender] = useState(0);
+
+  // 將isShowCellNumber設為true即可在畫面上看到格子的編號
+  // 方便開發時調整格子的樣式或排版
+  const handleShowCellNumber = () => {
+    isShowCellNumber = !isShowCellNumber;
+    setForceRender((state) => state + 1);
+  };
+
+  const testBtn =
+    process.env.NODE_ENV === 'development' ? (
+      <MyButton_v2 className="mr-5" onClick={handleShowCellNumber}>
+        切換顯示cell編號
+      </MyButton_v2>
+    ) : null;
+
+  return testBtn;
 };
