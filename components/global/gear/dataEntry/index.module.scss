@@ -156,20 +156,14 @@
 
 .inputSelect {
   position: relative;
-  z-index: 0;
-  // 原本是採用grid將兩input與label分為兩邊
-  // 但是這樣會使Select的Menu長度縮短
-  // 所以採用將input覆蓋在label上的作法
   > input {
     position: relative;
-    z-index: 2;
     width: calc(100% - 20px);
   }
   > label {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 1;
     display: block;
     width: 100%;
   }
@@ -178,10 +172,14 @@
 .control_inputSelect.plus {
   @extend .control_base;
   width: 100%;
+  user-select: none;
 }
 .valueContainer_inputSelect.plus {
   @extend .valueContainer_base;
-  visibility: hidden;
+  // isSearchable===false時，設置visibility會使點擊關閉menu無效
+  // visibility: hidden;
+  opacity: 0;
+  user-select: none;
 }
 .singleValue_inputSelect.plus {
   @extend .singleValue_base;
@@ -198,6 +196,11 @@
 .indicatorSeparator_inputSelect.plus {
   @extend .indicatorSeparator_base;
 }
+
+.menu_inputSelect.plus {
+  z-index: 3;
+}
+
 .option_inputSelect.plus {
   @extend .option_base;
   background-color: transparent;
