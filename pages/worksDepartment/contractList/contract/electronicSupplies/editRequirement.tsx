@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import _ from 'lodash';
 import classNames from 'classnames';
 
 import moment from 'moment';
@@ -11,6 +10,7 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 
 // component
 import SupplyTable, { useStateToGroup } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
+import DefaultItemSelector from 'components/page/worksDepartment/electronicSupplies/defaultItemSelector';
 
 // antd
 import { Select as AntdSelect } from 'antd';
@@ -32,30 +32,28 @@ import {
   //
   apiPostElectronicSuppliesRequirementRecord,
   apiPatchElectronicSuppliesRequirementRecord,
-  // apiGetDefaultElectronicSuppliesRequirementData,
   //
   useGetElectronicSuppliesRequirementRecord_id,
   useGetDefaultElectronicSuppliesRequirementData,
 } from 'js/api/api_engineering';
-import { useApiGetProdDoorModels } from 'js/api/api_product';
-
+// import { useApiGetProdDoorModels } from 'js/api/api_product';
 import { useGetContract_id } from 'js/api/api_quotation';
 
-import {
-  Tstate_electronicItem,
-  Tstate_info,
-  createEmptyStateInfo,
-  createDefaultState,
-  // orderDetailArr,
-} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import {
-  //
-  TemployeeDto,
-  // TelectronicSuppliesDefaultItemName,
-  // TelectronicSuppliesRequirementRecordDto,
-  // TelectronicSuppliesDefaultCategory,
-} from 'js/api/dtoTypes';
+  Tstate_info,
+  createEmptyStateInfo,
+} from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+
+import { TemployeeDto } from 'js/api/dtoTypes';
+
+// ==================================================================
+
+import {
+  useElectronicSuppliesRequirement,
+  Tstate_electronicItem,
+} from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 // ==================================================================
 type Tquery = {
@@ -63,20 +61,10 @@ type Tquery = {
   requirementRecordId: string | undefined;
 };
 
-type TstateList = {
-  [key: string]: Tstate_electronicItem;
-};
-
 // ==================================================================
 
 const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment']>({
   selectorArr: [
-    // {
-    //   key: 'employee',
-    //   caption: '領料人員',
-    //   tip: '單選',
-    //   limit: 1,
-    // },
     {
       key: 'employee_factoryDepartment',
       caption: '備料人員',
@@ -85,6 +73,22 @@ const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment']>({
     },
   ],
 });
+
+const config_inputSel: TinputSelProps = {
+  showBaseline: 'auto',
+  captionStyle: { width: '80px' },
+  wrapperStyle: { gap: '25px' },
+};
+
+const check_stateInfo = (state_info: Tstate_info) => {
+  let pass = true;
+
+  !state_info.date && (pass = false);
+  !state_info.preparer && (pass = false);
+  !state_info.doorModelName && (pass = false);
+
+  return pass;
+};
 
 // ==================================================================
 
@@ -101,48 +105,50 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
-  const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
+  const {
+    state_electronicItemDict,
+    dispatch,
+    replaceState: replaceState_electronicSuppliesRequirment,
+    createAddCategory,
+  } = useElectronicSuppliesRequirement();
+
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
+  const {
+    data: data_contract,
+    update: update_contract,
+    contactThatSkipContract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id(contractId);
 
   const {
     data: data_requirementRecord,
     update: update_requirementRecord,
-    // isFetching: isFetching_requirementRecord,
+    isFetching: isFetching_requirementRecord,
   } = useGetElectronicSuppliesRequirementRecord_id(requirementRecordId, {
     autoUpdate: !isNew,
   });
 
-  // const { electronicSuppliesId } = data_contract ?? {};
-
   const {
-    // isFetching,
-    // update,
     defaultElectronicSuppliesRequirementArr,
     worksheetIdArr,
     electronicSuppliesId,
+    isFetching: isFetching_defaultElectronicSuppliesRequirement,
   } = useGetDefaultElectronicSuppliesRequirementData(contractId, {
     autoUpdate: isNew,
   });
 
-  const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
+  const { formatOptions } = useGlobal_doorModel();
+  const options_doorModel = formatOptions();
 
   // ------------------------------------------------------------------
 
   // region REQUIREST
 
   const reqPostPatch = async () => {
-    const {
-      date,
-      // indexNumber,
-      // picker,
-      preparer,
-      doorModelName,
-      doorQty,
-    } = state_info;
+    const { date, preparer, doorModelName, doorQty } = state_info;
 
     const pass = check_stateInfo(state_info);
 
@@ -155,7 +161,7 @@ export default function EditRequirementRecord() {
     }
 
     let requirementRecordDetails: TcreateElectronicSuppliesRecordDetailDto[] = Object.values(
-      state_electronicItemList
+      state_electronicItemDict
     ).map((item) => {
       const { id, category, itemName, quantity, unit, code, subItemName, categoryParam } = item;
 
@@ -184,9 +190,7 @@ export default function EditRequirementRecord() {
     > = {
       operationDate: date!.toISOString(),
       storageManagementPersonnelId: preparer!.id,
-      // doorType: doorModelName || null,
       doorType: JSON.stringify(doorModelName),
-      // doorType: JSON.stringify(['AAA', 'BBB', 'CCC']),
       requirementRecordDetails,
       quantity: doorQty ? String(doorQty || 0) : null,
     };
@@ -223,7 +227,10 @@ export default function EditRequirementRecord() {
     }
   };
 
-  const reqGetDefaultElectronicSuppliesRequirement = async () => {
+  // ------------------------------------------------------------------
+
+  // MARK:updateDefaultToElectronicSuppliesRequirement
+  const updateDefaultToElectronicSuppliesRequirement = async () => {
     const state_electronicItemArr = (defaultElectronicSuppliesRequirementArr ?? []).map((item) => {
       const subItemName = item.category === '控制箱/盤' ? '捲門/水閘門' : null;
 
@@ -240,66 +247,39 @@ export default function EditRequirementRecord() {
       return state;
     });
 
-    const list = _.keyBy(state_electronicItemArr, 'category');
-    const { defaultStateList } = createDefaultState();
-
-    setState_electronicItemList({
-      ...defaultStateList,
-      ...list,
+    const { destroy } = myAlert.clear({
+      content: (
+        <DefaultItemSelector
+          state_electronicItemArr={state_electronicItemArr}
+          onConfirm={(stateArr) => {
+            replaceState_electronicSuppliesRequirment(stateArr);
+            destroy();
+          }}
+        />
+      ),
     });
   };
-
-  // ------------------------------------------------------------------
-
-  // region FUNCTION
-
-  const editItemQty = (key: string, qty: number) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          quantity: qty,
-        },
-      };
-    });
-  };
-
-  const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          categoryParam: categoryParam,
-        },
-      };
-    });
-  };
-
-  // ------------------------------------------------------------------
-
-  const groupArr = useStateToGroup({
-    stateArr: Object.values(state_electronicItemList),
-    handler_editItemQty: editItemQty,
-    handler_editCategoryValue: editCategoryValue,
-    disabled,
-  });
-
   // ------------------------------------------------------------------
 
   // region PROPS
+
+  const groupArr = useStateToGroup({
+    stateArr: Object.values(state_electronicItemDict),
+    handler_editItemQty: (key: string, qty: number) => {
+      dispatch({
+        type: 'editQty',
+        payload: { key, qty },
+      });
+    },
+    createAddCategory,
+  });
+
   const defaultSeletedDataArrArr: Parameters<typeof SelectorGroup>[0]['defaultSeletedDataArrArr'] = useMemo(() => {
-    // const arr01 = [];
     const arr02 = [];
 
-    // state_info.picker && arr01.push(state_info.picker);
     state_info.preparer && arr02.push(state_info.preparer);
 
-    return [
-      // arr01,
-      arr02,
-    ];
+    return [arr02];
   }, [state_info.picker, state_info.preparer]);
 
   const panelList_disabled: TpanelList = [
@@ -356,10 +336,6 @@ export default function EditRequirementRecord() {
   // region useEffect
 
   useEffect(() => {
-    update_doorModelList();
-  }, []);
-
-  useEffect(() => {
     update_contract();
   }, [contractId]);
 
@@ -368,15 +344,12 @@ export default function EditRequirementRecord() {
       return;
     }
 
-    const { defaultStateList } = createDefaultState();
-
     const { requirementRecordDetails = [] } = data_requirementRecord ?? {};
 
-    requirementRecordDetails?.forEach((detail) => {
+    const stateArr: Tstate_electronicItem[] = requirementRecordDetails?.map((detail) => {
       const { id: detailId, category, itemName, quantity, unit, code, categoryParam } = detail;
 
-      defaultStateList[category] = {
-        ...defaultStateList[category], // 可能是undefined // 會將subItemName帶入
+      return {
         id: detailId,
         category,
         itemName,
@@ -384,7 +357,7 @@ export default function EditRequirementRecord() {
         unit,
         code,
         categoryParam: categoryParam ?? '',
-      };
+      } as Tstate_electronicItem;
 
       //
     });
@@ -405,7 +378,7 @@ export default function EditRequirementRecord() {
       stateInfo.date = moment();
     }
 
-    setState_electronicItemList(defaultStateList);
+    replaceState_electronicSuppliesRequirment(stateArr);
     setState_info(stateInfo);
   }, [disabled, data_requirementRecord]);
 
@@ -415,7 +388,9 @@ export default function EditRequirementRecord() {
 
   return (
     <SubLayer
-    // isLoading_subLayer={isFetching_requirementRecord} api回應很快，不需要
+      isLoading_subLayer={
+        isFetching_contract || isFetching_requirementRecord || isFetching_defaultElectronicSuppliesRequirement
+      }
     >
       <PageHeader
         showReturnBtn={disabled}
@@ -452,19 +427,6 @@ export default function EditRequirementRecord() {
             inputProps={{ props: { defaultValue: state_info.indexNumber } }}
           />
 
-          {/* <InputSel
-            caption="領料人員"
-            {...confit_inputSel}
-            disabled={disabled}
-            onClick={() => setShowSelector(true)}
-            inputProps={{
-              props: {
-                placeholder: '',
-                value: state_info.picker?.chName ?? '',
-              },
-            }}
-          /> */}
-
           <InputSel
             className="global_tip_must"
             caption="備料人員"
@@ -479,22 +441,7 @@ export default function EditRequirementRecord() {
               },
             }}
           />
-          {/* <InputSel
-            className="global_tip_must"
-            caption="門型"
-            {...config_inputSel}
-            disabled={disabled}
-            selectProps={{
-              props: {
-                isSearchable: true,
-                options: options_doorModel,
-                value: { value: state_info.doorModelName ?? '', label: state_info.doorModelName ?? '' },
-                onChange: (option) => {
-                  setState_info((state) => ({ ...state, doorModelName: option?.value ?? '' }));
-                },
-              },
-            }}
-          /> */}
+
           <InputSel
             caption="樘數"
             {...config_inputSel}
@@ -527,7 +474,7 @@ export default function EditRequirementRecord() {
                 onChange={(arr: string[]) => {
                   setState_info((state) => ({ ...state, doorModelName: arr }));
                 }}
-                options={options_doorModel}
+                options={options_doorModel ?? []}
               />
             }
           />
@@ -536,9 +483,9 @@ export default function EditRequirementRecord() {
             <SquareBtn
               className={classNames((!isNew || disabled) && 'invisible')}
               sharp="mini"
-              onClick={reqGetDefaultElectronicSuppliesRequirement}
+              onClick={updateDefaultToElectronicSuppliesRequirement}
             >
-              重置為預設送電備品
+              建議送電備品
             </SquareBtn>
           </div>
         </div>
@@ -560,7 +507,6 @@ export default function EditRequirementRecord() {
 
           setState_info((state) => ({
             ...state,
-            // picker,
             preparer,
           }));
         }}
@@ -575,21 +521,3 @@ export default function EditRequirementRecord() {
 // MARK: END
 
 // ==================================================================
-
-const config_inputSel: TinputSelProps = {
-  showBaseline: 'auto',
-  captionStyle: { width: '80px' },
-  wrapperStyle: { gap: '25px' },
-};
-
-// ==================================================================
-
-const check_stateInfo = (state_info: Tstate_info) => {
-  let pass = true;
-
-  !state_info.date && (pass = false);
-  !state_info.preparer && (pass = false);
-  !state_info.doorModelName && (pass = false);
-
-  return pass;
-};

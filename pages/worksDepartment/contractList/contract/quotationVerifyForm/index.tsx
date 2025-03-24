@@ -30,6 +30,7 @@ export default function QuotationVerifyForm() {
   const {
     data: contract,
     update: update_contract,
+    isFetching,
     contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: [
@@ -65,7 +66,7 @@ export default function QuotationVerifyForm() {
   // ------------------------------------------------------------------------
   // MARK: RENDER
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching}>
       <PageHeader
         //  panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}

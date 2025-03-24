@@ -1,16 +1,5 @@
-import {
-  //
-  useState,
-  useEffect,
-  useMemo,
-  forwardRef,
-  useRef,
-  useImperativeHandle,
-  Fragment,
-  useCallback,
-  memo,
-} from 'react';
-import { useRouter, NextRouter } from 'next/router';
+import { useState, useEffect, useMemo, forwardRef, useRef, useImperativeHandle, Fragment, memo } from 'react';
+import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import { useInView } from 'react-intersection-observer';

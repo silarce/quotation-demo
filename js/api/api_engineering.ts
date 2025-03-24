@@ -224,11 +224,14 @@ export const apiGetEngineeringContact = async (id: string) => {
 /**以id取得工程聯絡單 */
 export const useGetEngineeringContact = (id: string | undefined | null) => {
   const [res, setRes] = useState<TengineeringContactDto>();
+  const [isFetching, setIsFetching] = useState(false);
 
   const update = async () => {
     if (!id) {
       return;
     }
+
+    setIsFetching(true);
 
     try {
       const newRes = await apiGetEngineeringContact(id);
@@ -243,11 +246,14 @@ export const useGetEngineeringContact = (id: string | undefined | null) => {
       myAlert.err({ title: '取得工程聯絡單失敗', content: err.message });
 
       return;
+    } finally {
+      setIsFetching(false);
     }
   };
 
   return {
     data: res,
+    isFetching,
     update,
   };
 };
@@ -355,6 +361,7 @@ export const apiGetEngineeringDispatching_id = async (id: string, params: Tparam
 
 export const useGetEngineeringDispatching_id = (id: string | undefined, customeParams?: Tparams) => {
   const [res, setRes] = useState<TdispatchingDto>();
+  const [isFetching, setIsFetching] = useState(false);
 
   const params = {
     populate: ['workerEmployee', 'todoList', 'outsourcing'],
@@ -366,7 +373,10 @@ export const useGetEngineeringDispatching_id = (id: string | undefined, customeP
       return;
     }
 
+    setIsFetching(true);
+
     const newRes = await apiGetEngineeringDispatching_id(id, params);
+    setIsFetching(false);
 
     if (newRes) {
       setRes(newRes);
@@ -378,6 +388,7 @@ export const useGetEngineeringDispatching_id = (id: string | undefined, customeP
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 
@@ -827,6 +838,7 @@ export const apiGetEngineeringExchanges = async (params?: Tparams) => {
 /**取得調退貨單列表 */
 export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetEngineeringExchanges>();
+  const [isFetching, setIsFetching] = useState(false);
 
   const params = {
     pageSize: 9999,
@@ -841,7 +853,9 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   };
 
   const update = async () => {
+    setIsFetching(true);
     const newRes = await apiGetEngineeringExchanges(params);
+    setIsFetching(false);
 
     if (newRes) {
       setRes(newRes);
@@ -854,6 +868,7 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
     data: res?.data,
     meta: res?.meta,
     update,
+    isFetching,
   };
 };
 
@@ -874,13 +889,16 @@ export const apiGetEngineeringExchanges_id = async (id: string) => {
 /**以id取得調退貨單 */
 export const useGetEngineeringExchanges_id = (id: string | undefined) => {
   const [res, setRes] = useState<TexchangeDto>();
+  const [isFetching, setIsFetching] = useState(false);
 
   const update = async () => {
     if (!id) {
       return;
     }
 
+    setIsFetching(true);
     const newRes = await apiGetEngineeringExchanges_id(id);
+    setIsFetching(false);
 
     if (newRes) {
       setRes(newRes);
@@ -892,6 +910,7 @@ export const useGetEngineeringExchanges_id = (id: string | undefined) => {
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 

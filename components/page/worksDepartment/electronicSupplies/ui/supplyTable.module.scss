@@ -1,6 +1,9 @@
 .group {
   display: flex;
   width: 100%;
+  &:hover {
+    background-color: theme("colors.hoverBgc");
+  }
 
   &.thead {
     background-color: theme("colors.bgc01");
@@ -24,10 +27,16 @@
 .rowWrapper {
   width: auto;
   flex: 1;
+
   .row {
     display: flex;
     justify-content: flex-start;
     flex: 1;
+    background-color: #fff;
+
+    &:hover {
+      background-color: theme("colors.hoverBgc");
+    }
 
     .cell:nth-last-of-type(1) {
       border-right: 0;
@@ -42,6 +51,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
   &.itemName {
     width: 200px;
   }
@@ -65,6 +75,7 @@
       width: 100%;
       border-bottom: solid 1px transparent;
       text-align: center;
+      background-color: transparent;
       &.Ok {
         color: theme("colors.success");
       }
@@ -78,4 +89,18 @@
 .inputGroup_3 {
   display: grid;
   grid-template-columns: repeat(3, 100px);
+}
+
+.itemNameWrapper {
+  position: relative;
+  .addIcon {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+
+    width: 20px;
+    height: 20px;
+    margin-top: 5px;
+  }
 }

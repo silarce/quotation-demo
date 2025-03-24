@@ -38,21 +38,21 @@ import { useApiGetProdDoorModels } from 'js/api/api_product';
 import scss from './index.module.scss';
 
 import {
-  Tstate_electronicItem,
   Tstate_info,
   createEmptyStateInfo,
-  orderDetailArr,
 } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+
+import {
+  Tstate_electronicItem,
+  orderDetailArr,
+  useElectronicSuppliesRequirement,
+} from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 // ==================================================================
 
 type Tquery = {
   contractId: string | undefined;
   pickupRecordId: string | undefined;
-};
-
-type TstateList = {
-  [key: string]: Tstate_electronicItem;
 };
 
 // ==================================================================
@@ -92,7 +92,12 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  const [state_electronicItemList, setState_electronicItemList] = useState<TstateList>({});
+  const {
+    state_electronicItemDict,
+    dispatch,
+    replaceState: replaceState_electronicSuppliesRequirment,
+  } = useElectronicSuppliesRequirement();
+
   const [state_info, setState_info] = useState<Tstate_info>(createEmptyStateInfo());
 
   const [requirementRecordId, setRequirementRecordId] = useState<string>();
@@ -104,21 +109,20 @@ export default function EditElectronicSuppliesPickup({
   const {
     data: data_pickup,
     update: update_pickup,
-    // isFetching,
+    isFetching: isFetching_pickup,
   } = useGetElectronicSuppliesPickupRecord_id(pickupRecordId);
 
   const { electronicSuppliesId } = data_contract ?? {};
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
-  const {
-    data: data_electronicSupplies,
-    // update: update_electronicSupplies,
-    // isFetching: isFetching_electronicSupplies,
-  } = useElectronicSupplies_id(electronicSuppliesId, {
-    params_cover: {
-      populate: ['requirementRecords.requirementRecordDetails'],
-    },
-  });
+  const { data: data_electronicSupplies, isFetching: isFetching_electronicSupplies } = useElectronicSupplies_id(
+    electronicSuppliesId,
+    {
+      params_cover: {
+        populate: ['requirementRecords.requirementRecordDetails'],
+      },
+    }
+  );
 
   // ------------------------------------------------------------------
 
@@ -173,7 +177,7 @@ export default function EditElectronicSuppliesPickup({
     }
 
     let pickupRecordDetails: (TcreateElectronicSuppliesRecordDetailDto & { id?: string })[] = Object.values(
-      state_electronicItemList
+      state_electronicItemDict
     ).map((item) => {
       const { id, category, itemName, quantity, unit, code, subItemName, categoryParam } = item;
       const detail = {
@@ -200,7 +204,6 @@ export default function EditElectronicSuppliesPickup({
       takeOffEmployeeId: state_info.picker!.id,
       action: '領取',
       preparationEmployeeId: state_info.preparer!.id,
-      // doorModel: state_info.doorModelName!,
       doorModel: JSON.stringify(state_info.doorModelName),
       requirementRecordId: requirementRecordId || null,
       pickupRecordDetails,
@@ -230,26 +233,9 @@ export default function EditElectronicSuppliesPickup({
   // region FUNCTION
 
   const editItemQty = (key: string, qty: number) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          quantity: qty,
-        },
-      };
-    });
-  };
-
-  const editCategoryValue = ({ key, categoryParam }: { key: string; categoryParam: string }) => {
-    setState_electronicItemList((state) => {
-      return {
-        ...state,
-        [key]: {
-          ...state[key],
-          categoryParam: categoryParam,
-        },
-      };
+    dispatch({
+      type: 'editQty',
+      payload: { key, qty },
     });
   };
 
@@ -303,21 +289,16 @@ export default function EditElectronicSuppliesPickup({
       return arr;
     })();
 
-    setState_electronicItemList(list);
+    replaceState_electronicSuppliesRequirment(list);
     setState_info((state) => ({ ...state, doorModelName: dooprTypeArr }));
   };
 
   // ------------------------------------------------------------------
 
   const groupArr = useStateToGroup({
-    stateArr: Object.values(state_electronicItemList),
+    stateArr: Object.values(state_electronicItemDict),
     handler_editItemQty: editItemQty,
-    handler_editCategoryValue: editCategoryValue,
-    disabled,
   });
-  //
-  // Object.values(state_electronicItemList),
-  // editItemQty
 
   // ------------------------------------------------------------------
   // region PROPS
@@ -424,7 +405,6 @@ export default function EditElectronicSuppliesPickup({
         indexNumber: data_pickup.number || '',
         picker: data_pickup.preparationEmployee || undefined,
         preparer: data_pickup.takeOffEmployee || undefined,
-        // doorModelName: data_pickup.doorModel ?? '',
         doorModelName: data_pickup.addition.doorTypeArr ?? [],
         doorQty: String(data_pickup.totalQuantity ?? '') as Tstate_info['doorQty'],
       };
@@ -435,14 +415,14 @@ export default function EditElectronicSuppliesPickup({
 
   useEffect(() => {
     if (disabled) {
-      setState_electronicItemList(defaultState);
+      replaceState_electronicSuppliesRequirment(defaultState);
     }
   }, [defaultState]);
 
   // ------------------------------------------------------------------
   // MARK: RENDER
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching_pickup || isFetching_electronicSupplies}>
       {CustomPageHeader && <CustomPageHeader disabled={disabled} />}
       {!CustomPageHeader && (
         <PageHeader
@@ -510,22 +490,7 @@ export default function EditElectronicSuppliesPickup({
               },
             }}
           />
-          {/* <InputSel
-            className="global_tip_must"
-            caption="門型"
-            {...config_inputSel}
-            disabled={disabled}
-            selectProps={{
-              props: {
-                isSearchable: true,
-                options: options_doorModel,
-                value: { value: state_info.doorModelName ?? '', label: state_info.doorModelName ?? '' },
-                onChange: (option) => {
-                  setState_info((state) => ({ ...state, doorModelName: option?.value ?? '' }));
-                },
-              },
-            }}
-          /> */}
+
           <InputSel
             caption="樘數"
             {...config_inputSel}
