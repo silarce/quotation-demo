@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import classNames from 'classnames';
 
 // layer
@@ -38,6 +38,40 @@ export default function SubLayer({
 }) {
   const ref_body = useRef<HTMLDivElement>(null!);
 
+  //---------------------------------------------------
+  const [isLoading_subLayer_debounce, setIsLoading_subLayer_debounce] = useState(isLoading_subLayer);
+
+  useEffect(() => {
+    const timeoutToken = setTimeout(
+      () => {
+        setIsLoading_subLayer_debounce(isLoading_subLayer);
+      },
+      isLoading_subLayer ? 100 : 0
+    );
+
+    return () => {
+      clearTimeout(timeoutToken);
+    };
+  }, [isLoading_subLayer]);
+
+  //---------------------------------------------------
+  const [isLoading_all_debounce, setIsLoading_all_debounce] = useState(isLoading_all);
+
+  useEffect(() => {
+    const timeoutToken = setTimeout(
+      () => {
+        setIsLoading_all_debounce(isLoading_all);
+      },
+      isLoading_all ? 100 : 0
+    );
+
+    return () => {
+      clearTimeout(timeoutToken);
+    };
+  }, [isLoading_all]);
+
+  //---------------------------------------------------
+
   const [firstChild, secondChild, ...restChildren] = React.Children.toArray(children);
 
   useEffect(() => {
@@ -60,10 +94,12 @@ export default function SubLayer({
         {secondChild}
         {/*把剩下的childredArr的item放進來*/}
         {restChildren}
-        <LoadingCover01 isLoading={isLoading_subLayer} />
+        {/* <LoadingCover01 isLoading={isLoading_subLayer} /> */}
+        <LoadingCover01 isLoading={isLoading_subLayer_debounce} />
       </div>
       {containerChildren}
-      <LoadingCover01 isLoading={isLoading_all} />
+      {/* <LoadingCover01 isLoading={isLoading_all} /> */}
+      <LoadingCover01 isLoading={isLoading_all_debounce} />
     </div>
   );
 }
