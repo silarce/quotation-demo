@@ -116,6 +116,7 @@ export default function EditDispatchList() {
   const {
     data: contract,
     update: update_contract,
+    isFetching: isFetching_contract,
     contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: [
@@ -134,7 +135,11 @@ export default function EditDispatchList() {
   // const { data: engineeringContact, update: update_engineeringContact } =
   //   useGetEngineeringContact(engineeringContactId);
 
-  const { data: dispatching, update: update_dispatching } = useGetEngineeringDispatching_id(dispatchingId);
+  const {
+    data: dispatching,
+    update: update_dispatching,
+    isFetching: isFetching_dispatching,
+  } = useGetEngineeringDispatching_id(dispatchingId);
 
   const haveTodoList = !!dispatching?.todoList;
 
@@ -819,7 +824,7 @@ export default function EditDispatchList() {
   // MARK:RENDER
 
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isLoading || isFetching_contract || isFetching_dispatching}>
       <PageHeader
         showReturnBtn={disabled}
         panelList={panelList}

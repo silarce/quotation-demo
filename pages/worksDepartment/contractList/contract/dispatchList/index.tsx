@@ -42,10 +42,18 @@ export default function DispatchList() {
 
   // ----------------------------------------------------
 
-  const { data: contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id(contractId);
   const engineeringContactId = contract?.engineeringContactId;
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
+  const {
+    data: engineeringContact,
+    update: update_engineeringContact,
+    isFetching: isFetching_engineeringContact,
+  } = useGetEngineeringContact(engineeringContactId);
 
   const params: Tparams = {
     populate: ['todoList', 'workerEmployee'],
@@ -146,7 +154,7 @@ export default function DispatchList() {
 
   // ----------------------------------------------------------
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching_contract || isFetching_engineeringContact}>
       <PageHeader
         panelList={panelList}
         contractNumber={contract?.contractNumber ?? ''}
