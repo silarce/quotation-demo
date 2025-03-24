@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // layout
@@ -14,23 +14,11 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
-// import {
-//   TupdateEngineeringDeliveryList,
-//   TupdateDeliveryStatus,
-//   TupdateEngineeringDeliveryStatusDto,
-//   TcreateEngineeringDeliveryStatusDto,
-//   useGetEngineeringContact,
-//   useGetEngineeringDeliveryList,
-//   apiPatchEngineeringDeliveryList,
-//   apiPostDeliveryStatus,
-//   apiPatchDeliveryStatus,
-//   apiDeleteDeliveryStatus,
-// } from 'js/api/api_engineering';
 
-import { useGetMemorandum, TmemorandumDto } from 'js/api/api_memorandum';
+import { useGetMemorandum } from 'js/api/api_memorandum';
 
 // type
-import { TcustomerDto, Tparams } from 'js/api/dtoTypes';
+import { Tparams } from 'js/api/dtoTypes';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -54,10 +42,10 @@ export default function Memorandum() {
 
   // 合約
   const {
-    //
     data: contract,
     update: update_contract,
     contactThatSkipContract,
+    isFetching: isFetching_contract,
   } = useGetContract_id(contractId, {
     customPopulate: ['engineeringContact'],
   });
@@ -80,8 +68,6 @@ export default function Memorandum() {
     poster: true;
     recipient: true;
   }>(contractId, { customParams: params });
-
-  // const [data_memorandum] = useState<TmemorandumDto_whole[]>(fake_memorandumArr);
 
   // ---------------------------------------------------------------------------
   useEffect(() => {
@@ -287,7 +273,7 @@ export default function Memorandum() {
 
   // ---------------------------------------------------------------------------
   return (
-    <SubLayer bodyOverflowY="scroll" isLoading_subLayer={isFetching_memorandum}>
+    <SubLayer bodyOverflowY="scroll" isLoading_subLayer={isFetching_memorandum || isFetching_contract}>
       <PageHeader
         panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}

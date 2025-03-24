@@ -147,6 +147,7 @@ export default function Worksheet({
   const {
     data: contract,
     update: update_contract,
+    isFetching: isFetching_contract,
     contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: [
@@ -161,11 +162,19 @@ export default function Worksheet({
     addintion_latestRecordReview: true,
   });
 
-  const { data: worksheetData, update: update_worksheetData } = useGetWorksheet_id(activeWorksheetId, {
+  const {
+    data: worksheetData,
+    update: update_worksheetData,
+    isLoading: isFetching_worksheetData,
+  } = useGetWorksheet_id(activeWorksheetId, {
     recordsWithReview: true,
   });
 
-  const { data: finalProduct = [], update: update_finalProduce } = useGetContract_id_finalProductItem(contractId);
+  const {
+    data: finalProduct = [],
+    update: update_finalProduce,
+    isLoading: isFetching_finalProduct,
+  } = useGetContract_id_finalProductItem(contractId);
 
   const {
     data: activeRecordData,
@@ -473,7 +482,15 @@ export default function Worksheet({
   // MARK: RENDER
 
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer
+      isLoading_all={
+        isLoading ||
+        isFetching_contract ||
+        isLoading_activeRecord ||
+        isFetching_worksheetData ||
+        isFetching_finalProduct
+      }
+    >
       {!isReadonly && (
         <PageHeader
           showReturnBtn={disabled}

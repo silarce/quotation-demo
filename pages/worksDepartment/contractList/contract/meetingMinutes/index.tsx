@@ -17,14 +17,14 @@ import { useGetContract_id } from 'js/api/api_quotation';
 import {
   // TupdateEngineeringDeliveryList,
   // TupdateDeliveryStatus,
-  TupdateEngineeringDeliveryStatusDto,
+  // TupdateEngineeringDeliveryStatusDto,
   useGetEngineeringContact,
-  useGetEngineeringDeliveryList,
-  apiPatchEngineeringDeliveryList,
-  TcreateEngineeringDeliveryStatusDto,
-  apiPostDeliveryStatus,
-  apiPatchDeliveryStatus,
-  apiDeleteDeliveryStatus,
+  // useGetEngineeringDeliveryList,
+  // apiPatchEngineeringDeliveryList,
+  // TcreateEngineeringDeliveryStatusDto,
+  // apiPostDeliveryStatus,
+  // apiPatchDeliveryStatus,
+  // apiDeleteDeliveryStatus,
 } from 'js/api/api_engineering';
 
 // ============================================================================
@@ -48,6 +48,7 @@ export default function MeetingMinutes() {
   const {
     data: contract,
     update: update_contract,
+    isFetching: isFetching_contract,
     contactThatSkipContract,
   } = useGetContract_id(contractId, {
     preBuiltPopulate: 'worksDepartment02',
@@ -169,7 +170,7 @@ export default function MeetingMinutes() {
 
   // ---------------------------------------------------------------------------
   return (
-    <SubLayer isLoading_all={isLoading || meetingMinutesState?.isLoading}>
+    <SubLayer isLoading_all={isLoading || meetingMinutesState?.isLoading || isFetching_contract}>
       <PageHeader
         panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}

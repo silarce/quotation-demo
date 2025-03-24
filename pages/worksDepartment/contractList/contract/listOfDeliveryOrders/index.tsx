@@ -5,8 +5,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import moment from 'moment';
+import classNames from 'classnames';
 
 // global gear
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // component
@@ -24,7 +26,7 @@ import { useGetContract_id } from 'js/api/api_quotation';
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // css
-import style from './listOfDeliveryOrders.module.scss';
+import scss from './listOfDeliveryOrders.module.scss';
 
 export default function ListOfDeliveryOrders() {
   const router = useRouter();
@@ -40,8 +42,17 @@ export default function ListOfDeliveryOrders() {
     pageSize: 9999,
   };
 
-  const { data: contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
-  const { data: exchangeArr, update: update_exchange } = useGetEngineeringExchanges(customParams);
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id(contractId);
+  const {
+    data: exchangeArr,
+    update: update_exchange,
+    isFetching: isFetching_exchange,
+  } = useGetEngineeringExchanges(customParams);
 
   useEffect(() => {
     update_exchange();
@@ -66,15 +77,15 @@ export default function ListOfDeliveryOrders() {
 
   // ----------------------------------------------------
   return (
-    <div className={style.container}>
+    <SubLayer isLoading_subLayer={isFetching_contract || isFetching_exchange}>
       <PageHeader
         panelList={panelList}
         contractNumber={contract?.contractNumber ?? ''}
         contactThatSkipContract={contactThatSkipContract}
       />
 
-      <div className={`${style.mainContainer} ${style.listOfDeliveryOrders}`}>
-        <div className={style.thead}>
+      <div className={classNames(scss.mainContainer, scss.listOfDeliveryOrders)}>
+        <div className={scss.thead}>
           {indexKeys.map((key, index) => {
             const { label } = config[key];
 
@@ -86,7 +97,7 @@ export default function ListOfDeliveryOrders() {
           })}
         </div>
 
-        <div className={style.tbody}>
+        <div className={scss.tbody}>
           {exchangeArr?.map((rowData, rowIndex) => {
             const {
               id,
@@ -114,7 +125,7 @@ export default function ListOfDeliveryOrders() {
             };
 
             return (
-              <CellWithBar className={style.row} key={rowIndex} onClick={onClick}>
+              <CellWithBar className={scss.row} key={rowIndex} onClick={onClick}>
                 {indexKeys.map((key, index) => {
                   const value = rowItem[key];
 
@@ -129,7 +140,7 @@ export default function ListOfDeliveryOrders() {
           })}
         </div>
       </div>
-    </div>
+    </SubLayer>
   );
 }
 

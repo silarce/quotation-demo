@@ -7,17 +7,13 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-// import Profile from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/profile';
 import EditTransfer, {
   Tcontroll as Tcontroll_transfer,
 } from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/editTransfer';
 import IconEdit, {
   UploadFile,
 } from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/iconEdit';
-import Signature, {
-  Tcontroll as Tcontroll_signature,
-  TemployeeDto,
-} from 'components/page/worksDepartment/contracList/contract/listOfDeliveryOrders/signature';
+
 import Profile, {
   Tcontroll as Tcontroll_profile,
 } from 'components/page/worksDepartment/contracList/contract/gear/profile';
@@ -37,11 +33,7 @@ import {
   useGetEngineeringContact,
 } from 'js/api/api_engineering';
 
-import {
-  apiPostEngineeringExchangeAttachments,
-  apiDeleteEngineeringExchangeAttachments,
-  TfileDto,
-} from 'js/api/api_engineering';
+import { apiPostEngineeringExchangeAttachments, apiDeleteEngineeringExchangeAttachments } from 'js/api/api_engineering';
 
 import { TuserDto } from 'js/api/dtoTypes';
 
@@ -57,14 +49,6 @@ type Tprofile = {
   dispatchDate: string;
 };
 
-// type Tsignature = {
-//   accounting: TemployeeDto | undefined;
-//   warehouseEmployee: TemployeeDto | undefined;
-//   factoryEmployee: TemployeeDto | undefined;
-//   supervisor: TemployeeDto | undefined;
-//   formCompleter: TemployeeDto | undefined;
-// };
-
 type Ttransfer = {
   id?: string;
   goodsName: string;
@@ -74,14 +58,7 @@ type Ttransfer = {
 };
 
 // -----------------------------------------------------------
-export default function Edit({
-  //
-  userInfo,
-  isReadonly,
-}: {
-  userInfo: TuserDto;
-  isReadonly?: boolean;
-}) {
+export default function Edit({ userInfo, isReadonly }: { userInfo: TuserDto; isReadonly?: boolean }) {
   const router = useRouter();
   const query = router.query as Tquery;
   const { contractId, exchangeId } = query;
@@ -99,24 +76,26 @@ export default function Edit({
   const [delImgIdArr, setDelImgIdArr] = useState<string[]>([]);
   // ----------------------------------------------------
 
-  const { data: contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
+  const {
+    data: contract,
+    update: update_contract,
+    contactThatSkipContract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id(contractId);
   const engineeringContactId = contract?.engineeringContactId;
-  const { data: engineeringContact, update: update_engineeringContact } =
-    useGetEngineeringContact(engineeringContactId);
-
-  const { data: exchange, update: update_exchange } = useGetEngineeringExchanges_id(exchangeId);
+  const {
+    data: engineeringContact,
+    update: update_engineeringContact,
+    isFetching: isFetching_engineeringContact,
+  } = useGetEngineeringContact(engineeringContactId);
 
   const {
-    ReviewFlow,
-    // reviewFlow,
-    // reviewFlowArr,
-    // isFetching,
-    // isFirstLoaded,
-    // update,
-    reqAddReview,
-    // reqSentReviewStop,
-    // sentReviewStop,
-  } = useReviewFlow({ uuid: exchange?.id });
+    data: exchange,
+    update: update_exchange,
+    isFetching: isFetching_exchange,
+  } = useGetEngineeringExchanges_id(exchangeId);
+
+  const { ReviewFlow, reqAddReview } = useReviewFlow({ uuid: exchange?.id });
 
   // ----------------------------------------------------
 
@@ -125,15 +104,6 @@ export default function Edit({
       return { ...profile, [key]: v };
     });
   };
-
-  // ----------------------------------------------------
-  // const [signature, setSignature] = useState<Tsignature>(emptySignature());
-
-  // const changeSignature = (key: keyof Tsignature, v: TemployeeDto) => {
-  //   setSignature((signature) => {
-  //     return { ...signature, [key]: v };
-  //   });
-  // };
 
   // ----------------------------------------------------
 
@@ -199,32 +169,6 @@ export default function Edit({
 
   // ----------------------------------------------------
 
-  // const controll_signature: Tcontroll_signature = {
-  //   accounting: {
-  //     employee: signature.accounting,
-  //     onChange: (v: TemployeeDto) => changeSignature('accounting', v),
-  //   },
-  //   warehouseEmployee: {
-  //     employee: signature.warehouseEmployee,
-  //     onChange: (v: TemployeeDto) => changeSignature('warehouseEmployee', v),
-  //   },
-  //   factoryEmployee: {
-  //     employee: signature.factoryEmployee,
-  //     onChange: (v: TemployeeDto) => changeSignature('factoryEmployee', v),
-  //   },
-  //   supervisor: {
-  //     employee: signature.supervisor,
-  //     onChange: (v: TemployeeDto) => changeSignature('supervisor', v),
-  //   },
-  //   formCompleter: {
-  //     employee: signature.formCompleter,
-  //     // onChange: (v: TemployeeDto) => changeSignature('formCompleter', v),
-  //     forbidden: true,
-  //   },
-  // };
-
-  // ----------------------------------------------------
-
   const controll_transfer_arr: Tcontroll_transfer['arr'] = transferArr.map((item, index) => {
     return {
       goodsName: {
@@ -258,34 +202,11 @@ export default function Edit({
     const body: TcreateExchgangeDto = {
       ...profile,
       exchangeRecords: transferArr,
-      // accountingId: signature.accounting?.id ?? '',
-      // warehouseEmployeeId: signature.warehouseEmployee?.id ?? '',
-      // factoryEmployeeId: signature.factoryEmployee?.id ?? '',
-      // supervisorId: signature.supervisor?.id ?? '',
-      // formCompleterId: signature.formCompleter?.id ?? '',
       contractId: contractId,
     };
 
-    // if (!body.accountingId) {
-    //   return myAlert.info({ title: '請選擇會計' });
-    // } else if (!body.warehouseEmployeeId) {
-    //   return myAlert.info({ title: '請選擇倉庫人員' });
-    // } else if (!body.factoryEmployeeId) {
-    //   return myAlert.info({ title: '請選擇廠務人員' });
-    // } else if (!body.supervisorId) {
-    //   return myAlert.info({ title: '請選擇單位主管' });
-    // } else if (!body.formCompleterId) {
-    //   return myAlert.info({ title: '請選擇填表人員' });
-    // } else if (!body.dispatchDate) {
-    //   return myAlert.info({ title: '請選擇派工日期' });
-    // } else if (!body.requirementsDate) {
-    //   return myAlert.info({ title: '請選擇需求日期' });
-    // }
-
     try {
       setIsLoading(true);
-
-      // const resId: string | undefined = undefined;
 
       if (exchangeId) {
         await apiPatchEngineeringExchange(exchangeId, body);
@@ -445,19 +366,7 @@ export default function Edit({
 
   useEffect(() => {
     const { projectName, projectNumber } = engineeringContact ?? {};
-    const {
-      sheetNumber,
-      // projectName,
-      // projectNumber: engineeringNumber,
-      requirementsDate,
-      dispatchDate,
-      //
-      // accounting,
-      // warehouseEmployee,
-      // factoryEmployee,
-      // supervisor,
-      // formCompleter,
-    } = exchange ?? {};
+    const { sheetNumber, requirementsDate, dispatchDate } = exchange ?? {};
 
     setProfile({
       sheetNumber: sheetNumber ?? '',
@@ -466,18 +375,6 @@ export default function Edit({
       requirementsDate: requirementsDate ?? '',
       dispatchDate: dispatchDate ?? '',
     });
-
-    // const isNew = !exchangeId;
-
-    // const theFormCompleter = isNew ? userInfo.employee : formCompleter;
-
-    // setSignature({
-    //   accounting,
-    //   warehouseEmployee,
-    //   factoryEmployee,
-    //   supervisor,
-    //   formCompleter: theFormCompleter,
-    // });
 
     const recoreds = _.cloneDeep(exchange?.exchangeRecords ?? []);
     setTransferArr(recoreds);
@@ -490,7 +387,7 @@ export default function Edit({
   // MARK: RENDER
 
   return (
-    <SubLayer isLoading_all={isLoading}>
+    <SubLayer isLoading_all={isLoading || isFetching_contract || isFetching_engineeringContact || isFetching_exchange}>
       <PageHeader
         showReturnBtn={isReadonly ? false : disabled}
         panelList={isReadonly ? undefined : panelList}
@@ -519,7 +416,6 @@ export default function Edit({
           <br />
           <br />
           <ReviewFlow className={'w-fit ml-4 gap-4'} />
-          {/* <Signature controll={controll_signature} disabled={disabled} /> */}
         </div>
       </div>
     </SubLayer>
@@ -535,14 +431,6 @@ const emptyProfileOri = (): Tprofile => ({
   requirementsDate: '',
   dispatchDate: '',
 });
-
-// const emptySignature = () => ({
-//   accounting: undefined,
-//   warehouseEmployee: undefined,
-//   factoryEmployee: undefined,
-//   supervisor: undefined,
-//   formCompleter: undefined,
-// });
 
 const emptyTransferOri = (): Ttransfer => ({
   goodsName: '',

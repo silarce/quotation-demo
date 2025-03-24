@@ -7,6 +7,7 @@ import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/
 import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
 import Tip from 'components/global/myAntd/popover/tip';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import DataEntry from 'components/global/gear/dataEntry';
 
 import {
   selectModalCreator_multi,
@@ -274,7 +275,26 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
             return (
               <Fragment key={index}>
                 <IconRemoveCircle className={classNames(scss.iconBtn, disabled && 'invisible')} onClick={remove} />
-                <InputSel
+                <DataEntry caption="接洽人" style={{ fontSize: 18 }} captionStyle={{ width: 70 }}>
+                  <DataEntry.InputSelect
+                    disabled={disabled}
+                    options={control.pointContractPersonOptions}
+                    value={_name.value}
+                    onChange={(v) => {
+                      _name.onChange({ label: v, value: v, phoneNumber: '' });
+                    }}
+                  />
+                </DataEntry>
+                <DataEntry caption="接洽人電話" style={{ fontSize: 18 }} captionStyle={{ width: 100 }}>
+                  <DataEntry.Input
+                    disabled={disabled}
+                    value={phoneNumber.value}
+                    onChange={(v) => {
+                      phoneNumber.onChange(v);
+                    }}
+                  />
+                </DataEntry>
+                {/* <InputSel
                   caption="接洽人"
                   disabled={disabled}
                   {...config_inputSel}
@@ -304,7 +324,7 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
                       onChange: phoneNumber.onChange,
                     },
                   }}
-                />
+                /> */}
               </Fragment>
             );
           })}
