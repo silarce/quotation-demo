@@ -1,17 +1,14 @@
 import { useMemo } from 'react';
 
 // component
-import SupplyTable, {
-  Tgroup,
-  // Tprops_cell, Tprops_cell_input
-} from './ui/supplyTable';
+import SupplyTable, { Tgroup } from './ui/supplyTable';
 
 // css
 import scss from './supplyList.module.scss';
 
 import type { TelectronicSuppliesContentDto } from 'js/api/dtoTypes';
 
-import { orderDetailArr } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+import { orderDetailArr } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 // ==================================================================
 
@@ -25,17 +22,11 @@ export default function SupplyList({
       [key: string]: Tgroup;
     } = {};
 
-    electronicSuppliesContents = orderDetailArr({ detailArr: electronicSuppliesContents });
-
-    electronicSuppliesContents.forEach((item) => {
+    orderDetailArr({ detailArr: electronicSuppliesContents }).forEach((item) => {
       const {
         //
         itemName,
         category,
-        // unit,
-        // pickUpQuantity,
-        // stayQuantity,
-        // quantity,
       } = item;
 
       const subItemName = itemName === '控制箱/盤' ? '捲門/水閘門' : undefined;

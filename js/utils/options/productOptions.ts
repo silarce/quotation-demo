@@ -630,6 +630,19 @@ export const optionsCreator_boxB_SJ305D = createOptionsCreator({
   ],
 });
 
+// 電壓
+export const optionsCreator_voltage = ({ withUnit }: { withUnit?: boolean } = {}) => {
+  const v_220 = withUnit ? '220V' : '220';
+  const v_380 = withUnit ? '380V' : '380';
+
+  const optionsArr: Toption[] = [
+    { value: v_220, label: '220V' },
+    { value: v_380, label: '380V' },
+  ];
+
+  return optionsArr;
+};
+
 // 電供
 export const optionsCreator_motorSupply = createOptionsCreator({
   optionsArr: [

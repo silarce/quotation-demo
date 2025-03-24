@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 // layout
-import { TtagList as TtabList, TpanelList, Tlink, TlinkArr } from 'components/PageHeader/PageHeader02/PageHeader02';
+import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // conmponent
 import CertifiedDocumentList from './certifiedDocumentList';
@@ -11,7 +11,7 @@ import Edit from './edit';
 import Certificate from './certificate';
 
 // type
-import { TdocType, TquotationContractDto } from 'js/api/dtoTypes';
+import { TdocType } from 'js/api/dtoTypes';
 
 // api
 import { useGetContract_id_strict } from 'js/api/api_quotation';
@@ -54,7 +54,11 @@ export default function CertifiedDocument({
 
   // ---------------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract } = useGetContract_id_strict(contractId, {
+  const {
+    data: data_contract,
+    update: update_contract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id_strict(contractId, {
     customPopulate: customPopulate,
   });
 
@@ -111,20 +115,6 @@ export default function CertifiedDocument({
     };
   }, [panelList]);
 
-  //
-  // useEffect(() => {
-  //   return () => {
-  //     const query_copy = { ...query };
-  //     delete query_copy.documentType;
-  //     delete query_copy.editCertifiedDocument;
-  //     delete query_copy.certifiedDocumentId;
-
-  //     router.replace({
-  //       query: query_copy,
-  //     });
-  //   };
-  // }, []);
-
   useEffect(() => {
     update_contract();
   }, [contractId]);
@@ -136,7 +126,6 @@ export default function CertifiedDocument({
       {isListShow && <CertifiedDocumentList showDocType={showDocType} contractId={data_contract?.id} />}
       {editCertifiedDocument && (
         <Edit
-          //
           className="mt-10"
           onPanelChange={setDynaPanelList}
           contract={data_contract}

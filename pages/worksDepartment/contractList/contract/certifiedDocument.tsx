@@ -35,6 +35,7 @@ export default function CertifiedDocument_page() {
     data: contract,
     update: update_contract,
     contactThatSkipContract,
+    isFetching: isFetching_contract,
   } = useGetContract_id(contractId, {
     customPopulate: [
       //
@@ -53,7 +54,7 @@ export default function CertifiedDocument_page() {
   // -------------------------------------------------------------------
 
   return (
-    <SubLayer>
+    <SubLayer isLoading_subLayer={isFetching_contract}>
       <PageHeader
         showReturnBtn={!editCertifiedDocument}
         panelList={compositionPanelList}
@@ -64,7 +65,6 @@ export default function CertifiedDocument_page() {
       <div>
         <CertifiedDocument
           onPanelListChange={setCompositionDynPanelList}
-          //
           showDocType={['保固書', '出廠證明']}
           allowdAddDocType={['保固書', '出廠證明']}
         />

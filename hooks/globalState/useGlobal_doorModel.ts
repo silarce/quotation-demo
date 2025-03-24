@@ -10,7 +10,7 @@ import {
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 
-import { TdoorModelInfoDto, apiGetProdDoorModels, useApiGetProdDoorModels } from 'js/api/api_product';
+import { TdoorModelInfoDto, apiGetProdDoorModels } from 'js/api/api_product';
 
 type TdoorModelDict = {
   [name: string]: TdoorModelInfoDto;
@@ -24,6 +24,7 @@ type TdoorModelList = {
   checkIsSpecialDoor: (doorModelName: string) => boolean;
   parseDoorModelSort: (doorModelName: string) => undefined | 'normal' | 'special' | 'w13456';
   update: () => void;
+  formatOptions: () => undefined | { value: string; label: string }[];
 };
 
 // type Tset = StoreApi<TdoorModelList>['setState'];
@@ -32,8 +33,6 @@ type TdoorModelList = {
 const useDoorModel_prime = create<TdoorModelList>()(
   immer<TdoorModelList>(
     (set, get) => {
-      // 我完全不知道(好啦，可能知道，這大概是建構函式)為什麼const doorModelList這一行之前程式碼只執行一次
-
       const update = async () => {
         return await apiGetProdDoorModels()
           .then((data) => {
@@ -69,10 +68,6 @@ const useDoorModel_prime = create<TdoorModelList>()(
           isSpecial = false;
         }
 
-        // if (doorModelName === 'W2') {
-        //   isSpecial = true;
-        // }
-
         return isSpecial;
       };
 
@@ -96,6 +91,14 @@ const useDoorModel_prime = create<TdoorModelList>()(
         return doorModelSort;
       };
 
+      const formatOptions = () => {
+        return get().doorModelArr?.map((item) => ({
+          value: item.name,
+          label: item.name,
+          ...item,
+        }));
+      };
+
       //
       const doorModelList: TdoorModelList = {
         raw: undefined,
@@ -105,6 +108,7 @@ const useDoorModel_prime = create<TdoorModelList>()(
         update,
         checkIsSpecialDoor,
         parseDoorModelSort,
+        formatOptions,
       };
 
       return doorModelList;

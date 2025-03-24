@@ -1,32 +1,22 @@
 import { useMemo } from 'react';
 import classNames from 'classnames';
 
-// component
-
-// gear
-// import Row from 'components/global/gear/table/row';
-
 // css
 import scss from './supplyTable.module.scss';
 
-// type
-import type { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/defaultState_detail';
+import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
-import { IconEdit } from 'public/image/icon/svgComponent/svgIcons';
+// type
+import { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 // ==================================================================
 
-// 先簡單處理，真的有效能問題再用memo
-
-// type TrowProperty = 'pickUpQuantity' | 'stayQuantity' | 'quantity' | 'pickupRecord' | 'requirementQty';
-
 type Tgroup = {
-  // 品名
-  itemName: string;
+  itemName: string; // 品名
   subItemName?: string | null;
+  onAddClick?: (() => void) | undefined;
   rowArr: {
-    // 種類
-    category: React.ReactNode;
+    category: React.ReactNode; // 種類
     valueArr: {
       value?: string;
       onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -36,44 +26,6 @@ type Tgroup = {
     }[];
   }[];
 };
-
-// type TrowPropertyCheck = {
-//   pickUpQuantity?: boolean;
-//   stayQuantity?: boolean;
-//   quantity?: boolean;
-//   pickupRecord?: boolean;
-//   requirementQty?: boolean;
-// };
-
-// type TrueKeys<T> = {
-//   [K in keyof T]: T[K] extends true ? K : never;
-// }[keyof T];
-
-// type Tfoo = TrueKeys<{
-//   pickUpQuantity: true;
-//   stayQuantity: true;
-// }>[];
-
-// type Tgroup<P extends TrowPropertyCheck> = {
-//   // 品名
-//   itemName: string;
-//   subItemName?: string | null;
-//   rowArr: {
-//     // 種類
-//     category: string;
-//     // 已領數量
-//     pickUpQuantity: P['pickUpQuantity'] extends true ? number | null : undefined;
-//     // 未領數量
-//     stayQuantity: P['stayQuantity'] extends true ? number | null : undefined;
-//     // 總需求數量
-//     quantity: P['quantity'] extends true ? number | null : undefined;
-//     //
-//     // 領取數量
-//     pickupRecord: P['pickupRecord'] extends true ? TcontrolItem : undefined;
-//     // 需求數量
-//     requirementQty: P['requirementQty'] extends true ? TcontrolItem : undefined;
-//   }[];
-// };
 
 type Tprops_cell = {
   children: React.ReactNode;
@@ -145,10 +97,17 @@ const Group = ({
   itemName,
   subItemName,
   rowArr,
+  onAddClick,
 }: Tgroup & { disabled?: boolean }) => {
   return (
     <div className={scss.group}>
-      <Cell_itemName>{itemName}</Cell_itemName>
+      <Cell_itemName>
+        <div className={scss.itemNameWrapper}>
+          {itemName}
+          {!disabled && onAddClick && <IconAddCircle className={scss.addIcon} onClick={onAddClick} />}
+        </div>
+      </Cell_itemName>
+
       {subItemName && <Cell_subItemName>{subItemName}</Cell_subItemName>}
 
       <div className={scss.rowWrapper}>
@@ -234,13 +193,11 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
 const useStateToGroup = ({
   stateArr,
   handler_editItemQty,
-  handler_editCategoryValue,
-  disabled,
+  createAddCategory,
 }: {
   stateArr: Tstate_electronicItem[];
   handler_editItemQty: (key: string, qty: number) => void;
-  handler_editCategoryValue: (props: { key: string; categoryParam: string }) => void;
-  disabled: boolean;
+  createAddCategory?: (itemName: Tstate_electronicItem['itemName']) => (() => void) | undefined;
 }) => {
   return useMemo(() => {
     const list: {
@@ -248,33 +205,19 @@ const useStateToGroup = ({
     } = {};
 
     stateArr.forEach((item) => {
-      const { itemName, category, categoryParam, quantity, subItemName, inputCategory } = item;
+      const { itemName, category, quantity, subItemName } = item;
 
       if (!list[itemName]) {
         list[itemName] = {
           itemName,
           subItemName,
+          onAddClick: createAddCategory?.(itemName),
           rowArr: [],
         };
       }
 
-      const theCategory = inputCategory ? (
-        <span className="flex gap-1">
-          {categoryParam}
-          <IconEdit
-            className={classNames(disabled && 'invisible')}
-            onClick={async () => {
-              const categoryValue = await inputCategory();
-              handler_editCategoryValue({ key: category, categoryParam: categoryValue });
-            }}
-          />
-        </span>
-      ) : (
-        categoryParam || category
-      );
-
       list[itemName].rowArr.push({
-        category: theCategory,
+        category,
         valueArr: [
           {
             value: String(quantity || '0'),

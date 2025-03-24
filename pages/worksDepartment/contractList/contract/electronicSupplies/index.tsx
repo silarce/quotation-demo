@@ -19,10 +19,7 @@ import Profile from 'components/page/worksDepartment/electronicSupplies/profile'
 import Wrapper_tab, { Ttab } from 'components/global/gear/wrapper_tab/wrapper_tab01';
 
 // api
-import {
-  //
-  useGetContract_id,
-} from 'js/api/api_quotation';
+import { useGetContract_id } from 'js/api/api_quotation';
 import { useElectronicSupplies_id } from 'js/api/api_engineering';
 
 // css
@@ -49,6 +46,7 @@ export default function ElectronicSupplies() {
   const {
     data: contract,
     update,
+    isFetching: isFetching_contract,
     contactThatSkipContract,
   } = useGetContract_id(contractId, {
     customPopulate: [
@@ -150,7 +148,7 @@ export default function ElectronicSupplies() {
   // MARK: RENDER
 
   return (
-    <SubLayer isLoading_subLayer={isFetching_electronicSupplies}>
+    <SubLayer isLoading_subLayer={isFetching_electronicSupplies || isFetching_contract}>
       <PageHeader
         panelList={panelList}
         contractNumber={contract?.contractNumber ?? '---'}
