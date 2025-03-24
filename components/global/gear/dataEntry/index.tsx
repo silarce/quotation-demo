@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import classNames from 'classnames';
 import _ from 'lodash';
 
@@ -297,20 +299,27 @@ const InputSelect = ({
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   selectProps?: rsProps<{ value: string; label: React.ReactNode }, false>;
 }) => {
+  const ref_input = useRef<HTMLInputElement>(null);
+
   return (
     <div className={scss.inputSelect}>
-      <input value={value} onChange={(e) => onChange?.(e.target.value)} readOnly={disabled} {...inputProps} />
       {/* 這邊用label包起來是為了避免觸發Container的Label */}
+      {/* label必須在input之前，這樣不用設z-index就可以使input蓋過select */}
+      {/* 不設index才能避免InputSelect垂直排列時menu因為z-index造成的跑版*/}
       <label>
         {!disabled && (
           <ReactSelect
             // menuIsOpen={true}
+            isSearchable={false}
             isDisabled={disabled}
             options={options}
             onChange={(option, action) => {
               const value = option?.value ?? '';
               onChange?.(value);
               selectOnChange?.(option, action);
+              setTimeout(() => {
+                ref_input.current?.focus();
+              }, 0);
             }}
             classNames={{
               ...cn,
@@ -332,6 +341,9 @@ const InputSelect = ({
               indicatorSeparator(props) {
                 return classNames(scss.indicatorSeparator_inputSelect, scss.plus, cn?.indicatorSeparator?.(props));
               },
+              menu(props) {
+                return classNames(scss.menu_inputSelect, scss.plus, cn?.menu?.(props));
+              },
               option(props) {
                 return classNames(scss.option, scss.option_inputSelect, scss.plus, cn?.option?.(props));
               },
@@ -340,6 +352,13 @@ const InputSelect = ({
           />
         )}
       </label>
+      <input
+        ref={ref_input}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        readOnly={disabled}
+        {...inputProps}
+      />
     </div>
   );
 };
