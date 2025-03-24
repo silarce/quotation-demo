@@ -838,6 +838,7 @@ export const apiGetEngineeringExchanges = async (params?: Tparams) => {
 /**取得調退貨單列表 */
 export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   const [res, setRes] = useState<TgetEngineeringExchanges>();
+  const [isFetching, setIsFetching] = useState(false);
 
   const params = {
     pageSize: 9999,
@@ -852,7 +853,9 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
   };
 
   const update = async () => {
+    setIsFetching(true);
     const newRes = await apiGetEngineeringExchanges(params);
+    setIsFetching(false);
 
     if (newRes) {
       setRes(newRes);
@@ -865,6 +868,7 @@ export const useGetEngineeringExchanges = (customParams?: Tparams) => {
     data: res?.data,
     meta: res?.meta,
     update,
+    isFetching,
   };
 };
 
@@ -885,13 +889,16 @@ export const apiGetEngineeringExchanges_id = async (id: string) => {
 /**以id取得調退貨單 */
 export const useGetEngineeringExchanges_id = (id: string | undefined) => {
   const [res, setRes] = useState<TexchangeDto>();
+  const [isFetching, setIsFetching] = useState(false);
 
   const update = async () => {
     if (!id) {
       return;
     }
 
+    setIsFetching(true);
     const newRes = await apiGetEngineeringExchanges_id(id);
+    setIsFetching(false);
 
     if (newRes) {
       setRes(newRes);
@@ -903,6 +910,7 @@ export const useGetEngineeringExchanges_id = (id: string | undefined) => {
   return {
     data: res,
     update,
+    isFetching,
   };
 };
 
