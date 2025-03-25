@@ -1,38 +1,76 @@
 import { useMemo } from 'react';
 import classNames from 'classnames';
-import _ from 'lodash';
 
 // gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import Row, { Cell } from 'components/global/gear/table/row';
+import { Checkbox } from 'components/global/gear/dataEntry';
 
 import scss from './itemList.module.scss';
 
 // type
 import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 // =============================================================
+
+type Titem = TquotationProductItemDto & {
+  qty: number;
+  //以下幾項都要從accessories裡面過濾
+  obstacleSensor: boolean;
+  infrared: boolean;
+  remoteControl: boolean;
+  bounceDoor: boolean;
+  smartSwitch: boolean;
+  antiTyphoonColumn: boolean;
+  antiTyphoonBaseLock: number;
+  ul: boolean;
+  wheel: boolean;
+};
+
 type TproductItemList = {
-  [key: string]: {
-    productItem: TquotationProductItemDto;
-    qty: number;
-  };
+  [key: string]: Titem;
+};
+
+interface configItem {
+  label?: string;
+  style: React.CSSProperties;
+  style_thead?: React.CSSProperties;
+  style_tbody?: React.CSSProperties;
+  className?: string;
+  render: (v: Titem) => React.ReactNode;
+}
+
+type Tkeys = keyof Pick<
+  Titem,
+  | 'itemName'
+  | 'itemNumber'
+  | 'floor'
+  | 'locationArea'
+  | 'qty'
+  | 'doorModelName'
+  | 'motorVendor'
+  | 'motorVoltage'
+  | 'horsepower'
+  //
+  | 'obstacleSensor'
+  | 'infrared'
+  | 'remoteControl'
+  | 'bounceDoor'
+  | 'smartSwitch'
+  | 'antiTyphoonColumn'
+  | 'antiTyphoonBaseLock'
+  | 'ul'
+  | 'wheel'
+>;
+
+type Tconfig = {
+  [key in Tkeys]: configItem;
 };
 
 // =============================================================
 
 // MARK:START
 
-export default function ItemList({
-  //
-  className,
-  worksheetArr,
-}: {
-  className?: string;
-  worksheetArr: TworksheetDto[];
-}) {
-  //
-
-  const productItemList: TproductItemList = useMemo(() => {
+export default function ItemList({ className, worksheetArr }: { className?: string; worksheetArr: TworksheetDto[] }) {
+  const productItemArr: Titem[] = useMemo(() => {
     const list: TproductItemList = {};
 
     worksheetArr.forEach((worksheet) => {
@@ -50,251 +88,283 @@ export default function ItemList({
 
       const qty = contractProductItems.length;
 
-      list[id] = {
-        productItem: contractProductItems[0],
-        qty,
+      const { accessories } = contractProductItems[0];
+
+      const checkList = {
+        obstacleSensor: false,
+        infrared: false,
+        remoteControl: false,
+        bounceDoor: false,
+        smartSwitch: false,
+        antiTyphoonColumn: false,
+        // antiTyphoonBaseLock: false,
+        ul: false,
+        wheel: false,
       };
-    }); // forEach
-
-    return list;
-    //
-  }, [worksheetArr]);
-
-  const control_table: Ttable = useMemo(() => {
-    const thead: Ttable['thead'] = {
-      cellArr: keysArr.map((key) => {
-        return {
-          ...configList[key],
-          children: configList[key].label,
-        };
-      }),
-    };
-
-    let productItemArr = Object.values(productItemList ?? {});
-    productItemArr = _.sortBy(productItemArr, [
-      ({ productItem }) => productItem.floor,
-      ({ productItem }) => productItem.doorModelName,
-    ]);
-
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = productItemArr.map((item, pIndex) => {
-      const { productItem, qty } = item;
-      const {
-        //
-        accessories,
-        itemName,
-        itemNumber,
-        doorModelName,
-        motorVendor,
-        motorVoltage,
-        horsepower,
-        floor,
-        locationArea,
-        //
-      } = productItem;
-
-      const electronicSupplies = {
-        obstacleSensor: false, // 障感器
-        infrared: false, // 紅外線
-        remoteControl: false, // 遙控器
-        bounceDoor: false, // 彈射門
-      };
+      let antiTyphoonBaseLock = 0;
 
       accessories.forEach((acce) => {
         const name = acce.name;
-        name.includes('障感器') && (electronicSupplies.obstacleSensor = true);
-        name.includes('紅外線') && (electronicSupplies.infrared = true);
-        name.includes('遙控器') && (electronicSupplies.remoteControl = true);
-        name.includes('彈射門') && (electronicSupplies.bounceDoor = true);
+
+        if (/^防颱.*中柱$/.test(name)) {
+          checkList.antiTyphoonColumn = true;
+        } else if (name.includes('防颱底座鎖固')) {
+          antiTyphoonBaseLock++;
+        } else {
+          Object.entries(acceCheckLookup).forEach(([key, property]) => {
+            if (name.includes(key)) {
+              checkList[property] = true;
+            }
+          });
+        }
       });
 
-      return {
-        cellArr: [
-          {
-            ...configList.itemName,
-            children: itemName,
-          },
-          {
-            ...configList.itemNumber,
-            children: itemNumber,
-          },
-          {
-            ...configList.floor,
-            children: floor,
-          },
-          {
-            ...configList.locationArea,
-            children: locationArea,
-          },
-          {
-            ...configList.qty,
-            children: qty,
-          },
-          {
-            ...configList.doorModelName,
-            children: doorModelName,
-          },
-          {
-            ...configList.motorVendor,
-            children: motorVendor,
-          },
-          {
-            ...configList.motorVoltage,
-            children: motorVoltage,
-          },
-          {
-            ...configList.horsepower,
-            children: horsepower,
-          },
-          {
-            ...configList.obstacleSensor,
-            children: <CheckBox_readonly value={electronicSupplies.obstacleSensor} />,
-          },
-          {
-            ...configList.infrared,
-            children: <CheckBox_readonly value={electronicSupplies.infrared} />,
-          },
-          {
-            ...configList.remoteControl,
-            children: <CheckBox_readonly value={electronicSupplies.remoteControl} />,
-          },
-          {
-            ...configList.bounceDoor,
-            children: <CheckBox_readonly value={electronicSupplies.bounceDoor} />,
-          },
-        ],
+      list[id] = {
+        ...contractProductItems[0],
+        qty,
+        antiTyphoonBaseLock,
+        ...checkList,
       };
     });
 
-    const tbody: Ttable['tbody'] = {
-      rowArr: tbodyRowArr,
-    };
-
-    return { thead, tbody };
-  }, [productItemList]);
+    return Object.values(list);
+    //
+  }, [worksheetArr]);
 
   // region RENDER
 
-  return <Table01 {...control_table} className={classNames(className)} />;
+  return (
+    <div className={classNames(scss.table, className)}>
+      <Row thead={true} gap={false}>
+        {keyArr.map((key) => {
+          const { label, style, className } = config[key];
+
+          return (
+            <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
+              {label}
+            </Cell>
+          );
+        })}
+      </Row>
+
+      {productItemArr.map((item, index) => {
+        return (
+          <Row key={index} className={scss.row} gap={false}>
+            {keyArr.map((key) => {
+              const { style, className, render } = config[key];
+
+              return (
+                <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
+                  {render(item)}
+                </Cell>
+              );
+            })}
+          </Row>
+        );
+      })}
+    </div>
+  );
 }
 
 // MARK: END
 
 // ==================================================================
-// ==================================================================
-// ==================================================================
-// ==================================================================
 
-const CheckBox_readonly = ({ value }: { value?: boolean }) => {
-  return (
-    <div>
-      <InputSel
-        showBaseline="invisible"
-        disabled={true}
-        checkBoxProps={{
-          propsArr: [
-            {
-              props: {
-                className: classNames(scss.checkBox, scss.plus),
-              },
-              key: 'notNeed',
-              value: value,
-            },
-          ],
-        }}
-      />
-    </div>
-  );
-};
-
-// =============================================================
-// =============================================================
-// =============================================================
-
-const keysArr = [
-  'itemName', // 名稱
-  'itemNumber', // 編號
-  'floor',
-  'locationArea',
-  'qty', // 樘數1
-  'doorModelName', // 門型
-  'motorVendor', // 馬達
-  'motorVoltage', // 電壓
-  'horsepower', // 馬力數
-  'obstacleSensor', // 障感器
-  'infrared', // 紅外線
-  'remoteControl', // 遙控器(1:2)
-  'bounceDoor', // 彈射門
-];
-
-const configList: { [key: string]: Tconfig_table } = {
+const config: Tconfig = {
   itemName: {
     label: '名稱',
-    width: 200,
-    justifyContent: 'flex-start',
+    style: {
+      width: 150,
+      justifyContent: 'flex-start',
+    },
+    className: scss.itemName,
+    render: ({ itemName }) => itemName,
   },
   itemNumber: {
     label: '編號',
-    width: 200,
-    justifyContent: 'flex-start',
+    style: {
+      width: 180,
+      justifyContent: 'flex-start',
+    },
+    className: scss.itemNumber,
+    render: ({ itemNumber }) => itemNumber,
   },
   floor: {
     label: '樓層',
-    // width: 60,
-    flex: '50%',
-    // justifyContent: 'center',
-    justifyContent: 'flex-start',
+    style: {
+      width: 150,
+      justifyContent: 'flex-start',
+    },
+    render: ({ floor }) => floor,
   },
   locationArea: {
     label: '區域',
-    // width: 200,
-    flex: '50%',
-    justifyContent: 'flex-start',
+    style: {
+      width: 150,
+      justifyContent: 'flex-start',
+    },
+    render: ({ locationArea }) => locationArea,
   },
   qty: {
     label: '樘數',
-    width: 60,
-    justifyContent: 'center',
+    style: {
+      width: 60,
+      justifyContent: 'center',
+    },
+    render: ({ qty }) => qty,
   },
   doorModelName: {
     label: '門型',
-    width: 120,
-    justifyContent: 'flex-start',
+    style: {
+      width: 120,
+      justifyContent: 'flex-start',
+    },
+    render: ({ doorModelName }) => doorModelName,
   },
   motorVendor: {
     label: '馬達',
-    width: 60,
-    justifyContent: 'center',
+    style: {
+      width: 60,
+      justifyContent: 'center',
+    },
+    render: ({ motorVendor }) => motorVendor,
   },
   motorVoltage: {
     label: '電壓',
-    width: 60,
-    justifyContent: 'center',
+    style: {
+      width: 60,
+      justifyContent: 'center',
+    },
+    render: ({ motorVoltage }) => motorVoltage,
   },
   horsepower: {
     label: '馬力數',
-    width: 90,
-    justifyContent: 'center',
+    style: {
+      width: 90,
+      justifyContent: 'center',
+    },
+    render: ({ horsepower }) => horsepower,
   },
   obstacleSensor: {
     label: '障感器',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ obstacleSensor }) => {
+      return <Checkbox checked={obstacleSensor} disabled={true} />;
+    },
   },
   infrared: {
     label: '紅外線',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ infrared }) => {
+      return <Checkbox checked={infrared} disabled={true} />;
+    },
   },
   remoteControl: {
     label: '遙控器',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ remoteControl }) => {
+      return <Checkbox checked={remoteControl} disabled={true} />;
+    },
   },
   bounceDoor: {
     label: '彈射門',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ bounceDoor }) => {
+      return <Checkbox checked={bounceDoor} disabled={true} />;
+    },
+  },
+  smartSwitch: {
+    label: '智慧開關',
+    style: {
+      width: 100,
+      justifyContent: 'center',
+    },
+    render: ({ smartSwitch }) => {
+      return <Checkbox checked={smartSwitch} disabled={true} />;
+    },
+  },
+  antiTyphoonColumn: {
+    label: '防颱中柱',
+    style: {
+      width: 100,
+      justifyContent: 'center',
+    },
+    render: ({ antiTyphoonColumn }) => {
+      return <Checkbox checked={antiTyphoonColumn} disabled={true} />;
+    },
+  },
+  antiTyphoonBaseLock: {
+    label: '防颱底座鎖固',
+    style: {
+      width: 120,
+      justifyContent: 'center',
+    },
+    render: ({ antiTyphoonBaseLock }) => antiTyphoonBaseLock,
+  },
+  ul: {
+    label: 'UL熔金體',
+    style: {
+      width: 100,
+      justifyContent: 'center',
+    },
+    render: ({ ul }) => {
+      return <Checkbox checked={ul} disabled={true} />;
+    },
+  },
+  wheel: {
+    label: '檔輪',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ wheel }) => {
+      return <Checkbox checked={wheel} disabled={true} />;
+    },
   },
 };
 
+const keyArr: Tkeys[] = [
+  'itemName',
+  'itemNumber',
+  'floor',
+  'locationArea',
+  'qty',
+  'doorModelName',
+  'motorVendor',
+  'motorVoltage',
+  'horsepower',
+  'antiTyphoonBaseLock',
+  'obstacleSensor',
+  'infrared',
+  'remoteControl',
+  'bounceDoor',
+  'smartSwitch',
+  'antiTyphoonColumn',
+  'ul',
+  'wheel',
+];
 // =======================================================================
+
+const acceCheckLookup = {
+  障感器: 'obstacleSensor',
+  障礙感知器: 'obstacleSensor',
+  紅外線: 'infrared',
+  遙控器: 'remoteControl',
+  彈射門: 'bounceDoor',
+  智慧型開關: 'smartSwitch',
+  // 防颱底座鎖固: 'antiTyphoonBaseLock',
+  UL熔金體: 'ul',
+  檔輪: 'wheel',
+} as const;
