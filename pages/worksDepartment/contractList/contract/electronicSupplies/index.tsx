@@ -44,39 +44,32 @@ export default function ElectronicSupplies() {
   // ------------------------------------------------------------------
 
   const {
-    data: contract,
+    data: {
+      //
+      engineeringContact,
+      worksheet,
+      electronicSuppliesId,
+      contractNumber,
+    } = {},
     update,
     isFetching: isFetching_contract,
     contactThatSkipContract,
   } = useGetContract_id(contractId, {
-    customPopulate: [
-      //
-      'engineeringContact',
-      'worksheet.latestRecord.contractProductItems.accessories',
-    ],
+    customPopulate: ['engineeringContact', 'worksheet.latestRecord.contractProductItems.accessories'],
   });
 
-  const { engineeringContact, worksheet, electronicSuppliesId } = contract ?? {};
-
   const {
-    data: data_electronicSupplies,
-    // update: update_electronicSupplies,
+    data: {
+      //
+      hasFinishPickUp,
+      electronicSuppliesContents = [],
+      pickupRecords = [],
+      requirementRecords = [],
+    } = {},
     isFetching: isFetching_electronicSupplies,
   } = useElectronicSupplies_id(electronicSuppliesId);
 
-  const {
-    // contractNumber = '',
-    projectName = '',
-    // projectContent = '',
-    projectNumber = '',
-  } = engineeringContact ?? {};
-
-  const {
-    hasFinishPickUp,
-    electronicSuppliesContents = [],
-    pickupRecords = [],
-    requirementRecords = [],
-  } = data_electronicSupplies ?? {};
+  const { projectName = '', projectNumber = '' } = engineeringContact ?? {};
 
   const isAllowAddRequirement = useMemo(() => {
     return (worksheet ?? []).some((item) => {
@@ -95,46 +88,7 @@ export default function ElectronicSupplies() {
     isAllowAddRequirement,
   });
 
-  // ------------------------------------------------------------------
-
-  const tabArr: Ttab[] = [
-    {
-      label: '送電備品列表',
-      isActive: listName === 'itemList',
-      onClick: () => {
-        router.replace({
-          query: { ...router.query, listName: 'itemList' },
-        });
-      },
-    },
-    {
-      label: '送電備品總料單',
-      isActive: listName === 'supplyList',
-      onClick: () => {
-        router.replace({
-          query: { ...router.query, listName: 'supplyList' },
-        });
-      },
-    },
-    {
-      label: '送電備品料單領取歷程',
-      isActive: listName === 'pickupRecord',
-      onClick: () => {
-        router.replace({
-          query: { ...router.query, listName: 'pickupRecord' },
-        });
-      },
-    },
-    {
-      label: '送電備品料單需求歷程',
-      isActive: listName === 'requirementRecord',
-      onClick: () => {
-        router.replace({
-          query: { ...router.query, listName: 'requirementRecord' },
-        });
-      },
-    },
-  ];
+  const tabArr = useTabArr();
 
   // ------------------------------------------------------------------
   // MARK: useEffect
@@ -151,7 +105,7 @@ export default function ElectronicSupplies() {
     <SubLayer isLoading_subLayer={isFetching_electronicSupplies || isFetching_contract}>
       <PageHeader
         panelList={panelList}
-        contractNumber={contract?.contractNumber ?? '---'}
+        contractNumber={contractNumber ?? '---'}
         contactThatSkipContract={contactThatSkipContract}
       />
       <div className={scss.container}>
@@ -191,12 +145,10 @@ const usePanelList = ({
   const query = router.query as Tquery;
   const { listName, contractId } = query;
 
-  // ------------------------------------------------------------------------
-  //
   const panelList_itemList: TpanelList = [];
-  //
+
   const panelList_supplyList: TpanelList = [];
-  //
+
   const panelList_pickupRecord: TpanelList = [
     electronicSuppliesId
       ? {
@@ -245,6 +197,52 @@ const usePanelList = ({
   const panelArr = listName ? list[listName] : [];
 
   return panelArr;
+};
+
+const useTabArr = () => {
+  const router = useRouter();
+  const { listName = 'itemList' } = router.query as Tquery;
+
+  const tabArr: Ttab[] = [
+    {
+      label: '送電備品列表',
+      isActive: listName === 'itemList',
+      onClick: () => {
+        router.replace({
+          query: { ...router.query, listName: 'itemList' },
+        });
+      },
+    },
+    {
+      label: '送電備品總料單',
+      isActive: listName === 'supplyList',
+      onClick: () => {
+        router.replace({
+          query: { ...router.query, listName: 'supplyList' },
+        });
+      },
+    },
+    {
+      label: '送電備品料單領取歷程',
+      isActive: listName === 'pickupRecord',
+      onClick: () => {
+        router.replace({
+          query: { ...router.query, listName: 'pickupRecord' },
+        });
+      },
+    },
+    {
+      label: '送電備品料單需求歷程',
+      isActive: listName === 'requirementRecord',
+      onClick: () => {
+        router.replace({
+          query: { ...router.query, listName: 'requirementRecord' },
+        });
+      },
+    },
+  ];
+
+  return tabArr;
 };
 
 // ============================================================================
