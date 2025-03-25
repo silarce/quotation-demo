@@ -93,7 +93,9 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
     <div className={className}>
       <Row thead={true} fullWidth={true}>
         {keyArr.map((key) => {
-          if (!config[key]) {
+          const configItem = config[key];
+
+          if (!configItem) {
             console.error('key', key);
             console.error('config', config);
 
@@ -101,8 +103,8 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
           }
 
           return (
-            <Cell key={key} style={config[key].style} className={classNames(scss.cell, scss.plus)}>
-              {config[key].label}
+            <Cell key={key} style={configItem.style} className={classNames(scss.cell, scss.plus)}>
+              {configItem.label}
             </Cell>
           );
         })}
@@ -112,14 +114,16 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
         return (
           <Row key={index} fullWidth={true}>
             {keyArr.map((key) => {
-              if (!config[key]) {
+              const configItem = config[key];
+
+              if (!configItem) {
                 console.error('key', key);
                 console.error('config', config);
 
                 throw new Error('config[key] is undefined');
               }
 
-              const { style, render } = config[key];
+              const { style, render } = configItem;
 
               return (
                 <Cell key={key} style={style} className={classNames(scss.cell, scss.plus)}>
