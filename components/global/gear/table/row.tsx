@@ -9,10 +9,11 @@ const Row_pre = (
     fullWidth?: boolean;
     preStyle?: 'style01';
     sticky?: 'top' | 'bottom';
+    gap?: boolean;
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
-  const { thead, fullWidth, preStyle, sticky } = props;
+  const { thead, fullWidth, preStyle, sticky, gap = true } = props;
 
   const attributes = {
     ...props,
@@ -33,6 +34,7 @@ const Row_pre = (
         fullWidth && scss.fullWidth,
         sticky === 'top' && scss.stickyTop,
         sticky === 'bottom' && scss.stickyBottom,
+        gap && scss.gap,
         props.className
       )}
     >
