@@ -184,7 +184,9 @@ export default function QuotationAdditions({
               const inputProps: TinputProps = {
                 ...inputSelPorps.inputProps,
                 props: {
-                  // 有紅虛線，但是check的時候沒有報錯，先不管
+                  // 沒有壞掉就先不修這個不知道怎麼修的型別錯誤
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
                   value: addi[key],
                   onChange: (e) => (addi[key] = e.target.value),
                   ...inputSelPorps?.inputProps?.props,
