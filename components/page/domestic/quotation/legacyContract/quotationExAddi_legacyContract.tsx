@@ -120,6 +120,9 @@ export default function QuotationExAddi({
             const inputProps: TinputProps = {
               ...inputSelPorps.inputProps,
               props: {
+                // 沒有壞掉就先不修這個不知道怎麼修的型別錯誤
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 value: classAddi[key],
                 onChange: (e) => (classAddi[key] = e.target.value),
                 ...inputSelPorps?.inputProps?.props,

@@ -112,7 +112,7 @@ export default function DndThead({
             const theadInfo = {
               id: key,
               label,
-              width: `${inputSelProps?.wrapperStyle?.width}` ?? 'auto',
+              width: `${inputSelProps.wrapperStyle?.width ?? 'auto'}`,
             };
 
             return (
