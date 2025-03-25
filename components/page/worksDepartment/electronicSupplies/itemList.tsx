@@ -34,6 +34,7 @@ interface configItem {
   style: React.CSSProperties;
   style_thead?: React.CSSProperties;
   style_tbody?: React.CSSProperties;
+  className?: string;
   render: (v: Titem) => React.ReactNode;
 }
 
@@ -134,13 +135,13 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 
   return (
     <div className={classNames(scss.table, className)}>
-      <Row thead={true}>
+      <Row thead={true} gap={false}>
         {keyArr.map((key) => {
-          const configItem = config[key];
+          const { label, style, className } = config[key];
 
           return (
-            <Cell key={key} style={configItem.style} className={classNames(scss.cell, scss.plus)}>
-              {configItem.label}
+            <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
+              {label}
             </Cell>
           );
         })}
@@ -148,14 +149,12 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 
       {productItemArr.map((item, index) => {
         return (
-          <Row key={index}>
+          <Row key={index} className={scss.row} gap={false}>
             {keyArr.map((key) => {
-              const configItem = config[key];
-
-              const { style, render } = configItem;
+              const { style, className, render } = config[key];
 
               return (
-                <Cell key={key} style={style} className={classNames(scss.cell, scss.plus)}>
+                <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
                   {render(item)}
                 </Cell>
               );
@@ -178,6 +177,7 @@ const config: Tconfig = {
       width: 150,
       justifyContent: 'flex-start',
     },
+    className: scss.itemName,
     render: ({ itemName }) => itemName,
   },
   itemNumber: {
@@ -186,6 +186,7 @@ const config: Tconfig = {
       width: 180,
       justifyContent: 'flex-start',
     },
+    className: scss.itemNumber,
     render: ({ itemNumber }) => itemNumber,
   },
   floor: {

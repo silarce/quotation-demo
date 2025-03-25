@@ -1,6 +1,12 @@
 .table {
   overflow: auto;
 }
+.row {
+  // background-color: pink;
+  // .cell {
+  //   background-color: inherit;
+  // }
+}
 
 .checkBox.plus {
   cursor: unset;
@@ -15,4 +21,13 @@
 .cell.plus {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.itemName {
+  position: sticky;
+  left: 0px;
+}
+.itemNumber {
+  position: sticky;
+  left: 150px;
 }
