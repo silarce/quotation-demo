@@ -35,8 +35,6 @@ type Tconfig = {
   [key in keyof Titem]?: configItem;
 };
 
-type Tkey = keyof typeof config;
-
 // =============================================================
 
 // MARK:START
@@ -95,13 +93,6 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
         {keyArr.map((key) => {
           const configItem = config[key];
 
-          if (!configItem) {
-            console.error('key', key);
-            console.error('config', config);
-
-            throw new Error('config[key] is undefined');
-          }
-
           return (
             <Cell key={key} style={configItem.style} className={classNames(scss.cell, scss.plus)}>
               {configItem.label}
@@ -115,13 +106,6 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
           <Row key={index} fullWidth={true}>
             {keyArr.map((key) => {
               const configItem = config[key];
-
-              if (!configItem) {
-                console.error('key', key);
-                console.error('config', config);
-
-                throw new Error('config[key] is undefined');
-              }
 
               const { style, render } = configItem;
 
@@ -142,7 +126,7 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 
 // ==================================================================
 
-const config: Tconfig = {
+const config = {
   itemName: {
     label: '名稱',
     style: {
@@ -255,9 +239,9 @@ const config: Tconfig = {
       return <Checkbox checked={bounceDoor} />;
     },
   },
-};
+} satisfies Tconfig;
 
-const keyArr: Tkey[] = [
+const keyArr: (keyof typeof config)[] = [
   'itemName',
   'itemNumber',
   'floor',
