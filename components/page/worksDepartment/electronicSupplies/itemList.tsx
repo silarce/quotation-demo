@@ -31,8 +31,25 @@ interface configItem {
   render: (v: Titem) => React.ReactNode;
 }
 
+type Tkeys = keyof Pick<
+  Titem,
+  | 'itemName'
+  | 'itemNumber'
+  | 'floor'
+  | 'locationArea'
+  | 'qty'
+  | 'doorModelName'
+  | 'motorVendor'
+  | 'motorVoltage'
+  | 'horsepower'
+  | 'obstacleSensor'
+  | 'infrared'
+  | 'remoteControl'
+  | 'bounceDoor'
+>;
+
 type Tconfig = {
-  [key in keyof Titem]?: configItem;
+  [key in Tkeys]: configItem;
 };
 
 // =============================================================
@@ -126,7 +143,7 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 
 // ==================================================================
 
-const config = {
+const config: Tconfig = {
   itemName: {
     label: '名稱',
     style: {
@@ -239,9 +256,9 @@ const config = {
       return <Checkbox checked={bounceDoor} />;
     },
   },
-} satisfies Tconfig;
+};
 
-const keyArr: (keyof typeof config)[] = [
+const keyArr: Tkeys[] = [
   'itemName',
   'itemNumber',
   'floor',
