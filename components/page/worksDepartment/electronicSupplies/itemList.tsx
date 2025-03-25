@@ -20,7 +20,7 @@ type Titem = TquotationProductItemDto & {
   bounceDoor: boolean;
   smartSwitch: boolean;
   antiTyphoonColumn: boolean;
-  antiTyphoonBaseLock: boolean;
+  antiTyphoonBaseLock: number;
   ul: boolean;
   wheel: boolean;
 };
@@ -96,16 +96,19 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
         bounceDoor: false,
         smartSwitch: false,
         antiTyphoonColumn: false,
-        antiTyphoonBaseLock: false,
+        // antiTyphoonBaseLock: false,
         ul: false,
         wheel: false,
       };
+      let antiTyphoonBaseLock = 0;
 
       accessories.forEach((acce) => {
         const name = acce.name;
 
         if (/^防颱.*中柱$/.test(name)) {
           checkList.antiTyphoonColumn = true;
+        } else if (name.includes('防颱底座鎖固')) {
+          antiTyphoonBaseLock++;
         } else {
           Object.entries(acceCheckLookup).forEach(([key, property]) => {
             if (name.includes(key)) {
@@ -118,6 +121,7 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
       list[id] = {
         ...contractProductItems[0],
         qty,
+        antiTyphoonBaseLock,
         ...checkList,
       };
     });
@@ -306,9 +310,7 @@ const config: Tconfig = {
       width: 120,
       justifyContent: 'center',
     },
-    render: ({ antiTyphoonBaseLock }) => {
-      return <Checkbox checked={antiTyphoonBaseLock} disabled={true} />;
-    },
+    render: ({ antiTyphoonBaseLock }) => antiTyphoonBaseLock,
   },
   ul: {
     label: 'UL熔金體',
@@ -342,13 +344,13 @@ const keyArr: Tkeys[] = [
   'motorVendor',
   'motorVoltage',
   'horsepower',
+  'antiTyphoonBaseLock',
   'obstacleSensor',
   'infrared',
   'remoteControl',
   'bounceDoor',
   'smartSwitch',
   'antiTyphoonColumn',
-  'antiTyphoonBaseLock',
   'ul',
   'wheel',
 ];
@@ -361,7 +363,7 @@ const acceCheckLookup = {
   遙控器: 'remoteControl',
   彈射門: 'bounceDoor',
   智慧型開關: 'smartSwitch',
-  防颱底座鎖固: 'antiTyphoonBaseLock',
+  // 防颱底座鎖固: 'antiTyphoonBaseLock',
   UL熔金體: 'ul',
   檔輪: 'wheel',
 } as const;
