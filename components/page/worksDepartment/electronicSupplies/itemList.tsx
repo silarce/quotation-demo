@@ -172,7 +172,7 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 
 const config: Tconfig = {
   itemName: {
-    label: '名稱',
+    label: '項目',
     style: {
       width: 150,
       justifyContent: 'flex-start',
@@ -337,7 +337,7 @@ const config: Tconfig = {
 
 const keyArr: Tkeys[] = [
   'itemName',
-  'itemNumber',
+  // 'itemNumber',
   'floor',
   'locationArea',
   'qty',
