@@ -78,7 +78,7 @@ export default function DndThead({
             const theadInfo = {
               id,
               label,
-              width: `${inputSelProps?.wrapperStyle?.width}` ?? 'auto',
+              width: `${inputSelProps.wrapperStyle?.width ?? 'auto'}`,
             };
 
             return (
