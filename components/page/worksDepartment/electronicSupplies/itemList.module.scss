@@ -1,3 +1,7 @@
+.table {
+  overflow: auto;
+}
+
 .checkBox.plus {
   cursor: unset;
   :global(.ant-checkbox-inner) {

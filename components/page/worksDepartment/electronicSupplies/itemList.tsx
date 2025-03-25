@@ -13,10 +13,16 @@ import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 
 type Titem = TquotationProductItemDto & {
   qty: number;
+  //以下幾項都要從accessories裡面過濾
   obstacleSensor: boolean;
   infrared: boolean;
   remoteControl: boolean;
   bounceDoor: boolean;
+  smartSwitch: boolean;
+  antiTyphoonColumn: boolean;
+  antiTyphoonBaseLock: boolean;
+  ul: boolean;
+  wheel: boolean;
 };
 
 type TproductItemList = {
@@ -42,10 +48,16 @@ type Tkeys = keyof Pick<
   | 'motorVendor'
   | 'motorVoltage'
   | 'horsepower'
+  //
   | 'obstacleSensor'
   | 'infrared'
   | 'remoteControl'
   | 'bounceDoor'
+  | 'smartSwitch'
+  | 'antiTyphoonColumn'
+  | 'antiTyphoonBaseLock'
+  | 'ul'
+  | 'wheel'
 >;
 
 type Tconfig = {
@@ -76,25 +88,37 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
       const qty = contractProductItems.length;
 
       const { accessories } = contractProductItems[0];
-      let obstacleSensor = false;
-      let infrared = false;
-      let remoteControl = false;
-      let bounceDoor = false;
+
+      const checkList = {
+        obstacleSensor: false,
+        infrared: false,
+        remoteControl: false,
+        bounceDoor: false,
+        smartSwitch: false,
+        antiTyphoonColumn: false,
+        antiTyphoonBaseLock: false,
+        ul: false,
+        wheel: false,
+      };
 
       accessories.forEach((acce) => {
         const name = acce.name;
-        name.includes('障感器') && (obstacleSensor = true);
-        name.includes('紅外線') && (infrared = true);
-        name.includes('遙控器') && (remoteControl = true);
-        name.includes('彈射門') && (bounceDoor = true);
+
+        if (/^防颱.*中柱$/.test(name)) {
+          checkList.antiTyphoonColumn = true;
+        } else {
+          Object.entries(acceCheckLookup).forEach(([key, property]) => {
+            if (name.includes(key)) {
+              checkList[property] = true;
+            }
+          });
+        }
       });
+
       list[id] = {
         ...contractProductItems[0],
         qty,
-        obstacleSensor,
-        infrared,
-        remoteControl,
-        bounceDoor,
+        ...checkList,
       };
     });
 
@@ -105,8 +129,8 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
   // region RENDER
 
   return (
-    <div className={className}>
-      <Row thead={true} fullWidth={true}>
+    <div className={classNames(scss.table, className)}>
+      <Row thead={true}>
         {keyArr.map((key) => {
           const configItem = config[key];
 
@@ -120,7 +144,7 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 
       {productItemArr.map((item, index) => {
         return (
-          <Row key={index} fullWidth={true}>
+          <Row key={index}>
             {keyArr.map((key) => {
               const configItem = config[key];
 
@@ -147,7 +171,7 @@ const config: Tconfig = {
   itemName: {
     label: '名稱',
     style: {
-      width: 200,
+      width: 150,
       justifyContent: 'flex-start',
     },
     render: ({ itemName }) => itemName,
@@ -155,7 +179,7 @@ const config: Tconfig = {
   itemNumber: {
     label: '編號',
     style: {
-      width: 200,
+      width: 180,
       justifyContent: 'flex-start',
     },
     render: ({ itemNumber }) => itemNumber,
@@ -163,7 +187,7 @@ const config: Tconfig = {
   floor: {
     label: '樓層',
     style: {
-      flex: 'auto',
+      width: 150,
       justifyContent: 'flex-start',
     },
     render: ({ floor }) => floor,
@@ -171,7 +195,7 @@ const config: Tconfig = {
   locationArea: {
     label: '區域',
     style: {
-      flex: 'auto',
+      width: 150,
       justifyContent: 'flex-start',
     },
     render: ({ locationArea }) => locationArea,
@@ -223,7 +247,7 @@ const config: Tconfig = {
       justifyContent: 'center',
     },
     render: ({ obstacleSensor }) => {
-      return <Checkbox checked={obstacleSensor} />;
+      return <Checkbox checked={obstacleSensor} disabled={true} />;
     },
   },
   infrared: {
@@ -233,7 +257,7 @@ const config: Tconfig = {
       justifyContent: 'center',
     },
     render: ({ infrared }) => {
-      return <Checkbox checked={infrared} />;
+      return <Checkbox checked={infrared} disabled={true} />;
     },
   },
   remoteControl: {
@@ -243,7 +267,7 @@ const config: Tconfig = {
       justifyContent: 'center',
     },
     render: ({ remoteControl }) => {
-      return <Checkbox checked={remoteControl} />;
+      return <Checkbox checked={remoteControl} disabled={true} />;
     },
   },
   bounceDoor: {
@@ -253,7 +277,57 @@ const config: Tconfig = {
       justifyContent: 'center',
     },
     render: ({ bounceDoor }) => {
-      return <Checkbox checked={bounceDoor} />;
+      return <Checkbox checked={bounceDoor} disabled={true} />;
+    },
+  },
+  smartSwitch: {
+    label: '智慧開關',
+    style: {
+      width: 100,
+      justifyContent: 'center',
+    },
+    render: ({ smartSwitch }) => {
+      return <Checkbox checked={smartSwitch} disabled={true} />;
+    },
+  },
+  antiTyphoonColumn: {
+    label: '防颱中柱',
+    style: {
+      width: 100,
+      justifyContent: 'center',
+    },
+    render: ({ antiTyphoonColumn }) => {
+      return <Checkbox checked={antiTyphoonColumn} disabled={true} />;
+    },
+  },
+  antiTyphoonBaseLock: {
+    label: '防颱底座鎖固',
+    style: {
+      width: 120,
+      justifyContent: 'center',
+    },
+    render: ({ antiTyphoonBaseLock }) => {
+      return <Checkbox checked={antiTyphoonBaseLock} disabled={true} />;
+    },
+  },
+  ul: {
+    label: 'UL熔金體',
+    style: {
+      width: 100,
+      justifyContent: 'center',
+    },
+    render: ({ ul }) => {
+      return <Checkbox checked={ul} disabled={true} />;
+    },
+  },
+  wheel: {
+    label: '檔輪',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ wheel }) => {
+      return <Checkbox checked={wheel} disabled={true} />;
     },
   },
 };
@@ -272,5 +346,22 @@ const keyArr: Tkeys[] = [
   'infrared',
   'remoteControl',
   'bounceDoor',
+  'smartSwitch',
+  'antiTyphoonColumn',
+  'antiTyphoonBaseLock',
+  'ul',
+  'wheel',
 ];
 // =======================================================================
+
+const acceCheckLookup = {
+  障感器: 'obstacleSensor',
+  障礙感知器: 'obstacleSensor',
+  紅外線: 'infrared',
+  遙控器: 'remoteControl',
+  彈射門: 'bounceDoor',
+  智慧型開關: 'smartSwitch',
+  防颱底座鎖固: 'antiTyphoonBaseLock',
+  UL熔金體: 'ul',
+  檔輪: 'wheel',
+} as const;
