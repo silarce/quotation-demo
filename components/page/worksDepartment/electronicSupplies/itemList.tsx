@@ -1,38 +1,48 @@
 import { useMemo } from 'react';
 import classNames from 'classnames';
-import _ from 'lodash';
 
 // gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import Row, { Cell } from 'components/global/gear/table/row';
+import { Checkbox } from 'components/global/gear/dataEntry';
 
 import scss from './itemList.module.scss';
 
 // type
 import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
 // =============================================================
-type TproductItemList = {
-  [key: string]: {
-    productItem: TquotationProductItemDto;
-    qty: number;
-  };
+
+type Titem = TquotationProductItemDto & {
+  qty: number;
+  obstacleSensor: boolean;
+  infrared: boolean;
+  remoteControl: boolean;
+  bounceDoor: boolean;
 };
+
+type TproductItemList = {
+  [key: string]: Titem;
+};
+
+interface configItem {
+  label?: string;
+  style: React.CSSProperties;
+  style_thead?: React.CSSProperties;
+  style_tbody?: React.CSSProperties;
+  render: (v: Titem) => React.ReactNode;
+}
+
+type Tconfig = {
+  [key in keyof Titem]?: configItem;
+};
+
+type Tkey = keyof typeof config;
 
 // =============================================================
 
 // MARK:START
 
-export default function ItemList({
-  //
-  className,
-  worksheetArr,
-}: {
-  className?: string;
-  worksheetArr: TworksheetDto[];
-}) {
-  //
-
-  const productItemList: TproductItemList = useMemo(() => {
+export default function ItemList({ className, worksheetArr }: { className?: string; worksheetArr: TworksheetDto[] }) {
+  const productItemArr: Titem[] = useMemo(() => {
     const list: TproductItemList = {};
 
     worksheetArr.forEach((worksheet) => {
@@ -50,251 +60,212 @@ export default function ItemList({
 
       const qty = contractProductItems.length;
 
-      list[id] = {
-        productItem: contractProductItems[0],
-        qty,
-      };
-    }); // forEach
-
-    return list;
-    //
-  }, [worksheetArr]);
-
-  const control_table: Ttable = useMemo(() => {
-    const thead: Ttable['thead'] = {
-      cellArr: keysArr.map((key) => {
-        return {
-          ...configList[key],
-          children: configList[key].label,
-        };
-      }),
-    };
-
-    let productItemArr = Object.values(productItemList ?? {});
-    productItemArr = _.sortBy(productItemArr, [
-      ({ productItem }) => productItem.floor,
-      ({ productItem }) => productItem.doorModelName,
-    ]);
-
-    const tbodyRowArr: Ttable['tbody']['rowArr'] = productItemArr.map((item, pIndex) => {
-      const { productItem, qty } = item;
-      const {
-        //
-        accessories,
-        itemName,
-        itemNumber,
-        doorModelName,
-        motorVendor,
-        motorVoltage,
-        horsepower,
-        floor,
-        locationArea,
-        //
-      } = productItem;
-
-      const electronicSupplies = {
-        obstacleSensor: false, // 障感器
-        infrared: false, // 紅外線
-        remoteControl: false, // 遙控器
-        bounceDoor: false, // 彈射門
-      };
+      const { accessories } = contractProductItems[0];
+      let obstacleSensor = false;
+      let infrared = false;
+      let remoteControl = false;
+      let bounceDoor = false;
 
       accessories.forEach((acce) => {
         const name = acce.name;
-        name.includes('障感器') && (electronicSupplies.obstacleSensor = true);
-        name.includes('紅外線') && (electronicSupplies.infrared = true);
-        name.includes('遙控器') && (electronicSupplies.remoteControl = true);
-        name.includes('彈射門') && (electronicSupplies.bounceDoor = true);
+        name.includes('障感器') && (obstacleSensor = true);
+        name.includes('紅外線') && (infrared = true);
+        name.includes('遙控器') && (remoteControl = true);
+        name.includes('彈射門') && (bounceDoor = true);
       });
-
-      return {
-        cellArr: [
-          {
-            ...configList.itemName,
-            children: itemName,
-          },
-          {
-            ...configList.itemNumber,
-            children: itemNumber,
-          },
-          {
-            ...configList.floor,
-            children: floor,
-          },
-          {
-            ...configList.locationArea,
-            children: locationArea,
-          },
-          {
-            ...configList.qty,
-            children: qty,
-          },
-          {
-            ...configList.doorModelName,
-            children: doorModelName,
-          },
-          {
-            ...configList.motorVendor,
-            children: motorVendor,
-          },
-          {
-            ...configList.motorVoltage,
-            children: motorVoltage,
-          },
-          {
-            ...configList.horsepower,
-            children: horsepower,
-          },
-          {
-            ...configList.obstacleSensor,
-            children: <CheckBox_readonly value={electronicSupplies.obstacleSensor} />,
-          },
-          {
-            ...configList.infrared,
-            children: <CheckBox_readonly value={electronicSupplies.infrared} />,
-          },
-          {
-            ...configList.remoteControl,
-            children: <CheckBox_readonly value={electronicSupplies.remoteControl} />,
-          },
-          {
-            ...configList.bounceDoor,
-            children: <CheckBox_readonly value={electronicSupplies.bounceDoor} />,
-          },
-        ],
+      list[id] = {
+        ...contractProductItems[0],
+        qty,
+        obstacleSensor,
+        infrared,
+        remoteControl,
+        bounceDoor,
       };
     });
 
-    const tbody: Ttable['tbody'] = {
-      rowArr: tbodyRowArr,
-    };
-
-    return { thead, tbody };
-  }, [productItemList]);
+    return Object.values(list);
+    //
+  }, [worksheetArr]);
 
   // region RENDER
 
-  return <Table01 {...control_table} className={classNames(className)} />;
+  return (
+    <div className={className}>
+      <Row thead={true} fullWidth={true}>
+        {keyArr.map((key) => {
+          if (!config[key]) {
+            console.error('key', key);
+            console.error('config', config);
+
+            throw new Error('config[key] is undefined');
+          }
+
+          return (
+            <Cell key={key} style={config[key].style} className={classNames(scss.cell, scss.plus)}>
+              {config[key].label}
+            </Cell>
+          );
+        })}
+      </Row>
+
+      {productItemArr.map((item, index) => {
+        return (
+          <Row key={index} fullWidth={true}>
+            {keyArr.map((key) => {
+              if (!config[key]) {
+                console.error('key', key);
+                console.error('config', config);
+
+                throw new Error('config[key] is undefined');
+              }
+
+              const { style, render } = config[key];
+
+              return (
+                <Cell key={key} style={style} className={classNames(scss.cell, scss.plus)}>
+                  {render(item)}
+                </Cell>
+              );
+            })}
+          </Row>
+        );
+      })}
+    </div>
+  );
 }
 
 // MARK: END
 
 // ==================================================================
-// ==================================================================
-// ==================================================================
-// ==================================================================
 
-const CheckBox_readonly = ({ value }: { value?: boolean }) => {
-  return (
-    <div>
-      <InputSel
-        showBaseline="invisible"
-        disabled={true}
-        checkBoxProps={{
-          propsArr: [
-            {
-              props: {
-                className: classNames(scss.checkBox, scss.plus),
-              },
-              key: 'notNeed',
-              value: value,
-            },
-          ],
-        }}
-      />
-    </div>
-  );
-};
-
-// =============================================================
-// =============================================================
-// =============================================================
-
-const keysArr = [
-  'itemName', // 名稱
-  'itemNumber', // 編號
-  'floor',
-  'locationArea',
-  'qty', // 樘數1
-  'doorModelName', // 門型
-  'motorVendor', // 馬達
-  'motorVoltage', // 電壓
-  'horsepower', // 馬力數
-  'obstacleSensor', // 障感器
-  'infrared', // 紅外線
-  'remoteControl', // 遙控器(1:2)
-  'bounceDoor', // 彈射門
-];
-
-const configList: { [key: string]: Tconfig_table } = {
+const config: Tconfig = {
   itemName: {
     label: '名稱',
-    width: 200,
-    justifyContent: 'flex-start',
+    style: {
+      width: 200,
+      justifyContent: 'flex-start',
+    },
+    render: ({ itemName }) => itemName,
   },
   itemNumber: {
     label: '編號',
-    width: 200,
-    justifyContent: 'flex-start',
+    style: {
+      width: 200,
+      justifyContent: 'flex-start',
+    },
+    render: ({ itemNumber }) => itemNumber,
   },
   floor: {
     label: '樓層',
-    // width: 60,
-    flex: '50%',
-    // justifyContent: 'center',
-    justifyContent: 'flex-start',
+    style: {
+      flex: 'auto',
+      justifyContent: 'flex-start',
+    },
+    render: ({ floor }) => floor,
   },
   locationArea: {
     label: '區域',
-    // width: 200,
-    flex: '50%',
-    justifyContent: 'flex-start',
+    style: {
+      flex: 'auto',
+      justifyContent: 'flex-start',
+    },
+    render: ({ locationArea }) => locationArea,
   },
   qty: {
     label: '樘數',
-    width: 60,
-    justifyContent: 'center',
+    style: {
+      width: 60,
+      justifyContent: 'center',
+    },
+    render: ({ qty }) => qty,
   },
   doorModelName: {
     label: '門型',
-    width: 120,
-    justifyContent: 'flex-start',
+    style: {
+      width: 120,
+      justifyContent: 'flex-start',
+    },
+    render: ({ doorModelName }) => doorModelName,
   },
   motorVendor: {
     label: '馬達',
-    width: 60,
-    justifyContent: 'center',
+    style: {
+      width: 60,
+      justifyContent: 'center',
+    },
+    render: ({ motorVendor }) => motorVendor,
   },
   motorVoltage: {
     label: '電壓',
-    width: 60,
-    justifyContent: 'center',
+    style: {
+      width: 60,
+      justifyContent: 'center',
+    },
+    render: ({ motorVoltage }) => motorVoltage,
   },
   horsepower: {
     label: '馬力數',
-    width: 90,
-    justifyContent: 'center',
+    style: {
+      width: 90,
+      justifyContent: 'center',
+    },
+    render: ({ horsepower }) => horsepower,
   },
   obstacleSensor: {
     label: '障感器',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ obstacleSensor }) => {
+      return <Checkbox checked={obstacleSensor} />;
+    },
   },
   infrared: {
     label: '紅外線',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ infrared }) => {
+      return <Checkbox checked={infrared} />;
+    },
   },
   remoteControl: {
     label: '遙控器',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ remoteControl }) => {
+      return <Checkbox checked={remoteControl} />;
+    },
   },
   bounceDoor: {
     label: '彈射門',
-    width: 80,
-    justifyContent: 'center',
+    style: {
+      width: 80,
+      justifyContent: 'center',
+    },
+    render: ({ bounceDoor }) => {
+      return <Checkbox checked={bounceDoor} />;
+    },
   },
 };
 
+const keyArr: Tkey[] = [
+  'itemName',
+  'itemNumber',
+  'floor',
+  'locationArea',
+  'qty',
+  'doorModelName',
+  'motorVendor',
+  'motorVoltage',
+  'horsepower',
+  'obstacleSensor',
+  'infrared',
+  'remoteControl',
+  'bounceDoor',
+];
 // =======================================================================
