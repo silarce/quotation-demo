@@ -1121,7 +1121,7 @@ export const useGetWorksheet_id = (
       const err = error as Error;
       myAlert.err({ title: '取得工作表失敗', content: err.message });
     } finally {
-      setIsLoading(true);
+      setIsLoading(false);
 
       return;
     }
