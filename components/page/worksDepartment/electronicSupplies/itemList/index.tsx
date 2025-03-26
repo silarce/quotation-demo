@@ -156,6 +156,7 @@ export default function ItemList({
     // ];
 
     myAlert.clear({ content: <ExportPdfExcel itemArr={productItemArr} /> });
+    // myAlert.clear({ content: <ExportPdfExcel itemArr={testFake} /> });
   }, [productItemArr]);
 
   useEffect(() => {
