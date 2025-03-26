@@ -15,8 +15,11 @@ import { config, acceCheckLookup, keyArr } from './index';
 import { dlPdf, getA4Rect } from 'js/utils/dlPdf';
 
 // ============================================================================
+
+import ExcelJs, { Column } from 'exceljs';
+
+// ============================================================================
 type TrowData = Titem & {
-  // rect?: DOMRectList;
   element?: HTMLDivElement | null;
 };
 
@@ -28,7 +31,7 @@ const theadHeight = 45.14;
 const tbodyHeight = new Decimal(pageStyle.height).sub(titleHeight).sub(theadHeight);
 
 // ============================================================================
-export default function ExportPdfExcel({ itemArr }: { itemArr: Titem[] }) {
+export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Titem[]; projectName: string }) {
   const [rowDataArr, setRowDataArr] = useState<TrowData[]>([]);
 
   const ref_rowArr = useRef<(HTMLDivElement | null)[]>([]);
@@ -96,7 +99,16 @@ export default function ExportPdfExcel({ itemArr }: { itemArr: Titem[] }) {
         <SquareBtn content="export" sharp="long" onClick={hanlder_dlPdf}>
           PDF
         </SquareBtn>
-        <SquareBtn content="export" sharp="long">
+        <SquareBtn
+          content="export"
+          sharp="long"
+          onClick={() => {
+            dlExcel({
+              itemArr,
+              projectName,
+            });
+          }}
+        >
           Excel
         </SquareBtn>
       </div>
@@ -223,3 +235,155 @@ const Page_ = (
 };
 
 const Page = forwardRef(Page_);
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+// ============================================================================
+
+type TpartialColumn = Partial<Column>;
+
+// MARK:dlExcel
+const dlExcel = ({ itemArr, projectName }: { itemArr: Titem[]; projectName: string }) => {
+  const workbook = new ExcelJs.Workbook();
+
+  const sheetName = 'foooo';
+
+  const sheet = workbook.addWorksheet(sheetName, {
+    pageSetup: {
+      paperSize: 9, // A4 paper size
+      orientation: 'portrait', // page orientation
+      // showGridLines: true,
+      // fitToPage: true, // fit to page
+      // fitToWidth: 1, // fit to one page wide
+      // fitToHeight: 0, // auto height
+    },
+  });
+
+  sheet.columns = Object.values(columnsLookup);
+  sheet.addRow([projectName]);
+
+  itemArr.forEach((item, index) => {
+    // const rowIndex = index + 2;
+    const arr = keyArr.map((key) => item[key]);
+    sheet.addRow(arr);
+  });
+
+  //
+}; // dlExcel close
+
+const c_itemName: TpartialColumn = {
+  key: 'itemName',
+  width: 10,
+};
+
+const c_floor: TpartialColumn = {
+  key: 'floor',
+  width: 10,
+};
+
+const c_locationArea: TpartialColumn = {
+  key: 'locationArea',
+  width: 10,
+};
+
+const c_qty: TpartialColumn = {
+  key: 'qty',
+  width: 10,
+};
+
+const c_doorModelName: TpartialColumn = {
+  key: 'doorModelName',
+  width: 10,
+};
+
+const c_motorVendor: TpartialColumn = {
+  key: 'motorVendor',
+  width: 10,
+};
+
+const c_motorVoltage: TpartialColumn = {
+  key: 'motorVoltage',
+  width: 10,
+};
+
+const c_horsepower: TpartialColumn = {
+  key: 'horsepower',
+  width: 10,
+};
+
+const c_antiTyphoonBaseLock: TpartialColumn = {
+  key: 'antiTyphoonBaseLock',
+  width: 10,
+};
+
+const c_obstacleSensor: TpartialColumn = {
+  key: 'obstacleSensor',
+  width: 10,
+};
+
+const c_infrared: TpartialColumn = {
+  key: 'infrared',
+  width: 10,
+};
+
+const c_remoteControl: TpartialColumn = {
+  key: 'remoteControl',
+  width: 10,
+};
+
+const c_smartSwitch: TpartialColumn = {
+  key: 'smartSwitch',
+  width: 10,
+};
+
+const c_antiTyphoonColumn: TpartialColumn = {
+  key: 'antiTyphoonColumn',
+  width: 10,
+};
+
+const c_ul: TpartialColumn = {
+  key: 'ul',
+  width: 10,
+};
+
+const c_wheel: TpartialColumn = {
+  key: 'wheel',
+  width: 10,
+};
+
+const c_itemNumber: TpartialColumn = {
+  key: 'itemNumber',
+  width: 10,
+};
+
+const c_bounceDoor: TpartialColumn = {
+  key: 'bounceDoor',
+  width: 10,
+};
+
+const columnsLookup: Record<(typeof keyArr)[number], TpartialColumn> = {
+  itemName: c_itemName,
+  floor: c_floor,
+  locationArea: c_locationArea,
+  qty: c_qty,
+  doorModelName: c_doorModelName,
+  motorVendor: c_motorVendor,
+  motorVoltage: c_motorVoltage,
+  horsepower: c_horsepower,
+  antiTyphoonBaseLock: c_antiTyphoonBaseLock,
+  obstacleSensor: c_obstacleSensor,
+  infrared: c_infrared,
+  remoteControl: c_remoteControl,
+  smartSwitch: c_smartSwitch,
+  antiTyphoonColumn: c_antiTyphoonColumn,
+  ul: c_ul,
+  wheel: c_wheel,
+  // 沒用到
+  itemNumber: c_itemNumber,
+  // 沒用到
+  bounceDoor: c_bounceDoor,
+};

@@ -77,11 +77,13 @@ export default function ItemList({
   worksheetArr,
   onWorksheetArrChange,
   onUnmount,
+  projectName,
 }: {
   className?: string;
   worksheetArr: TworksheetDto[] | undefined | null;
   onWorksheetArrChange?: (props: { openPdf: () => void }) => void;
   onUnmount?: () => void;
+  projectName: string;
 }) {
   //
   const productItemArr: Titem[] = useMemo(() => {
@@ -155,7 +157,7 @@ export default function ItemList({
     //   ...productItemArr,
     // ];
 
-    myAlert.clear({ content: <ExportPdfExcel itemArr={productItemArr} /> });
+    myAlert.clear({ content: <ExportPdfExcel itemArr={productItemArr} projectName={projectName} /> });
     // myAlert.clear({ content: <ExportPdfExcel itemArr={testFake} /> });
   }, [productItemArr]);
 
@@ -399,6 +401,7 @@ const keyArr: Tkeys[] = [
   'ul',
   'wheel',
 ];
+
 // =======================================================================
 
 const acceCheckLookup = {

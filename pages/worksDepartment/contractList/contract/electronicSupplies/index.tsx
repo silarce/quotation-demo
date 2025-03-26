@@ -131,6 +131,7 @@ export default function ElectronicSupplies() {
             <ItemList
               className={scss.table}
               worksheetArr={worksheet}
+              projectName={projectName}
               onWorksheetArrChange={({ openPdf }) => {
                 dispatchPanelList_itemList({
                   type: 'add0',
