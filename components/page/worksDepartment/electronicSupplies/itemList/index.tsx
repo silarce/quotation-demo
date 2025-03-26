@@ -1,11 +1,14 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
 import classNames from 'classnames';
 
 // gear
 import Row, { Cell } from 'components/global/gear/table/row';
 import { Checkbox } from 'components/global/gear/dataEntry';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import scss from './itemList.module.scss';
+
+import ExportPdfExcel from './exportPdfExcel';
 
 // type
 import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
@@ -69,11 +72,22 @@ type Tconfig = {
 
 // MARK:START
 
-export default function ItemList({ className, worksheetArr }: { className?: string; worksheetArr: TworksheetDto[] }) {
+export default function ItemList({
+  className,
+  worksheetArr,
+  onWorksheetArrChange,
+  onUnmount,
+}: {
+  className?: string;
+  worksheetArr: TworksheetDto[] | undefined | null;
+  onWorksheetArrChange?: (props: { openPdf: () => void }) => void;
+  onUnmount?: () => void;
+}) {
+  //
   const productItemArr: Titem[] = useMemo(() => {
     const list: TproductItemList = {};
 
-    worksheetArr.forEach((worksheet) => {
+    worksheetArr?.forEach((worksheet) => {
       const { latestRecord, isAbandoned, isAlreadyToElectronicSupplies } = worksheet;
 
       if (isAbandoned || !isAlreadyToElectronicSupplies) {
@@ -131,6 +145,29 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
     //
   }, [worksheetArr]);
 
+  const openPdf = useCallback(() => {
+    // const testFake = [
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    // ];
+
+    myAlert.clear({ content: <ExportPdfExcel itemArr={productItemArr} /> });
+  }, [productItemArr]);
+
+  useEffect(() => {
+    onWorksheetArrChange?.({ openPdf });
+  }, [openPdf]);
+
+  useEffect(() => {
+    return () => {
+      onUnmount?.();
+    };
+  }, []);
+
   // region RENDER
 
   return (
@@ -169,7 +206,10 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 // MARK: END
 
 // ==================================================================
+// ==================================================================
+// ==================================================================
 
+// MARK: config
 const config: Tconfig = {
   itemName: {
     label: '項目',
@@ -192,18 +232,21 @@ const config: Tconfig = {
   floor: {
     label: '樓層',
     style: {
-      width: 150,
+      width: 180,
       justifyContent: 'flex-start',
     },
     render: ({ floor }) => floor,
+    // render: ({ floor }) => <span>gggggggggggggggg</span>,
   },
   locationArea: {
     label: '區域',
     style: {
-      width: 150,
+      width: 180,
       justifyContent: 'flex-start',
     },
+    className: scss.cellSpan,
     render: ({ locationArea }) => locationArea,
+    // render: ({ locationArea }) => <span>aaaaaaaaaaaaaaaaaassssss</span>,
   },
   qty: {
     label: '樘數',
@@ -349,7 +392,7 @@ const keyArr: Tkeys[] = [
   'obstacleSensor',
   'infrared',
   'remoteControl',
-  'bounceDoor',
+  // 'bounceDoor',
   'smartSwitch',
   'antiTyphoonColumn',
   'ul',
@@ -368,3 +411,6 @@ const acceCheckLookup = {
   UL熔金體: 'ul',
   檔輪: 'wheel',
 } as const;
+
+export type { Titem, Tkeys, Tconfig };
+export { config, acceCheckLookup, keyArr };

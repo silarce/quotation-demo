@@ -1,6 +1,6 @@
 // https://github.com/San-Jeou/sanjeou-erp-fe/assets/65767828/3ab5b70e-bdda-42e4-af82-bb2ff6e2be63
 
-import { useEffect, useMemo } from 'react';
+import { useState, useEffect, useReducer, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -33,6 +33,15 @@ type Tquery = {
   contractId: string;
   listName: 'itemList' | 'supplyList' | 'pickupRecord' | 'requirementRecord' | undefined;
 };
+
+type Taction =
+  | {
+      type: 'add0';
+      payload: TpanelList[number];
+    }
+  | {
+      type: 'clear';
+    };
 
 // ------------------------------------------------------------------
 
@@ -83,7 +92,7 @@ export default function ElectronicSupplies() {
 
   const { doorModalQtyList, doorQtyTotal } = useCalcDoorModal(worksheet ?? []);
 
-  const panelList = usePanelList({
+  const { panelArr, dispatchPanelList_itemList } = usePanelList({
     electronicSuppliesId,
     isAllowAddRequirement,
   });
@@ -104,7 +113,7 @@ export default function ElectronicSupplies() {
   return (
     <SubLayer isLoading_subLayer={isFetching_electronicSupplies || isFetching_contract}>
       <PageHeader
-        panelList={panelList}
+        panelList={panelArr}
         contractNumber={contractNumber ?? '---'}
         contactThatSkipContract={contactThatSkipContract}
       />
@@ -118,7 +127,25 @@ export default function ElectronicSupplies() {
         />
 
         <Wrapper_tab tabArr={tabArr} className={classNames('mt-10', 'w-full')}>
-          {listName === 'itemList' && <ItemList className={scss.table} worksheetArr={worksheet ?? []} />}
+          {listName === 'itemList' && (
+            <ItemList
+              className={scss.table}
+              worksheetArr={worksheet}
+              onWorksheetArrChange={({ openPdf }) => {
+                dispatchPanelList_itemList({
+                  type: 'add0',
+                  payload: {
+                    type: 'myButton',
+                    label: '下載PDF',
+                    onClick: openPdf,
+                  },
+                });
+              }}
+              onUnmount={() => {
+                dispatchPanelList_itemList({ type: 'clear' });
+              }}
+            />
+          )}
           {listName === 'supplyList' && <SupplyList electronicSuppliesContents={electronicSuppliesContents} />}
           {listName === 'pickupRecord' && <PickupRecord className={scss.table} pickupRecords={pickupRecords} />}
           {listName === 'requirementRecord' && (
@@ -134,6 +161,24 @@ export default function ElectronicSupplies() {
 
 // region HOOK
 
+const reducer_itemList = (state: TpanelList, action: Taction) => {
+  const copy = [...state];
+  const { type } = action;
+
+  switch (type) {
+    case 'add0':
+      // copy.push(action.payload);
+      copy[0] = action.payload;
+
+      return copy;
+    case 'clear':
+      return [];
+
+    default:
+      return state;
+  }
+};
+
 const usePanelList = ({
   electronicSuppliesId,
   isAllowAddRequirement,
@@ -145,7 +190,8 @@ const usePanelList = ({
   const query = router.query as Tquery;
   const { listName, contractId } = query;
 
-  const panelList_itemList: TpanelList = [];
+  // const [panelList_itemList, setPanelList_itemList] = useState<TpanelList>([]);
+  const [panelList_itemList, dispatchPanelList_itemList] = useReducer(reducer_itemList, []);
 
   const panelList_supplyList: TpanelList = [];
 
@@ -196,7 +242,10 @@ const usePanelList = ({
 
   const panelArr = listName ? list[listName] : [];
 
-  return panelArr;
+  return {
+    panelArr,
+    dispatchPanelList_itemList,
+  };
 };
 
 const useTabArr = () => {
