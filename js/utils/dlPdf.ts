@@ -2,7 +2,7 @@ import html2canvas, { Options } from 'html2canvas';
 import jsPDF from 'jspdf';
 import Decimal from 'decimal.js';
 
-import domtoimage from 'dom-to-image';
+// import domtoimage from 'dom-to-image';
 // import domtoimage from 'dom-to-image-more';
 
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
@@ -32,51 +32,16 @@ const dlPdf = async ({
       continue;
     }
 
-    // const image = await html2canvas(ele, {
-    //   scale: 3, // PDF的寬高不會改變，但是會變清楚，檔案也更大
-    //   // useCORS: true,
-    //   // allowTaint: true,
-    //   // ...canvasOptions,
-    // }).then((canvas) => {
-    //   const image = canvas.toDataURL('image/JPEG');
+    const image = await html2canvas(ele, {
+      scale: 3, // PDF的寬高不會改變，但是會變清楚，檔案也更大
+      // useCORS: true,
+      // allowTaint: true,
+      // ...canvasOptions,
+    }).then((canvas) => {
+      const image = canvas.toDataURL('image/JPEG');
 
-    //   return image;
-    // });
-
-    // 用toBlob的話input會有border，還不知道怎麼處理
-    // const scale = 1.5;
-    // const image = await domtoimage
-    //   .toBlob(ele, {
-    //     width: ele.clientWidth * scale,
-    //     height: ele.clientHeight * scale,
-    //     style: {
-    //       transform: 'scale(' + scale + ')',
-    //       transformOrigin: 'top left',
-    //     },
-    //   })
-    //   .then((blob) => {
-    //     const imgUrl = URL.createObjectURL(blob);
-
-    //     const img = new Image();
-
-    //     img.src = imgUrl;
-
-    //     return img;
-    //   });
-
-    const image = await domtoimage
-      .toJpeg(ele, {
-        style: {
-          background: 'white',
-        },
-      })
-      .then((imgUrl) => {
-        const img = new Image();
-
-        img.src = imgUrl;
-
-        return img;
-      });
+      return image;
+    });
 
     //
     if (!isFirst) {

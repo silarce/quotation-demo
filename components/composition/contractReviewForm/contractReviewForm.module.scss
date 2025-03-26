@@ -327,3 +327,11 @@
 }
 
 // =====================================================================
+
+.radio {
+  &.readonly {
+    :global(.ant-radio-inner):after {
+      transition: none;
+    }
+  }
+}
