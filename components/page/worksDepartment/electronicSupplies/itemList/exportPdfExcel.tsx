@@ -2,7 +2,8 @@ import { useRef, useEffect, forwardRef, useMemo, useState } from 'react';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _ from 'lodash';
+import _, { size } from 'lodash';
+import moment from 'moment';
 
 // gear
 import Row, { Cell } from 'components/global/gear/table/row';
@@ -17,6 +18,7 @@ import { dlPdf, getA4Rect } from 'js/utils/dlPdf';
 // ============================================================================
 
 import ExcelJs, { Column } from 'exceljs';
+import { fontStyle } from 'html2canvas/dist/types/css/property-descriptors/font-style';
 
 // ============================================================================
 type TrowData = Titem & {
@@ -244,13 +246,16 @@ const Page = forwardRef(Page_);
 // ============================================================================
 // ============================================================================
 
-type TpartialColumn = Partial<Column>;
+type TcolumnConfig = {
+  outline: Partial<Column>;
+  getValue: (data: Titem) => string | number;
+};
 
 // MARK:dlExcel
-const dlExcel = ({ itemArr, projectName }: { itemArr: Titem[]; projectName: string }) => {
+const dlExcel = async ({ itemArr, projectName }: { itemArr: Titem[]; projectName: string }) => {
   const workbook = new ExcelJs.Workbook();
 
-  const sheetName = 'foooo';
+  const sheetName = '送電備品列表';
 
   const sheet = workbook.addWorksheet(sheetName, {
     pageSetup: {
@@ -263,109 +268,223 @@ const dlExcel = ({ itemArr, projectName }: { itemArr: Titem[]; projectName: stri
     },
   });
 
-  sheet.columns = Object.values(columnsLookup);
-  sheet.addRow([projectName]);
+  sheet.columns = keyArr.map((key) => columnsLookup[key].outline);
 
-  itemArr.forEach((item, index) => {
-    // const rowIndex = index + 2;
-    const arr = keyArr.map((key) => item[key]);
-    sheet.addRow(arr);
+  keyArr.forEach((key) => {
+    const { alignment } = columnsLookup[key].outline;
+    // 在上面建立column時，送alignment進去沒有用，所以要在這邊再設定一次
+    const column = sheet.getColumn(key);
+    column.alignment = { ...column.alignment, ...alignment };
+  });
+
+  sheet.addRow([projectName]).getCell('A').font = { bold: true, size: 20 };
+
+  const labelArr = keyArr.map((key) => config[key].label);
+  sheet.addRow(labelArr);
+
+  itemArr.forEach((item) => {
+    const rowValueArr = keyArr.map((key) => columnsLookup[key].getValue(item));
+    sheet.addRow(rowValueArr);
+  });
+
+  // -------------------------------------------------------
+  await workbook.xlsx.writeBuffer();
+
+  workbook.xlsx.writeBuffer().then((content) => {
+    const link = document.createElement('a');
+    const blobData = new Blob([content], {
+      type: 'application/vnd.ms-excel;charset=utf-8;',
+    });
+
+    const today = moment().format('yyyy-MM-DD');
+    link.download = `送電備品列表_${projectName}_${today}.xlsx`;
+    link.href = URL.createObjectURL(blobData);
+    link.click();
+    link.remove();
   });
 
   //
 }; // dlExcel close
 
-const c_itemName: TpartialColumn = {
-  key: 'itemName',
-  width: 10,
+const c_itemName: TcolumnConfig = {
+  outline: {
+    key: 'itemName',
+    width: 10,
+  },
+  getValue: (data) => data.itemName,
 };
 
-const c_floor: TpartialColumn = {
-  key: 'floor',
-  width: 10,
+const c_floor: TcolumnConfig = {
+  outline: {
+    key: 'floor',
+    width: 10,
+  },
+  getValue: (data) => data.floor ?? '',
 };
 
-const c_locationArea: TpartialColumn = {
-  key: 'locationArea',
-  width: 10,
+const c_locationArea: TcolumnConfig = {
+  outline: {
+    key: 'locationArea',
+    width: 10,
+  },
+  getValue: (data) => data.locationArea ?? '',
 };
 
-const c_qty: TpartialColumn = {
-  key: 'qty',
-  width: 10,
+const c_qty: TcolumnConfig = {
+  outline: {
+    key: 'qty',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => data.qty,
 };
 
-const c_doorModelName: TpartialColumn = {
-  key: 'doorModelName',
-  width: 10,
+const c_doorModelName: TcolumnConfig = {
+  outline: {
+    key: 'doorModelName',
+    width: 10,
+  },
+  getValue: (data) => data.doorModelName,
 };
 
-const c_motorVendor: TpartialColumn = {
-  key: 'motorVendor',
-  width: 10,
+const c_motorVendor: TcolumnConfig = {
+  outline: {
+    key: 'motorVendor',
+    width: 10,
+  },
+  getValue: (data) => data.motorVendor ?? '',
 };
 
-const c_motorVoltage: TpartialColumn = {
-  key: 'motorVoltage',
-  width: 10,
+const c_motorVoltage: TcolumnConfig = {
+  outline: {
+    key: 'motorVoltage',
+    width: 10,
+  },
+  getValue: (data) => {
+    const { motorVoltage, motorPhase } = data;
+
+    return `${motorPhase}ψ ${motorVoltage}V`;
+  },
 };
 
-const c_horsepower: TpartialColumn = {
-  key: 'horsepower',
-  width: 10,
+const c_horsepower: TcolumnConfig = {
+  outline: {
+    key: 'horsepower',
+    width: 10,
+  },
+  getValue: (data) => data.horsepower,
 };
 
-const c_antiTyphoonBaseLock: TpartialColumn = {
-  key: 'antiTyphoonBaseLock',
-  width: 10,
+const c_antiTyphoonBaseLock: TcolumnConfig = {
+  outline: {
+    key: 'antiTyphoonBaseLock',
+    width: 15,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => data.antiTyphoonBaseLock,
 };
 
-const c_obstacleSensor: TpartialColumn = {
-  key: 'obstacleSensor',
-  width: 10,
+const c_obstacleSensor: TcolumnConfig = {
+  outline: {
+    key: 'obstacleSensor',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.obstacleSensor && 'V') || '',
 };
 
-const c_infrared: TpartialColumn = {
-  key: 'infrared',
-  width: 10,
+const c_infrared: TcolumnConfig = {
+  outline: {
+    key: 'infrared',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.infrared && 'V') || '',
 };
 
-const c_remoteControl: TpartialColumn = {
-  key: 'remoteControl',
-  width: 10,
+const c_remoteControl: TcolumnConfig = {
+  outline: {
+    key: 'remoteControl',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.remoteControl && 'V') || '',
 };
 
-const c_smartSwitch: TpartialColumn = {
-  key: 'smartSwitch',
-  width: 10,
+const c_smartSwitch: TcolumnConfig = {
+  outline: {
+    key: 'smartSwitch',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.smartSwitch && 'V') || '',
 };
 
-const c_antiTyphoonColumn: TpartialColumn = {
-  key: 'antiTyphoonColumn',
-  width: 10,
+const c_antiTyphoonColumn: TcolumnConfig = {
+  outline: {
+    key: 'antiTyphoonColumn',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.antiTyphoonColumn && 'V') || '',
 };
 
-const c_ul: TpartialColumn = {
-  key: 'ul',
-  width: 10,
+const c_ul: TcolumnConfig = {
+  outline: {
+    key: 'ul',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.ul && 'V') || '',
 };
 
-const c_wheel: TpartialColumn = {
-  key: 'wheel',
-  width: 10,
+const c_wheel: TcolumnConfig = {
+  outline: {
+    key: 'wheel',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.wheel && 'V') || '',
 };
 
-const c_itemNumber: TpartialColumn = {
-  key: 'itemNumber',
-  width: 10,
+const c_itemNumber: TcolumnConfig = {
+  outline: {
+    key: 'itemNumber',
+    width: 10,
+  },
+  getValue: (data) => data.itemNumber,
 };
 
-const c_bounceDoor: TpartialColumn = {
-  key: 'bounceDoor',
-  width: 10,
+const c_bounceDoor: TcolumnConfig = {
+  outline: {
+    key: 'bounceDoor',
+    width: 10,
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  getValue: (data) => (data.bounceDoor && 'V') || '',
 };
 
-const columnsLookup: Record<(typeof keyArr)[number], TpartialColumn> = {
+const columnsLookup: Record<(typeof keyArr)[number], TcolumnConfig> = {
   itemName: c_itemName,
   floor: c_floor,
   locationArea: c_locationArea,
@@ -374,6 +493,7 @@ const columnsLookup: Record<(typeof keyArr)[number], TpartialColumn> = {
   motorVendor: c_motorVendor,
   motorVoltage: c_motorVoltage,
   horsepower: c_horsepower,
+
   antiTyphoonBaseLock: c_antiTyphoonBaseLock,
   obstacleSensor: c_obstacleSensor,
   infrared: c_infrared,

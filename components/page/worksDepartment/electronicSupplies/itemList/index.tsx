@@ -278,10 +278,10 @@ const config: Tconfig = {
   motorVoltage: {
     label: '電壓',
     style: {
-      width: 60,
+      width: 80,
       justifyContent: 'center',
     },
-    render: ({ motorVoltage }) => motorVoltage,
+    render: ({ motorVoltage, motorPhase }) => `${motorPhase}ψ ${motorVoltage}V`,
   },
   horsepower: {
     label: '馬力數',
