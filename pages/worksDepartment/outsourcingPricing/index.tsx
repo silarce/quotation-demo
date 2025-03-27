@@ -58,14 +58,6 @@ export default function OutsourcingPricing() {
   const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
   const [targetIsoDate, setTargetIsoDate] = useState<string>();
 
-  // ------------------------------------------------------------------------
-
-  const isShowVendorList = showListBy === 'vendor' && !targetOutsourcingId;
-  const isShowVendorMonthList = showListBy === 'vendor' && targetOutsourcingId;
-
-  const isShowDateList = showListBy === 'month' && !targetIsoDate;
-  const isShowMonthVendorList = showListBy === 'month' && targetIsoDate;
-
   const showComponent = {
     vendor: targetOutsourcingId ? 'showVendorMonthList' : 'showVendorList',
     month: targetOutsourcingId ? 'showMonthVendorList' : 'showDateList',
@@ -116,8 +108,7 @@ export default function OutsourcingPricing() {
     <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}>
       <PageHeader02 tagList={tagList} />
       <div>
-        {/*  */}
-        {isShowVendorList && (
+        {showComponent === 'showVendorList' && (
           <OutsourcingList
             className={classNames('m-auto mb-5')}
             outsourcingArr={outsourcingArr}
@@ -127,19 +118,18 @@ export default function OutsourcingPricing() {
             viewRef_bottom={viewRef_bottom}
           />
         )}
-        {/*  */}
+
         <DateList
-          className={classNames('m-auto mb-5 mt-[40px]', !isShowDateList && 'hidden')}
+          className={classNames('m-auto mb-5 mt-[40px]', showComponent !== 'showDateList' && 'hidden')}
           onCardClick={(dateStr) => {
             setTargetIsoDate(new Date(dateStr).toISOString());
           }}
         />
 
-        {/*  */}
-        {isShowVendorMonthList && (
+        {showComponent === 'showVendorMonthList' && (
           <VendorMonthPanel
             outsourcingArr={outsourcingArr}
-            viewRef_bottom={isShowVendorMonthList ? viewRef_bottom : undefined}
+            viewRef_bottom={viewRef_bottom}
             className={classNames('m-auto mb-5 mt-[40px]')}
             targetOutsourcingId={targetOutsourcingId}
             onTabClick={(outsourcingId) => {
@@ -147,8 +137,8 @@ export default function OutsourcingPricing() {
             }}
           />
         )}
-        {/*  */}
-        {isShowMonthVendorList && (
+
+        {showComponent === 'showMonthVendorList' && (
           <MonthVendorPanel
             targetDate={targetIsoDate}
             onDateTabClick={(isoString) => {
@@ -157,7 +147,6 @@ export default function OutsourcingPricing() {
             className={classNames('m-auto mb-5 mt-[40px]')}
           />
         )}
-        {/*  */}
       </div>
     </SubLayer>
   );
