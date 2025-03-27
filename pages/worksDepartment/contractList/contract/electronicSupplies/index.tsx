@@ -189,7 +189,7 @@ const usePanelList = ({
 }) => {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { listName, contractId } = query;
+  const { listName = 'itemList', contractId } = query;
 
   // const [panelList_itemList, setPanelList_itemList] = useState<TpanelList>([]);
   const [panelList_itemList, dispatchPanelList_itemList] = useReducer(reducer_itemList, []);
