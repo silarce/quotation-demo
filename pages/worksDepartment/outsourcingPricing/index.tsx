@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02, { TtagList, TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
 import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
@@ -23,18 +23,13 @@ import TabCarousel02, {
   Tcontrol_tabCarousel,
   TimperativeHandle,
 } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
+import VendorMonthPanel from 'components/page/worksDepartment/outsourcingPricing/vendorMonthPanel';
 
 // css
 import scss from './index.module.scss';
 
 // api
-import {
-  Tparams,
-  ToutsourcingDto,
-  ToutsourcingPaymentDto,
-  useGetOutsourcing,
-  useGetOutsourcingPayment,
-} from 'js/api/api_outsourcing';
+import { Tparams, ToutsourcingDto, useGetOutsourcing, useGetOutsourcingPayment } from 'js/api/api_outsourcing';
 
 // utils
 import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers/date/calcDate';
@@ -43,8 +38,10 @@ import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers
 type TfilterBy = 'vendor' | 'month';
 
 // ========================================================
+
+// MARK: START
+
 export default function OutsourcingPricing() {
-  // ------------------------------------------------------------------------
   const [showListBy, setShowListBy] = useState<TfilterBy>('vendor');
 
   const [targetOutsourcingId, setTargetOutsourcingId] = useState<string>();
@@ -92,6 +89,8 @@ export default function OutsourcingPricing() {
       },
     },
   ];
+
+  // MARK: RENDER
 
   return (
     <SubLayer bodyClassName={classNames(scss.subLayerBody, scss.plus)}>
@@ -143,6 +142,8 @@ export default function OutsourcingPricing() {
     </SubLayer>
   );
 }
+
+// MARK: END
 
 // ====================================================================
 // ====================================================================
@@ -288,142 +289,6 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
 };
 
 // ====================================================================
-
-const VendorMonthPanel = ({
-  //
-  outsourcingArr,
-  className,
-  viewRef_bottom,
-  targetOutsourcingId,
-  onTabClick,
-}: {
-  outsourcingArr: ToutsourcingDto[];
-  className?: string;
-  viewRef_bottom?: (node?: Element | null | undefined) => void;
-  targetOutsourcingId: string | undefined;
-  onTabClick: (outsourcingId: string) => void;
-}) => {
-  const router = useRouter();
-
-  // ----------------------------------------------------------------------
-  const [activeTab_vendor, setActiveTab_vendor] = useState<number>(0);
-
-  const ref_carousel = useRef<TimperativeHandle>(null!);
-
-  // ----------------------------------------------------------------------
-
-  const filter = {
-    outsourcingId: { $eq: targetOutsourcingId },
-  };
-
-  const params: Tparams = {
-    pageSize: 99999,
-    filter,
-  };
-
-  const {
-    dataArr: paymentArr,
-    isLoading,
-    reset: reset_payment,
-  } = useGetOutsourcingPayment({
-    customParams: params,
-  });
-
-  useEffect(() => {
-    reset_payment();
-  }, [targetOutsourcingId]);
-
-  // ----------------------------------------------------------------------
-
-  const { tabArr, activeIndex } = useMemo(() => {
-    let activeIndex = -1;
-
-    const arr: Tcontrol_tabCarousel['tabArr'] = outsourcingArr.map((data, index) => {
-      const viewRef = index === outsourcingArr.length - 1 ? viewRef_bottom : undefined;
-
-      if (data.id === targetOutsourcingId) {
-        setActiveTab_vendor(index);
-        activeIndex = index;
-      }
-
-      return {
-        label: data.name,
-        viewRef,
-        // isActive: targetOutsourcingId === data.id,
-        onClick: () => {
-          setActiveTab_vendor(index);
-          onTabClick(data.id);
-        },
-      };
-    });
-
-    return {
-      tabArr: arr,
-      activeIndex,
-    };
-  }, [outsourcingArr]);
-
-  const control_tabCarousel: Tcontrol_tabCarousel = {
-    activeIndex: activeTab_vendor,
-    tabArr,
-  };
-  // ----------------------------------------------------------------------
-
-  const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
-    const yearMonthList = getPaymentDateList(paymentArr);
-
-    let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthList]) => {
-      const twYear = String(Number(year) - 1911);
-
-      const cardList = Object.entries(monthList).map(([month, paymentInfo]) => {
-        const forbidden = !paymentInfo;
-
-        return {
-          label: `${month}月`,
-          onClick: () => {
-            if (forbidden) {
-              return;
-            }
-
-            router.push({
-              pathname: router.pathname + '/edit',
-              query: {
-                paymentId: paymentInfo?.id,
-              },
-            });
-          },
-          forbidden,
-        };
-      });
-
-      return {
-        label: twYear,
-        cardArr: cardList,
-      };
-    });
-
-    panelArr = panelArr.reverse();
-
-    return {
-      panelArr,
-    };
-  }, [paymentArr]);
-
-  // ----------------------------------------------------------------------
-
-  useEffect(() => {
-    ref_carousel.current.slideToIndex(activeIndex);
-  }, []);
-
-  // ----------------------------------------------------------------------
-
-  return (
-    <div className={className}>
-      <TabCarousel02 ref={ref_carousel} control={control_tabCarousel} />
-      <DateCollapse className={classNames('m-auto mt-1')} control={control_dateCollapse} />
-    </div>
-  );
-};
 
 const MonthVendorPanel = ({
   //
@@ -644,48 +509,8 @@ function generateMonthsSinceNow(): { [key: `${number}`]: number[] } {
   return result;
 }
 
-const getPaymentDateList = (paymentArr: ToutsourcingPaymentDto[]) => {
-  const result: {
-    [year: string]: {
-      [month: string]: { id: string } | undefined;
-    };
-  } = {};
-
-  paymentArr.forEach((payment) => {
-    const date = moment(payment.date);
-
-    const year = date.year().toString();
-    const month = (date.month() + 1).toString();
-
-    if (!result[year]) {
-      result[year] = {
-        '1': undefined,
-        '2': undefined,
-        '3': undefined,
-        '4': undefined,
-        '5': undefined,
-        '6': undefined,
-        '7': undefined,
-        '8': undefined,
-        '9': undefined,
-        '10': undefined,
-        '11': undefined,
-        '12': undefined,
-      };
-    }
-
-    result[year][month] = { id: payment.id };
-  });
-
-  return result;
-}; // getPaymentDateList
-
 //
 //
 //
 //
-export {
-  VendorMonthPanel,
-  //
-  generateMonthsSinceNow,
-};
+export { generateMonthsSinceNow };
