@@ -226,7 +226,7 @@ const config: Tconfig = {
   itemNumber: {
     label: '編號',
     style: {
-      width: 180,
+      width: 170,
       justifyContent: 'flex-start',
     },
     className: scss.itemNumber,
@@ -235,7 +235,7 @@ const config: Tconfig = {
   floor: {
     label: '樓層',
     style: {
-      width: 180,
+      width: 170,
       justifyContent: 'flex-start',
     },
     render: ({ floor }) => floor,
@@ -244,7 +244,7 @@ const config: Tconfig = {
   locationArea: {
     label: '區域',
     style: {
-      width: 180,
+      width: 170,
       justifyContent: 'flex-start',
     },
     className: scss.cellSpan,

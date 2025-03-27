@@ -1,8 +1,7 @@
-import { useRef, useEffect, forwardRef, useMemo, useState } from 'react';
+import { useRef, useEffect, forwardRef, useMemo, useState, createContext, useContext } from 'react';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import _, { size } from 'lodash';
 import moment from 'moment';
 
 // gear
@@ -10,20 +9,28 @@ import Row, { Cell } from 'components/global/gear/table/row';
 
 import scss from './exportPdfExcel.module.scss';
 
-import type { Titem, Tkeys, Tconfig } from './index';
-import { config, acceCheckLookup, keyArr } from './index';
+import type { Titem } from './index';
+import { config, keyArr } from './index';
 
 import { dlPdf, getA4Rect } from 'js/utils/dlPdf';
 
-// ============================================================================
-
 import ExcelJs, { Column } from 'exceljs';
-import { fontStyle } from 'html2canvas/dist/types/css/property-descriptors/font-style';
 
 // ============================================================================
+type Tcontext = { projectName: string };
+
 type TrowData = Titem & {
   element?: HTMLDivElement | null;
 };
+
+type TcolumnConfig = {
+  outline: Partial<Column>;
+  getValue: (data: Titem) => string | number;
+};
+
+// ============================================================================
+
+const Context = createContext<Tcontext>({ projectName: '' });
 
 // ============================================================================
 
@@ -33,6 +40,9 @@ const theadHeight = 45.14;
 const tbodyHeight = new Decimal(pageStyle.height).sub(titleHeight).sub(theadHeight);
 
 // ============================================================================
+
+// MARK: START
+
 export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Titem[]; projectName: string }) {
   const [rowDataArr, setRowDataArr] = useState<TrowData[]>([]);
 
@@ -95,101 +105,113 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
     setRowDataArr(arr);
   }, [itemArr]);
 
+  // MARK: RENDER
   return (
-    <div className={scss.container}>
-      <div className={scss.panel}>
-        <SquareBtn content="export" sharp="long" onClick={hanlder_dlPdf}>
-          PDF
-        </SquareBtn>
-        <SquareBtn
-          content="export"
-          sharp="long"
-          onClick={() => {
-            dlExcel({
-              itemArr,
-              projectName,
-            });
-          }}
-        >
-          Excel
-        </SquareBtn>
-      </div>
-      {/*  */}
-      <div className={scss.pageContainer}>
-        <Page isTemp={true}>
-          {itemArr.map((item, index) => {
-            return (
-              <Row
-                ref={(ele) => {
-                  ref_rowArr.current[index] = ele;
-                }}
-                key={index}
-                className={scss.row}
-                gap={false}
-                fullWidth={true}
-              >
-                {keyArr.map((key) => {
-                  const { style, className, render } = config[key];
+    <Context.Provider value={{ projectName }}>
+      <div className={scss.container}>
+        <div className={scss.panel}>
+          <SquareBtn content="export" sharp="long" onClick={hanlder_dlPdf}>
+            PDF
+          </SquareBtn>
+          <SquareBtn
+            content="export"
+            sharp="long"
+            onClick={() => {
+              dlExcel({
+                itemArr,
+                projectName,
+              });
+            }}
+          >
+            Excel
+          </SquareBtn>
+        </div>
+        {/*  */}
+        <div className={scss.pageContainer}>
+          <Page isTemp={true}>
+            {itemArr.map((item, index) => {
+              return (
+                <Row
+                  ref={(ele) => {
+                    ref_rowArr.current[index] = ele;
+                  }}
+                  key={index}
+                  className={scss.row}
+                  gap={false}
+                  fullWidth={true}
+                >
+                  {keyArr.map((key) => {
+                    const { style, className, render } = config[key];
 
+                    return (
+                      <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
+                        {render(item)}
+                      </Cell>
+                    );
+                  })}
+                </Row>
+              );
+            })}
+          </Page>
+
+          {pageArr.map((itemArr, index) => {
+            return (
+              <Page
+                key={index}
+                ref={(ele) => {
+                  ref_pageArr.current[index] = ele;
+                }}
+                className="mt-10"
+                page={index + 1}
+                totalPage={pageArr.length}
+              >
+                {itemArr.map((item, index) => {
                   return (
-                    <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
-                      {render(item)}
-                    </Cell>
+                    <Row
+                      ref={(ele) => {
+                        ref_rowArr.current[index] = ele;
+                      }}
+                      key={index}
+                      className={scss.row}
+                      gap={false}
+                    >
+                      {keyArr.map((key) => {
+                        const { style, className, render } = config[key];
+
+                        return (
+                          <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
+                            {render(item)}
+                          </Cell>
+                        );
+                      })}
+                    </Row>
                   );
                 })}
-              </Row>
+              </Page>
             );
           })}
-        </Page>
-
-        {pageArr.map((itemArr, index) => {
-          return (
-            <Page
-              key={index}
-              ref={(ele) => {
-                ref_pageArr.current[index] = ele;
-              }}
-              className="mt-10"
-              page={index + 1}
-              totalPage={pageArr.length}
-            >
-              {itemArr.map((item, index) => {
-                return (
-                  <Row
-                    ref={(ele) => {
-                      ref_rowArr.current[index] = ele;
-                    }}
-                    key={index}
-                    className={scss.row}
-                    gap={false}
-                  >
-                    {keyArr.map((key) => {
-                      const { style, className, render } = config[key];
-
-                      return (
-                        <Cell key={key} style={style} className={classNames(scss.cell, scss.plus, className)}>
-                          {render(item)}
-                        </Cell>
-                      );
-                    })}
-                  </Row>
-                );
-              })}
-            </Page>
-          );
-        })}
+        </div>
+        {/*  */}
       </div>
-      {/*  */}
-    </div>
+    </Context.Provider>
   );
 }
 
+// MARK: END
+
+// ============================================================================
+// ============================================================================
+// ============================================================================
 // ============================================================================
 
+// MARK: COMPONENT
+
 const Title = ({ page, totalPage }: { page: React.ReactNode; totalPage: React.ReactNode }) => {
+  const { projectName } = useContext(Context);
+
   return (
     <div className={scss.title} style={{ height: titleHeight }}>
-      <h1>送電備品列表</h1>
+      <h1>{projectName} 送電備品列表</h1>
       <span>
         {page} / {totalPage} 頁
       </span>
@@ -246,11 +268,6 @@ const Page = forwardRef(Page_);
 // ============================================================================
 // ============================================================================
 
-type TcolumnConfig = {
-  outline: Partial<Column>;
-  getValue: (data: Titem) => string | number;
-};
-
 // MARK:dlExcel
 const dlExcel = async ({ itemArr, projectName }: { itemArr: Titem[]; projectName: string }) => {
   const workbook = new ExcelJs.Workbook();
@@ -305,6 +322,8 @@ const dlExcel = async ({ itemArr, projectName }: { itemArr: Titem[]; projectName
 
   //
 }; // dlExcel close
+
+// region excel config
 
 const c_itemName: TcolumnConfig = {
   outline: {
@@ -507,3 +526,5 @@ const columnsLookup: Record<(typeof keyArr)[number], TcolumnConfig> = {
   // 沒用到
   bounceDoor: c_bounceDoor,
 };
+
+// endregion
