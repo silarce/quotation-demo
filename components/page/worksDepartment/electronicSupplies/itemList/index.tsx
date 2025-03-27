@@ -392,6 +392,7 @@ const keyArr: Tkeys[] = [
   'motorVoltage',
   'horsepower',
   'antiTyphoonBaseLock',
+
   'obstacleSensor',
   'infrared',
   'remoteControl',

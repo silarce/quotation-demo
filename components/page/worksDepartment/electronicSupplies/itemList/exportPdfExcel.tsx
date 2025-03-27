@@ -10,14 +10,14 @@ import Row, { Cell } from 'components/global/gear/table/row';
 import scss from './exportPdfExcel.module.scss';
 
 import type { Titem } from './index';
-import { config, keyArr } from './index';
+import { config, keyArr as _keyArr } from './index';
 
 import { dlPdf, getA4Rect } from 'js/utils/dlPdf';
 
 import ExcelJs, { Column } from 'exceljs';
 
 // ============================================================================
-type Tcontext = { projectName: string };
+type Tcontext = { projectName: string; extractedKeyArr: typeof _keyArr };
 
 type TrowData = Titem & {
   element?: HTMLDivElement | null;
@@ -30,7 +30,7 @@ type TcolumnConfig = {
 
 // ============================================================================
 
-const Context = createContext<Tcontext>({ projectName: '' });
+const Context = createContext<Tcontext>({ projectName: '', extractedKeyArr: [] });
 
 // ============================================================================
 
@@ -48,6 +48,8 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
 
   const ref_rowArr = useRef<(HTMLDivElement | null)[]>([]);
   const ref_pageArr = useRef<(HTMLDivElement | null)[]>([]);
+
+  const extractedKeyArr = useKeyArr(itemArr);
 
   const pageArr = useMemo(() => {
     if (!ref_rowArr.current.length) {
@@ -104,6 +106,7 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
     dlExcel({
       itemArr,
       projectName,
+      extractedKeyArr,
     });
   };
 
@@ -120,7 +123,7 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
 
   // MARK: RENDER
   return (
-    <Context.Provider value={{ projectName }}>
+    <Context.Provider value={{ projectName, extractedKeyArr }}>
       <div className={scss.container}>
         <div className={scss.panel}>
           <SquareBtn content="export" sharp="long" onClick={hanlder_dlPdf}>
@@ -144,7 +147,7 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
                   gap={false}
                   fullWidth={true}
                 >
-                  {keyArr.map((key) => {
+                  {extractedKeyArr.map((key) => {
                     const { style, className, render } = config[key];
 
                     return (
@@ -179,7 +182,7 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
                       className={scss.row}
                       gap={false}
                     >
-                      {keyArr.map((key) => {
+                      {extractedKeyArr.map((key) => {
                         const { style, className, render } = config[key];
 
                         return (
@@ -239,13 +242,15 @@ const Page_ = (
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
+  const { extractedKeyArr } = useContext(Context);
+
   return (
     <div className={classNames(scss.pageWrapper, isTemp && scss.tempPage, className)}>
       <div ref={ref} style={pageStyle} className={classNames(scss.page)}>
         <Title page={page} totalPage={totalPage} />
         <div className={scss.table}>
           <Row className={scss.thead} style={{ height: theadHeight }} thead={true} gap={false}>
-            {keyArr.map((key) => {
+            {extractedKeyArr.map((key) => {
               const { label, style, className } = config[key];
 
               return (
@@ -273,7 +278,16 @@ const Page = forwardRef(Page_);
 // ============================================================================
 
 // MARK:dlExcel
-const dlExcel = async ({ itemArr, projectName }: { itemArr: Titem[]; projectName: string }) => {
+const dlExcel = async ({
+  //
+  itemArr,
+  projectName,
+  extractedKeyArr,
+}: {
+  itemArr: Titem[];
+  projectName: string;
+  extractedKeyArr: typeof _keyArr;
+}) => {
   const workbook = new ExcelJs.Workbook();
 
   const sheetName = '送電備品列表';
@@ -289,9 +303,9 @@ const dlExcel = async ({ itemArr, projectName }: { itemArr: Titem[]; projectName
     },
   });
 
-  sheet.columns = keyArr.map((key) => columnsLookup[key].outline);
+  sheet.columns = extractedKeyArr.map((key) => columnsLookup[key].outline);
 
-  keyArr.forEach((key) => {
+  extractedKeyArr.forEach((key) => {
     const { alignment } = columnsLookup[key].outline;
     // 在上面建立column時，送alignment進去沒有用，所以要在這邊再設定一次
     const column = sheet.getColumn(key);
@@ -300,11 +314,11 @@ const dlExcel = async ({ itemArr, projectName }: { itemArr: Titem[]; projectName
 
   sheet.addRow([projectName]).getCell('A').font = { bold: true, size: 20 };
 
-  const labelArr = keyArr.map((key) => config[key].label);
+  const labelArr = extractedKeyArr.map((key) => config[key].label);
   sheet.addRow(labelArr);
 
   itemArr.forEach((item) => {
-    const rowValueArr = keyArr.map((key) => columnsLookup[key].getValue(item));
+    const rowValueArr = extractedKeyArr.map((key) => columnsLookup[key].getValue(item));
     sheet.addRow(rowValueArr);
   });
 
@@ -507,7 +521,7 @@ const c_bounceDoor: TcolumnConfig = {
   getValue: (data) => (data.bounceDoor && 'V') || '',
 };
 
-const columnsLookup: Record<(typeof keyArr)[number], TcolumnConfig> = {
+const columnsLookup: Record<(typeof _keyArr)[number], TcolumnConfig> = {
   itemName: c_itemName,
   floor: c_floor,
   locationArea: c_locationArea,
@@ -532,3 +546,43 @@ const columnsLookup: Record<(typeof keyArr)[number], TcolumnConfig> = {
 };
 
 // endregion
+
+const useKeyArr = (itemArr: Titem[]) => {
+  return useMemo(() => {
+    const dict: {
+      [key in (typeof _keyArr)[number]]?: boolean;
+    } = {
+      antiTyphoonBaseLock: false,
+      obstacleSensor: false,
+      infrared: false,
+      remoteControl: false,
+      smartSwitch: false,
+      antiTyphoonColumn: false,
+      ul: false,
+      wheel: false,
+    };
+
+    itemArr.forEach((item) => {
+      !!item.antiTyphoonBaseLock && (dict.antiTyphoonBaseLock = true);
+      !!item.obstacleSensor && (dict.obstacleSensor = true);
+      !!item.infrared && (dict.infrared = true);
+      !!item.remoteControl && (dict.remoteControl = true);
+      !!item.smartSwitch && (dict.smartSwitch = true);
+      !!item.antiTyphoonColumn && (dict.antiTyphoonColumn = true);
+      !!item.ul && (dict.ul = true);
+      !!item.wheel && (dict.wheel = true);
+    });
+
+    const arr = [..._keyArr];
+
+    Object.entries(dict).forEach(([_key, bool]) => {
+      const key = _key as (typeof _keyArr)[number];
+
+      if (!bool) {
+        arr.splice(arr.indexOf(key), 1);
+      }
+    });
+
+    return arr;
+  }, [itemArr]);
+};
