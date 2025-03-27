@@ -88,13 +88,26 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
     return pageArr;
   }, [rowDataArr]);
 
+  // -------------------------------------------------------
+
   const hanlder_dlPdf = () => {
+    const today = moment().format('yyyy-MM-DD');
+
     dlPdf({
       divElementArr: ref_pageArr.current,
-      fileName: '送電備品列表',
+      fileName: `${'送電備品列表'}_${projectName}_${today}`,
       horizontal: true,
     });
   };
+
+  const handler_dlExcel = () => {
+    dlExcel({
+      itemArr,
+      projectName,
+    });
+  };
+
+  // -------------------------------------------------------
 
   useEffect(() => {
     const arr = itemArr.map((item, index) => ({
@@ -113,16 +126,7 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
           <SquareBtn content="export" sharp="long" onClick={hanlder_dlPdf}>
             PDF
           </SquareBtn>
-          <SquareBtn
-            content="export"
-            sharp="long"
-            onClick={() => {
-              dlExcel({
-                itemArr,
-                projectName,
-              });
-            }}
-          >
+          <SquareBtn content="export" sharp="long" onClick={handler_dlExcel}>
             Excel
           </SquareBtn>
         </div>
