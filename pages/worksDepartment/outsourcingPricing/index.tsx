@@ -1,28 +1,12 @@
-// 這裡一系列的介面切換
-// 其實都是同一個資料來源，不同的呈現方式
+import { useState, useEffect } from 'react';
 
-// 每個外包廠商每個月只會有一張外包計價單
-
-// UX改善
-// 關於tabBar，被選中者置中應該會比較好，方便使用者點擊上一個被選中者
-
-import { useState, useEffect, useMemo, useRef } from 'react';
-import moment from 'moment';
 import classNames from 'classnames';
-import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TtagList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
-import Table01, { Ttable } from 'components/global/gear/table/table01';
-import DateCollapse, { Tcontrol_dateCollapse } from 'components/page/worksDepartment/outsourcingPricing/dateCollapse';
-import TabCarousel02, {
-  Tcontrol_tabCarousel,
-  TimperativeHandle,
-} from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
 import VendorMonthPanel from 'components/page/worksDepartment/outsourcingPricing/vendorMonthPanel';
 import OutsourcingList from 'components/page/worksDepartment/outsourcingPricing/outsourcingList';
 import DateList from 'components/page/worksDepartment/outsourcingPricing/dateList';
@@ -32,10 +16,7 @@ import MonthVendorPanel from 'components/page/worksDepartment/outsourcingPricing
 import scss from './index.module.scss';
 
 // api
-import { Tparams, ToutsourcingDto, useGetOutsourcing, useGetOutsourcingPayment } from 'js/api/api_outsourcing';
-
-// utils
-import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers/date/calcDate';
+import { Tparams, useGetOutsourcing } from 'js/api/api_outsourcing';
 
 // ========================================================
 type TfilterBy = 'vendor' | 'month';
