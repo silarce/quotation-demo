@@ -24,6 +24,8 @@ import TabCarousel02, {
   TimperativeHandle,
 } from 'components/page/worksDepartment/outsourcingPricing/tabCarousel02';
 import VendorMonthPanel from 'components/page/worksDepartment/outsourcingPricing/vendorMonthPanel';
+import OutsourcingList from 'components/page/worksDepartment/outsourcingPricing/outsourcingList';
+import DateList from 'components/page/worksDepartment/outsourcingPricing/dateList';
 
 // css
 import scss from './index.module.scss';
@@ -36,6 +38,14 @@ import { getAllMonthByRange, getAllyearMonthListByRange } from 'js/utils/helpers
 
 // ========================================================
 type TfilterBy = 'vendor' | 'month';
+
+type TcellConfig = {
+  [key: string]: {
+    label: string;
+    width?: React.CSSProperties['width'];
+    flex?: React.CSSProperties['flex'];
+  };
+};
 
 // ========================================================
 
@@ -151,142 +161,6 @@ export default function OutsourcingPricing() {
 // ====================================================================
 // ====================================================================
 // ====================================================================
-
-const OutsourcingList = ({
-  className,
-  outsourcingArr,
-  onRowClick,
-  viewRef_bottom,
-}: {
-  className?: string;
-  outsourcingArr: ToutsourcingDto[];
-  onRowClick: (outsourcingId: string) => void;
-  viewRef_bottom: (node?: Element | null | undefined) => void;
-}) => {
-  //
-  const thead: Ttable['thead'] = {
-    stickyTop: {
-      top: '40px',
-    },
-    rowProps: {
-      minHeight: tableConfig.row.minHeight,
-    },
-    cellArr: [
-      {
-        children: cellCofig.vendor.label,
-        width: cellCofig.vendor.width,
-      },
-      {
-        children: cellCofig.phoneNumber.label,
-        width: cellCofig.phoneNumber.width,
-        // flex: cellCofig.phoneNumber.flex,
-      },
-    ],
-  };
-
-  const rowArr: Ttable['tbody']['rowArr'] = useMemo(() => {
-    return outsourcingArr.map((data, index) => {
-      const viewRef = index === outsourcingArr.length - 5 ? viewRef_bottom : undefined;
-
-      return {
-        minHeight: tableConfig.row.minHeight,
-        onClick: () => {
-          onRowClick(data.id);
-        },
-        viewRef,
-        cellArr: [
-          {
-            children: data.name,
-            width: cellCofig.vendor.width,
-          },
-          {
-            children: data.contactNumber,
-            width: cellCofig.phoneNumber.width,
-          },
-        ],
-      };
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outsourcingArr]);
-
-  const control_table: Ttable = {
-    thead: thead,
-    tbody: {
-      rowArr,
-    },
-    haveBorder: false,
-  };
-
-  return (
-    <Wrapper_tab
-      className={classNames(className)}
-      // className={classNames('m-auto mb-5', !isShowVendorList && 'hidden')}
-      childrenOption={{
-        noBorderTop: true,
-      }}
-      stickyTop={{
-        top: 40,
-      }}
-    >
-      <Table01 {...control_table} />
-    </Wrapper_tab>
-  );
-};
-//--------------------------------------------------------
-
-const DateList = ({ className, onCardClick }: { className?: string; onCardClick: (dateString: string) => void }) => {
-  const params: Tparams = {
-    sort: 'date',
-    order: 'ASC',
-    // pageSize: 999999,
-  };
-
-  // 只是為了取得最早的日期，並從該日期開始
-  const { dataArr, reset } = useGetOutsourcingPayment({ customParams: params });
-  // console.log(dataArr);
-
-  const oldestDate = dataArr[0]?.date;
-
-  useEffect(() => {
-    reset();
-  }, []);
-
-  // ----------------------------------------------------------------------
-  // 產生的年月表會包括沒有資料的年月，這是符合預期的
-  // 另外預期每個月都會有資料，在正式環境應該是不會有點下去沒資料的情況
-  const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
-    const yearMonthList = getAllyearMonthListByRange({
-      start: oldestDate,
-      end: new Date().toISOString(),
-    });
-
-    let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthArr]) => {
-      const twYear = String(Number(year) - 1911);
-
-      const cardList = monthArr.map((month) => {
-        return {
-          label: `${month}月`,
-          onClick: () => {
-            onCardClick(`${year}-${month}`);
-          },
-        };
-      });
-
-      return {
-        label: twYear,
-        cardArr: cardList,
-      };
-    });
-
-    panelArr = panelArr.reverse();
-
-    return {
-      panelArr,
-    };
-  }, [oldestDate]);
-
-  return <DateCollapse className={classNames(className)} control={control_dateCollapse} />;
-};
 
 // ====================================================================
 
@@ -460,23 +334,7 @@ const MonthVendorPanel = ({
 // ====================================================================
 // ====================================================================
 
-// function generateRandomDate(): string {
-//   const start = moment().year(2022).startOf('year');
-//   const end = moment().year(2024).endOf('year');
-//   const randomDate = start.add(Math.random() * end.diff(start));
-
-//   return randomDate.toISOString();
-// }
-
 // ====================================================================
-
-type TcellConfig = {
-  [key: string]: {
-    label: string;
-    width?: React.CSSProperties['width'];
-    flex?: React.CSSProperties['flex'];
-  };
-};
 
 const tableConfig = {
   row: {
@@ -514,3 +372,7 @@ function generateMonthsSinceNow(): { [key: `${number}`]: number[] } {
 //
 //
 export { generateMonthsSinceNow };
+
+export type { TcellConfig };
+
+export { tableConfig, cellCofig };
