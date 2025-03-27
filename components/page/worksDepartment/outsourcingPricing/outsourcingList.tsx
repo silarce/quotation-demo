@@ -1,14 +1,11 @@
-import { useMemo } from 'react';
 import classNames from 'classnames';
 
-import Table01, { Ttable } from 'components/global/gear/table/table01';
-import Wrapper_tab from 'components/global/gear/wrapper_tab/wrapper_tab01';
+import Row, { Cell } from 'components/global/gear/table/row';
 
 import type { ToutsourcingDto } from 'js/api/dtoTypes';
 
-import { tableConfig, cellCofig } from 'pages/worksDepartment/outsourcingPricing';
-
-// ===============================================================
+import { cellCofig } from 'pages/worksDepartment/outsourcingPricing';
+import scss from './outsourcingList.module.scss';
 
 // ===============================================================
 const OutsourcingList = ({
@@ -23,72 +20,44 @@ const OutsourcingList = ({
   viewRef_bottom: (node?: Element | null | undefined) => void;
 }) => {
   //
-  const thead: Ttable['thead'] = {
-    stickyTop: {
-      top: '40px',
-    },
-    rowProps: {
-      minHeight: tableConfig.row.minHeight,
-    },
-    cellArr: [
-      {
-        children: cellCofig.vendor.label,
-        width: cellCofig.vendor.width,
-      },
-      {
-        children: cellCofig.phoneNumber.label,
-        width: cellCofig.phoneNumber.width,
-        // flex: cellCofig.phoneNumber.flex,
-      },
-    ],
+
+  const style_vendor = {
+    width: cellCofig.vendor.width,
+    flex: cellCofig.vendor.flex,
   };
 
-  const rowArr: Ttable['tbody']['rowArr'] = useMemo(() => {
-    return outsourcingArr.map((data, index) => {
-      const viewRef = index === outsourcingArr.length - 5 ? viewRef_bottom : undefined;
-
-      return {
-        minHeight: tableConfig.row.minHeight,
-        onClick: () => {
-          onRowClick(data.id);
-        },
-        viewRef,
-        cellArr: [
-          {
-            children: data.name,
-            width: cellCofig.vendor.width,
-          },
-          {
-            children: data.contactNumber,
-            width: cellCofig.phoneNumber.width,
-          },
-        ],
-      };
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [outsourcingArr]);
-
-  const control_table: Ttable = {
-    thead: thead,
-    tbody: {
-      rowArr,
-    },
-    haveBorder: false,
+  const style_phoneNumber = {
+    width: cellCofig.phoneNumber.width,
+    flex: cellCofig.phoneNumber.flex,
   };
 
   return (
-    <Wrapper_tab
-      className={classNames(className)}
-      // className={classNames('m-auto mb-5', !isShowVendorList && 'hidden')}
-      childrenOption={{
-        noBorderTop: true,
-      }}
-      stickyTop={{
-        top: 40,
-      }}
-    >
-      <Table01 {...control_table} />
-    </Wrapper_tab>
+    <div className={classNames(scss.table, className)}>
+      <Row thead={true} fullWidth={true} className={scss.thead}>
+        <Cell style={style_vendor}>{cellCofig.vendor.label}</Cell>
+        <Cell style={style_phoneNumber}>{cellCofig.phoneNumber.label}</Cell>
+      </Row>
+      {outsourcingArr.map(({ id, name, contactNumber }, index) => {
+        const viewRef = index === outsourcingArr.length - 5 ? viewRef_bottom : undefined;
+
+        return (
+          <Row
+            key={id}
+            ref={viewRef}
+            className="hover:bg-hoverBgc cursor-pointer"
+            fullWidth={true}
+            onClick={() => {
+              onRowClick(id);
+            }}
+          >
+            <Cell style={style_vendor} className="border-r-[1px] border-border">
+              {name}
+            </Cell>
+            <Cell style={style_phoneNumber}>{contactNumber}</Cell>
+          </Row>
+        );
+      })}
+    </div>
   );
 };
 
