@@ -2,6 +2,13 @@
   margin: 40px;
 }
 
+
+.inValid {
+  background-color: theme("colors.warning") !important;
+}
+
+
+// =======================
 .profile {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -11,8 +18,4 @@
 
 .select {
   z-index: 3;
-}
-
-.inValid {
-  background-color: theme("colors.warning") !important;
 }

@@ -13,6 +13,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 // components
 import Table01, { CellInput, CellSelect } from 'components/global/gear/table/table01';
 import type { Tcell, TcellArr, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import Profile from 'components/page/worksDepartment/outsourcingPricing/detail/profile';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -347,107 +348,14 @@ export default function OutsourcingPricingDetail() {
       <PageHeader02 tag="外包計價單明細" panelList={panelList} />
       <div className={scss.main}>
         {/*  */}
-        <div className={scss.profile}>
-          <InputSel caption={'外包廠商'} showBaseline="invisible" node={outsourcing?.name} />
-          <InputSel
-            caption={'工程編號'}
-            disabled={isAllowEditProfile ? disabled : true}
-            showBaseline="auto"
-            inputProps={{
-              props: {
-                placeholder: '',
-                value: state_profile.projectNumber,
-                onChange: (e) => {
-                  setState_profile((prev) => ({ ...prev, projectNumber: e.target.value }));
-                },
-              },
-            }}
-          />
-          <InputSel
-            caption={'工程日期'}
-            disabled={isAllowEditProfile ? disabled : true}
-            showBaseline="auto"
-            datePickerProps={{
-              props: {
-                value: state_profile.projectDate,
-                onChange: (date) => {
-                  setState_profile((prev) => ({ ...prev, projectDate: date }));
-                },
-              },
-            }}
-          />
-          <InputSel caption={'安裝人員'} showBaseline="invisible" node={outsourcing?.name} />
-          <InputSel
-            caption={'工程名稱'}
-            className="col-span-2"
-            disabled={isAllowEditProfile ? disabled : true}
-            showBaseline="auto"
-            inputProps={{
-              props: {
-                placeholder: '',
-                value: state_profile.projectName,
-                onChange: (e) => {
-                  setState_profile((prev) => ({ ...prev, projectName: e.target.value }));
-                },
-              },
-            }}
-          />
-          <AddressBar
-            inputSelProps={{
-              caption: '工程地址',
-              className: 'col-span-2',
-              disabled: isAllowEditProfile ? disabled : true,
-              showBaseline: 'auto',
-            }}
-            addressProps={{
-              county: {
-                wrapperClassName: scss.select,
-                props: {
-                  menuPortalTarget: undefined,
-                  placeholder: '',
-                  isDisabled: isAllowEditProfile ? disabled : true,
-                  value: { value: state_profile.county, label: state_profile.county },
-                  onChange: (option) => {
-                    const value = option?.value ?? '';
 
-                    setState_profile((prev) => ({
-                      ...prev,
-                      county: value,
-                      district: '',
-                    }));
-                  },
-                },
-              },
-              district: {
-                wrapperClassName: scss.select,
-                props: {
-                  menuPortalTarget: undefined,
-                  placeholder: '',
-                  isDisabled: isAllowEditProfile ? disabled : true,
-                  value: { value: state_profile.district, label: state_profile.district },
-                  onChange: (option) => {
-                    const value = option?.value ?? '';
-
-                    setState_profile((prev) => ({
-                      ...prev,
-                      district: value,
-                    }));
-                  },
-                },
-              },
-              address: {
-                props: {
-                  placeholder: '',
-                  readOnly: isAllowEditProfile ? disabled : true,
-                  value: state_profile.address,
-                  onChange: (e) => {
-                    setState_profile((prev) => ({ ...prev, address: e.target.value }));
-                  },
-                },
-              },
-            }}
-          />
-        </div>
+        <Profile
+          isAllowEditProfile={isAllowEditProfile}
+          outsourcingName={outsourcing?.name ?? ''}
+          disabled={disabled}
+          state={state_profile}
+          setState={setState_profile}
+        />
         {/*  */}
 
         <div className="mt-10">
