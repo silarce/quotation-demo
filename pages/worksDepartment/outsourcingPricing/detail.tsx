@@ -20,6 +20,7 @@ import type {
 } from 'components/global/gear/table/table01';
 import Profile from 'components/page/worksDepartment/outsourcingPricing/detail/profile';
 import InstallItem from 'components/page/worksDepartment/outsourcingPricing/detail/installItem';
+import OtherWorkItem from 'components/page/worksDepartment/outsourcingPricing/detail/otherWorkItem';
 
 // gear
 // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -302,13 +303,13 @@ export default function OutsourcingPricingDetail() {
   //   isNew,
   // });
 
-  const { control_otherWorkItem } = useTable_otherWorkItem({
-    state_otherWorkItemArr,
-    options_installItem,
-    createEditState_otherWorkItem,
-    deleteOtherWorkItem,
-    disabled,
-  });
+  // const { control_otherWorkItem } = useTable_otherWorkItem({
+  //   state_otherWorkItemArr,
+  //   options_installItem,
+  //   createEditState_otherWorkItem,
+  //   deleteOtherWorkItem,
+  //   disabled,
+  // });
 
   const control_detailTotal = useTable_total({
     detailTotal: state_outsourcingTotal,
@@ -409,7 +410,8 @@ export default function OutsourcingPricingDetail() {
               !disabled && addOtherWorkItem();
             }}
           />
-          <Table01 {...control_otherWorkItem} />
+          {/* <Table01 {...control_otherWorkItem} /> */}
+          <OtherWorkItem className={'w-[1100px]'} api_useDetail={api_useDetail} disabled={disabled} />
         </div>
         <Table01 className="mt-20" {...control_detailTotal} />
         {/*  */}
@@ -627,6 +629,7 @@ const useDetail = ({
 
     options_installItem,
     total_installItem,
+    total_otherWorkItem,
 
     createEditState_installItem,
     createEditState_otherWorkItem,
@@ -1115,203 +1118,203 @@ const useDetail_default = ({
 // };
 
 // MARK:useTable_otherWorkItem
-const useTable_otherWorkItem = ({
-  state_otherWorkItemArr,
-  options_installItem,
-  createEditState_otherWorkItem,
-  deleteOtherWorkItem,
-  disabled,
-}: {
-  state_otherWorkItemArr: Tstate_otherWorkItemArr;
-  options_installItem: Toption[];
-  createEditState_otherWorkItem: TcreateSetState_otherWorkItem;
-  deleteOtherWorkItem: (index: number) => void;
-  disabled: boolean;
-}) => {
-  const { control_otherWorkItem, subTotal_otherWorkItem } = useMemo(() => {
-    const thead: Ttable['thead'] = {
-      cellArr: [
-        {
-          children: config_useTable02.btn.label,
-          ...config_useTable02.btn,
-        },
-        {
-          children: config_useTable02.floorNumber.label,
-          ...config_useTable02.floorNumber,
-        },
-        {
-          children: config_useTable02.workContent.label,
-          ...config_useTable02.workContent,
-        },
-        {
-          children: config_useTable02.qty.label,
-          ...config_useTable02.qty,
-        },
-        {
-          children: config_useTable02.unitPrice.label,
-          ...config_useTable02.unitPrice,
-        },
-        {
-          children: config_useTable02.dualPrice.label,
-          ...config_useTable02.dualPrice,
-        },
-      ],
-    };
+// const useTable_otherWorkItem = ({
+//   state_otherWorkItemArr,
+//   options_installItem,
+//   createEditState_otherWorkItem,
+//   deleteOtherWorkItem,
+//   disabled,
+// }: {
+//   state_otherWorkItemArr: Tstate_otherWorkItemArr;
+//   options_installItem: Toption[];
+//   createEditState_otherWorkItem: TcreateSetState_otherWorkItem;
+//   deleteOtherWorkItem: (index: number) => void;
+//   disabled: boolean;
+// }) => {
+//   const { control_otherWorkItem, subTotal_otherWorkItem } = useMemo(() => {
+//     const thead: Ttable['thead'] = {
+//       cellArr: [
+//         {
+//           children: config_useTable02.btn.label,
+//           ...config_useTable02.btn,
+//         },
+//         {
+//           children: config_useTable02.floorNumber.label,
+//           ...config_useTable02.floorNumber,
+//         },
+//         {
+//           children: config_useTable02.workContent.label,
+//           ...config_useTable02.workContent,
+//         },
+//         {
+//           children: config_useTable02.qty.label,
+//           ...config_useTable02.qty,
+//         },
+//         {
+//           children: config_useTable02.unitPrice.label,
+//           ...config_useTable02.unitPrice,
+//         },
+//         {
+//           children: config_useTable02.dualPrice.label,
+//           ...config_useTable02.dualPrice,
+//         },
+//       ],
+//     };
 
-    let decimal_subTotal = new Decimal(0);
+//     let decimal_subTotal = new Decimal(0);
 
-    const rowArr: Ttable['tbody']['rowArr'] = state_otherWorkItemArr.map((item, index) => {
-      const {
-        //
-        installItemKey,
-        // floorNumber,
-        content,
-        quantity,
-        unitPrice,
-        totalPrice,
-      } = item;
+//     const rowArr: Ttable['tbody']['rowArr'] = state_otherWorkItemArr.map((item, index) => {
+//       const {
+//         //
+//         installItemKey,
+//         // floorNumber,
+//         content,
+//         quantity,
+//         unitPrice,
+//         totalPrice,
+//       } = item;
 
-      const setState_otherWorkItem = createEditState_otherWorkItem(index);
+//       const setState_otherWorkItem = createEditState_otherWorkItem(index);
 
-      decimal_subTotal = decimal_subTotal.add(totalPrice);
+//       decimal_subTotal = decimal_subTotal.add(totalPrice);
 
-      const cellArr: Tcell[] = [
-        {
-          children: (
-            <IconDelete01 onClick={() => deleteOtherWorkItem(index)} className={classNames(disabled && 'invisible')} />
-          ),
-          ...config_useTable02.btn,
-        },
-        {
-          children: (
-            <CellSelect
-              //
-              disabled={disabled}
-              style={{ width: config_useTable02.floorNumber.style?.width }}
-              selectProps={{
-                value: installItemKey,
-                placeholder: '',
-                options: options_installItem,
-                onChange: (_, option) => {
-                  const theOption = option as Toption;
+//       const cellArr: Tcell[] = [
+//         {
+//           children: (
+//             <IconDelete01 onClick={() => deleteOtherWorkItem(index)} className={classNames(disabled && 'invisible')} />
+//           ),
+//           ...config_useTable02.btn,
+//         },
+//         {
+//           children: (
+//             <CellSelect
+//               //
+//               disabled={disabled}
+//               style={{ width: config_useTable02.floorNumber.style?.width }}
+//               selectProps={{
+//                 value: installItemKey,
+//                 placeholder: '',
+//                 options: options_installItem,
+//                 onChange: (_, option) => {
+//                   const theOption = option as Toption;
 
-                  const { value, label, floorNumber } = theOption ?? {};
+//                   const { value, label, floorNumber } = theOption ?? {};
 
-                  setState_otherWorkItem((prev) => {
-                    const copy = { ...prev };
-                    copy.installItemKey = value;
-                    copy.floorNumber = floorNumber as string;
+//                   setState_otherWorkItem((prev) => {
+//                     const copy = { ...prev };
+//                     copy.installItemKey = value;
+//                     copy.floorNumber = floorNumber as string;
 
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.floorNumber,
-        },
-        {
-          children: (
-            <CellSelect
-              disabled={disabled}
-              style={{ width: config_useTable02.workContent.style?.width }}
-              selectProps={{
-                value: content,
-                placeholder: '工作內容...',
-                options: optionsCreator_otherWorkItems(),
-                onChange: (str) => {
-                  setState_otherWorkItem((prev) => ({ ...prev, content: str }));
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.workContent,
-        },
-        {
-          children: (
-            <CellInput
-              disabled={disabled}
-              style={{ width: config_useTable02.qty.style?.width }}
-              inputProps={{
-                type: 'number',
-                min: 0,
-                step: 0,
-                value: quantity,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  const value = e.target.value as `${number}`;
-                  setState_otherWorkItem((prev) => ({ ...prev, quantity: value }), { calcTotalPrice: true });
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.qty,
-        },
-        {
-          children: (
-            <CellInput
-              disabled={disabled}
-              style={{ width: config_useTable02.unitPrice.style?.width }}
-              inputProps={{
-                type: 'number',
-                min: 0,
-                step: 0,
-                value: unitPrice,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  const value = e.target.value as `${number}`;
-                  setState_otherWorkItem((prev) => ({ ...prev, unitPrice: value }), { calcTotalPrice: true });
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.unitPrice,
-        },
-        {
-          children: totalPrice,
-          ...config_useTable02.dualPrice,
-        },
-      ];
+//                     return copy;
+//                   });
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable02.floorNumber,
+//         },
+//         {
+//           children: (
+//             <CellSelect
+//               disabled={disabled}
+//               style={{ width: config_useTable02.workContent.style?.width }}
+//               selectProps={{
+//                 value: content,
+//                 placeholder: '工作內容...',
+//                 options: optionsCreator_otherWorkItems(),
+//                 onChange: (str) => {
+//                   setState_otherWorkItem((prev) => ({ ...prev, content: str }));
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable02.workContent,
+//         },
+//         {
+//           children: (
+//             <CellInput
+//               disabled={disabled}
+//               style={{ width: config_useTable02.qty.style?.width }}
+//               inputProps={{
+//                 type: 'number',
+//                 min: 0,
+//                 step: 0,
+//                 value: quantity,
+//                 onWheel: (e) => e.currentTarget.blur(),
+//                 onChange: (e) => {
+//                   const value = e.target.value as `${number}`;
+//                   setState_otherWorkItem((prev) => ({ ...prev, quantity: value }), { calcTotalPrice: true });
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable02.qty,
+//         },
+//         {
+//           children: (
+//             <CellInput
+//               disabled={disabled}
+//               style={{ width: config_useTable02.unitPrice.style?.width }}
+//               inputProps={{
+//                 type: 'number',
+//                 min: 0,
+//                 step: 0,
+//                 value: unitPrice,
+//                 onWheel: (e) => e.currentTarget.blur(),
+//                 onChange: (e) => {
+//                   const value = e.target.value as `${number}`;
+//                   setState_otherWorkItem((prev) => ({ ...prev, unitPrice: value }), { calcTotalPrice: true });
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable02.unitPrice,
+//         },
+//         {
+//           children: totalPrice,
+//           ...config_useTable02.dualPrice,
+//         },
+//       ];
 
-      return {
-        className: classNames(!installItemKey && scss.inValid),
-        cellArr,
-      };
-    });
+//       return {
+//         className: classNames(!installItemKey && scss.inValid),
+//         cellArr,
+//       };
+//     });
 
-    rowArr.push({
-      cellArr: [
-        {
-          children: '合計',
-          ...confit_public.left,
-        },
-        {
-          children: decimal_subTotal.toNumber().toLocaleString(),
-          ...confit_public.right,
-        },
-      ],
-    });
+//     rowArr.push({
+//       cellArr: [
+//         {
+//           children: '合計',
+//           ...confit_public.left,
+//         },
+//         {
+//           children: decimal_subTotal.toNumber().toLocaleString(),
+//           ...confit_public.right,
+//         },
+//       ],
+//     });
 
-    const tbody = {
-      rowArr,
-    };
+//     const tbody = {
+//       rowArr,
+//     };
 
-    const control_otherWorkItem = {
-      thead,
-      tbody,
-    };
+//     const control_otherWorkItem = {
+//       thead,
+//       tbody,
+//     };
 
-    return {
-      control_otherWorkItem,
-      subTotal_otherWorkItem: decimal_subTotal.toNumber(),
-    };
-  }, [state_otherWorkItemArr, disabled, options_installItem]); // useMemo
+//     return {
+//       control_otherWorkItem,
+//       subTotal_otherWorkItem: decimal_subTotal.toNumber(),
+//     };
+//   }, [state_otherWorkItemArr, disabled, options_installItem]); // useMemo
 
-  return {
-    control_otherWorkItem,
-    subTotal_otherWorkItem,
-  };
-};
+//   return {
+//     control_otherWorkItem,
+//     subTotal_otherWorkItem,
+//   };
+// };
 
 const useTable_total = ({ detailTotal }: { detailTotal: number }) => {
   const control_detailTotal: Ttable = useMemo(() => {
@@ -1430,51 +1433,51 @@ const confit_public: Tconfig = {
 //   },
 // };
 
-const config_useTable02: Tconfig = {
-  btn: {
-    label: '',
-    style: {
-      width: 40,
-      justifyContent: 'center',
-    },
-  },
-  floorNumber: {
-    label: '樓層編號',
-    style: {
-      width: 158,
-      justifyContent: 'center',
-    },
-  },
-  workContent: {
-    label: '工作內容',
-    style: {
-      flex: 'auto',
-      width: '418px',
-      justifyContent: 'center',
-    },
-  },
-  qty: {
-    label: '數量',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  unitPrice: {
-    label: '單價',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  dualPrice: {
-    label: '小計',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-};
+// const config_useTable02: Tconfig = {
+//   btn: {
+//     label: '',
+//     style: {
+//       width: 40,
+//       justifyContent: 'center',
+//     },
+//   },
+//   floorNumber: {
+//     label: '樓層編號',
+//     style: {
+//       width: 158,
+//       justifyContent: 'center',
+//     },
+//   },
+//   workContent: {
+//     label: '工作內容',
+//     style: {
+//       flex: 'auto',
+//       width: '418px',
+//       justifyContent: 'center',
+//     },
+//   },
+//   qty: {
+//     label: '數量',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+//   unitPrice: {
+//     label: '單價',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+//   dualPrice: {
+//     label: '小計',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+// };
 
 // ===========================================================================
 
@@ -1921,6 +1924,7 @@ export type {
   TsetState_installItem,
   TcreateSetState_otherWorkItem,
   Tapi_useDetail,
+  TsetState_otherWorkItem,
 };
 
 export { calcTotalPrice, calcTalent };

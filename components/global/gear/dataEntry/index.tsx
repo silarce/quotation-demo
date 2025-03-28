@@ -283,6 +283,7 @@ function Select_rs<
 
 // MARK:InputSelect
 const InputSelect = ({
+  className,
   value,
   onChange,
   disabled,
@@ -291,6 +292,7 @@ const InputSelect = ({
   inputProps,
   selectProps: { classNames: cn, onChange: selectOnChange, ...selectProps } = {},
 }: {
+  className?: string;
   value?: string;
   onChange?: (value: string) => void;
   disabled?: boolean;
@@ -302,7 +304,7 @@ const InputSelect = ({
   const ref_input = useRef<HTMLInputElement>(null);
 
   return (
-    <div className={scss.inputSelect}>
+    <div className={classNames(scss.inputSelect, className)}>
       {/* 這邊用label包起來是為了避免觸發Container的Label */}
       {/* label必須在input之前，這樣不用設z-index就可以使input蓋過select */}
       {/* 不設index才能避免InputSelect垂直排列時menu因為z-index造成的跑版*/}
