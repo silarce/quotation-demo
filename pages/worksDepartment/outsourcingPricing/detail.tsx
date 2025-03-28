@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useReducer } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -14,6 +14,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import Table01, { CellInput, CellSelect } from 'components/global/gear/table/table01';
 import type { Tcell, TcellArr, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 import Profile from 'components/page/worksDepartment/outsourcingPricing/detail/profile';
+import InstallItem from 'components/page/worksDepartment/outsourcingPricing/detail/installItem';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -42,6 +43,7 @@ import {
 
 // utils
 import { optionsCreator_otherWorkItems } from 'js/utils/options/options';
+import { calcProductVolume } from 'js/utils/product/calc';
 
 // type
 import type { ToutsourcingPaymentDetailItemDto } from 'js/api/dtoTypes';
@@ -82,7 +84,7 @@ type Tstate_installItem = {
   quantity: `${number}` | ''; //樘數
   unitPrice: `${number}` | ''; //一才價格
 
-  totalPrice: number;
+  totalPrice: number; // 這是虛值，後端沒有這個property
 };
 
 type Tstate_installItemDict = Record<string, Tstate_installItem>;
@@ -111,6 +113,8 @@ type TsetState_installItem = (
 ) => void;
 type TcreateSetState_installItem = (key: string) => TsetState_installItem;
 
+// type TcreateDisptach_installItem = (key: string) => TsetState_installItem;
+
 type TsetState_otherWorkItem = (
   setStateActopm: React.SetStateAction<Tstate_otherWorkItem>,
   option?: {
@@ -118,6 +122,8 @@ type TsetState_otherWorkItem = (
   }
 ) => void;
 type TcreateSetState_otherWorkItem = (index: number) => TsetState_otherWorkItem;
+
+type Tapi_useDetail = ReturnType<typeof useDetail>;
 
 // =======================================================================
 
@@ -157,30 +163,52 @@ export default function OutsourcingPricingDetail() {
 
   // ---------------------------------------------------------------------
 
+  // const {
+  //   state_installItemDict,
+  //   state_otherWorkItemArr,
+  //   state_outsourcingTotal,
+
+  //   options_installItem,
+
+  //   createEditState_installItem,
+  //   createEditState_otherWorkItem,
+  //   addInstallItem,
+  //   addOtherWorkItem,
+  //   deleteInstallItem,
+  //   deleteOtherWorkItem,
+
+  //   checkOtherWorkItemArr,
+  //   groupOtherWorkItem,
+  //   checkInstallItemId,
+
+  //   resetState,
+  // } = useDetail({
+  //   paymentDetail,
+  //   disabled,
+  //   outsourcingId,
+  // });
+  const api_useDetail = useDetail({
+    paymentDetail,
+    disabled,
+    outsourcingId,
+  });
+
   const {
     state_installItemDict,
     state_otherWorkItemArr,
     state_outsourcingTotal,
-
     options_installItem,
-
     createEditState_installItem,
     createEditState_otherWorkItem,
     addInstallItem,
     addOtherWorkItem,
     deleteInstallItem,
     deleteOtherWorkItem,
-
     checkOtherWorkItemArr,
     groupOtherWorkItem,
     checkInstallItemId,
-
     resetState,
-  } = useDetail({
-    paymentDetail,
-    disabled,
-    outsourcingId,
-  });
+  } = api_useDetail;
 
   const { state_profile, setState_profile, resetProfile } = useProfile({ paymentDetail });
 
@@ -261,13 +289,13 @@ export default function OutsourcingPricingDetail() {
 
   // region PROPS
 
-  const { control_installItem } = useTable_installItem({
-    state_installItemDict,
-    createEditState_installItem,
-    deleteInstallItem,
-    disabled,
-    isNew,
-  });
+  // const { control_installItem } = useTable_installItem({
+  //   state_installItemDict,
+  //   createEditState_installItem,
+  //   deleteInstallItem,
+  //   disabled,
+  //   isNew,
+  // });
 
   const { control_otherWorkItem } = useTable_otherWorkItem({
     state_otherWorkItemArr,
@@ -365,7 +393,9 @@ export default function OutsourcingPricingDetail() {
               !disabled && addInstallItem();
             }}
           />
-          <Table01 {...control_installItem} />
+          <InstallItem className={'w-[1100px]'} api_useDetail={api_useDetail} disabled={disabled} />
+
+          {/* <Table01 {...control_installItem} /> */}
         </div>
         <div className="mt-10">
           <IconAddCircle
@@ -591,6 +621,7 @@ const useDetail = ({
     state_outsourcingTotal,
 
     options_installItem,
+    total_installItem,
 
     createEditState_installItem,
     createEditState_otherWorkItem,
@@ -791,292 +822,292 @@ const useDetail_default = ({
 };
 
 // MARK:useTable_installItem
-const useTable_installItem = ({
-  state_installItemDict,
-  createEditState_installItem,
-  deleteInstallItem,
-  disabled,
-  isNew,
-}: {
-  state_installItemDict: Tstate_installItemDict;
-  createEditState_installItem: TcreateSetState_installItem;
-  deleteInstallItem: (key: string) => void;
-  disabled: boolean;
-  isNew: boolean;
-}) => {
-  const { control_installItem, subTotal_installItem } = useMemo(() => {
-    const thead: Ttable['thead'] = {
-      cellArr: [
-        isNew
-          ? {
-              children: config_useTable01.btn.label,
-              ...config_useTable01.btn,
-            }
-          : null,
-        {
-          children: config_useTable01.floorNumber.label,
-          ...config_useTable01.floorNumber,
-        },
-        {
-          children: config_useTable01.width.label,
-          ...config_useTable01.width,
-        },
-        {
-          children: config_useTable01.height.label,
-          ...config_useTable01.height,
-        },
-        {
-          children: config_useTable01.volume.label,
-          ...config_useTable01.volume,
-        },
-        {
-          children: config_useTable01.qty.label,
-          ...config_useTable01.qty,
-        },
-        {
-          children: config_useTable01.unitPrice.label,
-          ...config_useTable01.unitPrice,
-        },
-        {
-          children: config_useTable01.dualPrice.label,
-          ...config_useTable01.dualPrice,
-        },
-      ],
-    };
-    //
+// const useTable_installItem = ({
+//   state_installItemDict,
+//   createEditState_installItem,
+//   deleteInstallItem,
+//   disabled,
+//   isNew,
+// }: {
+//   state_installItemDict: Tstate_installItemDict;
+//   createEditState_installItem: TcreateSetState_installItem;
+//   deleteInstallItem: (key: string) => void;
+//   disabled: boolean;
+//   isNew: boolean;
+// }) => {
+//   const { control_installItem, subTotal_installItem } = useMemo(() => {
+//     const thead: Ttable['thead'] = {
+//       cellArr: [
+//         isNew
+//           ? {
+//               children: config_useTable01.btn.label,
+//               ...config_useTable01.btn,
+//             }
+//           : null,
+//         {
+//           children: config_useTable01.floorNumber.label,
+//           ...config_useTable01.floorNumber,
+//         },
+//         {
+//           children: config_useTable01.width.label,
+//           ...config_useTable01.width,
+//         },
+//         {
+//           children: config_useTable01.height.label,
+//           ...config_useTable01.height,
+//         },
+//         {
+//           children: config_useTable01.volume.label,
+//           ...config_useTable01.volume,
+//         },
+//         {
+//           children: config_useTable01.qty.label,
+//           ...config_useTable01.qty,
+//         },
+//         {
+//           children: config_useTable01.unitPrice.label,
+//           ...config_useTable01.unitPrice,
+//         },
+//         {
+//           children: config_useTable01.dualPrice.label,
+//           ...config_useTable01.dualPrice,
+//         },
+//       ],
+//     };
+//     //
 
-    let decimal_subTotal = new Decimal(0);
+//     let decimal_subTotal = new Decimal(0);
 
-    const rowArr: Ttable['tbody']['rowArr'] = Object.values(state_installItemDict).map((state_installItem, index) => {
-      const { key, floorNumber, width, height, talent, quantity, unitPrice, totalPrice } = state_installItem;
+//     const rowArr: Ttable['tbody']['rowArr'] = Object.values(state_installItemDict).map((state_installItem, index) => {
+//       const { key, floorNumber, width, height, talent, quantity, unitPrice, totalPrice } = state_installItem;
 
-      const setState_installItem = createEditState_installItem(key);
+//       const setState_installItem = createEditState_installItem(key);
 
-      decimal_subTotal = decimal_subTotal.add(totalPrice);
+//       decimal_subTotal = decimal_subTotal.add(totalPrice);
 
-      const cellArr: TcellArr = [
-        isNew
-          ? {
-              children: (
-                <IconDelete01 onClick={() => deleteInstallItem(key)} className={classNames(disabled && 'invisible')} />
-              ),
-              ...config_useTable01.btn,
-            }
-          : null,
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.floorNumber.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                value: floorNumber,
-                readOnly: disabled,
-                onChange: (e) => {
-                  setState_installItem((prev) => {
-                    const copy = { ...prev };
-                    copy.floorNumber = e.target.value as `${number}`;
+//       const cellArr: TcellArr = [
+//         isNew
+//           ? {
+//               children: (
+//                 <IconDelete01 onClick={() => deleteInstallItem(key)} className={classNames(disabled && 'invisible')} />
+//               ),
+//               ...config_useTable01.btn,
+//             }
+//           : null,
+//         {
+//           children: (
+//             <CellInput
+//               style={{ width: config_useTable01.floorNumber.style?.width }}
+//               disabled={isNew ? disabled : true}
+//               inputProps={{
+//                 value: floorNumber,
+//                 readOnly: disabled,
+//                 onChange: (e) => {
+//                   setState_installItem((prev) => {
+//                     const copy = { ...prev };
+//                     copy.floorNumber = e.target.value as `${number}`;
 
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.floorNumber,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.width.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: width,
-                readOnly: disabled,
-                min: 0,
-                step: 0,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
+//                     return copy;
+//                   });
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable01.floorNumber,
+//         },
+//         {
+//           children: (
+//             <CellInput
+//               style={{ width: config_useTable01.width.style?.width }}
+//               disabled={isNew ? disabled : true}
+//               inputProps={{
+//                 type: 'number',
+//                 value: width,
+//                 readOnly: disabled,
+//                 min: 0,
+//                 step: 0,
+//                 onWheel: (e) => e.currentTarget.blur(),
+//                 onChange: (e) => {
+//                   if (!e.target.validity.valid) {
+//                     return;
+//                   }
 
-                  setState_installItem((prev) => {
-                    const copy = { ...prev };
-                    copy.width = e.target.value as `${number}`;
+//                   setState_installItem((prev) => {
+//                     const copy = { ...prev };
+//                     copy.width = e.target.value as `${number}`;
 
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.width,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.height.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: height,
-                readOnly: disabled,
-                min: 0,
-                step: 0,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
+//                     return copy;
+//                   });
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable01.width,
+//         },
+//         {
+//           children: (
+//             <CellInput
+//               style={{ width: config_useTable01.height.style?.width }}
+//               disabled={isNew ? disabled : true}
+//               inputProps={{
+//                 type: 'number',
+//                 value: height,
+//                 readOnly: disabled,
+//                 min: 0,
+//                 step: 0,
+//                 onWheel: (e) => e.currentTarget.blur(),
+//                 onChange: (e) => {
+//                   if (!e.target.validity.valid) {
+//                     return;
+//                   }
 
-                  setState_installItem((prev) => {
-                    const copy = { ...prev };
-                    copy.height = e.target.value as `${number}`;
+//                   setState_installItem((prev) => {
+//                     const copy = { ...prev };
+//                     copy.height = e.target.value as `${number}`;
 
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.height,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.volume.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: talent,
-                readOnly: disabled,
-                min: 0,
-                step: 'any',
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
+//                     return copy;
+//                   });
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable01.height,
+//         },
+//         {
+//           children: (
+//             <CellInput
+//               style={{ width: config_useTable01.volume.style?.width }}
+//               disabled={isNew ? disabled : true}
+//               inputProps={{
+//                 type: 'number',
+//                 value: talent,
+//                 readOnly: disabled,
+//                 min: 0,
+//                 step: 'any',
+//                 onWheel: (e) => e.currentTarget.blur(),
+//                 onChange: (e) => {
+//                   if (!e.target.validity.valid) {
+//                     return;
+//                   }
 
-                  setState_installItem(
-                    (prev) => {
-                      const copy = { ...prev };
-                      copy.talent = e.target.value as `${number}`;
+//                   setState_installItem(
+//                     (prev) => {
+//                       const copy = { ...prev };
+//                       copy.talent = e.target.value as `${number}`;
 
-                      return copy;
-                    },
-                    { calcTotalPrice: true }
-                  );
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.volume,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.qty.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: quantity,
-                readOnly: disabled,
-                min: 0,
-                step: 0,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
+//                       return copy;
+//                     },
+//                     { calcTotalPrice: true }
+//                   );
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable01.volume,
+//         },
+//         {
+//           children: (
+//             <CellInput
+//               style={{ width: config_useTable01.qty.style?.width }}
+//               disabled={isNew ? disabled : true}
+//               inputProps={{
+//                 type: 'number',
+//                 value: quantity,
+//                 readOnly: disabled,
+//                 min: 0,
+//                 step: 0,
+//                 onWheel: (e) => e.currentTarget.blur(),
+//                 onChange: (e) => {
+//                   if (!e.target.validity.valid) {
+//                     return;
+//                   }
 
-                  setState_installItem(
-                    (prev) => {
-                      const copy = { ...prev };
-                      copy.quantity = e.target.value as `${number}`;
+//                   setState_installItem(
+//                     (prev) => {
+//                       const copy = { ...prev };
+//                       copy.quantity = e.target.value as `${number}`;
 
-                      return copy;
-                    },
-                    { calcTotalPrice: true }
-                  );
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.qty,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.unitPrice.style?.width }}
-              disabled={disabled}
-              inputProps={{
-                type: 'number',
-                min: 0,
-                step: 0,
-                value: unitPrice,
-                readOnly: disabled,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  e.target.validity.valid &&
-                    setState_installItem(
-                      (prev) => {
-                        const copy = { ...prev };
-                        copy.unitPrice = e.target.value as `${number}`;
+//                       return copy;
+//                     },
+//                     { calcTotalPrice: true }
+//                   );
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable01.qty,
+//         },
+//         {
+//           children: (
+//             <CellInput
+//               style={{ width: config_useTable01.unitPrice.style?.width }}
+//               disabled={disabled}
+//               inputProps={{
+//                 type: 'number',
+//                 min: 0,
+//                 step: 0,
+//                 value: unitPrice,
+//                 readOnly: disabled,
+//                 onWheel: (e) => e.currentTarget.blur(),
+//                 onChange: (e) => {
+//                   e.target.validity.valid &&
+//                     setState_installItem(
+//                       (prev) => {
+//                         const copy = { ...prev };
+//                         copy.unitPrice = e.target.value as `${number}`;
 
-                        return copy;
-                      },
-                      { calcTotalPrice: true }
-                    );
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.unitPrice,
-        },
-        {
-          children: totalPrice,
-          ...config_useTable01.dualPrice,
-        },
-      ];
+//                         return copy;
+//                       },
+//                       { calcTotalPrice: true }
+//                     );
+//                 },
+//               }}
+//             />
+//           ),
+//           ...config_useTable01.unitPrice,
+//         },
+//         {
+//           children: totalPrice,
+//           ...config_useTable01.dualPrice,
+//         },
+//       ];
 
-      return {
-        cellArr,
-      };
-    });
+//       return {
+//         cellArr,
+//       };
+//     });
 
-    rowArr.push({
-      cellArr: [
-        {
-          children: '合計',
-          ...confit_public.left,
-        },
-        {
-          children: decimal_subTotal.toNumber().toLocaleString(),
-          ...confit_public.right,
-        },
-      ],
-    });
+//     rowArr.push({
+//       cellArr: [
+//         {
+//           children: '合計',
+//           ...confit_public.left,
+//         },
+//         {
+//           children: decimal_subTotal.toNumber().toLocaleString(),
+//           ...confit_public.right,
+//         },
+//       ],
+//     });
 
-    const tbody = {
-      rowArr,
-    };
+//     const tbody = {
+//       rowArr,
+//     };
 
-    const control_table = {
-      thead,
-      tbody,
-    };
+//     const control_table = {
+//       thead,
+//       tbody,
+//     };
 
-    return {
-      control_installItem: control_table,
-      subTotal_installItem: decimal_subTotal.toNumber(),
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state_installItemDict, disabled]); // useMemo
+//     return {
+//       control_installItem: control_table,
+//       subTotal_installItem: decimal_subTotal.toNumber(),
+//     };
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [state_installItemDict, disabled]); // useMemo
 
-  return { control_installItem, subTotal_installItem };
-};
+//   return { control_installItem, subTotal_installItem };
+// };
 
 // MARK:useTable_otherWorkItem
 const useTable_otherWorkItem = ({
@@ -1490,17 +1521,30 @@ const calcTotalPrice = ({
   quantity,
   unitPrice,
 }: {
-  talent?: `${number}` | number;
-  quantity: `${number}` | number;
-  unitPrice: `${number}` | number;
+  talent?: `${number}` | number | '';
+  quantity: `${number}` | number | '';
+  unitPrice: `${number}` | number | '';
 }) => {
-  return new Decimal(talent).mul(quantity).mul(unitPrice).toDecimalPlaces(0).toNumber();
+  return new Decimal(talent || 0)
+    .mul(quantity || 0)
+    .mul(unitPrice || 0)
+    .toDecimalPlaces(0)
+    .toNumber();
+};
+
+const calcTalent = ({ width, height }: { width: `${number}` | number | ''; height: `${number}` | number | '' }) => {
+  const area = new Decimal(width || 0).mul(height || 0).toNumber();
+
+  return calcProductVolume(area);
 };
 
 // ============================================================================
 
 // MARK: REFACTOR
-
+//
+//
+//
+// MARK:useProfile
 const useProfile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
   const defaultState_profile = useDefault_profile({ paymentDetail });
 
@@ -1565,8 +1609,130 @@ const useDefault_profile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaym
   }, [paymentDetail]);
 };
 
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+
+// type action_installItem =
+//   | {
+//       type: 'floorNumber';
+//       key: string;
+//       payload: Tstate_installItem['floorNumber'];
+//     }
+//   | {
+//       type: 'width';
+//       key: string;
+//       payload: Tstate_installItem['width'];
+//     }
+//   | {
+//       type: 'height';
+//       key: string;
+//       payload: Tstate_installItem['height'];
+//     }
+//   | {
+//       type: 'talent';
+//       key: string;
+//       payload: Tstate_installItem['talent'];
+//     }
+//   | {
+//       type: 'quantity';
+//       key: string;
+//       payload: Tstate_installItem['quantity'];
+//     }
+//   | {
+//       type: 'unitPrice';
+//       key: string;
+//       payload: Tstate_installItem['unitPrice'];
+//     }
+//   | {
+//       type: 'add';
+//       key?: undefined;
+//       payload?: undefined;
+//     }
+//   | {
+//       type: 'delete';
+//       key: string;
+//       payload?: undefined;
+//     };
+
+// const reducer_installItem = (state: Tstate_installItemDict, action: action_installItem) => {
+//   const { type, key, payload } = action;
+
+//   const copy = { ...state };
+
+//   if (key) {
+//     const targetItem = copy[key];
+
+//     const _calcTotalPrice = () => {
+//       return calcTotalPrice({
+//         talent: targetItem.talent || 0,
+//         quantity: targetItem.quantity || 0,
+//         unitPrice: targetItem.unitPrice || 0,
+//       });
+//     };
+
+//     const calcTalent = () => {
+//       const area = new Decimal(targetItem.width).mul(targetItem.height).toNumber();
+
+//       return calcProductVolume(area);
+//     };
+
+//     switch (type) {
+//       case 'floorNumber':
+//         targetItem.floorNumber = payload;
+//         break;
+//       case 'width':
+//         targetItem.width = payload;
+//         targetItem.talent = calcTalent();
+//         targetItem.totalPrice = _calcTotalPrice();
+
+//         break;
+//       case 'height':
+//         targetItem.height = payload;
+//         targetItem.talent = calcTalent();
+//         targetItem.totalPrice = _calcTotalPrice();
+//         break;
+//       case 'talent':
+//         targetItem.talent = payload;
+//         targetItem.totalPrice = _calcTotalPrice();
+//         break;
+//       case 'quantity':
+//         targetItem.quantity = payload;
+//         targetItem.totalPrice = _calcTotalPrice();
+//         break;
+//       case 'unitPrice':
+//         targetItem.unitPrice = payload;
+//         targetItem.totalPrice = _calcTotalPrice();
+//         break;
+//       case 'delete':
+//         delete copy[key];
+//         break;
+//     }
+//   } else {
+//     switch (type) {
+//       case 'add':
+//         const key = nanoid();
+//         copy[key] = emptyState_installItem(key);
+
+//         break;
+
+//       default:
+//         break;
+//     }
+//   }
+
+//   return copy;
+// };
+
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
 // =========================================================================
 
+// MARK: API
 const reqPatchOutsourcingPaymentDetail_new = async ({
   //
   paymentDetailId,
@@ -1735,3 +1901,21 @@ const reqPost_new = async ({
 
   return apiPostOutsourcingPaymentDetail(paymentId, body);
 };
+
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+
+export type {
+  Tstate_installItem,
+  Tstate_installItemDict,
+  Tstate_otherWorkItem,
+  Tstate_otherWorkItemArr,
+  Tstate_outsourcingTotal,
+  TsetState_installItem,
+  TcreateSetState_otherWorkItem,
+  Tapi_useDetail,
+};
+
+export { calcTotalPrice, calcTalent };

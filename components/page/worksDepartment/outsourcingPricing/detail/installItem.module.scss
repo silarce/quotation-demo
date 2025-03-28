@@ -1,0 +1,41 @@
+.table {
+  border: solid 1px theme("colors.border");
+  border-bottom: 0;
+
+  .cell {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .cell_body {
+    @extend .cell;
+    border-right: solid 1px theme("colors.border");
+    &:nth-last-of-type(1) {
+      border-right: 0;
+    }
+  }
+
+  .cell_btn {
+    @extend .cell_body;
+    padding-left: unset;
+    padding-right: unset;
+  }
+}
+
+.input {
+  border-bottom: solid 1px black;
+  text-align: center;
+  &.disabled {
+    border-bottom: solid 1px transparent;
+  }
+}
+
+.textLeft {
+  text-align: left;
+}
+
+.money {
+  width: 100%;
+  border-bottom: solid 1px transparent;
+  text-align: right;
+}
