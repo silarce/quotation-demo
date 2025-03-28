@@ -82,7 +82,7 @@ export default function InstallItem({
 
         return (
           <TheRow key={key}>
-            <Cell style={config_useTable01.btn.style} className={classNames(scss.cell_btn)}>
+            <Cell style={config_useTable01.btn.style} className={classNames(scss.cell_btn, disabled && 'invisible')}>
               <IconDelete01 onClick={() => deleteInstallItem(key)} />
             </Cell>
 
@@ -109,8 +109,11 @@ export default function InstallItem({
           className={classNames(scss.cell_body)}
           style={{
             flex: 'auto',
+            justifyContent: 'flex-end',
           }}
-        />
+        >
+          合計
+        </Cell>
         <Cell className={classNames(scss.cell_body)} style={config_useTable01.unitPrice.style}>
           {total_installItem.toLocaleString()}
         </Cell>
