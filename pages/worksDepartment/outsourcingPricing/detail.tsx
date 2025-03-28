@@ -12,13 +12,18 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 
 // components
 import Table01, { CellInput, CellSelect } from 'components/global/gear/table/table01';
-import type { Tcell, TcellArr, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
+import type {
+  Tcell,
+  //  TcellArr,
+  Ttable,
+  Tconfig_table,
+} from 'components/global/gear/table/table01';
 import Profile from 'components/page/worksDepartment/outsourcingPricing/detail/profile';
 import InstallItem from 'components/page/worksDepartment/outsourcingPricing/detail/installItem';
 
 // gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+// import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+// import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
 
 // icon
 import { IconAddCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
@@ -1365,65 +1370,65 @@ const confit_public: Tconfig = {
   },
 };
 
-const config_useTable01: Tconfig = {
-  btn: {
-    label: '',
-    style: {
-      width: 40,
-      justifyContent: 'center',
-    },
-  },
-  floorNumber: {
-    label: '樓層編號',
-    style: {
-      // width:230
-      flex: 'auto',
-      justifyContent: 'center',
-    },
-  },
-  width: {
-    label: '寬',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  height: {
-    label: '高',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  volume: {
-    label: '才數',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  qty: {
-    label: '樘數',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  unitPrice: {
-    label: '價格/才',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  dualPrice: {
-    label: '小計',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-};
+// const config_useTable01: Tconfig = {
+//   btn: {
+//     label: '',
+//     style: {
+//       width: 40,
+//       justifyContent: 'center',
+//     },
+//   },
+//   floorNumber: {
+//     label: '樓層編號',
+//     style: {
+//       // width:230
+//       flex: 'auto',
+//       justifyContent: 'center',
+//     },
+//   },
+//   width: {
+//     label: '寬',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+//   height: {
+//     label: '高',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+//   volume: {
+//     label: '才數',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+//   qty: {
+//     label: '樘數',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+//   unitPrice: {
+//     label: '價格/才',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+//   dualPrice: {
+//     label: '小計',
+//     style: {
+//       width: 150,
+//       justifyContent: 'center',
+//     },
+//   },
+// };
 
 const config_useTable02: Tconfig = {
   btn: {
