@@ -282,7 +282,9 @@ function Select_rs<
 }
 
 // MARK:InputSelect
-const InputSelect = ({
+function InputSelect<
+  O extends { [key: string]: any; value: string; label: React.ReactNode } = { value: string; label: React.ReactNode }
+>({
   className,
   value,
   onChange,
@@ -296,11 +298,11 @@ const InputSelect = ({
   value?: string;
   onChange?: (value: string) => void;
   disabled?: boolean;
-  options?: rsProps<{ value: string; label: React.ReactNode }, false>['options'];
+  options?: rsProps<O, false>['options'];
 
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
-  selectProps?: rsProps<{ value: string; label: React.ReactNode }, false>;
-}) => {
+  selectProps?: rsProps<O, false>;
+}) {
   const ref_input = useRef<HTMLInputElement>(null);
 
   return (
@@ -363,7 +365,7 @@ const InputSelect = ({
       />
     </div>
   );
-};
+}
 
 // =============================================================================
 const MustTip = () => {
