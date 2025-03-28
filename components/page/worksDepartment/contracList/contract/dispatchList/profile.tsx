@@ -283,6 +283,14 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
                     onChange={(v) => {
                       _name.onChange({ label: v, value: v, phoneNumber: '' });
                     }}
+                    selectProps={{
+                      onChange(option) {
+                        const value = option?.value ?? '';
+                        const phoneNumber = option?.phoneNumber ?? '';
+
+                        _name.onChange({ label: value, value: value, phoneNumber });
+                      },
+                    }}
                   />
                 </DataEntry>
                 <DataEntry caption="接洽人電話" style={{ fontSize: 18 }} captionStyle={{ width: 100 }}>
