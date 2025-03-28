@@ -1594,9 +1594,14 @@ const RadioContainer = ({
   return (
     <div className={classNames(className)}>
       <span className={classNames('inline-block', labelClassName)}>{label}</span>
+
       <Radio.Group disabled={disabled} onChange={(e) => onChange(e.target.value)} value={value}>
-        <Radio value={true}>是</Radio>
-        <Radio value={false}>否</Radio>
+        <Radio className={classNames(scss.radio, disabled && scss.readonly)} value={true}>
+          是
+        </Radio>
+        <Radio className={classNames(scss.radio, disabled && scss.readonly)} value={false}>
+          否
+        </Radio>
       </Radio.Group>
     </div>
   );
