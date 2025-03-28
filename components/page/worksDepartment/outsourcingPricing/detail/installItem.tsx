@@ -22,8 +22,8 @@ import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 type Tkeys =
   | keyof Pick<
-      Tapi_useDetail['state_installItemDict'],
-      'floorNumber' | 'width' | 'height' | 'volume' | 'qty' | 'unitPrice' | 'dualPrice'
+      Tstate_installItem,
+      'floorNumber' | 'width' | 'height' | 'talent' | 'quantity' | 'unitPrice' | 'totalPrice'
     >
   | 'btn';
 
@@ -124,7 +124,7 @@ export default function InstallItem({
 
 // ====================================================================
 
-const keyArr: Tkeys[] = ['floorNumber', 'width', 'height', 'volume', 'qty', 'unitPrice', 'dualPrice'];
+const keyArr: Tkeys[] = ['floorNumber', 'width', 'height', 'talent', 'quantity', 'unitPrice', 'totalPrice'];
 
 const config_useTable01: Tconfig = {
   btn: {
@@ -216,7 +216,7 @@ const config_useTable01: Tconfig = {
       );
     },
   },
-  volume: {
+  talent: {
     label: '才數',
     style: {
       width: 150,
@@ -246,7 +246,7 @@ const config_useTable01: Tconfig = {
       );
     },
   },
-  qty: {
+  quantity: {
     label: '樘數',
     style: {
       width: 150,
@@ -310,14 +310,14 @@ const config_useTable01: Tconfig = {
       );
     },
   },
-  dualPrice: {
+  totalPrice: {
     label: '小計',
     style: {
       width: 150,
       justifyContent: 'flex-end',
     },
     render: ({ state }) => {
-      return <div className={classNames(scss.money)}>{Number(state.unitPrice || 0).toLocaleString()}</div>;
+      return <div className={classNames(scss.money)}>{Number(state.totalPrice || 0).toLocaleString()}</div>;
     },
   },
 };
