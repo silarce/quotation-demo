@@ -1001,7 +1001,9 @@ const calcTotalPrice = ({
   quantity: `${number}` | number | '';
   unitPrice: `${number}` | number | '';
 }) => {
-  return new Decimal(talent || 0)
+  const theTalent = Number(talent || 0) < 100 ? 100 : talent;
+
+  return new Decimal(theTalent || 0)
     .mul(quantity || 0)
     .mul(unitPrice || 0)
     .toDecimalPlaces(0)
