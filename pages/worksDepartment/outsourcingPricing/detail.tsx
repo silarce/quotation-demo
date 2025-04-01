@@ -21,6 +21,7 @@ import type {
 import Profile from 'components/page/worksDepartment/outsourcingPricing/detail/profile';
 import InstallItem from 'components/page/worksDepartment/outsourcingPricing/detail/installItem';
 import OtherWorkItem from 'components/page/worksDepartment/outsourcingPricing/detail/otherWorkItem';
+import DetailTotal from 'components/page/worksDepartment/outsourcingPricing/detail/detailTotal';
 
 // gear
 // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -403,7 +404,8 @@ export default function OutsourcingPricingDetail() {
 
           {/* <Table01 {...control_installItem} /> */}
         </div>
-        <div className="mt-10">
+        <br />
+        <div>
           <IconAddCircle
             className={classNames('mb-2', disabled && 'invisible')}
             onClick={() => {
@@ -413,7 +415,10 @@ export default function OutsourcingPricingDetail() {
           {/* <Table01 {...control_otherWorkItem} /> */}
           <OtherWorkItem className={'w-[1100px]'} api_useDetail={api_useDetail} disabled={disabled} />
         </div>
-        <Table01 className="mt-20" {...control_detailTotal} />
+        {/* <Table01 className="mt-20" {...control_detailTotal} /> */}
+        <br />
+        <DetailTotal detailTotal={state_outsourcingTotal.toLocaleString()} />
+
         {/*  */}
       </div>
     </SubLayer>
