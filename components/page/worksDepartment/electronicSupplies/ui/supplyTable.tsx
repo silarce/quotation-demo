@@ -53,8 +53,8 @@ type Tinfo = {
   contractNumber: string;
   projectName: string;
   date: string;
-  takeOffEmployeeName: string; // 領料人員
-  preparationEmployeeName: string; // 備料人員
+  takeOffEmployeeName?: string; // 領料人員
+  preparationEmployeeName?: string; // 備料人員
 };
 
 type TimperativeHandle = {

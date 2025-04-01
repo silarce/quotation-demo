@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
@@ -9,7 +9,10 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
-import SupplyTable, { useStateToGroup } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
+import SupplyTable, {
+  TimperativeHandle,
+  useStateToGroup,
+} from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
 import DefaultItemSelector from 'components/page/worksDepartment/electronicSupplies/defaultItemSelector';
 
 // antd
@@ -48,6 +51,7 @@ import {
 
 import { TemployeeDto } from 'js/api/dtoTypes';
 
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 // ==================================================================
 
 import {
@@ -99,6 +103,8 @@ export default function EditRequirementRecord() {
   const { contractId, requirementRecordId } = router.query as Tquery;
   const isNew = !requirementRecordId;
 
+  const ref_supplyTable = useRef<TimperativeHandle>(null);
+
   // ------------------------------------------------------------------
   const [disabled, setDisabled] = useState(!isNew);
   const [showSelector, setShowSelector] = useState(false);
@@ -121,7 +127,9 @@ export default function EditRequirementRecord() {
     update: update_contract,
     contactThatSkipContract,
     isFetching: isFetching_contract,
-  } = useGetContract_id(contractId);
+  } = useGetContract_id(contractId, {
+    customPopulate: ['engineeringContact'],
+  });
 
   const {
     data: data_requirementRecord,
@@ -142,6 +150,12 @@ export default function EditRequirementRecord() {
 
   const { formatOptions } = useGlobal_doorModel();
   const options_doorModel = formatOptions();
+
+  const engineeringContact = data_contract?.engineeringContact;
+
+  const contractNumber = data_contract?.contractNumber ?? '';
+  const projectName = engineeringContact?.projectName ?? '';
+  const preparationEmployeeName = data_requirementRecord?.storageManagementPersonnelEmployee?.chName ?? '';
 
   // ------------------------------------------------------------------
 
@@ -283,6 +297,13 @@ export default function EditRequirementRecord() {
   }, [state_info.picker, state_info.preparer]);
 
   const panelList_disabled: TpanelList = [
+    {
+      type: 'myButton',
+      label: '匯出PDF',
+      onClick: () => {
+        ref_supplyTable.current?.openPdf();
+      },
+    },
     {
       type: 'myButton',
       label: '編輯',
@@ -491,10 +512,17 @@ export default function EditRequirementRecord() {
         </div>
         {/* table */}
         <SupplyTable
+          ref={ref_supplyTable}
           className="border border-border mt-10"
           valueLabelArr={['需求數量']}
           groupArr={groupArr}
           disabled={disabled}
+          //
+          pdfFileName={`送電備品需求單_${contractNumber}_${moment().format('YYYY-MM-DD')}`}
+          contractNumber={contractNumber}
+          projectName={projectName}
+          date={getTaiwanDateStr(data_requirementRecord?.updatedAt) ?? ''}
+          preparationEmployeeName={preparationEmployeeName}
         />
 
         {/*  */}
