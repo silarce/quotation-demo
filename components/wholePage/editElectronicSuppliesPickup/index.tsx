@@ -589,7 +589,7 @@ export default function EditElectronicSuppliesPickup({
           pdfFileName={`送電備品領取單_${contractNumber}_${moment().format('YYYY-MM-DD')}`}
           contractNumber={contractNumber}
           projectName={projectName}
-          date={getTaiwanDateStr(data_electronicSupplies?.updatedAt) ?? ''}
+          date={getTaiwanDateStr(data_pickup?.updatedAt) ?? ''}
           takeOffEmployeeName={takeOffEmployeeName}
           preparationEmployeeName={preparationEmployeeName}
         />
