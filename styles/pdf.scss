@@ -61,6 +61,7 @@ $pdfPadding: 60px 40px;
   width: 100%;
   padding: 10px 20px;
   background-color: theme("colors.border");
+  z-index: 1;
 }
 
 .pdfPageWrapper {
