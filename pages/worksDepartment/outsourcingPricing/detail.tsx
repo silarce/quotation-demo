@@ -191,7 +191,7 @@ export default function OutsourcingPricingDetail() {
     setIsLoading(true);
 
     try {
-      await reqPatchOutsourcingPaymentDetail_new({
+      await reqPatchOutsourcingPaymentDetail({
         paymentDetailId,
         otherWorkItemGroup: groupOtherWorkItem(),
         isFromUserCreat,
@@ -757,72 +757,8 @@ const useDetail_default = ({
 
 // ===========================================================================
 
-const emptyState_profile = () => {
-  const state_profile: Tstate_profile = {
-    projectNumber: '',
-    projectDate: null,
-    projectName: '',
-    county: '',
-    district: '',
-    address: '',
-  };
-
-  return state_profile;
-};
-
-const emptyState_installItem = (key: string) => {
-  const state_installItem: Tstate_installItem = {
-    key,
-    floorNumber: '',
-    width: '',
-    height: '',
-    talent: '',
-    quantity: '',
-    unitPrice: '',
-    totalPrice: 0,
-  };
-
-  return state_installItem;
-};
-
-const emptyState_otherWorkItem = () => {
-  const state_otherWorkItem: Tstate_otherWorkItem = {
-    installItemKey: '',
-    floorNumber: '',
-    content: '',
-    quantity: '',
-    unitPrice: '',
-    totalPrice: 0,
-  };
-
-  return state_otherWorkItem;
-};
-
-const calcTotalPrice = ({
-  talent = 1,
-  quantity,
-  unitPrice,
-}: {
-  talent?: `${number}` | number | '';
-  quantity: `${number}` | number | '';
-  unitPrice: `${number}` | number | '';
-}) => {
-  return new Decimal(talent || 0)
-    .mul(quantity || 0)
-    .mul(unitPrice || 0)
-    .toDecimalPlaces(0)
-    .toNumber();
-};
-
-const calcTalent = ({ width, height }: { width: `${number}` | number | ''; height: `${number}` | number | '' }) => {
-  const area = new Decimal(width || 0).mul(height || 0).toNumber();
-
-  return calcProductVolume(area);
-};
-
-// ============================================================================
-
 // MARK: REFACTOR
+//
 //
 //
 //
@@ -847,6 +783,7 @@ const useProfile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetai
   };
 };
 
+// MARK:useDefault_profile
 const useDefault_profile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
   return useMemo(() => {
     if (!paymentDetail) {
@@ -896,7 +833,7 @@ const useDefault_profile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaym
 // ==========================================================================
 
 // MARK: API
-const reqPatchOutsourcingPaymentDetail_new = async ({
+const reqPatchOutsourcingPaymentDetail = async ({
   paymentDetailId,
   otherWorkItemGroup,
   isFromUserCreat,
@@ -1060,6 +997,71 @@ const reqPost_new = async ({
   };
 
   return apiPostOutsourcingPaymentDetail(paymentId, body);
+};
+
+// ==========================================================================
+
+const emptyState_profile = () => {
+  const state_profile: Tstate_profile = {
+    projectNumber: '',
+    projectDate: null,
+    projectName: '',
+    county: '',
+    district: '',
+    address: '',
+  };
+
+  return state_profile;
+};
+
+const emptyState_installItem = (key: string) => {
+  const state_installItem: Tstate_installItem = {
+    key,
+    floorNumber: '',
+    width: '',
+    height: '',
+    talent: '',
+    quantity: '',
+    unitPrice: '',
+    totalPrice: 0,
+  };
+
+  return state_installItem;
+};
+
+const emptyState_otherWorkItem = () => {
+  const state_otherWorkItem: Tstate_otherWorkItem = {
+    installItemKey: '',
+    floorNumber: '',
+    content: '',
+    quantity: '',
+    unitPrice: '',
+    totalPrice: 0,
+  };
+
+  return state_otherWorkItem;
+};
+
+const calcTotalPrice = ({
+  talent = 1,
+  quantity,
+  unitPrice,
+}: {
+  talent?: `${number}` | number | '';
+  quantity: `${number}` | number | '';
+  unitPrice: `${number}` | number | '';
+}) => {
+  return new Decimal(talent || 0)
+    .mul(quantity || 0)
+    .mul(unitPrice || 0)
+    .toDecimalPlaces(0)
+    .toNumber();
+};
+
+const calcTalent = ({ width, height }: { width: `${number}` | number | ''; height: `${number}` | number | '' }) => {
+  const area = new Decimal(width || 0).mul(height || 0).toNumber();
+
+  return calcProductVolume(area);
 };
 
 // ==========================================================================
