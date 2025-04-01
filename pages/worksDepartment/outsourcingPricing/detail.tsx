@@ -140,18 +140,18 @@ export default function OutsourcingPricingDetail() {
   } = useGetOutsourcingPaymentDetail_id(paymentDetailId);
 
   const {
+    engineeringContactId,
     engineeringContact,
     outsourcingPayment,
     // installItems,
-    itemDetail,
+    // itemDetail,
   } = paymentDetail ?? {};
 
   const outsourcing = isNew ? outsourcing_forNew : outsourcingPayment?.outsourcing;
   const outsourcingId = outsourcing?.id;
   const isPaymentCleared = outsourcingPayment?.isPaymentCleared;
 
-  const isFromUserCreat = !!itemDetail;
-
+  const isFromUserCreat = !!engineeringContactId;
   const isAllowEditProfile = isNew || isFromUserCreat;
 
   // ---------------------------------------------------------------------
