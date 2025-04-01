@@ -641,9 +641,12 @@ const useDetail_default = ({
           itemName,
           itemPrice,
 
-          fullWidth,
+          // fullWidth,
           height,
           volume,
+
+          WG,
+          boxB,
 
           deliveryStatus,
         } = item;
@@ -674,8 +677,10 @@ const useDetail_default = ({
           id: id,
           deliveryStatusId: firstDeliveryStatus.id,
           floorNumber: itemName, // 沒有放錯，itemName要放進floorNumber
-          width: `${fullWidth}`,
-          height: `${height}`,
+          // width: `${fullWidth}`,
+          width: `${WG}`,
+          // height: `${height}`,
+          height: new Decimal(height).add(boxB).toString() as `${number}`,
           talent: `${volume || 0}` as `${number}`,
           quantity: '1', // 不知道為什麼是'1'
           unitPrice: `${itemPrice || 0}`,
