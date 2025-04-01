@@ -287,7 +287,6 @@ const Page_ = (
   ref: React.Ref<HTMLDivElement>
 ) => {
   const { takeOffEmployeeName, preparationEmployeeName } = takeAndPreparation;
-  console.log(takeOffEmployeeName);
 
   return (
     <div className={scss.pdfPageWrapper}>
