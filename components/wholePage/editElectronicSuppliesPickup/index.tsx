@@ -356,7 +356,7 @@ export default function EditElectronicSuppliesPickup({
   const panelList_disabled: TpanelList = [
     {
       type: 'myButton',
-      label: '匯出',
+      label: '匯出PDF',
       onClick: () => {
         ref_supplyTable.current?.openPdf();
       },
