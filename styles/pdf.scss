@@ -6,6 +6,18 @@ $pdfHeight: calc(842px * 2);
 $pdfWidth_horizontal: calc(842px * 2);
 $pdfHeight_horizontal: calc(595px * 2);
 
+$pdfPadding: 60px 40px;
+
+@mixin pdfRect($scale: 1) {
+  width: calc(595px * $scale);
+  width: calc(842px * $scale);
+}
+
+@mixin pdfFont {
+  font-family: Microsoft JhengHei;
+  color: black;
+}
+
 .antdModalWrapper {
   // margin-top: 40px;
 }
@@ -36,5 +48,30 @@ $pdfHeight_horizontal: calc(595px * 2);
   padding: 60px 40px;
   * {
     color: black;
+  }
+}
+
+// ===============================================================================
+
+.pdfPanel {
+  position: sticky;
+  top: 0;
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  padding: 10px 20px;
+  background-color: theme("colors.border");
+}
+
+.pdfPageWrapper {
+  margin: 40px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.pdfPage {
+  @include pdfFont;
+  padding: $pdfPadding;
+  * {
+    @include pdfFont;
   }
 }
