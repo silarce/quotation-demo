@@ -136,7 +136,7 @@ const config_useTable01: Tconfig = {
     render: () => null,
   },
   floorNumber: {
-    label: '樓層編號',
+    label: '項目',
     style: {
       flex: 'auto',
       justifyContent: 'flex-start',

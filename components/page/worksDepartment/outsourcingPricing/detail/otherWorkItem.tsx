@@ -138,7 +138,7 @@ const config = defineConfig({
     render: () => null,
   },
   floorNumber: {
-    label: '樓層編號',
+    label: '項目',
     style: {
       flex: 'auto',
       justifyContent: 'flex-start',
