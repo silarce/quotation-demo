@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import moment, { Moment } from 'moment';
 import _, { filter } from 'lodash';
 
-import scss from './ProdInOutQueryList.module.scss';
+import scss from './completedPOQuery.module.scss';
 import Thead01 from '../ui/table/thead01';
 import Tbody01 from '../ui/table/tbody01';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -64,11 +64,10 @@ import icon_clear from 'public/image/icon/fc_clear.svg';
 import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
-export default function ProdInOutQueryList() {
-    const [pagename, setPagename] = useState<string>("出入庫查詢")
+export default function completedPOQuery() {
+    const [pagename, setPagename] = useState<string>("已交貨查詢")
     const [autoRefreshOpen, setAutoRefreshOpen] = useState<boolean>(false)
     const [autoRefresh, setAutoRefresh] = useState<number>(1)//分鐘
-
     //#region ===========【路由參數】
     const router = useRouter();
     const {
@@ -101,7 +100,7 @@ export default function ProdInOutQueryList() {
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
     const [keyword4, setKeyword4] = useState<string>("");
-    const [keyword5, setKeyword5] = useState<string>("出庫");
+    const [keyword5, setKeyword5] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -192,7 +191,7 @@ export default function ProdInOutQueryList() {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: keyword5,
+                type: "未交貨查詢",
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -205,7 +204,7 @@ export default function ProdInOutQueryList() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetInOutDetail?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetUnReceipt?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -395,7 +394,7 @@ export default function ProdInOutQueryList() {
     const filterData = () => {
         const startDate = keywordstartdate;
         const endDate = keywordenddate;
-        const type = keyword5.trim().toLowerCase(); // 將條件轉為小寫;
+        const supplierid = keyword5.trim().toLowerCase(); // 將條件轉為小寫
         const supplier = keyword1.trim().toLowerCase();
         const productid = keyword2.trim().toLowerCase();
         const name = keyword3.trim().toLowerCase();
@@ -404,7 +403,7 @@ export default function ProdInOutQueryList() {
         // 檢查是否所有條件都為空
         if ((!startDate || !startDate.isValid()) &&
             (!endDate || !endDate.isValid()) &&
-            !type &&
+            !supplierid &&
             !supplier &&
             !productid &&
             !name &&
@@ -422,42 +421,41 @@ export default function ProdInOutQueryList() {
             return isDateInRange;
         });
 
-        // let filteredData = data;
-
-        // 模糊查詢價格類別(詢價/進價)
-        // if (type) {
-        //     filteredData = filteredData.filter(item =>
-        //         item.detail_type.toString().includes(type)
-        //     );
-        // }
+        // 模糊查詢價格類別(廠商編號)
+        if (supplierid) {
+            filteredData = filteredData.filter(item =>
+                item.supplierid?.toString().toLowerCase().includes(supplierid) // 忽略大小寫
+            );
+        }
 
         // 模糊查詢單據狀態
         if (supplier) {
             filteredData = filteredData.filter(item =>
-                item.detail_suppliername?.toString().toLowerCase().includes(supplier)
+                item.suppliername?.toString().toLowerCase().includes(supplier) // 忽略大小寫
             );
         }
 
         if (productid) {
             filteredData = filteredData.filter(item =>
-                item.detail_productid?.toString().toLowerCase().includes(productid)
+                item.productid?.toString().toLowerCase().includes(productid) // 忽略大小寫
             );
         }
 
         if (name) {
             filteredData = filteredData.filter(item =>
-                item.detail_name?.toString().toLowerCase().includes(name)
+                item.name?.toString().toLowerCase().includes(name) // 忽略大小寫
             );
         }
 
         if (spec) {
             filteredData = filteredData.filter(item =>
-                item.detail_spec?.toString().toLowerCase().includes(spec)
+                item.spec?.toString().toLowerCase().includes(spec) // 忽略大小寫
             );
         }
 
         setSearchdata(filteredData);
     };
+
 
     // 監聽條件變更
     useEffect(() => {
@@ -484,11 +482,6 @@ export default function ProdInOutQueryList() {
     };
     //#endregion
 
-    //#region===========【API】
-    useEffect(() => {
-        Get();
-    }, [keyword5]);
-    //#endregion
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={pagename}
@@ -509,16 +502,14 @@ export default function ProdInOutQueryList() {
                     padding: '20px',
                     border: '1px solid #ccc',
                     // backgroundColor: '#f9f9f9',
-                    zIndex: '1000',
-
+                    zIndex: '1000'
                 }}>
-
 
                 <div className={scss.search_content1}>
                     {/* 每個項目 */}
                     <div>
                         {/* 種類下拉選單 */}
-                        <label
+                        {/* <label
                             style={{
                                 fontSize: "16px",
                                 fontWeight: "bold",
@@ -526,7 +517,7 @@ export default function ProdInOutQueryList() {
                                 display: 'block',
                             }}
                         >
-                            查詢種類
+                            價格種類
                         </label>
                         <select
                             value={keyword5 || ''}
@@ -542,13 +533,91 @@ export default function ProdInOutQueryList() {
                                 marginTop: '-1px', // 調整負值以微調向上位置
                             }}
                         >
-                            <option value="出庫">出庫</option>
-                            <option value="入庫">入庫</option>
-                        </select>
+                            <option value="">全部</option>
+                            <option value="詢價">詢價</option>
+                            <option value="進價">進價</option>
+                        </select> */}
+                        {/* 廠商編號 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            廠商編號
+                        </label>
+                        <InputSel
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            inputProps={{
+                                props: {
+                                    placeholder: '請輸入廠商編號',
+                                    style: { width: "300px", paddingLeft: '5px' },
+                                    value: keyword5,
+                                    onChange: (e) => {
+                                        setKeyword5(e.target.value)
+                                    }
+                                },
+                            }}
+                        />
+                    </div>
+                    <div>
+                        {/* 廠商名稱 */}
+                        <label
+                            style={{
+                                fontSize: "16px",
+                                fontWeight: "bold",
+                                marginRight: "10px",
+                                display: 'block',
+                            }}
+                        >
+                            廠商名稱
+                        </label>
+                        <InputSel
+                            disabled={false}
+                            captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
+                            inputProps={{
+                                props: {
+                                    placeholder: '請輸入廠商名稱',
+                                    style: { width: "300px", paddingLeft: '5px' },
+                                    value: keyword1,
+                                    onChange: (e) => {
+                                        setKeyword1(e.target.value)
+                                    }
+                                },
+                            }}
+                        />
+                    </div>
+                    <div>
+
+                        {/* 隱藏保留位置 */}
+                        {/* <label
+                        style={{
+                            fontSize: "16px",
+                            fontWeight: "bold",
+                            marginRight: "10px",
+                            display: 'block',
+                            visibility: 'hidden', // 隱藏但保留位置
+                        }}
+                    >
+                        保留位置
+                    </label>
+                    <input
+                        type="text"
+                        placeholder="保留位置"
+                        style={{
+                            width: '100%',
+                            // padding: "8px",
+                            border: "1px solid #ccc",
+                            fontSize: "16px",
+                            visibility: 'hidden', // 隱藏但保留位置
+                        }}
+                        value={"保留位置"}
+                    /> */}
 
                     </div>
-                    <div></div>
-                    <div></div>
                 </div>
                 <div className={scss.search_content2}>
                     <div>
@@ -648,6 +717,7 @@ export default function ProdInOutQueryList() {
                             品名
                         </label>
                         <InputSel
+                            // caption="單號"
                             disabled={false}
                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                             inputProps={{
@@ -675,6 +745,7 @@ export default function ProdInOutQueryList() {
                             規格
                         </label>
                         <InputSel
+                            // caption="單號"
                             disabled={false}
                             captionStyle={{ fontSize: '18px', fontWeight: 'normal', marginRight: '28px' }}
                             inputProps={{
@@ -690,14 +761,11 @@ export default function ProdInOutQueryList() {
                         />
                     </div>
                 </div>
+
             </div>
             <div
                 style={{
                     border: '1px solid rgb(168, 168, 168)',
-                    // marginLeft: '20px',
-                    // marginRight: '20px',
-                    // height: '660px'
-                    // height: '480px'
                     height: `${isCollapsed ? '443px' : '660px'}`
                 }}>
                 <div className={scss.body_content1} style={{ overflowX: 'auto', maxHeight: `${isCollapsed ? '443px' : '660px'}` }} >
@@ -733,13 +801,18 @@ export default function ProdInOutQueryList() {
                         </span>
                         <span>序</span>
                         <span>單號</span>
-                        <span>日期</span>
+                        <span>建立日期</span>
+                        <span>需用日期</span>
                         <span>料號</span>
                         <span>品名</span>
                         <span>規格</span>
                         <span>數量</span>
+                        <span>已交貨</span>
+                        <span>未交數</span>
                         <span>單位</span>
-                        <span>出庫/入庫</span>
+                        <span>單價</span>
+                        <span>總價</span>
+                        <span>廠商</span>
                         <span></span>
                     </div>
                     {/* {searchdata && (searchdata.map((_item: any, index: number) => ( */}
@@ -747,22 +820,44 @@ export default function ProdInOutQueryList() {
                         return (
                             <CellWithBar key={index} className={scss.panelHeader15}
                                 onClick={() => {
+                                    // 深拷貝 _item 物件，避免直接修改原始資料
+                                    let updatedItem = { ..._item };
+
+                                    if (updatedItem.detail_type === "詢價") {
+                                        // 如果是詢價，改變欄位名稱
+                                        updatedItem = {
+                                            ...updatedItem,
+                                            id: updatedItem.uuid,            // uuid 改為原本的 id
+                                            quotereqid: updatedItem.id,      // id 改為原本的 quotereqid
+                                        };
+                                    } else if (updatedItem.detail_type === "進價") {
+                                        // 如果是進價，改變欄位名稱
+                                        updatedItem = {
+                                            ...updatedItem,
+                                            prodreceiptuuid: updatedItem.uuid, // uuid 改為原本的 prodreceiptuuid
+                                            prodreceiptid: updatedItem.id,    // id 改為原本的 prodreceiptid
+                                        };
+                                    }
+
                                     myAlert.confirm({
                                         title: '確定導向此單據嗎?',
-                                        content: _item.prodreceiptid,
+                                        content: updatedItem.detail_main_id,
                                         props: {
                                             onOk: () => {
                                                 router.push({
                                                     pathname:
-                                                        `${_item.detail_type === "出庫" ? '/factoryDepartment/PKingDetail' : '/factoryDepartment/PEntryDetail'}`,
+                                                        // `${updatedItem.detail_type === "詢價" ? '/factoryDepartment/QReqDetail' : '/factoryDepartment/PReceiptDetail'}`,
+                                                        `/factoryDepartment/POrderDetail`,
                                                     query: {
-                                                        item: JSON.stringify(_item),
+                                                        item: JSON.stringify(updatedItem),
                                                     },
                                                 });
                                             }
                                         }
                                     })
-                                }}>
+                                }}
+
+                            >
                                 <>
                                     <div
                                         key={index}
@@ -770,20 +865,28 @@ export default function ProdInOutQueryList() {
                                                 ${_item.prodentryuuid === selectedItemId ? scss.selectedRow : ''}`}
                                     >
                                         <span style={{ color: '#14256a' }}>
-                                            {_item.detail_type}
+
                                         </span>
                                         <span>{index + 1}</span>
-                                        <span>{_item.detail_main_id}</span>
-                                        <span>{getTaiwanDateStr(_item.detail_create_at)}</span>
+                                        <span>{_item.purchaseorderid}</span>
+                                        <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                        <span>{getTaiwanDateStr(_item.need_date)}</span>
                                         <span>
-                                            {_item.detail_productid}
+                                            {_item.productid}
                                         </span>
                                         <span>
-                                            {_item.detail_name}
+                                            {_item.name}
                                         </span>
-                                        <span>{_item.detail_spec}</span>
-                                        <span>{Number(_item.detail_inout_qty).toLocaleString()}</span>
-                                        <span>{_item.detail_unit}</span>
+                                        <span>{_item.spec}</span>
+                                        <span>{Number(_item.quantity).toLocaleString()}</span>
+                                        <span style={{ color: '#14256a' }}>{Number(_item.alreadyinquantity).toLocaleString()}</span>
+                                        <span style={{ color: '#ea1833' }}>{(Number(_item.quantity) - Number(_item.alreadyinquantity)).toLocaleString()}</span>
+                                        <span>{_item.unit}</span>
+                                        <span>{Number(_item.unitprice).toLocaleString()}</span>
+                                        <span>{Number(_item.totalprice).toLocaleString()}</span>
+                                        <span>
+                                            {_item.suppliername}
+                                        </span>
                                     </div>
                                 </>
                             </CellWithBar>

@@ -7,7 +7,7 @@
     top: 0;
     z-index: 1000; // 確保元素位於其他內容的上層
     display: grid;
-    grid-template-columns: 40px 30px 100px 100px 150px 400px 400px 100px 50px;
+    grid-template-columns: 40px 30px 100px 100px 150px 400px 400px 100px 50px 100PX;
     gap: 10px; // 與 panelHeader15 的 row01 保持一致
     height: 40px;
     padding: 0px 20px;
