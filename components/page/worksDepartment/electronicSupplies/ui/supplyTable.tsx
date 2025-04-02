@@ -49,7 +49,7 @@ type Tprops_cell_input = {
 } & Omit<Tprops_cell, 'children'>;
 
 type Tinfo = {
-  // pdfFileName: string;
+  pdfFileName: string;
   contractNumber: string;
   projectName: string;
   date: string;
@@ -75,26 +75,27 @@ function SupplyTable(
     valueLabelArr,
     groupArr,
     disabled,
-    //
-    // pdfFileName,
-    pdfFileName,
-    ...info
+
+    pdfInfo,
   }: {
     className?: string;
     valueLabelArr: string[];
     groupArr: Tgroup[];
     disabled?: boolean;
 
-    pdfFileName: string;
-    // contractNumber: string;
-    // projectName: string;
-    // date: string;
-  } & Tinfo,
+    pdfInfo?: Tinfo;
+  },
   ref: React.Ref<TimperativeHandle>
 ) {
   const openPdf = () => {
+    if (!pdfInfo) {
+      alert('pdfInfo is undefined');
+
+      return;
+    }
+
     myAlert.clear({
-      content: <PdfModal {...info} valueLabelArr={valueLabelArr} groupArr={groupArr} pdfFileName={pdfFileName} />,
+      content: <PdfModal pdfInfo={pdfInfo} valueLabelArr={valueLabelArr} groupArr={groupArr} />,
     });
   };
 
@@ -237,19 +238,18 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
 const PdfModal = ({
   valueLabelArr,
   groupArr,
-  pdfFileName,
-  ...info
+  pdfInfo,
 }: {
   valueLabelArr: string[];
   groupArr: Tgroup[];
-  pdfFileName: string;
-} & Tinfo) => {
+  pdfInfo: Tinfo;
+}) => {
   const ref_pdf = useRef(null);
 
   const handle_dlPdf = () => {
     dlPdf({
       divElementArr: [ref_pdf.current!],
-      fileName: pdfFileName,
+      fileName: pdfInfo.pdfFileName,
     });
   };
 
@@ -266,7 +266,7 @@ const PdfModal = ({
         </SquareBtn>
       </div>
       {/*  */}
-      <Page ref={ref_pdf} valueLabelArr={valueLabelArr} groupArr={groupArr} {...info} />
+      <Page ref={ref_pdf} valueLabelArr={valueLabelArr} groupArr={groupArr} {...pdfInfo} />
     </div>
   );
 };

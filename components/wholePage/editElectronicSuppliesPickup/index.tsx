@@ -562,9 +562,7 @@ export default function EditElectronicSuppliesPickup({
             <AntdSelect
               placeholder="請選擇需求單"
               size="large"
-              // className="w-96"
               className={classNames('w-36')}
-              // mode="multiple"
               allowClear
               options={requirementRecordOptions}
               value={requirementRecordId}
@@ -585,13 +583,14 @@ export default function EditElectronicSuppliesPickup({
           valueLabelArr={['領取數量']}
           groupArr={groupArr}
           disabled={disabled}
-          //
-          pdfFileName={`送電備品領取單_${contractNumber}_${moment().format('YYYY-MM-DD')}`}
-          contractNumber={contractNumber}
-          projectName={projectName}
-          date={getTaiwanDateStr(data_pickup?.updatedAt) ?? ''}
-          takeOffEmployeeName={takeOffEmployeeName}
-          preparationEmployeeName={preparationEmployeeName}
+          pdfInfo={{
+            pdfFileName: `送電備品領取單_${contractNumber}_${moment().format('YYYY-MM-DD')}`,
+            contractNumber: contractNumber,
+            projectName: projectName,
+            date: getTaiwanDateStr(data_pickup?.updatedAt) ?? '',
+            takeOffEmployeeName: takeOffEmployeeName,
+            preparationEmployeeName: preparationEmployeeName,
+          }}
         />
         {/*  */}
         <SelectorGroup

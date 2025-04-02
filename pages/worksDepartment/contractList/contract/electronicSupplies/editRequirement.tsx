@@ -518,11 +518,13 @@ export default function EditRequirementRecord() {
           groupArr={groupArr}
           disabled={disabled}
           //
-          pdfFileName={`送電備品需求單_${contractNumber}_${moment().format('YYYY-MM-DD')}`}
-          contractNumber={contractNumber}
-          projectName={projectName}
-          date={getTaiwanDateStr(data_requirementRecord?.updatedAt) ?? ''}
-          preparationEmployeeName={preparationEmployeeName}
+          pdfInfo={{
+            pdfFileName: `送電備品需求單_${contractNumber}_${moment().format('YYYY-MM-DD')}`,
+            contractNumber: contractNumber,
+            projectName: projectName,
+            date: getTaiwanDateStr(data_requirementRecord?.updatedAt) ?? '',
+            preparationEmployeeName: preparationEmployeeName,
+          }}
         />
 
         {/*  */}
