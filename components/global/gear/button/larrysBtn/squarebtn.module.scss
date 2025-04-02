@@ -33,7 +33,7 @@
 @mixin basicEvent {
   &:hover {
     border: solid 1px #c1c1c1;
-    background-color: #c1c1c17c;
+    background-color: theme("colors.hoverBgc");
   }
 
   &:focus {
