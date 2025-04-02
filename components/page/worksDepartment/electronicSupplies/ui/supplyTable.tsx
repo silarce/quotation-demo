@@ -1,5 +1,6 @@
 import { useMemo, forwardRef, useImperativeHandle, useRef } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -24,6 +25,7 @@ type Tgroup = {
   onAddClick?: (() => void) | undefined;
   rowArr: {
     category: React.ReactNode; // 種類
+    // valueArr之所以是arr是因為送電備品總料單最後面有三欄
     valueArr: {
       value?: string;
       onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -94,8 +96,28 @@ function SupplyTable(
       return;
     }
 
+    const groupArr_clone = _.cloneDeep(groupArr);
+
+    const filteredGroupArr: Tgroup[] = groupArr_clone
+      .map((group) => {
+        group.rowArr = group.rowArr
+          .map((row) => {
+            row.valueArr = row.valueArr.filter(({ value }) => !!Number(value));
+
+            return row;
+          })
+          .filter((row) => !!row.valueArr.length);
+
+        if (group.rowArr.length === 0) {
+          return null;
+        }
+
+        return group;
+      })
+      .filter((group) => !!group);
+
     myAlert.clear({
-      content: <PdfModal pdfInfo={pdfInfo} valueLabelArr={valueLabelArr} groupArr={groupArr} />,
+      content: <PdfModal pdfInfo={pdfInfo} valueLabelArr={valueLabelArr} groupArr={filteredGroupArr} />,
     });
   };
 
