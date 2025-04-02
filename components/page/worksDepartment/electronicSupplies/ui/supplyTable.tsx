@@ -114,7 +114,7 @@ function SupplyTable(
 
         return group;
       })
-      .filter((group) => !!group);
+      .filter((group) => !!group) as Tgroup[];
 
     myAlert.clear({
       content: <PdfModal pdfInfo={pdfInfo} valueLabelArr={valueLabelArr} groupArr={filteredGroupArr} />,
