@@ -720,6 +720,19 @@ export const optionsCreator_deliveryStatusInstallationItem = createOptionsCreato
   })(),
 });
 
+export const optionsCreator_開啟方式 = createOptionsCreator({
+  optionsArr: [
+    { value: '單開', label: '單開' },
+    { value: '雙開', label: '雙開' },
+  ],
+});
+export const optionsCreator_開門方向 = createOptionsCreator({
+  optionsArr: [
+    { value: '外視左開', label: '外視左開' },
+    { value: '外視右開', label: '外視右開' },
+  ],
+});
+
 // const optionsCreator_foooooo = (props: { haveEmpty?: boolean } = {}): Toption[] => {
 //   const { haveEmpty } = props;
 //   const arr = [{ value: 'foooo' as const, label: 'fooooo' }];

@@ -22,12 +22,18 @@ import type { Tstate_specialDoor } from 'components/page/worksDepartment/contrac
 
 import { TsetState, options_electricSupply, basicConfig, createElectricSupply } from './shared';
 
-import { optionsCreator_closingType } from 'js/utils/options/productOptions';
+import {
+  optionsCreator_closingType,
+  optionsCreator_開啟方式,
+  optionsCreator_開門方向,
+} from 'js/utils/options/productOptions';
 import { findOption } from 'js/utils/options/findOption';
 
 // ===============================================================================================================
 
 const options_closingtype = optionsCreator_closingType();
+const options_開啟方式 = optionsCreator_開啟方式();
+const options_開門方向 = optionsCreator_開門方向();
 // ===============================================================================================================
 
 type Tstate_specialProd_w1w3 = {
@@ -43,6 +49,10 @@ type Tstate_specialProd_w1w3 = {
   motorPhase: 1 | 3 | null;
   skeleton: string;
   doorModelName_whole: () => string;
+
+  // FIXME 待API新增property後再根據property改key
+  開啟方式: '單開' | '雙開' | null;
+  開門方向: '外視左開' | '外視右開' | null;
 };
 
 // ===============================================================================================================
@@ -133,7 +143,7 @@ const Form_specialProd_basic = ({
   const {
     itemName,
     quoteType,
-    // doorModelName,
+    doorModelName,
     qty,
     fullWidth,
     height,
@@ -142,6 +152,9 @@ const Form_specialProd_basic = ({
     motorVoltage,
     motorPhase,
     skeleton,
+
+    開啟方式,
+    開門方向,
   } = state;
 
   const value_electricSupply = createElectricSupply({
@@ -287,6 +300,46 @@ const Form_specialProd_basic = ({
             },
           }}
         />
+
+        {doorModelName === 'W1' && (
+          <>
+            <InputSel
+              {...basicConfig}
+              caption="開啟方式"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  value: 開啟方式 ? findOption({ value: 開啟方式, options: options_開啟方式 }) : null,
+                  options: options_開啟方式,
+                  onChange: (option) => {
+                    const value = (option?.value ?? null) as typeof 開啟方式;
+                    const new開門方向 = value !== '單開' ? null : 開門方向;
+                    setState((prev) => ({ ...prev, 開啟方式: value, 開門方向: new開門方向 }));
+                  },
+                },
+              }}
+            />
+
+            <InputSel
+              {...basicConfig}
+              caption="開門方向"
+              disabled={開啟方式 !== '單開' ? true : disabled}
+              className={classNames(開啟方式 !== '單開' && scss.frozen)}
+              captionClassName={classNames(開啟方式 !== '單開' && scss.frozen)}
+              selectProps={{
+                props: {
+                  placeholder: '',
+                  value: 開門方向 ? findOption({ value: 開門方向, options: options_開門方向 }) : null,
+                  options: options_開門方向,
+                  onChange: (option) => {
+                    const value = (option?.value ?? null) as typeof 開門方向;
+                    setState((prev) => ({ ...prev, 開門方向: value }));
+                  },
+                },
+              }}
+            />
+          </>
+        )}
       </div>
     </div>
   );

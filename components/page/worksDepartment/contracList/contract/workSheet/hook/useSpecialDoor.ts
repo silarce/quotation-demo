@@ -163,6 +163,11 @@ type Tstate_specialDoor = {
   skeleton: string;
   // 上蓋
   // upperMask: boolean;
+  //
+
+  // FIXME 待API新增property後再根據property改key
+  開啟方式: '單開' | '雙開' | null;
+  開門方向: '外視左開' | '外視右開' | null;
 };
 
 // MARK:useSpecialDoor
@@ -433,6 +438,9 @@ const useDefaultState_specialDoor = ({
 
       skeleton: quotationProductItem.skeleton ?? '',
       // upperMask: !!quotationProductItem.upperMask,
+      // TODO api給資料後要把資料串接上
+      開啟方式: null,
+      開門方向: null,
     };
 
     return defaultState;
@@ -526,6 +534,9 @@ const emptyState_specialDoor = (): Tstate_specialDoor => {
 
     skeleton: '',
     // upperMask: false,
+
+    開啟方式: null,
+    開門方向: null,
   };
 
   return state;
