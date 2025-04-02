@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -11,15 +11,13 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
-import Table01, { CellInput, CellSelect } from 'components/global/gear/table/table01';
-import type { Tcell, TcellArr, Ttable, Tconfig_table } from 'components/global/gear/table/table01';
-
-// gear
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import AddressBar from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
+import Profile from 'components/page/worksDepartment/outsourcingPricing/detail/profile';
+import InstallItem from 'components/page/worksDepartment/outsourcingPricing/detail/installItem';
+import OtherWorkItem from 'components/page/worksDepartment/outsourcingPricing/detail/otherWorkItem';
+import DetailTotal from 'components/page/worksDepartment/outsourcingPricing/detail/detailTotal';
 
 // icon
-import { IconAddCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
+import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './detail.module.scss';
@@ -27,23 +25,20 @@ import scss from './detail.module.scss';
 // api
 import {
   ToutsourcingPaymentDetailDto,
-  TcreateOutsourcingPaymentDetailItemDto,
   TupdateOutsourcingPaymentDetailDto,
   TcreateOutsourcingPaymentDetailDto,
   TitemDetail,
   TsingleItemDetail,
   useGetOutsourcingPaymentDetail_id,
-  // apiPatchOutsourcingPaymentDetail,
   apiPostOutsourcingPaymentDetail,
   useGetOutsourcing_id,
   apiPatchOutsourcingPaymentDetail_updateRetainage,
 } from 'js/api/api_outsourcing';
 
 // utils
-import { optionsCreator_otherWorkItems } from 'js/utils/options/options';
+import { calcProductVolume } from 'js/utils/product/calc';
 
 // type
-import type { ToutsourcingPaymentDetailItemDto } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
@@ -57,10 +52,8 @@ type Tquery = {
 };
 
 type Tstate_profile = {
-  // outsourcingName: string;
   projectNumber: string;
   projectDate: Moment | null;
-  // installer: string;
   projectName: string;
   county: string;
   district: string;
@@ -81,7 +74,7 @@ type Tstate_installItem = {
   quantity: `${number}` | ''; //樘數
   unitPrice: `${number}` | ''; //一才價格
 
-  totalPrice: number;
+  totalPrice: number; // 這是虛值，後端沒有這個property
 };
 
 type Tstate_installItemDict = Record<string, Tstate_installItem>;
@@ -118,6 +111,8 @@ type TsetState_otherWorkItem = (
 ) => void;
 type TcreateSetState_otherWorkItem = (index: number) => TsetState_otherWorkItem;
 
+type Tapi_useDetail = ReturnType<typeof useDetail>;
+
 // =======================================================================
 
 // MARK: START
@@ -144,50 +139,45 @@ export default function OutsourcingPricingDetail() {
     isLoading_outsourcingPaymentDetail,
   } = useGetOutsourcingPaymentDetail_id(paymentDetailId);
 
-  const { engineeringContact, outsourcingPayment, installItems, itemDetail } = paymentDetail ?? {};
+  const {
+    engineeringContactId,
+    engineeringContact,
+    outsourcingPayment,
+    // installItems,
+    // itemDetail,
+  } = paymentDetail ?? {};
 
   const outsourcing = isNew ? outsourcing_forNew : outsourcingPayment?.outsourcing;
   const outsourcingId = outsourcing?.id;
   const isPaymentCleared = outsourcingPayment?.isPaymentCleared;
 
-  // const isFromEngineeringContact = !!installItems;
-  const isFromUserCreat = !!itemDetail;
-
+  const isFromUserCreat = !!engineeringContactId;
   const isAllowEditProfile = isNew || isFromUserCreat;
-  // isFromUserCreat && (disabled = true); // 現在沒有api可以更新itemDetail
 
   // ---------------------------------------------------------------------
 
-  const {
-    state_profile,
-    state_installItemDict,
-    state_otherWorkItemArr,
-    state_outsourcingTotal,
-
-    options_installItem,
-
-    setState_profile,
-
-    createEditState_installItem,
-    createEditState_otherWorkItem,
-    addInstallItem,
-    addOtherWorkItem,
-    deleteInstallItem,
-    deleteOtherWorkItem,
-
-    checkOtherWorkItemArr,
-    groupOtherWorkItem,
-    checkInstallItemId,
-  } = useDetail({
+  const api_useDetail = useDetail({
     paymentDetail,
     disabled,
     outsourcingId,
   });
 
+  const {
+    state_installItemDict,
+    state_outsourcingTotal,
+    addInstallItem,
+    addOtherWorkItem,
+    checkOtherWorkItemArr,
+    groupOtherWorkItem,
+    resetState,
+  } = api_useDetail;
+
+  const { state_profile, setState_profile, resetProfile } = useProfile({ paymentDetail });
+
   // ---------------------------------------------------------------------
   // region REQUEST
 
-  const reqPatchOutsourcingPaymentDetail = async () => {
+  const handle_reqPatchOutsourcingPaymentDetail = async () => {
     if (!paymentDetailId) {
       return;
     }
@@ -201,110 +191,26 @@ export default function OutsourcingPricingDetail() {
       return;
     }
 
-    const otherWorkItemGroup = groupOtherWorkItem();
-
-    let body: TupdateOutsourcingPaymentDetailDto;
-
-    if (!isFromUserCreat) {
-      if (!engineeringContact?.id) {
-        myAlert.err({ title: '更新外包計價單錯誤', content: '沒有engineeringContact.id' });
-
-        return;
-      }
-
-      const installItems: TcreateOutsourcingPaymentDetailItemDto[] = Object.values(state_installItemDict).map(
-        (state_installItem) => {
-          const { key, id, deliveryStatusId, unitPrice, totalPrice } = state_installItem;
-
-          if (!id) {
-            console.error(state_installItem);
-
-            throw new Error('reqPatchOutsourcingPaymentDetail: 沒有installItem.id');
-          }
-
-          const otherWorkItems: ToutsourcingPaymentDetailItemDto[] = otherWorkItemGroup[key]?.map(
-            (state_otherWorkItem) => {
-              const { content, quantity, unitPrice, totalPrice } = state_otherWorkItem;
-              const otherWorkItem: ToutsourcingPaymentDetailItemDto = {
-                otherInstallation: content,
-                otherQuantity: Number(quantity || 0),
-                otherUnitPrice: Number(unitPrice || 0),
-                otherSubTotalPrice: totalPrice,
-                quotationItemStatusId: deliveryStatusId,
-              };
-
-              return otherWorkItem;
-            }
-          );
-
-          const installItem: TcreateOutsourcingPaymentDetailItemDto = {
-            itemId: id,
-            itemPrice: Number(unitPrice || 0),
-            otherWorkItems: otherWorkItems,
-            otherWorkItemTotal: totalPrice,
-          };
-
-          return installItem;
-        }
-      );
-
-      body = {
-        engineeringContactId: engineeringContact.id,
-        installItems: installItems,
-        outsourcingTotal: state_outsourcingTotal,
-      };
-    } else {
-      // const itemDetailArr: TitemDetail[] = [];
-
-      const itemDetailArr: TitemDetail[] = Object.values(state_installItemDict).map((state_installItem) => {
-        const { key, deliveryStatusId, unitPrice, totalPrice } = state_installItem;
-
-        const singleItemDetail: TsingleItemDetail[] = otherWorkItemGroup[key]?.map((state_otherWorkItem) => {
-          const { content, quantity, unitPrice } = state_otherWorkItem;
-
-          const singleItemDetail: TsingleItemDetail = {
-            floorNumber: state_otherWorkItem.floorNumber,
-            content,
-            quantity: Number(quantity || 0),
-            unitPrice: Number(unitPrice || 0),
-          };
-
-          return singleItemDetail;
-        });
-
-        const itemDetail: TitemDetail = {
-          floorNumber: state_installItem.floorNumber,
-          width: Number(state_installItem.width || 0),
-          height: Number(state_installItem.height || 0),
-          talent: Number(state_installItem.talent || 0),
-          quantity: Number(state_installItem.quantity || 0),
-          unitPrice: Number(unitPrice || 0),
-          singleItemDetail: singleItemDetail,
-        };
-
-        return itemDetail;
-      });
-      body = {
-        engineeringContactId: null,
-        installItems: null,
-        outsourcingTotal: state_outsourcingTotal,
-        itemDetail: itemDetailArr,
-      };
-    }
+    setIsLoading(true);
 
     try {
-      setIsLoading(true);
-      // await apiPatchOutsourcingPaymentDetail(paymentDetailId, body);
-      await apiPatchOutsourcingPaymentDetail_updateRetainage(paymentDetailId, body);
+      await reqPatchOutsourcingPaymentDetail({
+        paymentDetailId,
+        otherWorkItemGroup: groupOtherWorkItem(),
+        // isFromUserCreat,
+        engineeringContactId: engineeringContact?.id,
+
+        state_installItemDict,
+        state_outsourcingTotal,
+      });
       await update();
       setDisabled(true);
-    } catch (error) {
-    } finally {
-      setIsLoading(false);
-    }
+    } catch (error) {}
+
+    setIsLoading(false);
   };
 
-  const reqPost = async () => {
+  const handle_reqPost = async () => {
     if (!paymentId) {
       myAlert.warning({
         title: '外包計價單錯誤',
@@ -323,88 +229,27 @@ export default function OutsourcingPricingDetail() {
       return;
     }
 
-    const otherWorkItemGroup = groupOtherWorkItem();
-
-    const itemDetailArr: TitemDetail[] = Object.values(state_installItemDict).map((state_installItem) => {
-      const { key, floorNumber, width, height, talent, quantity, unitPrice } = state_installItem;
-
-      const singleItemDetailArr = Object.values(otherWorkItemGroup[key]).map((state_otherWorkItem) => {
-        const { floorNumber, content, quantity, unitPrice } = state_otherWorkItem;
-
-        const singleItemDetail: TsingleItemDetail = {
-          floorNumber,
-          content,
-          quantity: Number(quantity || 0),
-          unitPrice: Number(unitPrice || 0),
-        };
-
-        return singleItemDetail;
+    try {
+      const res = await reqPost({
+        otherWorkItemGroup: groupOtherWorkItem(),
+        state_installItemDict,
+        state_outsourcingTotal,
+        state_profile,
+        paymentId,
       });
 
-      const itemDetail: TitemDetail = {
-        floorNumber,
-        width: Number(width || 0),
-        height: Number(height || 0),
-        talent: Number(talent || 0),
-        quantity: Number(quantity || 0),
-        unitPrice: Number(unitPrice || 0),
-        singleItemDetail: singleItemDetailArr,
-      };
-
-      return itemDetail;
-
-      //
-    });
-
-    const body: TcreateOutsourcingPaymentDetailDto = {
-      engineeringContactId: null,
-
-      projectNumber: state_profile.projectNumber,
-      projectName: state_profile.projectName,
-      projectCounty: state_profile.county,
-      projectDistrict: state_profile.district,
-      projectAddress: state_profile.address,
-      projectDate: state_profile.projectDate?.toISOString() || null,
-      installItems: [],
-      outsourcingTotal: state_outsourcingTotal,
-      itemDetail: itemDetailArr,
-    };
-
-    await apiPostOutsourcingPaymentDetail(paymentId, body)
-      .then((res) => {
-        router.replace({
-          query: {
-            paymentDetailId: res.id,
-          },
-        });
-        setDisabled(true);
-      })
-      .catch();
+      router.replace({
+        query: {
+          paymentDetailId: res.id,
+        },
+      });
+      setDisabled(true);
+    } catch (err) {}
   };
 
   // ---------------------------------------------------------------------
 
   // region PROPS
-
-  const { control_installItem } = useTable_installItem({
-    state_installItemDict,
-    createEditState_installItem,
-    deleteInstallItem,
-    disabled,
-    isNew,
-  });
-
-  const { control_otherWorkItem } = useTable_otherWorkItem({
-    state_otherWorkItemArr,
-    options_installItem,
-    createEditState_otherWorkItem,
-    deleteOtherWorkItem,
-    disabled,
-  });
-
-  const control_detailTotal = useTable_total({
-    detailTotal: state_outsourcingTotal,
-  });
 
   const panelList_disabled: TpanelList = [
     !isPaymentCleared
@@ -429,8 +274,7 @@ export default function OutsourcingPricingDetail() {
     {
       type: 'redButton',
       label: '確認',
-      // onClick: reqPatchOutsourcingPaymentDetail,
-      onClick: isNew ? reqPost : reqPatchOutsourcingPaymentDetail,
+      onClick: isNew ? handle_reqPost : handle_reqPatchOutsourcingPaymentDetail,
     },
     {
       type: 'myButton',
@@ -455,6 +299,11 @@ export default function OutsourcingPricingDetail() {
     update_outsourcing();
   }, [isNew, query.outsourcingId]);
 
+  useEffect(() => {
+    resetProfile();
+    resetState();
+  }, [disabled]);
+
   // endregion useEffect
 
   // ---------------------------------------------------------------------
@@ -466,107 +315,14 @@ export default function OutsourcingPricingDetail() {
       <PageHeader02 tag="外包計價單明細" panelList={panelList} />
       <div className={scss.main}>
         {/*  */}
-        <div className={scss.profile}>
-          <InputSel caption={'外包廠商'} showBaseline="invisible" node={outsourcing?.name} />
-          <InputSel
-            caption={'工程編號'}
-            disabled={isAllowEditProfile ? disabled : true}
-            showBaseline="auto"
-            inputProps={{
-              props: {
-                placeholder: '',
-                value: state_profile.projectNumber,
-                onChange: (e) => {
-                  setState_profile((prev) => ({ ...prev, projectNumber: e.target.value }));
-                },
-              },
-            }}
-          />
-          <InputSel
-            caption={'工程日期'}
-            disabled={isAllowEditProfile ? disabled : true}
-            showBaseline="auto"
-            datePickerProps={{
-              props: {
-                value: state_profile.projectDate,
-                onChange: (date) => {
-                  setState_profile((prev) => ({ ...prev, projectDate: date }));
-                },
-              },
-            }}
-          />
-          <InputSel caption={'安裝人員'} showBaseline="invisible" node={outsourcing?.name} />
-          <InputSel
-            caption={'工程名稱'}
-            className="col-span-2"
-            disabled={isAllowEditProfile ? disabled : true}
-            showBaseline="auto"
-            inputProps={{
-              props: {
-                placeholder: '',
-                value: state_profile.projectName,
-                onChange: (e) => {
-                  setState_profile((prev) => ({ ...prev, projectName: e.target.value }));
-                },
-              },
-            }}
-          />
-          <AddressBar
-            inputSelProps={{
-              caption: '工程地址',
-              className: 'col-span-2',
-              disabled: isAllowEditProfile ? disabled : true,
-              showBaseline: 'auto',
-            }}
-            addressProps={{
-              county: {
-                wrapperClassName: scss.select,
-                props: {
-                  menuPortalTarget: undefined,
-                  placeholder: '',
-                  isDisabled: isAllowEditProfile ? disabled : true,
-                  value: { value: state_profile.county, label: state_profile.county },
-                  onChange: (option) => {
-                    const value = option?.value ?? '';
 
-                    setState_profile((prev) => ({
-                      ...prev,
-                      county: value,
-                      district: '',
-                    }));
-                  },
-                },
-              },
-              district: {
-                wrapperClassName: scss.select,
-                props: {
-                  menuPortalTarget: undefined,
-                  placeholder: '',
-                  isDisabled: isAllowEditProfile ? disabled : true,
-                  value: { value: state_profile.district, label: state_profile.district },
-                  onChange: (option) => {
-                    const value = option?.value ?? '';
-
-                    setState_profile((prev) => ({
-                      ...prev,
-                      district: value,
-                    }));
-                  },
-                },
-              },
-              address: {
-                props: {
-                  placeholder: '',
-                  readOnly: isAllowEditProfile ? disabled : true,
-                  value: state_profile.address,
-                  onChange: (e) => {
-                    setState_profile((prev) => ({ ...prev, address: e.target.value }));
-                  },
-                },
-              },
-            }}
-          />
-        </div>
+        <Profile
+          isAllowEditProfile={isAllowEditProfile}
+          outsourcingName={outsourcing?.name ?? ''}
+          disabled={disabled}
+          state={state_profile}
+          setState={setState_profile}
+        />
         {/*  */}
 
         <div className="mt-10">
@@ -576,18 +332,21 @@ export default function OutsourcingPricingDetail() {
               !disabled && addInstallItem();
             }}
           />
-          <Table01 {...control_installItem} />
+          <InstallItem className={'w-[1100px]'} api_useDetail={api_useDetail} disabled={disabled} />
         </div>
-        <div className="mt-10">
+        <br />
+        <div>
           <IconAddCircle
             className={classNames('mb-2', disabled && 'invisible')}
             onClick={() => {
               !disabled && addOtherWorkItem();
             }}
           />
-          <Table01 {...control_otherWorkItem} />
+          <OtherWorkItem className={'w-[1100px]'} api_useDetail={api_useDetail} disabled={disabled} />
         </div>
-        <Table01 className="mt-20" {...control_detailTotal} />
+        <br />
+        <DetailTotal detailTotal={state_outsourcingTotal.toLocaleString()} />
+
         {/*  */}
       </div>
     </SubLayer>
@@ -615,32 +374,15 @@ const useDetail = ({
 }) => {
   const defaultState = useDetail_default({ paymentDetail, outsourcingId });
 
-  const isItemEdited = useRef(false);
-
-  const [state_profile, setState_profile] = useState<Tstate_profile>(defaultState.defaultState_profile);
-  const [state_installItemDict, _setState_installItemDict] = useState<Tstate_installItemDict>(
+  const [state_installItemDict, setState_installItemDict] = useState<Tstate_installItemDict>(
     defaultState.defaultState_installItemDict
   );
-  const [state_otherWorkItemArr, _setState_otherWorkItemArr] = useState<Tstate_otherWorkItemArr>(
+  const [state_otherWorkItemArr, setState_otherWorkItemArr] = useState<Tstate_otherWorkItemArr>(
     defaultState.defaultState_otherWorkItemArr
   );
   const [state_outsourcingTotal, setState_outsourcingTotal] = useState<Tstate_outsourcingTotal>(
     defaultState.defaultState_outsourcingTotal
   );
-
-  const setState_installItemDict: React.Dispatch<React.SetStateAction<Tstate_installItemDict>> = (
-    setStateAction: React.SetStateAction<Tstate_installItemDict>
-  ) => {
-    isItemEdited.current = true;
-    _setState_installItemDict(setStateAction);
-  };
-
-  const setState_otherWorkItemArr: React.Dispatch<React.SetStateAction<Tstate_otherWorkItemArr>> = (
-    setStateAction: React.SetStateAction<Tstate_otherWorkItemArr>
-  ) => {
-    isItemEdited.current = true;
-    _setState_otherWorkItemArr(setStateAction);
-  };
 
   // ------------------------------------------------------------------------
   const options_installItem = useMemo(() => {
@@ -792,16 +534,18 @@ const useDetail = ({
     return Object.values(state_installItemDict).every((item) => !!item.id);
   };
 
-  // ------------------------------------------------------------------------
-  useEffect(() => {
-    setState_profile(defaultState.defaultState_profile);
+  const resetState = () => {
     setState_installItemDict(defaultState.defaultState_installItemDict);
     setState_otherWorkItemArr(defaultState.defaultState_otherWorkItemArr);
     setState_outsourcingTotal(defaultState.defaultState_outsourcingTotal);
-  }, [defaultState, disabled]);
+  };
+
+  // ------------------------------------------------------------------------
+
+  useEffect(resetState, [defaultState]);
 
   useEffect(() => {
-    if (!isItemEdited.current) {
+    if (disabled) {
       return;
     }
 
@@ -809,17 +553,16 @@ const useDetail = ({
     setState_outsourcingTotal(total);
   }, [total_installItem, total_otherWorkItem]);
 
-  //
+  // ------------------------------------------------------------------------
 
   return {
-    state_profile,
     state_installItemDict,
     state_otherWorkItemArr,
     state_outsourcingTotal,
 
     options_installItem,
-
-    setState_profile,
+    total_installItem,
+    total_otherWorkItem,
 
     createEditState_installItem,
     createEditState_otherWorkItem,
@@ -831,6 +574,8 @@ const useDetail = ({
     checkOtherWorkItemArr,
     groupOtherWorkItem,
     checkInstallItemId,
+    //
+    resetState,
   };
   //
 };
@@ -872,15 +617,11 @@ const useDetail_default = ({
       projectDistrict = engineeringContact.district;
       projectAddress = engineeringContact.address;
       projectDate = outsourcingPayment?.date || null;
-      // outsourcingName = outsourcingPayment?.outsourcing?.name ?? '';
-      // installer = outsourcingPayment?.outsourcing?.name ?? '';
     }
 
     const defaultState_profile: Tstate_profile = {
-      // outsourcingName,
       projectNumber: projectNumber ?? '',
       projectDate: projectDate ? moment(projectDate) : null,
-      // installer,
       projectName: projectName ?? '',
       county: projectCounty ?? '',
       district: projectDistrict ?? '',
@@ -890,16 +631,22 @@ const useDetail_default = ({
     const defaultState_installItemDict: Tstate_installItemDict = {};
     const defaultState_otherWorkItemArr: Tstate_otherWorkItemArr = [];
 
-    if (engineeringContact) {
+    if (
+      // engineeringContact
+      !itemDetail
+    ) {
       (installItems ?? []).forEach((item) => {
         const {
           id,
           itemName,
           itemPrice,
 
-          fullWidth,
+          // fullWidth,
           height,
           volume,
+
+          WG,
+          boxB,
 
           deliveryStatus,
         } = item;
@@ -930,8 +677,10 @@ const useDetail_default = ({
           id: id,
           deliveryStatusId: firstDeliveryStatus.id,
           floorNumber: itemName, // 沒有放錯，itemName要放進floorNumber
-          width: `${fullWidth}`,
-          height: `${height}`,
+          // width: `${fullWidth}`,
+          width: `${WG}`,
+          // height: `${height}`,
+          height: new Decimal(height).add(boxB).toString() as `${number}`,
           talent: `${volume || 0}` as `${number}`,
           quantity: '1', // 不知道為什麼是'1'
           unitPrice: `${itemPrice || 0}`,
@@ -1017,664 +766,195 @@ const useDetail_default = ({
   return defaultState;
 };
 
-// MARK:useTable_installItem
-const useTable_installItem = ({
-  state_installItemDict,
-  createEditState_installItem,
-  deleteInstallItem,
-  disabled,
-  isNew,
-}: {
-  state_installItemDict: Tstate_installItemDict;
-  createEditState_installItem: TcreateSetState_installItem;
-  deleteInstallItem: (key: string) => void;
-  disabled: boolean;
-  isNew: boolean;
-}) => {
-  const { control_installItem, subTotal_installItem } = useMemo(() => {
-    const thead: Ttable['thead'] = {
-      cellArr: [
-        isNew
-          ? {
-              children: config_useTable01.btn.label,
-              ...config_useTable01.btn,
-            }
-          : null,
-        {
-          children: config_useTable01.floorNumber.label,
-          ...config_useTable01.floorNumber,
-        },
-        {
-          children: config_useTable01.width.label,
-          ...config_useTable01.width,
-        },
-        {
-          children: config_useTable01.height.label,
-          ...config_useTable01.height,
-        },
-        {
-          children: config_useTable01.volume.label,
-          ...config_useTable01.volume,
-        },
-        {
-          children: config_useTable01.qty.label,
-          ...config_useTable01.qty,
-        },
-        {
-          children: config_useTable01.unitPrice.label,
-          ...config_useTable01.unitPrice,
-        },
-        {
-          children: config_useTable01.dualPrice.label,
-          ...config_useTable01.dualPrice,
-        },
-      ],
-    };
-    //
+// MARK:useProfile
+const useProfile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
+  const defaultState_profile = useDefault_profile({ paymentDetail });
 
-    let decimal_subTotal = new Decimal(0);
+  const [state_profile, setState_profile] = useState<Tstate_profile>(defaultState_profile);
 
-    const rowArr: Ttable['tbody']['rowArr'] = Object.values(state_installItemDict).map((state_installItem, index) => {
-      const { key, floorNumber, width, height, talent, quantity, unitPrice, totalPrice } = state_installItem;
+  const resetProfile = () => {
+    setState_profile(defaultState_profile);
+  };
 
-      const setState_installItem = createEditState_installItem(key);
-
-      decimal_subTotal = decimal_subTotal.add(totalPrice);
-
-      const cellArr: TcellArr = [
-        isNew
-          ? {
-              children: (
-                <IconDelete01 onClick={() => deleteInstallItem(key)} className={classNames(disabled && 'invisible')} />
-              ),
-              ...config_useTable01.btn,
-            }
-          : null,
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.floorNumber.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                value: floorNumber,
-                readOnly: disabled,
-                onChange: (e) => {
-                  setState_installItem((prev) => {
-                    const copy = { ...prev };
-                    copy.floorNumber = e.target.value as `${number}`;
-
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.floorNumber,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.width.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: width,
-                readOnly: disabled,
-                min: 0,
-                step: 0,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
-
-                  setState_installItem((prev) => {
-                    const copy = { ...prev };
-                    copy.width = e.target.value as `${number}`;
-
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.width,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.height.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: height,
-                readOnly: disabled,
-                min: 0,
-                step: 0,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
-
-                  setState_installItem((prev) => {
-                    const copy = { ...prev };
-                    copy.height = e.target.value as `${number}`;
-
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.height,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.volume.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: talent,
-                readOnly: disabled,
-                min: 0,
-                step: 'any',
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
-
-                  setState_installItem(
-                    (prev) => {
-                      const copy = { ...prev };
-                      copy.talent = e.target.value as `${number}`;
-
-                      return copy;
-                    },
-                    { calcTotalPrice: true }
-                  );
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.volume,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.qty.style?.width }}
-              disabled={isNew ? disabled : true}
-              inputProps={{
-                type: 'number',
-                value: quantity,
-                readOnly: disabled,
-                min: 0,
-                step: 0,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  if (!e.target.validity.valid) {
-                    return;
-                  }
-
-                  setState_installItem(
-                    (prev) => {
-                      const copy = { ...prev };
-                      copy.quantity = e.target.value as `${number}`;
-
-                      return copy;
-                    },
-                    { calcTotalPrice: true }
-                  );
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.qty,
-        },
-        {
-          children: (
-            <CellInput
-              style={{ width: config_useTable01.unitPrice.style?.width }}
-              disabled={disabled}
-              inputProps={{
-                type: 'number',
-                min: 0,
-                step: 0,
-                value: unitPrice,
-                readOnly: disabled,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  e.target.validity.valid &&
-                    setState_installItem(
-                      (prev) => {
-                        const copy = { ...prev };
-                        copy.unitPrice = e.target.value as `${number}`;
-
-                        return copy;
-                      },
-                      { calcTotalPrice: true }
-                    );
-                },
-              }}
-            />
-          ),
-          ...config_useTable01.unitPrice,
-        },
-        {
-          children: totalPrice,
-          ...config_useTable01.dualPrice,
-        },
-      ];
-
-      return {
-        cellArr,
-      };
-    });
-
-    rowArr.push({
-      cellArr: [
-        {
-          children: '合計',
-          ...confit_public.left,
-        },
-        {
-          children: decimal_subTotal.toNumber().toLocaleString(),
-          ...confit_public.right,
-        },
-      ],
-    });
-
-    const tbody = {
-      rowArr,
-    };
-
-    const control_table = {
-      thead,
-      tbody,
-    };
-
-    return {
-      control_installItem: control_table,
-      subTotal_installItem: decimal_subTotal.toNumber(),
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state_installItemDict, disabled]); // useMemo
-
-  return { control_installItem, subTotal_installItem };
-};
-
-// MARK:useTable_otherWorkItem
-const useTable_otherWorkItem = ({
-  state_otherWorkItemArr,
-  options_installItem,
-  createEditState_otherWorkItem,
-  deleteOtherWorkItem,
-  disabled,
-}: {
-  state_otherWorkItemArr: Tstate_otherWorkItemArr;
-  options_installItem: Toption[];
-  createEditState_otherWorkItem: TcreateSetState_otherWorkItem;
-  deleteOtherWorkItem: (index: number) => void;
-  disabled: boolean;
-}) => {
-  const { control_otherWorkItem, subTotal_otherWorkItem } = useMemo(() => {
-    const thead: Ttable['thead'] = {
-      cellArr: [
-        {
-          children: config_useTable02.btn.label,
-          ...config_useTable02.btn,
-        },
-        {
-          children: config_useTable02.floorNumber.label,
-          ...config_useTable02.floorNumber,
-        },
-        {
-          children: config_useTable02.workContent.label,
-          ...config_useTable02.workContent,
-        },
-        {
-          children: config_useTable02.qty.label,
-          ...config_useTable02.qty,
-        },
-        {
-          children: config_useTable02.unitPrice.label,
-          ...config_useTable02.unitPrice,
-        },
-        {
-          children: config_useTable02.dualPrice.label,
-          ...config_useTable02.dualPrice,
-        },
-      ],
-    };
-
-    let decimal_subTotal = new Decimal(0);
-
-    const rowArr: Ttable['tbody']['rowArr'] = state_otherWorkItemArr.map((item, index) => {
-      const {
-        //
-        installItemKey,
-        // floorNumber,
-        content,
-        quantity,
-        unitPrice,
-        totalPrice,
-      } = item;
-
-      const setState_otherWorkItem = createEditState_otherWorkItem(index);
-
-      decimal_subTotal = decimal_subTotal.add(totalPrice);
-
-      const cellArr: Tcell[] = [
-        {
-          children: (
-            <IconDelete01 onClick={() => deleteOtherWorkItem(index)} className={classNames(disabled && 'invisible')} />
-          ),
-          ...config_useTable02.btn,
-        },
-        {
-          children: (
-            <CellSelect
-              //
-              disabled={disabled}
-              style={{ width: config_useTable02.floorNumber.style?.width }}
-              selectProps={{
-                value: installItemKey,
-                placeholder: '',
-                options: options_installItem,
-                onChange: (_, option) => {
-                  const theOption = option as Toption;
-
-                  const { value, label, floorNumber } = theOption ?? {};
-
-                  setState_otherWorkItem((prev) => {
-                    const copy = { ...prev };
-                    copy.installItemKey = value;
-                    copy.floorNumber = floorNumber as string;
-
-                    return copy;
-                  });
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.floorNumber,
-        },
-        {
-          children: (
-            <CellSelect
-              disabled={disabled}
-              style={{ width: config_useTable02.workContent.style?.width }}
-              selectProps={{
-                value: content,
-                placeholder: '工作內容...',
-                options: optionsCreator_otherWorkItems(),
-                onChange: (str) => {
-                  setState_otherWorkItem((prev) => ({ ...prev, content: str }));
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.workContent,
-        },
-        {
-          children: (
-            <CellInput
-              disabled={disabled}
-              style={{ width: config_useTable02.qty.style?.width }}
-              inputProps={{
-                type: 'number',
-                min: 0,
-                step: 0,
-                value: quantity,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  const value = e.target.value as `${number}`;
-                  setState_otherWorkItem((prev) => ({ ...prev, quantity: value }), { calcTotalPrice: true });
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.qty,
-        },
-        {
-          children: (
-            <CellInput
-              disabled={disabled}
-              style={{ width: config_useTable02.unitPrice.style?.width }}
-              inputProps={{
-                type: 'number',
-                min: 0,
-                step: 0,
-                value: unitPrice,
-                onWheel: (e) => e.currentTarget.blur(),
-                onChange: (e) => {
-                  const value = e.target.value as `${number}`;
-                  setState_otherWorkItem((prev) => ({ ...prev, unitPrice: value }), { calcTotalPrice: true });
-                },
-              }}
-            />
-          ),
-          ...config_useTable02.unitPrice,
-        },
-        {
-          children: totalPrice,
-          ...config_useTable02.dualPrice,
-        },
-      ];
-
-      return {
-        className: classNames(!installItemKey && scss.inValid),
-        cellArr,
-      };
-    });
-
-    rowArr.push({
-      cellArr: [
-        {
-          children: '合計',
-          ...confit_public.left,
-        },
-        {
-          children: decimal_subTotal.toNumber().toLocaleString(),
-          ...confit_public.right,
-        },
-      ],
-    });
-
-    const tbody = {
-      rowArr,
-    };
-
-    const control_otherWorkItem = {
-      thead,
-      tbody,
-    };
-
-    return {
-      control_otherWorkItem,
-      subTotal_otherWorkItem: decimal_subTotal.toNumber(),
-    };
-  }, [state_otherWorkItemArr, disabled, options_installItem]); // useMemo
+  useEffect(() => {
+    setState_profile(defaultState_profile);
+  }, [defaultState_profile]);
 
   return {
-    control_otherWorkItem,
-    subTotal_otherWorkItem,
+    state_profile,
+    setState_profile,
+    resetProfile,
   };
 };
 
-const useTable_total = ({ detailTotal }: { detailTotal: number }) => {
-  const control_detailTotal: Ttable = useMemo(() => {
-    const thead: Ttable['thead'] = {
-      cellArr: [
-        {
-          children: '總計',
-          flex: 'auto',
-          width: '100%',
-        },
-      ],
+// MARK:useDefault_profile
+const useDefault_profile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaymentDetailDto | undefined }) => {
+  return useMemo(() => {
+    if (!paymentDetail) {
+      return emptyState_profile();
+    }
+
+    const { engineeringContact, outsourcingPayment } = paymentDetail ?? {};
+
+    let {
+      //
+      projectNumber,
+      projectName,
+      projectCounty,
+      projectDistrict,
+      projectAddress,
+      projectDate,
+    } = paymentDetail ?? {};
+
+    // 原本一定是先有工程聯絡單才有paymentDetail
+    // 但某天說要不經過工程聯絡單直接產生paymentDetail
+    // 所以才會在上面取值後下面再判斷代入
+
+    if (engineeringContact) {
+      projectNumber = engineeringContact.projectNumber;
+      projectName = engineeringContact?.projectName ?? '';
+      projectCounty = engineeringContact.county;
+      projectDistrict = engineeringContact.district;
+      projectAddress = engineeringContact.address;
+      projectDate = outsourcingPayment?.date || null;
+    }
+
+    const defaultState_profile: Tstate_profile = {
+      projectNumber: projectNumber ?? '',
+      projectDate: projectDate ? moment(projectDate) : null,
+      projectName: projectName ?? '',
+      county: projectCounty ?? '',
+      district: projectDistrict ?? '',
+      address: projectAddress ?? '',
     };
 
-    const rowArr: Ttable['tbody']['rowArr'] = [
-      {
-        cellArr: [
-          {
-            children: '總計',
-            ...confit_public.left,
-          },
-          {
-            children: detailTotal.toLocaleString(),
-            ...confit_public.right,
-          },
-        ],
-      },
-    ];
+    return defaultState_profile;
+  }, [paymentDetail]);
+};
 
-    const tbody = {
-      rowArr,
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+
+// MARK: API
+const reqPatchOutsourcingPaymentDetail = async ({
+  paymentDetailId,
+  otherWorkItemGroup,
+  engineeringContactId = null,
+  state_installItemDict,
+  state_outsourcingTotal,
+}: {
+  paymentDetailId: string;
+  otherWorkItemGroup: _.Dictionary<Tstate_otherWorkItem[]>;
+  engineeringContactId: string | undefined | null;
+  state_installItemDict: Tstate_installItemDict;
+  state_outsourcingTotal: number;
+}) => {
+  const itemDetailArr: TitemDetail[] = Object.values(state_installItemDict).map((state_installItem) => {
+    const { key, unitPrice } = state_installItem;
+
+    const singleItemDetail: TsingleItemDetail[] = otherWorkItemGroup[key]?.map((state_otherWorkItem) => {
+      const { content, quantity, unitPrice } = state_otherWorkItem;
+
+      const singleItemDetail: TsingleItemDetail = {
+        floorNumber: state_otherWorkItem.floorNumber,
+        content,
+        quantity: Number(quantity || 0),
+        unitPrice: Number(unitPrice || 0),
+      };
+
+      return singleItemDetail;
+    });
+
+    const itemDetail: TitemDetail = {
+      floorNumber: state_installItem.floorNumber,
+      width: Number(state_installItem.width || 0),
+      height: Number(state_installItem.height || 0),
+      talent: Number(state_installItem.talent || 0),
+      quantity: Number(state_installItem.quantity || 0),
+      unitPrice: Number(unitPrice || 0),
+      singleItemDetail: singleItemDetail,
     };
 
-    return {
-      thead,
-      tbody,
+    return itemDetail;
+  });
+  const body: TupdateOutsourcingPaymentDetailDto = {
+    engineeringContactId: engineeringContactId,
+    installItems: null,
+    outsourcingTotal: state_outsourcingTotal,
+    itemDetail: itemDetailArr,
+  };
+
+  return apiPatchOutsourcingPaymentDetail_updateRetainage(paymentDetailId, body);
+};
+
+const reqPost = async ({
+  otherWorkItemGroup,
+  state_installItemDict,
+  state_outsourcingTotal,
+  state_profile,
+  paymentId,
+}: {
+  otherWorkItemGroup: _.Dictionary<Tstate_otherWorkItem[]>;
+  state_installItemDict: Tstate_installItemDict;
+  state_outsourcingTotal: number;
+  state_profile: Tstate_profile;
+  paymentId: string;
+}) => {
+  const itemDetailArr: TitemDetail[] = Object.values(state_installItemDict).map((state_installItem) => {
+    const { key, floorNumber, width, height, talent, quantity, unitPrice } = state_installItem;
+
+    const singleItemDetailArr = Object.values(otherWorkItemGroup[key]).map((state_otherWorkItem) => {
+      const { floorNumber, content, quantity, unitPrice } = state_otherWorkItem;
+
+      const singleItemDetail: TsingleItemDetail = {
+        floorNumber,
+        content,
+        quantity: Number(quantity || 0),
+        unitPrice: Number(unitPrice || 0),
+      };
+
+      return singleItemDetail;
+    });
+
+    const itemDetail: TitemDetail = {
+      floorNumber,
+      width: Number(width || 0),
+      height: Number(height || 0),
+      talent: Number(talent || 0),
+      quantity: Number(quantity || 0),
+      unitPrice: Number(unitPrice || 0),
+      singleItemDetail: singleItemDetailArr,
     };
-  }, [detailTotal]);
 
-  return control_detailTotal;
+    return itemDetail;
+
+    //
+  });
+
+  const body: TcreateOutsourcingPaymentDetailDto = {
+    engineeringContactId: null,
+
+    projectNumber: state_profile.projectNumber,
+    projectName: state_profile.projectName,
+    projectCounty: state_profile.county,
+    projectDistrict: state_profile.district,
+    projectAddress: state_profile.address,
+    projectDate: state_profile.projectDate?.toISOString() || null,
+    installItems: [],
+    outsourcingTotal: state_outsourcingTotal,
+    itemDetail: itemDetailArr,
+  };
+
+  return apiPostOutsourcingPaymentDetail(paymentId, body);
 };
 
-// ===========================================================================
-
-type Tconfig = {
-  [key: string]: Tconfig_table;
-};
-
-const confit_public: Tconfig = {
-  left: {
-    flex: 'auto',
-    justifyContent: 'flex-end',
-  },
-  right: {
-    width: 150,
-    justifyContent: 'center',
-  },
-};
-
-const config_useTable01: Tconfig = {
-  btn: {
-    label: '',
-    style: {
-      width: 40,
-      justifyContent: 'center',
-    },
-  },
-  floorNumber: {
-    label: '樓層編號',
-    style: {
-      // width:230
-      flex: 'auto',
-      justifyContent: 'center',
-    },
-  },
-  width: {
-    label: '寬',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  height: {
-    label: '高',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  volume: {
-    label: '才數',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  qty: {
-    label: '樘數',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  unitPrice: {
-    label: '價格/才',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  dualPrice: {
-    label: '小計',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-};
-
-const config_useTable02: Tconfig = {
-  btn: {
-    label: '',
-    style: {
-      width: 40,
-      justifyContent: 'center',
-    },
-  },
-  floorNumber: {
-    label: '樓層編號',
-    style: {
-      width: 158,
-      justifyContent: 'center',
-    },
-  },
-  workContent: {
-    label: '工作內容',
-    style: {
-      flex: 'auto',
-      width: '418px',
-      justifyContent: 'center',
-    },
-  },
-  qty: {
-    label: '數量',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  unitPrice: {
-    label: '單價',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-  dualPrice: {
-    label: '小計',
-    style: {
-      width: 150,
-      justifyContent: 'center',
-    },
-  },
-};
-
-// ===========================================================================
+// ==========================================================================
 
 const emptyState_profile = () => {
   const state_profile: Tstate_profile = {
-    // outsourcingName: '',
     projectNumber: '',
     projectDate: null,
-    // installer: '',
     projectName: '',
     county: '',
     district: '',
@@ -1717,9 +997,152 @@ const calcTotalPrice = ({
   quantity,
   unitPrice,
 }: {
-  talent?: `${number}` | number;
-  quantity: `${number}` | number;
-  unitPrice: `${number}` | number;
+  talent?: `${number}` | number | '';
+  quantity: `${number}` | number | '';
+  unitPrice: `${number}` | number | '';
 }) => {
-  return new Decimal(talent).mul(quantity).mul(unitPrice).toDecimalPlaces(0).toNumber();
+  const theTalent = Number(talent || 0) < 100 ? 100 : talent;
+
+  return new Decimal(theTalent || 0)
+    .mul(quantity || 0)
+    .mul(unitPrice || 0)
+    .toDecimalPlaces(0)
+    .toNumber();
 };
+
+const calcTalent = ({ width, height }: { width: `${number}` | number | ''; height: `${number}` | number | '' }) => {
+  const area = new Decimal(width || 0).mul(height || 0).toNumber();
+
+  return calcProductVolume(area);
+};
+
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+// ==========================================================================
+
+export type {
+  Tstate_installItem,
+  Tstate_installItemDict,
+  Tstate_otherWorkItem,
+  Tstate_otherWorkItemArr,
+  Tstate_outsourcingTotal,
+  TsetState_installItem,
+  TcreateSetState_otherWorkItem,
+  Tapi_useDetail,
+  TsetState_otherWorkItem,
+};
+
+export { calcTotalPrice, calcTalent };
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+// ===========================================================================
+
+// 暫時先留著，免得哪天說要改回來 20250401
+// 應該半年(20251001)後就可以刪了
+// const reqPatchOutsourcingPaymentDetail_old = async ({
+//   paymentDetailId,
+//   otherWorkItemGroup,
+//   isFromUserCreat,
+//   engineeringContactId,
+//   state_installItemDict,
+//   state_outsourcingTotal,
+// }: {
+//   paymentDetailId: string;
+//   otherWorkItemGroup: _.Dictionary<Tstate_otherWorkItem[]>;
+//   isFromUserCreat: boolean;
+//   engineeringContactId: string | undefined;
+//   state_installItemDict: Tstate_installItemDict;
+//   state_outsourcingTotal: number;
+// }) => {
+//   let body: TupdateOutsourcingPaymentDetailDto;
+
+//   if (!isFromUserCreat) {
+//     if (!engineeringContactId) {
+//       myAlert.err({ title: '更新外包計價單錯誤', content: '沒有engineeringContact.id' });
+
+//       return;
+//     }
+
+//     const installItems: TcreateOutsourcingPaymentDetailItemDto[] = Object.values(state_installItemDict).map(
+//       (state_installItem) => {
+//         const { key, id, deliveryStatusId, unitPrice, totalPrice } = state_installItem;
+
+//         if (!id) {
+//           console.error(state_installItem);
+
+//           throw new Error('reqPatchOutsourcingPaymentDetail: 沒有installItem.id');
+//         }
+
+//         const otherWorkItems: ToutsourcingPaymentDetailItemDto[] = otherWorkItemGroup[key]?.map(
+//           (state_otherWorkItem) => {
+//             const { content, quantity, unitPrice, totalPrice } = state_otherWorkItem;
+//             const otherWorkItem: ToutsourcingPaymentDetailItemDto = {
+//               otherInstallation: content,
+//               otherQuantity: Number(quantity || 0),
+//               otherUnitPrice: Number(unitPrice || 0),
+//               otherSubTotalPrice: totalPrice,
+//               quotationItemStatusId: deliveryStatusId,
+//             };
+
+//             return otherWorkItem;
+//           }
+//         );
+
+//         const installItem: TcreateOutsourcingPaymentDetailItemDto = {
+//           itemId: id,
+//           itemPrice: Number(unitPrice || 0),
+//           otherWorkItems: otherWorkItems,
+//           otherWorkItemTotal: totalPrice,
+//         };
+
+//         return installItem;
+//       }
+//     );
+
+//     body = {
+//       engineeringContactId: engineeringContactId,
+//       installItems: installItems,
+//       outsourcingTotal: state_outsourcingTotal,
+//     };
+//   } else {
+//     const itemDetailArr: TitemDetail[] = Object.values(state_installItemDict).map((state_installItem) => {
+//       const { key, unitPrice } = state_installItem;
+
+//       const singleItemDetail: TsingleItemDetail[] = otherWorkItemGroup[key]?.map((state_otherWorkItem) => {
+//         const { content, quantity, unitPrice } = state_otherWorkItem;
+
+//         const singleItemDetail: TsingleItemDetail = {
+//           floorNumber: state_otherWorkItem.floorNumber,
+//           content,
+//           quantity: Number(quantity || 0),
+//           unitPrice: Number(unitPrice || 0),
+//         };
+
+//         return singleItemDetail;
+//       });
+
+//       const itemDetail: TitemDetail = {
+//         floorNumber: state_installItem.floorNumber,
+//         width: Number(state_installItem.width || 0),
+//         height: Number(state_installItem.height || 0),
+//         talent: Number(state_installItem.talent || 0),
+//         quantity: Number(state_installItem.quantity || 0),
+//         unitPrice: Number(unitPrice || 0),
+//         singleItemDetail: singleItemDetail,
+//       };
+
+//       return itemDetail;
+//     });
+//     body = {
+//       engineeringContactId: null,
+//       installItems: null,
+//       outsourcingTotal: state_outsourcingTotal,
+//       itemDetail: itemDetailArr,
+//     };
+//   }
+
+//   return apiPatchOutsourcingPaymentDetail_updateRetainage(paymentDetailId, body);
+// };

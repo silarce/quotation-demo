@@ -7,7 +7,7 @@
   top: 0;
   z-index: 1000; // 確保元素位於其他內容的上層
   display: grid;
-  grid-template-columns: 40px 30px 100px 250px 100px 100px 150px 250px 250px 100px 100px 100px 50px 100px 100px 250px;
+  grid-template-columns: 40px 30px 100px 100px 100px 150px 400px 400px 100px 100px 100px 50px 100px 100px 250px;
   gap: 10px; // 與 panelHeader15 的 row01 保持一致
   height: 40px;
   padding: 0px 20px;
@@ -52,7 +52,7 @@ div.panelHeader15 {
     
     .row01 {
         display: grid;
-        grid-template-columns: 40px 30px 100px 250px 100px 100px 150px 250px 250px 100px 100px 100px 50px 100px 100px;
+        grid-template-columns: 40px 30px 100px 100px 100px 150px 400px 400px 100px 100px 100px 50px 100px 100px 250px;
         gap: 10px; // 與 head15 保持一致
         cursor: pointer;
         transition: background-color 0.3s ease;
@@ -539,7 +539,7 @@ div.panelHeader26 {
 
 .search_content1 {
   display: grid;
-  grid-template-columns: 300px 500px 1fr; // 左右兩邊比例，可以調整
+  grid-template-columns: 300px 1fr 1fr; // 左右兩邊比例，可以調整
   gap: 15px;
   // margin-top: 5px;
   // margin-left: 20px;

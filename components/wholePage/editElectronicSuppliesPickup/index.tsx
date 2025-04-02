@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -12,7 +12,10 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 import { Select as AntdSelect, SelectProps } from 'antd';
 
 // component
-import SupplyTable, { useStateToGroup } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
+import SupplyTable, {
+  TimperativeHandle,
+  useStateToGroup,
+} from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
 
 // gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -48,6 +51,8 @@ import {
   useElectronicSuppliesRequirement,
 } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 // ==================================================================
 
 type Tquery = {
@@ -75,6 +80,9 @@ const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment', 'e
 });
 
 // ==================================================================
+
+// MARK:START
+
 export default function EditElectronicSuppliesPickup({
   CustomPageHeader,
 }: {
@@ -85,6 +93,8 @@ export default function EditElectronicSuppliesPickup({
   const { contractId, pickupRecordId } = query;
 
   const isNew = !pickupRecordId;
+
+  const ref_supplyTable = useRef<TimperativeHandle>(null);
 
   // ------------------------------------------------------------------
   const [disabled, setDisabled] = useState(!isNew);
@@ -104,7 +114,13 @@ export default function EditElectronicSuppliesPickup({
 
   // ------------------------------------------------------------------
 
-  const { data: data_contract, update: update_contract, contactThatSkipContract } = useGetContract_id(contractId);
+  const {
+    data: data_contract,
+    update: update_contract,
+    contactThatSkipContract,
+  } = useGetContract_id(contractId, {
+    customPopulate: ['engineeringContact'],
+  });
 
   const {
     data: data_pickup,
@@ -112,7 +128,7 @@ export default function EditElectronicSuppliesPickup({
     isFetching: isFetching_pickup,
   } = useGetElectronicSuppliesPickupRecord_id(pickupRecordId);
 
-  const { electronicSuppliesId } = data_contract ?? {};
+  const { electronicSuppliesId, engineeringContact } = data_contract ?? {};
   const { options_doorModel, update: update_doorModelList } = useApiGetProdDoorModels();
 
   const { data: data_electronicSupplies, isFetching: isFetching_electronicSupplies } = useElectronicSupplies_id(
@@ -123,6 +139,11 @@ export default function EditElectronicSuppliesPickup({
       },
     }
   );
+
+  const contractNumber = data_contract?.contractNumber ?? '';
+  const projectName = engineeringContact?.projectName ?? '';
+  const takeOffEmployeeName = data_pickup?.takeOffEmployee?.chName ?? '';
+  const preparationEmployeeName = data_pickup?.preparationEmployee?.chName ?? '';
 
   // ------------------------------------------------------------------
 
@@ -335,6 +356,13 @@ export default function EditElectronicSuppliesPickup({
   const panelList_disabled: TpanelList = [
     {
       type: 'myButton',
+      label: '匯出PDF',
+      onClick: () => {
+        ref_supplyTable.current?.openPdf();
+      },
+    },
+    {
+      type: 'myButton',
       label: '編輯',
       onClick: () => {
         setDisabled(false);
@@ -428,7 +456,7 @@ export default function EditElectronicSuppliesPickup({
         <PageHeader
           showReturnBtn={disabled}
           panelList={panelList}
-          contractNumber={data_contract?.contractNumber ?? '---'}
+          contractNumber={contractNumber ?? '---'}
           contactThatSkipContract={contactThatSkipContract}
         />
       )}
@@ -534,9 +562,7 @@ export default function EditElectronicSuppliesPickup({
             <AntdSelect
               placeholder="請選擇需求單"
               size="large"
-              // className="w-96"
               className={classNames('w-36')}
-              // mode="multiple"
               allowClear
               options={requirementRecordOptions}
               value={requirementRecordId}
@@ -552,10 +578,19 @@ export default function EditElectronicSuppliesPickup({
 
         {/* table */}
         <SupplyTable
+          ref={ref_supplyTable}
           className="border border-border mt-10"
           valueLabelArr={['領取數量']}
           groupArr={groupArr}
           disabled={disabled}
+          pdfInfo={{
+            pdfFileName: `送電備品領取單_${contractNumber}_${moment().format('YYYY-MM-DD')}`,
+            contractNumber: contractNumber,
+            projectName: projectName,
+            date: getTaiwanDateStr(data_pickup?.updatedAt) ?? '',
+            takeOffEmployeeName: takeOffEmployeeName,
+            preparationEmployeeName: preparationEmployeeName,
+          }}
         />
         {/*  */}
         <SelectorGroup

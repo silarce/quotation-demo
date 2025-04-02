@@ -1,13 +1,21 @@
-import { useMemo } from 'react';
+import { useMemo, forwardRef, useImperativeHandle, useRef } from 'react';
 import classNames from 'classnames';
+import _ from 'lodash';
+
+// gear
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+
+// type
+import { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
+
+// icon
+import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
 import scss from './supplyTable.module.scss';
 
-import { IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
-
-// type
-import { Tstate_electronicItem } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
+import { dlPdf, getA4Rect } from 'js/utils/dlPdf';
 
 // ==================================================================
 
@@ -17,6 +25,7 @@ type Tgroup = {
   onAddClick?: (() => void) | undefined;
   rowArr: {
     category: React.ReactNode; // 種類
+    // valueArr之所以是arr是因為送電備品總料單最後面有三欄
     valueArr: {
       value?: string;
       onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -41,27 +50,83 @@ type Tprops_cell_input = {
   inputAttr?: React.InputHTMLAttributes<HTMLInputElement>;
 } & Omit<Tprops_cell, 'children'>;
 
-export type { Tgroup, Tprops_cell, Tprops_cell_input };
+type Tinfo = {
+  pdfFileName: string;
+  contractNumber: string;
+  projectName: string;
+  date: string;
+  takeOffEmployeeName?: string; // 領料人員
+  preparationEmployeeName?: string; // 備料人員
+};
+
+type TimperativeHandle = {
+  openPdf: () => void;
+};
+
+// ==================================================================
+
+const pdfRect = getA4Rect();
 
 // ==================================================================
 
 // MARK:START
 
-export default function SupplyTable({
-  //
-  className,
-  valueLabelArr,
-  groupArr,
-  disabled,
-}: {
-  className?: string;
-  valueLabelArr: string[];
-  groupArr: Tgroup[];
-  disabled?: boolean;
-}) {
-  // MARK: RENDER
+function SupplyTable(
+  {
+    className,
+    valueLabelArr,
+    groupArr,
+    disabled,
+
+    pdfInfo,
+  }: {
+    className?: string;
+    valueLabelArr: string[];
+    groupArr: Tgroup[];
+    disabled?: boolean;
+
+    pdfInfo?: Tinfo;
+  },
+  ref: React.Ref<TimperativeHandle>
+) {
+  const openPdf = () => {
+    if (!pdfInfo) {
+      alert('pdfInfo is undefined');
+
+      return;
+    }
+
+    const groupArr_clone = _.cloneDeep(groupArr);
+
+    const filteredGroupArr: Tgroup[] = groupArr_clone
+      .map((group) => {
+        group.rowArr = group.rowArr
+          .map((row) => {
+            row.valueArr = row.valueArr.filter(({ value }) => !!Number(value));
+
+            return row;
+          })
+          .filter((row) => !!row.valueArr.length);
+
+        if (group.rowArr.length === 0) {
+          return null;
+        }
+
+        return group;
+      })
+      .filter((group) => !!group) as Tgroup[];
+
+    myAlert.clear({
+      content: <PdfModal pdfInfo={pdfInfo} valueLabelArr={valueLabelArr} groupArr={filteredGroupArr} />,
+    });
+  };
+
+  useImperativeHandle(ref, () => ({
+    openPdf,
+  }));
+
   return (
-    <div className={classNames(scss.supplyList, className)}>
+    <div className={classNames(scss.container, className)}>
       <Thead valueLabelArr={valueLabelArr} />
 
       {groupArr.map((props, index) => {
@@ -70,6 +135,7 @@ export default function SupplyTable({
     </div>
   );
 }
+
 // MARK:END
 // ============================================================================
 // ============================================================================
@@ -187,6 +253,115 @@ const Cell_input = (props: Tprops_cell_input = {}) => {
 };
 
 // ============================================================================
+// ============================================================================
+
+// MARK: PDF COMPONENTS
+
+const PdfModal = ({
+  valueLabelArr,
+  groupArr,
+  pdfInfo,
+}: {
+  valueLabelArr: string[];
+  groupArr: Tgroup[];
+  pdfInfo: Tinfo;
+}) => {
+  const ref_pdf = useRef(null);
+
+  const handle_dlPdf = () => {
+    dlPdf({
+      divElementArr: [ref_pdf.current!],
+      fileName: pdfInfo.pdfFileName,
+    });
+  };
+
+  return (
+    <div>
+      <div className={scss.pdfPanel}>
+        <SquareBtn
+          sharp="long"
+          onClick={() => {
+            handle_dlPdf();
+          }}
+        >
+          下載PDF
+        </SquareBtn>
+      </div>
+      {/*  */}
+      <Page ref={ref_pdf} valueLabelArr={valueLabelArr} groupArr={groupArr} {...pdfInfo} />
+    </div>
+  );
+};
+
+const Page_ = (
+  {
+    valueLabelArr,
+    groupArr,
+
+    contractNumber,
+    projectName,
+    date,
+    ...takeAndPreparation
+  }: {
+    valueLabelArr: string[];
+    groupArr: Tgroup[];
+  } & Tinfo,
+  ref: React.Ref<HTMLDivElement>
+) => {
+  const { takeOffEmployeeName, preparationEmployeeName } = takeAndPreparation;
+
+  return (
+    <div className={scss.pdfPageWrapper}>
+      <div ref={ref} style={pdfRect} className={scss.pdfPage}>
+        {/*  */}
+        <div className={'flex gap-3 text-lg'}>
+          <Caption className="" label="編號" value={<span className="inline-block w-32">{contractNumber}</span>} />
+          <Caption label="工程名稱" value={projectName} />
+          <Caption className="m-auto mr-0" label="日期" value={<span className="inline-block w-24">{date}</span>} />
+        </div>
+        {/*  */}
+        <div className={scss.table}>
+          <Thead valueLabelArr={valueLabelArr} />
+
+          {groupArr.map((props, index) => {
+            return <Group key={index} disabled={true} {...props} />;
+          })}
+        </div>
+        <div className={'flex gap-3 justify-end text-lg'}>
+          {'takeOffEmployeeName' in takeAndPreparation && (
+            <Caption label="領料" value={<span className="inline-block w-24">{takeOffEmployeeName}</span>} />
+          )}
+
+          {'preparationEmployeeName' in takeAndPreparation && (
+            <Caption label="填表" value={<span className="inline-block w-24">{preparationEmployeeName}</span>} />
+          )}
+        </div>
+        {/*  */}
+      </div>
+    </div>
+  );
+};
+
+const Caption = ({
+  className,
+  label,
+  value,
+}: {
+  className?: string;
+  label: React.ReactNode;
+  value: React.ReactNode;
+}) => {
+  return (
+    <div className={classNames(className)}>
+      <span>{label}</span>: <span>{value}</span>
+    </div>
+  );
+};
+
+const Page = forwardRef(Page_);
+
+// ============================================================================
+// ============================================================================
 
 // region HOOK
 
@@ -233,4 +408,7 @@ const useStateToGroup = ({
   }, [stateArr]);
 };
 
+// ===========================================================================
+export default forwardRef(SupplyTable);
 export { useStateToGroup };
+export type { Tgroup, Tprops_cell, Tprops_cell_input, TimperativeHandle };

@@ -1,11 +1,14 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
 import classNames from 'classnames';
 
 // gear
 import Row, { Cell } from 'components/global/gear/table/row';
 import { Checkbox } from 'components/global/gear/dataEntry';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import scss from './itemList.module.scss';
+
+import ExportPdfExcel from './exportPdfExcel';
 
 // type
 import { TworksheetDto, TquotationProductItemDto } from 'js/api/dtoTypes';
@@ -69,11 +72,24 @@ type Tconfig = {
 
 // MARK:START
 
-export default function ItemList({ className, worksheetArr }: { className?: string; worksheetArr: TworksheetDto[] }) {
+export default function ItemList({
+  className,
+  worksheetArr,
+  onWorksheetArrChange,
+  onUnmount,
+  projectName,
+}: {
+  className?: string;
+  worksheetArr: TworksheetDto[] | undefined | null;
+  onWorksheetArrChange?: (props: { openPdf: () => void }) => void;
+  onUnmount?: () => void;
+  projectName: string;
+}) {
+  //
   const productItemArr: Titem[] = useMemo(() => {
     const list: TproductItemList = {};
 
-    worksheetArr.forEach((worksheet) => {
+    worksheetArr?.forEach((worksheet) => {
       const { latestRecord, isAbandoned, isAlreadyToElectronicSupplies } = worksheet;
 
       if (isAbandoned || !isAlreadyToElectronicSupplies) {
@@ -131,6 +147,30 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
     //
   }, [worksheetArr]);
 
+  const openPdf = useCallback(() => {
+    // const testFake = [
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    //   ...productItemArr,
+    // ];
+
+    myAlert.clear({ content: <ExportPdfExcel itemArr={productItemArr} projectName={projectName} /> });
+    // myAlert.clear({ content: <ExportPdfExcel itemArr={testFake} /> });
+  }, [productItemArr]);
+
+  useEffect(() => {
+    onWorksheetArrChange?.({ openPdf });
+  }, [openPdf]);
+
+  useEffect(() => {
+    return () => {
+      onUnmount?.();
+    };
+  }, []);
+
   // region RENDER
 
   return (
@@ -169,10 +209,13 @@ export default function ItemList({ className, worksheetArr }: { className?: stri
 // MARK: END
 
 // ==================================================================
+// ==================================================================
+// ==================================================================
 
+// MARK: config
 const config: Tconfig = {
   itemName: {
-    label: '名稱',
+    label: '項目',
     style: {
       width: 150,
       justifyContent: 'flex-start',
@@ -183,7 +226,7 @@ const config: Tconfig = {
   itemNumber: {
     label: '編號',
     style: {
-      width: 180,
+      width: 170,
       justifyContent: 'flex-start',
     },
     className: scss.itemNumber,
@@ -192,18 +235,21 @@ const config: Tconfig = {
   floor: {
     label: '樓層',
     style: {
-      width: 150,
+      width: 170,
       justifyContent: 'flex-start',
     },
     render: ({ floor }) => floor,
+    // render: ({ floor }) => <span>gggggggggggggggg</span>,
   },
   locationArea: {
     label: '區域',
     style: {
-      width: 150,
+      width: 170,
       justifyContent: 'flex-start',
     },
+    className: scss.cellSpan,
     render: ({ locationArea }) => locationArea,
+    // render: ({ locationArea }) => <span>aaaaaaaaaaaaaaaaaassssss</span>,
   },
   qty: {
     label: '樘數',
@@ -232,10 +278,10 @@ const config: Tconfig = {
   motorVoltage: {
     label: '電壓',
     style: {
-      width: 60,
+      width: 80,
       justifyContent: 'center',
     },
-    render: ({ motorVoltage }) => motorVoltage,
+    render: ({ motorVoltage, motorPhase }) => `${motorPhase}ψ ${motorVoltage}V`,
   },
   horsepower: {
     label: '馬力數',
@@ -337,7 +383,7 @@ const config: Tconfig = {
 
 const keyArr: Tkeys[] = [
   'itemName',
-  'itemNumber',
+  // 'itemNumber',
   'floor',
   'locationArea',
   'qty',
@@ -346,15 +392,17 @@ const keyArr: Tkeys[] = [
   'motorVoltage',
   'horsepower',
   'antiTyphoonBaseLock',
+
   'obstacleSensor',
   'infrared',
   'remoteControl',
-  'bounceDoor',
+  // 'bounceDoor',
   'smartSwitch',
   'antiTyphoonColumn',
   'ul',
   'wheel',
 ];
+
 // =======================================================================
 
 const acceCheckLookup = {
@@ -368,3 +416,6 @@ const acceCheckLookup = {
   UL熔金體: 'ul',
   檔輪: 'wheel',
 } as const;
+
+export type { Titem, Tkeys, Tconfig };
+export { config, acceCheckLookup, keyArr };
