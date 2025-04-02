@@ -4992,11 +4992,17 @@ export type TcreateOutsourcingPaymentDetailItemDto = {
 // };
 export type TupdateOutsourcingPaymentDetailDto = {
   engineeringContactId: string | null; // 工程聯落單id
-  installItems: TcreateOutsourcingPaymentDetailItemDto[] | null; // 項目
+
+  // 棄用，一律送null
+  installItems: null; // 項目
+  // installItems: TcreateOutsourcingPaymentDetailItemDto[] | null; // 項目
+
   // outsourcing: number; // 外包計價明細總計
   outsourcingTotal: number; // 外包計價明細總計
 
-  itemDetail?: TitemDetail[] | null;
+  // 不再送installItems，一律送itemDetail
+  itemDetail: TitemDetail[] | null;
+  // itemDetail?: TitemDetail[] | null;
 };
 
 export type ToutsourcingPaymentDetailItemDto = {

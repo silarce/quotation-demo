@@ -180,11 +180,20 @@ div.panelHeader15 {
   .modal_right_content {
     width: 95%;
     overflow-y: auto;
-    // padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  
     overflow-x: auto;
-  }
+    position: relative;  /* 使用相對定位，避免影響其他定位元素 */
+    // padding-top: 60px;  /* 如果需要額外的空間，可以調整這個 padding-top 來防止被 .modal_right_head 覆蓋 */
+}
+
+.modal_right_content2 {
+    position: absolute;
+    top: 40px;  /* 設定為 .modal_right_head 的高度，這樣就會位於 head 下面 */
+    left: 0;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: auto;
+}
   
   .modal_left {
     width: 500px;
@@ -198,19 +207,16 @@ div.panelHeader15 {
   
   .modal_right_head {
     position: absolute;
-    /* 使其絕對定位 */
     top: 0;
-    /* 使其對齊到父容器的頂部 */
     left: 0;
-    /* 使其對齊到父容器的左側 */
     width: 100%;
-    /* 根據需要調整 */
     display: flex;
     justify-content: flex-start;
-    /* 水平方向左對齊 */
     align-items: flex-start;
-    /* 垂直方向上對齊 */
-  }
+    height: auto;  /* 設定頭部的高度 */
+    // background-color: #f0f0f0;  /* 設定背景色（可以根據需求修改） */
+    padding:10px 10px;
+}
   
   
   .modal_right {
@@ -516,3 +522,71 @@ div.panelHeader15 {
     }
   
   }
+
+
+  //#region 物料明細
+.thead30 {
+  position: -webkit-sticky; // 為兼容性增加前綴
+  position: sticky;
+  top: 0;
+  z-index: 1000; // 確保元素位於其他內容的上層
+  display: grid;
+  grid-template-columns: 60px 150px 415px 415px 100px 65px 65px;
+  // gap: 5px;
+  height: 40px;
+  padding: 0px 20px;
+  background-color: $bgc01;
+
+  >* {
+      margin: auto;
+      margin-left: 0;
+
+      &:nth-last-of-type(1) {
+          margin-left: auto;
+      }
+  }
+
+  >span {
+      font-weight: 400;
+      font-size: 18px;
+      // color: #979797;
+      color: #14256a;
+  }
+}
+
+//#endregion
+
+//#region 進貨單明細
+div.panelHeader30 {
+  border-bottom: solid 1px $colorBorder01;
+
+  .row01,
+  .row02 {
+      padding-left: 20px;
+
+      span {
+          font-weight: 400;
+          font-size: 16px;
+      }
+
+      .clientName,
+      .country {
+          color: $colorMain;
+      }
+  }
+
+  .row01 {
+      display: grid;
+      grid-template-columns: 60px 150px 415px 415px 100px 65px 65px;
+      gap: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+  }
+
+  .selectedRow {
+      background-color: #ecf1ff;
+      /* 當前選擇項目的背景顏色 */
+  }
+}
+
+//#endregion

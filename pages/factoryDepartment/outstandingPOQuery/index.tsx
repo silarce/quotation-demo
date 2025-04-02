@@ -95,12 +95,15 @@ export default function outstandingPOQuery() {
 
     const [data3, setData3] = useState<any[]>([]);
 
+    const [selecttype, setSelectType] = useState<string>("");
+
     //搜尋
     const [keyword1, setKeyword1] = useState<string>("");
     const [keyword2, setKeyword2] = useState<string>("");
     const [keyword3, setKeyword3] = useState<string>("");
     const [keyword4, setKeyword4] = useState<string>("");
     const [keyword5, setKeyword5] = useState<string>("");
+    const [keyword6, setKeyword6] = useState<string>("");
     // 預設截止日期為今天，起始日期為今天往前推30天
     const defaultEndDate = moment();
     const defaultStartDate = moment().subtract(30, 'days');
@@ -164,34 +167,35 @@ export default function outstandingPOQuery() {
 
     //#region ===========【頁面進入】
     useEffect(() => {
-        Get();
+        Get("未交貨");
+        setSelectType("未交貨");
     }, []);
 
     //#endregion
 
     //#endregion ===========【自動更新】
-    useEffect(() => {
-        if (autoRefreshOpen === true) {
+    // useEffect(() => {
+    //     if (autoRefreshOpen === true) {
 
-            // 定義一個 interval，每隔 5 分鐘執行一次 Get 函式
-            const intervalId = setInterval(() => {
-                Get();
-            }, autoRefresh * 60 * 1000); // 5 分鐘 = 5 * 60 * 1000 毫秒
+    //         // 定義一個 interval，每隔 5 分鐘執行一次 Get 函式
+    //         const intervalId = setInterval(() => {
+    //             Get();
+    //         }, autoRefresh * 60 * 1000); // 5 分鐘 = 5 * 60 * 1000 毫秒
 
-            // 清除 interval，避免記憶體洩漏
-            return () => clearInterval(intervalId);
-        }
-    }, []); // 確保只在組件掛載時設定一次
+    //         // 清除 interval，避免記憶體洩漏
+    //         return () => clearInterval(intervalId);
+    //     }
+    // }, []); // 確保只在組件掛載時設定一次
     //#endregion
 
     //#region ===========【API】
 
     //取單據
-    const Get = async () => {
+    const Get = async (type: any) => {
         try {
             setIsLoading(true);
             const conditionModel = {
-                type: "未交貨查詢",
+                type: type,
                 username: userInfo?.employee?.id.toString()
             };
 
@@ -204,7 +208,7 @@ export default function outstandingPOQuery() {
 
             const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-            const response = await fetch(`${setting.apipath}/WareHouse/GetUnReceipt?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/GetUnReceiptOrReceipt?${queryParams}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data');
             }
@@ -255,6 +259,63 @@ export default function outstandingPOQuery() {
         }
         finally {
             // setIsLoading(false);
+        }
+    };
+
+    //匯出單據
+    const Excel = async (id: any, type2: any, quoid: any) => {
+        try {
+
+            setIsLoading(true);
+            const conditionModel = {
+                id: id,
+                type: "outstandingPOQuery",
+                type2: type2,
+                quoterequuid: quoid
+            };
+
+            const inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+
+            // 將響應轉換為 Blob
+            const blob = await response.blob();
+
+            // 創建一個 URL 來下載 Blob
+            const url = window.URL.createObjectURL(blob);
+
+            // 創建一個下載鏈接
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+
+            // 將鏈接添加到 DOM 並觸發點擊下載
+            document.body.appendChild(link);
+            link.click();
+
+            // 清除鏈接和 URL 物件
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Download failed:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -377,6 +438,9 @@ export default function outstandingPOQuery() {
         }));
     };
 
+    const handleExport = () => {
+        Excel("", selecttype, "")
+    }
     //#endregion
 
     //#region ===========【明細功能區】
@@ -482,12 +546,26 @@ export default function outstandingPOQuery() {
     };
     //#endregion
 
+
+
     return (
         <SubLayer isLoading_subLayer={false}>
             <PageHeader02 tag={pagename}
                 customeLeft={[
                     <>
-                        {/* {windowSize.width} */}
+                        {/* <button
+                            className={scss.shortsquarebtn}
+                            onClick={() => {
+                                handleExport();
+                            }}
+                            title="匯出單據"
+                            style={{ margin: '0px 10px' }}
+                        >
+                            <span style={{ paddingRight: '5px' }}>
+                                <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                            </span>
+                            Excel
+                        </button> */}
                     </>
                 ]}
                 customeRight={[
@@ -509,7 +587,7 @@ export default function outstandingPOQuery() {
                     {/* 每個項目 */}
                     <div>
                         {/* 種類下拉選單 */}
-                        {/* <label
+                        <label
                             style={{
                                 fontSize: "16px",
                                 fontWeight: "bold",
@@ -517,13 +595,16 @@ export default function outstandingPOQuery() {
                                 display: 'block',
                             }}
                         >
-                            價格種類
+                            查詢種類
                         </label>
                         <select
-                            value={keyword5 || ''}
+                            value={keyword6 || ''}
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                setKeyword5(e.target.value);
+                                setKeyword6(e.target.value);
+
+                                Get(e.target.value);
                                 e.target.blur(); // 讓 select 失去焦點
+                                setSelectType(e.target.value);
                             }}
                             disabled={false} // 根據需求設置是否禁用
                             style={{
@@ -533,10 +614,12 @@ export default function outstandingPOQuery() {
                                 marginTop: '-1px', // 調整負值以微調向上位置
                             }}
                         >
-                            <option value="">全部</option>
-                            <option value="詢價">詢價</option>
-                            <option value="進價">進價</option>
-                        </select> */}
+                            <option value="未交貨">未交貨</option>
+                            <option value="已交貨">已交貨</option>
+                        </select>
+
+                    </div>
+                    <div>
                         {/* 廠商編號 */}
                         <label
                             style={{
@@ -562,6 +645,7 @@ export default function outstandingPOQuery() {
                                 },
                             }}
                         />
+
                     </div>
                     <div>
                         {/* 廠商名稱 */}
@@ -589,9 +673,6 @@ export default function outstandingPOQuery() {
                                 },
                             }}
                         />
-                    </div>
-                    <div>
-
                         {/* 隱藏保留位置 */}
                         {/* <label
                         style={{
@@ -801,18 +882,18 @@ export default function outstandingPOQuery() {
                         </span>
                         <span>序</span>
                         <span>單號</span>
+                        <span>廠商</span>
                         <span>建立日期</span>
                         <span>需用日期</span>
                         <span>料號</span>
                         <span>品名</span>
                         <span>規格</span>
                         <span>數量</span>
-                        <span>已交貨</span>
+                        <span>已交數</span>
                         <span>未交數</span>
                         <span>單位</span>
                         <span>單價</span>
                         <span>總價</span>
-                        <span>廠商</span>
                         <span></span>
                     </div>
                     {/* {searchdata && (searchdata.map((_item: any, index: number) => ( */}
@@ -869,6 +950,9 @@ export default function outstandingPOQuery() {
                                         </span>
                                         <span>{index + 1}</span>
                                         <span>{_item.purchaseorderid}</span>
+                                        <span>
+                                            {_item.suppliername}
+                                        </span>
                                         <span>{getTaiwanDateStr(_item.create_at)}</span>
                                         <span>{getTaiwanDateStr(_item.need_date)}</span>
                                         <span>
@@ -884,9 +968,7 @@ export default function outstandingPOQuery() {
                                         <span>{_item.unit}</span>
                                         <span>{Number(_item.unitprice).toLocaleString()}</span>
                                         <span>{Number(_item.totalprice).toLocaleString()}</span>
-                                        <span>
-                                            {_item.suppliername}
-                                        </span>
+
                                     </div>
                                 </>
                             </CellWithBar>
