@@ -351,6 +351,7 @@ interface TstateProd {
   >;
   quotationDiscount_iterativeProd?: number | `${number}`; //
 
+  // 目前沒有地方會改變isQuantityValid
   // isQuantityValid應該是用不到了，可以移除
   isQuantityValid: boolean; // 若qty_reduce與modifyedProduct.quantity總和大於quantity，則為false
   // ____________________________________________________________
