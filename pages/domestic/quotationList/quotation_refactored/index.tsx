@@ -567,7 +567,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:更新追加追減報價單
   const handlePatchModify = () => {
-    if (checkIsIterativeProdValid()) {
+    if (!checkIsIterativeProdValid()) {
       myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
 
       return;
