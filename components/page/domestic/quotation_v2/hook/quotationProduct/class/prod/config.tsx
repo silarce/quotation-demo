@@ -537,6 +537,8 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
+      // 有icon的select，點擊開啟menu時click事件的傳遞不太正常
+      // 造成的問題已經以別的方式解決，但還是要留意一下
       return <InputSel_prod_select {...inputSelProps} disabled={disabled} />;
     },
   },
