@@ -838,6 +838,9 @@ const QuotationRow_dealClass = ({
         dragHandleInvisible={disabled || isIterativeProd}
         left={left}
         right={right}
+        props_center={{
+          className: classNames(!classProd.isInited && !disabled && scss.rowCover),
+        }}
         //
         onDragStart={(e) => {
           choseActiveProd(undefined);
@@ -846,6 +849,10 @@ const QuotationRow_dealClass = ({
           e.stopPropagation();
           choseActiveProd(classProd.state);
         }}
+        // onMouseDown={(e) => {
+        //   e.stopPropagation();
+        //   choseActiveProd(classProd.state);
+        // }}
       >
         {cellKeyArr.map((cellKey, cIndex) => {
           const { style, className, createNode } = classProd.nodeConfig[cellKey];
