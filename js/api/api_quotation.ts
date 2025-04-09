@@ -1081,12 +1081,9 @@ export const useGetContract_id = (
   };
 
   // 是否為跳過合約生成的工程聯絡單
-  // /worksDepartment/contractList/createWorkContactDoc 這個頁面可以跳過合約產生工程聯絡單
-  // 但是在產生工程聯絡單時也會產生一個合約，而工程聯絡單就在這個不正常的合約下面
-  // 正常的合約的managerReviewedAt一定有值，因此用managerReviewedAt判斷
-  // 其他判斷的方法，quotation不存在、subContracts為空陣列
-  // 但是quotation與subContracts如果沒有設populate，本來就拿不到，所以不可靠
-  const contactThatSkipContract = !res?.content.managerReviewedAt;
+  // 以/engineering/engineering-contact/independent建立的合約沒有合約審核表
+  // 因此以verifyFormId判斷
+  const contactThatSkipContract = !res?.content.verifyFormId;
 
   return {
     data: res,
@@ -1531,7 +1528,11 @@ export const apiQuotationModify = (contractId: string, body: TcreateModifyQuotat
   return axi
     .patch<TquotationDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      myAlert.err({ title: '新增追加追減報價單失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
 
 // ================================================================
@@ -2162,21 +2163,13 @@ export const useGetQuotation_id_3 = (
 
   // 新增
   // post成功後不會自動更新
-  const reqPost = async ({
-    body,
-    attachmentArr,
-  }: // onPostSuccess,
-  {
-    body: TcreateQuotationContentDto;
-    attachmentArr: FormData[];
-    // onPostSuccess?: (newQuotation: TquotationDto) => void;
-  }) => {
+  const reqPost = async ({ body, attachmentArr }: { body: TcreateQuotationContentDto; attachmentArr: FormData[] }) => {
     setIsFetching(true);
 
     try {
       const res = await apiPostQuotation(body).catch((err) => {
         myAlert.err({ title: '新增報價單失敗' });
-        console.log(err);
+        console.error(err);
       });
 
       if (!res) {
@@ -2211,34 +2204,6 @@ export const useGetQuotation_id_3 = (
     } finally {
       setIsFetching(false);
     }
-
-    // return await apiPostQuotation(body)
-    //   .then(async (newQuotation) => {
-    //     const contentId = newQuotation.latestContent.id;
-    //     let isSomethingWrong = false;
-
-    //     for (const attachment of attachmentArr) {
-    //       await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
-    //         isSomethingWrong = true;
-    //       });
-    //     }
-
-    //     isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
-
-    //     return newQuotation;
-    //   })
-    //   .then((newQuotation) => {
-    //     onPostSuccess && onPostSuccess(newQuotation);
-
-    //     return newQuotation;
-    //   })
-    //   .catch((err) => {
-    //     myAlert.err({ title: '新增報價單失敗' });
-    //     console.log(err);
-    //   })
-    //   .finally(() => {
-    //     setIsFetching(false);
-    //   });
   };
 
   // ------------------------------------------------------------------------
@@ -2261,7 +2226,7 @@ export const useGetQuotation_id_3 = (
 
     const res = await apiPatchQuotation(body, raw.id).catch((err) => {
       myAlert.err({ title: '更新報價單失敗' });
-      console.log(err);
+      console.error(err);
     });
 
     if (!res) {
@@ -2295,53 +2260,13 @@ export const useGetQuotation_id_3 = (
       newAttachmentArr: newQuotation?.attachmentArr,
       isUpdated,
     };
-
-    // const newQuotation = await apiPatchQuotation(body, raw.id)
-    //   .then(async (newQuotation) => {
-    //     shouldUpdate = true;
-    //     const contentId = newQuotation.latestContent.id;
-    //     let isSomethingWrong = false;
-
-    //     for (const attachment of attachmentArr) {
-    //       await apiPostQuotation_id_attachments(contentId, attachment).catch(() => {
-    //         isSomethingWrong = true;
-    //       });
-    //     }
-
-    //     isSomethingWrong && myAlert.err({ title: '部分附件上傳失敗' });
-
-    //     return newQuotation;
-    //   })
-    //   .catch((err) => {
-    //     myAlert.err({ title: '更新報價單失敗' });
-    //     console.log(err);
-    //   })
-    //   .finally(async () => {
-    //     if (shouldUpdate) {
-    //       await update();
-    //       isUpdated = true;
-    //     }
-
-    //     setIsFetching(false);
-    //   });
-
-    // return {
-    //   newQuotation: res,
-    //   isUpdated,
-    // };
   };
 
   // ------------------------------------------------------------------------
 
   // 送審
   // body送{}似乎是不變更審核人員，僅重置審核狀態
-  const reqPatchReviewer = async ({
-    // quotationId,
-    body,
-  }: {
-    // quotationId: string;
-    body: TsubmitReviewQotuationContentDto;
-  }) => {
+  const reqPatchReviewer = async ({ body }: { body: TsubmitReviewQotuationContentDto }) => {
     if (!raw) {
       myAlert.warning({ title: '還未取得報價單' });
 
@@ -2711,5 +2636,9 @@ export const apiPatchModifyQuotation = ({
   return axi
     .patch<TquotationDto>(api, body)
     .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+    .catch((err) => {
+      myAlert.err({ title: '更新追加追減報價單失敗', content: err.message });
+
+      return Promise.reject(err);
+    });
 };
