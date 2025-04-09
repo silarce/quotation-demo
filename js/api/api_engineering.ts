@@ -293,7 +293,8 @@ export const apiPostEngineeringContact = async (body: TcreateEngineeringContactD
     .catch((err) => Promise.reject(err));
 };
 
-// 新建工程聯絡單
+// 新建工程聯絡單 // 工程聯絡單一定是歸在一個合約之下，所以會同時新建一個合約
+// 該合約不會有合約審核表
 export const apiPostEngineeringContactIndependent = async (body: TcreateEngineeringContactIndependent) => {
   const api = '/engineering/engineering-contact/independent';
 
