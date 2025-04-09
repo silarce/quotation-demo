@@ -4206,8 +4206,12 @@ class Class_product {
   get body() {
     const copy = _.cloneDeep(this._prodData);
 
+    if (copy.id === copy.rootProductId) {
+      copy.rootProductId = undefined;
+    }
+
     let body: TcreateQuotationProductDto = {
-      ...copy,
+      // ...copy,
       id: copy.id,
       doorModelName: this.doorType,
       materialName: this.material,
@@ -4277,6 +4281,17 @@ class Class_product {
       //
       bounceDoorWidth: this._prodData.bounceDoorWidth || null,
       bounceDoor: !!(this._prodData.bounceDoorWidth || null),
+      //
+      discount: copy.discount,
+      itemName: copy.itemName,
+      quoteType: copy.quoteType,
+      horsepower: copy.horsepower,
+      motorLockBox: copy.motorLockBox,
+      rollerSpec: copy.rollerSpec,
+      quantity: copy.quantity,
+      notes: copy.notes,
+      bottomBarAngleIron: copy.bottomBarAngleIron,
+      bottomBarPlate: copy.bottomBarPlate,
     };
 
     if (this.isSpecialProd) {
@@ -4357,6 +4372,8 @@ class Class_product {
     const body: Tprod = {
       ...copy,
       id: copy.id,
+      rootProductId: undefined,
+
       quantity: Number(this._prodData.quantity),
       price: Number(this._price),
       dualPrice: Number(this._dualPrice),
