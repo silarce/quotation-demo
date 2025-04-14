@@ -271,7 +271,14 @@ export default function outstandingPOQuery() {
                 id: id,
                 type: "outstandingPOQuery",
                 type2: type2,
-                quoterequuid: quoid
+                quoterequuid: quoid,
+                keywordstartdate:keywordstartdate,
+                keywordenddate:keywordenddate,
+                supplierid:keyword5,
+                suppliername:keyword1,
+                productid:keyword2,
+                name:keyword3,
+                spec:keyword4,
             };
 
             const inputModel = {
@@ -302,7 +309,7 @@ export default function outstandingPOQuery() {
             // 創建一個下載鏈接
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+            link.setAttribute('download', `三久建材_${selecttype}明細表_${id}.xls`); // 設置文件名
 
             // 將鏈接添加到 DOM 並觸發點擊下載
             document.body.appendChild(link);
@@ -553,7 +560,7 @@ export default function outstandingPOQuery() {
             <PageHeader02 tag={pagename}
                 customeLeft={[
                     <>
-                        {/* <button
+                        <button
                             className={scss.shortsquarebtn}
                             onClick={() => {
                                 handleExport();
@@ -565,7 +572,7 @@ export default function outstandingPOQuery() {
                                 <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
                             </span>
                             Excel
-                        </button> */}
+                        </button>
                     </>
                 ]}
                 customeRight={[
