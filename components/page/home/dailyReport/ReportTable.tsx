@@ -24,7 +24,7 @@ import scss from './reportTable.module.scss';
 import { TdailyReportDto, useApiDailyReports } from 'js/api/api_dailyReport';
 
 // option
-import { Toption, optionsCreator_dailyReportPeriod } from 'js/utils/options/options';
+import { optionsCreator_dailyReportPeriod } from 'js/utils/options/options';
 
 // class
 import { Class_reportItem } from 'pages/home/dailyReport';
@@ -48,7 +48,7 @@ import {
   useSensors,
   DragStartEvent,
   DragEndEvent,
-  DraggableAttributes,
+  // DraggableAttributes,
 } from '@dnd-kit/core';
 
 import {
@@ -68,6 +68,13 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 // ==================================================
+
+interface TtimeTrigger {
+  rIndex: number;
+  key: string;
+}
+
+// ==================================================
 // 防抖
 let timeoutId: NodeJS.Timeout;
 //
@@ -76,8 +83,7 @@ const optionArr_period = optionsCreator_dailyReportPeriod();
 // ==================================================
 export default function ReportTable({
   addDailyReportItem,
-}: // removeDailyReportItem,
-{
+}: {
   addDailyReportItem: () => void;
   // removeDailyReportItem: (index: number) => void;
 }) {
@@ -238,7 +244,6 @@ export default function ReportTable({
       return;
     }
 
-    // console.log('add', activeItem.description);
     activeItem.addWorker(workerArr);
   };
 
@@ -266,7 +271,7 @@ export default function ReportTable({
 
   // ------------------------------------------------
   /**用來觸發目的地、離工地的focus */
-  const [timeTrigger, setTimeTrigger] = useState({ rIndex: -1, key: '' });
+  const [timeTrigger, setTimeTrigger] = useState<TtimeTrigger>({ rIndex: -1, key: '' });
   // ------------------------------------------------
   // dnd
 
@@ -302,9 +307,10 @@ export default function ReportTable({
   // ------------------------------------------------
   // ------------------------------------------------
 
+  // MARK: ROW
+
   const Row = useCallback(
     function Row({
-      //
       item,
       rIndex,
       delSelf,
@@ -340,18 +346,7 @@ export default function ReportTable({
           </div>
           {/*  */}
           {theBodyKeyArr.map((key, cIndex) => {
-            let { headerClassName_mobile, bodyClassName_mobile } = config[key] ?? {};
-            const {
-              eleType,
-              optionArr,
-              label,
-              inputType,
-              placeholder,
-              placeholder_mobile,
-              headerClassName,
-              bodyClassName,
-              suffix,
-            } = config[key] ?? {};
+            const { suffix, render, wrapperClassName } = config[key] ?? {};
 
             let disabled = disabledOri;
 
@@ -359,351 +354,53 @@ export default function ReportTable({
               disabled = !isEdit;
             }
 
-            if (!rwd1023) {
-              headerClassName_mobile = undefined;
-              bodyClassName_mobile = undefined;
-            }
+            const onWorkersAddClick = () => {
+              if (disabled) {
+                return;
+              }
 
-            const thePlaceholder = rwd1023 ? placeholder_mobile || placeholder : placeholder;
+              setActiveItem(item);
+              toShowModal_worker();
+            };
 
-            if (eleType === 'select') {
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile
-                  )}
-                >
-                  <InputSel
-                    disabled={disabled}
-                    showBaseline="auto"
-                    placeholder={thePlaceholder}
-                    selectProps={{
-                      options: optionArr ?? [],
-                      value: item[key as TclassKeys] as string,
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
-                      onChange: (v) => {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        item[key] = v!.value;
-                      },
-                      arrowType: 'black',
-                      fontSize: '16px',
-                    }}
-                  />
-                </div>
-              );
-            }
+            const onMealAddClick = () => {
+              if (disabled) {
+                return;
+              }
 
-            if (eleType === 'input') {
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile
-                  )}
-                >
-                  <InputSel
-                    className="inline-grid"
-                    disabled={disabled}
-                    showBaseline="auto"
-                    placeholder={thePlaceholder}
-                    inputProps={{
-                      value: item[key as TclassKeys] as string,
-                      inputType,
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
-                      onChange: (v) => {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        item[key] = v;
-                      },
-                      // className: scss.textarea,
-                    }}
-                  />
-                  {suffix && disabled && <span>{suffix}</span>}
-                </div>
-              );
-            }
+              setActiveItem(item);
+              toShowModal_meals();
+            };
 
-            if (eleType === 'textarea') {
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile,
-                    scss.textareaCell
-                  )}
-                >
-                  <InputSel
-                    disabled={disabled}
-                    showBaseline="auto"
-                    placeholder={thePlaceholder}
-                    textareaProps={{
-                      value: item[key as TclassKeys] as string,
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
-                      onChange: (v) => {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        item[key] = v;
-                      },
-                      className: classNames(
-                        scss.textarea,
-                        { [scss.customerName]: key === 'customerName' },
-                        { [scss.description]: key === 'description' }
-                      ),
-                      allowNewLineByUser: key === 'description',
-                      props: {
-                        maxLength: 600,
-                      },
-                    }}
-                  />
-                </div>
-              );
-            }
+            const onLicensePlateAddClick = () => {
+              if (disabled) {
+                return;
+              }
 
-            if (eleType === 'timePicker') {
-              const focusTrigger = timeTrigger.rIndex === rIndex && timeTrigger.key === key;
+              setActiveItem(item);
+              setShowModal_licensePlate(true);
+            };
 
-              const changeTrigger = () => {
-                let theKey = '';
+            const onRemoveClick = disabled ? undefined : delSelf;
 
-                if (key === 'departureTime') {
-                  theKey = 'arrivalTime';
-                }
-
-                if (key === 'arrivalTime') {
-                  theKey = 'departureWorksiteTime';
-                }
-
-                setTimeTrigger({ rIndex, key: theKey });
-              };
-
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile
-                  )}
-                >
-                  <InputSel
-                    disabled={disabled}
-                    showBaseline="auto"
-                    placeholder={thePlaceholder}
-                    timePickerProps={{
-                      value: item[key as TclassKeys] as string,
-                      onChange02: (v) => {
-                        const foo = v?.toISOString();
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        item[key] = foo;
-                        changeTrigger();
-                      },
-                      focusTrigger: focusTrigger,
-                    }}
-                  />
-                </div>
-              );
-            }
-
-            if (eleType === 'modal' && key === 'workers') {
-              const workersArr = item['workers'];
-
-              const onAdd = () => {
-                if (disabled) {
-                  return;
-                }
-
-                setActiveItem(item);
-                toShowModal_worker();
-              };
-
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    scss.workerCell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile
-                  )}
-                >
-                  {!workersArr[0] && !disabled && (
-                    <div className={scss.worker}>
-                      <span></span>
-                      <IconAddCircle className={scss.icon} onClick={onAdd} />
-                    </div>
-                  )}
-                  {workersArr?.map((worker, wIndex, arr) => {
-                    const onRemove = () => {
-                      item.removeWorker(wIndex);
-                    };
-
-                    const isLast = arr.length === wIndex + 1;
-
-                    return (
-                      <div key={wIndex} className={scss.worker}>
-                        <InputSel
-                          disabled={true}
-                          showBaseline={disabled ? 'invisible' : 'always'}
-                          inputProps={{
-                            value: worker.chName,
-                          }}
-                        />
-                        {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                      </div>
-                    );
-                  })}
-
-                  {workersArr[0] && !disabled && (
-                    <div className={scss.worker}>
-                      <span></span>
-                      <IconAddCircle className={scss.icon} onClick={onAdd} />
-                    </div>
-                  )}
-                </div>
-              );
-            }
-
-            // ---------------------
-            if (eleType === 'modal' && key === 'meals') {
-              const mealsArr = item['meals'];
-
-              const onAdd = () => {
-                if (disabled) {
-                  return;
-                }
-
-                setActiveItem(item);
-                toShowModal_meals();
-              };
-
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    scss.workerCell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile
-                  )}
-                >
-                  {!mealsArr[0] && !disabled && (
-                    <div className={scss.worker}>
-                      <span></span>
-                      <IconAddCircle className={scss.icon} onClick={onAdd} />
-                    </div>
-                  )}
-                  {mealsArr?.map((meals, wIndex, arr) => {
-                    const onRemove = () => {
-                      item.removeMeals(wIndex);
-                    };
-
-                    return (
-                      <div key={wIndex} className={scss.worker}>
-                        <InputSel
-                          disabled={true}
-                          showBaseline={disabled ? 'invisible' : 'always'}
-                          inputProps={{
-                            value: mealsLookup[meals],
-                          }}
-                        />
-                        {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
-                      </div>
-                    );
-                  })}
-
-                  {mealsArr[0] && !disabled && (
-                    <div className={scss.worker}>
-                      <span></span>
-                      <IconAddCircle className={scss.icon} onClick={onAdd} />
-                    </div>
-                  )}
-                </div>
-              );
-            }
-
-            //
-            if (eleType === 'modal' && key === 'licensePlate') {
-              const licensePlate = item['licensePlate'];
-
-              const onAdd = () => {
-                if (disabled) {
-                  return;
-                }
-
-                setActiveItem(item);
-                setShowModal_licensePlate(true);
-              };
-
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    scss.workerCell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile
-                  )}
-                >
-                  <div className={scss.worker}>
-                    <InputSel
-                      disabled={true}
-                      showBaseline={disabled ? 'invisible' : 'always'}
-                      placeholder={thePlaceholder}
-                      inputProps={{
-                        value: licensePlate ?? '',
-                      }}
-                    />
-                    {!disabled && <IconAddCircle className={scss.icon} onClick={onAdd} />}
-                  </div>
-                </div>
-              );
-            }
-
-            //
-            if (key === 'remove') {
-              const onClick = disabled ? undefined : delSelf;
-
-              return (
-                <div
-                  key={cIndex}
-                  className={classNames(
-                    scss.cell,
-                    headerClassName,
-                    bodyClassName,
-                    headerClassName_mobile,
-                    bodyClassName_mobile
-                  )}
-                >
-                  {isMine && !disabled && <IconDelete01 onClick={onClick} />}
-                </div>
-              );
-            }
+            return (
+              <div key={cIndex} className={classNames(scss.cell, wrapperClassName?.(rwd1023).body)}>
+                {render?.({
+                  class_reportItem: item,
+                  disabled,
+                  rwd1023,
+                  onWorkersAddClick: onWorkersAddClick,
+                  onMealAddClick: onMealAddClick,
+                  onLicensePlateAddClick: onLicensePlateAddClick,
+                  onRemoveClick: onRemoveClick,
+                  timeTrigger,
+                  setTimeTrigger,
+                  index: rIndex,
+                  isMine,
+                })}
+                {suffix && disabled && <span>{suffix}</span>}
+              </div>
+            );
           })}
         </div>
       );
@@ -711,12 +408,9 @@ export default function ReportTable({
     [reportInEdit]
   );
 
-  // ------------------------------------------------
-  // ------------------------------------------------
-  // ------------------------------------------------
-  // ------------------------------------------------
-  // ------------------------------------------------
-  // ------------------------------------------------
+  //
+
+  // MARK: RENDER
 
   return (
     <Drawer
@@ -749,43 +443,27 @@ export default function ReportTable({
 
       <div className={classNames(scss.table)} key={id}>
         <div className={scss.roof} />
-        {/*  */}
+
         <div className={classNames(scss.thead)}>
-          {/*  */}
           <div className={classNames(scss.cell, scss.empty, 'row-span-6')}></div>
-          {/*  */}
+
           {theHeaderKeyArr.map((key) => {
-            let { headerClassName_mobile } = config[key] ?? {};
-            const { label, label_mobile, headerClassName } = config[key] ?? {};
+            const { createLabel, wrapperClassName } = config[key] ?? {};
 
-            if (!rwd1023) {
-              headerClassName_mobile = undefined;
-            }
-
-            const theLabel = (() => {
-              if (key === 'remove' && !isMine) {
-                return undefined;
-              }
-
-              return rwd1023 ? label_mobile || label : label;
-            })();
+            const label = key === 'remove' && !isMine ? '' : createLabel?.(rwd1023);
 
             return (
-              <div key={key} className={classNames(scss.cell, headerClassName, headerClassName_mobile)}>
-                <span>{theLabel}</span>
+              <div key={key} className={classNames(scss.cell, wrapperClassName?.(rwd1023).header)}>
+                <span>{label}</span>
               </div>
             );
-            //
           })}
         </div>
-        {/*  */}
+
         <div className={classNames(scss.tbody)}>
           <DndContext
             sensors={sensors}
-            modifiers={[
-              restrictToVerticalAxis,
-              // restrictToWindowEdges,
-            ]}
+            modifiers={[restrictToVerticalAxis]}
             onDragEnd={onDragEnd}
             onDragStart={onDragStart}
           >
@@ -899,173 +577,453 @@ const bodyKeyArr: (TclassKeys | 'remove')[] = [
 
 type Tconfig = {
   [key in TclassKeys | 'workingTime' | 'remove']?: {
-    label: string;
-    label_mobile?: string;
-    placeholder: string;
-    placeholder_mobile?: string;
     color?: 'black' | 'main';
+    suffix?: React.ReactNode;
+    createLabel: (rwd1023: boolean) => React.ReactNode;
+    wrapperClassName: (rwd1023: boolean) => {
+      header: string;
+      body: string;
+    };
+    render: (props: {
+      class_reportItem: Class_reportItem;
+      disabled: boolean;
+      rwd1023: boolean;
+      onWorkersAddClick: () => void;
+      onMealAddClick: () => void;
+      onLicensePlateAddClick: () => void;
+      onRemoveClick: (() => void) | undefined;
 
-    headerClassName: string;
-    headerClassName_mobile: string;
-    bodyClassName: string;
-    bodyClassName_mobile: string;
-    optionArr?: Toption[];
-    inputType?: 'number' | 'text';
-    suffix?: string;
-  } & (
-    | { eleType?: 'input' | 'timePicker' | 'textarea' | 'modal' | 'icon' }
-    | {
-        eleType?: 'select';
-        optionArr: Toption[];
-      }
-  );
+      timeTrigger: TtimeTrigger;
+      setTimeTrigger: React.Dispatch<React.SetStateAction<TtimeTrigger>>;
+      index: number;
+
+      isMine: boolean;
+    }) => React.ReactNode;
+  };
 };
 
-// bodyClassName 加 ! 是為了使css確實壓過 headerClassName
-
+// MARK: config
 const config: Tconfig = {
   periodOfDay: {
-    eleType: 'select',
-    optionArr: optionArr_period,
-    label: '上午/下午',
-    placeholder: '時段',
-    headerClassName: classNames('w-[104px] row-span-6'),
-    headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('!row-span-2'),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '上午/下午',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[104px] row-span-6', rwd1023 && 'h-[43px]');
+      const body = classNames(header, '!row-span-2', rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled }) {
+      return (
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'時段'}
+          selectProps={{
+            options: optionArr_period,
+            value: class_reportItem.periodOfDay,
+            onChange: (v) => {
+              const value = (v?.value || null) as 'AM' | 'PM' | null;
+              class_reportItem.periodOfDay = value;
+            },
+            arrowType: 'black',
+            fontSize: '16px',
+          }}
+        />
+      );
+    },
   },
   workingTime: {
-    label: '工務時間',
-    placeholder: '時間',
-    headerClassName: classNames('w-[170px] row-span-2 col-span-2'),
-    headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames(),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '工務時間',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[170px] row-span-2 col-span-2', rwd1023 && 'h-[43px]');
+      const body = classNames(header, '', rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render() {
+      return null;
+    },
   },
   customerName: {
-    eleType: 'textarea',
-    label: '客戶名稱/工程名稱',
-    label_mobile: '客戶名稱',
-    placeholder: '客戶名稱/工程名稱',
-    placeholder_mobile: '客戶名稱',
-    headerClassName: classNames('w-[250px] row-span-3', scss.textLeft),
-    headerClassName_mobile: classNames('h-[62px]'),
-    bodyClassName: classNames('!row-span-1'),
-    bodyClassName_mobile: classNames('h-[62px]'),
+    createLabel: (rwd1023) => (rwd1023 ? '客戶名稱' : '客戶名稱/工程名稱'),
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[250px] row-span-3', scss.textLeft, rwd1023 && 'h-[62px]');
+      const body = classNames(header, '!row-span-1', rwd1023 && 'h-[62px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled, rwd1023 }) {
+      return (
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={rwd1023 ? '客戶名稱' : '客戶名稱/工程名稱'}
+          textareaProps={{
+            value: class_reportItem.customerName,
+            onChange: (v) => {
+              class_reportItem.customerName = v;
+            },
+            className: classNames(scss.textarea, scss.customerName),
+            props: {
+              maxLength: 600,
+            },
+          }}
+        />
+      );
+    },
   },
   contactName: {
-    eleType: 'input',
-    label: '接洽人',
-    placeholder: '請輸入接洽人',
-    headerClassName: classNames('w-[250px] row-span-3', scss.textLeft),
-    headerClassName_mobile: classNames('h-[62px]'),
-    bodyClassName: classNames('!row-span-1'),
-    bodyClassName_mobile: classNames('h-[62px]'),
+    createLabel: (rwd1023) => '接洽人',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[250px] row-span-3', scss.textLeft, rwd1023 && 'h-[62px]');
+      const body = classNames(header, '!row-span-1', rwd1023 && 'h-[62px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled }) {
+      return (
+        <InputSel
+          className="inline-grid"
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'請輸入接洽人'}
+          inputProps={{
+            value: class_reportItem.contactName,
+            onChange: (v) => {
+              class_reportItem.contactName = v;
+            },
+          }}
+        />
+      );
+    },
   },
   description: {
-    eleType: 'textarea',
-    label: '工作內容',
-    placeholder: '請輸入接洽內容',
-    headerClassName: classNames('w-auto row-span-6', scss.textLeft),
-    headerClassName_mobile: classNames('h-[300px]'),
-    bodyClassName: classNames('!row-span-2'),
-    bodyClassName_mobile: classNames('h-[300px]'),
+    createLabel: (rwd1023) => '工作內容',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-auto row-span-6', scss.textLeft, rwd1023 && 'h-[300px]');
+      const body = classNames(scss.textareaCell, header, '!row-span-2', rwd1023 && 'h-[300px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled }) {
+      return (
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'請輸入接洽內容'}
+          textareaProps={{
+            value: class_reportItem.description,
+            onChange: (v) => {
+              class_reportItem.description = v;
+            },
+            className: classNames(scss.textarea, scss.description),
+            allowNewLineByUser: true,
+            props: {
+              maxLength: 600,
+            },
+          }}
+        />
+      );
+    },
   },
   workers: {
-    eleType: 'modal',
-    label: '工務人員',
-    placeholder: '接洽人',
-    headerClassName: classNames('w-[140px] row-span-6', scss.textLeft),
-    headerClassName_mobile: classNames('h-[120px]'),
-    bodyClassName: classNames('!row-span-2'),
-    bodyClassName_mobile: classNames('h-[120px]'),
+    createLabel: (rwd1023) => '工務人員',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[140px] row-span-6', scss.textLeft, rwd1023 && 'h-[120px]');
+      const body = classNames(scss.workerCell, header, '!row-span-2', rwd1023 && 'h-[120px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled, onWorkersAddClick }) {
+      const workersArr = class_reportItem.workers;
+
+      return (
+        <>
+          {!workersArr[0] && !disabled && (
+            <div className={scss.worker}>
+              <span></span>
+              <IconAddCircle className={scss.icon} onClick={onWorkersAddClick} />
+            </div>
+          )}
+          {workersArr?.map((worker, wIndex, arr) => {
+            const onRemove = () => {
+              class_reportItem.removeWorker(wIndex);
+            };
+
+            return (
+              <div key={wIndex} className={scss.worker}>
+                <InputSel
+                  disabled={true}
+                  showBaseline={disabled ? 'invisible' : 'always'}
+                  inputProps={{
+                    value: worker.chName,
+                  }}
+                />
+                {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+              </div>
+            );
+          })}
+
+          {workersArr[0] && !disabled && (
+            <div className={scss.worker}>
+              <span></span>
+              <IconAddCircle className={scss.icon} onClick={onWorkersAddClick} />
+            </div>
+          )}
+        </>
+      );
+    },
   },
   dispatchOrderId: {
-    eleType: 'input',
-    label: '派工單序號',
-    placeholder: '派工單序號',
-    headerClassName: classNames('w-[160px] row-span-3', scss.textLeft),
-    headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('!row-span-1'),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '派工單序號',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[160px] row-span-3', scss.textLeft, rwd1023 && 'h-[43px]');
+      const body = classNames(header, '!row-span-1', rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled }) {
+      return (
+        <InputSel
+          className="inline-grid"
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'派工單序號'}
+          inputProps={{
+            value: class_reportItem.dispatchOrderId ?? '',
+            onChange: (v) => {
+              class_reportItem.dispatchOrderId = v;
+            },
+          }}
+        />
+      );
+    },
   },
   meals: {
-    eleType: 'modal',
-    label: '餐費',
-    placeholder: '餐費',
-    headerClassName: classNames('w-[100px] row-span-3'),
-    headerClassName_mobile: classNames('h-[120px]'),
-    bodyClassName: classNames('!row-span-1'),
-    bodyClassName_mobile: classNames('h-[120px]'),
+    createLabel: (rwd1023) => '餐費',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[100px] row-span-3', rwd1023 && 'h-[120px]');
+      const body = classNames(scss.workerCell, header, '!row-span-1', rwd1023 && 'h-[120px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled, onMealAddClick }) {
+      const mealsArr = class_reportItem['meals'];
+
+      return (
+        <>
+          {!mealsArr[0] && !disabled && (
+            <div className={scss.worker}>
+              <span></span>
+              <IconAddCircle className={scss.icon} onClick={onMealAddClick} />
+            </div>
+          )}
+          {mealsArr?.map((meals, wIndex, arr) => {
+            const onRemove = () => {
+              class_reportItem.removeMeals(wIndex);
+            };
+
+            return (
+              <div key={wIndex} className={scss.worker}>
+                <InputSel
+                  disabled={true}
+                  showBaseline={disabled ? 'invisible' : 'always'}
+                  inputProps={{
+                    value: mealsLookup[meals],
+                  }}
+                />
+                {!disabled && <IconRemoveCircle className={scss.icon} onClick={onRemove} />}
+              </div>
+            );
+          })}
+
+          {mealsArr[0] && !disabled && (
+            <div className={scss.worker}>
+              <span></span>
+              <IconAddCircle className={scss.icon} onClick={onMealAddClick} />
+            </div>
+          )}
+        </>
+      );
+    },
   },
   departureTime: {
-    eleType: 'timePicker',
-    label: '出發',
-    placeholder: '時間',
-    headerClassName: classNames('w-[85px] row-span-2'),
-    headerClassName_mobile: classNames('h-[43px]', scss.single),
-    bodyClassName: classNames('!row-span-1', scss.single),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '出發',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[85px] row-span-2', rwd1023 && 'h-[43px]', scss.single);
+      const body = classNames(header, '!row-span-1', scss.single, rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
+      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'departureTime';
+
+      const time = moment(class_reportItem.departureTime);
+      const isBeforeAM8 = time.isBefore(moment(time).startOf('day').add(8, 'hours'));
+
+      return (
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'時間'}
+          timePickerProps={{
+            timePickerClassName: classNames(isBeforeAM8 && scss.date_redColor),
+            value: class_reportItem.departureTime ?? '',
+            onChange02: (v) => {
+              const value = v?.toISOString();
+              class_reportItem.departureTime = value;
+              setTimeTrigger({ rIndex: index, key: 'arrivalTime' });
+            },
+            focusTrigger: focusTrigger,
+          }}
+        />
+      );
+    },
   },
   departureWorksiteTime: {
-    eleType: 'timePicker',
-    label: '離工地',
-    placeholder: '時間',
-    headerClassName: classNames('w-[85px] row-span-4'),
-    headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('!row-span-2'),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '離工地',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[85px] row-span-4', rwd1023 && 'h-[43px]');
+      const body = classNames(header, '!row-span-2', rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
+      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
+
+      const time = moment(class_reportItem.departureWorksiteTime);
+      const isAfterPM5 = time.isAfter(moment(time).startOf('day').add(17, 'hours'));
+
+      return (
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'時間'}
+          timePickerProps={{
+            timePickerClassName: classNames(isAfterPM5 && scss.date_redColor),
+            value: class_reportItem.departureWorksiteTime ?? '',
+            onChange02: (v) => {
+              const value = v?.toISOString();
+              class_reportItem.departureWorksiteTime = value;
+              setTimeTrigger({ rIndex: index, key: '' });
+            },
+            focusTrigger: focusTrigger,
+          }}
+        />
+      );
+    },
   },
   arrivalTime: {
-    eleType: 'timePicker',
-    label: '目的地',
-    placeholder: '時間',
-    headerClassName: classNames('w-[85px] row-span-2'),
-    headerClassName_mobile: classNames('h-[43px]', scss.single),
-    bodyClassName: classNames('!row-span-1', scss.single),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '目的地',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[85px] row-span-2', rwd1023 && 'h-[43px]', scss.single);
+      const body = classNames(header, '!row-span-1', scss.single, rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
+      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
+
+      return (
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'時間'}
+          timePickerProps={{
+            value: class_reportItem.arrivalTime ?? '',
+            onChange02: (v) => {
+              const value = v?.toISOString();
+              class_reportItem.arrivalTime = value;
+              setTimeTrigger({ rIndex: index, key: 'departureWorksiteTime' });
+            },
+            focusTrigger: focusTrigger,
+          }}
+        />
+      );
+    },
   },
   licensePlate: {
-    eleType: 'modal',
-    label: '車牌',
-    placeholder: '請選擇',
-    headerClassName: classNames('w-[160px] row-span-3', scss.textLeft),
-    headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('!row-span-1'),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '車牌',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[160px] row-span-3', scss.textLeft, rwd1023 && 'h-[43px]');
+      const body = classNames(scss.workerCell, header, '!row-span-1', rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled, onLicensePlateAddClick }) {
+      return (
+        <div className={scss.worker}>
+          <InputSel
+            disabled={true}
+            showBaseline={disabled ? 'invisible' : 'always'}
+            placeholder={'請選擇'}
+            inputProps={{
+              value: class_reportItem['licensePlate'] ?? '',
+            }}
+          />
+          {!disabled && <IconAddCircle className={scss.icon} onClick={onLicensePlateAddClick} />}
+        </div>
+      );
+    },
   },
   stayLength: {
-    eleType: 'select',
-    optionArr: [
-      { value: '0', label: '無' },
-      { value: '1', label: '有' },
-    ],
-    label: '住宿',
-    placeholder: '天數',
-    inputType: 'number',
-    headerClassName: classNames('w-[100px] row-span-3'),
-    headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('!row-span-1', scss.suffix),
-    bodyClassName_mobile: classNames('h-[43px]', scss.stayLength),
+    createLabel: (rwd1023) => '住宿',
     suffix: '天',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[100px] row-span-3', rwd1023 && 'h-[43px]');
+      const body = classNames(header, '!row-span-1', scss.suffix, rwd1023 && 'h-[43px]', scss.stayLength);
+
+      return { header, body };
+    },
+
+    render({ class_reportItem, disabled }) {
+      return (
+        <InputSel
+          disabled={disabled}
+          showBaseline="auto"
+          placeholder={'天數'}
+          selectProps={{
+            options: [
+              { value: '0', label: '無' },
+              { value: '1', label: '有' },
+            ],
+            value: class_reportItem.stayLength,
+            onChange: (v) => {
+              class_reportItem.stayLength = v!.value;
+            },
+            arrowType: 'black',
+            fontSize: '16px',
+          }}
+        />
+      );
+    },
   },
   remove: {
-    eleType: 'icon',
-    label: '刪除',
-    placeholder: '',
-    headerClassName: classNames('w-[60px] row-span-6', scss.rightEdge),
-    headerClassName_mobile: classNames('h-[43px]'),
-    bodyClassName: classNames('!row-span-2'),
-    bodyClassName_mobile: classNames('h-[43px]'),
+    createLabel: (rwd1023) => '刪除',
+    wrapperClassName(rwd1023) {
+      const header = classNames('w-[60px] row-span-6', scss.rightEdge, rwd1023 && 'h-[43px]');
+      const body = classNames(header, '!row-span-2', rwd1023 && 'h-[43px]');
+
+      return { header, body };
+    },
+
+    render({ isMine, disabled, onRemoveClick }) {
+      return <>{isMine && !disabled && <IconDelete01 onClick={onRemoveClick} />}</>;
+    },
   },
 };
-
-const mealsLookup = {
-  none: '無',
-  breakfast: '早餐',
-  lunch: '午餐',
-  dinner: '晚餐',
-} as const;
 
 // ==============================================================================
 // ==============================================================================
@@ -1318,16 +1276,11 @@ function Bar_reviewer_inEdit_user() {
   );
 }
 
-// const Bar_reporter_reviewed = () => {
-//   return (
-//     <div className={classNames(scss.bar, scss.reviwedBdage)}>
-//       <Badge className={scss.antdBadge02} color="auto" text="已檢視" />
-//     </div>
-//   );
-// };
+const mealsLookup = {
+  none: '無',
+  breakfast: '早餐',
+  lunch: '午餐',
+  dinner: '晚餐',
+} as const;
 
-// ===================================================================
-
-export type { Tconfig };
-
-export { headerKeyArr, bodyKeyArr, config, mealsLookup };
+export { mealsLookup };

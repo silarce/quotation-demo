@@ -323,3 +323,11 @@
     font-weight: 500;
   }
 }
+
+.date_redColor {
+  :global(.ant-picker-input) {
+    > input {
+      color: red !important;
+    }
+  }
+}
