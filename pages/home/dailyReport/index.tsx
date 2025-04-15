@@ -69,8 +69,7 @@ const reportedAtOptions = [
 
 // =====================================================================
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-export const DailyReportContext = createContext<TdailyReportContext>(null!);
+const DailyReportContext = createContext<TdailyReportContext>(null!);
 
 // --------------------------------------------------------
 // type
@@ -118,14 +117,8 @@ type Ttab = {
   prevDate: string;
 };
 
-export type { Class_reportItem, Tidentity, Ttab };
+// MARK: START
 
-// =====================================================================
-// =====================================================================
-// =====================================================================
-// =====================================================================
-// =====================================================================
-// =====================================================================
 export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -708,12 +701,8 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     setReportItemKeyArr,
   };
 
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
+  // MARK: RENDER
+
   return (
     <>
       <SubLayer
@@ -1075,3 +1064,6 @@ const paramsCre = ({
     filter,
   };
 };
+
+export type { Class_reportItem, Tidentity, Ttab };
+export { DailyReportContext };
