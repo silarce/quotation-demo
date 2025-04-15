@@ -867,12 +867,16 @@ const config: Tconfig = {
     render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
       const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'departureTime';
 
+      const time = moment(class_reportItem.departureTime);
+      const isBeforeAM8 = time.isBefore(moment(time).startOf('day').add(8, 'hours'));
+
       return (
         <InputSel
           disabled={disabled}
           showBaseline="auto"
           placeholder={'時間'}
           timePickerProps={{
+            timePickerClassName: classNames(isBeforeAM8 && scss.date_redColor),
             value: class_reportItem.departureTime ?? '',
             onChange02: (v) => {
               const value = v?.toISOString();
@@ -897,12 +901,16 @@ const config: Tconfig = {
     render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
       const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
 
+      const time = moment(class_reportItem.departureWorksiteTime);
+      const isAfterPM5 = time.isAfter(moment(time).startOf('day').add(17, 'hours'));
+
       return (
         <InputSel
           disabled={disabled}
           showBaseline="auto"
           placeholder={'時間'}
           timePickerProps={{
+            timePickerClassName: classNames(isAfterPM5 && scss.date_redColor),
             value: class_reportItem.departureWorksiteTime ?? '',
             onChange02: (v) => {
               const value = v?.toISOString();
