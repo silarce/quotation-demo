@@ -244,35 +244,35 @@ export default function EditRequirementRecord() {
   // ------------------------------------------------------------------
 
   // MARK:updateDefaultToElectronicSuppliesRequirement
-  const updateDefaultToElectronicSuppliesRequirement = async () => {
-    const state_electronicItemArr = (defaultElectronicSuppliesRequirementArr ?? []).map((item) => {
-      const subItemName = item.category === '控制箱/盤' ? '捲門/水閘門' : null;
+  // const updateDefaultToElectronicSuppliesRequirement = async () => {
+  //   const state_electronicItemArr = (defaultElectronicSuppliesRequirementArr ?? []).map((item) => {
+  //     const subItemName = item.category === '控制箱/盤' ? '捲門/水閘門' : null;
 
-      const state: Tstate_electronicItem = {
-        category: item.category,
-        categoryParam: item.category,
-        itemName: item.itemName,
-        quantity: item.quantity,
-        unit: item.unit ?? null,
-        code: item.code,
-        subItemName,
-      };
+  //     const state: Tstate_electronicItem = {
+  //       category: item.category,
+  //       categoryParam: item.category,
+  //       itemName: item.itemName,
+  //       quantity: item.quantity,
+  //       unit: item.unit ?? null,
+  //       code: item.code,
+  //       subItemName,
+  //     };
 
-      return state;
-    });
+  //     return state;
+  //   });
 
-    const { destroy } = myAlert.clear({
-      content: (
-        <DefaultItemSelector
-          state_electronicItemArr={state_electronicItemArr}
-          onConfirm={(stateArr) => {
-            replaceState_electronicSuppliesRequirment(stateArr);
-            destroy();
-          }}
-        />
-      ),
-    });
-  };
+  //   const { destroy } = myAlert.clear({
+  //     content: (
+  //       <DefaultItemSelector
+  //         state_electronicItemArr={state_electronicItemArr}
+  //         onConfirm={(stateArr) => {
+  //           replaceState_electronicSuppliesRequirment(stateArr);
+  //           destroy();
+  //         }}
+  //       />
+  //     ),
+  //   });
+  // };
   // ------------------------------------------------------------------
 
   // region PROPS
@@ -403,6 +403,26 @@ export default function EditRequirementRecord() {
     setState_info(stateInfo);
   }, [disabled, data_requirementRecord]);
 
+  useEffect(() => {
+    const state_electronicItemArr = (defaultElectronicSuppliesRequirementArr ?? []).map((item) => {
+      const subItemName = item.category === '控制箱/盤' ? '捲門/水閘門' : null;
+
+      const state: Tstate_electronicItem = {
+        category: item.category,
+        categoryParam: item.category,
+        itemName: item.itemName,
+        quantity: item.quantity,
+        unit: item.unit ?? null,
+        code: item.code,
+        subItemName,
+      };
+
+      return state;
+    });
+
+    replaceState_electronicSuppliesRequirment(state_electronicItemArr);
+  }, [defaultElectronicSuppliesRequirementArr]);
+
   // ------------------------------------------------------------------
 
   // MARK: RENDER
@@ -500,7 +520,7 @@ export default function EditRequirementRecord() {
             }
           />
 
-          <div>
+          {/* <div>
             <SquareBtn
               className={classNames((!isNew || disabled) && 'invisible')}
               sharp="mini"
@@ -508,7 +528,7 @@ export default function EditRequirementRecord() {
             >
               建議送電備品
             </SquareBtn>
-          </div>
+          </div> */}
         </div>
         {/* table */}
         <SupplyTable
