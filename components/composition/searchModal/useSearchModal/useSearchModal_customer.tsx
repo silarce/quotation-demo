@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react';
-import moment from 'moment';
 
 import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
@@ -17,6 +16,7 @@ import SearchModal, { Tprops_refine } from '..';
 import { customerTypesLookup } from 'js/api/api_customer';
 
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // =====================================================================================
 
@@ -200,6 +200,11 @@ SearchModal_customer.open = (props: Tprops_refine<TcustomerDto>) => {
     children: <SearchModal_customer {...props} />,
   });
 };
+
+SearchModal_customer.open2 = (props: Tprops_refine<TcustomerDto>) =>
+  myAlert.clear({
+    content: <SearchModal_customer {...props} />,
+  });
 
 // ============================================================================
 
