@@ -1,0 +1,74 @@
+$gap: 16px 24px;
+$padding: 18px 24px;
+$fontSize: 18px;
+
+.profile {
+  display: grid;
+  grid-template-columns: 800px 320px;
+  gap: 33px;
+  justify-content: space-between;
+  margin: 0 22px 0 50px;
+}
+
+.left {
+  display: grid;
+  align-content: flex-start;
+  gap: $gap;
+  padding: 18px 0;
+}
+
+.right {
+  display: grid;
+  align-content: flex-start;
+  gap: $gap;
+  height: fit-content;
+  padding: $padding;
+  background-color: theme("colors.bgc01");
+  // .caption {
+  //   font-size: 18px;
+  //   font-weight: 400;
+  //   color: theme("colors.main");
+  // }
+}
+
+.container {
+  gap: 24px;
+}
+.caption {
+  width: 120px;
+  font-size: $fontSize;
+}
+
+.input,
+.select,
+.datePicker,
+.customerName,
+.childrenWrapper,
+.suffisWrapper {
+  font-size: $fontSize;
+}
+
+.customer {
+  display: flex;
+  gap: 10px;
+
+  align-items: flex-start;
+
+  .remove {
+    transform: translateY(5px);
+  }
+
+  > *:not(.customerName) {
+    flex: 0 0 auto;
+  }
+
+  .customerName {
+    font-size: $fontSize;
+  }
+}
+
+.address {
+  display: grid;
+  grid-template-columns: 100px 100px 1fr;
+  gap: 10px;
+}

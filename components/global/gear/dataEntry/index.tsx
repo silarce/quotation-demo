@@ -73,7 +73,7 @@ const DataEntryContainer = ({
   suffixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   isMust?: boolean;
-} & React.HTMLAttributes<HTMLLabelElement>) => {
+} & React.LabelHTMLAttributes<HTMLLabelElement>) => {
   return (
     <label className={classNames(scss.container, className)} {...props_container}>
       {caption !== undefined && (
