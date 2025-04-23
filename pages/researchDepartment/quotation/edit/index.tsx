@@ -6,7 +6,9 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 // component
 import Profile from 'components/page/researchDepartment/quotation/profile';
 import QuotationRemark, { Tprops_quotationRemark } from 'components/page/domestic/quotation_v2/QuotationRemark';
+import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 
+// CSS
 import scss from './index.module.scss';
 
 export default function Edit() {
@@ -22,7 +24,9 @@ export default function Edit() {
             <QuotationRemark {...propsForTest_quotationRemark} label="報價範圍" />
           </div>
           {/*  */}
-          <div className={scss.right}>445456d</div>
+          <div className={scss.right}>
+            <QuotationPayInfo {...propsForTest_quotationPayInfo} />
+          </div>
         </div>
       </div>
     </SubLayer>
@@ -43,4 +47,40 @@ const propsForTest_quotationRemark: Tprops_quotationRemark = {
       onDelete: () => {},
     },
   ],
+};
+
+const propsForTest_quotationPayInfo: Tprops_quotationPayInfo = {
+  disabled: false,
+  disabled_taxAndCurrency: false,
+  form: {
+    deliveryLocation: {
+      value: 'test',
+    },
+    deliveryDate: {
+      value: null,
+    },
+    paymentMethodArr: [
+      {
+        milestone: {
+          value: 'test',
+        },
+        totalPaymentRatio: {
+          value: 'test',
+        },
+      },
+    ],
+    haveTax: {
+      value: true,
+    },
+    discountRate: {
+      value: '999',
+    },
+    tuneTotal: {
+      value: '999',
+    },
+    avgDiscount: 999,
+    subTotal: 999,
+    salesTax: 999,
+    total: 999,
+  },
 };
