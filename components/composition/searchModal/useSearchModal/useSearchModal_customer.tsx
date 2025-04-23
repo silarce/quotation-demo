@@ -72,7 +72,7 @@ const useData = (state_filter: Tstate_filter | undefined): TmodalData<TcustomerD
       sort: 'customerNumber',
       order: 'ASC',
       filter,
-      populate: ['types'],
+      populate: ['types', 'contacts'],
     };
   }, [state_filter]);
 
