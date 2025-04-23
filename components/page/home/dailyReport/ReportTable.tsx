@@ -902,7 +902,7 @@ const config: Tconfig = {
       const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
 
       const time = moment(class_reportItem.departureWorksiteTime);
-      const isAfterPM5 = time.isAfter(moment(time).startOf('day').add(17, 'hours'));
+      const isAfter1715 = time.isAfter(moment(time).startOf('day').add(17, 'hours').add(15, 'minutes'));
 
       return (
         <InputSel
@@ -910,7 +910,7 @@ const config: Tconfig = {
           showBaseline="auto"
           placeholder={'時間'}
           timePickerProps={{
-            timePickerClassName: classNames(isAfterPM5 && scss.date_redColor),
+            timePickerClassName: classNames(isAfter1715 && scss.date_redColor),
             value: class_reportItem.departureWorksiteTime ?? '',
             onChange02: (v) => {
               const value = v?.toISOString();
