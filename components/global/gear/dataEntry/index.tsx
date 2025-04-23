@@ -52,6 +52,7 @@ const DataEntryContainer = ({
   suffixWrapperProps: { className: className_suffix, ...suffixWrapperProps } = {},
 
   isMust,
+  fontSize = 18,
   //
   className,
   children,
@@ -73,10 +74,13 @@ const DataEntryContainer = ({
   suffixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   isMust?: boolean;
+  fontSize?: 12 | 14 | 16 | 18 | 20 | 22;
 } & React.HTMLAttributes<HTMLDivElement>) =>
   // 過陣子確認沒有問題就把這個型別刪掉
   //  & React.HTMLAttributes<HTMLLabelElement>
   {
+    const className_fontSize = `f${fontSize}`;
+
     return (
       // 當children有多個form元素時會造成一些麻煩(同時被focus)，所以決定把label替換為div
       // 過陣子確認沒有問題就把這個label刪掉
@@ -85,8 +89,9 @@ const DataEntryContainer = ({
         {caption !== undefined && (
           <div
             className={classNames(
-              'w-[100px] text-main font-bold',
+              'w-[100px] text-main font-medium',
               `mr-${captionMr}`,
+              className_fontSize,
               scss.captionWrapper,
               captionClassName,
               className_caption
@@ -98,18 +103,23 @@ const DataEntryContainer = ({
           </div>
         )}
         {prefix && (
-          <div className={classNames('mr-1', className_prefix)} {...prefixWrapperProps}>
+          <div className={classNames('mr-1', className_fontSize, className_prefix)} {...prefixWrapperProps}>
             {prefix}
           </div>
         )}
         <div
-          className={classNames(scss.childrenWrapper, showBorder && scss.showBorder, className_childrenWrapper)}
+          className={classNames(
+            scss.childrenWrapper,
+            className_fontSize,
+            showBorder && scss.showBorder,
+            className_childrenWrapper
+          )}
           {...childrenWrapperProps}
         >
           {children}
         </div>
         {suffix && (
-          <div className={classNames('ml-1', className_suffix)} {...suffixWrapperProps}>
+          <div className={classNames('ml-1', className_fontSize, className_suffix)} {...suffixWrapperProps}>
             {suffix}
           </div>
         )}
@@ -212,8 +222,8 @@ const Radio = (props: RadioProps) => {
 };
 
 // MARK:RadioGroup
-const RadioGroup = (props: RadioGroupProps) => {
-  return <AntdRadio.Group {...props} />;
+const RadioGroup = ({ className, ...props }: RadioGroupProps) => {
+  return <AntdRadio.Group {...props} className={classNames(scss.radioGroup, className)} />;
 };
 
 // MARK:Select
@@ -300,6 +310,7 @@ function InputSelect<
 
   inputProps,
   selectProps: { classNames: cn, onChange: selectOnChange, ...selectProps } = {},
+  ...divPros
 }: {
   className?: string;
   value?: string;
@@ -309,16 +320,21 @@ function InputSelect<
 
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
   selectProps?: rsProps<O, false>;
-}) {
+} & Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  'className' | 'value' | 'onChange' | 'disabled' | 'options' | 'inputProps' | 'selectProps'
+>) {
   const ref_input = useRef<HTMLInputElement>(null);
+  const value_props = value;
 
   return (
-    <div className={classNames(scss.inputSelect, className)}>
+    <div {...divPros} className={classNames(scss.inputSelect, className)}>
       {/* //// 這邊用label包起來是為了避免觸發Container的Label */}
       {/* ////label必須在input之前，這樣不用設z-index就可以使input蓋過select */}
       {/* ////不設index才能避免InputSelect垂直排列時menu因為z-index造成的跑版*/}
       {/* 過陣子沒問題就把註解的lable刪掉，css裡的 inputSelect>label也刪掉 */}
       {/* <label> */}
+
       {!disabled && (
         <ReactSelect
           className={scss.select}
@@ -330,9 +346,11 @@ function InputSelect<
             const value = option?.value ?? '';
             onChange?.(value);
             selectOnChange?.(option, action);
-            setTimeout(() => {
-              ref_input.current?.focus();
-            }, 0);
+            ref_input.current?.focus();
+
+            // 當value_props為undefined時作用，只是為了在未串接value_propse時方便測試
+            // 如果這個行為造成bug，直接刪掉就好了
+            value_props === undefined && ref_input.current && (ref_input.current.value = value);
           }}
           classNames={{
             ...cn,

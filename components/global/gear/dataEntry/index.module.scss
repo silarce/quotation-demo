@@ -40,8 +40,15 @@
 
 .datepicker {
   &:global(.ant-picker) {
+    font-size: inherit;
     padding: 0;
     border: 0;
+    > :global(.ant-picker-input) {
+      font-size: inherit;
+      > input {
+        font-size: inherit;
+      }
+    }
   }
 }
 .timepicker {
@@ -53,12 +60,34 @@
 
 .checkbox {
   display: flex;
+  font-size: inherit;
+
+  > :global(.ant-checkbox-wrapper) {
+    position: relative;
+    align-items: center;
+    font-size: inherit;
+    > :global(.ant-checkbox) {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.radioGroup {
+  font-size: inherit;
+  > :global(.ant-radio-wrapper) {
+    font-size: inherit;
+    align-items: center;
+    > :global(.ant-radio) {
+      transform: translateY(-2px);
+    }
+  }
 }
 
 .antdSelect,
 .antdSelect.plus,
 .antdSelect.plus.plus2 {
   display: flex;
+  font-size: inherit;
   :global(.ant-select-selector) {
     // background-color: transparent;
     padding: unset;
