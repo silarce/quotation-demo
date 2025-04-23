@@ -9,15 +9,20 @@ import QuotationRemark, { Tprops_quotationRemark } from 'components/page/domesti
 import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 import Table from 'components/page/researchDepartment/quotation/table';
 
+// hook
+import { useProfile } from 'components/page/researchDepartment/quotation/hook/useProfile';
+
 // CSS
 import scss from './index.module.scss';
 
 export default function Edit() {
+  const return_useProfile = useProfile();
+
   return (
     <SubLayer>
       <PageHeader02 tag="新增報價單" />
       <div className={scss.main}>
-        <Profile />
+        <Profile return_useProfile={return_useProfile} />
 
         <br />
         <br />
