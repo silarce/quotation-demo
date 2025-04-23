@@ -73,45 +73,52 @@ const DataEntryContainer = ({
   suffixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   isMust?: boolean;
-} & React.HTMLAttributes<HTMLLabelElement>) => {
-  return (
-    <label className={classNames(scss.container, className)} {...props_container}>
-      {caption !== undefined && (
+} & React.HTMLAttributes<HTMLDivElement>) =>
+  // 過陣子確認沒有問題就把這個型別刪掉
+  //  & React.HTMLAttributes<HTMLLabelElement>
+  {
+    return (
+      // 當children有多個form元素時會造成一些麻煩(同時被focus)，所以決定把label替換為div
+      // 過陣子確認沒有問題就把這個label刪掉
+      // <label className={classNames(scss.container, className)} {...props_container}>
+      <div className={classNames(scss.container, className)} {...props_container}>
+        {caption !== undefined && (
+          <div
+            className={classNames(
+              'w-[100px] text-main font-bold',
+              `mr-${captionMr}`,
+              scss.captionWrapper,
+              captionClassName,
+              className_caption
+            )}
+            style={captionStyle}
+            {...captionWrapperProps}
+          >
+            {caption}
+          </div>
+        )}
+        {prefix && (
+          <div className={classNames('mr-1', className_prefix)} {...prefixWrapperProps}>
+            {prefix}
+          </div>
+        )}
         <div
-          className={classNames(
-            'w-[100px] text-main font-bold',
-            `mr-${captionMr}`,
-            scss.captionWrapper,
-            captionClassName,
-            className_caption
-          )}
-          style={captionStyle}
-          {...captionWrapperProps}
+          className={classNames(scss.childrenWrapper, showBorder && scss.showBorder, className_childrenWrapper)}
+          {...childrenWrapperProps}
         >
-          {caption}
+          {children}
         </div>
-      )}
-      {prefix && (
-        <div className={classNames('mr-1', className_prefix)} {...prefixWrapperProps}>
-          {prefix}
-        </div>
-      )}
-      <div
-        className={classNames(scss.childrenWrapper, showBorder && scss.showBorder, className_childrenWrapper)}
-        {...childrenWrapperProps}
-      >
-        {children}
+        {suffix && (
+          <div className={classNames('ml-1', className_suffix)} {...suffixWrapperProps}>
+            {suffix}
+          </div>
+        )}
+        {/*  */}
+        {isMust && <MustTip />}
       </div>
-      {suffix && (
-        <div className={classNames('ml-1', className_suffix)} {...suffixWrapperProps}>
-          {suffix}
-        </div>
-      )}
-      {/*  */}
-      {isMust && <MustTip />}
-    </label>
-  );
-};
+      // </label>
+    );
+  };
 
 // MARK:Input
 const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => {
@@ -307,55 +314,57 @@ function InputSelect<
 
   return (
     <div className={classNames(scss.inputSelect, className)}>
-      {/* 這邊用label包起來是為了避免觸發Container的Label */}
-      {/* label必須在input之前，這樣不用設z-index就可以使input蓋過select */}
-      {/* 不設index才能避免InputSelect垂直排列時menu因為z-index造成的跑版*/}
-      <label>
-        {!disabled && (
-          <ReactSelect
-            // menuIsOpen={true}
-            isSearchable={false}
-            isDisabled={disabled}
-            options={options}
-            onChange={(option, action) => {
-              const value = option?.value ?? '';
-              onChange?.(value);
-              selectOnChange?.(option, action);
-              setTimeout(() => {
-                ref_input.current?.focus();
-              }, 0);
-            }}
-            classNames={{
-              ...cn,
-              control(props) {
-                return classNames(scss.control_inputSelect, scss.plus, cn?.control?.(props));
-              },
-              valueContainer(props) {
-                return classNames(scss.valueContainer_inputSelect, scss.plus, cn?.valueContainer?.(props));
-              },
-              singleValue(props) {
-                return classNames(scss.singleValue_inputSelect, scss.plus, cn?.singleValue?.(props));
-              },
-              input(props) {
-                return classNames(scss.input_inputSelect, scss.plus, cn?.input?.(props));
-              },
-              indicatorsContainer(props) {
-                return classNames(scss.indicatorsContainer_inputSelect, scss.plus, cn?.indicatorsContainer?.(props));
-              },
-              indicatorSeparator(props) {
-                return classNames(scss.indicatorSeparator_inputSelect, scss.plus, cn?.indicatorSeparator?.(props));
-              },
-              menu(props) {
-                return classNames(scss.menu_inputSelect, scss.plus, cn?.menu?.(props));
-              },
-              option(props) {
-                return classNames(scss.option, scss.option_inputSelect, scss.plus, cn?.option?.(props));
-              },
-            }}
-            {...selectProps}
-          />
-        )}
-      </label>
+      {/* //// 這邊用label包起來是為了避免觸發Container的Label */}
+      {/* ////label必須在input之前，這樣不用設z-index就可以使input蓋過select */}
+      {/* ////不設index才能避免InputSelect垂直排列時menu因為z-index造成的跑版*/}
+      {/* 過陣子沒問題就把註解的lable刪掉，css裡的 inputSelect>label也刪掉 */}
+      {/* <label> */}
+      {!disabled && (
+        <ReactSelect
+          className={scss.select}
+          // menuIsOpen={true}
+          isSearchable={false}
+          isDisabled={disabled}
+          options={options}
+          onChange={(option, action) => {
+            const value = option?.value ?? '';
+            onChange?.(value);
+            selectOnChange?.(option, action);
+            setTimeout(() => {
+              ref_input.current?.focus();
+            }, 0);
+          }}
+          classNames={{
+            ...cn,
+            control(props) {
+              return classNames(scss.control_inputSelect, scss.plus, cn?.control?.(props));
+            },
+            valueContainer(props) {
+              return classNames(scss.valueContainer_inputSelect, scss.plus, cn?.valueContainer?.(props));
+            },
+            singleValue(props) {
+              return classNames(scss.singleValue_inputSelect, scss.plus, cn?.singleValue?.(props));
+            },
+            input(props) {
+              return classNames(scss.input_inputSelect, scss.plus, cn?.input?.(props));
+            },
+            indicatorsContainer(props) {
+              return classNames(scss.indicatorsContainer_inputSelect, scss.plus, cn?.indicatorsContainer?.(props));
+            },
+            indicatorSeparator(props) {
+              return classNames(scss.indicatorSeparator_inputSelect, scss.plus, cn?.indicatorSeparator?.(props));
+            },
+            menu(props) {
+              return classNames(scss.menu_inputSelect, scss.plus, cn?.menu?.(props));
+            },
+            option(props) {
+              return classNames(scss.option, scss.option_inputSelect, scss.plus, cn?.option?.(props));
+            },
+          }}
+          {...selectProps}
+        />
+      )}
+      {/* </label> */}
       <input
         ref={ref_input}
         value={value}
