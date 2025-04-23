@@ -1,3 +1,11 @@
 .table {
+  position: relative;
   border: solid 1px theme("colors.border");
+  height: 300px;
+  overflow: auto;
+  .thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
 }

@@ -1,3 +1,6 @@
+import DataEntry from 'components/global/gear/dataEntry';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+
 // component
 import {
   Tprops_cell,
@@ -19,48 +22,50 @@ import scss from './index.module.scss';
 
 export default function Table() {
   return (
-    <div className={scss.table}>
-      <QuotationRow_dndThead
-        disabled={true}
-        keyArr={keyArr}
-        configDict={config}
-        onDragEnd={() => {}}
-        dragHandleInvisible={true}
-      />
+    <div>
+      <div className="flex gap-2 mb-1">
+        <span className="text-main text-xl">主產品</span>
+        <DataEntry
+          className="w-[170px] gap-2"
+          caption="總折數 : "
+          captionWrapperProps={{ className: 'text-xl font-normal w-fit' }}
+          childrenWrapperProps={{
+            className: 'text-xl',
+          }}
+        >
+          <DataEntry.Input />
+        </DataEntry>
+      </div>
 
-      <QuotationRow_dnd id="x" index={0}>
-        {keyArr.map((key) => {
-          const style = config[key]?.style ?? {};
+      <div className={scss.table}>
+        <QuotationRow_dndThead
+          className={scss.thead}
+          disabled={true}
+          keyArr={keyArr}
+          configDict={config}
+          onDragEnd={() => {}}
+          dragHandleInvisible={true}
+        />
 
+        {Array.from({ length: 30 }).map((_, index) => {
           return (
-            <Cell key={key} style={style}>
-              {key}
-            </Cell>
+            <QuotationRow_dnd key={index} id={`${index}`} index={0}>
+              {keyArr.map((key) => {
+                const style = config[key]?.style ?? {};
+
+                return (
+                  <Cell key={key} style={style}>
+                    {key}
+                  </Cell>
+                );
+              })}
+            </QuotationRow_dnd>
           );
         })}
-      </QuotationRow_dnd>
-      <QuotationRow_dnd id="y" index={1}>
-        {keyArr.map((key) => {
-          const style = config[key]?.style ?? {};
-
-          return (
-            <Cell key={key} style={style}>
-              {key}
-            </Cell>
-          );
-        })}
-      </QuotationRow_dnd>
-      <QuotationRow_dnd id="z" index={2}>
-        {keyArr.map((key) => {
-          const style = config[key]?.style ?? {};
-
-          return (
-            <Cell key={key} style={style}>
-              {key}
-            </Cell>
-          );
-        })}
-      </QuotationRow_dnd>
+      </div>
+      <div className="p-2 border border-t-0 border-border ">
+        <SquareBtn sharp="mini">新增</SquareBtn>
+      </div>
     </div>
   );
 }
