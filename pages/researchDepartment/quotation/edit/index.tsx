@@ -7,6 +7,7 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import Profile from 'components/page/researchDepartment/quotation/profile';
 import QuotationRemark, { Tprops_quotationRemark } from 'components/page/domestic/quotation_v2/QuotationRemark';
 import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
+import Table from 'components/page/researchDepartment/quotation/table';
 
 // CSS
 import scss from './index.module.scss';
@@ -15,8 +16,16 @@ export default function Edit() {
   return (
     <SubLayer>
       <PageHeader02 tag="新增報價單" />
-      <div>
+      <div className={scss.main}>
         <Profile />
+
+        <br />
+        <br />
+
+        <Table />
+
+        <br />
+        <br />
 
         <div className={scss.summary}>
           <div className={scss.left}>
