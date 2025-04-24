@@ -1757,6 +1757,10 @@ export type TquotationProductItemDto = {
   skeleton: string | null;
   // 上遮 // 棄用
   upperMask: boolean | null;
+  // 開啟方向(for扇形水閘門用)
+  openDirection: string | null;
+  // 開啟方式(for扇形水閘門用)
+  openType: string | null;
 };
 
 type TquotationContentDto_copy = {
@@ -3949,6 +3953,11 @@ export type TupdateContractProductItemDto = {
   skeleton: string | null;
   // 上遮 // 棄用
   upperMask?: boolean | null;
+
+  // 開啟方向(for扇形水閘門用)
+  openDirection: string | null; // '單開' | '雙開' | null;
+  // 開啟方式(for扇形水閘門用)
+  openType: string | null; // '外視左開' | '外視右開' | null;
 
   // @ApiProperty({ type: QuotationProductDto, description: '主產品' })
   // product: QuotationProductDto;

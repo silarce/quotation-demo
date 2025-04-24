@@ -50,9 +50,10 @@ type Tstate_specialProd_w1w3 = {
   skeleton: string;
   doorModelName_whole: () => string;
 
-  // FIXME 待API新增property後再根據property改key
-  開啟方式: '單開' | '雙開' | null;
-  開門方向: '外視左開' | '外視右開' | null;
+  // 開啟方向(for扇形水閘門用)
+  openDirection: string | null;
+  // 開啟方式(for扇形水閘門用)
+  openType: string | null;
 };
 
 // ===============================================================================================================
@@ -153,8 +154,8 @@ const Form_specialProd_basic = ({
     motorPhase,
     skeleton,
 
-    開啟方式,
-    開門方向,
+    openDirection,
+    openType,
   } = state;
 
   const value_electricSupply = createElectricSupply({
@@ -309,12 +310,12 @@ const Form_specialProd_basic = ({
               disabled={disabled}
               selectProps={{
                 props: {
-                  value: 開啟方式 ? findOption({ value: 開啟方式, options: options_開啟方式 }) : null,
+                  value: openType ? findOption({ value: openType, options: options_開啟方式 }) : null,
                   options: options_開啟方式,
                   onChange: (option) => {
-                    const value = (option?.value ?? null) as typeof 開啟方式;
-                    const new開門方向 = value !== '單開' ? null : 開門方向;
-                    setState((prev) => ({ ...prev, 開啟方式: value, 開門方向: new開門方向 }));
+                    const value = (option?.value ?? null) as typeof openType;
+                    const new開門方向 = value !== '單開' ? null : openDirection;
+                    setState((prev) => ({ ...prev, openType: value, openDirection: new開門方向 }));
                   },
                 },
               }}
@@ -323,17 +324,17 @@ const Form_specialProd_basic = ({
             <InputSel
               {...basicConfig}
               caption="開門方向"
-              disabled={開啟方式 !== '單開' ? true : disabled}
-              className={classNames(開啟方式 !== '單開' && scss.frozen)}
-              captionClassName={classNames(開啟方式 !== '單開' && scss.frozen)}
+              disabled={openType !== '單開' ? true : disabled}
+              className={classNames(openType !== '單開' && scss.frozen)}
+              captionClassName={classNames(openType !== '單開' && scss.frozen)}
               selectProps={{
                 props: {
                   placeholder: '',
-                  value: 開門方向 ? findOption({ value: 開門方向, options: options_開門方向 }) : null,
+                  value: openDirection ? findOption({ value: openDirection, options: options_開門方向 }) : null,
                   options: options_開門方向,
                   onChange: (option) => {
-                    const value = (option?.value ?? null) as typeof 開門方向;
-                    setState((prev) => ({ ...prev, 開門方向: value }));
+                    const value = (option?.value ?? null) as typeof openDirection;
+                    setState((prev) => ({ ...prev, openDirection: value }));
                   },
                 },
               }}
