@@ -163,6 +163,12 @@ type Tstate_specialDoor = {
   skeleton: string;
   // 上蓋
   // upperMask: boolean;
+  //
+
+  // 開啟方向(for扇形水閘門用)
+  openDirection: string | null;
+  // 開啟方式(for扇形水閘門用)
+  openType: string | null;
 };
 
 // MARK:useSpecialDoor
@@ -299,6 +305,9 @@ const useSpecialDoor = ({
         hasWheel: state_specialDoor.hasWheel,
 
         skeleton: state_specialDoor.skeleton,
+
+        openDirection: state_specialDoor.openDirection,
+        openType: state_specialDoor.openType,
         // upperMask: state_specialDoor.upperMask,
       };
 
@@ -433,6 +442,9 @@ const useDefaultState_specialDoor = ({
 
       skeleton: quotationProductItem.skeleton ?? '',
       // upperMask: !!quotationProductItem.upperMask,
+
+      openDirection: quotationProductItem.openDirection,
+      openType: quotationProductItem.openType,
     };
 
     return defaultState;
@@ -526,6 +538,9 @@ const emptyState_specialDoor = (): Tstate_specialDoor => {
 
     skeleton: '',
     // upperMask: false,
+
+    openDirection: null,
+    openType: null,
   };
 
   return state;

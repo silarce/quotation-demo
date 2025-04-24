@@ -177,6 +177,10 @@
   background-color: theme("colors.danger");
 }
 
+.frozen {
+  background-color: theme("colors.border");
+}
+
 .cover {
   position: absolute;
   top: 0;
