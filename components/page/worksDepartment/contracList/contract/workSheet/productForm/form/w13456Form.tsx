@@ -22,12 +22,18 @@ import type { Tstate_specialDoor } from 'components/page/worksDepartment/contrac
 
 import { TsetState, options_electricSupply, basicConfig, createElectricSupply } from './shared';
 
-import { optionsCreator_closingType } from 'js/utils/options/productOptions';
+import {
+  optionsCreator_closingType,
+  optionsCreator_openType,
+  optionsCreator_openDirection,
+} from 'js/utils/options/productOptions';
 import { findOption } from 'js/utils/options/findOption';
 
 // ===============================================================================================================
 
 const options_closingtype = optionsCreator_closingType();
+const options_openType = optionsCreator_openType();
+const options_openDirection = optionsCreator_openDirection();
 // ===============================================================================================================
 
 type Tstate_specialProd_w1w3 = {
@@ -43,6 +49,11 @@ type Tstate_specialProd_w1w3 = {
   motorPhase: 1 | 3 | null;
   skeleton: string;
   doorModelName_whole: () => string;
+
+  // 開啟方向(for扇形水閘門用)
+  openDirection: string | null;
+  // 開啟方式(for扇形水閘門用)
+  openType: string | null;
 };
 
 // ===============================================================================================================
@@ -133,7 +144,7 @@ const Form_specialProd_basic = ({
   const {
     itemName,
     quoteType,
-    // doorModelName,
+    doorModelName,
     qty,
     fullWidth,
     height,
@@ -142,6 +153,9 @@ const Form_specialProd_basic = ({
     motorVoltage,
     motorPhase,
     skeleton,
+
+    openDirection,
+    openType,
   } = state;
 
   const value_electricSupply = createElectricSupply({
@@ -287,6 +301,46 @@ const Form_specialProd_basic = ({
             },
           }}
         />
+
+        {doorModelName === 'W1' && (
+          <>
+            <InputSel
+              {...basicConfig}
+              caption="開啟方式"
+              disabled={disabled}
+              selectProps={{
+                props: {
+                  value: openType ? findOption({ value: openType, options: options_openType }) : null,
+                  options: options_openType,
+                  onChange: (option) => {
+                    const value = (option?.value ?? null) as typeof openType;
+                    const newOpenDirection = value !== '單開' ? null : openDirection;
+                    setState((prev) => ({ ...prev, openType: value, openDirection: newOpenDirection }));
+                  },
+                },
+              }}
+            />
+
+            <InputSel
+              {...basicConfig}
+              caption="開門方向"
+              disabled={openType !== '單開' ? true : disabled}
+              className={classNames(openType !== '單開' && scss.frozen)}
+              captionClassName={classNames(openType !== '單開' && scss.frozen)}
+              selectProps={{
+                props: {
+                  placeholder: '',
+                  value: openDirection ? findOption({ value: openDirection, options: options_openDirection }) : null,
+                  options: options_openDirection,
+                  onChange: (option) => {
+                    const value = (option?.value ?? null) as typeof openDirection;
+                    setState((prev) => ({ ...prev, openDirection: value }));
+                  },
+                },
+              }}
+            />
+          </>
+        )}
       </div>
     </div>
   );
