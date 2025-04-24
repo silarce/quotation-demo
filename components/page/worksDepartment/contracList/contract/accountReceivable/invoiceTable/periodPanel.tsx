@@ -113,6 +113,7 @@ const useSelector_contract = (thisContractId: string | undefined) => {
 
 function PeriodPanel_pre(
   {
+    indexNumber,
     data_period,
     finalProdArr,
     data_otherArr,
@@ -124,6 +125,7 @@ function PeriodPanel_pre(
     currency,
     contractId,
   }: {
+    indexNumber?: string | number;
     data_period?: Tperiod_reduce;
     finalProdArr: TquotationProductDto[];
     data_otherArr: TquotationContentOtherDto[];
@@ -370,7 +372,7 @@ function PeriodPanel_pre(
     // _______________________________________________________________________
     // _______________________________________________________________________
 
-    let caption = `第${period}期 ${type}`;
+    let caption = `第${indexNumber}次付款-${type} 第${period}期`;
 
     if (totalsTotal) {
       caption = '合計';
