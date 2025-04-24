@@ -132,7 +132,14 @@ const DataEntryContainer = ({
 
 // MARK:Input
 const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => {
-  return <input {...props} className={classNames('w-full', className)} />;
+  return (
+    <input
+      // 避免使用者滾動page時意外編輯了input的值
+      onWheel={(e) => e.currentTarget.blur()}
+      {...props}
+      className={classNames('w-full', className)}
+    />
+  );
 };
 
 // MARK:Textarea
