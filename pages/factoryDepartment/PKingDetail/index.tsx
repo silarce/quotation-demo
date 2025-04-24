@@ -1677,6 +1677,7 @@ export default function PKingDetail() {
     //#region ===【儲格變數】
     const [data11, setData11] = useState<any[]>([]);
     const [whpositionqmodalopen, setWhpositionqmodalopen] = useState<boolean>(false);
+    const [normaldata, setNormalData] = useState<any[]>([]);
     const [whpnumber, setWhpnumber] = useState<string>("");
     const [whpproductid, setWhpproductid] = useState<string>("");
     const [whpname, setWhpname] = useState<string>("");
@@ -1702,6 +1703,9 @@ export default function PKingDetail() {
     const [nowwhpositionuuid, setNowwhpositionuuid] = useState<string>("");
     const [nowpickinglistdetailuuid, setNowpickinglistdetailuuid] = useState<string>("");
     const [modalcheckfirstin, setModalcheckfirstin] = useState<number>(0);
+    const [inventoryid, setInventoryid] = useState<string>("");
+    //倉庫類型
+    const [warehouse_type, setWarehouse_type] = useState<string>('');
     //滑鼠hover
     const [hoverInfo, setHoverInfo] = useState<string | null>(null);
     const [mouseX, setMouseX] = useState('0px');
@@ -1808,6 +1812,54 @@ export default function PKingDetail() {
         }
     };
 
+    const MinusNormalInventory = async (id: any) => {
+
+        try {
+            setIsLoading(true);
+            const conditionModel = {
+                inventoryid: id,
+                quantity: inboxquantity,
+                productid: nowproductid,
+                update_by: userInfo?.employee?.chName.toString(),
+                pickinglistdetailuuid: nowpickinglistdetailuuid,
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const response = await fetch(`${setting.apipath}/WareHouse/MinusNormalInventory`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inputModel)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            handleRowClick(id);
+            getWhpositionDetailByProductId(nowproductid);
+            setNowpickingqty((parseInt(nowpickingqty) + inboxquantity).toString());
+            GetDetailById(uuidin);
+            setWhpquantity((parseInt(whpquantity) - inboxquantity).toString());
+            setInboxquantity(0);
+            GetNormalInventory(whid);
+
+        } catch (error: any) {
+            setError("getProdReceiptDetail:" + error.message);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
     //取得儲格物料資訊
     const getWhpositionDetailByProductId = async (productid: any) => {
         try {
@@ -1844,20 +1896,20 @@ export default function PKingDetail() {
             }
             setData3(data);
 
-            handleRowClick(data[0].id);
+            // handleRowClick(data[0].id);
             GetTrayStatus(data[0].whid);
             GetLayOut(data[0].whid, data[0].trayname, data[0].id);
-            if (modalcheckfirstin === 0) {
-                setWhid(data[0].whid);
-                setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-                setWhpname(data[0].name);
-                setWhpproductid(data[0].productid);
-                setWhpspec(data[0].spec);
-                setWhpquantity(data[0].quantity);
-                setNowwhname(data[0].whname);
-                setNowtrayname(data[0].trayname);
-                setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-            }
+            // if (modalcheckfirstin === 0) {
+            //     setWhid(data[0].whid);
+            //     setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+            //     setWhpname(data[0].name);
+            //     setWhpproductid(data[0].productid);
+            //     setWhpspec(data[0].spec);
+            //     setWhpquantity(data[0].quantity);
+            //     setNowwhname(data[0].whname);
+            //     setNowtrayname(data[0].trayname);
+            //     setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+            // }
 
 
 
@@ -1886,6 +1938,54 @@ export default function PKingDetail() {
             setIsLoading(false);
         }
     };
+
+    // 取得一般倉庫資訊
+    const GetNormalInventory = async (whid: any) => {
+        try {
+            // setIsLoading(true);
+            const conditionModel = {
+                // productid: productid as string | undefined,
+                // type: "entry",
+                whid: whid
+            };
+
+
+            var inputModel = {
+                TypeName: 'ERP',
+                ServiceName: 'WareHouseService',
+                FunctionName: 'no',
+                FilterConditions: JSON.stringify(conditionModel),
+            };
+
+            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            const response = await fetch(`${setting.apipath}/WareHouse/GetNormalInventory?${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data');
+            }
+            const data = await response.json();
+
+            if (data.length === 0) {
+                myAlert.warning({
+                    title: "查詢結果",
+                    content: "目前沒有可存放的儲位資訊"
+                });
+                return;
+            }
+
+            setNormalData(data);
+
+
+
+        } catch (error: any) {
+            myAlert.err({
+                title: "prodEntry(getWhpositionDetailByProductId)",
+                content: error.message
+            })
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
 
     //取得托盤呼叫狀態
     const GetTrayStatus = async (whid: string) => {
@@ -1987,22 +2087,38 @@ export default function PKingDetail() {
     const handleModalClose = async () => {
         setWhpositionqmodalopen(false);
         setSelectedItemId(null);
+        setWarehouse_type('');
     }
 
     // 領料扣庫存
     const handleminusquantity = () => {
-        if (inboxquantity > parseInt(whpquantity)) {
-            myAlert.warning({ title: "領取數量大於庫存數" });
-            return;
-        }
-        myAlert.confirm({
-            title: `確定要從此儲格領取嗎?: ${nowwhname}-${nowtrayname}-${nowwhposition}`,
-            props: {
-                onOk: async () => {
-                    await MinusWHPositionQuantity();
-                }
+        if (warehouse_type === '立體倉庫') {
+            if (inboxquantity > parseInt(whpquantity)) {
+                myAlert.warning({ title: "領取數量大於庫存數" });
+                return;
             }
-        });
+            myAlert.confirm({
+                title: `確定要從此儲格領取嗎?: ${nowwhname}-${nowtrayname}-${nowwhposition}`,
+                props: {
+                    onOk: async () => {
+                        await MinusWHPositionQuantity();
+                    }
+                }
+            });
+        } else {
+            if (inboxquantity > parseInt(nowquantity)) {
+                myAlert.warning({ title: "領取數量大於庫存數" });
+                return;
+            }
+            myAlert.confirm({
+                title: `確定要領取嗎?`,
+                props: {
+                    onOk: async () => {
+                        await MinusNormalInventory(inventoryid);
+                    }
+                }
+            });
+        }
     }
 
     const handleinbox = (item: any) => {
@@ -2025,27 +2141,52 @@ export default function PKingDetail() {
     }
 
     const handleGetLayOut = (item: any) => {
-        GetTrayStatus(item.whid);//取得托盤呼叫狀態
-        handleRowClick(item.id);
-        setWhid(item.whid);
-        setNowwhname(item.whname);
-        setNowtrayname(item.trayname);
-        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        GetLayOut(item.whid, item.trayname, item.id)
-        if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
+        setWarehouse_type(item?.type);
+        if (item?.type === '立體倉庫') {
+            handleRowClick(item.inventoryid);
+            GetTrayStatus(item.whid);//取得托盤呼叫狀態
+            setWhid(item.whid);
+            setNowwhname(item.whname);
+            setNowtrayname(item.trayname);
+            setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+            GetLayOut(item.whid, item.trayname, item.id)
+            if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
+                setInboxquantity(0);
+            }
+            setNowwhpositionuuid(item.id);
+            setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+            setWhpname(item.name);
+            setWhpproductid(item.productid);
+            setWhpspec(item.spec);
+            setWhpquantity(item.quantity);
+            setWhid(item.whid);
+            setNowwhname(item.whname);
+            setNowtrayname(item.trayname);
+            setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+        } else {
+            // alert(item.inventoryid);
+            handleRowClick(item.inventoryid);
+            // GetNormalInventory(item.productid);
+            // alert("目前還沒有一般儲存功能");
+            // alert(item.inventoryid);
+            // getWhpositionDetailByProductId(nowproductid);
+            // setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
+            // GetDetailById(uuidin);
+            setWhpname(item.name);
+            setWhpspec(item.spec);
+            setTraynamecalled('');
+            setWhpnumber('');
+            setWhpproductid(item.productid);
+            setWhpspec(item.spec);
+            setWhpquantity(item.quantity);
             setInboxquantity(0);
+            GetNormalInventory(item.whid);
+            setWhid(item.whid);
+            setNowwhname(item.whname);
+            setNowwhposition('');
+            setInventoryid(item.inventoryid);
+            setNowtrayname('');
         }
-        setNowwhpositionuuid(item.id);
-        setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        setWhpname(item.name);
-        setWhpproductid(item.productid);
-        setWhpspec(item.spec);
-        setWhpquantity(item.quantity);
-        setWhid(item.whid);
-        setNowwhname(item.whname);
-        setNowtrayname(item.trayname);
-        setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-
 
     }
 
@@ -3876,17 +4017,18 @@ export default function PKingDetail() {
                                             <CellWithBar key={index} className={scss.panelHeader26}>
                                                 <div
                                                     key={index}
-                                                    className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                    // onClick={() => handleGetLayOut(_item)}
-                                                    onClick={()=>{
-                                                        console.log(_item);
-                                                        handleGetLayOut(_item);
-                                                    }}
+                                                    className={`${scss.row01} ${_item.inventoryid === selectedItemId ? scss.selectedRow : ''}`}
+                                                    onClick={() => handleGetLayOut(_item)}
+                                                // onClick={() => {
+                                                //     console.log(_item);
+                                                //     alert(_item.inventoryid);
+                                                //     handleGetLayOut(_item);
+                                                // }}
                                                 >
                                                     <span>{index + 1}</span>
                                                     <span>{_item.whname}</span>
                                                     <span>{_item.trayname}</span>
-                                                    <span>{`${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
+                                                    <span>{_item.type === '一般倉庫' ? '' : `${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
                                                     <span style={{ color: `${_item.productid != nowproductid ? 'red' : 'black'}` }}>{_item.productid}</span>
                                                     <span style={{ color: `${_item.quantity === 0 ? 'red' : 'black'}` }}>{_item.quantity}</span>
                                                     <span>
@@ -3902,93 +4044,172 @@ export default function PKingDetail() {
                             </div>
                         </div>
                         <div className={scss.modal_right}>
-                            <div className={scss.modal_right_head}>
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="倉庫編號"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: nowwhname ? nowwhname : ' '
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="托盤編號"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: nowtrayname ? nowtrayname : ' '
-                                        },
-                                    }}
-                                />
-                                <InputSel
-                                    {...inputSelProps}
-                                    caption="儲格編號"
-                                    className='align-bottom'
-                                    disabled={true}
-                                    inputProps={{
-                                        props: {
-                                            value: nowwhposition ? nowwhposition : ' '
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div className={scss.modal_right_content}>
-                                {data11.map((Data) => (
-                                    <table className={scss.traytable} style={{ border: 'solid 1px black' }}>
-                                        <tbody>
-                                            <tr className={scss.tr}>
-                                                {Data.widthdata.map((item: any) => (
-                                                    <td className={scss.td} style={{ backgroundColor: item.color, color: item.color === '#ea1833' ? '#FFFFFF' : 'black' }}>
-                                                        {item.childtraylayoutmodel && item.childtraylayoutmodel.map((childitem: any) => (
-                                                            <table className={scss.childtraytable} key={item.childlengthid}>
-                                                                <tbody>
-                                                                    <tr className={scss.childtraytabletr}>
-                                                                        {childitem.childwidthdata.map((childDataItem: any) => (
-                                                                            <td className={scss.childtraytabletd} key={childDataItem.id} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
-                                                                                <button className={scss.childtraytabletdButton}
-                                                                                    style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
-                                                                                    onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
-                                                                                    onMouseLeave={() => setHoverInfo(null)}
-                                                                                >
-                                                                                    {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
-                                                                                </button>
-                                                                            </td>
-                                                                        ))}
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        ))}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                ))}
-                                {hoverInfo && (
-                                    <div
-                                        style={{
-                                            backgroundColor: '#dfdcdc',
-                                            position: 'fixed',
-                                            top: mouseY,
-                                            left: mouseX,
-                                            transform: 'translate(10%, 60%)',
-                                            padding: '5px',
-                                            borderRadius: '5px',
-                                            boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                                            zIndex: '1002',
-                                            whiteSpace: 'pre-line', // 控制換行的 CSS 屬性
-                                            fontSize: '16px'
-                                        }}
-                                    >
-                                        {hoverInfo}
-                                    </div>
-                                )}
-                            </div>
+
+                            {warehouse_type ? (
+                                warehouse_type === '立體倉庫' ? (
+                                    <>
+                                        <div className={scss.modal_right_head}>
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="倉庫編號"
+                                                className='align-bottom'
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: nowwhname ? nowwhname : ' '
+                                                    },
+                                                }}
+                                            />
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="托盤編號"
+                                                className='align-bottom'
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: nowtrayname ? nowtrayname : ' '
+                                                    },
+                                                }}
+                                            />
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="儲格編號"
+                                                className='align-bottom'
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: nowwhposition ? nowwhposition : ' '
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div className={scss.modal_right_content}>
+                                            {data11.map((Data) => (
+                                                <table className={scss.traytable} style={{ border: 'solid 1px black' }}>
+                                                    <tbody>
+                                                        <tr className={scss.tr}>
+                                                            {Data.widthdata.map((item: any) => (
+                                                                <td className={scss.td} style={{ backgroundColor: item.color, color: item.color === '#ea1833' ? '#FFFFFF' : 'black' }}>
+                                                                    {item.childtraylayoutmodel && item.childtraylayoutmodel.map((childitem: any) => (
+                                                                        <table className={scss.childtraytable} key={item.childlengthid}>
+                                                                            <tbody>
+                                                                                <tr className={scss.childtraytabletr}>
+                                                                                    {childitem.childwidthdata.map((childDataItem: any) => (
+                                                                                        <td className={scss.childtraytabletd} key={childDataItem.id} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
+                                                                                            <button className={scss.childtraytabletdButton}
+                                                                                                style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
+                                                                                                onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
+                                                                                                onMouseLeave={() => setHoverInfo(null)}
+                                                                                            >
+                                                                                                {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
+                                                                                            </button>
+                                                                                        </td>
+                                                                                    ))}
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    ))}
+                                                                </td>
+                                                            ))}
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            ))}
+                                            {hoverInfo && (
+                                                <div
+                                                    style={{
+                                                        backgroundColor: '#dfdcdc',
+                                                        position: 'fixed',
+                                                        top: mouseY,
+                                                        left: mouseX,
+                                                        transform: 'translate(10%, 60%)',
+                                                        padding: '5px',
+                                                        borderRadius: '5px',
+                                                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                                                        zIndex: '1002',
+                                                        whiteSpace: 'pre-line',
+                                                        fontSize: '16px'
+                                                    }}
+                                                >
+                                                    {hoverInfo}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className={scss.modal_right_head}>
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="倉庫編號"
+                                                className='align-bottom'
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: nowwhname ? warehouse_type + " " + nowwhname : ' '
+                                                    },
+                                                }}
+                                            />
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="托盤編號"
+                                                className='align-bottom'
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: nowtrayname ? nowtrayname : ' '
+                                                    },
+                                                }}
+                                            />
+                                            <InputSel
+                                                {...inputSelProps}
+                                                caption="儲格編號"
+                                                className='align-bottom'
+                                                disabled={true}
+                                                inputProps={{
+                                                    props: {
+                                                        value: nowwhposition ? nowwhposition : ' '
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div className={scss.modal_right_content2}>
+                                            <div className={scss.body_content1}>
+                                                <div className={scss.thead30}>
+                                                    <span>序</span>
+                                                    <span>料號</span>
+                                                    <span>品名</span>
+                                                    <span>規格</span>
+                                                    <span>數量</span>
+                                                    <span></span>
+                                                </div>
+
+                                                {normaldata && (
+                                                    normaldata.map((_item: any, index: number) => (
+                                                        <CellWithBar key={index} className={scss.panelHeader30}>
+                                                            <div
+                                                                key={index}
+                                                                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                                                style={{ backgroundColor: `${_item.inventoryid === inventoryid ? '#ea1833' : ''}` }}
+                                                            >
+                                                                <span>{index + 1}</span>
+                                                                <span>{_item.productid}</span>
+                                                                <span>{_item.name}</span>
+                                                                <span>{_item.spec}</span>
+                                                                <span>{_item.quantity}</span>
+                                                                <span></span>
+                                                                <span>
+                                                                </span>
+                                                            </div>
+                                                        </CellWithBar>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
+                                )
+                            ) : <div></div>}
+
                         </div>
                     </div>
                     <div className={scss.modal_container2}>
@@ -3999,22 +4220,26 @@ export default function PKingDetail() {
                                         <button
                                             className={
                                                 called
-                                                    ? (data3.length === 0 ? scss.disabledbtn : scss.greenbutton)
-                                                    : (data3.length === 0 ? scss.disabledbtn : scss.redbtn)
+                                                    ? (data3.length === 0 || (warehouse_type === '一般倉庫'|| warehouse_type==='' ) ? scss.disabledbtn : scss.greenbutton)
+                                                    : (data3.length === 0 || (warehouse_type === '一般倉庫'|| warehouse_type==='' ) ? scss.disabledbtn : scss.redbtn)
                                             }
                                             onClick={() => {
-                                                if (called) {
-                                                    if (data3.length !== 0) handleBack();
-                                                } else {
-                                                    if (data3.length !== 0) handleCall();
+                                                if (warehouse_type !== '一般倉庫') { // 只在不是一般倉庫的情況下觸發操作
+                                                    if (called) {
+                                                        if (data3.length !== 0) handleBack();
+                                                    } else {
+                                                        if (data3.length !== 0) handleCall();
+                                                    }
                                                 }
                                             }}
-                                            disabled={data3.length === 0}
+                                            disabled={(warehouse_type === '一般倉庫' || warehouse_type==='' ) ? true : false}
+                                        // style={{ display: `${warehouse_type === '一般倉庫' ? 'none' : ''}` }}
                                         >
                                             {called
-                                                ? (data3.length === 0 ? `收回托盤收回托盤(${calledTray})` : `收回托盤(${calledTray})`)
-                                                : (data3.length === 0 ? `呼叫托盤(${nowtrayname})` : `呼叫托盤(${nowtrayname})`)}
+                                                ? (data3.length === 0 || warehouse_type === '一般倉庫' ? `收回托盤收回托盤(${calledTray})` : `收回托盤(${calledTray})`)
+                                                : (data3.length === 0 || warehouse_type === '一般倉庫' ? `呼叫托盤(${nowtrayname})` : `呼叫托盤(${nowtrayname})`)}
                                         </button>
+                                        {warehouse_type}
                                     </div>
                                     <div style={{ paddingTop: '5px' }}>
                                         {/* <InputSel

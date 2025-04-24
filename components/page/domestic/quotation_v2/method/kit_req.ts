@@ -263,7 +263,6 @@ const kit_req = ({
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
 
-    // const { isUpdated, newQuotation } = await reqPost({ body, attachmentArr });
     const newQuotation = await apiPatchModifyQuotation({
       quotationId: quotationId,
       body,

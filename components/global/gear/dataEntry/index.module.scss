@@ -40,8 +40,15 @@
 
 .datepicker {
   &:global(.ant-picker) {
+    font-size: inherit;
     padding: 0;
     border: 0;
+    > :global(.ant-picker-input) {
+      font-size: inherit;
+      > input {
+        font-size: inherit;
+      }
+    }
   }
 }
 .timepicker {
@@ -53,12 +60,34 @@
 
 .checkbox {
   display: flex;
+  font-size: inherit;
+
+  > :global(.ant-checkbox-wrapper) {
+    position: relative;
+    align-items: center;
+    font-size: inherit;
+    > :global(.ant-checkbox) {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.radioGroup {
+  font-size: inherit;
+  > :global(.ant-radio-wrapper) {
+    font-size: inherit;
+    align-items: center;
+    > :global(.ant-radio) {
+      transform: translateY(-2px);
+    }
+  }
 }
 
 .antdSelect,
 .antdSelect.plus,
 .antdSelect.plus.plus2 {
   display: flex;
+  font-size: inherit;
   :global(.ant-select-selector) {
     // background-color: transparent;
     padding: unset;
@@ -155,6 +184,7 @@
 // ==================================================
 
 .inputSelect {
+  display: inline-block;
   position: relative;
   > input {
     position: relative;
@@ -167,6 +197,23 @@
     display: block;
     width: 100%;
   }
+
+  .select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+  }
+
+  // 過陣子確定沒問題就刪掉
+  // > label {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   display: block;
+  //   width: 100%;
+  // }
 }
 
 .control_inputSelect.plus {

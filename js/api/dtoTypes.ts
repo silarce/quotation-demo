@@ -1940,6 +1940,7 @@ export type TquotationContentDto = {
   products: TquotationProductDto[];
 
   verifyForm?: TquotationVerifyFormDto | undefined;
+  verifyFormId: string | null;
 
   // // ! 直接放TquotationContractDto會造成循環參考，電腦的效能被吃光
   // // ! 所以只設需要拿的東西

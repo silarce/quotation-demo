@@ -894,7 +894,7 @@ function ReviewForm({
               className="mt-1 w-full"
               prefix="備註 :"
               disabled={disabled}
-              inputAttr={{
+              textareaProps={{
                 placeholder: '',
                 value: watchData.paymentDateNote ?? '',
                 onChange: (e) => {
@@ -994,7 +994,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 placeholder: '',
 
@@ -1023,7 +1023,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 value: watchData.performanceBondNote ?? '',
                 onChange: (e) => {
@@ -1052,7 +1052,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 placeholder: '',
                 value: watchData.depositPaymentNote ?? '',
@@ -1090,7 +1090,7 @@ function ReviewForm({
             <InputBox
               prefix="備註 :"
               className="mt-1 w-full"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 ...register('note'),
               }}
@@ -1114,7 +1114,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 value: watchData.warrantyPaymentNote ?? '',
                 onChange: (e) => {
@@ -1167,7 +1167,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 placeholder: '',
                 value: watchData.fireproofCertificateNote ?? '',
@@ -1220,7 +1220,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 placeholder: '',
                 value: watchData.factoryCertificateNote ?? '',
@@ -1272,7 +1272,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 placeholder: '',
                 value: watchData.warrantyNote ?? '',
@@ -1302,7 +1302,7 @@ function ReviewForm({
             <InputBox
               className="mt-1 w-full"
               prefix="備註 :"
-              inputAttr={{
+              textareaProps={{
                 disabled: disabled,
                 placeholder: '',
                 value: watchData.testDriveNote ?? '',
@@ -1326,7 +1326,7 @@ function ReviewForm({
                 boxStyle={{ width: '100%' }}
                 disabled={disabled}
                 textareaProps={{
-                  // ...register('debitItem'),
+                  disabled,
                   value: watchData.debitItem,
                   onChange: (e) => {
                     setValue('debitItem', e.target.value);
@@ -1436,9 +1436,15 @@ const InputBox = ({
   return (
     <div style={boxStyle} className={classNames(scss.inputBox, disabled && scss.disabled, className)}>
       <span>{prefix}</span>
-
       {inputAttr && <input type="text" readOnly={disabled} {...inputAttr} />}
-      {textareaProps && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
+
+      {/* htmlToCanvas無法正確解析textarea的換行，所以要改為span */}
+      {textareaProps && !textareaProps.disabled && <TextareaAutosize readOnly={disabled} {...textareaProps} />}
+      {textareaProps && textareaProps.disabled && (
+        <span className={classNames(textareaProps.className, scss.spanReplaceTextarea)} style={textareaProps.style}>
+          {textareaProps.value}
+        </span>
+      )}
       <span>{suffix}</span>
     </div>
   );

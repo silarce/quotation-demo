@@ -78,7 +78,7 @@ export default function BudgetList({
                   // pathname: `/domestic/quotationList/attachQuotation`,
                   // pathname: `/domestic/quotationList/quotation`,
                   pathname: isRefactoredQuotaion
-                    ? optionalConfig.path_oldQuotation
+                    ? optionalConfig.path_refactoredQuotation
                     : optionalConfig.path_attachQuotation,
                   query: { id },
                 },
