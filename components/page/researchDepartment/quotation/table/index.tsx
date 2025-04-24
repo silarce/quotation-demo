@@ -51,11 +51,13 @@ export default function Table() {
           return (
             <QuotationRow_dnd key={index} id={`${index}`} index={0}>
               {keyArr.map((key) => {
-                const style = config[key]?.style ?? {};
+                const { style, render } = config[key]!;
+
+                const node = render({ index });
 
                 return (
                   <Cell key={key} style={style}>
-                    {key}
+                    {node}
                   </Cell>
                 );
               })}
@@ -72,25 +74,43 @@ export default function Table() {
 
 // =====================================================================
 
-const keyArr = ['a', 'b', 'c'];
+type Tconfig = Tprops_quotationRow_dndThead['configDict'] &
+  Record<
+    string,
+    {
+      render: (props: { index: number }) => React.ReactNode;
+    }
+  >;
 
-const config: Tprops_quotationRow_dndThead['configDict'] = {
+const config = {
+  indexNumber: {
+    label: null,
+    style: {
+      width: 40,
+    },
+    render: ({ index }) => index + 1,
+  },
   a: {
     label: 'A',
     style: {
       width: 100,
     },
+    render: (props) => 'a',
   },
   b: {
     label: 'B',
     style: {
       width: 200,
     },
+    render: (props) => 'b',
   },
   c: {
     label: 'C',
     style: {
       width: 300,
     },
+    render: (props) => 'c',
   },
-};
+} satisfies Tconfig;
+
+const keyArr: (keyof typeof config)[] = ['indexNumber', 'a', 'b', 'c'];
