@@ -464,6 +464,7 @@ export default function PeriodTable({
               ref={(handle) => {
                 ref_invoicePanelArr.current[index] = handle;
               }}
+              indexNumber={index + 1}
               key={data_invoice.id}
               data_period={data_invoice}
               finalProdArr={finalProdArr}
