@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import moment, { Moment } from 'moment';
 import { nanoid } from 'nanoid';
+import _ from 'lodash';
 
 interface Tstate_prod {
   id?: string;
@@ -71,6 +72,74 @@ const useProduct = ({ diasbled }: { diasbled: boolean }) => {
 
         return newDict;
       });
+    };
+
+    const copySelf = () => {
+      const newState = _.cloneDeep(state_prod);
+      newState.id = undefined;
+
+      setState_prodDict((dict) => {
+        return {
+          ...dict,
+          [nanoid()]: newState,
+        };
+      });
+    };
+
+    const deleteSelf = () => {
+      setState_prodDict((dict) => {
+        const newDict = { ...dict };
+        delete newDict[key];
+
+        return newDict;
+      });
+    };
+
+    return {
+      state_prod,
+      copySelf,
+      deleteSelf,
+      //
+      getProductid: () => state_prod.productid,
+      setProductid: (v: string) => {
+        setState((state) => ({
+          ...state,
+          productid: v,
+        }));
+      },
+      //
+      getSpec: () => state_prod.spec,
+      setSpec: (v: string) => {
+        setState((state) => ({
+          ...state,
+          spec: v,
+        }));
+      },
+      //
+      getMaterial: () => state_prod.material,
+      setMaterial: (v: string) => {
+        setState((state) => ({
+          ...state,
+          material: v,
+        }));
+      },
+      //
+      getThickness: () => state_prod.thickness,
+      setThickness: (v: `${number}` | '') => {
+        setState((state) => ({
+          ...state,
+          thickness: v,
+        }));
+      },
+      //
+      getSurface: () => state_prod.surface,
+      setSurface: (v: string) => {
+        setState((state) => ({
+          ...state,
+          surface: v,
+        }));
+      },
+      //
     };
   };
 
