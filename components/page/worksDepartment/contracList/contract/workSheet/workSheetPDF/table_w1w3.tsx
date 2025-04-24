@@ -14,8 +14,8 @@ interface Tprops_table_w1w3 {
   skeleton: React.ReactNode;
   closingType: React.ReactNode;
 
-  開啟方式: React.ReactNode;
-  開門方向: React.ReactNode;
+  openType: React.ReactNode;
+  openDirection: React.ReactNode;
 }
 
 type TconfigKeys = keyof Pick<
@@ -29,8 +29,8 @@ type TconfigKeys = keyof Pick<
   | 'electricSupply'
   | 'skeleton'
   | 'closingType'
-  | '開啟方式'
-  | '開門方向'
+  | 'openType'
+  | 'openDirection'
 >;
 
 type TconfigItem = {
@@ -90,8 +90,8 @@ const keyArr_basic = Array.from(
     'electricSupply',
     'skeleton',
     'closingType',
-    '開啟方式',
-    '開門方向',
+    'openType',
+    'openDirection',
   ])
 );
 
@@ -150,13 +150,13 @@ const config: Record<TconfigKeys, TconfigItem> = {
       width: 100,
     },
   },
-  開啟方式: {
+  openType: {
     label: '開啟方式',
     style: {
       width: 100,
     },
   },
-  開門方向: {
+  openDirection: {
     label: '開門方向',
     style: {
       width: 100,

@@ -24,16 +24,16 @@ import { TsetState, options_electricSupply, basicConfig, createElectricSupply } 
 
 import {
   optionsCreator_closingType,
-  optionsCreator_開啟方式,
-  optionsCreator_開門方向,
+  optionsCreator_openType,
+  optionsCreator_openDirection,
 } from 'js/utils/options/productOptions';
 import { findOption } from 'js/utils/options/findOption';
 
 // ===============================================================================================================
 
 const options_closingtype = optionsCreator_closingType();
-const options_開啟方式 = optionsCreator_開啟方式();
-const options_開門方向 = optionsCreator_開門方向();
+const options_openType = optionsCreator_openType();
+const options_openDirection = optionsCreator_openDirection();
 // ===============================================================================================================
 
 type Tstate_specialProd_w1w3 = {
@@ -310,12 +310,12 @@ const Form_specialProd_basic = ({
               disabled={disabled}
               selectProps={{
                 props: {
-                  value: openType ? findOption({ value: openType, options: options_開啟方式 }) : null,
-                  options: options_開啟方式,
+                  value: openType ? findOption({ value: openType, options: options_openType }) : null,
+                  options: options_openType,
                   onChange: (option) => {
                     const value = (option?.value ?? null) as typeof openType;
-                    const new開門方向 = value !== '單開' ? null : openDirection;
-                    setState((prev) => ({ ...prev, openType: value, openDirection: new開門方向 }));
+                    const newOpenDirection = value !== '單開' ? null : openDirection;
+                    setState((prev) => ({ ...prev, openType: value, openDirection: newOpenDirection }));
                   },
                 },
               }}
@@ -330,8 +330,8 @@ const Form_specialProd_basic = ({
               selectProps={{
                 props: {
                   placeholder: '',
-                  value: openDirection ? findOption({ value: openDirection, options: options_開門方向 }) : null,
-                  options: options_開門方向,
+                  value: openDirection ? findOption({ value: openDirection, options: options_openDirection }) : null,
+                  options: options_openDirection,
                   onChange: (option) => {
                     const value = (option?.value ?? null) as typeof openDirection;
                     setState((prev) => ({ ...prev, openDirection: value }));

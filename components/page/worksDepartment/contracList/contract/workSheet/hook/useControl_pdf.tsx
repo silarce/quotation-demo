@@ -402,9 +402,8 @@ const createPdfSpecialItem = ({
     motorPhase,
     motorVoltage,
 
-    // api還沒給
-    // 開啟方式,
-    // 開門方向,
+    openDirection,
+    openType,
   } = item;
 
   const phase = motorPhase ? lookup_motorPhase[String(motorPhase) as '1' | '3'] : '';
@@ -499,16 +498,12 @@ const createPdfW1W3Item = ({
     parentItemName,
   });
 
-  const {
-    // api還沒給
-    // 開啟方式,
-    // 開門方向,
-  } = item;
+  const { openDirection, openType } = item;
 
   const w1w3Item: Tcontrol_workSheetPDF_01['w1w3ItemArr'][number] = {
     ...specialItem,
-    開啟方式: null,
-    開門方向: null,
+    openType: openType,
+    openDirection: openDirection,
   };
 
   return w1w3Item;
