@@ -55,7 +55,7 @@ export default function QuotationProfile({
             onChange={(e) => setState_Profile({ ...state_profile, name: e.target.value })}
           />
         </Container>
-        <Container caption="客戶名稱" showBorder={false} htmlFor="">
+        <Container caption="客戶名稱" showBorder={false}>
           <div className={scss.customer}>
             {state_profile.customer && <IconRemove02 className={scss.remove} onClick={removeCustomer} />}
             {!state_profile.customer && (
@@ -85,7 +85,7 @@ export default function QuotationProfile({
             onChange={(e) => setState_Profile({ ...state_profile, fax: e.target.value })}
           />
         </Container>
-        <Container caption="地址" htmlFor="" showBorder={!disable}>
+        <Container caption="地址" showBorder={!disable}>
           <div className={scss.addressContainer}>
             <Select
               options={options_county}
