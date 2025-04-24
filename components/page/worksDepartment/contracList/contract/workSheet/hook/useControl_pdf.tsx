@@ -79,7 +79,7 @@ const useControl_pdf = ({
         });
         specialItemArr.push(control_item);
       } else if (doorModelSort === 'w13456') {
-        const control_item = createPdfSpecialItem({
+        const control_item = createPdfW1W3Item({
           contractProductItems: record.contractProductItems,
           assetDict,
           parentId: record.parentItemName,
@@ -401,6 +401,9 @@ const createPdfSpecialItem = ({
     sprocketWheelModel,
     motorPhase,
     motorVoltage,
+
+    openDirection,
+    openType,
   } = item;
 
   const phase = motorPhase ? lookup_motorPhase[String(motorPhase) as '1' | '3'] : '';
@@ -473,6 +476,37 @@ const createPdfSpecialItem = ({
   };
 
   return specialItem;
+};
+
+const createPdfW1W3Item = ({
+  contractProductItems,
+  assetDict,
+  parentId,
+  parentItemName,
+}: {
+  contractProductItems: TquotationProductItemDto[];
+  assetDict: Record<string, string>;
+  parentId: string;
+  parentItemName: string;
+}) => {
+  const item = contractProductItems[0];
+
+  const specialItem = createPdfSpecialItem({
+    contractProductItems,
+    assetDict,
+    parentId,
+    parentItemName,
+  });
+
+  const { openDirection, openType } = item;
+
+  const w1w3Item: Tcontrol_workSheetPDF_01['w1w3ItemArr'][number] = {
+    ...specialItem,
+    openType: openType,
+    openDirection: openDirection,
+  };
+
+  return w1w3Item;
 };
 
 export { useControl_pdf };
