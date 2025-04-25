@@ -1,4 +1,9 @@
-import DataEntry from 'components/global/gear/dataEntry';
+import { useState } from 'react';
+
+import DataEntry, { DataEntryContainer, Input, Select } from 'components/global/gear/dataEntry';
+
+// console.log(Select);
+
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 // component
@@ -18,11 +23,54 @@ import {
   Panel_accessory,
 } from 'components/page/domestic/quotation_v2/quotationRow';
 
+import type { Tinstance_useProduct } from '../hook/useProduct';
+
 import scss from './index.module.scss';
 
-export default function Table() {
+// ========================================================
+
+type TstateKit = ReturnType<Tinstance_useProduct['createStateKit']>;
+
+// ========================================================
+export default function Table({
+  disabled,
+  instance_useProduct,
+}: {
+  disabled: boolean;
+  instance_useProduct: Tinstance_useProduct;
+}) {
+  const { state_keyArr, createStateKit, addProd } = instance_useProduct;
+
+  const [count, setCount] = useState(0);
+
   return (
     <div>
+      <button
+        onClick={() => {
+          setCount((prev) => prev + 1);
+        }}
+      >
+        test
+      </button>
+
+      {/* {Array.from({
+        length: count,
+      })
+        .fill('foo')
+        .map((_, index) => {
+          return (
+            <QuotationRow_dnd key={index} id={`${index}`} index={index}>
+              <DataEntry caption="喵喵" fontSize={22}>
+                {qoo.foo()}
+              </DataEntry>
+
+              <DataEntry caption="喵喵" fontSize={22}>
+                {qoo.bar()}
+              </DataEntry>
+            </QuotationRow_dnd>
+          );
+        })} */}
+
       <div className="flex gap-2 mb-1">
         <span className="text-main text-xl">主產品</span>
         <DataEntry
@@ -33,7 +81,7 @@ export default function Table() {
             className: 'text-xl',
           }}
         >
-          <DataEntry.Input />
+          <Input />
         </DataEntry>
       </div>
 
@@ -47,13 +95,15 @@ export default function Table() {
           dragHandleInvisible={true}
         />
 
-        {Array.from({ length: 30 }).map((_, index) => {
+        {state_keyArr.map((key, index) => {
+          const stateKit = createStateKit(key);
+
           return (
-            <QuotationRow_dnd key={index} id={`${index}`} index={0}>
+            <QuotationRow_dnd key={key} id={key} index={index}>
               {keyArr.map((key) => {
                 const { style, render } = config[key]!;
 
-                const node = render({ index });
+                const node = render({ disabled, index, stateKit });
 
                 return (
                   <Cell key={key} style={style}>
@@ -64,9 +114,29 @@ export default function Table() {
             </QuotationRow_dnd>
           );
         })}
+
+        {/* {Array.from({ length: 30 }).map((_, index) => {
+          return (
+            <QuotationRow_dnd key={index} id={`${index}`} index={0}>
+              {keyArr.map((key) => {
+                const { style, render } = config[key]!;
+
+                const node = render({ index, stateKit });
+
+                return (
+                  <Cell key={key} style={style}>
+                    {node}
+                  </Cell>
+                );
+              })}
+            </QuotationRow_dnd>
+          );
+        })} */}
       </div>
       <div className="p-2 border border-t-0 border-border ">
-        <SquareBtn sharp="mini">新增</SquareBtn>
+        <SquareBtn sharp="mini" onClick={addProd}>
+          新增
+        </SquareBtn>
       </div>
     </div>
   );
@@ -78,7 +148,12 @@ type Tconfig = Tprops_quotationRow_dndThead['configDict'] &
   Record<
     string,
     {
-      render: (props: { index: number }) => React.ReactNode;
+      render: (props: {
+        //
+        disabled: boolean;
+        index: number;
+        stateKit: TstateKit;
+      }) => React.ReactNode;
     }
   >;
 
@@ -90,27 +165,181 @@ const config = {
     },
     render: ({ index }) => index + 1,
   },
-  a: {
-    label: 'A',
+
+  productid: {
+    label: '品名',
     style: {
       width: 100,
     },
-    render: (props) => 'a',
-  },
-  b: {
-    label: 'B',
-    style: {
-      width: 200,
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            value={stateKit.getProductid()}
+            onChange={(e) => {
+              stateKit.setProductid(e.target.value);
+            }}
+          />
+        </DataEntry>
+      );
     },
-    render: (props) => 'b',
   },
-  c: {
-    label: 'C',
+  spec: {
+    label: '規格',
     style: {
-      width: 300,
+      width: 100,
     },
-    render: (props) => 'c',
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            value={stateKit.getSpec()}
+            onChange={(e) => {
+              stateKit.setSpec(e.target.value);
+            }}
+          />
+        </DataEntry>
+      );
+    },
   },
-} satisfies Tconfig;
+  material: {
+    label: '材質',
+    style: {
+      width: 100,
+    },
+    render: ({ disabled, stateKit }) => {
+      // console.log(DataEntryContainer);
+      // console.log(Select);
 
-const keyArr: (keyof typeof config)[] = ['indexNumber', 'a', 'b', 'c'];
+      // return null;
+
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Select
+            options={fakeOptions}
+            value={stateKit.getMaterial()}
+            onChange={(v) => {
+              stateKit.setMaterial(v);
+            }}
+          />
+        </DataEntry>
+      );
+    },
+  },
+  thickness: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  surface: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  quantity: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  unitPrice: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  price: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  dualPrice: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  totalPrice: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  note: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  discount: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+  imgUrl: {
+    label: 'aaaa',
+    style: {
+      width: 100,
+    },
+    render: ({ index }) => {
+      return null;
+    },
+  },
+};
+
+const keyArr: (keyof typeof config)[] = [
+  'indexNumber',
+  'productid',
+  'spec',
+  'material',
+  'thickness',
+  'surface',
+  'quantity',
+  'unitPrice',
+  'price',
+  'dualPrice',
+  'totalPrice',
+  'note',
+  'discount',
+  'imgUrl',
+];
+
+// =====================================================================
+
+const fakeOptions = [
+  { value: '喵', label: '喵' },
+  { value: '汪', label: '汪' },
+  { value: '咩', label: '咩' },
+  { value: '啾', label: '啾' },
+];

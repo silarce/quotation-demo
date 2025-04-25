@@ -44,17 +44,21 @@ interface Tstate_allProd {
 
 // =====================================================================
 
-const useProduct = ({ diasbled }: { diasbled: boolean }) => {
-  const defaultState_prodDict = useDefault_prodDict(undefined);
+const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
+  const defaultState_prodDict = useDefault_prodDict(rawData);
   const defaultState_allProd = useDefault_allProd(undefined);
+  const defaultState_keyArr = useDefault_keyArr(rawData);
   const [state_prodDict, setState_prodDict] = useState<Tstate_prodDict>(defaultState_prodDict);
   const [state_allProd, setState_allProd] = useState<Tstate_allProd>(defaultState_allProd);
+  const [state_keyArr, setState_KeyArr] = useState<string[]>(defaultState_keyArr);
+
+  // ---------------------------------------------------------------------
 
   // ---------------------------------------------------------------------
 
   // region:setState
 
-  const createKit = (key: string) => {
+  const createStateKit = (key: string) => {
     const state_prod = state_prodDict[key];
 
     const setState: React.Dispatch<React.SetStateAction<Tstate_prod>> = (action) => {
@@ -75,14 +79,19 @@ const useProduct = ({ diasbled }: { diasbled: boolean }) => {
     };
 
     const copySelf = () => {
+      const newKey = nanoid();
+
       const newState = _.cloneDeep(state_prod);
       newState.id = undefined;
 
       setState_prodDict((dict) => {
         return {
           ...dict,
-          [nanoid()]: newState,
+          [newKey]: newState,
         };
+      });
+      setState_KeyArr((arr) => {
+        return [...arr, newKey];
       });
     };
 
@@ -92,6 +101,10 @@ const useProduct = ({ diasbled }: { diasbled: boolean }) => {
         delete newDict[key];
 
         return newDict;
+      });
+
+      setState_KeyArr((arr) => {
+        return arr.filter((item) => item !== key);
       });
     };
 
@@ -140,6 +153,70 @@ const useProduct = ({ diasbled }: { diasbled: boolean }) => {
         }));
       },
       //
+      getQuantity: () => state_prod.quantity,
+      setQuantity: (v: `${number}` | '') => {
+        setState((state) => ({
+          ...state,
+          quantity: v,
+        }));
+      },
+      //
+      getUnitPrice: () => state_prod.unitPrice,
+      setUnitPrice: (v: number) => {
+        setState((state) => ({
+          ...state,
+          unitPrice: v,
+        }));
+      },
+      //
+      getPrice: () => state_prod.price,
+      setPrice: (v: number) => {
+        setState((state) => ({
+          ...state,
+          price: v,
+        }));
+      },
+      //
+      getDualPrice: () => state_prod.dualPrice,
+      setDualPrice: (v: number) => {
+        setState((state) => ({
+          ...state,
+          dualPrice: v,
+        }));
+      },
+      //
+      getTotalPrice: () => state_prod.totalPrice,
+      setTotalPrice: (v: number) => {
+        setState((state) => ({
+          ...state,
+          totalPrice: v,
+        }));
+      },
+      //
+      getNote: () => state_prod.note,
+      setNote: (v: string) => {
+        setState((state) => ({
+          ...state,
+          note: v,
+        }));
+      },
+      //
+      getDiscount: () => state_prod.discount,
+      setDiscount: (v: `${number}` | '') => {
+        setState((state) => ({
+          ...state,
+          discount: v,
+        }));
+      },
+      //
+      getImgUrl: () => state_prod.imgUrl,
+      setImgUrl: (v: string | undefined) => {
+        setState((state) => ({
+          ...state,
+          imgUrl: v,
+        }));
+      },
+      //
     };
   };
 
@@ -150,28 +227,23 @@ const useProduct = ({ diasbled }: { diasbled: boolean }) => {
   // region: method
 
   const addProd = () => {
-    const key = nanoid();
+    const newKey = nanoid();
 
     setState_prodDict((dict) => ({
       ...dict,
-      [key]: {
+      [newKey]: {
         ...emptyState_prod(),
       },
     }));
-  };
-
-  const removeProd = (key: string) => {
-    setState_prodDict((dict) => {
-      const newDict = { ...dict };
-      delete newDict[key];
-
-      return newDict;
+    setState_KeyArr((arr) => {
+      return [...arr, newKey];
     });
   };
 
   const reset = () => {
     setState_prodDict(defaultState_prodDict);
     setState_allProd(defaultState_allProd);
+    setState_KeyArr(defaultState_keyArr);
   };
 
   // endregion
@@ -188,13 +260,25 @@ const useProduct = ({ diasbled }: { diasbled: boolean }) => {
     setState_allProd(defaultState_allProd);
   }, [defaultState_allProd]);
 
+  useEffect(() => {
+    setState_KeyArr(defaultState_keyArr);
+  }, [defaultState_keyArr]);
+
   // endregion
 
   // ---------------------------------------------------------------------
   return {
+    state_keyArr,
+
     reset,
+    createStateKit,
+    addProd,
   };
 };
+
+// MARK: END
+
+// ====================================================================
 
 const useDefault_prodDict = (data: unknown | undefined) => {
   const defaultState: Tstate_prodDict = useMemo(() => {
@@ -233,6 +317,18 @@ const useDefault_allProd = (data: unknown | undefined) => {
   return defaultState;
 };
 
+const useDefault_keyArr = (data: unknown | undefined) => {
+  const defaultState: string[] = useMemo(() => {
+    if (!data) {
+      return [] as string[];
+    }
+
+    return [] as string[];
+  }, [data]);
+
+  return defaultState;
+};
+
 const emptyState_prod = (): Tstate_prod => ({
   id: undefined,
   productid: '', // 品名
@@ -251,3 +347,11 @@ const emptyState_prod = (): Tstate_prod => ({
   discount: '', // 折數
   imgUrl: undefined,
 });
+
+// ===========================================================================
+
+type Tinstance_useProduct = ReturnType<typeof useProduct>;
+
+// ===========================================================================
+export type { Tinstance_useProduct };
+export { useProduct };

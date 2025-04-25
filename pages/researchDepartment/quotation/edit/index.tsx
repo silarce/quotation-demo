@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import useRouter from 'next/router';
 
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -11,12 +13,17 @@ import Table from 'components/page/researchDepartment/quotation/table';
 
 // hook
 import { useProfile } from 'components/page/researchDepartment/quotation/hook/useProfile';
+import { useProduct } from 'components/page/researchDepartment/quotation/hook/useProduct';
 
 // CSS
 import scss from './index.module.scss';
 
 export default function Edit() {
+  const [disabled, setDisabled] = useState(false);
+
   const return_useProfile = useProfile();
+
+  const instance_useProduct = useProduct({ rawData: undefined });
 
   return (
     <SubLayer>
@@ -27,7 +34,7 @@ export default function Edit() {
         <br />
         <br />
 
-        <Table />
+        <Table disabled={disabled} instance_useProduct={instance_useProduct} />
 
         <br />
         <br />
