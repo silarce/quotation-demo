@@ -311,8 +311,9 @@ const c06 = c04 + c02 - c03 + c6c10Adjust;
 const c07 = 'auto';
 const c08 = 35 * magnification;
 
-// const c09 = 110 * magnification ;
-const c09 = 90 * magnification;
+const c09 = 120 * magnification;
+// const c09 = 110 * magnification;
+// const c09 = 90 * magnification;
 
 const c10 = c04 + c08 - c6c10Adjust;
 const c11 = c0 + c02 + c04 + c02 + c04 + c02 + c04;
