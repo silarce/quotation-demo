@@ -816,6 +816,8 @@ export default function PriQueryList() {
                                         content: updatedItem.detail_main_id,
                                         props: {
                                             onOk: () => {
+                                                // console.log(updatedItem);
+                                                // return;
                                                 router.push({
                                                     pathname:
                                                         `${updatedItem.detail_type === "詢價" ? '/factoryDepartment/QReqDetail' : '/factoryDepartment/PReceiptDetail'}`,

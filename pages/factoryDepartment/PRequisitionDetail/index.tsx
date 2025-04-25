@@ -616,7 +616,7 @@ export default function PRequisitionDetail() {
             // 創建一個下載鏈接
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+            link.setAttribute('download', `三久建材_請購單_${id}.xls`); // 設置文件名
 
             // 將鏈接添加到 DOM 並觸發點擊下載
             document.body.appendChild(link);
@@ -1966,7 +1966,7 @@ export default function PRequisitionDetail() {
                             </span>
                         </div>
                         {/* <div className={scss.body_foot2}> */}
-                        <div>
+                        <div style={{marginLeft: '20px', marginRight: '20px' }}>
                             {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
                                 <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
                                     尚未送審
