@@ -58,7 +58,7 @@ export default function PKingDetail() {
     //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>("領料")
     const [statusarea, setStatusarea] = useState<boolean>(false)
-    const [excelopen, setExcelopen] = useState<boolean>(false)
+    const [excelopen, setExcelopen] = useState<boolean>(true)
     const [printopen, setPrintopen] = useState<boolean>(true)
     const [reviewopen, setReviewopen] = useState<boolean>(false)
     const [transopen, setTransopen] = useState<boolean>(false)
@@ -671,7 +671,7 @@ export default function PKingDetail() {
             setIsLoading(true);
             const conditionModel = {
                 id: id,
-                type: 'purchaseorder',
+                type: 'pickinglist',
                 type2: type2,
                 quoterequuid: quoid
             };
@@ -1361,7 +1361,7 @@ export default function PKingDetail() {
 
     //匯出單據
     const handleExport = () => {
-        Excel(idin, "po", "")
+        Excel(idin, "pk", "")
     }
 
     //#endregion

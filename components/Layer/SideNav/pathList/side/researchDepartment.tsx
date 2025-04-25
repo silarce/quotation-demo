@@ -7,6 +7,7 @@ export default function SidePathResearch (){
         return {
             path,
             list: [
+                
                 {
                     label: '工作表',
                     path: path + '/workSheet',
@@ -20,6 +21,11 @@ export default function SidePathResearch (){
                 {
                     label: 'BOM維護',
                     path: path + '/bomListForResearch',
+                    erpFeature: devPass,
+                },
+                {
+                    label: '請購列表',
+                    path: path + '/PRequisitionListForResearch',
                     erpFeature: devPass,
                 },
             ],
