@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import { Image } from 'antd';
 import DataEntry, { Input, Select } from 'components/global/gear/dataEntry';
 
 // console.log(Select);
@@ -41,36 +41,8 @@ export default function Table({
 }) {
   const { state_keyArr, createStateKit, addProd } = instance_useProduct;
 
-  const [count, setCount] = useState(0);
-
   return (
     <div>
-      <button
-        onClick={() => {
-          setCount((prev) => prev + 1);
-        }}
-      >
-        test
-      </button>
-
-      {/* {Array.from({
-        length: count,
-      })
-        .fill('foo')
-        .map((_, index) => {
-          return (
-            <QuotationRow_dnd key={index} id={`${index}`} index={index}>
-              <DataEntry caption="喵喵" fontSize={22}>
-                {qoo.foo()}
-              </DataEntry>
-
-              <DataEntry caption="喵喵" fontSize={22}>
-                {qoo.bar()}
-              </DataEntry>
-            </QuotationRow_dnd>
-          );
-        })} */}
-
       <div className="flex gap-2 mb-1">
         <span className="text-main text-xl">主產品</span>
         <DataEntry
@@ -193,6 +165,7 @@ const config = {
       return (
         <DataEntry showBorder={!disabled}>
           <Input
+            readOnly={disabled}
             value={stateKit.getSpec()}
             onChange={(e) => {
               stateKit.setSpec(e.target.value);
@@ -230,7 +203,7 @@ const config = {
       return (
         <DataEntry showBorder={!disabled}>
           <Input
-            type="number" // 數字
+            type="number"
             min={0}
             step={0.001}
             value={stateKit.getThickness()}
@@ -250,80 +223,163 @@ const config = {
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            value={stateKit.getSpec()}
+            onChange={(e) => {
+              if (e.target.validity.valid) {
+                const value = e.target.value as `${number}` | '';
+                stateKit.setSpec(value);
+              }
+            }}
+          />
+        </DataEntry>
+      );
     },
   },
   quantity: {
-    label: 'aaaa',
+    label: '數量',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            type="number"
+            min={0}
+            step={0}
+            value={stateKit.getQuantity()}
+            onChange={(e) => {
+              if (e.target.validity.valid) {
+                const value = e.target.value as `${number}` | '';
+                stateKit.setQuantity(value);
+              }
+            }}
+          />
+        </DataEntry>
+      );
     },
   },
-  unitPrice: {
-    label: 'aaaa',
-    style: {
-      width: 100,
-    },
-    render: ({ index }) => {
-      return null;
-    },
-  },
+
   price: {
-    label: 'aaaa',
+    label: '牌價',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            type="number"
+            min={0}
+            step={0}
+            value={stateKit.getPrice()}
+            onChange={(e) => {
+              if (e.target.validity.valid) {
+                const value = e.target.value as `${number}` | '';
+                stateKit.setPrice(value);
+              }
+            }}
+          />
+        </DataEntry>
+      );
     },
   },
   dualPrice: {
-    label: 'aaaa',
+    label: '牌價複價',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      const dualPrice: React.ReactNode = stateKit.getDualPrice();
+      const node = disabled ? dualPrice.toLocaleString() : dualPrice;
+
+      return node;
+    },
+  },
+  unitPrice: {
+    label: '單價',
+    style: {
+      width: 100,
+    },
+    render: ({ disabled, stateKit }) => {
+      const unitPrice: React.ReactNode = stateKit.getUnitPrice();
+      const node = disabled ? unitPrice.toLocaleString() : unitPrice;
+
+      return node;
     },
   },
   totalPrice: {
-    label: 'aaaa',
+    label: '複價',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      const totalPrice: React.ReactNode = stateKit.getTotalPrice();
+      const node = disabled ? totalPrice.toLocaleString() : totalPrice;
+
+      return node;
     },
   },
   note: {
-    label: 'aaaa',
+    label: '備註',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            readOnly={disabled}
+            value={stateKit.getNote()}
+            onChange={(e) => {
+              stateKit.setNote(e.target.value);
+            }}
+          />
+        </DataEntry>
+      );
     },
   },
   discount: {
-    label: 'aaaa',
+    label: '折數',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            type="number"
+            min={0}
+            step={0.001}
+            value={stateKit.getDiscount()}
+            onChange={(e) => {
+              if (e.target.validity.valid) {
+                const value = e.target.value as `${number}` | '';
+                stateKit.setDiscount(value);
+              }
+            }}
+          />
+        </DataEntry>
+      );
     },
   },
   imgUrl: {
-    label: 'aaaa',
+    label: '',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ stateKit }) => {
+      const src = stateKit.getImgUrl();
+
+      if (!src) {
+        return null;
+      }
+
+      return <Image src={src} alt={src} className={scss.img} />;
     },
   },
 } satisfies Tconfig;

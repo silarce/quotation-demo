@@ -11,14 +11,15 @@ interface Tstate_prod {
   material: string;
   thickness: `${number}` | '';
   surface: string;
-  quantity: `${number}` | '';
-  unitPrice: number; // 單價
-  price: number; // 牌價
-  dualPrice: number; // 牌價複價
-  totalPrice: number; // 複價
   note: string;
 
   discount: `${number}` | ''; // 折數
+  quantity: `${number}` | '';
+  price: `${number}` | ''; // 牌價
+  dualPrice: number; // 牌價複價
+  unitPrice: number; // 單價
+  totalPrice: number; // 複價
+
   imgUrl?: string; // 圖片網址
 }
 
@@ -161,37 +162,37 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
         }));
       },
       //
-      getUnitPrice: () => state_prod.unitPrice,
-      setUnitPrice: (v: number) => {
-        setState((state) => ({
-          ...state,
-          unitPrice: v,
-        }));
-      },
-      //
       getPrice: () => state_prod.price,
-      setPrice: (v: number) => {
+      setPrice: (v: `${number}` | '') => {
         setState((state) => ({
           ...state,
           price: v,
         }));
       },
       //
+      getUnitPrice: () => state_prod.unitPrice,
+      // setUnitPrice: (v: number) => {
+      //   setState((state) => ({
+      //     ...state,
+      //     unitPrice: v,
+      //   }));
+      // },
+      //
       getDualPrice: () => state_prod.dualPrice,
-      setDualPrice: (v: number) => {
-        setState((state) => ({
-          ...state,
-          dualPrice: v,
-        }));
-      },
+      // setDualPrice: (v: number) => {
+      //   setState((state) => ({
+      //     ...state,
+      //     dualPrice: v,
+      //   }));
+      // },
       //
       getTotalPrice: () => state_prod.totalPrice,
-      setTotalPrice: (v: number) => {
-        setState((state) => ({
-          ...state,
-          totalPrice: v,
-        }));
-      },
+      // setTotalPrice: (v: number) => {
+      //   setState((state) => ({
+      //     ...state,
+      //     totalPrice: v,
+      //   }));
+      // },
       //
       getNote: () => state_prod.note,
       setNote: (v: string) => {
@@ -210,12 +211,12 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       },
       //
       getImgUrl: () => state_prod.imgUrl,
-      setImgUrl: (v: string | undefined) => {
-        setState((state) => ({
-          ...state,
-          imgUrl: v,
-        }));
-      },
+      // setImgUrl: (v: string | undefined) => {
+      //   setState((state) => ({
+      //     ...state,
+      //     imgUrl: v,
+      //   }));
+      // },
       //
     };
   };
@@ -339,13 +340,15 @@ const emptyState_prod = (): Tstate_prod => ({
   note: '', // 備註
 
   quantity: '', // 數量
-  unitPrice: 0, // 單價
-  price: 0, // 牌價
+  price: '0', // 牌價
   dualPrice: 0, // 複價
+  unitPrice: 0, // 單價
   totalPrice: 0, // 總價
 
   discount: '', // 折數
-  imgUrl: undefined,
+  // imgUrl: undefined,
+  imgUrl:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/220px-Cat_November_2010-1a.jpg',
 });
 
 // ===========================================================================
