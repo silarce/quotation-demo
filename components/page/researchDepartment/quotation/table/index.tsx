@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import DataEntry, { DataEntryContainer, Input, Select } from 'components/global/gear/dataEntry';
+import DataEntry, { Input, Select } from 'components/global/gear/dataEntry';
 
 // console.log(Select);
 
@@ -208,11 +208,6 @@ const config = {
       width: 100,
     },
     render: ({ disabled, stateKit }) => {
-      // console.log(DataEntryContainer);
-      // console.log(Select);
-
-      // return null;
-
       return (
         <DataEntry showBorder={!disabled}>
           <Select
@@ -227,12 +222,27 @@ const config = {
     },
   },
   thickness: {
-    label: 'aaaa',
+    label: '厚度',
     style: {
       width: 100,
     },
-    render: ({ index }) => {
-      return null;
+    render: ({ disabled, stateKit }) => {
+      return (
+        <DataEntry showBorder={!disabled}>
+          <Input
+            type="number" // 數字
+            min={0}
+            step={0.001}
+            value={stateKit.getThickness()}
+            onChange={(e) => {
+              if (e.target.validity.valid) {
+                const value = e.target.value as `${number}` | '';
+                stateKit.setThickness(value);
+              }
+            }}
+          />
+        </DataEntry>
+      );
     },
   },
   surface: {
@@ -316,7 +326,7 @@ const config = {
       return null;
     },
   },
-};
+} satisfies Tconfig;
 
 const keyArr: (keyof typeof config)[] = [
   'indexNumber',
