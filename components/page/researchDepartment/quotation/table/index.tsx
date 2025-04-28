@@ -38,7 +38,9 @@ export default function Table({
   disabled: boolean;
   instance_useProduct: Tinstance_useProduct;
 }) {
-  const { state_keyArr, createStateKit, addProd } = instance_useProduct;
+  const { state_keyArr, createStateKit, addProd, state_allProd, createStateKit_allProd } = instance_useProduct;
+
+  const stateKit_allProd = createStateKit_allProd();
 
   return (
     <div>
@@ -52,7 +54,18 @@ export default function Table({
             className: 'text-xl',
           }}
         >
-          <Input />
+          <Input
+            type="number"
+            min={0}
+            step={0.001}
+            value={state_allProd.discount_all}
+            onChange={(e) => {
+              if (e.target.validity.valid) {
+                const value = e.target.value as `${number}` | '';
+                stateKit_allProd.setDiscount_all(value);
+              }
+            }}
+          />
         </DataEntry>
       </div>
 
@@ -437,13 +450,15 @@ const keyArr: Tkey[] = [
   'material',
   'thickness',
   'surface',
+
+  'discount',
   'quantity',
-  'unitPrice',
   'price',
   'dualPrice',
+  'unitPrice',
   'totalPrice',
+
   'note',
-  'discount',
 ];
 
 const keyArr_left: Tkey[] = ['indexNumber', 'productid'];

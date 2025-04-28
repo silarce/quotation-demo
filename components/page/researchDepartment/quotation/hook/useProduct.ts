@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import moment, { Moment } from 'moment';
 import { nanoid } from 'nanoid';
 import _ from 'lodash';
+import Decimal from 'decimal.js';
 
 interface Tstate_prod {
   id?: string;
@@ -35,29 +36,30 @@ interface Tstate_allProd {
   salesTax: number; // 營業稅
   total: number; // 總計
 
-  deliveryLocation: string; // 交貨地點
-  deliveryDate: Moment; // 交貨日期
-  paymentMethods: {
-    milestone: string;
-    totalPaymentRatio: `${number}` | ''; // 0~100 浮點數
-  }[]; //付款辦法
+  // deliveryLocation: string; // 交貨地點
+  // deliveryDate: Moment; // 交貨日期
+  // paymentMethods: {
+  //   milestone: string;
+  //   totalPaymentRatio: `${number}` | ''; // 0~100 浮點數
+  // }[]; //付款辦法
 }
 
 // =====================================================================
 
 const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
   const defaultState_prodDict = useDefault_prodDict(rawData);
-  const defaultState_allProd = useDefault_allProd(undefined);
   const defaultState_keyArr = useDefault_keyArr(rawData);
+  const defaultState_allProd = useDefault_allProd(undefined);
+
   const [state_prodDict, setState_prodDict] = useState<Tstate_prodDict>(defaultState_prodDict);
-  const [state_allProd, setState_allProd] = useState<Tstate_allProd>(defaultState_allProd);
   const [state_keyArr, setState_KeyArr] = useState<string[]>(defaultState_keyArr);
+  const [state_allProd, setState_allProd] = useState<Tstate_allProd>(defaultState_allProd);
 
   // ---------------------------------------------------------------------
 
   // ---------------------------------------------------------------------
 
-  // region:setState
+  // region:createStateKit
 
   const createStateKit = (key: string) => {
     const state_prod = state_prodDict[key];
@@ -109,6 +111,22 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       });
     };
 
+    const getAllPrice = (state: Tstate_prod): Pick<Tstate_prod, 'price' | 'dualPrice' | 'unitPrice' | 'totalPrice'> => {
+      const { price, dualPrice, unitPrice, totalPrice } = calcAllPrice({
+        discount_all: state_allProd.discount_all,
+        discount_prod: state.discount,
+        quantity: state.quantity,
+        price: state.price,
+      });
+
+      return {
+        price: `${price}` as `${number}`,
+        dualPrice: dualPrice,
+        unitPrice: unitPrice,
+        totalPrice: totalPrice,
+      };
+    };
+
     return {
       state_prod,
       copySelf,
@@ -156,28 +174,34 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //
       getQuantity: () => state_prod.quantity,
       setQuantity: (v: `${number}` | '') => {
-        setState((state) => ({
-          ...state,
-          quantity: v,
-        }));
+        setState((state) => {
+          const copy = {
+            ...state,
+            quantity: v,
+          };
+
+          return {
+            ...copy,
+            ...getAllPrice(copy),
+          };
+        });
       },
-      //
+      // 牌價
       getPrice: () => state_prod.price,
       setPrice: (v: `${number}` | '') => {
-        setState((state) => ({
-          ...state,
-          price: v,
-        }));
+        setState((state) => {
+          const copy = {
+            ...state,
+            price: v,
+          };
+
+          return {
+            ...copy,
+            ...getAllPrice(copy),
+          };
+        });
       },
-      //
-      getUnitPrice: () => state_prod.unitPrice,
-      // setUnitPrice: (v: number) => {
-      //   setState((state) => ({
-      //     ...state,
-      //     unitPrice: v,
-      //   }));
-      // },
-      //
+      // 牌價複價
       getDualPrice: () => state_prod.dualPrice,
       // setDualPrice: (v: number) => {
       //   setState((state) => ({
@@ -185,7 +209,15 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //     dualPrice: v,
       //   }));
       // },
-      //
+      // 單價
+      getUnitPrice: () => state_prod.unitPrice,
+      // setUnitPrice: (v: number) => {
+      //   setState((state) => ({
+      //     ...state,
+      //     unitPrice: v,
+      //   }));
+      // },
+      // 複價
       getTotalPrice: () => state_prod.totalPrice,
       // setTotalPrice: (v: number) => {
       //   setState((state) => ({
@@ -204,10 +236,17 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //
       getDiscount: () => state_prod.discount,
       setDiscount: (v: `${number}` | '') => {
-        setState((state) => ({
-          ...state,
-          discount: v,
-        }));
+        setState((state) => {
+          const copy = {
+            ...state,
+            discount: v,
+          };
+
+          return {
+            ...copy,
+            ...getAllPrice(copy),
+          };
+        });
       },
       //
       getImgUrl: () => state_prod.imgUrl,
@@ -218,6 +257,57 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //   }));
       // },
       //
+    };
+  };
+
+  // endregion
+
+  // region:createStateKit_allProd
+
+  const createStateKit_allProd = () => {
+    const setDiscount_all = (value: `${number}` | '' | number) => {
+      setState_allProd((state) => {
+        return {
+          ...state,
+          discount_all: `${value}`,
+        };
+      });
+
+      setState_prodDict((dict) => {
+        const newDict = { ...dict };
+        Object.entries(newDict).forEach(([key, state_prod]) => {
+          const allPrice = calcAllPrice({
+            discount_all: `${value}`,
+            discount_prod: state_prod.discount,
+            quantity: state_prod.quantity,
+            price: state_prod.price,
+          });
+
+          newDict[key] = {
+            ...state_prod,
+            ...allPrice,
+            price: `${allPrice.price}` as `${number}`,
+          };
+        });
+
+        return newDict;
+      });
+    };
+
+    const setTuneTotal = (value: `${number}` | '' | number) => {
+      setState_allProd((state) => {
+        return {
+          ...state,
+          tuneTotal: `${value}`,
+        };
+      });
+    };
+
+    //
+    return {
+      state_allProd,
+      setDiscount_all,
+      setTuneTotal,
     };
   };
 
@@ -274,6 +364,9 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
     reset,
     createStateKit,
     addProd,
+
+    state_allProd,
+    createStateKit_allProd,
   };
 };
 
@@ -296,27 +389,19 @@ const useDefault_prodDict = (data: unknown | undefined) => {
 const useDefault_allProd = (data: unknown | undefined) => {
   const defaultState: Tstate_allProd = useMemo(() => {
     return {
-      discount_all: '0',
-      discount_avg: 0,
+      discount_all: '100',
+      discount_avg: 100,
       tuneTotal: '0',
       subTotal: 0,
       salesTax: 0,
       total: 0,
-
-      deliveryLocation: '',
-      deliveryDate: moment(), // 當前時間
-
-      paymentMethods: [
-        {
-          milestone: 'test',
-          totalPaymentRatio: '0',
-        },
-      ],
     };
   }, [data]);
 
   return defaultState;
 };
+
+// =============================================================================
 
 const useDefault_keyArr = (data: unknown | undefined) => {
   const defaultState: string[] = useMemo(() => {
@@ -339,17 +424,52 @@ const emptyState_prod = (): Tstate_prod => ({
   surface: '', // 表面處理
   note: '', // 備註
 
-  quantity: '', // 數量
+  quantity: '1', // 數量
   price: '0', // 牌價
   dualPrice: 0, // 複價
   unitPrice: 0, // 單價
   totalPrice: 0, // 總價
 
-  discount: '', // 折數
+  discount: '100', // 折數
   // imgUrl: undefined,
   imgUrl:
     'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/220px-Cat_November_2010-1a.jpg',
 });
+
+// ===========================================================================
+
+const calcAllPrice = (props: {
+  discount_all: `${number}` | number | '';
+  discount_prod: `${number}` | number | '';
+  quantity: `${number}` | number | '';
+  price: `${number}` | number | '';
+}) => {
+  const discount_all = new Decimal(props.discount_all || 0).div(100);
+  const discount_prod = new Decimal(props.discount_prod || 0).div(100);
+  const quantity = new Decimal(props.quantity || 0);
+  const price = new Decimal(props.price || 0);
+
+  const discount = discount_all.mul(discount_prod);
+
+  const dualPrice = price.mul(quantity); // 複價
+  const unitPrice = price.mul(discount).toDecimalPlaces(0);
+  const totalPrice = unitPrice.mul(quantity); // 總價
+
+  return {
+    price: price.toNumber(),
+    dualPrice: dualPrice.toNumber(),
+    unitPrice: unitPrice.toNumber(),
+    totalPrice: totalPrice.toNumber(),
+  };
+};
+
+const calcDiscount_avg = ({
+  discount_all,
+  state_prodDict,
+}: {
+  discount_all: `${number}` | number | '';
+  state_prodDict: Tstate_prodDict;
+}) => {};
 
 // ===========================================================================
 
