@@ -324,61 +324,52 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
 
   // region:createStateKit_allProd
 
-  const createStateKit_allProd = () => {
-    //
-    const setDiscount_all = (value: `${number}` | '' | number) => {
-      setState_allProd((state) => {
-        const copy = { ...state };
-        copy.discount_quotation = `${value}`;
+  //
+  const setDiscount_all = (value: `${number}` | '' | number) => {
+    setState_allProd((state) => {
+      const copy = { ...state };
+      copy.discount_quotation = `${value}`;
 
-        return copy;
-      });
+      return copy;
+    });
 
-      setState_prodDict((dict) => {
-        const newDict = { ...dict };
-        Object.entries(newDict).forEach(([key, state_prod]) => {
-          const discount_price = calcPriceDiscount({
-            discount_quotation: value,
-            discount_prod: state_prod.discount,
-          });
-
-          const allPrice = calcAllPrice({
-            discount: discount_price,
-            quantity: state_prod.quantity,
-            price: state_prod.price,
-          });
-
-          newDict[key] = {
-            ...state_prod,
-            ...allPrice,
-            price: `${allPrice.price}` as `${number}`,
-          };
+    setState_prodDict((dict) => {
+      const newDict = { ...dict };
+      Object.entries(newDict).forEach(([key, state_prod]) => {
+        const discount_price = calcPriceDiscount({
+          discount_quotation: value,
+          discount_prod: state_prod.discount,
         });
 
-        setAvgDiscount({
-          discount_all: value,
-          prodDict: newDict,
+        const allPrice = calcAllPrice({
+          discount: discount_price,
+          quantity: state_prod.quantity,
+          price: state_prod.price,
         });
 
-        return newDict;
-      });
-    };
-
-    const setTuneTotal = (value: `${number}` | '' | number) => {
-      setState_allProd((state) => {
-        return {
-          ...state,
-          tuneTotal: `${value}`,
+        newDict[key] = {
+          ...state_prod,
+          ...allPrice,
+          price: `${allPrice.price}` as `${number}`,
         };
       });
-    };
 
-    //
-    return {
-      state_allProd,
-      setDiscount_all,
-      setTuneTotal,
-    };
+      setAvgDiscount({
+        discount_all: value,
+        prodDict: newDict,
+      });
+
+      return newDict;
+    });
+  };
+
+  const setTuneTotal = (value: `${number}` | '' | number) => {
+    setState_allProd((state) => {
+      return {
+        ...state,
+        tuneTotal: `${value}`,
+      };
+    });
   };
 
   // endregion
@@ -448,7 +439,10 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
     addProd,
 
     state_allProd,
-    createStateKit_allProd,
+    // createStateKit_allProd,
+    // state_allProd,
+    setDiscount_all,
+    setTuneTotal,
   };
 };
 

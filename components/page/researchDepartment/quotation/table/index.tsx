@@ -43,9 +43,7 @@ export default function Table({
   disabled: boolean;
   instance_useProduct: Tinstance_useProduct;
 }) {
-  const { state_keyArr, createStateKit, addProd, state_allProd, createStateKit_allProd } = instance_useProduct;
-
-  const stateKit_allProd = createStateKit_allProd();
+  const { state_keyArr, createStateKit, addProd, state_allProd, setDiscount_all } = instance_useProduct;
 
   return (
     <div>
@@ -67,7 +65,7 @@ export default function Table({
             onChange={(e) => {
               if (e.target.validity.valid) {
                 const value = e.target.value as `${number}` | '';
-                stateKit_allProd.setDiscount_all(value);
+                setDiscount_all(value);
               }
             }}
           />

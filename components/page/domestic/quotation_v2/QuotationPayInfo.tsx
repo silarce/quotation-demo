@@ -43,12 +43,7 @@ interface Tform_pay {
     onChange?: (value: boolean) => void;
     disabled?: boolean;
   };
-  // 總折數
-  discountRate: {
-    value: string;
-    // onChange?: (value: TnumberStr) => void;
-    // disabled?: boolean;
-  };
+
   // 小計調整
   tuneTotal: {
     value: string;
@@ -67,10 +62,11 @@ interface Tform_pay {
     disabled?: boolean;
   };
 
-  avgDiscount: string | number; // 平均折數
-  subTotal: string | number; // 小計
-  salesTax: string | number; // 營業稅
-  total: string | number; // 總計
+  discountRate: React.ReactNode; // 總折數
+  avgDiscount: React.ReactNode; // 平均折數
+  subTotal: React.ReactNode; // 小計
+  salesTax: React.ReactNode; // 營業稅
+  total: React.ReactNode; // 總計
   foreignTotal?: string | number; // 外幣計價
 }
 
@@ -94,7 +90,6 @@ interface Tform_info {
 
 interface Tprops_quotationPayInfo {
   disabled: boolean;
-  disabled_taxAndCurrency: boolean;
   form: Tform_pay & Tform_info;
 }
 
@@ -103,7 +98,7 @@ export type { Tprops_quotationPayInfo };
 // ========================================================================
 
 // MARK: START
-export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, form }: Tprops_quotationPayInfo) {
+export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPayInfo) {
   const {
     haveTax,
     discountRate,
@@ -133,7 +128,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
           className={classNames('m-auto mr-0 mb-5', !haveTax && 'invisible')}
           wrapperStyle={{ width: '97px' }}
           showBaseline="invisible"
-          disabled={disabled || disabled_taxAndCurrency}
+          disabled={disabled || haveTax.disabled}
           checkBoxProps_v2={{
             props: {
               value: haveTax.value ? ['haveTax'] : [],
@@ -155,24 +150,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
           <span className="relative">{'總折數'}</span>
 
           <div>
-            <input
-              type="number"
-              onWheel={(e) => {
-                e.currentTarget.blur();
-              }}
-              className={classNames(
-                //
-                'bg-transparent',
-                // (disabled || discountRate.disabled) && scss.noBaseLine
-                scss.noBaseLine
-              )}
-              value={discountRate.value}
-              // onChange={(e) => {
-              //   discountRate.onChange?.(e.target.value as `${number}` | '');
-              // }}
-              // readOnly={disabled || discountRate.disabled}
-              readOnly={true}
-            />
+            {discountRate}
             <span>%</span>
           </div>
         </div>
@@ -239,36 +217,15 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
 
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">小計</span>
-          <div>
-            <input
-              type="text"
-              className={classNames('bg-transparent', scss.noBaseLine)}
-              value={subTotal}
-              readOnly={true}
-            />
-          </div>
+          <div>{subTotal}</div>
         </div>
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">營業稅</span>
-          <div>
-            <input
-              type="text"
-              className={classNames('bg-transparent', scss.noBaseLine)}
-              value={salesTax}
-              readOnly={true}
-            />
-          </div>
+          <div>{salesTax}</div>
         </div>
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">總計</span>
-          <div>
-            <input
-              type="text"
-              className={classNames('bg-transparent', scss.noBaseLine)}
-              value={total}
-              readOnly={true}
-            />
-          </div>
+          <div>{total}</div>
         </div>
 
         <hr className={classNames(scss.grayHr, !currency && !exchangeRate && !foreignTotal && 'hidden')} />
@@ -280,7 +237,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
               <InputSel
                 wrapperStyle={{ width: 150 }}
                 showBaseline="auto"
-                disabled={disabled || currency.disabled || disabled_taxAndCurrency}
+                disabled={disabled || currency.disabled}
                 selectProps={{
                   props: {
                     menuPortalTarget: undefined,
@@ -314,7 +271,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
                 className={classNames('bg-transparent', (disabled || exchangeRate.disabled) && scss.noBaseLine)}
                 value={exchangeRate.value}
                 onChange={(e) => exchangeRate.onChange?.(e.target.value as TnumberStr)}
-                readOnly={disabled || exchangeRate.disabled || disabled_taxAndCurrency}
+                readOnly={disabled || exchangeRate.disabled}
               />
             </div>
           </div>

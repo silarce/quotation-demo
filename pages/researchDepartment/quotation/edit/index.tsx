@@ -25,7 +25,43 @@ export default function Edit() {
 
   const instance_useProduct = useProduct({ rawData: undefined });
 
-  propsForTest_quotationPayInfo.form.avgDiscount = instance_useProduct.state_allProd.discount_avg;
+  const propsForTest_quotationPayInfo: Tprops_quotationPayInfo = {
+    disabled: false,
+    form: {
+      deliveryLocation: {
+        value: 'test',
+      },
+      deliveryDate: {
+        value: null,
+      },
+      paymentMethodArr: [
+        {
+          milestone: {
+            value: 'test',
+          },
+          totalPaymentRatio: {
+            value: 'test',
+          },
+        },
+      ],
+
+      haveTax: {
+        value: true,
+      },
+
+      tuneTotal: {
+        value: instance_useProduct.state_allProd.tuneTotal,
+        onChange: (value) => {
+          instance_useProduct.setTuneTotal(value);
+        },
+      },
+      discountRate: instance_useProduct.state_allProd.discount_quotation,
+      avgDiscount: instance_useProduct.state_allProd.discount_avg,
+      subTotal: instance_useProduct.state_allProd.subTotal,
+      salesTax: instance_useProduct.state_allProd.salesTax,
+      total: instance_useProduct.state_allProd.total,
+    },
+  };
 
   return (
     <SubLayer>
@@ -70,40 +106,4 @@ const propsForTest_quotationRemark: Tprops_quotationRemark = {
       onDelete: () => {},
     },
   ],
-};
-
-const propsForTest_quotationPayInfo: Tprops_quotationPayInfo = {
-  disabled: false,
-  disabled_taxAndCurrency: false,
-  form: {
-    deliveryLocation: {
-      value: 'test',
-    },
-    deliveryDate: {
-      value: null,
-    },
-    paymentMethodArr: [
-      {
-        milestone: {
-          value: 'test',
-        },
-        totalPaymentRatio: {
-          value: 'test',
-        },
-      },
-    ],
-    haveTax: {
-      value: true,
-    },
-    discountRate: {
-      value: '999',
-    },
-    tuneTotal: {
-      value: '999',
-    },
-    avgDiscount: 999,
-    subTotal: 999,
-    salesTax: 999,
-    total: 999,
-  },
 };
