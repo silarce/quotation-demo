@@ -1,8 +1,7 @@
 import { useState } from 'react';
+
 import { Image } from 'antd';
 import DataEntry, { Input, Select } from 'components/global/gear/dataEntry';
-
-// console.log(Select);
 
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
@@ -65,15 +64,80 @@ export default function Table({
           configDict={config}
           onDragEnd={() => {}}
           dragHandleInvisible={true}
+          left={
+            <>
+              {keyArr_left.map((key) => {
+                const { label, style } = config[key];
+
+                return (
+                  <Cell key={key} style={style}>
+                    {label}
+                  </Cell>
+                );
+              })}
+            </>
+          }
+          right={
+            <>
+              {keyArr_right.map((key) => {
+                const { label, style } = config[key];
+
+                return (
+                  <Cell key={key} style={style}>
+                    {label}
+                  </Cell>
+                );
+              })}
+            </>
+          }
+          props_right={{
+            style: { border: 'none' },
+          }}
         />
 
         {state_keyArr.map((key, index) => {
           const stateKit = createStateKit(key);
 
           return (
-            <QuotationRow_dnd key={key} id={key} index={index}>
+            <QuotationRow_dnd
+              className={scss.row}
+              key={key}
+              id={key}
+              index={index}
+              left={
+                <>
+                  {keyArr_left.map((key) => {
+                    const { style, render } = config[key];
+                    const node = render({ disabled, index, stateKit });
+
+                    return (
+                      <Cell key={key} style={style}>
+                        {node}
+                      </Cell>
+                    );
+                  })}
+                </>
+              }
+              right={
+                <>
+                  {keyArr_right.map((key) => {
+                    const { style, render } = config[key];
+                    const node = render({ disabled, index, stateKit });
+
+                    return (
+                      <Cell key={key} style={style}>
+                        {node}
+                      </Cell>
+                    );
+                  })}
+                </>
+              }
+              props_right={{
+                style: { border: 'none' },
+              }}
+            >
               {keyArr.map((key) => {
-                const { style, render } = config[key]!;
+                const { style, render } = config[key];
 
                 const node = render({ disabled, index, stateKit });
 
@@ -86,24 +150,6 @@ export default function Table({
             </QuotationRow_dnd>
           );
         })}
-
-        {/* {Array.from({ length: 30 }).map((_, index) => {
-          return (
-            <QuotationRow_dnd key={index} id={`${index}`} index={0}>
-              {keyArr.map((key) => {
-                const { style, render } = config[key]!;
-
-                const node = render({ index, stateKit });
-
-                return (
-                  <Cell key={key} style={style}>
-                    {node}
-                  </Cell>
-                );
-              })}
-            </QuotationRow_dnd>
-          );
-        })} */}
       </div>
       <div className="p-2 border border-t-0 border-border ">
         <SquareBtn sharp="mini" onClick={addProd}>
@@ -219,7 +265,7 @@ const config = {
     },
   },
   surface: {
-    label: 'aaaa',
+    label: '表面',
     style: {
       width: 100,
     },
@@ -227,11 +273,11 @@ const config = {
       return (
         <DataEntry showBorder={!disabled}>
           <Input
-            value={stateKit.getSpec()}
+            value={stateKit.getSurface()}
             onChange={(e) => {
               if (e.target.validity.valid) {
                 const value = e.target.value as `${number}` | '';
-                stateKit.setSpec(value);
+                stateKit.setSurface(value);
               }
             }}
           />
@@ -384,9 +430,9 @@ const config = {
   },
 } satisfies Tconfig;
 
-const keyArr: (keyof typeof config)[] = [
-  'indexNumber',
-  'productid',
+type Tkey = keyof typeof config;
+
+const keyArr: Tkey[] = [
   'spec',
   'material',
   'thickness',
@@ -398,8 +444,10 @@ const keyArr: (keyof typeof config)[] = [
   'totalPrice',
   'note',
   'discount',
-  'imgUrl',
 ];
+
+const keyArr_left: Tkey[] = ['indexNumber', 'productid'];
+const keyArr_right: Tkey[] = ['imgUrl'];
 
 // =====================================================================
 
