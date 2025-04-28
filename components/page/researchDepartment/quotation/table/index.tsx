@@ -24,6 +24,8 @@ import {
 
 import type { Tinstance_useProduct } from '../hook/useProduct';
 
+import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
+
 import scss from './index.module.scss';
 
 // ========================================================
@@ -31,6 +33,9 @@ import scss from './index.module.scss';
 type TstateKit = ReturnType<Tinstance_useProduct['createStateKit']>;
 
 // ========================================================
+
+// MARK: START
+
 export default function Table({
   disabled,
   instance_useProduct,
@@ -189,10 +194,25 @@ type Tconfig = Tprops_quotationRow_dndThead['configDict'] &
   >;
 
 const config = {
+  panel: {
+    label: null,
+    style: {
+      width: 55,
+    },
+    render: ({ stateKit }) => {
+      return (
+        <div className="flex gap-2 ">
+          <IconCopy onClick={stateKit.copySelf} />
+          <IconDelete01 onClick={stateKit.deleteSelf} />
+        </div>
+      );
+    },
+  },
+
   indexNumber: {
     label: null,
     style: {
-      width: 40,
+      width: 30,
     },
     render: ({ index }) => index + 1,
   },
@@ -461,7 +481,7 @@ const keyArr: Tkey[] = [
   'note',
 ];
 
-const keyArr_left: Tkey[] = ['indexNumber', 'productid'];
+const keyArr_left: Tkey[] = ['panel', 'indexNumber', 'productid'];
 const keyArr_right: Tkey[] = ['imgUrl'];
 
 // =====================================================================

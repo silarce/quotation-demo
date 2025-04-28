@@ -115,14 +115,14 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       const newState = _.cloneDeep(state_prod);
       newState.id = undefined;
 
-      const prodDict: Tstate_prodDict = {};
+      let prodDict: Tstate_prodDict = {};
 
       setState_prodDict((dict) => {
         const copy = {
           ...dict,
           [newKey]: newState,
         };
-        dict = copy;
+        prodDict = copy;
 
         return copy;
       });
