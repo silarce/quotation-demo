@@ -58,7 +58,7 @@ export default function Table({
             type="number"
             min={0}
             step={0.001}
-            value={state_allProd.discount_all}
+            value={state_allProd.discount_quotation}
             onChange={(e) => {
               if (e.target.validity.valid) {
                 const value = e.target.value as `${number}` | '';
@@ -146,7 +146,7 @@ export default function Table({
                 </>
               }
               props_right={{
-                style: { border: 'none' },
+                style: { border: 'none', backgroundColor: 'inherit' },
               }}
             >
               {keyArr.map((key) => {

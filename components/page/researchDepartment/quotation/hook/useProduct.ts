@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import moment, { Moment } from 'moment';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { nanoid } from 'nanoid';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -28,8 +27,8 @@ interface Tstate_prodDict {
   [id: string]: Tstate_prod;
 }
 
-interface Tstate_allProd {
-  discount_all: `${number}` | ''; // 總折數
+interface Tstate_quotationPrice {
+  discount_quotation: `${number}` | ''; // 總折數
   discount_avg: number; // 平均折數
   tuneTotal: `${number}` | ''; // 小計調整
   subTotal: number; // 小計
@@ -53,9 +52,34 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
 
   const [state_prodDict, setState_prodDict] = useState<Tstate_prodDict>(defaultState_prodDict);
   const [state_keyArr, setState_KeyArr] = useState<string[]>(defaultState_keyArr);
-  const [state_allProd, setState_allProd] = useState<Tstate_allProd>(defaultState_allProd);
+  const [state_allProd, setState_allProd] = useState<Tstate_quotationPrice>(defaultState_allProd);
+
+  const ref_timeout_avgDiscount = useRef<NodeJS.Timeout | null>(null);
 
   // ---------------------------------------------------------------------
+
+  const setAvgDiscount = ({
+    discount_all,
+    prodDict,
+  }: {
+    discount_all: `${number}` | '' | number;
+    prodDict: Tstate_prodDict;
+  }) => {
+    ref_timeout_avgDiscount.current && clearTimeout(ref_timeout_avgDiscount.current);
+    ref_timeout_avgDiscount.current = setTimeout(() => {
+      const discount_avg = calcDiscount_avg({
+        discount_all,
+        prodDict,
+      });
+
+      setState_allProd((state) => {
+        return {
+          ...state,
+          discount_avg: discount_avg,
+        };
+      });
+    }, 300);
+  };
 
   // ---------------------------------------------------------------------
 
@@ -64,7 +88,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
   const createStateKit = (key: string) => {
     const state_prod = state_prodDict[key];
 
-    const setState: React.Dispatch<React.SetStateAction<Tstate_prod>> = (action) => {
+    const setState: (action: React.SetStateAction<Tstate_prod>) => Tstate_prodDict = (action) => {
       let newStates: Tstate_prod;
 
       if (typeof action === 'function') {
@@ -73,12 +97,16 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
         newStates = action;
       }
 
+      let newDict: Tstate_prodDict = {};
+
       setState_prodDict((dict) => {
-        const newDict = { ...dict };
+        newDict = { ...dict };
         newDict[key] = newStates;
 
         return newDict;
       });
+
+      return newDict;
     };
 
     const copySelf = () => {
@@ -112,9 +140,13 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
     };
 
     const getAllPrice = (state: Tstate_prod): Pick<Tstate_prod, 'price' | 'dualPrice' | 'unitPrice' | 'totalPrice'> => {
-      const { price, dualPrice, unitPrice, totalPrice } = calcAllPrice({
-        discount_all: state_allProd.discount_all,
+      const discount_price = calcPriceDiscount({
+        discount_quotation: state_allProd.discount_quotation,
         discount_prod: state.discount,
+      });
+
+      const { price, dualPrice, unitPrice, totalPrice } = calcAllPrice({
+        discount: discount_price,
         quantity: state.quantity,
         price: state.price,
       });
@@ -174,7 +206,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //
       getQuantity: () => state_prod.quantity,
       setQuantity: (v: `${number}` | '') => {
-        setState((state) => {
+        const prodDict = setState((state) => {
           const copy = {
             ...state,
             quantity: v,
@@ -184,6 +216,11 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
             ...copy,
             ...getAllPrice(copy),
           };
+        });
+
+        setAvgDiscount({
+          discount_all: state_allProd.discount_quotation,
+          prodDict: prodDict,
         });
       },
       // 牌價
@@ -236,7 +273,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //
       getDiscount: () => state_prod.discount,
       setDiscount: (v: `${number}` | '') => {
-        setState((state) => {
+        const prodDict = setState((state) => {
           const copy = {
             ...state,
             discount: v,
@@ -246,6 +283,11 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
             ...copy,
             ...getAllPrice(copy),
           };
+        });
+
+        setAvgDiscount({
+          discount_all: state_allProd.discount_quotation,
+          prodDict: prodDict,
         });
       },
       //
@@ -265,20 +307,25 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
   // region:createStateKit_allProd
 
   const createStateKit_allProd = () => {
+    //
     const setDiscount_all = (value: `${number}` | '' | number) => {
       setState_allProd((state) => {
-        return {
-          ...state,
-          discount_all: `${value}`,
-        };
+        const copy = { ...state };
+        copy.discount_quotation = `${value}`;
+
+        return copy;
       });
 
       setState_prodDict((dict) => {
         const newDict = { ...dict };
         Object.entries(newDict).forEach(([key, state_prod]) => {
-          const allPrice = calcAllPrice({
-            discount_all: `${value}`,
+          const discount_price = calcPriceDiscount({
+            discount_quotation: value,
             discount_prod: state_prod.discount,
+          });
+
+          const allPrice = calcAllPrice({
+            discount: discount_price,
             quantity: state_prod.quantity,
             price: state_prod.price,
           });
@@ -288,6 +335,11 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
             ...allPrice,
             price: `${allPrice.price}` as `${number}`,
           };
+        });
+
+        setAvgDiscount({
+          discount_all: value,
+          prodDict: newDict,
         });
 
         return newDict;
@@ -387,15 +439,17 @@ const useDefault_prodDict = (data: unknown | undefined) => {
 };
 
 const useDefault_allProd = (data: unknown | undefined) => {
-  const defaultState: Tstate_allProd = useMemo(() => {
-    return {
-      discount_all: '100',
+  const defaultState: Tstate_quotationPrice = useMemo(() => {
+    const state: Tstate_quotationPrice = {
+      discount_quotation: '100',
       discount_avg: 100,
       tuneTotal: '0',
       subTotal: 0,
       salesTax: 0,
       total: 0,
     };
+
+    return state;
   }, [data]);
 
   return defaultState;
@@ -438,18 +492,28 @@ const emptyState_prod = (): Tstate_prod => ({
 
 // ===========================================================================
 
-const calcAllPrice = (props: {
-  discount_all: `${number}` | number | '';
+const calcPriceDiscount = ({
+  discount_quotation, // ex 50 37
+  discount_prod, // ex 50 37
+}: {
+  discount_quotation: `${number}` | number | '';
   discount_prod: `${number}` | number | '';
+}) =>
+  new Decimal(discount_quotation || 0)
+    .mul(discount_prod || 0)
+    .div(100)
+    // .div(100)
+    .toNumber();
+
+const calcAllPrice = (props: {
+  discount: number; // ex 50 37
   quantity: `${number}` | number | '';
   price: `${number}` | number | '';
 }) => {
-  const discount_all = new Decimal(props.discount_all || 0).div(100);
-  const discount_prod = new Decimal(props.discount_prod || 0).div(100);
   const quantity = new Decimal(props.quantity || 0);
   const price = new Decimal(props.price || 0);
 
-  const discount = discount_all.mul(discount_prod);
+  const discount = new Decimal(props.discount).div(100);
 
   const dualPrice = price.mul(quantity); // 複價
   const unitPrice = price.mul(discount).toDecimalPlaces(0);
@@ -463,13 +527,21 @@ const calcAllPrice = (props: {
   };
 };
 
-const calcDiscount_avg = ({
-  discount_all,
-  state_prodDict,
-}: {
-  discount_all: `${number}` | number | '';
-  state_prodDict: Tstate_prodDict;
-}) => {};
+const calcDiscount_avg = (props: { discount_all: `${number}` | number | ''; prodDict: Tstate_prodDict }) => {
+  const discount_all = new Decimal(props.discount_all || 0).div(100);
+
+  let discountTotal = new Decimal(0);
+  let qty = new Decimal(0);
+
+  Object.values(props.prodDict).forEach((state_prod) => {
+    const quantity = new Decimal(state_prod.quantity || 0);
+
+    discountTotal = discountTotal.add(quantity.mul(state_prod.discount || 0));
+    qty = qty.add(quantity);
+  });
+
+  return discountTotal.div(qty).mul(discount_all).toDecimalPlaces(3).toNumber();
+};
 
 // ===========================================================================
 

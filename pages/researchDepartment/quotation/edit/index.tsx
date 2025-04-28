@@ -25,6 +25,8 @@ export default function Edit() {
 
   const instance_useProduct = useProduct({ rawData: undefined });
 
+  propsForTest_quotationPayInfo.form.avgDiscount = instance_useProduct.state_allProd.discount_avg;
+
   return (
     <SubLayer>
       <PageHeader02 tag="新增報價單" />
