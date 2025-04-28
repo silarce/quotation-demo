@@ -115,27 +115,45 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       const newState = _.cloneDeep(state_prod);
       newState.id = undefined;
 
+      const prodDict: Tstate_prodDict = {};
+
       setState_prodDict((dict) => {
-        return {
+        const copy = {
           ...dict,
           [newKey]: newState,
         };
+        dict = copy;
+
+        return copy;
       });
       setState_KeyArr((arr) => {
         return [...arr, newKey];
       });
+
+      setAvgDiscount({
+        discount_all: state_allProd.discount_quotation,
+        prodDict,
+      });
     };
 
     const deleteSelf = () => {
-      setState_prodDict((dict) => {
-        const newDict = { ...dict };
-        delete newDict[key];
+      let prodDict: Tstate_prodDict = {};
 
-        return newDict;
+      setState_prodDict((dict) => {
+        const copy = { ...dict };
+        delete copy[key];
+        prodDict = copy;
+
+        return copy;
       });
 
       setState_KeyArr((arr) => {
         return arr.filter((item) => item !== key);
+      });
+
+      setAvgDiscount({
+        discount_all: state_allProd.discount_quotation,
+        prodDict,
       });
     };
 
@@ -372,14 +390,26 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
   const addProd = () => {
     const newKey = nanoid();
 
-    setState_prodDict((dict) => ({
-      ...dict,
-      [newKey]: {
-        ...emptyState_prod(),
-      },
-    }));
+    let prodDict: Tstate_prodDict = {};
+
+    setState_prodDict((dict) => {
+      const copy = {
+        ...dict,
+        [newKey]: {
+          ...emptyState_prod(),
+        },
+      };
+      prodDict = copy;
+
+      return copy;
+    });
     setState_KeyArr((arr) => {
       return [...arr, newKey];
+    });
+
+    setAvgDiscount({
+      discount_all: state_allProd.discount_quotation,
+      prodDict,
     });
   };
 
