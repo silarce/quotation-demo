@@ -1222,7 +1222,7 @@ export default function AddTray() {
                                         min: 1, // 設定最小值為1
                                         onChange: (e) => {
                                             // const value = Math.max(1, Number(e.target.value)); // 確保值不小於1
-                                            handleChildKeyDown2(e, "length"); // 傳入正確的數值
+                                            handleChildKeyDown2(e, "length");
                                         }
                                     },
                                 }}
