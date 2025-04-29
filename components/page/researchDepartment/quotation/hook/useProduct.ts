@@ -3,6 +3,8 @@ import { nanoid } from 'nanoid';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 
+import { taxRate } from 'config/config_common';
+
 interface Tstate_prod {
   id?: string;
 
@@ -27,7 +29,7 @@ interface Tstate_prodDict {
   [id: string]: Tstate_prod;
 }
 
-interface Tstate_quotationPrice {
+interface Tstate_quotationPriceInfo {
   discount_quotation: `${number}` | ''; // 總折數
   discount_avg: number; // 平均折數
   tuneTotal: `${number}` | ''; // 小計調整
@@ -35,12 +37,19 @@ interface Tstate_quotationPrice {
   salesTax: number; // 營業稅
   total: number; // 總計
 
+  haveTax: boolean;
+
   // deliveryLocation: string; // 交貨地點
   // deliveryDate: Moment; // 交貨日期
   // paymentMethods: {
   //   milestone: string;
   //   totalPaymentRatio: `${number}` | ''; // 0~100 浮點數
   // }[]; //付款辦法
+}
+
+interface Tref_state {
+  state_prodDict: Tstate_prodDict;
+  state_quotationPriceInfo: Tstate_quotationPriceInfo;
 }
 
 // =====================================================================
@@ -52,33 +61,50 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
 
   const [state_prodDict, setState_prodDict] = useState<Tstate_prodDict>(defaultState_prodDict);
   const [state_keyArr, setState_KeyArr] = useState<string[]>(defaultState_keyArr);
-  const [state_allProd, setState_allProd] = useState<Tstate_quotationPrice>(defaultState_allProd);
+  const [state_quotationPriceInfo, setState_quotationPriceInfo] =
+    useState<Tstate_quotationPriceInfo>(defaultState_allProd);
 
-  const ref_timeout_avgDiscount = useRef<NodeJS.Timeout | null>(null);
+  // ref_state使setAvgDiscount與setQuotationPrice可以取得最新狀態
+  // 否則會因為閉包的問題導致取得的狀態不是最新的
+  const ref_state = useRef<Tref_state>({
+    state_prodDict,
+    state_quotationPriceInfo,
+  });
+  ref_state.current = {
+    state_prodDict,
+    state_quotationPriceInfo,
+  };
+
+  const { addDebounce } = useDebounceFuc();
 
   // ---------------------------------------------------------------------
 
-  const setAvgDiscount = ({
-    discount_all,
-    prodDict,
-  }: {
-    discount_all: `${number}` | '' | number;
-    prodDict: Tstate_prodDict;
-  }) => {
-    ref_timeout_avgDiscount.current && clearTimeout(ref_timeout_avgDiscount.current);
-    ref_timeout_avgDiscount.current = setTimeout(() => {
-      const discount_avg = calcDiscount_avg({
-        discount_all,
-        prodDict,
-      });
+  const setAvgDiscount = () => {
+    const discount_avg = calcDiscount_avg({
+      discount_quotation: ref_state.current.state_quotationPriceInfo.discount_quotation,
+      prodDict: ref_state.current.state_prodDict,
+    });
 
-      setState_allProd((state) => {
-        return {
-          ...state,
-          discount_avg: discount_avg,
-        };
-      });
-    }, 300);
+    setState_quotationPriceInfo((state) => {
+      return {
+        ...state,
+        discount_avg: discount_avg,
+      };
+    });
+  };
+
+  const setQuotationPrice = () => {
+    const result = calcQuotationPrice({
+      prodDict: ref_state.current.state_prodDict,
+      quotationPriceInfo: ref_state.current.state_quotationPriceInfo,
+    });
+
+    setState_quotationPriceInfo((state) => {
+      return {
+        ...state,
+        ...result,
+      };
+    });
   };
 
   // ---------------------------------------------------------------------
@@ -88,7 +114,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
   const createStateKit = (key: string) => {
     const state_prod = state_prodDict[key];
 
-    const setState: (action: React.SetStateAction<Tstate_prod>) => Tstate_prodDict = (action) => {
+    const setState: React.Dispatch<React.SetStateAction<Tstate_prod>> = (action) => {
       let newStates: Tstate_prod;
 
       if (typeof action === 'function') {
@@ -97,18 +123,15 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
         newStates = action;
       }
 
-      let newDict: Tstate_prodDict = {};
-
       setState_prodDict((dict) => {
-        newDict = { ...dict };
+        const newDict = { ...dict };
         newDict[key] = newStates;
 
         return newDict;
       });
-
-      return newDict;
     };
 
+    // MARK:copySelf
     const copySelf = () => {
       const newKey = nanoid();
 
@@ -130,12 +153,13 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
         return [...arr, newKey];
       });
 
-      setAvgDiscount({
-        discount_all: state_allProd.discount_quotation,
-        prodDict,
+      addDebounce({
+        setAvgDiscount,
+        setQuotationPrice,
       });
     };
 
+    // MARK:deleteSelf
     const deleteSelf = () => {
       let prodDict: Tstate_prodDict = {};
 
@@ -151,15 +175,16 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
         return arr.filter((item) => item !== key);
       });
 
-      setAvgDiscount({
-        discount_all: state_allProd.discount_quotation,
-        prodDict,
+      addDebounce({
+        setAvgDiscount,
+        setQuotationPrice,
       });
     };
 
+    // MARK: getAllPrice
     const getAllPrice = (state: Tstate_prod): Pick<Tstate_prod, 'price' | 'dualPrice' | 'unitPrice' | 'totalPrice'> => {
       const discount_price = calcPriceDiscount({
-        discount_quotation: state_allProd.discount_quotation,
+        discount_quotation: state_quotationPriceInfo.discount_quotation,
         discount_prod: state.discount,
       });
 
@@ -224,7 +249,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //
       getQuantity: () => state_prod.quantity,
       setQuantity: (v: `${number}` | '') => {
-        const prodDict = setState((state) => {
+        setState((state) => {
           const copy = {
             ...state,
             quantity: v,
@@ -236,9 +261,9 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
           };
         });
 
-        setAvgDiscount({
-          discount_all: state_allProd.discount_quotation,
-          prodDict: prodDict,
+        addDebounce({
+          setAvgDiscount,
+          setQuotationPrice,
         });
       },
       // 牌價
@@ -255,31 +280,17 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
             ...getAllPrice(copy),
           };
         });
+
+        addDebounce({
+          setQuotationPrice,
+        });
       },
       // 牌價複價
       getDualPrice: () => state_prod.dualPrice,
-      // setDualPrice: (v: number) => {
-      //   setState((state) => ({
-      //     ...state,
-      //     dualPrice: v,
-      //   }));
-      // },
       // 單價
       getUnitPrice: () => state_prod.unitPrice,
-      // setUnitPrice: (v: number) => {
-      //   setState((state) => ({
-      //     ...state,
-      //     unitPrice: v,
-      //   }));
-      // },
       // 複價
       getTotalPrice: () => state_prod.totalPrice,
-      // setTotalPrice: (v: number) => {
-      //   setState((state) => ({
-      //     ...state,
-      //     totalPrice: v,
-      //   }));
-      // },
       //
       getNote: () => state_prod.note,
       setNote: (v: string) => {
@@ -291,7 +302,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       //
       getDiscount: () => state_prod.discount,
       setDiscount: (v: `${number}` | '') => {
-        const prodDict = setState((state) => {
+        setState((state) => {
           const copy = {
             ...state,
             discount: v,
@@ -303,19 +314,13 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
           };
         });
 
-        setAvgDiscount({
-          discount_all: state_allProd.discount_quotation,
-          prodDict: prodDict,
+        addDebounce({
+          setAvgDiscount,
+          setQuotationPrice,
         });
       },
       //
       getImgUrl: () => state_prod.imgUrl,
-      // setImgUrl: (v: string | undefined) => {
-      //   setState((state) => ({
-      //     ...state,
-      //     imgUrl: v,
-      //   }));
-      // },
       //
     };
   };
@@ -326,7 +331,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
 
   //
   const setDiscount_all = (value: `${number}` | '' | number) => {
-    setState_allProd((state) => {
+    setState_quotationPriceInfo((state) => {
       const copy = { ...state };
       copy.discount_quotation = `${value}`;
 
@@ -354,9 +359,9 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
         };
       });
 
-      setAvgDiscount({
-        discount_all: value,
-        prodDict: newDict,
+      addDebounce({
+        setAvgDiscount,
+        setQuotationPrice,
       });
 
       return newDict;
@@ -364,10 +369,21 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
   };
 
   const setTuneTotal = (value: `${number}` | '' | number) => {
-    setState_allProd((state) => {
+    setState_quotationPriceInfo((state) => {
       return {
         ...state,
         tuneTotal: `${value}`,
+      };
+    });
+
+    addDebounce({ setQuotationPrice });
+  };
+
+  const setHaveTax = (haveTax: boolean) => {
+    setState_quotationPriceInfo((state) => {
+      return {
+        ...state,
+        haveTax: haveTax,
       };
     });
   };
@@ -398,15 +414,14 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       return [...arr, newKey];
     });
 
-    setAvgDiscount({
-      discount_all: state_allProd.discount_quotation,
-      prodDict,
+    addDebounce({
+      setAvgDiscount,
     });
   };
 
   const reset = () => {
     setState_prodDict(defaultState_prodDict);
-    setState_allProd(defaultState_allProd);
+    setState_quotationPriceInfo(defaultState_allProd);
     setState_KeyArr(defaultState_keyArr);
   };
 
@@ -421,7 +436,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
   }, [defaultState_prodDict]);
 
   useEffect(() => {
-    setState_allProd(defaultState_allProd);
+    setState_quotationPriceInfo(defaultState_allProd);
   }, [defaultState_allProd]);
 
   useEffect(() => {
@@ -438,11 +453,12 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
     createStateKit,
     addProd,
 
-    state_allProd,
+    state_allProd: state_quotationPriceInfo,
     // createStateKit_allProd,
     // state_allProd,
     setDiscount_all,
     setTuneTotal,
+    setHaveTax,
   };
 };
 
@@ -463,14 +479,15 @@ const useDefault_prodDict = (data: unknown | undefined) => {
 };
 
 const useDefault_allProd = (data: unknown | undefined) => {
-  const defaultState: Tstate_quotationPrice = useMemo(() => {
-    const state: Tstate_quotationPrice = {
+  const defaultState: Tstate_quotationPriceInfo = useMemo(() => {
+    const state: Tstate_quotationPriceInfo = {
       discount_quotation: '100',
       discount_avg: 100,
       tuneTotal: '0',
       subTotal: 0,
       salesTax: 0,
       total: 0,
+      haveTax: true,
     };
 
     return state;
@@ -551,8 +568,8 @@ const calcAllPrice = (props: {
   };
 };
 
-const calcDiscount_avg = (props: { discount_all: `${number}` | number | ''; prodDict: Tstate_prodDict }) => {
-  const discount_all = new Decimal(props.discount_all || 0).div(100);
+const calcDiscount_avg = (props: { discount_quotation: `${number}` | number | ''; prodDict: Tstate_prodDict }) => {
+  const discount_all = new Decimal(props.discount_quotation || 0).div(100);
 
   let discountTotal = new Decimal(0);
   let qty = new Decimal(0);
@@ -565,6 +582,68 @@ const calcDiscount_avg = (props: { discount_all: `${number}` | number | ''; prod
   });
 
   return discountTotal.div(qty).mul(discount_all).toDecimalPlaces(3).toNumber();
+};
+
+const calcQuotationPrice = ({
+  prodDict,
+  quotationPriceInfo: { tuneTotal, haveTax },
+}: {
+  prodDict: Tstate_prodDict;
+  quotationPriceInfo: Pick<Tstate_quotationPriceInfo, 'tuneTotal' | 'haveTax'>;
+}) => {
+  let prodTotal = new Decimal(0);
+
+  Object.values(prodDict).forEach((state_prod) => {
+    prodTotal = prodTotal.add(state_prod.totalPrice || 0);
+  });
+
+  prodTotal = prodTotal.add(tuneTotal);
+
+  const subTotal = prodTotal;
+  const salesTax = haveTax ? subTotal.mul(taxRate).toNumber() : 0; // 營業稅
+  const total = subTotal.add(salesTax); // 總計
+
+  return {
+    subTotal: subTotal.toNumber(),
+    salesTax: salesTax,
+    total: total.toNumber(),
+  };
+};
+
+interface TdebounceFuc {
+  [string: string]: () => void;
+}
+
+const useDebounceFuc = ({ delay = 300 }: { delay?: number } = {}) => {
+  const ref_timeout = useRef<NodeJS.Timeout | null>(null);
+  const ref_debounce = useRef<TdebounceFuc>({});
+
+  const addDebounce = (dict: TdebounceFuc, { coverDelay }: { coverDelay?: number } = {}) => {
+    ref_timeout.current && clearTimeout(ref_timeout.current);
+    ref_debounce.current = { ...ref_debounce.current, ...dict };
+
+    ref_timeout.current = setTimeout(() => {
+      Object.values(ref_debounce.current).forEach((func) => {
+        func();
+      });
+
+      ref_debounce.current = {};
+    }, coverDelay ?? delay);
+  };
+
+  const clearDebounce = () => {
+    ref_timeout.current && clearTimeout(ref_timeout.current);
+    ref_debounce.current = {};
+  };
+
+  useEffect(() => {
+    return () => {
+      ref_timeout.current && clearTimeout(ref_timeout.current);
+      ref_debounce.current = {};
+    };
+  }, []);
+
+  return { addDebounce, clearDebounce };
 };
 
 // ===========================================================================

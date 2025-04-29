@@ -46,7 +46,10 @@ export default function Edit() {
       ],
 
       haveTax: {
-        value: true,
+        value: instance_useProduct.state_allProd.haveTax,
+        onChange: (value) => {
+          instance_useProduct.setHaveTax(value);
+        },
       },
 
       tuneTotal: {
@@ -57,6 +60,7 @@ export default function Edit() {
       },
       discountRate: instance_useProduct.state_allProd.discount_quotation,
       avgDiscount: instance_useProduct.state_allProd.discount_avg,
+      // subTotal: instance_useProduct.state_allProd.subTotal,
       subTotal: instance_useProduct.state_allProd.subTotal,
       salesTax: instance_useProduct.state_allProd.salesTax,
       total: instance_useProduct.state_allProd.total,
