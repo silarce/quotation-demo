@@ -43,7 +43,13 @@ export default function Table({
   disabled: boolean;
   instance_useProduct: Tinstance_useProduct;
 }) {
-  const { state_keyArr, createStateKit, addProd, state_allProd, setDiscount_all } = instance_useProduct;
+  const {
+    state_keyArr,
+    createStateKit,
+    addProd,
+    state_quotationPriceInfo: state_allProd,
+    setDiscount_all,
+  } = instance_useProduct;
 
   return (
     <div>

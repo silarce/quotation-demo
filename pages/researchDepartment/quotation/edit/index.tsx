@@ -117,23 +117,23 @@ const createQuotationPayInfo = ({
       addPaymentMethod: addPaymentMethod,
 
       haveTax: {
-        value: instance_useProduct.state_allProd.haveTax,
+        value: instance_useProduct.state_quotationPriceInfo.haveTax,
         onChange: (value) => {
           instance_useProduct.setHaveTax(value);
         },
       },
 
       tuneTotal: {
-        value: instance_useProduct.state_allProd.tuneTotal,
+        value: instance_useProduct.state_quotationPriceInfo.tuneTotal,
         onChange: (value) => {
           instance_useProduct.setTuneTotal(value);
         },
       },
-      discountRate: instance_useProduct.state_allProd.discount_quotation,
-      avgDiscount: instance_useProduct.state_allProd.discount_avg,
-      subTotal: instance_useProduct.state_allProd.subTotal,
-      salesTax: instance_useProduct.state_allProd.salesTax,
-      total: instance_useProduct.state_allProd.total,
+      discountRate: instance_useProduct.state_quotationPriceInfo.discount_quotation,
+      avgDiscount: instance_useProduct.state_quotationPriceInfo.discount_avg,
+      subTotal: instance_useProduct.state_quotationPriceInfo.subTotal,
+      salesTax: instance_useProduct.state_quotationPriceInfo.salesTax,
+      total: instance_useProduct.state_quotationPriceInfo.total,
     },
   };
 

@@ -5,6 +5,9 @@ import Decimal from 'decimal.js';
 
 import { taxRate } from 'config/config_common';
 
+import { useDebounceFuc } from 'hooks/useDebounceFuc';
+// =======================================================================
+
 interface Tstate_prod {
   id?: string;
 
@@ -44,6 +47,7 @@ interface Tref_state {
   state_quotationPriceInfo: Tstate_quotationPriceInfo;
 }
 
+type Tinstance_useProduct = ReturnType<typeof useProduct>;
 // =====================================================================
 
 const useProduct = (rawData: unknown | undefined) => {
@@ -70,6 +74,7 @@ const useProduct = (rawData: unknown | undefined) => {
   const { addDebounce } = useDebounceFuc();
 
   // ---------------------------------------------------------------------
+  // 運算成本高的方法，搭配addDebounce使用
 
   const setAvgDiscount = () => {
     const discount_avg = calcDiscount_avg({
@@ -101,284 +106,27 @@ const useProduct = (rawData: unknown | undefined) => {
 
   // ---------------------------------------------------------------------
 
-  // region:createStateKit
+  // MARK: stateKit
 
   const createStateKit = (key: string) => {
-    const state_prod = state_prodDict[key];
-
-    const setState: React.Dispatch<React.SetStateAction<Tstate_prod>> = (action) => {
-      let newStates: Tstate_prod;
-
-      if (typeof action === 'function') {
-        newStates = action(state_prod);
-      } else {
-        newStates = action;
-      }
-
-      setState_prodDict((dict) => {
-        const newDict = { ...dict };
-        newDict[key] = newStates;
-
-        return newDict;
-      });
-    };
-
-    // MARK:copySelf
-    const copySelf = () => {
-      const newKey = nanoid();
-
-      const newState = _.cloneDeep(state_prod);
-      newState.id = undefined;
-
-      setState_prodDict((dict) => {
-        const copy = {
-          ...dict,
-          [newKey]: newState,
-        };
-
-        return copy;
-      });
-      setState_KeyArr((arr) => {
-        return [...arr, newKey];
-      });
-
-      addDebounce({
-        setAvgDiscount,
-        setQuotationPrice,
-      });
-    };
-
-    // MARK:deleteSelf
-    const deleteSelf = () => {
-      let prodDict: Tstate_prodDict = {};
-
-      setState_prodDict((dict) => {
-        const copy = { ...dict };
-        delete copy[key];
-        prodDict = copy;
-
-        return copy;
-      });
-
-      setState_KeyArr((arr) => {
-        return arr.filter((item) => item !== key);
-      });
-
-      addDebounce({
-        setAvgDiscount,
-        setQuotationPrice,
-      });
-    };
-
-    // MARK: getAllPrice
-    const getAllPrice = (state: Tstate_prod): Pick<Tstate_prod, 'price' | 'dualPrice' | 'unitPrice' | 'totalPrice'> => {
-      const discount_price = calcPriceDiscount({
-        discount_quotation: state_quotationPriceInfo.discount_quotation,
-        discount_prod: state.discount,
-      });
-
-      const { price, dualPrice, unitPrice, totalPrice } = calcAllPrice({
-        discount: discount_price,
-        quantity: state.quantity,
-        price: state.price,
-      });
-
-      return {
-        price: `${price}` as `${number}`,
-        dualPrice: dualPrice,
-        unitPrice: unitPrice,
-        totalPrice: totalPrice,
-      };
-    };
-
-    return {
-      state_prod,
-      copySelf,
-      deleteSelf,
-      //
-      getProductid: () => state_prod.productid,
-      setProductid: (v: string) => {
-        setState((state) => ({
-          ...state,
-          productid: v,
-        }));
-      },
-      //
-      getSpec: () => state_prod.spec,
-      setSpec: (v: string) => {
-        setState((state) => ({
-          ...state,
-          spec: v,
-        }));
-      },
-      //
-      getMaterial: () => state_prod.material,
-      setMaterial: (v: string) => {
-        setState((state) => ({
-          ...state,
-          material: v,
-        }));
-      },
-      //
-      getThickness: () => state_prod.thickness,
-      setThickness: (v: `${number}` | '') => {
-        setState((state) => ({
-          ...state,
-          thickness: v,
-        }));
-      },
-      //
-      getSurface: () => state_prod.surface,
-      setSurface: (v: string) => {
-        setState((state) => ({
-          ...state,
-          surface: v,
-        }));
-      },
-      //
-      getQuantity: () => state_prod.quantity,
-      setQuantity: (v: `${number}` | '') => {
-        setState((state) => {
-          const copy = {
-            ...state,
-            quantity: v,
-          };
-
-          return {
-            ...copy,
-            ...getAllPrice(copy),
-          };
-        });
-
-        addDebounce({
-          setAvgDiscount,
-          setQuotationPrice,
-        });
-      },
-      // 牌價
-      getPrice: () => state_prod.price,
-      setPrice: (v: `${number}` | '') => {
-        setState((state) => {
-          const copy = {
-            ...state,
-            price: v,
-          };
-
-          return {
-            ...copy,
-            ...getAllPrice(copy),
-          };
-        });
-
-        addDebounce({
-          setQuotationPrice,
-        });
-      },
-      // 牌價複價
-      getDualPrice: () => state_prod.dualPrice,
-      // 單價
-      getUnitPrice: () => state_prod.unitPrice,
-      // 複價
-      getTotalPrice: () => state_prod.totalPrice,
-      //
-      getNote: () => state_prod.note,
-      setNote: (v: string) => {
-        setState((state) => ({
-          ...state,
-          note: v,
-        }));
-      },
-      //
-      getDiscount: () => state_prod.discount,
-      setDiscount: (v: `${number}` | '') => {
-        setState((state) => {
-          const copy = {
-            ...state,
-            discount: v,
-          };
-
-          return {
-            ...copy,
-            ...getAllPrice(copy),
-          };
-        });
-
-        addDebounce({
-          setAvgDiscount,
-          setQuotationPrice,
-        });
-      },
-      //
-      getImgUrl: () => state_prod.imgUrl,
-      //
-    };
-  };
-
-  // endregion
-
-  // region:createStateKit_allProd
-
-  //
-  const setDiscount_all = (value: `${number}` | '' | number) => {
-    setState_quotationPriceInfo((state) => {
-      const copy = { ...state };
-      copy.discount_quotation = `${value}`;
-
-      return copy;
-    });
-
-    setState_prodDict((dict) => {
-      const newDict = { ...dict };
-      Object.entries(newDict).forEach(([key, state_prod]) => {
-        const discount_price = calcPriceDiscount({
-          discount_quotation: value,
-          discount_prod: state_prod.discount,
-        });
-
-        const allPrice = calcAllPrice({
-          discount: discount_price,
-          quantity: state_prod.quantity,
-          price: state_prod.price,
-        });
-
-        newDict[key] = {
-          ...state_prod,
-          ...allPrice,
-          price: `${allPrice.price}` as `${number}`,
-        };
-      });
-
-      addDebounce({
-        setAvgDiscount,
-        setQuotationPrice,
-      });
-
-      return newDict;
+    return factory_createStateKit(key, {
+      state_prodDict,
+      state_quotationPriceInfo,
+      setState_prodDict,
+      setState_KeyArr,
+      addDebounce,
+      setAvgDiscount,
+      setQuotationPrice,
     });
   };
 
-  const setTuneTotal = (value: `${number}` | '' | number) => {
-    setState_quotationPriceInfo((state) => {
-      return {
-        ...state,
-        tuneTotal: `${value}`,
-      };
-    });
-
-    addDebounce({ setQuotationPrice });
-  };
-
-  const setHaveTax = (haveTax: boolean) => {
-    setState_quotationPriceInfo((state) => {
-      return {
-        ...state,
-        haveTax: haveTax,
-      };
-    });
-    addDebounce({ setQuotationPrice });
-  };
-
-  // endregion
+  const { setDiscount_all, setTuneTotal, setHaveTax } = factory_stateKit_prodDict({
+    setState_prodDict,
+    setState_quotationPriceInfo,
+    addDebounce,
+    setAvgDiscount,
+    setQuotationPrice,
+  });
 
   // ---------------------------------------------------------------------
 
@@ -387,8 +135,6 @@ const useProduct = (rawData: unknown | undefined) => {
   const addProd = () => {
     const newKey = nanoid();
 
-    let prodDict: Tstate_prodDict = {};
-
     setState_prodDict((dict) => {
       const copy = {
         ...dict,
@@ -396,7 +142,6 @@ const useProduct = (rawData: unknown | undefined) => {
           ...emptyState_prod(),
         },
       };
-      prodDict = copy;
 
       return copy;
     });
@@ -437,23 +182,26 @@ const useProduct = (rawData: unknown | undefined) => {
 
   // ---------------------------------------------------------------------
   return {
+    state_quotationPriceInfo,
     state_keyArr,
 
-    reset,
     createStateKit,
     addProd,
-
-    state_allProd: state_quotationPriceInfo,
 
     setDiscount_all,
     setTuneTotal,
     setHaveTax,
+
+    reset,
   };
 };
 
 // MARK: END
 
 // ====================================================================
+// ====================================================================
+
+// region: useDefault
 
 const useDefault_prodDict = (rawData: unknown | undefined) => {
   return useCallback(() => {
@@ -516,7 +264,13 @@ const emptyState_prod = (): Tstate_prod => ({
     'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Cat_November_2010-1a.jpg/220px-Cat_November_2010-1a.jpg',
 });
 
+// endregion
+
 // ===========================================================================
+// ===========================================================================
+// ===========================================================================
+
+// region: utility
 
 const calcPriceDiscount = ({
   discount_quotation, // ex 50 37
@@ -599,46 +353,314 @@ const calcQuotationPrice = ({
   };
 };
 
-interface TdebounceFuc {
-  [string: string]: () => void;
-}
+// endregion
 
 // ===========================================================================
-const useDebounceFuc = ({ delay = 300 }: { delay?: number } = {}) => {
-  const ref_timeout = useRef<NodeJS.Timeout | null>(null);
-  const ref_debounce = useRef<TdebounceFuc>({});
 
-  const addDebounce = (dict: TdebounceFuc, { coverDelay }: { coverDelay?: number } = {}) => {
-    ref_timeout.current && clearTimeout(ref_timeout.current);
-    ref_debounce.current = { ...ref_debounce.current, ...dict };
+// MARK:factory_createStateKit
+const factory_createStateKit = (
+  key: string,
+  {
+    state_prodDict,
+    state_quotationPriceInfo,
+    setState_prodDict,
+    setState_KeyArr,
+    addDebounce,
+    setAvgDiscount,
+    setQuotationPrice,
+  }: {
+    state_prodDict: Tstate_prodDict;
+    state_quotationPriceInfo: Tstate_quotationPriceInfo;
+    setState_prodDict: React.Dispatch<React.SetStateAction<Tstate_prodDict>>;
+    setState_KeyArr: React.Dispatch<React.SetStateAction<string[]>>;
+    addDebounce: ReturnType<typeof useDebounceFuc>['addDebounce'];
+    setAvgDiscount: () => void;
+    setQuotationPrice: () => void;
+  }
+) => {
+  const state_prod = state_prodDict[key];
 
-    ref_timeout.current = setTimeout(() => {
-      Object.values(ref_debounce.current).forEach((func) => {
-        func();
+  const setState: React.Dispatch<React.SetStateAction<Tstate_prod>> = (action) => {
+    let newStates: Tstate_prod;
+
+    if (typeof action === 'function') {
+      newStates = action(state_prod);
+    } else {
+      newStates = action;
+    }
+
+    setState_prodDict((dict) => {
+      const newDict = { ...dict };
+      newDict[key] = newStates;
+
+      return newDict;
+    });
+  };
+
+  const copySelf = () => {
+    const newKey = nanoid();
+
+    const newState = _.cloneDeep(state_prod);
+    newState.id = undefined;
+
+    setState_prodDict((dict) => {
+      const copy = {
+        ...dict,
+        [newKey]: newState,
+      };
+
+      return copy;
+    });
+    setState_KeyArr((arr) => {
+      return [...arr, newKey];
+    });
+
+    addDebounce({
+      setAvgDiscount,
+      setQuotationPrice,
+    });
+  };
+
+  const deleteSelf = () => {
+    setState_prodDict((dict) => {
+      const copy = { ...dict };
+      delete copy[key];
+
+      return copy;
+    });
+
+    setState_KeyArr((arr) => {
+      return arr.filter((item) => item !== key);
+    });
+
+    addDebounce({
+      setAvgDiscount,
+      setQuotationPrice,
+    });
+  };
+
+  const getAllPrice = (state: Tstate_prod): Pick<Tstate_prod, 'price' | 'dualPrice' | 'unitPrice' | 'totalPrice'> => {
+    const discount_price = calcPriceDiscount({
+      discount_quotation: state_quotationPriceInfo.discount_quotation,
+      discount_prod: state.discount,
+    });
+
+    const { price, dualPrice, unitPrice, totalPrice } = calcAllPrice({
+      discount: discount_price,
+      quantity: state.quantity,
+      price: state.price,
+    });
+
+    return {
+      price: `${price}` as `${number}`,
+      dualPrice: dualPrice,
+      unitPrice: unitPrice,
+      totalPrice: totalPrice,
+    };
+  };
+
+  return {
+    state_prod,
+    copySelf,
+    deleteSelf,
+    //
+    getProductid: () => state_prod.productid,
+    setProductid: (v: string) => {
+      setState((state) => ({
+        ...state,
+        productid: v,
+      }));
+    },
+    //
+    getSpec: () => state_prod.spec,
+    setSpec: (v: string) => {
+      setState((state) => ({
+        ...state,
+        spec: v,
+      }));
+    },
+    //
+    getMaterial: () => state_prod.material,
+    setMaterial: (v: string) => {
+      setState((state) => ({
+        ...state,
+        material: v,
+      }));
+    },
+    //
+    getThickness: () => state_prod.thickness,
+    setThickness: (v: `${number}` | '') => {
+      setState((state) => ({
+        ...state,
+        thickness: v,
+      }));
+    },
+    //
+    getSurface: () => state_prod.surface,
+    setSurface: (v: string) => {
+      setState((state) => ({
+        ...state,
+        surface: v,
+      }));
+    },
+    //
+    getQuantity: () => state_prod.quantity,
+    setQuantity: (v: `${number}` | '') => {
+      setState((state) => {
+        const copy = {
+          ...state,
+          quantity: v,
+        };
+
+        return {
+          ...copy,
+          ...getAllPrice(copy),
+        };
       });
 
-      ref_debounce.current = {};
-    }, coverDelay ?? delay);
+      addDebounce({
+        setAvgDiscount,
+        setQuotationPrice,
+      });
+    },
+    // 牌價
+    getPrice: () => state_prod.price,
+    setPrice: (v: `${number}` | '') => {
+      setState((state) => {
+        const copy = {
+          ...state,
+          price: v,
+        };
+
+        return {
+          ...copy,
+          ...getAllPrice(copy),
+        };
+      });
+
+      addDebounce({
+        setQuotationPrice,
+      });
+    },
+    // 牌價複價
+    getDualPrice: () => state_prod.dualPrice,
+    // 單價
+    getUnitPrice: () => state_prod.unitPrice,
+    // 複價
+    getTotalPrice: () => state_prod.totalPrice,
+    //
+    getNote: () => state_prod.note,
+    setNote: (v: string) => {
+      setState((state) => ({
+        ...state,
+        note: v,
+      }));
+    },
+    //
+    getDiscount: () => state_prod.discount,
+    setDiscount: (v: `${number}` | '') => {
+      setState((state) => {
+        const copy = {
+          ...state,
+          discount: v,
+        };
+
+        return {
+          ...copy,
+          ...getAllPrice(copy),
+        };
+      });
+
+      addDebounce({
+        setAvgDiscount,
+        setQuotationPrice,
+      });
+    },
+    //
+    getImgUrl: () => state_prod.imgUrl,
+    //
   };
-
-  const clearDebounce = () => {
-    ref_timeout.current && clearTimeout(ref_timeout.current);
-    ref_debounce.current = {};
-  };
-
-  useEffect(() => {
-    return () => {
-      ref_timeout.current && clearTimeout(ref_timeout.current);
-      ref_debounce.current = {};
-    };
-  }, []);
-
-  return { addDebounce, clearDebounce };
 };
 
-// ===========================================================================
+// MARK:factory_stateKit_prodDict
+const factory_stateKit_prodDict = ({
+  setState_prodDict,
+  setState_quotationPriceInfo,
+  addDebounce,
+  setAvgDiscount,
+  setQuotationPrice,
+}: {
+  setState_prodDict: React.Dispatch<React.SetStateAction<Tstate_prodDict>>;
+  setState_quotationPriceInfo: React.Dispatch<React.SetStateAction<Tstate_quotationPriceInfo>>;
+  addDebounce: ReturnType<typeof useDebounceFuc>['addDebounce'];
+  setAvgDiscount: () => void;
+  setQuotationPrice: () => void;
+}) => {
+  const setDiscount_all = (value: `${number}` | '' | number) => {
+    setState_quotationPriceInfo((state) => {
+      const copy = { ...state };
+      copy.discount_quotation = `${value}`;
 
-type Tinstance_useProduct = ReturnType<typeof useProduct>;
+      return copy;
+    });
+
+    setState_prodDict((dict) => {
+      const newDict = { ...dict };
+      Object.entries(newDict).forEach(([key, state_prod]) => {
+        const discount_price = calcPriceDiscount({
+          discount_quotation: value,
+          discount_prod: state_prod.discount,
+        });
+
+        const allPrice = calcAllPrice({
+          discount: discount_price,
+          quantity: state_prod.quantity,
+          price: state_prod.price,
+        });
+
+        newDict[key] = {
+          ...state_prod,
+          ...allPrice,
+          price: `${allPrice.price}` as `${number}`,
+        };
+      });
+
+      addDebounce({
+        setAvgDiscount,
+        setQuotationPrice,
+      });
+
+      return newDict;
+    });
+  };
+
+  const setTuneTotal = (value: `${number}` | '' | number) => {
+    setState_quotationPriceInfo((state) => {
+      return {
+        ...state,
+        tuneTotal: `${value}`,
+      };
+    });
+
+    addDebounce({ setQuotationPrice });
+  };
+
+  const setHaveTax = (haveTax: boolean) => {
+    setState_quotationPriceInfo((state) => {
+      return {
+        ...state,
+        haveTax: haveTax,
+      };
+    });
+    addDebounce({ setQuotationPrice });
+  };
+
+  return {
+    setDiscount_all,
+    setTuneTotal,
+    setHaveTax,
+  };
+};
 
 // ===========================================================================
 export type { Tinstance_useProduct };
