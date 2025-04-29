@@ -22,7 +22,7 @@ import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 
 import { optionsCreator_county, districtOptionsSelector } from 'js/utils/options/countryAndDistrict';
 
-import { Treturn_useProfile } from 'components/page/researchDepartment/quotation/hook/useProfile';
+import { Tinstance_useProfile } from 'components/page/researchDepartment/quotation/hook/useProfile';
 
 // ===========================================================================
 
@@ -36,7 +36,7 @@ export default function QuotationProfile({
   return_useProfile,
 }: {
   disable?: boolean;
-  return_useProfile: Treturn_useProfile;
+  return_useProfile: Tinstance_useProfile;
 }) {
   const { state_profile, setState_Profile, selectCustomer, removeCustomer, editCounty } = return_useProfile;
 

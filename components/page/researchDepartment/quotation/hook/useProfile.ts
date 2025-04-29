@@ -22,6 +22,8 @@ interface Tstate_profile {
   isLost: boolean;
 }
 
+type Tinstance_useProfile = ReturnType<typeof useProfile>;
+
 // =====================================================================
 const useProfile = (rawData: unknown | undefined) => {
   const defaultState = useDefault(rawData);
@@ -49,11 +51,15 @@ const useProfile = (rawData: unknown | undefined) => {
     setState_Profile((prev) => ({ ...prev, county, district: '' }));
   };
 
-  useEffect(() => {
+  const reset = () => {
     setState_Profile(defaultState);
+  };
+
+  useEffect(() => {
+    reset();
   }, [defaultState]);
 
-  return { state_profile, setState_Profile, selectCustomer, removeCustomer, editCounty };
+  return { reset, state_profile, setState_Profile, selectCustomer, removeCustomer, editCounty };
 };
 
 const useDefault = (rawData: unknown | undefined) => {
@@ -84,7 +90,5 @@ const useDefault = (rawData: unknown | undefined) => {
 
 // ===================================================================
 
-type Treturn_useProfile = ReturnType<typeof useProfile>;
-
 export { useProfile };
-export type { Treturn_useProfile };
+export type { Tinstance_useProfile };

@@ -20,10 +20,11 @@ import { useRemark, Tinstance_useRemark } from 'components/page/researchDepartme
 // CSS
 import scss from './index.module.scss';
 
+// MARK: START
 export default function Edit() {
   const [disabled, setDisabled] = useState(false);
 
-  const return_useProfile = useProfile(undefined);
+  const instance_useProfile = useProfile(undefined);
   const instance_useProduct = useProduct(undefined);
   const instance_useOtherInfo = useOtherInfo(undefined);
   const instance_useRemark = useRemark(undefined);
@@ -35,26 +36,28 @@ export default function Edit() {
 
   const { props_remark, props_quotationRange } = createProps_quotationRemark(instance_useRemark);
 
+  const reset = () => {
+    instance_useProfile.reset();
+    instance_useProduct.reset();
+    instance_useOtherInfo.reset();
+    instance_useRemark.reset();
+  };
+
   return (
     <SubLayer>
       <PageHeader02 tag="新增報價單" />
       <div className={scss.main}>
-        <Profile return_useProfile={return_useProfile} />
-
+        <Profile return_useProfile={instance_useProfile} />
         <br />
         <br />
-
         <Table disabled={disabled} instance_useProduct={instance_useProduct} />
-
         <br />
         <br />
-
         <div className={scss.summary}>
           <div className={scss.left}>
             <QuotationRemark disabled={disabled} {...props_remark} />
             <QuotationRemark disabled={disabled} {...props_quotationRange} />
           </div>
-          {/*  */}
           <div className={scss.right}>
             <QuotationPayInfo disabled={disabled} {...props_quotationPayInfo} />
           </div>
@@ -63,6 +66,8 @@ export default function Edit() {
     </SubLayer>
   );
 }
+
+// MARK: END
 
 // =============================================================
 

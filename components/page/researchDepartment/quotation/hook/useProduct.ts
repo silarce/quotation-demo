@@ -444,8 +444,7 @@ const useProduct = (rawData: unknown | undefined) => {
     addProd,
 
     state_allProd: state_quotationPriceInfo,
-    // createStateKit_allProd,
-    // state_allProd,
+
     setDiscount_all,
     setTuneTotal,
     setHaveTax,
