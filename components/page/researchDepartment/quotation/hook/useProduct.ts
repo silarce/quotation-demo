@@ -383,6 +383,7 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
         haveTax: haveTax,
       };
     });
+    addDebounce({ setQuotationPrice });
   };
 
   // endregion
