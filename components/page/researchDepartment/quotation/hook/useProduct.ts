@@ -138,14 +138,11 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
       const newState = _.cloneDeep(state_prod);
       newState.id = undefined;
 
-      let prodDict: Tstate_prodDict = {};
-
       setState_prodDict((dict) => {
         const copy = {
           ...dict,
           [newKey]: newState,
         };
-        prodDict = copy;
 
         return copy;
       });
@@ -580,6 +577,10 @@ const calcDiscount_avg = (props: { discount_quotation: `${number}` | number | ''
     discountTotal = discountTotal.add(quantity.mul(state_prod.discount || 0));
     qty = qty.add(quantity);
   });
+
+  if (!discountTotal.toNumber() && !qty.toNumber()) {
+    return discount_all.mul(100).toDecimalPlaces(3).toNumber();
+  }
 
   return discountTotal.div(qty).mul(discount_all).toDecimalPlaces(3).toNumber();
 };
