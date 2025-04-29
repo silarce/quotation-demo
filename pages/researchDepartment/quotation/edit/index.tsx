@@ -13,7 +13,8 @@ import Table from 'components/page/researchDepartment/quotation/table';
 
 // hook
 import { useProfile } from 'components/page/researchDepartment/quotation/hook/useProfile';
-import { useProduct } from 'components/page/researchDepartment/quotation/hook/useProduct';
+import { useProduct, Tinstance_useProduct } from 'components/page/researchDepartment/quotation/hook/useProduct';
+import { useOtherInfo, Tinstance_useOtherInfo } from 'components/page/researchDepartment/quotation/hook/useOtherInfo';
 
 // CSS
 import scss from './index.module.scss';
@@ -24,48 +25,12 @@ export default function Edit() {
   const return_useProfile = useProfile();
 
   const instance_useProduct = useProduct({ rawData: undefined });
+  const instance_useOtherInfo = useOtherInfo(undefined);
 
-  const propsForTest_quotationPayInfo: Tprops_quotationPayInfo = {
-    disabled: false,
-    form: {
-      deliveryLocation: {
-        value: 'test',
-      },
-      deliveryDate: {
-        value: null,
-      },
-      paymentMethodArr: [
-        {
-          milestone: {
-            value: 'test',
-          },
-          totalPaymentRatio: {
-            value: 'test',
-          },
-        },
-      ],
-
-      haveTax: {
-        value: instance_useProduct.state_allProd.haveTax,
-        onChange: (value) => {
-          instance_useProduct.setHaveTax(value);
-        },
-      },
-
-      tuneTotal: {
-        value: instance_useProduct.state_allProd.tuneTotal,
-        onChange: (value) => {
-          instance_useProduct.setTuneTotal(value);
-        },
-      },
-      discountRate: instance_useProduct.state_allProd.discount_quotation,
-      avgDiscount: instance_useProduct.state_allProd.discount_avg,
-      // subTotal: instance_useProduct.state_allProd.subTotal,
-      subTotal: instance_useProduct.state_allProd.subTotal,
-      salesTax: instance_useProduct.state_allProd.salesTax,
-      total: instance_useProduct.state_allProd.total,
-    },
-  };
+  const props_quotationPayInfo = createQuotationPayInfo({
+    instance_useProduct,
+    instance_useOtherInfo,
+  });
 
   return (
     <SubLayer>
@@ -88,13 +53,84 @@ export default function Edit() {
           </div>
           {/*  */}
           <div className={scss.right}>
-            <QuotationPayInfo {...propsForTest_quotationPayInfo} />
+            <QuotationPayInfo disabled={disabled} {...props_quotationPayInfo} />
           </div>
         </div>
       </div>
     </SubLayer>
   );
 }
+
+// =============================================================
+
+const createQuotationPayInfo = ({
+  instance_useProduct,
+  instance_useOtherInfo,
+}: {
+  instance_useProduct: Tinstance_useProduct;
+  instance_useOtherInfo: Tinstance_useOtherInfo;
+}) => {
+  const { state_otherInfo, setState_otherInfo, addPaymentMethod, removePaymentMethod, editPaymentMethod } =
+    instance_useOtherInfo;
+
+  const props_quotationPayInfo: Omit<Tprops_quotationPayInfo, 'disabled'> = {
+    form: {
+      deliveryLocation: {
+        value: state_otherInfo.deliveryLocation,
+        onChange: (value) => {
+          setState_otherInfo((prev) => ({ ...prev, deliveryLocation: value }));
+        },
+      },
+      deliveryDate: {
+        value: state_otherInfo.deliveryDate,
+        onChange: (value) => {
+          setState_otherInfo((prev) => ({ ...prev, deliveryDate: value }));
+        },
+      },
+      paymentMethodArr: state_otherInfo.paymentMethods.map((item, index) => {
+        return {
+          milestone: {
+            value: item.milestone,
+            onChange: (value) => {
+              editPaymentMethod({ index, milestone: value });
+            },
+          },
+          totalPaymentRatio: {
+            value: item.totalPaymentRatio,
+            onChange: (value) => {
+              editPaymentMethod({ index, totalPaymentRatio: value });
+            },
+          },
+          onDelete: () => {
+            removePaymentMethod(index);
+          },
+        };
+      }),
+      addPaymentMethod: addPaymentMethod,
+
+      haveTax: {
+        value: instance_useProduct.state_allProd.haveTax,
+        onChange: (value) => {
+          instance_useProduct.setHaveTax(value);
+        },
+      },
+
+      tuneTotal: {
+        value: instance_useProduct.state_allProd.tuneTotal,
+        onChange: (value) => {
+          instance_useProduct.setTuneTotal(value);
+        },
+      },
+      discountRate: instance_useProduct.state_allProd.discount_quotation,
+      avgDiscount: instance_useProduct.state_allProd.discount_avg,
+      subTotal: instance_useProduct.state_allProd.subTotal,
+      salesTax: instance_useProduct.state_allProd.salesTax,
+      total: instance_useProduct.state_allProd.total,
+    },
+  };
+
+  return props_quotationPayInfo;
+};
 
 // =============================================================
 

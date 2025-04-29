@@ -30,21 +30,13 @@ interface Tstate_prodDict {
 }
 
 interface Tstate_quotationPriceInfo {
+  haveTax: boolean;
   discount_quotation: `${number}` | ''; // 總折數
   discount_avg: number; // 平均折數
   tuneTotal: `${number}` | ''; // 小計調整
   subTotal: number; // 小計
   salesTax: number; // 營業稅
   total: number; // 總計
-
-  haveTax: boolean;
-
-  // deliveryLocation: string; // 交貨地點
-  // deliveryDate: Moment; // 交貨日期
-  // paymentMethods: {
-  //   milestone: string;
-  //   totalPaymentRatio: `${number}` | ''; // 0~100 浮點數
-  // }[]; //付款辦法
 }
 
 interface Tref_state {
