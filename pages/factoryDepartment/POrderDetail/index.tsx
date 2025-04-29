@@ -2977,7 +2977,7 @@ export default function POrderDetail() {
                                     </span>
                                 </div>
                                 {/* <div className={scss.body_foot2}> */}
-                                <div>
+                                <div style={{ marginLeft: '20px', marginRight: '20px' }}>
                                     {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
                                         <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
                                             尚未送審
@@ -3037,7 +3037,7 @@ export default function POrderDetail() {
                                     )}
 
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                                <div style={{ marginLeft: '20px', marginRight: '20px', display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
                                     {reviewflowdata2.length > 0 ? (
                                         reviewflowdata2.map((item, index) => (
                                             <div key={index} style={{

@@ -23,6 +23,11 @@ export default function SidePathResearch() {
           erpFeature: devPass,
         },
         {
+          label: '請購列表',
+          path: path + '/PRequisitionListForResearch',
+          erpFeature: devPass,
+        },
+        {
           label: '報價單',
           path: path + '/quotation',
           erpFeature: devPass,
