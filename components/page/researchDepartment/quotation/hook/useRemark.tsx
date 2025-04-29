@@ -6,8 +6,8 @@ type TstateArr = string[];
 type Tinstance_useRemark = ReturnType<typeof useRemark>;
 
 // =====================================================================
-const useRemark = (data: unknown | undefined) => {
-  const defaultState = useDefaultState(data);
+const useRemark = (rawData: unknown | undefined) => {
+  const defaultState = useDefaultState(rawData);
 
   const [stateArr_remark, setStateArr_remark] = useState<TstateArr>([...defaultState.remarkArr]);
   const [stateArr_quotationRange, setStateArr_quotationRange] = useState<TstateArr>([
@@ -94,9 +94,9 @@ const useRemark = (data: unknown | undefined) => {
   };
 };
 
-const useDefaultState = (data: unknown | undefined) => {
+const useDefaultState = (rawData: unknown | undefined) => {
   return useMemo(() => {
-    if (!data) {
+    if (!rawData) {
       return {
         remarkArr: [] as TstateArr,
         quotationRangeArr: [] as TstateArr,
@@ -107,7 +107,7 @@ const useDefaultState = (data: unknown | undefined) => {
       remarkArr: [] as TstateArr,
       quotationRangeArr: [] as TstateArr,
     };
-  }, [data]);
+  }, [rawData]);
 };
 
 export type { Tinstance_useRemark };

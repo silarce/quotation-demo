@@ -23,9 +23,8 @@ import scss from './index.module.scss';
 export default function Edit() {
   const [disabled, setDisabled] = useState(false);
 
-  const return_useProfile = useProfile();
-
-  const instance_useProduct = useProduct({ rawData: undefined });
+  const return_useProfile = useProfile(undefined);
+  const instance_useProduct = useProduct(undefined);
   const instance_useOtherInfo = useOtherInfo(undefined);
   const instance_useRemark = useRemark(undefined);
 

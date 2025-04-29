@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { Moment } from 'moment';
 
@@ -16,8 +16,8 @@ interface Tstate_otherInfo {
 type Tinstance_useOtherInfo = ReturnType<typeof useOtherInfo>;
 
 // =================================================================================
-const useOtherInfo = (data: unknown | undefined) => {
-  const defaultState = useDefaultState(data);
+const useOtherInfo = (rawDarta: unknown | undefined) => {
+  const defaultState = useDefaultState(rawDarta);
   const [state_otherInfo, setState_otherInfo] = useState<Tstate_otherInfo>(defaultState);
 
   // -------------------------------------------------------------------
@@ -69,7 +69,7 @@ const useOtherInfo = (data: unknown | undefined) => {
 
   // -------------------------------------------------------------------
   const reset = () => {
-    setState_otherInfo(defaultState);
+    setState_otherInfo(defaultState());
   };
 
   // -------------------------------------------------------------------
@@ -88,14 +88,14 @@ const useOtherInfo = (data: unknown | undefined) => {
   };
 };
 
-const useDefaultState = (data: unknown | undefined) => {
-  return useMemo(() => {
-    if (!data) {
+const useDefaultState = (rawData: unknown | undefined) => {
+  return useCallback(() => {
+    if (!rawData) {
       return emptyState();
     }
 
     return emptyState();
-  }, [data]);
+  }, [rawData]);
 };
 
 const emptyState = (): Tstate_otherInfo => ({

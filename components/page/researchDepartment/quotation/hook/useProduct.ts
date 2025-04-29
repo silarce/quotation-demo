@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { nanoid } from 'nanoid';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -46,10 +46,10 @@ interface Tref_state {
 
 // =====================================================================
 
-const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
+const useProduct = (rawData: unknown | undefined) => {
   const defaultState_prodDict = useDefault_prodDict(rawData);
   const defaultState_keyArr = useDefault_keyArr(rawData);
-  const defaultState_allProd = useDefault_allProd(undefined);
+  const defaultState_allProd = useDefault_allProd(rawData);
 
   const [state_prodDict, setState_prodDict] = useState<Tstate_prodDict>(defaultState_prodDict);
   const [state_keyArr, setState_KeyArr] = useState<string[]>(defaultState_keyArr);
@@ -456,21 +456,19 @@ const useProduct = ({ rawData }: { rawData: unknown | undefined }) => {
 
 // ====================================================================
 
-const useDefault_prodDict = (data: unknown | undefined) => {
-  const defaultState: Tstate_prodDict = useMemo(() => {
-    if (!data) {
+const useDefault_prodDict = (rawData: unknown | undefined) => {
+  return useCallback(() => {
+    if (!rawData) {
       return {} as Tstate_prodDict;
     }
 
     return {} as Tstate_prodDict;
-  }, [data]);
-
-  return defaultState;
+  }, [rawData]);
 };
 
-const useDefault_allProd = (data: unknown | undefined) => {
-  const defaultState: Tstate_quotationPriceInfo = useMemo(() => {
-    const state: Tstate_quotationPriceInfo = {
+const useDefault_allProd = (rawData: unknown | undefined) => {
+  return useCallback(() => {
+    const empty: Tstate_quotationPriceInfo = {
       discount_quotation: '100',
       discount_avg: 100,
       tuneTotal: '0',
@@ -480,24 +478,22 @@ const useDefault_allProd = (data: unknown | undefined) => {
       haveTax: true,
     };
 
-    return state;
-  }, [data]);
+    if (!rawData) {
+      return empty;
+    }
 
-  return defaultState;
+    return empty;
+  }, [rawData]);
 };
 
-// =============================================================================
-
-const useDefault_keyArr = (data: unknown | undefined) => {
-  const defaultState: string[] = useMemo(() => {
-    if (!data) {
+const useDefault_keyArr = (rawData: unknown | undefined) => {
+  return useCallback(() => {
+    if (!rawData) {
       return [] as string[];
     }
 
     return [] as string[];
-  }, [data]);
-
-  return defaultState;
+  }, [rawData]);
 };
 
 const emptyState_prod = (): Tstate_prod => ({
@@ -608,6 +604,7 @@ interface TdebounceFuc {
   [string: string]: () => void;
 }
 
+// ===========================================================================
 const useDebounceFuc = ({ delay = 300 }: { delay?: number } = {}) => {
   const ref_timeout = useRef<NodeJS.Timeout | null>(null);
   const ref_debounce = useRef<TdebounceFuc>({});

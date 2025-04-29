@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { TcustomerDto } from 'js/api/dtoTypes';
 
@@ -23,8 +23,8 @@ interface Tstate_profile {
 }
 
 // =====================================================================
-const useProfile = () => {
-  const defaultState = useDefault(undefined);
+const useProfile = (rawData: unknown | undefined) => {
+  const defaultState = useDefault(rawData);
 
   const [state_profile, setState_Profile] = useState<Tstate_profile>(defaultState);
 
@@ -56,33 +56,32 @@ const useProfile = () => {
   return { state_profile, setState_Profile, selectCustomer, removeCustomer, editCounty };
 };
 
-const useDefault = (data: unknown | undefined) => {
-  const defaultState: Tstate_profile = useMemo(() => {
-    if (!data) {
-      return { ...emptyState } as typeof emptyState;
+const useDefault = (rawData: unknown | undefined) => {
+  return useCallback(() => {
+    const emptyState: Tstate_profile = {
+      name: '',
+      customer: null,
+      contactPerson: '',
+      contactNumber: '',
+      fax: '',
+      county: '',
+      district: '',
+      address: '',
+
+      quotationNumber: '',
+      quotationPeriod: '',
+      quotationDate: '',
+      isLost: false,
+    };
+
+    if (!rawData) {
+      return emptyState;
     }
 
-    return { ...emptyState } as typeof emptyState;
-  }, [data]);
-
-  return defaultState;
+    return emptyState;
+  }, [rawData]);
 };
 
-const emptyState: Tstate_profile = {
-  name: '',
-  customer: null,
-  contactPerson: '',
-  contactNumber: '',
-  fax: '',
-  county: '',
-  district: '',
-  address: '',
-
-  quotationNumber: '',
-  quotationPeriod: '',
-  quotationDate: '',
-  isLost: false,
-};
 // ===================================================================
 
 type Treturn_useProfile = ReturnType<typeof useProfile>;
