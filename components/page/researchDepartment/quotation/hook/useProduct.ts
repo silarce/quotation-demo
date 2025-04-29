@@ -599,7 +599,7 @@ const calcQuotationPrice = ({
     prodTotal = prodTotal.add(state_prod.totalPrice || 0);
   });
 
-  prodTotal = prodTotal.add(tuneTotal);
+  prodTotal = prodTotal.add(tuneTotal || 0);
 
   const subTotal = prodTotal;
   const salesTax = haveTax ? subTotal.mul(taxRate).toNumber() : 0; // 營業稅
