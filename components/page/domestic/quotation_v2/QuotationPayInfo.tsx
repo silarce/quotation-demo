@@ -158,7 +158,8 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className={scss.avgDiscount}>
             {'平均折數'}
-            <Popover
+
+            {/* <Popover
               content={
                 <>
                   <span>平均折數計算方式</span>
@@ -173,7 +174,7 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
               trigger="hover"
             >
               <InfoCircleOutlined />
-            </Popover>
+            </Popover> */}
           </span>
 
           <div>
@@ -185,7 +186,7 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className={scss.avgDiscount}>
             {'小計調整'}
-            <Popover content={'不可以大於1000，不可以小於-1000'} trigger="hover">
+            <Popover content={'-1000 ～ 1000'} trigger="hover">
               <InfoCircleOutlined />
             </Popover>
           </span>
