@@ -15,6 +15,7 @@ import Table from 'components/page/researchDepartment/quotation/table';
 import { useProfile } from 'components/page/researchDepartment/quotation/hook/useProfile';
 import { useProduct, Tinstance_useProduct } from 'components/page/researchDepartment/quotation/hook/useProduct';
 import { useOtherInfo, Tinstance_useOtherInfo } from 'components/page/researchDepartment/quotation/hook/useOtherInfo';
+import { useRemark, Tinstance_useRemark } from 'components/page/researchDepartment/quotation/hook/useRemark';
 
 // CSS
 import scss from './index.module.scss';
@@ -26,11 +27,14 @@ export default function Edit() {
 
   const instance_useProduct = useProduct({ rawData: undefined });
   const instance_useOtherInfo = useOtherInfo(undefined);
+  const instance_useRemark = useRemark(undefined);
 
   const props_quotationPayInfo = createQuotationPayInfo({
     instance_useProduct,
     instance_useOtherInfo,
   });
+
+  const { props_remark, props_quotationRange } = createProps_quotationRemark(instance_useRemark);
 
   return (
     <SubLayer>
@@ -48,8 +52,8 @@ export default function Edit() {
 
         <div className={scss.summary}>
           <div className={scss.left}>
-            <QuotationRemark {...propsForTest_quotationRemark} label="備註" />
-            <QuotationRemark {...propsForTest_quotationRemark} label="報價範圍" />
+            <QuotationRemark disabled={disabled} {...props_remark} />
+            <QuotationRemark disabled={disabled} {...props_quotationRange} />
           </div>
           {/*  */}
           <div className={scss.right}>
@@ -134,16 +138,58 @@ const createQuotationPayInfo = ({
 
 // =============================================================
 
-const propsForTest_quotationRemark: Tprops_quotationRemark = {
-  disabled: false,
-  label: '備註',
-  onAddClick: () => {},
-  onUpponAddClick: () => {},
-  remarkArr: [
-    {
-      value: 'test',
-      onChange: (v: string) => {},
-      onDelete: () => {},
+const createProps_quotationRemark = (instance_useRemark: Tinstance_useRemark) => {
+  const {
+    stateArr_remark,
+    stateArr_quotationRange,
+    setRemark,
+    setQuotationRange,
+    addRemark,
+    addQuotationRange,
+    removeRemark,
+    removeQuotationRange,
+  } = instance_useRemark;
+
+  const props_remark: Omit<Tprops_quotationRemark, 'disabled'> = {
+    label: '備註',
+    onAddClick: addRemark,
+    onUpponAddClick: () => {
+      alert('開發中');
     },
-  ],
+    remarkArr: stateArr_remark.map((item, index) => {
+      return {
+        value: item,
+        onChange: (value: string) => {
+          setRemark(index, value);
+        },
+        onDelete: () => {
+          removeRemark(index);
+        },
+      };
+    }),
+  };
+
+  const props_quotationRange: Omit<Tprops_quotationRemark, 'disabled'> = {
+    label: '報價範圍',
+    onAddClick: addQuotationRange,
+    onUpponAddClick: () => {
+      alert('開發中');
+    },
+    remarkArr: stateArr_quotationRange.map((item, index) => {
+      return {
+        value: item,
+        onChange: (value: string) => {
+          setQuotationRange(index, value);
+        },
+        onDelete: () => {
+          removeQuotationRange(index);
+        },
+      };
+    }),
+  };
+
+  return {
+    props_remark,
+    props_quotationRange,
+  };
 };
