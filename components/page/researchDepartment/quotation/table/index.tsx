@@ -178,18 +178,33 @@ export default function Table({
 
 // =====================================================================
 
-type Tconfig = Tprops_quotationRow_dndThead['configDict'] &
-  Record<
-    string,
-    {
-      render: (props: {
-        //
-        disabled: boolean;
-        index: number;
-        stateKit: TstateKit;
-      }) => React.ReactNode;
-    }
-  >;
+type Tconfig = Record<
+  string,
+  {
+    label: React.ReactNode;
+    style?: React.CSSProperties;
+    render: (props: {
+      //
+      disabled: boolean;
+      index: number;
+      stateKit: TstateKit;
+    }) => React.ReactNode;
+  }
+>;
+// type Tconfig = NonNullable<
+//   Tprops_quotationRow_dndThead['configDict'] &
+//     Record<
+//       string,
+//       {
+//         render: (props: {
+//           //
+//           disabled: boolean;
+//           index: number;
+//           stateKit: TstateKit;
+//         }) => React.ReactNode;
+//       }
+//     >
+// >;
 
 const config = {
   panel: {
