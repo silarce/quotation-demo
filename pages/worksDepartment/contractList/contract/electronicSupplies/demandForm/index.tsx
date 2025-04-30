@@ -1,0 +1,103 @@
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useRouter } from 'next/router';
+import classNames from 'classnames';
+
+import moment from 'moment';
+
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+
+// component
+// import SupplyTable, {
+//   TimperativeHandle,
+//   useStateToGroup,
+// } from 'components/page/worksDepartment/electronicSupplies/ui/supplyTable';
+// import DefaultItemSelector from 'components/page/worksDepartment/electronicSupplies/defaultItemSelector';
+
+// gear
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import Row, { Cell } from 'components/global/gear/table/row';
+
+// css
+import scss from './index.module.scss';
+
+// import { useApiGetProdDoorModels } from 'js/api/api_product';
+import { useGetContract_id } from 'js/api/api_quotation';
+
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
+
+// ==================================================================
+type Tquery = {
+  contractId: string | undefined;
+  requirementRecordId: string | undefined;
+};
+
+// ==================================================================
+
+// MARK: START
+
+export default function EditRequirementRecord() {
+  const router = useRouter();
+  const { contractId, requirementRecordId } = router.query as Tquery;
+  const isNew = !requirementRecordId;
+
+  // ------------------------------------------------------------------
+  const [disabled, setDisabled] = useState(!isNew);
+
+  // ------------------------------------------------------------------
+
+  const {
+    data: data_contract,
+    update: update_contract,
+    contactThatSkipContract,
+    isFetching: isFetching_contract,
+  } = useGetContract_id(contractId, {
+    customPopulate: ['engineeringContact'],
+  });
+
+  const { formatOptions } = useGlobal_doorModel();
+
+  // const engineeringContact = data_contract?.engineeringContact;
+
+  // ------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    update_contract();
+  }, [contractId]);
+
+  // ------------------------------------------------------------------
+
+  // MARK: RENDER
+
+  return (
+    <SubLayer isLoading_subLayer={isFetching_contract}>
+      <PageHeader
+        showReturnBtn={disabled}
+        panelList={[]}
+        contractNumber={data_contract?.contractNumber ?? '---'}
+        contactThatSkipContract={contactThatSkipContract}
+      />
+
+      <div>
+        <div></div>
+      </div>
+    </SubLayer>
+  );
+}
+
+// MARK: END
+
+// ==================================================================
+
+interface Tconfig {
+  label: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  render: () => React.ReactNode;
+}
