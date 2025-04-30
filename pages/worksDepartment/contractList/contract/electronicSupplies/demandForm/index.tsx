@@ -9,6 +9,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 
 // component
+import Table_main from 'components/page/worksDepartment/electronicSupplies/demandForm/table_main';
 // import SupplyTable, {
 //   TimperativeHandle,
 //   useStateToGroup,
@@ -29,6 +30,8 @@ import scss from './index.module.scss';
 import { useGetContract_id } from 'js/api/api_quotation';
 
 import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
+
+import { useDemandForm } from 'components/page/worksDepartment/electronicSupplies/demandForm/useDemandForm';
 
 // ==================================================================
 type Tquery = {
@@ -65,6 +68,11 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
+  const instance_useDemandForm = useDemandForm(undefined);
+  const { stateArr, checkedStateArr } = instance_useDemandForm;
+
+  // ------------------------------------------------------------------
+
   // region useEffect
 
   useEffect(() => {
@@ -76,7 +84,10 @@ export default function EditRequirementRecord() {
   // MARK: RENDER
 
   return (
-    <SubLayer isLoading_subLayer={isFetching_contract}>
+    <SubLayer
+      isLoading_subLayer={isFetching_contract}
+      //  bodyClassName={scss.body}
+    >
       <PageHeader
         showReturnBtn={disabled}
         panelList={[]}
@@ -84,8 +95,16 @@ export default function EditRequirementRecord() {
         contactThatSkipContract={contactThatSkipContract}
       />
 
-      <div>
-        <div></div>
+      <div className={scss.main}>
+        <div>
+          <Table_main disabled={disabled} instance_useDemandForm={instance_useDemandForm} />
+          <div className={scss.info}>
+            <span>共 {stateArr.length} 項</span>
+            <span>已開{0}</span>
+            <span>已選 {checkedStateArr.length} 項</span>
+            <SquareBtn sharp="mini">產生明細</SquareBtn>
+          </div>
+        </div>
       </div>
     </SubLayer>
   );
@@ -94,10 +113,3 @@ export default function EditRequirementRecord() {
 // MARK: END
 
 // ==================================================================
-
-interface Tconfig {
-  label: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  render: () => React.ReactNode;
-}

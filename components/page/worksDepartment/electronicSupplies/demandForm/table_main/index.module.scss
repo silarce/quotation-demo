@@ -1,0 +1,29 @@
+.table {
+  width: 100%;
+  overflow: auto;
+  border: solid 1px theme("colors.border");
+  height: 300px;
+}
+
+.row {
+  padding-right: 10px;
+
+  &:first-child {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  // &:last-child {
+  //   border-bottom: 0;
+  // }
+  > *:nth-child(1) {
+    position: sticky;
+    left: 0;
+    padding-left: 10px;
+  }
+}
+
+.cell.cell.cell {
+  justify-content: flex-start;
+}
