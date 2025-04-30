@@ -3,10 +3,11 @@
   > *:nth-last-of-type(2) {
     border-bottom: 0;
   }
-  > div {
-    gap: 0;
-    // padding: 0 10px;
-  }
+}
+
+.row.row {
+  gap: 0;
+  
 }
 
 .thead {
@@ -20,12 +21,12 @@
   bottom: 0;
   border-top: solid 1px theme("colors.border");
   > div {
-    background-color: theme("colors.bgc01");
+    // background-color: theme("colors.bgc01");
     &:nth-last-of-type(1) {
-      background-color: inherit;
+      // background-color: inherit;
     }
     &:nth-last-of-type(2) {
-      border-right: solid 1px theme("colors.border");
+      // border-right: solid 1px theme("colors.border");
       border-left: solid 1px theme("colors.border");
     }
   }
