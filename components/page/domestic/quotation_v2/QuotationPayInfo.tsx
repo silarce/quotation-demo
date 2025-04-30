@@ -43,35 +43,31 @@ interface Tform_pay {
     onChange?: (value: boolean) => void;
     disabled?: boolean;
   };
-  // 總折數
-  discountRate: {
-    value: string;
-    // onChange?: (value: TnumberStr) => void;
-    // disabled?: boolean;
-  };
+
   // 小計調整
   tuneTotal: {
     value: string;
     onChange?: (value: TnumberStr) => void;
   };
   // 幣別
-  currency: {
+  currency?: {
     value: string;
     onChange?: (value: Tcurrency) => void;
     disabled?: boolean;
   };
   // 匯率
-  exchangeRate: {
+  exchangeRate?: {
     value: TnumberStr;
     onChange?: (value: TnumberStr) => void;
     disabled?: boolean;
   };
 
-  avgDiscount: string | number; // 平均折數
-  subTotal: string | number; // 小計
-  salesTax: string | number; // 營業稅
-  total: string | number; // 總計
-  foreignTotal: string | number; // 外幣計價
+  discountRate: React.ReactNode; // 總折數
+  avgDiscount: React.ReactNode; // 平均折數
+  subTotal: React.ReactNode; // 小計
+  salesTax: React.ReactNode; // 營業稅
+  total: React.ReactNode; // 總計
+  foreignTotal?: string | number; // 外幣計價
 }
 
 interface Tform_info {
@@ -94,7 +90,6 @@ interface Tform_info {
 
 interface Tprops_quotationPayInfo {
   disabled: boolean;
-  disabled_taxAndCurrency: boolean;
   form: Tform_pay & Tform_info;
 }
 
@@ -103,7 +98,7 @@ export type { Tprops_quotationPayInfo };
 // ========================================================================
 
 // MARK: START
-export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, form }: Tprops_quotationPayInfo) {
+export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPayInfo) {
   const {
     haveTax,
     discountRate,
@@ -133,7 +128,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
           className={classNames('m-auto mr-0 mb-5', !haveTax && 'invisible')}
           wrapperStyle={{ width: '97px' }}
           showBaseline="invisible"
-          disabled={disabled || disabled_taxAndCurrency}
+          disabled={disabled || haveTax.disabled}
           checkBoxProps_v2={{
             props: {
               value: haveTax.value ? ['haveTax'] : [],
@@ -155,24 +150,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
           <span className="relative">{'總折數'}</span>
 
           <div>
-            <input
-              type="number"
-              onWheel={(e) => {
-                e.currentTarget.blur();
-              }}
-              className={classNames(
-                //
-                'bg-transparent',
-                // (disabled || discountRate.disabled) && scss.noBaseLine
-                scss.noBaseLine
-              )}
-              value={discountRate.value}
-              // onChange={(e) => {
-              //   discountRate.onChange?.(e.target.value as `${number}` | '');
-              // }}
-              // readOnly={disabled || discountRate.disabled}
-              readOnly={true}
-            />
+            {discountRate}
             <span>%</span>
           </div>
         </div>
@@ -180,7 +158,8 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className={scss.avgDiscount}>
             {'平均折數'}
-            <Popover
+
+            {/* <Popover
               content={
                 <>
                   <span>平均折數計算方式</span>
@@ -195,7 +174,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
               trigger="hover"
             >
               <InfoCircleOutlined />
-            </Popover>
+            </Popover> */}
           </span>
 
           <div>
@@ -207,7 +186,7 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className={scss.avgDiscount}>
             {'小計調整'}
-            <Popover content={'不可以大於1000，不可以小於-1000'} trigger="hover">
+            <Popover content={'-1000 ～ 1000'} trigger="hover">
               <InfoCircleOutlined />
             </Popover>
           </span>
@@ -218,19 +197,16 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
               min={-1000}
               max={1000}
               step={0}
-              className={classNames(
-                //
-                'bg-transparent',
-                disabled && scss.noBaseLine
-              )}
+              className={classNames('bg-transparent', disabled && scss.noBaseLine)}
               readOnly={disabled}
               value={disabled ? Number(tuneTotal.value || 0).toLocaleString() : tuneTotal.value}
               onChange={(e) => {
-                if (!e.target.validity.valid) {
+                const value = e.target.value;
+
+                if (!e.target.validity.valid && value !== '') {
                   return;
                 }
 
-                const value = e.target.value;
                 tuneTotal.onChange?.(value as `${number}` | '');
               }}
             />
@@ -239,95 +215,84 @@ export default function QuotationPayInfo({ disabled, disabled_taxAndCurrency, fo
 
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">小計</span>
-          <div>
-            <input
-              type="text"
-              className={classNames('bg-transparent', scss.noBaseLine)}
-              value={subTotal}
-              readOnly={true}
-            />
-          </div>
+          <div>{subTotal}</div>
         </div>
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">營業稅</span>
-          <div>
-            <input
-              type="text"
-              className={classNames('bg-transparent', scss.noBaseLine)}
-              value={salesTax}
-              readOnly={true}
-            />
-          </div>
+          <div>{salesTax}</div>
         </div>
         <div className={classNames(scss.avgDiscount, 'relative')}>
           <span className="relative">總計</span>
-          <div>
-            <input
-              type="text"
-              className={classNames('bg-transparent', scss.noBaseLine)}
-              value={total}
-              readOnly={true}
-            />
-          </div>
+          <div>{total}</div>
         </div>
 
-        <hr />
-        <div className={classNames(scss.avgDiscount, 'relative')}>
-          <span className="relative">{'幣別'}</span>
-          <div>
-            <InputSel
-              wrapperStyle={{ width: 150 }}
-              showBaseline="auto"
-              disabled={disabled || currency.disabled || disabled_taxAndCurrency}
-              selectProps={{
-                props: {
-                  menuPortalTarget: undefined,
-                  placeholder: '',
-                  value: { value: currency.value, label: currency.value },
-                  options: optionsCreator_currency(),
-                  onChange(option) {
-                    if (option) {
-                      const value = option.value as Tcurrency;
-                      currency.onChange?.(value);
-                    }
-                  },
-                  classNames: {
-                    singleValue: () => 'text-right',
-                    option: () => 'text-right',
-                  },
-                },
-              }}
-            />
-          </div>
-        </div>
-        <div className={classNames(scss.avgDiscount, 'relative')}>
-          <span className="relative">{'匯率(外幣兌新台幣)'}</span>
-          <div>
-            <input
-              type="number"
-              onWheel={(e) => e.currentTarget.blur()}
-              className={classNames('bg-transparent', (disabled || exchangeRate.disabled) && scss.noBaseLine)}
-              value={exchangeRate.value}
-              onChange={(e) => exchangeRate.onChange?.(e.target.value as TnumberStr)}
-              readOnly={disabled || exchangeRate.disabled || disabled_taxAndCurrency}
-            />
-          </div>
-        </div>
-        <div className={classNames(scss.avgDiscount, 'relative')}>
-          <span className="relative">
-            {'外幣計價 '}
-            <Popover content={'外幣計價 = 總計 / 匯率'} trigger="hover">
-              <InfoCircleOutlined />
-            </Popover>
-          </span>
+        <hr className={classNames(scss.grayHr, !currency && !exchangeRate && !foreignTotal && 'hidden')} />
 
-          <div>
-            <input className={classNames('bg-transparent', scss.noBaseLine)} value={foreignTotal} readOnly={true} />
+        {currency && (
+          <div className={classNames(scss.avgDiscount, 'relative')}>
+            <span className="relative">{'幣別'}</span>
+            <div>
+              <InputSel
+                wrapperStyle={{ width: 150 }}
+                showBaseline="auto"
+                disabled={disabled || currency.disabled}
+                selectProps={{
+                  props: {
+                    menuPortalTarget: undefined,
+                    placeholder: '',
+                    value: { value: currency.value, label: currency.value },
+                    options: optionsCreator_currency(),
+                    onChange(option) {
+                      if (option) {
+                        const value = option.value as Tcurrency;
+                        currency.onChange?.(value);
+                      }
+                    },
+                    classNames: {
+                      singleValue: () => 'text-right',
+                      option: () => 'text-right',
+                    },
+                  },
+                }}
+              />
+            </div>
           </div>
-        </div>
+        )}
+
+        {exchangeRate && (
+          <div className={classNames(scss.avgDiscount, 'relative')}>
+            <span className="relative">{'匯率(外幣兌新台幣)'}</span>
+            <div>
+              <input
+                type="number"
+                onWheel={(e) => e.currentTarget.blur()}
+                className={classNames('bg-transparent', (disabled || exchangeRate.disabled) && scss.noBaseLine)}
+                value={exchangeRate.value}
+                onChange={(e) => exchangeRate.onChange?.(e.target.value as TnumberStr)}
+                readOnly={disabled || exchangeRate.disabled}
+              />
+            </div>
+          </div>
+        )}
+
+        {foreignTotal !== undefined && (
+          <div className={classNames(scss.avgDiscount, 'relative')}>
+            <span className="relative">
+              {'外幣計價 '}
+              <Popover content={'外幣計價 = 總計 / 匯率'} trigger="hover">
+                <InfoCircleOutlined />
+              </Popover>
+            </span>
+
+            <div>
+              <input className={classNames('bg-transparent', scss.noBaseLine)} value={foreignTotal} readOnly={true} />
+            </div>
+          </div>
+        )}
       </div>
 
-      <hr className={scss.grayHr} />
+      <hr className={classNames(scss.grayHr)} />
+
       <div>
         <div className={scss.inputBox01}>
           <span>交貨地點</span>

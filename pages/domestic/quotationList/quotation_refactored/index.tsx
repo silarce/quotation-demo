@@ -875,6 +875,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     state_quotationDiscount,
     disabled,
     avgDiscount,
+    isAttach,
   });
 
   // MARK:usePanel
@@ -1068,7 +1069,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           {/* 付款資訊 */}
           <div className={scss.right}>
             {/* <div className="w-[400px] border border-border">付款資訊</div> */}
-            <QuotationPayInfo disabled={disabled} disabled_taxAndCurrency={isAttach} form={props_payInfo} />
+            <QuotationPayInfo disabled={disabled} form={props_payInfo} />
           </div>
         </div>
         <SignatureBar

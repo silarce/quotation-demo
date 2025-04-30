@@ -350,3 +350,5 @@ export {
   //
   arrayMove,
 };
+
+export type { Tprops_quotationRow_dndThead };
