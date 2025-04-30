@@ -50,6 +50,7 @@ interface Tref_state {
 type Tinstance_useProduct = ReturnType<typeof useProduct>;
 // =====================================================================
 
+// MARK: START
 const useProduct = (rawData: unknown | undefined) => {
   const defaultState_prodDict = useDefault_prodDict(rawData);
   const defaultState_keyArr = useDefault_keyArr(rawData);
@@ -191,6 +192,8 @@ const useProduct = (rawData: unknown | undefined) => {
     setDiscount_all,
     setTuneTotal,
     setHaveTax,
+
+    setState_KeyArr,
 
     reset,
   };
@@ -354,10 +357,12 @@ const calcQuotationPrice = ({
 };
 
 // endregion
-
+//
+//
+//
 // ===========================================================================
 
-// MARK:factory_createStateKit
+// region:factory_createStateKit
 const factory_createStateKit = (
   key: string,
   {
@@ -582,7 +587,12 @@ const factory_createStateKit = (
   };
 };
 
-// MARK:factory_stateKit_prodDict
+// endregion
+
+//
+//
+//
+// region:factory_stateKit_prodDict
 const factory_stateKit_prodDict = ({
   setState_prodDict,
   setState_quotationPriceInfo,
@@ -661,6 +671,8 @@ const factory_stateKit_prodDict = ({
     setHaveTax,
   };
 };
+
+// endregion
 
 // ===========================================================================
 export type { Tinstance_useProduct };

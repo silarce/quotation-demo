@@ -1,25 +1,22 @@
-import { useState } from 'react';
-
 import { Image } from 'antd';
 import DataEntry, { Input, Select } from 'components/global/gear/dataEntry';
-
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 // component
 import {
-  Tprops_cell,
-  Tprops_quotationRow_dndThead,
+  // Tprops_cell,
+  // Tprops_quotationRow_dndThead,
   //
-  QuotationRow,
+  // QuotationRow,
   Cell,
   QuotationRow_dndThead,
   QuotationRow_dnd,
-  Table_dnd,
-  Panel_iterativeProd_right_thead,
-  Panel_iterativeProd_right,
-  Panel_prod,
-  Panel_iterativeProd,
-  Panel_accessory,
+  // Table_dnd,
+  // Panel_iterativeProd_right_thead,
+  // Panel_iterativeProd_right,
+  // Panel_prod,
+  // Panel_iterativeProd,
+  // Panel_accessory,
 } from 'components/page/domestic/quotation_v2/quotationRow';
 
 import type { Tinstance_useProduct } from '../hook/useProduct';
@@ -27,6 +24,11 @@ import type { Tinstance_useProduct } from '../hook/useProduct';
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 
 import scss from './index.module.scss';
+
+// DND
+import { DndContext } from '@dnd-kit/core';
+import { arrayMove, SortableContext } from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // ========================================================
 
@@ -49,6 +51,8 @@ export default function Table({
     addProd,
     state_quotationPriceInfo: state_allProd,
     setDiscount_all,
+
+    setState_KeyArr,
   } = instance_useProduct;
 
   return (
@@ -84,7 +88,7 @@ export default function Table({
           disabled={true}
           keyArr={keyArr}
           configDict={config}
-          onDragEnd={() => {}}
+          onDragEnd={(e) => {}}
           dragHandleInvisible={true}
           left={
             <>
@@ -117,19 +121,66 @@ export default function Table({
           }}
         />
 
-        {state_keyArr.map((key, index) => {
-          const stateKit = createStateKit(key);
+        <DndContext
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={(e) => {
+            const { active, over } = e;
 
-          return (
-            <QuotationRow_dnd
-              className={scss.row}
-              key={key}
-              id={key}
-              index={index}
-              left={
-                <>
-                  {keyArr_left.map((key) => {
+            if (!over) {
+              return;
+            }
+
+            const activeIndex = active.data.current!.index as number;
+            const overIndex = over.data.current!.index as number;
+
+            setState_KeyArr(arrayMove(state_keyArr, activeIndex, overIndex));
+          }}
+        >
+          <SortableContext items={state_keyArr}>
+            {state_keyArr.map((key, index) => {
+              const stateKit = createStateKit(key);
+
+              return (
+                <QuotationRow_dnd
+                  className={scss.row}
+                  key={key}
+                  id={key}
+                  index={index}
+                  left={
+                    <>
+                      {keyArr_left.map((key) => {
+                        const { style, render } = config[key];
+                        const node = render({ disabled, index, stateKit });
+
+                        return (
+                          <Cell key={key} style={style}>
+                            {node}
+                          </Cell>
+                        );
+                      })}
+                    </>
+                  }
+                  right={
+                    <>
+                      {keyArr_right.map((key) => {
+                        const { style, render } = config[key];
+                        const node = render({ disabled, index, stateKit });
+
+                        return (
+                          <Cell key={key} style={style}>
+                            {node}
+                          </Cell>
+                        );
+                      })}
+                    </>
+                  }
+                  props_right={{
+                    style: { border: 'none', backgroundColor: 'inherit' },
+                  }}
+                >
+                  {keyArr.map((key) => {
                     const { style, render } = config[key];
+
                     const node = render({ disabled, index, stateKit });
 
                     return (
@@ -138,40 +189,11 @@ export default function Table({
                       </Cell>
                     );
                   })}
-                </>
-              }
-              right={
-                <>
-                  {keyArr_right.map((key) => {
-                    const { style, render } = config[key];
-                    const node = render({ disabled, index, stateKit });
-
-                    return (
-                      <Cell key={key} style={style}>
-                        {node}
-                      </Cell>
-                    );
-                  })}
-                </>
-              }
-              props_right={{
-                style: { border: 'none', backgroundColor: 'inherit' },
-              }}
-            >
-              {keyArr.map((key) => {
-                const { style, render } = config[key];
-
-                const node = render({ disabled, index, stateKit });
-
-                return (
-                  <Cell key={key} style={style}>
-                    {node}
-                  </Cell>
-                );
-              })}
-            </QuotationRow_dnd>
-          );
-        })}
+                </QuotationRow_dnd>
+              );
+            })}
+          </SortableContext>
+        </DndContext>
       </div>
       <div className="p-2 border border-t-0 border-border ">
         <SquareBtn sharp="mini" onClick={addProd}>
@@ -189,28 +211,9 @@ type Tconfig = Record<
   {
     label: React.ReactNode;
     style?: React.CSSProperties;
-    render: (props: {
-      //
-      disabled: boolean;
-      index: number;
-      stateKit: TstateKit;
-    }) => React.ReactNode;
+    render: (props: { disabled: boolean; index: number; stateKit: TstateKit }) => React.ReactNode;
   }
 >;
-// type Tconfig = NonNullable<
-//   Tprops_quotationRow_dndThead['configDict'] &
-//     Record<
-//       string,
-//       {
-//         render: (props: {
-//           //
-//           disabled: boolean;
-//           index: number;
-//           stateKit: TstateKit;
-//         }) => React.ReactNode;
-//       }
-//     >
-// >;
 
 const config = {
   panel: {
