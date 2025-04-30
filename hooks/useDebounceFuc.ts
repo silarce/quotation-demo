@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface TdebounceFuc {
   [string: string]: () => void;
@@ -8,7 +8,11 @@ const useDebounceFuc = ({ delay = 300 }: { delay?: number } = {}) => {
   const ref_timeout = useRef<NodeJS.Timeout | null>(null);
   const ref_debounce = useRef<TdebounceFuc>({});
 
-  const addDebounce = (dict: TdebounceFuc, { coverDelay }: { coverDelay?: number } = {}) => {
+  const [isDebouncing, setIsDebouncing] = useState(false);
+
+  const addDebounce = (dict: TdebounceFuc, props: { delay?: number } = {}) => {
+    setIsDebouncing(true);
+
     ref_timeout.current && clearTimeout(ref_timeout.current);
     ref_debounce.current = { ...ref_debounce.current, ...dict };
 
@@ -18,7 +22,8 @@ const useDebounceFuc = ({ delay = 300 }: { delay?: number } = {}) => {
       });
 
       ref_debounce.current = {};
-    }, coverDelay ?? delay);
+      setIsDebouncing(false);
+    }, props.delay ?? delay);
   };
 
   const clearDebounce = () => {
@@ -33,7 +38,7 @@ const useDebounceFuc = ({ delay = 300 }: { delay?: number } = {}) => {
     };
   }, []);
 
-  return { addDebounce, clearDebounce };
+  return { isDebouncing, addDebounce, clearDebounce };
 };
 
 export { useDebounceFuc };
