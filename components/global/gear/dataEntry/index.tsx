@@ -248,7 +248,7 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
       disabled={disabled}
       allowClear={true}
       suffixIcon={hideSuffixIconWhenDisabled && disabled ? null : suffixIcon}
-      className={classNames(scss.antdSelect, scss.plus, scss.plus2, className)}
+      className={classNames(scss.antdSelect, className)}
       {...props}
     />
   );

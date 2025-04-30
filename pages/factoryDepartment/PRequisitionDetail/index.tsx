@@ -57,7 +57,7 @@ export default function PRequisitionDetail() {
     //#region ===========【頁面參數】
     const [pagename, setPagename] = useState<string>("請購")
     const [statusarea, setStatusarea] = useState<boolean>(true)
-    const [excelopen, setExcelopen] = useState<boolean>(false)
+    const [excelopen, setExcelopen] = useState<boolean>(true)
     const [printopen, setPrintopen] = useState<boolean>(true)
     //#endregion
     //#region ===========【路由參數】

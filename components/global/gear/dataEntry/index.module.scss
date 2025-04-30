@@ -83,13 +83,11 @@
   }
 }
 
-.antdSelect,
-.antdSelect.plus,
-.antdSelect.plus.plus2 {
+.antdSelect.antdSelect.antdSelect.antdSelect {
   display: flex;
   font-size: inherit;
   :global(.ant-select-selector) {
-    // background-color: transparent;
+    background-color: transparent;
     padding: unset;
     border: unset;
     height: unset;
