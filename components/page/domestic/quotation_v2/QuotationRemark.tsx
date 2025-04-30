@@ -64,3 +64,5 @@ export default function QuotationRemark({ disabled, label, onAddClick, onUpponAd
     </div>
   );
 }
+
+export type { Tprops as Tprops_quotationRemark };
