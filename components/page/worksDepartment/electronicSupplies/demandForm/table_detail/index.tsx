@@ -111,7 +111,7 @@ const config: Tconfig = {
   },
   quantity: {
     label: '數量',
-    style: { width: 100 },
+    style: { width: 40 },
     render({ disabled, state, stateKit }) {
       return (
         <DataEntry showBorder={!disabled}>
@@ -140,7 +140,7 @@ const config: Tconfig = {
   },
   note: {
     label: '備註',
-    style: { width: 200 },
+    style: { width: 400 },
     render({ state }) {
       return state.note;
     },
