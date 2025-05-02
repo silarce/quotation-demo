@@ -122,42 +122,42 @@ const config: Tconfig = {
   },
   fullWidth: {
     label: 'L',
-    style: { width: 100 },
+    style: { width: 60 },
     render({ stateKit: { state } }) {
       return state.fullWidth;
     },
   },
   WG: {
     label: 'WG',
-    style: { width: 100 },
+    style: { width: 60 },
     render({ stateKit: { state } }) {
       return state.WG;
     },
   },
   height: {
     label: 'h',
-    style: { width: 100 },
+    style: { width: 60 },
     render({ stateKit: { state } }) {
       return state.height;
     },
   },
   volume: {
     label: '才數',
-    style: { width: 100 },
+    style: { width: 60 },
     render({ stateKit: { state } }) {
       return state.volume;
     },
   },
   motor: {
     label: '馬達',
-    style: { width: 100 },
+    style: { width: 50 },
     render({ stateKit: { state } }) {
       return state.motor;
     },
   },
   horsepower: {
     label: '馬力數',
-    style: { width: 100 },
+    style: { width: 50 },
     render({ stateKit: { state } }) {
       return state.horsepower;
     },
@@ -171,56 +171,56 @@ const config: Tconfig = {
   },
   antiTyphoonBaseLock: {
     label: '防颱鎖固',
-    style: { width: 100 },
+    style: { width: 70 },
     render({ stateKit: { state } }) {
       return state.antiTyphoonBaseLock;
     },
   },
   obstacleSensor: {
     label: '障感器',
-    style: { width: 100 },
+    style: { width: 70, justifyContent: 'center' },
     render({ stateKit: { state } }) {
       return <Checkbox checked={state.obstacleSensor} disabled={true} />;
     },
   },
   infrared: {
     label: '紅外線',
-    style: { width: 100 },
+    style: { width: 70, justifyContent: 'center' },
     render({ stateKit: { state } }) {
       return <Checkbox checked={state.infrared} disabled={true} />;
     },
   },
   remoteControl: {
     label: '遙控器',
-    style: { width: 100 },
+    style: { width: 70, justifyContent: 'center' },
     render({ stateKit: { state } }) {
       return <Checkbox checked={state.remoteControl} disabled={true} />;
     },
   },
   smartSwitch: {
     label: '智慧開關',
-    style: { width: 100 },
+    style: { width: 70, justifyContent: 'center' },
     render({ stateKit: { state } }) {
       return <Checkbox checked={state.smartSwitch} disabled={true} />;
     },
   },
   antiTyphoonColumn: {
     label: '防颱中柱',
-    style: { width: 100 },
+    style: { width: 70, justifyContent: 'center' },
     render({ stateKit: { state } }) {
       return <Checkbox checked={state.antiTyphoonColumn} disabled={true} />;
     },
   },
   ul: {
     label: 'UL熔金體',
-    style: { width: 100 },
+    style: { width: 70, justifyContent: 'center' },
     render({ stateKit: { state } }) {
       return <Checkbox checked={state.ul} disabled={true} />;
     },
   },
   wheel: {
     label: '檔輪',
-    style: { width: 100 },
+    style: { width: 70, justifyContent: 'center' },
     render({ stateKit: { state } }) {
       return <Checkbox checked={state.wheel} disabled={true} />;
     },
