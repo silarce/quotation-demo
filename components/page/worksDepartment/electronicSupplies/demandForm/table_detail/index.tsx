@@ -7,6 +7,7 @@ import DataEntry, { Input } from 'components/global/gear/dataEntry';
 import { useDemandFormDetail, Tstate, TstateKit } from '../useDemandFormDetail';
 
 import scss from './index.module.scss';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 // =========================================================================
 
@@ -43,36 +44,44 @@ export default function Table_detail() {
   const { stateDict, createStateKit, reset } = useDemandFormDetail(undefined);
 
   return (
-    <div className={scss.table}>
-      <Row thead={true}>
-        {keyArr.map((key) => {
-          const { label, style, className } = config[key];
+    <div className="m-5">
+      <div className="mb-2">
+        {disabled && <SquareBtn sharp="mini">編輯</SquareBtn>}
+        {!disabled && <SquareBtn sharp="mini">上傳</SquareBtn>}
+      </div>
+
+      {/*  */}
+      <div className={scss.table}>
+        <Row thead={true}>
+          {keyArr.map((key) => {
+            const { label, style, className } = config[key];
+
+            return (
+              <Cell key={key} style={style} className={className}>
+                {label}
+              </Cell>
+            );
+          })}
+        </Row>
+
+        {Object.entries(stateDict).map(([key, state]) => {
+          const stateKit = createStateKit(key);
 
           return (
-            <Cell key={key} style={style} className={className}>
-              {label}
-            </Cell>
+            <Row key={key} thead={false}>
+              {keyArr.map((key) => {
+                const { render, style, className } = config[key];
+
+                return (
+                  <Cell key={key} style={style} className={className}>
+                    {render({ disabled, state, stateKit })}
+                  </Cell>
+                );
+              })}
+            </Row>
           );
         })}
-      </Row>
-
-      {Object.entries(stateDict).map(([key, state]) => {
-        const stateKit = createStateKit(key);
-
-        return (
-          <Row key={key} thead={false}>
-            {keyArr.map((key) => {
-              const { render, style, className } = config[key];
-
-              return (
-                <Cell key={key} style={style} className={className}>
-                  {render({ disabled, state, stateKit })}
-                </Cell>
-              );
-            })}
-          </Row>
-        );
-      })}
+      </div>
     </div>
   );
 }

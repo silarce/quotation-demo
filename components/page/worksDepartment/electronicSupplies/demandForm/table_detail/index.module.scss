@@ -1,8 +1,8 @@
 .table {
   width: 100%;
-  // overflow: auto;
   border: solid 1px theme("colors.border");
-  // height: 580px;
+  height: 580px;
+  overflow: auto;
 }
 
 .row {
@@ -23,4 +23,7 @@
 
 .cell.cell.cell {
   justify-content: flex-start;
+  white-space: wrap;
+  word-break: break-word;
+  align-items: flex-end;
 }
