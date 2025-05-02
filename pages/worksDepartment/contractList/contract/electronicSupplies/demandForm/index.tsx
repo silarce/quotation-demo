@@ -1,8 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import classNames from 'classnames';
-
-import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -31,7 +28,7 @@ import scss from './index.module.scss';
 // import { useApiGetProdDoorModels } from 'js/api/api_product';
 import { useGetContract_id } from 'js/api/api_quotation';
 
-import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
+// import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import { useDemandForm } from 'components/page/worksDepartment/electronicSupplies/demandForm/useDemandForm';
 
@@ -64,7 +61,7 @@ export default function EditRequirementRecord() {
     customPopulate: ['engineeringContact'],
   });
 
-  const { formatOptions } = useGlobal_doorModel();
+  // const { formatOptions } = useGlobal_doorModel();
 
   // const engineeringContact = data_contract?.engineeringContact;
 
