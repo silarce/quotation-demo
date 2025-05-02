@@ -289,6 +289,7 @@ export const useGetQuotation_id_2 = (
 
     try {
       const res = await apiGetQuotation_id(id, theParams);
+      res.latestContent.others = _.sortBy(res.latestContent.others, 'item');
 
       if (getProductItems) {
         const prodIdArr = res.latestContent.products.map((prod) => prod.id);
@@ -442,6 +443,7 @@ export const useGetQuotationContent_id = (id: string | undefined) => {
 
     try {
       const newRes = await apiGetQuotationContent_Id(id);
+      newRes.others = _.sortBy(newRes.others, 'item');
 
       if (newRes) {
         setRes(newRes);
@@ -497,6 +499,7 @@ export const useGetQuotationContent_id_2 = (
     try {
       setIsLoading(true);
       const newRes = await apiGetQuotationContent_Id_2(id, theParams);
+      newRes.others = _.sortBy(newRes.others, 'item');
 
       if (newRes) {
         setRes(newRes);
@@ -2099,6 +2102,8 @@ export const useGetQuotation_id_3 = (
             quotation_addition.designatedContent = content;
           }
         }
+
+        quotation_addition.latestContent.others = _.sortBy(quotation_addition.latestContent.others, 'item');
 
         return quotation_addition;
       })
