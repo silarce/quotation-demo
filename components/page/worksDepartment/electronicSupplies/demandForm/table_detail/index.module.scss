@@ -1,8 +1,8 @@
 .table {
   width: 100%;
-  overflow: auto;
+  // overflow: auto;
   border: solid 1px theme("colors.border");
-  height: 580px;
+  // height: 580px;
 }
 
 .row {
@@ -14,9 +14,6 @@
     z-index: 1;
   }
 
-  // &:last-child {
-  //   border-bottom: 0;
-  // }
   > *:nth-child(1) {
     position: sticky;
     left: 0;

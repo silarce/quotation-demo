@@ -10,6 +10,7 @@ import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracL
 
 // component
 import Table_main from 'components/page/worksDepartment/electronicSupplies/demandForm/table_main';
+import Table_detail from 'components/page/worksDepartment/electronicSupplies/demandForm/table_detail';
 // import SupplyTable, {
 //   TimperativeHandle,
 //   useStateToGroup,
@@ -17,11 +18,12 @@ import Table_main from 'components/page/worksDepartment/electronicSupplies/deman
 // import DefaultItemSelector from 'components/page/worksDepartment/electronicSupplies/defaultItemSelector';
 
 // gear
-import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-import Row, { Cell } from 'components/global/gear/table/row';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
+// import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
+// import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+// import Row, { Cell } from 'components/global/gear/table/row';
 
 // css
 import scss from './index.module.scss';
@@ -73,6 +75,14 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
+  const handle_openDetail = () => {
+    myAlert.clear({
+      content: <Table_detail />,
+    });
+  };
+
+  // ------------------------------------------------------------------
+
   // region useEffect
 
   useEffect(() => {
@@ -84,10 +94,7 @@ export default function EditRequirementRecord() {
   // MARK: RENDER
 
   return (
-    <SubLayer
-      isLoading_subLayer={isFetching_contract}
-      //  bodyClassName={scss.body}
-    >
+    <SubLayer isLoading_subLayer={isFetching_contract}>
       <PageHeader
         showReturnBtn={disabled}
         panelList={[]}
@@ -102,7 +109,9 @@ export default function EditRequirementRecord() {
             <span>共 {stateArr.length} 項</span>
             <span>已開{0}</span>
             <span>已選 {checkedStateArr.length} 項</span>
-            <SquareBtn sharp="mini">產生明細</SquareBtn>
+            <SquareBtn sharp="mini" onClick={handle_openDetail}>
+              產生明細
+            </SquareBtn>
           </div>
         </div>
       </div>
