@@ -11,7 +11,7 @@ import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/Pa
 import { Spin } from 'antd';
 
 // gear
-import Row, { Cell } from 'components/global/gear/table/row';
+import Row_, { Cell, Tprops_row } from 'components/global/gear/table/row';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // utils
@@ -52,6 +52,12 @@ type TreqPatchReceiptCashedDate = (
 
 // ============================================================================
 
+const Row = ({ className, ...props }: Tprops_row) => {
+  return <Row_ {...props} className={classNames(scss.row, className)} />;
+};
+
+// ============================================================================
+
 // MARK:START
 
 export default function BillCashingDetailList() {
@@ -87,6 +93,7 @@ export default function BillCashingDetailList() {
 
     const params: Tparams = {
       sort: 'exchangeFrom.sheetNumber',
+      pageSize: 999999,
       populate: [
         // 'incomeBill',
         // 'invoices',
@@ -306,7 +313,7 @@ export default function BillCashingDetailList() {
         {/*  */}
         {/*  */}
 
-        <Row className={scss.bottom} fullWidth={true}>
+        <Row className={scss.bottom} fullWidth={true} thead={true}>
           <Cell style={config.selectBox.style} />
           {keyArr.slice(0, 5).map((key) => {
             return <Cell key={key} style={config[key].style} />;
@@ -413,7 +420,7 @@ const Accountant = ({
   }, [data_accountant]);
 
   return (
-    <Row fullWidth={true} className={scss.row}>
+    <Row fullWidth={true}>
       <Cell className={classNames(sheetNumber && 'invisible')} style={config.selectBox.style}>
         <input
           className={'cursor-pointer scale-150'}
@@ -577,67 +584,67 @@ const config: Tconfig = {
   selectBox: {
     label: '',
     style: {
-      width: '50px',
+      width: '60px',
     },
   },
   receiptStatus: {
     label: '狀態',
     style: {
-      width: '60px',
+      width: '70px',
     },
   },
   sheetNumber: {
     label: '匯兌單號',
     style: {
-      width: '100px',
+      width: '110px',
     },
   },
   noteNumber: {
     label: '票據號碼',
     style: {
-      width: '120px',
+      width: '130px',
     },
   },
   importAccountingNumber: {
     label: '付款帳號',
     style: {
-      width: '120px',
+      width: '130px',
     },
   },
   vendorName: {
     label: '廠商名稱',
     style: {
-      width: '200px',
+      width: '210px',
     },
   },
   noteMaturityDate: {
     label: '票據到期日',
     style: {
-      width: '110px',
+      width: '120px',
     },
   },
   price: {
     label: '金額',
     style: {
-      width: '120px',
+      width: '130px',
     },
   },
   accountingNumber: {
     label: '存入帳號',
     style: {
-      width: '200px',
+      width: '210px',
     },
   },
   receiptEstimatedDate: {
     label: '預兌日',
     style: {
-      width: '110px',
+      width: '120px',
     },
   },
   receiptCashedDate: {
     label: '兌現日',
     style: {
-      width: '110px',
+      width: '120px',
     },
   },
 };

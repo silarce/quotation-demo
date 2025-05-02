@@ -17,12 +17,14 @@ const createProps_payInfo = ({
   state_quotationDiscount,
   avgDiscount,
   disabled,
+  isAttach,
 }: {
   instance_quotationPrice: ReturnType<typeof useQuotationTotalPrice>;
   kit_payInfo: ReturnType<typeof usePayInfo>['kit'];
   state_quotationDiscount: `${number}` | '';
   disabled: boolean;
   avgDiscount: number;
+  isAttach: boolean;
 }): Tprops_quotationPayInfo['form'] => {
   const props_payInfo: Tprops_quotationPayInfo['form'] = {
     haveTax: {
@@ -30,8 +32,9 @@ const createProps_payInfo = ({
       onChange(value) {
         setHaveTax(value);
       },
+      disabled: isAttach || undefined,
     },
-    discountRate: { value: state_quotationDiscount },
+    discountRate: state_quotationDiscount,
     tuneTotal: {
       value: disabled ? Number(state_quotationTotal.tuneTotal).toLocaleString() : state_quotationTotal.tuneTotal,
       onChange(value) {
@@ -43,12 +46,14 @@ const createProps_payInfo = ({
       onChange(value) {
         setCurrency(value);
       },
+      disabled: isAttach || undefined,
     },
     exchangeRate: {
       value: state_quotationTotal.exchangeRate,
       onChange(value) {
         setExchangeRate(value);
       },
+      disabled: isAttach || undefined,
     },
     avgDiscount: avgDiscount,
     subTotal: Number(state_quotationTotal.subTotal).toLocaleString(),
