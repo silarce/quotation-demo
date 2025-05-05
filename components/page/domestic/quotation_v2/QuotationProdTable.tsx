@@ -839,7 +839,9 @@ const QuotationRow_dealClass = ({
         left={left}
         right={right}
         props_center={{
-          className: classNames(!classProd.isInited && !disabled && scss.rowCover),
+          // 為了避免在初始化之前就被編輯而造成問題
+          // 初始化前在這裡加上遮罩避免使用者編輯
+          className: classNames(!classProd.isInited && !disabled && scss.rowDisabled),
         }}
         //
         onDragStart={(e) => {
