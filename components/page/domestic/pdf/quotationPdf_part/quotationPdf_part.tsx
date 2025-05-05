@@ -470,7 +470,7 @@ const productTomainProduct = ({
   // const { part_distributionBox, part_installationFee } = prodToPart({
   //   product_item,
   // });
-  const { part_distributionBox, part_installationFee } =
+  const { part_distributionBox = undefined, part_installationFee = undefined } =
     product_item.doorModelName !== 'W2'
       ? prodToPart({
           product_item,
