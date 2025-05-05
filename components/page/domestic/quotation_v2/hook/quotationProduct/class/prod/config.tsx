@@ -42,6 +42,8 @@ import type { Toption, ToptionPlus } from 'js/utils/options/options';
 
 import { TdoorModel } from 'js/api/dtoTypes';
 
+import scss from './config.module.scss';
+
 // =======================================================================
 const options_quoteType = optionsCreator_quoteType();
 
@@ -1096,6 +1098,9 @@ const createNodeConfig_prime = ({
           } else {
             classProd.doorModelName = doorModelName;
           }
+        },
+        classNames: {
+          menuPortal: () => scss.menuPortal,
         },
       },
     };

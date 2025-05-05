@@ -1001,6 +1001,10 @@ class ClassProd {
   get isInited() {
     let isInit = true;
 
+    if (!this.isValid_doorModel) {
+      return true;
+    }
+
     if (this.state.generalSpecs === undefined) {
       isInit = false;
     } else if (this.state.availableComponents === undefined) {
@@ -1322,7 +1326,7 @@ class ClassProd {
       return;
     }
 
-    this.clearState();
+    this.clearState({ keepDistributionBoxQuantity: doorModel?.name !== 'W2' });
 
     this.state.doorModel = doorModel;
     this.data.doorModelName = doorModel?.name ?? '';
