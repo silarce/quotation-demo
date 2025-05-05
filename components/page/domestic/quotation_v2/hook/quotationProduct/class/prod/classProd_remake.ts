@@ -1326,7 +1326,7 @@ class ClassProd {
       return;
     }
 
-    this.clearState();
+    this.clearState({ keepDistributionBoxQuantity: doorModel?.name !== 'W2' });
 
     this.state.doorModel = doorModel;
     this.data.doorModelName = doorModel?.name ?? '';

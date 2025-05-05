@@ -417,6 +417,7 @@ const useActivedClass = ({
 
     if (activedClassProd.doorModelName === 'W2') {
       delete activedPseudoComponentDict.installationFee;
+      delete activedPseudoComponentDict.distributionBox;
     }
 
     const activedClassAccessoryDict = createAccessoryDict({

@@ -133,7 +133,7 @@ type TclassComponentDict = {
 };
 
 type TclassPsuedoComponentDict = {
-  distributionBox: Class_distributionBox;
+  distributionBox?: Class_distributionBox;
   installationFee?: Class_installationFee;
 };
 

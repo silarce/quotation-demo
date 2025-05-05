@@ -346,6 +346,7 @@ const accessoryToPart = ({
 
 const prodToPart = ({ product_item }: { product_item: TquotationProductItemDto }) => {
   const {
+    doorModelName,
     distributionBoxUnitPrice,
     distributionBoxQuantity,
     distributionBoxTotalPrice,
@@ -466,9 +467,19 @@ const productTomainProduct = ({
 
   totalPrice_d = totalPrice_d.add(distributionBoxTotalPrice || 0).add(installationFeeTotalPrice || 0);
 
-  const { part_distributionBox, part_installationFee } = prodToPart({
-    product_item,
-  });
+  // const { part_distributionBox, part_installationFee } = prodToPart({
+  //   product_item,
+  // });
+  const { part_distributionBox, part_installationFee } =
+    product_item.doorModelName !== 'W2'
+      ? prodToPart({
+          product_item,
+        })
+      : {};
+
+  const part: TmainProduct['part'] = [...part_component, ...part_accessory];
+  part_distributionBox && part.push(part_distributionBox);
+  part_installationFee && part.push(part_installationFee);
 
   const mainProduct: TmainProduct = {
     quotationNumber: quotationNumber,
@@ -477,7 +488,7 @@ const productTomainProduct = ({
     surface: materialSurface ?? '',
     doorType: doorModelName,
     size: size,
-    part: [...part_component, ...part_accessory, part_distributionBox, part_installationFee],
+    part,
     priceTotal: totalPrice_d.toNumber().toLocaleString(),
   };
 
