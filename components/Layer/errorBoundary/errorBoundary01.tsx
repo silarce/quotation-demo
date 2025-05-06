@@ -1,51 +1,70 @@
-// 還沒用到，留作參考
-
 import React, { ErrorInfo } from 'react';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 interface State {
   hasError: boolean;
+  componentStack: string;
 }
 
 interface Props {
   children: React.ReactNode;
+  pathname?: string;
 }
 
 class ErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    // Define a state variable to track whether is an error or not
     this.state = {
       hasError: false,
+      componentStack: '',
     };
   }
 
   static getDerivedStateFromError(error: Error) {
-    // Update state so the next render will show the fallback UI
-
-    return { hasError: true };
+    return {
+      hasError: true,
+    };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // You can use your own error logging service here
-    console.log({ error, errorInfo });
+    this.setState({
+      hasError: true,
+      componentStack: errorInfo.componentStack,
+    });
+  }
+
+  componentWillUnmount() {
+    this.setState({
+      hasError: false,
+      componentStack: '',
+    });
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    // 檢查 pathname 是否改變
+    if (prevProps.pathname !== this.props.pathname) {
+      this.setState({
+        hasError: false,
+        componentStack: '',
+      });
+    }
   }
 
   render() {
-    // Check if the error is thrown
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       return (
-        <div>
-          <h2>Oops, there is an error!</h2>
-          <button type="button" onClick={() => this.setState({ hasError: false })}>
-            Try again?
-          </button>
+        <div className="p-5">
+          <h2>程式發生非預期錯誤</h2>
+          {/* <SquareBtn>發送錯誤紀錄</SquareBtn> */}
+          <br />
+          <br />
+          <br />
+          <span className="whitespace-pre">{this.state.componentStack}</span>
         </div>
       );
     }
 
-    // Return children components in case of no error
     return this.props.children;
   }
 }

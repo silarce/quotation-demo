@@ -30,6 +30,7 @@ module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // productionBrowserSourceMaps:true,
   webpack: (config) => {
     // 使import路徑大小寫敏感
     config.plugins.push(new CaseSensitivePathsPlugin());
