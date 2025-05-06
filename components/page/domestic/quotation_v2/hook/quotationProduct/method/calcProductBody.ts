@@ -246,7 +246,7 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     // 捲軸規格  // 棄用
     rollerSpec: null, // 無凸 | 雙凸
     // 門軌消音條
-    hasSilencingStrip: data_prod.hasMotorSupportStand,
+    hasSilencingStrip: data_prod.hasSilencingStrip,
     // 一體式捲箱
     isIntegratedHeadBox: data_prod.isIntegratedHeadBox,
     // 捲箱厚度

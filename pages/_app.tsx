@@ -29,6 +29,12 @@ import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalCo
 import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 
 // -----------------------------------------------------------------------------------
+
+import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
+
+// import ErrorBoundary from 'antd/lib/alert/ErrorBoundary';
+
+// -----------------------------------------------------------------------------------
 // 全域 css
 import '../styles/globals.scss';
 import 'antd/dist/antd.css';
@@ -221,21 +227,26 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       <Head>
         <title>三久ERP</title>
       </Head>
-      <AppContext.Provider value={appContextValue}>
-        {getLayout(
-          <Component
-            {...pageProps}
-            {...myPageProps}
-            // isAdmin={userInfo?.account === 'admin3'}
-            // userInfo={userInfo}
-            // userGrade={userGrade}
-            // userErpFeature={userErpFeature}
-            // rwd1023={rwd1023}
-            // rwd1439={rwd1439}
-            // onLogin={onLogin}
-          />
-        )}
-      </AppContext.Provider>
+
+      <ErrorBoundary>
+        <AppContext.Provider value={appContextValue}>
+          {getLayout(
+            <ErrorBoundary pathname={router.pathname}>
+              <Component
+                {...pageProps}
+                {...myPageProps}
+                // isAdmin={userInfo?.account === 'admin3'}
+                // userInfo={userInfo}
+                // userGrade={userGrade}
+                // userErpFeature={userErpFeature}
+                // rwd1023={rwd1023}
+                // rwd1439={rwd1439}
+                // onLogin={onLogin}
+              />
+            </ErrorBoundary>
+          )}
+        </AppContext.Provider>
+      </ErrorBoundary>
       {/* 全域loading cover */}
       {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
       <RootLoadingCover />
