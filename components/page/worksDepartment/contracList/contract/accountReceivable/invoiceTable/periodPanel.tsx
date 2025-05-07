@@ -8,7 +8,7 @@ import React, {
   useContext,
 } from 'react';
 import classNames from 'classnames';
-import _, { divide } from 'lodash';
+import _ from 'lodash';
 import Decimal from 'decimal.js';
 import moment, { Moment } from 'moment';
 
@@ -20,6 +20,8 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
+// import { Select } from 'components/global/gear/dataEntry';
+import { Select } from 'antd';
 
 // css
 import scss from './periodTable.module.scss';
@@ -30,6 +32,7 @@ import type {
   TretainageType,
   TaccountsReceivableInvoiceDto,
   TquotationContentOtherDto,
+  TperiodType,
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
@@ -75,6 +78,17 @@ type TimperativeHandle_panel = {
 export type { Tcenter, TimperativeHandle_panel };
 
 // ==========================================================================
+
+const options_periodType = (): { value: TperiodType; label: React.ReactNode }[] => [
+  {
+    value: '請款',
+    label: '請款',
+  },
+  {
+    value: '訂金',
+    label: '訂金',
+  },
+];
 
 const Selector_invoiceBook = selectModalCreator_multi<['invoiceBook']>({
   selectorArr: [
@@ -372,7 +386,7 @@ function PeriodPanel_pre(
     // _______________________________________________________________________
     // _______________________________________________________________________
 
-    let caption = `第${indexNumber}次付款-${type} 第${period}期`;
+    let caption = `第${indexNumber}期請款-${type} 第${period}期`;
 
     if (totalsTotal) {
       caption = '合計';
@@ -427,16 +441,24 @@ function PeriodPanel_pre(
       <Thead caption={caption}>
         <div className={scss.top}>
           {isNew && (
-            <Radio.Group
-              disabled={disabled}
-              onChange={(e) => {
-                handle_editType(e.target.value);
-              }}
+            <Select
+              className={scss.periosSelect}
+              options={options_periodType()}
               value={state_period.type}
-            >
-              <Radio value={'請款'}>請款</Radio>
-              <Radio value={'訂金'}>訂金</Radio>
-            </Radio.Group>
+              onChange={(value) => {
+                handle_editType(value);
+              }}
+            />
+            // <Radio.Group
+            //   disabled={disabled}
+            //   onChange={(e) => {
+            //     handle_editType(e.target.value);
+            //   }}
+            //   value={state_period.type}
+            // >
+            //   <Radio value={'請款'}>請款</Radio>
+            //   <Radio value={'訂金'}>訂金</Radio>
+            // </Radio.Group>
           )}
 
           {!isNew && caption}
