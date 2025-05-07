@@ -348,7 +348,7 @@ export default function PeriodTable({
     const periodTotal: Tperiod_reduce = {
       id: '',
       updatedAt: '',
-      type: '請款',
+      type: '訂金',
       period: 0,
       depositPeriod: 0,
 
