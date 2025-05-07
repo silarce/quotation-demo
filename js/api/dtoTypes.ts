@@ -27,7 +27,16 @@ export type TdeliveryStatusInstallationItem = '門片' | '馬達' | '支軌';
 
 export type TinvoiceStatus = '已開立' | '已作廢';
 
-export type TperiodType = '請款' | '訂金';
+// export type TperiodType = '請款' | '訂金';
+export type TperiodType =
+  | '請款' //棄用
+  | '訂金'
+  | '貨到'
+  | '支軌'
+  | '安裝'
+  | '送電'
+  | '清潔'
+  | '其他';
 export type TretainageType = '含稅' | '未稅';
 
 export type TengineeringContactAttachmentType = 'color' | 'construction' | 'detail' | 'floor' | 'design';
