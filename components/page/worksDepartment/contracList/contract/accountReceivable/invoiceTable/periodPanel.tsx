@@ -1909,7 +1909,7 @@ const create_emptyPeriod = (): Tperiod_reduce => {
     id: '',
     updatedAt: 'undefined',
 
-    type: '請款',
+    type: '訂金',
     period: null,
     depositPeriod: null,
 
