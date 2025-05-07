@@ -4432,7 +4432,7 @@ export type TaccountsReceivablePeriodDto = {
   createdAt: string;
   updatedAt: string;
 
-  //  期數
+  // 應收帳款類型
   type: TperiodType;
   // 請款期數
   period: number | null;
