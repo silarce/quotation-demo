@@ -81,12 +81,32 @@ export type { Tcenter, TimperativeHandle_panel };
 
 const options_periodType = (): { value: TperiodType; label: React.ReactNode }[] => [
   {
-    value: '請款',
-    label: '請款',
-  },
-  {
     value: '訂金',
     label: '訂金',
+  },
+  {
+    value: '貨到',
+    label: '貨到',
+  },
+  {
+    value: '支軌',
+    label: '支軌',
+  },
+  {
+    value: '安裝',
+    label: '安裝',
+  },
+  {
+    value: '送電',
+    label: '送電',
+  },
+  {
+    value: '清潔',
+    label: '清潔',
+  },
+  {
+    value: '其他',
+    label: '其他',
   },
 ];
 
