@@ -286,7 +286,6 @@ export default function Edit({ userInfo, isReadonly }: { userInfo: TuserDto; isR
 
                 reqAddReview({
                   review_id: reviewFlowId,
-                  document_id: '---',
                   document_uuid: exchange?.id,
                   document_type: '調貨單',
                   user_id: userId,

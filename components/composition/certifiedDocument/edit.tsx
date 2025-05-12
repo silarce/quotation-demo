@@ -489,7 +489,6 @@ export default function Edit({
 
         reqAddReview({
           review_id: reviewFlowId,
-          document_id: '---',
           document_uuid: id,
           document_type: '證明文件',
           user_id: userId,
