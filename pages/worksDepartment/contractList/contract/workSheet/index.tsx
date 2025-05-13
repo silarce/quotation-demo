@@ -307,7 +307,6 @@ export default function Worksheet({
 
     const body: Parameters<typeof req_backThanAdd>[0] = {
       review_id: review_id,
-      document_id: '',
       document_uuid: activeRecordId,
       document_type: '工作表',
       user_id: userId,
