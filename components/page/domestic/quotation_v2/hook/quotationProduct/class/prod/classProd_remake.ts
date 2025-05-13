@@ -489,13 +489,26 @@ class ClassProd {
     this.data.bearingHousingSize = generalSpecs.bearingHousingSize;
     this.data.bearingName = generalSpecs.bearingName || null;
 
-    const WG_mm = calcProductWG({
-      fullWidth: this.fullWidth_mm,
-      gapA: this.data.gapA,
-      gapC: this.data.gapC,
-    });
+    if (Number(this.data.fullWidth)) {
+      const WG_mm = calcProductWG({
+        fullWidth: this.fullWidth_mm,
+        gapA: this.data.gapA,
+        gapC: this.data.gapC,
+      });
 
-    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+      this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+    } else {
+      const fuillWidth_mm = calcProductFullWidth({
+        WG: new Decimal(this.data.WG).mul(1000).toNumber(),
+        gapA: Number(this.data.gapA ?? 0),
+        gapC: Number(this.data.gapC ?? 0),
+      });
+
+      const fuillWidth = new Decimal(fuillWidth_mm).div(1000).toString() as `${number}`;
+
+      this.data.fullWidth = fuillWidth;
+    }
+
     this.data.thickness = generalSpecs.thickness as `${number}`;
 
     const {
@@ -1387,6 +1400,7 @@ class ClassProd {
       return;
     }
 
+    this.data.WG = '0';
     this.clearState_some();
 
     this.isAllowReqChain && this.addAfterChange('reqChain_01');
@@ -1435,11 +1449,15 @@ class ClassProd {
       return;
     }
 
-    const fullWidth = calcProductFullWidth({
-      WG: new Decimal(this.data.WG).mul(1000).toNumber(),
-      gapA: Number(this.data.gapA ?? 0),
-      gapC: Number(this.data.gapC ?? 0),
-    });
+    // const fullWidth =
+    //   this.data.gapA && this.data.gapC
+    //     ? calcProductFullWidth({
+    //         WG: new Decimal(this.data.WG).mul(1000).toNumber(),
+    //         gapA: Number(this.data.gapA ?? 0),
+    //         gapC: Number(this.data.gapC ?? 0),
+    //       })
+    //     : 0;
+    const fullWidth = 0;
 
     this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
 
