@@ -73,7 +73,6 @@ import {
   calcQtyModify,
   calcProdRemain,
 } from '../../method/calcProd';
-import TheadItem from 'components/global/gear/HOC/dnd/dndTable01/gear/dndThead/theadItem';
 
 // ================================================================================
 
@@ -1456,58 +1455,12 @@ class ClassProd {
 
     this.render();
   }
-  // get W() {
-  //   const WG_mm = new Decimal(this.data.WG || 0).mul(1000).toNumber();
-  //   const G = this.data.guideRailG || 0;
-
-  //   const W_mm = calcW({
-  //     WG: WG_mm,
-  //     G,
-  //   });
-
-  //   return new Decimal(W_mm).div(1000).toString() as `${number}` | '';
-  // }
-  // set W(v) {
-  //   const v_mm = new Decimal(v || 0).mul(1000).toNumber();
-
-  //   const WG_mm = calcProductWG_withWAndG({
-  //     W: v_mm,
-  //     G: this.data.guideRailG || 0,
-  //   });
-
-  //   this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
-
-  //   if (this.isSpecial) {
-  //     this.render();
-
-  //     return;
-  //   }
-
-  //   // const fullWidth =
-  //   //   this.data.gapA && this.data.gapC
-  //   //     ? calcProductFullWidth({
-  //   //         WG: new Decimal(this.data.WG).mul(1000).toNumber(),
-  //   //         gapA: Number(this.data.gapA ?? 0),
-  //   //         gapC: Number(this.data.gapC ?? 0),
-  //   //       })
-  //   //     : 0;
-  //   const fullWidth = 0;
-
-  //   this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
-
-  //   this.clearState_some();
-
-  //   this.isAllowReqChain && this.addAfterChange('reqChain_01_withHp');
-
-  //   this.render();
-  // }
 
   // MARK:height
   get height() {
     return this.data.height;
   }
   set height(value) {
-    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
     this.data.height = value;
 
     if (this.isSpecial) {

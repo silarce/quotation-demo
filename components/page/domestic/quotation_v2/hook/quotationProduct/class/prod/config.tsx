@@ -283,6 +283,7 @@ const nodeConfig_origin: TnodeConfig = {
         props: {
           type: 'number',
           step: 0.001,
+          min: 0,
           value: classProd.fullWidth,
           onChange: (e) => {
             if (e.target.validity.valid) {
@@ -309,6 +310,7 @@ const nodeConfig_origin: TnodeConfig = {
         props: {
           type: 'number',
           step: 0.001,
+          min: 0,
           value: classProd.W,
           onChange: (e) => {
             if (e.target.validity.valid) {
@@ -354,9 +356,13 @@ const nodeConfig_origin: TnodeConfig = {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
           type: 'number',
+          step: 0.001,
+          min: 0,
           value: classProd.height,
           onChange: (e) => {
-            classProd.height = e.target.value as `${number}` | '';
+            if (e.target.validity.valid) {
+              classProd.height = e.target.value as `${number}` | '';
+            }
           },
           onBlur() {
             classProd.runAfterChange?.();
