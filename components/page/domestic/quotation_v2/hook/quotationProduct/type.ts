@@ -67,6 +67,10 @@ interface TstateProdData {
   boxB: `${number}` | '';
   // D(公尺) 浮點數
   boxD: `${number}` | '';
+
+  // W(公尺) 浮點數
+  W: `${number}` | '';
+
   // 面積 (平方公尺) 浮點數
   area: `${number}` | '' | null;
   // 才數 (台制單位，代表面積) 浮點數

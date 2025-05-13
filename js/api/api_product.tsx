@@ -234,7 +234,7 @@ type TpcgsPrams = {
   | {
       fullWidth?: undefined;
       WG: number;
-      hp: Thp;
+      hp?: Thp;
     }
 );
 
