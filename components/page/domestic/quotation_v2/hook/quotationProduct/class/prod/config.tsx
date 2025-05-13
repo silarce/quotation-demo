@@ -679,9 +679,13 @@ const nodeConfig_origin: TnodeConfig = {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
           type: 'number',
+          min: 0,
+          step: 0.001,
           value: classProd.bounceDoorWidth,
           onChange: (e) => {
-            classProd.bounceDoorWidth = e.target.value as `${number}` | '';
+            if (e.target.validity.valid) {
+              classProd.bounceDoorWidth = e.target.value as `${number}` | '';
+            }
           },
         },
       };

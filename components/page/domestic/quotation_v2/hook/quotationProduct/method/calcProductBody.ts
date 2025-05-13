@@ -265,8 +265,9 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
     isAntiTyphoon: data_prod.isAntiTyphoon,
     // 彈射門
     bounceDoor: data_prod.bounceDoor,
-    // 彈射門寬度
-    bounceDoorWidth: Number(data_prod.bounceDoorWidth || 0),
+    // 彈射門寬度 // 單位轉為mm
+    bounceDoorWidth: new Decimal(data_prod.bounceDoorWidth || 0).mul(1000).toNumber(),
+    // 要限制彈射門寬度的浮點數位數
     // 彈射門高度
     // bounceDoorHeight?: data_prod.bounceDoorHeight,
     // 彈射門長度
