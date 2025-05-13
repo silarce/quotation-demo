@@ -282,9 +282,12 @@ const nodeConfig_origin: TnodeConfig = {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
           type: 'number',
+          step: 0.001,
           value: classProd.fullWidth,
           onChange: (e) => {
-            classProd.fullWidth = e.target.value as `${number}` | '';
+            if (e.target.validity.valid) {
+              classProd.fullWidth = e.target.value as `${number}` | '';
+            }
           },
           onBlur() {
             classProd.runAfterChange?.();
@@ -305,9 +308,12 @@ const nodeConfig_origin: TnodeConfig = {
       const inputProps: TinputSelProps['inputProps'] = {
         props: {
           type: 'number',
+          step: 0.001,
           value: classProd.W,
           onChange: (e) => {
-            classProd.W = e.target.value as `${number}` | '';
+            if (e.target.validity.valid) {
+              classProd.W = e.target.value as `${number}` | '';
+            }
           },
           onBlur() {
             classProd.runAfterChange();

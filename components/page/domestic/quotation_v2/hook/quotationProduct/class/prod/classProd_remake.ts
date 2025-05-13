@@ -1379,8 +1379,6 @@ class ClassProd {
     return this.data.fullWidth;
   }
   set fullWidth(value) {
-    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
-
     this.data.fullWidth = value;
 
     if (this.isSpecial) {
@@ -1404,9 +1402,9 @@ class ClassProd {
   // set WG(value) {
   //   this.setData('WG', value);
   // }
-  // get WG_mm() {
-  //   return new Decimal(this.data.WG).mul(1000).toNumber();
-  // }
+  get WG_mm() {
+    return new Decimal(this.data.WG).mul(1000).toNumber();
+  }
 
   // MARK:W
   // W要額外處理
@@ -1422,8 +1420,7 @@ class ClassProd {
     return new Decimal(W_mm).div(1000).toString() as `${number}` | '';
   }
   set W(v) {
-    const v_num = fixedToFloat3(v || 0);
-    const v_mm = new Decimal(v_num).mul(1000).toNumber();
+    const v_mm = new Decimal(v || 0).mul(1000).toNumber();
 
     const WG_mm = calcProductWG_withWAndG({
       W: v_mm,
