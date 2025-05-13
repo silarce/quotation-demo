@@ -77,7 +77,7 @@ const useReviewFlow = ({
   const query = router.query as Tquery;
 
   const document_uuid = uuid || query.document_uuid || query.id;
-  const document_id = _document_id || query.document_id;
+  const document_id = _document_id || query.document_id || undefined;
 
   const {
     //  req_addReview,
@@ -111,11 +111,17 @@ const useReviewFlow = ({
       myAlert.err({ title: '沒有document_uuid' });
 
       return;
-    } else if (typeof doucmentId !== 'string') {
-      myAlert.err({ title: 'doucmentId不是string' });
-
-      return;
     }
+
+    // 舊時document_id是必須要有值的，但不是每個資料都有document_id
+    // 所以有些地方會workaround的送cretedAt進去
+    // 但現在可以直接不送document_id了
+    // 已經送了document_id的地方不要改掉，不然舊資料會取不到
+    // else if (typeof doucmentId !== 'string') {
+    //   myAlert.err({ title: 'doucmentId不是string' });
+
+    //   return;
+    // }
 
     const body: TaddReview = {
       ...theBody,

@@ -85,6 +85,7 @@ const ImageDragger = ({
       <div className={classNames(scss.draggerContainer, fileSrc && 'hidden')}>
         <Spin spinning={isUploading} size="large">
           <Dragger
+            customRequest={() => {}}
             className={classNames(scss.antdDragger, scss.plus)}
             onChange={(e) => {
               onDraggerChange(e);
