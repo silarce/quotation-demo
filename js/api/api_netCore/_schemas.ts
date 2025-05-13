@@ -84,7 +84,11 @@ interface TgetReivewById {
 
 interface TaddReivew {
   review_id: TgetReivewById['id']; // 審核流程id
-  document_id: TgetReivewById['document_id'];
+  // 舊時document_id是必須要有值的，但不是每個資料都有document_id
+  // 所以有些地方會workaround的送cretedAt進去
+  // 但現在可以直接不送document_id了
+  // 已經送了document_id的地方不要改掉，不然舊資料會取不到
+  document_id?: TgetReivewById['document_id'] | undefined;
   document_uuid: string; // 唯一識別id // 被審核資料的唯一識別id
   document_type: string; // ex:請購單 // 任意字串
   // username: string;

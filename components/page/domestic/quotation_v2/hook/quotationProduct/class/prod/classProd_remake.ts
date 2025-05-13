@@ -73,7 +73,6 @@ import {
   calcQtyModify,
   calcProdRemain,
 } from '../../method/calcProd';
-import TheadItem from 'components/global/gear/HOC/dnd/dndTable01/gear/dndThead/theadItem';
 
 // ================================================================================
 
@@ -489,13 +488,32 @@ class ClassProd {
     this.data.bearingHousingSize = generalSpecs.bearingHousingSize;
     this.data.bearingName = generalSpecs.bearingName || null;
 
-    const WG_mm = calcProductWG({
-      fullWidth: this.fullWidth_mm,
-      gapA: this.data.gapA,
-      gapC: this.data.gapC,
-    });
+    if (Number(this.data.fullWidth)) {
+      const WG_mm = calcProductWG({
+        fullWidth: this.fullWidth_mm,
+        gapA: this.data.gapA,
+        gapC: this.data.gapC,
+      });
 
-    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+      const W_mm = calcW({
+        WG: WG_mm,
+        G: this.data.guideRailG || 0,
+      });
+
+      this.data.W = new Decimal(W_mm).div(1000).toString() as `${number}`;
+      this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+    } else {
+      const fuillWidth_mm = calcProductFullWidth({
+        WG: new Decimal(this.data.WG).mul(1000).toNumber(),
+        gapA: Number(this.data.gapA ?? 0),
+        gapC: Number(this.data.gapC ?? 0),
+      });
+
+      const fuillWidth = new Decimal(fuillWidth_mm).div(1000).toString() as `${number}`;
+
+      this.data.fullWidth = fuillWidth;
+    }
+
     this.data.thickness = generalSpecs.thickness as `${number}`;
 
     const {
@@ -1379,8 +1397,6 @@ class ClassProd {
     return this.data.fullWidth;
   }
   set fullWidth(value) {
-    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
-
     this.data.fullWidth = value;
 
     if (this.isSpecial) {
@@ -1389,6 +1405,7 @@ class ClassProd {
       return;
     }
 
+    this.data.WG = '0';
     this.clearState_some();
 
     this.isAllowReqChain && this.addAfterChange('reqChain_01');
@@ -1404,29 +1421,19 @@ class ClassProd {
   // set WG(value) {
   //   this.setData('WG', value);
   // }
-  // get WG_mm() {
-  //   return new Decimal(this.data.WG).mul(1000).toNumber();
-  // }
+  get WG_mm() {
+    return new Decimal(this.data.WG).mul(1000).toNumber();
+  }
 
-  // MARK:W
-  // W要額外處理
   get W() {
-    const WG_mm = new Decimal(this.data.WG || 0).mul(1000).toNumber();
-    const G = this.data.guideRailG || 0;
-
-    const W_mm = calcW({
-      WG: WG_mm,
-      G,
-    });
-
-    return new Decimal(W_mm).div(1000).toString() as `${number}` | '';
+    return this.data.W;
   }
   set W(v) {
-    const v_num = fixedToFloat3(v || 0);
-    const v_mm = new Decimal(v_num).mul(1000).toNumber();
+    this.data.W = v || '0';
+    const W_mm = new Decimal(this.data.W).mul(1000).toNumber();
 
     const WG_mm = calcProductWG_withWAndG({
-      W: v_mm,
+      W: W_mm,
       G: this.data.guideRailG || 0,
     });
 
@@ -1438,17 +1445,13 @@ class ClassProd {
       return;
     }
 
-    const fullWidth = calcProductFullWidth({
-      WG: new Decimal(this.data.WG).mul(1000).toNumber(),
-      gapA: Number(this.data.gapA ?? 0),
-      gapC: Number(this.data.gapC ?? 0),
-    });
+    const fullWidth = 0;
 
     this.data.fullWidth = new Decimal(fullWidth).div(1000).toString() as `${number}`;
 
     this.clearState_some();
 
-    this.isAllowReqChain && this.addAfterChange('reqChain_01_withHp');
+    this.isAllowReqChain && this.addAfterChange('reqChain_01');
 
     this.render();
   }
@@ -1458,7 +1461,6 @@ class ClassProd {
     return this.data.height;
   }
   set height(value) {
-    value = value !== '' ? `${fixedToFloat3(value || 0)}` : value;
     this.data.height = value;
 
     if (this.isSpecial) {
@@ -1614,9 +1616,13 @@ class ClassProd {
 
     this.isAllowReqChain &&
       (async () => {
-        await this.updateBoxD();
-        await this.reqChain_03();
+        await this.reqChain_01_withHp();
+        this.state.isFetching = false;
+        // await this.updateBoxD();
+        // await this.reqChain_03();
       })();
+
+    // reqChain_01_withHp
 
     this.render();
   }

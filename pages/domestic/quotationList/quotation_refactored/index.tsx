@@ -105,6 +105,8 @@ import { TuserDto } from 'js/api/dtoTypes';
 
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
+import { calcW } from 'js/utils/product/calc';
+
 // ======================================================================
 
 // region REFACTOR IMPORT
@@ -238,10 +240,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     managerReviewedAt,
     toSalesAt,
     toSupervisorAt,
-    toSalesManagerAt,
-    toWorkDirectorAt,
+    // toSalesManagerAt,
+    // toWorkDirectorAt,
     toCashierAt,
-    toManagerAt,
+    // toManagerAt,
     // isSendToReview,
     // isSendToReview_pending,
     isAttach,
@@ -270,8 +272,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     latestSubContract,
     parentSubContract,
   } = useData();
-
-  // console.log(isQuotationExpired);
 
   isAttach = !!iterativeContractProductArr?.length;
 
@@ -308,10 +308,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   managerReviewedAt = content?.managerReviewedAt;
   toSalesAt = content?.toSalesAt;
   toSupervisorAt = content?.toSupervisorAt;
-  toSalesManagerAt = content?.toSalesManagerAt;
-  toWorkDirectorAt = content?.toWorkDirectorAt;
+  // toSalesManagerAt = content?.toSalesManagerAt;
+  // toWorkDirectorAt = content?.toWorkDirectorAt;
   toCashierAt = content?.toCashierAt;
-  toManagerAt = content?.toManagerAt;
+  // toManagerAt = content?.toManagerAt;
 
   const agentEmployee = !quotationId ? userInfo?.employee : content?.agentEmployee;
 
@@ -1366,9 +1366,14 @@ const useData = () => {
         quotationProductArr: prodArr,
       });
 
-      prod.addition.action = action;
+      let W: number | `${number}` = calcW({
+        WG: prod.WG,
+        G: prod.guideRailG || 0, // 若是特殊門，guideRailG應該會是0
+      });
+      W = new Decimal(W).div(1000).toString() as `${number}`;
 
-      // console.log(action);
+      prod.addition.action = action;
+      prod.addition.W = W;
 
       return prod;
     });
@@ -1388,6 +1393,14 @@ const useData = () => {
         quotationDiscount: quotationDiscount,
       });
 
+      let W: number | `${number}` = calcW({
+        WG: prod.WG,
+        G: prod.guideRailG || 0, // 若是特殊門，guideRailG應該會是0
+      });
+      W = new Decimal(W).div(1000).toString() as `${number}`;
+
+      console.log('WWWW', W);
+
       acc[key] = {
         ...prod,
         addition: {
@@ -1398,6 +1411,7 @@ const useData = () => {
           action: undefined,
           quotationDiscount,
           priceDiscount_percent,
+          W,
         },
       };
 
