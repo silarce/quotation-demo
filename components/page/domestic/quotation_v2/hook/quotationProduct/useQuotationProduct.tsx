@@ -94,6 +94,8 @@ type Taddition = {
   // 必須在迭代時就取得所屬報價單的discount
   quotationDiscount: number | `${number}`; // 會送到TstateProd['quotationDiscount_iterativeProd']
   priceDiscount_percent: number | `${number}`;
+  //
+  W: `${number}` | '';
 };
 
 type TprodSource = TquotationProductDto & { addition: Taddition };

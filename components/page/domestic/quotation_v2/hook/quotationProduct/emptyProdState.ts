@@ -9,6 +9,7 @@ const createEmptyStateProdData = () => {
     doorModelName: '',
     fullWidth: '',
     WG: '',
+    W: '',
     height: '',
     boxB: '',
     boxD: '',
