@@ -1451,7 +1451,7 @@ class ClassProd {
 
     this.clearState_some();
 
-    this.isAllowReqChain && this.addAfterChange('reqChain_01_withHp');
+    this.isAllowReqChain && this.addAfterChange('reqChain_01');
 
     this.render();
   }
@@ -1616,9 +1616,13 @@ class ClassProd {
 
     this.isAllowReqChain &&
       (async () => {
-        await this.updateBoxD();
-        await this.reqChain_03();
+        await this.reqChain_01_withHp();
+        this.state.isFetching = false;
+        // await this.updateBoxD();
+        // await this.reqChain_03();
       })();
+
+    // reqChain_01_withHp
 
     this.render();
   }
