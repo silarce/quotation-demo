@@ -423,7 +423,7 @@ class ClassProd {
   }
 
   renewWG() {
-    const W_mm = new Decimal(this.data.W).mul(1000).toNumber();
+    const W_mm = new Decimal(this.data.W || 0).mul(1000).toNumber();
 
     const WG_mm = calcProductWG_withWAndG({
       W: W_mm,
