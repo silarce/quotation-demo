@@ -488,7 +488,7 @@ class ClassProd {
     this.data.bearingHousingSize = generalSpecs.bearingHousingSize;
     this.data.bearingName = generalSpecs.bearingName || null;
 
-    if (Number(this.data.fullWidth)) {
+    if (this.data.calcByLW === 'l') {
       const WG_mm = calcProductWG({
         fullWidth: this.fullWidth_mm,
         gapA: this.data.gapA,
@@ -1398,6 +1398,7 @@ class ClassProd {
   }
   set fullWidth(value) {
     this.data.fullWidth = value;
+    this.data.calcByLW = 'l';
 
     if (this.isSpecial) {
       this.render();
@@ -1406,6 +1407,7 @@ class ClassProd {
     }
 
     this.data.WG = '0';
+    this.data.W = '0';
     this.clearState_some();
 
     this.isAllowReqChain && this.addAfterChange('reqChain_01');
@@ -1430,6 +1432,8 @@ class ClassProd {
   }
   set W(v) {
     this.data.W = v || '0';
+    this.data.calcByLW = 'w';
+
     const W_mm = new Decimal(this.data.W).mul(1000).toNumber();
 
     const WG_mm = calcProductWG_withWAndG({

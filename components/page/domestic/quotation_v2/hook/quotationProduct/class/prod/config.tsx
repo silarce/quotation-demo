@@ -323,7 +323,13 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
-      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+      return (
+        <InputSel_prod
+          inputProps={inputProps}
+          disabled={disabled}
+          // suffix={'fooo'}
+        />
+      );
     },
   },
 

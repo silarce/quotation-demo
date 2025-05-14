@@ -58,12 +58,13 @@ const reqGetProdCalcGeneralSpec = async ({ classProd, withHp = false }: { classP
     hp: withHp ? hp : undefined,
   };
 
-  const body: TpcgsPrams = classProd.fullWidth_mm
-    ? { ...preBody, fullWidth: classProd.fullWidth_mm }
-    : {
-        ...preBody,
-        WG: classProd.WG_mm,
-      };
+  const body: TpcgsPrams =
+    classProd.data.calcByLW === 'l'
+      ? { ...preBody, fullWidth: classProd.fullWidth_mm }
+      : {
+          ...preBody,
+          WG: classProd.WG_mm,
+        };
 
   return await apiGetProdCalcGeneralSpec(body)
     .then((res) => res)
