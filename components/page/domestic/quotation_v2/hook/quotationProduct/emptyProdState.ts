@@ -72,6 +72,8 @@ const createEmptyStateProdData = () => {
     unitPrice: '',
     totalPrice: '',
     rootProductId: '',
+    //
+    calcByLW: 'l',
   };
 
   return emptyStateProdData;
