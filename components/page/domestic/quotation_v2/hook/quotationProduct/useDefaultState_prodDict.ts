@@ -264,6 +264,8 @@ const createDateProd = (raw: TprodSource) => {
 
     attachedToProductId: raw.attachedToProductId,
     rootProductId: raw.rootProductId,
+
+    calcByLW: 'l',
   };
 
   return data_prod;
@@ -476,6 +478,7 @@ const createEmptydataProd = () => {
     order: 9999,
     // attachedToProductId: null,
     // rootProductId: '',
+    calcByLW: 'l',
   };
 
   return data_prod;
