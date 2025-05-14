@@ -172,7 +172,7 @@ const useDefaultState_prodDict = ({
 // ========================================================================
 
 // MARK: createDateProd
-const createDateProd = (raw: TquotationProductDto) => {
+const createDateProd = (raw: TprodSource) => {
   const data_prod: TstateProdData & { id: string } = {
     id: raw.id,
     itemName: raw.itemName,
@@ -185,6 +185,9 @@ const createDateProd = (raw: TquotationProductDto) => {
     height: new Decimal(raw.height).div(1000).toString() as `${number}` | '',
     boxB: new Decimal(raw.boxB).div(1000).toString() as `${number}` | '',
     boxD: new Decimal(raw.boxD).div(1000).toString() as `${number}` | '',
+
+    W: raw.addition.W,
+
     area: raw.area as `${number}` | null,
     volume: raw.volume as `${number}` | null,
 
@@ -261,6 +264,8 @@ const createDateProd = (raw: TquotationProductDto) => {
 
     attachedToProductId: raw.attachedToProductId,
     rootProductId: raw.rootProductId,
+
+    calcByLW: 'l',
   };
 
   return data_prod;
@@ -400,6 +405,9 @@ const createEmptydataProd = () => {
     height: '',
     boxB: '',
     boxD: '',
+
+    W: '',
+
     area: null,
     volume: null,
 
@@ -470,6 +478,7 @@ const createEmptydataProd = () => {
     order: 9999,
     // attachedToProductId: null,
     // rootProductId: '',
+    calcByLW: 'l',
   };
 
   return data_prod;

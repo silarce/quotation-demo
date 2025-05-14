@@ -9,6 +9,7 @@ const createEmptyStateProdData = () => {
     doorModelName: '',
     fullWidth: '',
     WG: '',
+    W: '',
     height: '',
     boxB: '',
     boxD: '',
@@ -71,6 +72,8 @@ const createEmptyStateProdData = () => {
     unitPrice: '',
     totalPrice: '',
     rootProductId: '',
+    //
+    calcByLW: 'l',
   };
 
   return emptyStateProdData;

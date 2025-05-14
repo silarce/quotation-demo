@@ -44,6 +44,8 @@ interface TstateProdData {
   // 實際上可能為null，運作正常的話預期不會為null。若為null代表有問題，要跟後端討論
   readonly rootProductId?: string;
 
+  calcByLW: 'w' | 'l'; // gapA或g改變時，計算以W或L為基準
+
   // 項目名
   itemName: string;
   // 折數
@@ -67,6 +69,10 @@ interface TstateProdData {
   boxB: `${number}` | '';
   // D(公尺) 浮點數
   boxD: `${number}` | '';
+
+  // W(公尺) 浮點數
+  W: `${number}` | '';
+
   // 面積 (平方公尺) 浮點數
   area: `${number}` | '' | null;
   // 才數 (台制單位，代表面積) 浮點數

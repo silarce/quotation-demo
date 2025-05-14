@@ -49,30 +49,29 @@ const reqGetProdCalcGeneralSpec = async ({ classProd, withHp = false }: { classP
 
   const prodData = classProd.data;
 
-  // '1/4' | '1/3' | '1/2' | '3/4' | '1' | '1 1/2' | '2' | '3' | '5';
   const hp = prodData.horsepower.replaceAll('HP', '') as Thp;
 
-  const body: TpcgsPrams = {
-    // classProd.doorModelName的實際型別為string而非TpcgsPrams['modelName']
-    // 預期可能會422，但已在catch處理
-    // modelName: classProd.doorModelName as TpcgsPrams['modelName'],
+  const preBody = {
     modelName: prodData.doorModelName as TpcgsPrams['modelName'],
     height: classProd.height_mm,
-    //
-    fullWidth: classProd.fullWidth_mm,
-    WG: undefined, // 不使用WG，統一使用fullWidth
-    //
     isAntiTyphoon: !!prodData.isAntiTyphoon,
-    // hp:  hp || undefined,
     hp: withHp ? hp : undefined,
   };
+
+  const body: TpcgsPrams =
+    classProd.data.calcByLW === 'l'
+      ? { ...preBody, fullWidth: classProd.fullWidth_mm }
+      : {
+          ...preBody,
+          WG: classProd.WG_mm,
+        };
 
   return await apiGetProdCalcGeneralSpec(body)
     .then((res) => res)
     .catch((err: TresError) => {
       console.log(err);
 
-      let message = err.response?.data.message as any;
+      let message = err.response?.data.message as unknown;
 
       if (typeof message === 'string') {
         message = message;
