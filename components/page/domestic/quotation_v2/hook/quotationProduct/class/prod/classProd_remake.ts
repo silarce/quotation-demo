@@ -344,13 +344,9 @@ class ClassProd {
       }
     }
 
-    const WG_mm = calcProductWG({
-      fullWidth: this.fullWidth_mm,
-      gapA: this.data.gapA || 0,
-      gapC: this.data.gapC || 0,
-    });
-    const WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
-    this.data.WG = WG;
+    this.renewWG();
+
+    this.renewLW();
   }
 
   // MARK:renewProdAllPrice
@@ -426,6 +422,45 @@ class ClassProd {
     this.data.installationFeeTotalPrice = `${totalPrice}`;
   }
 
+  renewWG() {
+    const W_mm = new Decimal(this.data.W).mul(1000).toNumber();
+
+    const WG_mm = calcProductWG_withWAndG({
+      W: W_mm,
+      G: this.data.guideRailG || 0,
+    });
+
+    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+  }
+
+  renewLW() {
+    if (this.data.calcByLW === 'l') {
+      const WG_mm = calcProductWG({
+        fullWidth: this.fullWidth_mm,
+        gapA: this.data.gapA || '0',
+        gapC: this.data.gapC || '0',
+      });
+
+      const W_mm = calcW({
+        WG: WG_mm,
+        G: this.data.guideRailG || 0,
+      });
+
+      this.data.W = new Decimal(W_mm).div(1000).toString() as `${number}`;
+      this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+    } else {
+      const fuillWidth_mm = calcProductFullWidth({
+        WG: new Decimal(this.data.WG).mul(1000).toNumber(),
+        gapA: Number(this.data.gapA ?? 0),
+        gapC: Number(this.data.gapC ?? 0),
+      });
+
+      const fuillWidth = new Decimal(fuillWidth_mm).div(1000).toString() as `${number}`;
+
+      this.data.fullWidth = fuillWidth;
+    }
+  }
+
   // ---------------------------------------------------------------------------
 
   // ==========================================================================
@@ -488,31 +523,7 @@ class ClassProd {
     this.data.bearingHousingSize = generalSpecs.bearingHousingSize;
     this.data.bearingName = generalSpecs.bearingName || null;
 
-    if (Number(this.data.fullWidth)) {
-      const WG_mm = calcProductWG({
-        fullWidth: this.fullWidth_mm,
-        gapA: this.data.gapA,
-        gapC: this.data.gapC,
-      });
-
-      const W_mm = calcW({
-        WG: WG_mm,
-        G: this.data.guideRailG || 0,
-      });
-
-      this.data.W = new Decimal(W_mm).div(1000).toString() as `${number}`;
-      this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
-    } else {
-      const fuillWidth_mm = calcProductFullWidth({
-        WG: new Decimal(this.data.WG).mul(1000).toNumber(),
-        gapA: Number(this.data.gapA ?? 0),
-        gapC: Number(this.data.gapC ?? 0),
-      });
-
-      const fuillWidth = new Decimal(fuillWidth_mm).div(1000).toString() as `${number}`;
-
-      this.data.fullWidth = fuillWidth;
-    }
+    this.renewLW();
 
     this.data.thickness = generalSpecs.thickness as `${number}`;
 
@@ -1398,6 +1409,7 @@ class ClassProd {
   }
   set fullWidth(value) {
     this.data.fullWidth = value;
+    this.data.calcByLW = 'l';
 
     if (this.isSpecial) {
       this.render();
@@ -1406,6 +1418,7 @@ class ClassProd {
     }
 
     this.data.WG = '0';
+    this.data.W = '0';
     this.clearState_some();
 
     this.isAllowReqChain && this.addAfterChange('reqChain_01');
@@ -1430,14 +1443,9 @@ class ClassProd {
   }
   set W(v) {
     this.data.W = v || '0';
-    const W_mm = new Decimal(this.data.W).mul(1000).toNumber();
+    this.data.calcByLW = 'w';
 
-    const WG_mm = calcProductWG_withWAndG({
-      W: W_mm,
-      G: this.data.guideRailG || 0,
-    });
-
-    this.data.WG = new Decimal(WG_mm).div(1000).toString() as `${number}`;
+    this.renewWG();
 
     if (this.isSpecial) {
       this.render();
