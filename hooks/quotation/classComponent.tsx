@@ -99,7 +99,7 @@ class Class_component {
   readonly identificationId;
 
   callReqGetCodeNumber() {
-    this._prod.shouldCall_pgpb = true;
+    this._prod.params_pgpb = {};
     this._prod.callAllReq();
   }
   //

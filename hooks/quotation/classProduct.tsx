@@ -527,9 +527,9 @@ class Class_product {
   // 防抖
   callAllTimeoutId: NodeJS.Timeout | undefined = undefined;
 
-  shouldCall_cgs = false; //req_calcGeneralSpec
-  shouldCall_pac = false; //req_getProdAvailableComponents
-  shouldCall_pgpb = false; //reqProdGenerateDoorProductBom
+  params_cgs: object | undefined = {}; //req_calcGeneralSpec
+  params_pac: object | undefined = {}; //req_getProdAvailableComponents
+  params_pgpb: object | undefined = {}; //reqProdGenerateDoorProductBom
 
   // 其他防抖
   timeoutId_retrieveCreProdCom: NodeJS.Timeout | null = null;
@@ -1053,10 +1053,10 @@ class Class_product {
     //   this._doorGeneralSpecs?.diameter !== res.diameter
     //   //
     // ) {
-    //   this.shouldCall_pac = true;
+    //   this.params_pac = {};
     // }
 
-    this.shouldCall_pac = true;
+    this.params_cgs = {};
 
     // 這個判斷幾乎沒有意義，改變寬度時部分欄位一定會改變
     // 而寬度經常改變
@@ -1069,9 +1069,9 @@ class Class_product {
     //   this._doorGeneralSpecs?.bearingName !== res.bearingName ||
     //   this._doorGeneralSpecs?.sprocketWheelChains !== res.sprocketWheelChains
     // ) {
-    //   this.shouldCall_pgpb = true;
+    //   this.params_pgpb = {};
     // }
-    this.shouldCall_pgpb = true;
+    this.params_pgpb = {};
 
     this._doorGeneralSpecs = res;
 
@@ -1323,20 +1323,20 @@ class Class_product {
       // 因此在這邊設為undefined，避免呼叫相關方法
       // 在下面呼叫this.req_getProdAvailableComponents而更新_availableComponents後
       // 會使用_availableComponents的方法應該就會被呼叫了(包括建立comList的方法)
-      if (this.shouldCall_pac) {
+      if (this.params_pac) {
         this._availableComponents = undefined;
         this.comList = undefined;
       }
 
-      if (this.shouldCall_cgs) {
+      if (this.params_cgs) {
         res1 = await this.req_calcGeneralSpec();
       }
 
-      if (this.shouldCall_pac) {
+      if (this.params_pac) {
         res2 = await this.req_getProdAvailableComponents();
       }
 
-      if (this.shouldCall_pgpb) {
+      if (this.params_pgpb) {
         res3 = await this.reqProdGenerateDoorProductBom();
       }
     } catch (error) {
@@ -1378,9 +1378,9 @@ class Class_product {
       await this.reqGetDetailSpec();
     }
 
-    this.shouldCall_cgs = false;
-    this.shouldCall_pac = false;
-    this.shouldCall_pgpb = false;
+    this.params_cgs = undefined;
+    this.params_pac = undefined;
+    this.params_pgpb = undefined;
 
     // ! warning01
     // 若是在沒有gapA的情況計算出fulllWidth(以下稱舊L)並執行req_calcGeneralSpec
@@ -1738,7 +1738,7 @@ class Class_product {
 
     this.material = this.material;
 
-    this.shouldCall_pgpb = true;
+    this.params_pgpb = {};
 
     this.callAllReq();
     // this.reqChain();
@@ -2827,9 +2827,9 @@ class Class_product {
     this.toGetInstallationFee();
     this.subComList.distributionBox.quantity = '1';
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pac = true;
-    this.shouldCall_pgpb = true;
+    this.params_cgs = {};
+    this.params_pac = {};
+    this.params_pgpb = {};
     // this.callAllReq();
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
@@ -2867,7 +2867,7 @@ class Class_product {
     this.area = this.calcArea();
     // this.calcChangeAccePrice();
     // this.clearProd();
-    this.shouldCall_cgs = true;
+    this.params_cgs = {};
     // this.callAllReq();
 
     this.reRender();
@@ -3008,8 +3008,8 @@ class Class_product {
     this.area = this.calcArea();
     // this.clearProd();
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pgpb = true;
+    this.params_cgs = {};
+    this.params_pgpb = {};
     // this.callAllReq();
 
     this.reRender();
@@ -3082,7 +3082,7 @@ class Class_product {
 
       // this.callRetrieveCreProdCom();
 
-      this.shouldCall_pgpb = true;
+      this.params_pgpb = {};
 
       this.callAllReq({ toCallRetrieveCreProdCom: true });
       // this.callRetrieveCreProdCom();
@@ -3198,7 +3198,7 @@ class Class_product {
     // this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
     // this.area = this.calcArea();
 
-    // this.shouldCall_pgpb = true;
+    // this.params_pgpb = {};
     // this.callAllReq();
 
     this.reRender();
@@ -3455,9 +3455,9 @@ class Class_product {
 
     if (originallyIsZero) {
       // 呼叫callAllReq後就會再自動算金額了
-      this.shouldCall_cgs = true;
-      this.shouldCall_pac = true;
-      this.shouldCall_pgpb = true;
+      this.params_cgs = {};
+      this.params_pac = {};
+      this.params_pgpb = {};
       // this.callAllReq();
     }
 
@@ -3592,9 +3592,9 @@ class Class_product {
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pac = true;
-    this.shouldCall_pgpb = true;
+    this.params_cgs = {};
+    this.params_pac = {};
+    this.params_pgpb = {};
     this.callAllReq();
 
     this.reRender();
@@ -3820,9 +3820,9 @@ class Class_product {
     // onDoorTypeChange必須放在賦值之後再執行
     // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pac = true;
-    this.shouldCall_pgpb = true;
+    this.params_cgs = {};
+    this.params_pac = {};
+    this.params_pgpb = {};
     this.callAllReq();
 
     this.reRender();
@@ -3930,7 +3930,7 @@ class Class_product {
 
     this.comList?.bottomBar.setMaterial_noRelationToProd(angleIronMaterial ?? this.material);
 
-    this.shouldCall_pgpb = true;
+    this.params_pgpb = {};
     this.callAllReq();
     this.reRender();
   }
@@ -3968,7 +3968,7 @@ class Class_product {
 
     this.comList?.bottomBar.setMaterial_noRelationToProd(plateMaterial ?? this.material);
 
-    this.shouldCall_pgpb = true;
+    this.params_pgpb = {};
     this.callAllReq();
     this.reRender();
   }
