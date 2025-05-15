@@ -459,7 +459,7 @@ class Class_product {
   private makeFormatValueDontTriggerTwice = false;
 
   // private isWgChanged = false;
-  private isDontClearProd = false;
+  // private isDontClearProd = false;
 
   // private isEditW_noGapA = false;
 
@@ -523,17 +523,59 @@ class Class_product {
   };
 
   // ---------------------------------------------------------
-  // req呼叫控制
-  // 防抖
+  // reqChain防抖
   callAllTimeoutId: NodeJS.Timeout | undefined = undefined;
-
-  params_cgs: object | undefined = {}; //req_calcGeneralSpec
-  params_pac: object | undefined = {}; //req_getProdAvailableComponents
-  params_pgpb: object | undefined = {}; //reqProdGenerateDoorProductBom
 
   // 其他防抖
   timeoutId_retrieveCreProdCom: NodeJS.Timeout | null = null;
   timeoutId_calcFullWidth: NodeJS.Timeout | null = null;
+
+  // reqChain參數與呼叫控制
+  private _params_cgs: { isDontClearProd?: boolean } | undefined = {}; //req_calcGeneralSpec
+  private _params_pac: object | undefined = {}; //req_getProdAvailableComponents
+  private _params_pgpb: object | undefined = {}; //reqProdGenerateDoorProductBom
+
+  addParams_cgs(params?: Class_product['_params_cgs']) {
+    if (!this._params_cgs) {
+      this._params_cgs = {};
+    }
+
+    this._params_cgs = {
+      ...this._params_cgs,
+      ...params,
+    };
+  }
+  clearParams_cgs() {
+    this._params_cgs = undefined;
+  }
+
+  addParams_pac(params?: Class_product['_params_pac']) {
+    if (!this._params_pac) {
+      this._params_pac = {};
+    }
+
+    this._params_pac = {
+      ...this._params_pac,
+      ...params,
+    };
+  }
+  clearParams_pac() {
+    this._params_pac = undefined;
+  }
+
+  addParams_pgpb(params?: Class_product['_params_pgpb']) {
+    if (!this._params_pgpb) {
+      this._params_pgpb = {};
+    }
+
+    this._params_pgpb = {
+      ...this._params_pgpb,
+      ...params,
+    };
+  }
+  clearParams_pgpb() {
+    this._params_pgpb = undefined;
+  }
 
   // ---------------------------------------------------------
 
@@ -905,14 +947,15 @@ class Class_product {
   // ---------------------------------------------------------
   // api請求
   // this.shouldCall_cgs
-  async req_calcGeneralSpec() {
+  async req_calcGeneralSpec({
+    //
+    isDontClearProd,
+  }: NonNullable<Class_product['_params_cgs']>) {
     // const wasWgChanged = this.isWgChanged;
 
-    if (!this.isDontClearProd) {
+    if (isDontClearProd) {
       this.clearProd();
     }
-
-    this.isDontClearProd = false;
 
     if (!this.doorType || !this.height) {
       return false;
@@ -947,15 +990,15 @@ class Class_product {
       return false;
     }
 
-    const res = await reqGetCalcGeneralSpec(body);
+    const res_spec = await reqGetCalcGeneralSpec(body);
 
-    if (!res) {
+    if (!res_spec) {
       this.clearProd();
 
       return false;
     }
 
-    this._doorGeneralSpecs = res;
+    this._doorGeneralSpecs = res_spec;
 
     // const oldW = this.W;
 
@@ -1056,7 +1099,7 @@ class Class_product {
     //   this.params_pac = {};
     // }
 
-    this.params_cgs = {};
+    // this.params_pac = {};
 
     // 這個判斷幾乎沒有意義，改變寬度時部分欄位一定會改變
     // 而寬度經常改變
@@ -1071,9 +1114,9 @@ class Class_product {
     // ) {
     //   this.params_pgpb = {};
     // }
-    this.params_pgpb = {};
+    // this.params_pgpb = {};
 
-    this._doorGeneralSpecs = res;
+    this._doorGeneralSpecs = res_spec;
 
     // this.isWgChanged = false;
 
@@ -1323,20 +1366,25 @@ class Class_product {
       // 因此在這邊設為undefined，避免呼叫相關方法
       // 在下面呼叫this.req_getProdAvailableComponents而更新_availableComponents後
       // 會使用_availableComponents的方法應該就會被呼叫了(包括建立comList的方法)
-      if (this.params_pac) {
+      if (this._params_pac) {
         this._availableComponents = undefined;
         this.comList = undefined;
       }
 
-      if (this.params_cgs) {
-        res1 = await this.req_calcGeneralSpec();
+      if (this._params_cgs) {
+        res1 = await this.req_calcGeneralSpec(this._params_cgs);
+
+        if (res1 === true) {
+          this.addParams_pac();
+          this.addParams_pgpb();
+        }
       }
 
-      if (this.params_pac) {
+      if (this._params_pac) {
         res2 = await this.req_getProdAvailableComponents();
       }
 
-      if (this.params_pgpb) {
+      if (this._params_pgpb) {
         res3 = await this.reqProdGenerateDoorProductBom();
       }
     } catch (error) {
@@ -1378,9 +1426,9 @@ class Class_product {
       await this.reqGetDetailSpec();
     }
 
-    this.params_cgs = undefined;
-    this.params_pac = undefined;
-    this.params_pgpb = undefined;
+    this.clearParams_cgs();
+    this.clearParams_pac();
+    this.clearParams_pgpb();
 
     // ! warning01
     // 若是在沒有gapA的情況計算出fulllWidth(以下稱舊L)並執行req_calcGeneralSpec
@@ -1738,7 +1786,7 @@ class Class_product {
 
     this.material = this.material;
 
-    this.params_pgpb = {};
+    this.addParams_pgpb();
 
     this.callAllReq();
     // this.reqChain();
@@ -2827,9 +2875,10 @@ class Class_product {
     this.toGetInstallationFee();
     this.subComList.distributionBox.quantity = '1';
 
-    this.params_cgs = {};
-    this.params_pac = {};
-    this.params_pgpb = {};
+    this.addParams_cgs();
+    this.addParams_pac();
+    this.addParams_pgpb();
+
     // this.callAllReq();
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
@@ -2867,7 +2916,7 @@ class Class_product {
     this.area = this.calcArea();
     // this.calcChangeAccePrice();
     // this.clearProd();
-    this.params_cgs = {};
+    this.addParams_cgs();
     // this.callAllReq();
 
     this.reRender();
@@ -3008,8 +3057,9 @@ class Class_product {
     this.area = this.calcArea();
     // this.clearProd();
 
-    this.params_cgs = {};
-    this.params_pgpb = {};
+    this.addParams_cgs();
+    this.addParams_pgpb();
+
     // this.callAllReq();
 
     this.reRender();
@@ -3082,7 +3132,7 @@ class Class_product {
 
       // this.callRetrieveCreProdCom();
 
-      this.params_pgpb = {};
+      this.addParams_pgpb();
 
       this.callAllReq({ toCallRetrieveCreProdCom: true });
       // this.callRetrieveCreProdCom();
@@ -3385,7 +3435,9 @@ class Class_product {
     const { gapA, gapC } = lookup_hpToGapAGapC[v as keyof typeof lookup_hpToGapAGapC];
 
     if (!this._doorGeneralSpecs) {
-      this.isDontClearProd = true;
+      this.addParams_cgs({
+        isDontClearProd: true,
+      });
       this.resetDoorGeneralSpacs();
     }
 
@@ -3455,9 +3507,11 @@ class Class_product {
 
     if (originallyIsZero) {
       // 呼叫callAllReq後就會再自動算金額了
-      this.params_cgs = {};
-      this.params_pac = {};
-      this.params_pgpb = {};
+
+      this.addParams_cgs();
+      this.addParams_pac();
+      this.addParams_pgpb();
+
       // this.callAllReq();
     }
 
@@ -3583,7 +3637,7 @@ class Class_product {
 
     //
     this._prodData.typhoonProtection = v;
-    this.isDontClearProd = true;
+
     this._prodData.isULGuideRail = false;
 
     this._prodData.doorTrack = '';
@@ -3592,9 +3646,13 @@ class Class_product {
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
-    this.params_cgs = {};
-    this.params_pac = {};
-    this.params_pgpb = {};
+    this.addParams_cgs({
+      isDontClearProd: true,
+    });
+
+    this.addParams_pac();
+    this.addParams_pgpb();
+
     this.callAllReq();
 
     this.reRender();
@@ -3810,7 +3868,6 @@ class Class_product {
 
     // ________________________
 
-    this.isDontClearProd = true;
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
     // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
@@ -3820,9 +3877,13 @@ class Class_product {
     // onDoorTypeChange必須放在賦值之後再執行
     // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
-    this.params_cgs = {};
-    this.params_pac = {};
-    this.params_pgpb = {};
+    this.addParams_cgs({
+      isDontClearProd: true,
+    });
+
+    this.addParams_pac();
+    this.addParams_pgpb();
+
     this.callAllReq();
 
     this.reRender();
@@ -3930,7 +3991,8 @@ class Class_product {
 
     this.comList?.bottomBar.setMaterial_noRelationToProd(angleIronMaterial ?? this.material);
 
-    this.params_pgpb = {};
+    this.addParams_pgpb();
+
     this.callAllReq();
     this.reRender();
   }
@@ -3968,7 +4030,8 @@ class Class_product {
 
     this.comList?.bottomBar.setMaterial_noRelationToProd(plateMaterial ?? this.material);
 
-    this.params_pgpb = {};
+    this.addParams_pgpb();
+
     this.callAllReq();
     this.reRender();
   }
@@ -4961,7 +5024,7 @@ const reqGetCalcGeneralSpec = async ({
     height,
     isAntiTyphoon,
     fullWidth,
-    WG: WG,
+    WG,
     hp,
   };
 
