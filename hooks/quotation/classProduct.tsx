@@ -454,9 +454,6 @@ class Class_product {
 
   private defaultMotorSpecs: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
-  // readonly options_doorTrack_normal = options_doorTrack_normal;
-  // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
-
   private _quotationDiscount = 100;
 
   private makeFormatValueDontTriggerTwice = false;
@@ -772,8 +769,6 @@ class Class_product {
   // ---------------------
 
   clearProd() {
-    // if(this.isWgChanged)
-
     const empty = emptyProdOri();
 
     const prod: Tprod = {
@@ -911,7 +906,6 @@ class Class_product {
   // api請求
   // this.shouldCall_cgs
   async req_calcGeneralSpec() {
-    // const hadHorsepower = !!this._prodData.horsepower;
     const wasWgChanged = this.isWgChanged;
 
     if (!this.isDontClearProd) {
@@ -921,17 +915,10 @@ class Class_product {
     this.isDontClearProd = false;
 
     if (!this.doorType || !this.height) {
-      // this.isWgChanged = false;
-
       return false;
     }
 
-    if (
-      !this.fullWidth
-      // && !this.WG
-    ) {
-      // this.isWgChanged = false;
-
+    if (!this.fullWidth) {
       return false;
     }
 
@@ -951,21 +938,17 @@ class Class_product {
         isAntiTyphoon,
         fullWidth,
         WG: undefined,
-        // hp: this.isWgChanged ? hp : undefined,
         hp: hp || undefined,
       };
     })();
 
     if (body.fullWidth <= 0 && !body.WG) {
-      // this.isWgChanged = false;
-
       return false;
     }
 
     const res = await reqGetCalcGeneralSpec(body);
 
     if (!res) {
-      // this.isWgChanged = false;
       this.clearProd();
 
       return false;
