@@ -4346,6 +4346,7 @@ class Class_product {
       boxD: new Decimal(this._prodData.boxD || 0).mul(1000).toNumber(),
       volume: this._prodData.volume || '0',
       area: this._prodData.area || '0',
+      guideRailG: this._prodData.guideRailG || 0,
 
       headBoxThickness: this._prodData.rollUpBoxThick,
       motorVoltage: Number(this._prodData.voltage),
