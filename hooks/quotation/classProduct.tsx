@@ -531,7 +531,13 @@ class Class_product {
   timeoutId_calcFullWidth: NodeJS.Timeout | null = null;
 
   // reqChain參數與呼叫控制
-  private _params_cgs: { isDontClearProd?: boolean } | undefined = {}; //req_calcGeneralSpec
+  private _params_cgs:
+    | {
+        //
+        dontClearProd?: boolean;
+        onlyUpdateSpec?: boolean;
+      }
+    | undefined = {}; //req_calcGeneralSpec
   private _params_pac: object | undefined = {}; //req_getProdAvailableComponents
   private _params_pgpb: object | undefined = {}; //reqProdGenerateDoorProductBom
 
@@ -949,11 +955,12 @@ class Class_product {
   // this.shouldCall_cgs
   async req_calcGeneralSpec({
     //
-    isDontClearProd,
+    onlyUpdateSpec,
+    dontClearProd: dontClearProd,
   }: NonNullable<Class_product['_params_cgs']>) {
     // const wasWgChanged = this.isWgChanged;
 
-    if (isDontClearProd) {
+    if (!dontClearProd) {
       this.clearProd();
     }
 
@@ -999,6 +1006,10 @@ class Class_product {
     }
 
     this._doorGeneralSpecs = res_spec;
+
+    // if (onlyUpdateSpec) {
+    //   return true;
+    // }
 
     // const oldW = this.W;
 
@@ -1052,11 +1063,7 @@ class Class_product {
     this.defaultMotorSpecs = defaultMotorSpecs;
 
     // WARNING W2判斷
-    if (
-      !this.isW2 &&
-      // !wasWgChanged ||
-      (!this._prodData.boxB || !this.horsepower)
-    ) {
+    if (!this.isW2) {
       // this.horsepower = defaultMotorSpecs.hp;
       this.changeHorsepower_noChangeW_noReq(defaultMotorSpecs.hp);
 
@@ -1376,7 +1383,7 @@ class Class_product {
 
         if (res1 === true) {
           this.addParams_pac();
-          this.addParams_pgpb();
+          // this.addParams_pgpb();
         }
       }
 
@@ -1462,7 +1469,10 @@ class Class_product {
       this.callAllTimeoutId = undefined;
 
       await this.reqChain();
-      toCallRetrieveCreProdCom && this.callRetrieveCreProdCom();
+
+      if (toCallRetrieveCreProdCom) {
+        await this.callRetrieveCreProdCom();
+      }
 
       // 在reqChain中，可能會間接的再次呼叫callAllReq
       // 於是this.callAllTimeoutId就不會為undefined
@@ -1615,7 +1625,6 @@ class Class_product {
           isUL: this.isULGuideRail,
         },
       });
-
       let motor: Tcomponent | null = filter_motors({
         dataArr: availableComponents.motors,
         filterParams: {
@@ -3436,22 +3445,36 @@ class Class_product {
 
     if (!this._doorGeneralSpecs) {
       this.addParams_cgs({
-        isDontClearProd: true,
+        dontClearProd: true,
       });
       this.resetDoorGeneralSpacs();
     }
 
     this._doorGeneralSpecs!.gapA = gapA;
     this._doorGeneralSpecs!.gapC = gapC;
+    this._prodData.boxB = '';
 
-    const W = calcW_2({
+    // const W = calcW_2({
+    //   fullWidth: this.fullWidth_mm,
+    //   gapA: Number(this._doorGeneralSpecs!.gapA || '0'),
+    //   gapC: Number(this._doorGeneralSpecs!.gapC || '0'),
+    //   G: this.guildRailG_mm,
+    // });
+
+    const WG_mm = calcProductWG({
       fullWidth: this.fullWidth_mm,
-      gapA: Number(this._doorGeneralSpecs!.gapA || '0'),
-      gapC: Number(this._doorGeneralSpecs!.gapC || '0'),
-      G: this.guildRailG_mm,
+      gapA: this._doorGeneralSpecs!.gapA,
+      gapC: this._doorGeneralSpecs!.gapC,
     });
 
-    this.W = new Decimal(W).div(1000).toString();
+    this._prodData.WG = new Decimal(WG_mm).div(1000).toString();
+
+    this.addParams_cgs({
+      dontClearProd: true,
+      onlyUpdateSpec: true,
+    });
+
+    // this.W = new Decimal(W).div(1000).toString();
 
     this.changeDistributionBoxPrice_byHorsepower();
     this.changePhase_byHorsepower();
@@ -3647,7 +3670,7 @@ class Class_product {
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
     this.addParams_cgs({
-      isDontClearProd: true,
+      dontClearProd: true,
     });
 
     this.addParams_pac();
@@ -3878,7 +3901,7 @@ class Class_product {
     // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
     this.addParams_cgs({
-      isDontClearProd: true,
+      dontClearProd: true,
     });
 
     this.addParams_pac();
