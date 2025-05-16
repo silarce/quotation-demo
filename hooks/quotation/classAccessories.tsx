@@ -71,7 +71,7 @@ class Class_accessories {
   private _acceData;
   readonly key;
   private _prod;
-  readonly identificationId;
+  identificationId;
 
   delSelf: () => void;
   copySelf: () => void;

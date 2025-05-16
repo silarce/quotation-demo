@@ -96,7 +96,7 @@ class Class_component {
   _prod;
   private _com;
   readonly key;
-  readonly identificationId;
+  identificationId;
 
   callReqGetCodeNumber() {
     this._prod.addParams_pgpb();

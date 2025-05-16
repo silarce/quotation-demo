@@ -1113,11 +1113,14 @@ const useClassProdList = ({
       return;
     }
 
-    const newKey = nanoid();
+    const newKey = 'new-' + nanoid();
 
     const copy = _.cloneDeep(list[copyKey]);
-    copy.replaceId(copyKey);
+
+    copy.replaceId(newKey);
     copy.clearRootProductId();
+
+    copy.editItemName(`${copy.itemName}-copy`);
 
     copy.delSelf = () => {
       delSelf_prod(list, newKey);
@@ -1135,7 +1138,12 @@ const useClassProdList = ({
 
     copy.attachId = newKey;
 
+    copy.comList &&
+      Object.values(copy.comList).forEach((com) => {
+        com.identificationId = copy.id!;
+      });
     Object.values(copy.accessoriesList).forEach((acce) => {
+      acce.identificationId = copy.id!;
       acce.reNewMethod();
     });
 
