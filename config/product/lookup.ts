@@ -139,7 +139,7 @@ export const lookup_hpToGapAGapC = {
     HPValue: 1.5,
     outputTooth: 9,
     reelGear: 60,
-    gapA: 70,
+    gapA: 120,
     gapC: 20,
     distributionBoxPrice: 5940,
   },

@@ -1,15 +1,10 @@
 import _ from 'lodash';
-import Decimal from 'decimal.js';
 
 // antd
 import { Checkbox } from 'antd';
 
 // gear
-import InputSel, {
-  TinputSelProps,
-  inputLocaleStringSwitcher,
-  InputSel_input_timeout,
-} from 'components/global/gear/inputAndSel_v2/inputSel';
+import { TinputSelProps, inputLocaleStringSwitcher } from 'components/global/gear/inputAndSel_v2/inputSel';
 import {
   InputSel_prod,
   // InputSel_prod_memo_select,
@@ -18,27 +13,30 @@ import {
 import { ClassProd } from './classProd_remake';
 
 import {
-  optionsCreator_doorModel,
+  // optionsCreator_doorModel,
   optionsCreator_quoteType,
-  optionsCreator_bottomBar,
-  optionsCreator_motorLockBox,
-  optionsCreator_rollerSpec,
+  // optionsCreator_bottomBar,
+  // optionsCreator_motorLockBox,
+  // optionsCreator_rollerSpec,
   optionsCreator_closingType,
-  optionsCreator_bottomBarAngleIron,
-  optionsCreator_bottomBarPlate,
+  // optionsCreator_bottomBarAngleIron,
+  // optionsCreator_bottomBarPlate,
   optionsCreator_boxB_SJ302,
   optionsCreator_boxB_SJ303A,
   optionsCreator_boxB_SJ312,
   optionsCreator_boxB_SJ305D,
-  optionsCreator_horsePower,
-  lookup_options_bottomBarAngleIronAndPlate,
-  optionsCreator_doorModelName,
+  // optionsCreator_horsePower,
+  // lookup_options_bottomBarAngleIronAndPlate,
+  // optionsCreator_doorModelName,
   lookup_quoteType_doorModelName,
 } from 'js/utils/options/productOptions';
 
 import { TdoorModelInfoDto } from 'js/api/api_product';
 import { createAssetUrl } from 'js/api/api_product';
-import type { Toption, ToptionPlus } from 'js/utils/options/options';
+import type {
+  Toption,
+  //  ToptionPlus
+} from 'js/utils/options/options';
 
 import { TdoorModel } from 'js/api/dtoTypes';
 
@@ -130,13 +128,13 @@ const defaultKeyArr: TcellKey[] = [
   'height',
   'boxB',
   'boxD',
-  'area',
-  'volume',
-
   'horsepower',
   'guideRail',
   'isAntiTyphoon',
   'hasSilencingStrip',
+
+  'area',
+  'volume',
   'thickness',
   'materialName',
   'materialSurface',
@@ -418,7 +416,7 @@ const nodeConfig_origin: TnodeConfig = {
   boxD: {
     label: 'D',
     style: {
-      width: 80,
+      width: 50,
     },
     createNode({ disabled, classProd }) {
       disabled = classProd.isSpecial ? disabled : true;
@@ -557,9 +555,15 @@ const nodeConfig_origin: TnodeConfig = {
         },
       };
 
+      const title = v?.replace(/\.svg$/, '');
+
       // 有icon的select，點擊開啟menu時click事件的傳遞不太正常
       // 造成的問題已經以別的方式解決，但還是要留意一下
-      return <InputSel_prod_select {...inputSelProps} disabled={disabled} />;
+      return (
+        <span title={title}>
+          <InputSel_prod_select {...inputSelProps} disabled={disabled} />
+        </span>
+      );
     },
   },
 

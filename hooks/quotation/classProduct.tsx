@@ -454,17 +454,14 @@ class Class_product {
 
   private defaultMotorSpecs: TdoorGeneralSpecsMotorDto | undefined = undefined;
 
-  // readonly options_doorTrack_normal = options_doorTrack_normal;
-  // readonly options_doorTrack_typhoonProtection = options_doorTrack_typhoonProtection;
-
   private _quotationDiscount = 100;
 
   private makeFormatValueDontTriggerTwice = false;
 
-  private isWgChanged = false;
-  private isDontClearProd = false;
+  // private isWgChanged = false;
+  // private isDontClearProd = false;
 
-  private isEditW_noGapA = false;
+  // private isEditW_noGapA = false;
 
   get isComplete() {
     if (!this._prodData.raw) {
@@ -526,17 +523,65 @@ class Class_product {
   };
 
   // ---------------------------------------------------------
-  // req呼叫控制
-  // 防抖
+  // reqChain防抖
   callAllTimeoutId: NodeJS.Timeout | undefined = undefined;
-
-  shouldCall_cgs = false; //req_calcGeneralSpec
-  shouldCall_pac = false; //req_getProdAvailableComponents
-  shouldCall_pgpb = false; //reqProdGenerateDoorProductBom
 
   // 其他防抖
   timeoutId_retrieveCreProdCom: NodeJS.Timeout | null = null;
   timeoutId_calcFullWidth: NodeJS.Timeout | null = null;
+
+  // reqChain參數與呼叫控制
+  private _params_cgs:
+    | {
+        //
+        dontClearProd?: boolean;
+        onlyUpdateSpec?: boolean;
+      }
+    | undefined = {}; //req_calcGeneralSpec
+  private _params_pac: object | undefined = {}; //req_getProdAvailableComponents
+  private _params_pgpb: object | undefined = {}; //reqProdGenerateDoorProductBom
+
+  addParams_cgs(params?: Class_product['_params_cgs']) {
+    if (!this._params_cgs) {
+      this._params_cgs = {};
+    }
+
+    this._params_cgs = {
+      ...this._params_cgs,
+      ...params,
+    };
+  }
+  clearParams_cgs() {
+    this._params_cgs = undefined;
+  }
+
+  addParams_pac(params?: Class_product['_params_pac']) {
+    if (!this._params_pac) {
+      this._params_pac = {};
+    }
+
+    this._params_pac = {
+      ...this._params_pac,
+      ...params,
+    };
+  }
+  clearParams_pac() {
+    this._params_pac = undefined;
+  }
+
+  addParams_pgpb(params?: Class_product['_params_pgpb']) {
+    if (!this._params_pgpb) {
+      this._params_pgpb = {};
+    }
+
+    this._params_pgpb = {
+      ...this._params_pgpb,
+      ...params,
+    };
+  }
+  clearParams_pgpb() {
+    this._params_pgpb = undefined;
+  }
 
   // ---------------------------------------------------------
 
@@ -614,6 +659,10 @@ class Class_product {
   }
 
   // ---------------------------------------------------------
+
+  editItemName(v: string) {
+    this._prodData.itemName = v;
+  }
 
   // 選配設定
 
@@ -772,8 +821,6 @@ class Class_product {
   // ---------------------
 
   clearProd() {
-    // if(this.isWgChanged)
-
     const empty = emptyProdOri();
 
     const prod: Tprod = {
@@ -822,16 +869,16 @@ class Class_product {
     // prod.boxB = '';
     // prod.thickness = '';
 
-    if (this.isWgChanged) {
-      prod.horsepower = this._prodData.horsepower;
-      prod.motor = this._prodData.motor;
-      prod.boxB = this._prodData.boxB;
-      prod.boxD = this._prodData.boxD;
-      // prod.gapA = this._prodData.gapA;
-      // prod.gapC = this._prodData.gapC;
-      // prod.gapA = this._doorGeneralSpecs?.gapA ?? 0;
-      // prod.gapC = this._doorGeneralSpecs?.gapC ?? 0;
-    }
+    // if (this.isWgChanged) {
+    //   prod.horsepower = this._prodData.horsepower;
+    //   prod.motor = this._prodData.motor;
+    //   prod.boxB = this._prodData.boxB;
+    //   prod.boxD = this._prodData.boxD;
+    //   // prod.gapA = this._prodData.gapA;
+    //   // prod.gapC = this._prodData.gapC;
+    //   // prod.gapA = this._doorGeneralSpecs?.gapA ?? 0;
+    //   // prod.gapC = this._doorGeneralSpecs?.gapC ?? 0;
+    // }
 
     this._prodData = prod;
 
@@ -910,70 +957,65 @@ class Class_product {
   // ---------------------------------------------------------
   // api請求
   // this.shouldCall_cgs
-  async req_calcGeneralSpec() {
-    // const hadHorsepower = !!this._prodData.horsepower;
-    const wasWgChanged = this.isWgChanged;
+  async req_calcGeneralSpec({
+    //
+    onlyUpdateSpec,
+    dontClearProd: dontClearProd,
+  }: NonNullable<Class_product['_params_cgs']>) {
+    // const wasWgChanged = this.isWgChanged;
 
-    if (!this.isDontClearProd) {
+    if (!dontClearProd) {
       this.clearProd();
     }
 
-    this.isDontClearProd = false;
-
     if (!this.doorType || !this.height) {
-      // this.isWgChanged = false;
-
       return false;
     }
 
-    if (
-      !this.fullWidth
-      // && !this.WG
-    ) {
-      // this.isWgChanged = false;
-
+    if (!this.fullWidth && !this.WG) {
       return false;
     }
 
     const body = (() => {
-      // const fullWidth = Number(this.fullWidth || 0) * 1000;
-      const fullWidth = new Decimal(this.fullWidth || 0).mul(1000).toNumber();
+      const fullWidth = new Decimal(this.fullWidth || 0).mul(1000).toNumber() || undefined;
       const modelName = this.doorType as TpcgsPrams['modelName'];
-      // const height = Number(this.height) * 1000;
+
       const height = new Decimal(this.height).mul(1000).toNumber();
       const isAntiTyphoon = this.typhoonProtection;
 
       const hp = this.horsepower.replaceAll('HP', '') as Thp;
+
+      const WG = this.WG ? new Decimal(this.WG).mul(1000).toNumber() : undefined;
 
       return {
         modelName,
         height,
         isAntiTyphoon,
         fullWidth,
-        WG: undefined,
-        // hp: this.isWgChanged ? hp : undefined,
+        WG: fullWidth ? undefined : WG,
         hp: hp || undefined,
       };
     })();
 
-    if (body.fullWidth <= 0 && !body.WG) {
-      // this.isWgChanged = false;
-
+    if (!body.fullWidth && !body.WG) {
       return false;
     }
 
-    const res = await reqGetCalcGeneralSpec(body);
+    const res_spec = await reqGetCalcGeneralSpec(body);
 
-    if (!res) {
-      // this.isWgChanged = false;
+    if (!res_spec) {
       this.clearProd();
 
       return false;
     }
 
-    this._doorGeneralSpecs = res;
+    this._doorGeneralSpecs = res_spec;
 
-    const oldW = this.W;
+    // if (onlyUpdateSpec) {
+    //   return true;
+    // }
+
+    // const oldW = this.W;
 
     // this._prodData.WG = String(
     //   calcProductWG({
@@ -983,12 +1025,29 @@ class Class_product {
     //   }) / 1000
     // );
 
-    const theWG = calcProductWG({
-      fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
-      gapA: this._doorGeneralSpecs.gapA,
-      gapC: this._doorGeneralSpecs.gapC,
-    });
-    this._prodData.WG = new Decimal(theWG).div(1000).toString();
+    // const theWG = calcProductWG({
+    //   fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+    //   gapA: this._doorGeneralSpecs.gapA,
+    //   gapC: this._doorGeneralSpecs.gapC,
+    // });
+    // this._prodData.WG = new Decimal(theWG).div(1000).toString();
+
+    if (Number(this.fullWidth)) {
+      const theWG = calcProductWG({
+        fullWidth: new Decimal(this._prodData.fullWidth || 0).mul(1000).toNumber(),
+        gapA: this._doorGeneralSpecs.gapA,
+        gapC: this._doorGeneralSpecs.gapC,
+      });
+      this._prodData.WG = new Decimal(theWG).div(1000).toString();
+    } else {
+      const fullWidth = calcProductFullWidth({
+        WG: this.WG_mm,
+        gapA: this._doorGeneralSpecs.gapA,
+        gapC: this._doorGeneralSpecs.gapC,
+      });
+
+      this._prodData.fullWidth = new Decimal(fullWidth).div(1000).toString();
+    }
 
     // WARNING W2判斷
     if (!this.doorTrack && !this.isW2) {
@@ -1008,8 +1067,9 @@ class Class_product {
     this.defaultMotorSpecs = defaultMotorSpecs;
 
     // WARNING W2判斷
-    if (!this.isW2 && (!wasWgChanged || !this._prodData.boxB || !this.horsepower)) {
-      this.horsepower = defaultMotorSpecs.hp;
+    if (!this.isW2) {
+      // this.horsepower = defaultMotorSpecs.hp;
+      this.changeHorsepower_noChangeW_noReq(defaultMotorSpecs.hp);
 
       this.motor = defaultMotorVendor ?? '';
       const theBoxB = String(this.boxB || defaultBoxB || '');
@@ -1030,9 +1090,9 @@ class Class_product {
       this.area = this.calcArea();
       this.reRender();
 
-      if (wasWgChanged) {
-        this.W = oldW;
-      }
+      // if (wasWgChanged) {
+      //   this.W = oldW;
+      // }
     }
 
     // this.options_boxB?.unshift({
@@ -1047,10 +1107,10 @@ class Class_product {
     //   this._doorGeneralSpecs?.diameter !== res.diameter
     //   //
     // ) {
-    //   this.shouldCall_pac = true;
+    //   this.params_pac = {};
     // }
 
-    this.shouldCall_pac = true;
+    // this.params_pac = {};
 
     // 這個判斷幾乎沒有意義，改變寬度時部分欄位一定會改變
     // 而寬度經常改變
@@ -1063,13 +1123,13 @@ class Class_product {
     //   this._doorGeneralSpecs?.bearingName !== res.bearingName ||
     //   this._doorGeneralSpecs?.sprocketWheelChains !== res.sprocketWheelChains
     // ) {
-    //   this.shouldCall_pgpb = true;
+    //   this.params_pgpb = {};
     // }
-    this.shouldCall_pgpb = true;
+    // this.params_pgpb = {};
 
-    this._doorGeneralSpecs = res;
+    this._doorGeneralSpecs = res_spec;
 
-    this.isWgChanged = false;
+    // this.isWgChanged = false;
 
     return true;
   } // calcGeneralSpec
@@ -1317,20 +1377,25 @@ class Class_product {
       // 因此在這邊設為undefined，避免呼叫相關方法
       // 在下面呼叫this.req_getProdAvailableComponents而更新_availableComponents後
       // 會使用_availableComponents的方法應該就會被呼叫了(包括建立comList的方法)
-      if (this.shouldCall_pac) {
+      if (this._params_pac) {
         this._availableComponents = undefined;
         this.comList = undefined;
       }
 
-      if (this.shouldCall_cgs) {
-        res1 = await this.req_calcGeneralSpec();
+      if (this._params_cgs) {
+        res1 = await this.req_calcGeneralSpec(this._params_cgs);
+
+        if (res1 === true) {
+          this.addParams_pac();
+          // this.addParams_pgpb();
+        }
       }
 
-      if (this.shouldCall_pac) {
+      if (this._params_pac) {
         res2 = await this.req_getProdAvailableComponents();
       }
 
-      if (this.shouldCall_pgpb) {
+      if (this._params_pgpb) {
         res3 = await this.reqProdGenerateDoorProductBom();
       }
     } catch (error) {
@@ -1372,19 +1437,19 @@ class Class_product {
       await this.reqGetDetailSpec();
     }
 
-    this.shouldCall_cgs = false;
-    this.shouldCall_pac = false;
-    this.shouldCall_pgpb = false;
+    this.clearParams_cgs();
+    this.clearParams_pac();
+    this.clearParams_pgpb();
 
     // ! warning01
     // 若是在沒有gapA的情況計算出fulllWidth(以下稱舊L)並執行req_calcGeneralSpec
     // 取得的doorGeneralSpecs會是錯誤的
     // 因此必須再取得 新L 後執行fullWidth的setter，再執行一次呼叫鏈，取得新L的doorGeneralSpec
     // 但是若舊L與新L在後端算出的重量剛好對應到不同馬達，將會導致新L時的W與舊L時的W不相符
-    if (this.isEditW_noGapA) {
-      this.fullWidth = this.fullWidth;
-      this.isEditW_noGapA = false;
-    }
+    // if (this.isEditW_noGapA) {
+    //   this.fullWidth = this.fullWidth;
+    //   this.isEditW_noGapA = false;
+    // }
 
     this.reRender();
   }
@@ -1396,8 +1461,6 @@ class Class_product {
     // 應該不會有因為使用者操作太快導致tocCallRetrieveCreProdCom被覆蓋掉的問題
     toCallRetrieveCreProdCom = false,
   }: { toCallRetrieveCreProdCom?: boolean } = {}) {
-    // console.log('callAllReq', key);
-
     if (this.callAllTimeoutId) {
       clearTimeout(this.callAllTimeoutId);
       this.callAllTimeoutId = undefined;
@@ -1410,7 +1473,10 @@ class Class_product {
       this.callAllTimeoutId = undefined;
 
       await this.reqChain();
-      toCallRetrieveCreProdCom && this.callRetrieveCreProdCom();
+
+      if (toCallRetrieveCreProdCom) {
+        await this.callRetrieveCreProdCom();
+      }
 
       // 在reqChain中，可能會間接的再次呼叫callAllReq
       // 於是this.callAllTimeoutId就不會為undefined
@@ -1563,7 +1629,6 @@ class Class_product {
           isUL: this.isULGuideRail,
         },
       });
-
       let motor: Tcomponent | null = filter_motors({
         dataArr: availableComponents.motors,
         filterParams: {
@@ -1734,7 +1799,7 @@ class Class_product {
 
     this.material = this.material;
 
-    this.shouldCall_pgpb = true;
+    this.addParams_pgpb();
 
     this.callAllReq();
     // this.reqChain();
@@ -2582,8 +2647,6 @@ class Class_product {
 
   // 主產品的折數，與報價單折數不同
   get discount() {
-    // console.log(this._prodData.discount);
-
     return this._prodData.discount;
   }
   set discount(v) {
@@ -2825,9 +2888,10 @@ class Class_product {
     this.toGetInstallationFee();
     this.subComList.distributionBox.quantity = '1';
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pac = true;
-    this.shouldCall_pgpb = true;
+    this.addParams_cgs();
+    this.addParams_pac();
+    this.addParams_pgpb();
+
     // this.callAllReq();
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
@@ -2841,11 +2905,15 @@ class Class_product {
     return this._prodData.fullWidth;
   }
   set fullWidth(v) {
-    if (!checkIsFloat(v, 3)) {
-      return;
+    // if (!checkIsFloat(v, 3)) {
+    //   return;
+    // }
+
+    if (!isNaN(Number(v))) {
+      v = new Decimal(v || 0).toDecimalPlaces(3).toNumber().toString();
     }
 
-    this.isWgChanged = false;
+    // this.isWgChanged = false;
 
     this._prodData.fullWidth = v;
 
@@ -2861,7 +2929,7 @@ class Class_product {
     this.area = this.calcArea();
     // this.calcChangeAccePrice();
     // this.clearProd();
-    this.shouldCall_cgs = true;
+    this.addParams_cgs();
     // this.callAllReq();
 
     this.reRender();
@@ -2908,16 +2976,18 @@ class Class_product {
 
     // 改變了WG並改變了L，就要呼叫
     // 之後呼叫的req_calcGeneralSpec的時候就會把hp帶入
-    this.isWgChanged = true;
+    // this.isWgChanged = true;
 
-    const L = calcProductFullWidth({
-      WG: new Decimal(this._prodData.WG).mul(1000).toNumber(),
-      gapA: this._doorGeneralSpecs?.gapA ?? 0,
-      gapC: this._doorGeneralSpecs?.gapC ?? 0,
-    });
+    // const L = calcProductFullWidth({
+    //   WG: new Decimal(this._prodData.WG).mul(1000).toNumber(),
+    //   gapA: this._doorGeneralSpecs?.gapA ?? 0,
+    //   gapC: this._doorGeneralSpecs?.gapC ?? 0,
+    // });
 
-    this.fullWidth = new Decimal(L).div(1000).toString();
-    this.isWgChanged = true;
+    // this.fullWidth = new Decimal(L).div(1000).toString();
+
+    this.fullWidth = '';
+    // this.isWgChanged = true;
 
     this.reRender();
   }
@@ -2959,11 +3029,20 @@ class Class_product {
     }
     // ________________________
 
-    if (!this._doorGeneralSpecs?.gapA) {
-      this.isEditW_noGapA = true;
-    }
+    // if (!this._doorGeneralSpecs?.gapA) {
+    //   this.isEditW_noGapA = true;
+    // }
 
     this.reRender;
+  }
+
+  changeWGbyW(W: number | `${number}`) {
+    const WG = calcProductWG_withWAndG({
+      W: Number(W || 0),
+      G: Number(this.guildRailG || 0),
+    });
+
+    this._prodData.WG = WG.toString();
   }
 
   // ------------------------------------
@@ -2991,8 +3070,9 @@ class Class_product {
     this.area = this.calcArea();
     // this.clearProd();
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pgpb = true;
+    this.addParams_cgs();
+    this.addParams_pgpb();
+
     // this.callAllReq();
 
     this.reRender();
@@ -3065,7 +3145,7 @@ class Class_product {
 
       // this.callRetrieveCreProdCom();
 
-      this.shouldCall_pgpb = true;
+      this.addParams_pgpb();
 
       this.callAllReq({ toCallRetrieveCreProdCom: true });
       // this.callRetrieveCreProdCom();
@@ -3181,7 +3261,7 @@ class Class_product {
     // this._prodData.boxB = lookup_boxBAndBoxD[this._prodData.doorType]?.DtoB[v] ?? '';
     // this.area = this.calcArea();
 
-    // this.shouldCall_pgpb = true;
+    // this.params_pgpb = {};
     // this.callAllReq();
 
     this.reRender();
@@ -3334,15 +3414,28 @@ class Class_product {
     this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
     this._prodData.guideRailG = theGuideRail?.width ?? 0;
 
-    this.W = String(
-      calcW({
-        WG: Number(this._prodData.WG) || 0,
-        G: Number(this.guildRailG) || 0,
-      })
-    );
+    // this.W = String(
+    //   calcW({
+    //     WG: Number(this._prodData.WG) || 0,
+    //     G: Number(this.guildRailG) || 0,
+    //   })
+    // );
+
+    const WG_mm = calcProductWG({
+      fullWidth: this.fullWidth_mm,
+      gapA: this._doorGeneralSpecs?.gapA || 0,
+      gapC: this._doorGeneralSpecs?.gapC || 0,
+    });
+
+    this._prodData.WG = new Decimal(WG_mm).div(1000).toString();
+
+    this.addParams_cgs({
+      dontClearProd: true,
+      onlyUpdateSpec: true,
+    });
 
     this.callAllReq();
-    this.callRetrieveCreProdCom();
+    // this.callRetrieveCreProdCom();
 
     this.reRender();
   }
@@ -3368,21 +3461,37 @@ class Class_product {
     const { gapA, gapC } = lookup_hpToGapAGapC[v as keyof typeof lookup_hpToGapAGapC];
 
     if (!this._doorGeneralSpecs) {
-      this.isDontClearProd = true;
+      this.addParams_cgs({
+        dontClearProd: true,
+      });
       this.resetDoorGeneralSpacs();
     }
 
     this._doorGeneralSpecs!.gapA = gapA;
     this._doorGeneralSpecs!.gapC = gapC;
+    this._prodData.boxB = '';
 
-    const W = calcW_2({
+    // const W = calcW_2({
+    //   fullWidth: this.fullWidth_mm,
+    //   gapA: Number(this._doorGeneralSpecs!.gapA || '0'),
+    //   gapC: Number(this._doorGeneralSpecs!.gapC || '0'),
+    //   G: this.guildRailG_mm,
+    // });
+
+    const WG_mm = calcProductWG({
       fullWidth: this.fullWidth_mm,
-      gapA: Number(this._doorGeneralSpecs!.gapA || '0'),
-      gapC: Number(this._doorGeneralSpecs!.gapC || '0'),
-      G: this.guildRailG_mm,
+      gapA: this._doorGeneralSpecs!.gapA,
+      gapC: this._doorGeneralSpecs!.gapC,
     });
 
-    this.W = new Decimal(W).div(1000).toString();
+    this._prodData.WG = new Decimal(WG_mm).div(1000).toString();
+
+    this.addParams_cgs({
+      dontClearProd: true,
+      onlyUpdateSpec: true,
+    });
+
+    // this.W = new Decimal(W).div(1000).toString();
 
     this.changeDistributionBoxPrice_byHorsepower();
     this.changePhase_byHorsepower();
@@ -3392,6 +3501,16 @@ class Class_product {
     // this.callRetrieveCreProdCom();
 
     this.reRender();
+  }
+
+  changeHorsepower_noChangeW_noReq(v: string) {
+    if (this._prodData.horsepower === v) {
+      return;
+    }
+
+    this._prodData.horsepower = v;
+    this.changeDistributionBoxPrice_byHorsepower();
+    this.changePhase_byHorsepower();
   }
 
   get quantity() {
@@ -3428,9 +3547,11 @@ class Class_product {
 
     if (originallyIsZero) {
       // 呼叫callAllReq後就會再自動算金額了
-      this.shouldCall_cgs = true;
-      this.shouldCall_pac = true;
-      this.shouldCall_pgpb = true;
+
+      this.addParams_cgs();
+      this.addParams_pac();
+      this.addParams_pgpb();
+
       // this.callAllReq();
     }
 
@@ -3556,7 +3677,7 @@ class Class_product {
 
     //
     this._prodData.typhoonProtection = v;
-    this.isDontClearProd = true;
+
     this._prodData.isULGuideRail = false;
 
     this._prodData.doorTrack = '';
@@ -3565,9 +3686,13 @@ class Class_product {
     // onDoorTypeChange必須放在賦值之後再執行
     this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pac = true;
-    this.shouldCall_pgpb = true;
+    this.addParams_cgs({
+      dontClearProd: true,
+    });
+
+    this.addParams_pac();
+    this.addParams_pgpb();
+
     this.callAllReq();
 
     this.reRender();
@@ -3783,7 +3908,6 @@ class Class_product {
 
     // ________________________
 
-    this.isDontClearProd = true;
     this._prodData.doorTrack = '';
     this._prodData.guideRailG = 0;
     // this.doorTrack = this.options_doorTrack?.[0]?.value ?? '';
@@ -3793,9 +3917,13 @@ class Class_product {
     // onDoorTypeChange必須放在賦值之後再執行
     // this.onDoorTypeChange?.({ newDoorType: this.doorType, newIsAntiTyphoon: this.typhoonProtection });
 
-    this.shouldCall_cgs = true;
-    this.shouldCall_pac = true;
-    this.shouldCall_pgpb = true;
+    this.addParams_cgs({
+      dontClearProd: true,
+    });
+
+    this.addParams_pac();
+    this.addParams_pgpb();
+
     this.callAllReq();
 
     this.reRender();
@@ -3903,7 +4031,8 @@ class Class_product {
 
     this.comList?.bottomBar.setMaterial_noRelationToProd(angleIronMaterial ?? this.material);
 
-    this.shouldCall_pgpb = true;
+    this.addParams_pgpb();
+
     this.callAllReq();
     this.reRender();
   }
@@ -3941,7 +4070,8 @@ class Class_product {
 
     this.comList?.bottomBar.setMaterial_noRelationToProd(plateMaterial ?? this.material);
 
-    this.shouldCall_pgpb = true;
+    this.addParams_pgpb();
+
     this.callAllReq();
     this.reRender();
   }
@@ -4233,6 +4363,7 @@ class Class_product {
       boxD: new Decimal(this._prodData.boxD || 0).mul(1000).toNumber(),
       volume: this._prodData.volume || '0',
       area: this._prodData.area || '0',
+      guideRailG: this._prodData.guideRailG || 0,
 
       headBoxThickness: this._prodData.rollUpBoxThick,
       motorVoltage: Number(this._prodData.voltage),
@@ -4934,7 +5065,7 @@ const reqGetCalcGeneralSpec = async ({
     height,
     isAntiTyphoon,
     fullWidth,
-    WG: WG,
+    WG,
     hp,
   };
 

@@ -96,10 +96,10 @@ class Class_component {
   _prod;
   private _com;
   readonly key;
-  readonly identificationId;
+  identificationId;
 
   callReqGetCodeNumber() {
-    this._prod.shouldCall_pgpb = true;
+    this._prod.addParams_pgpb();
     this._prod.callAllReq();
   }
   //
