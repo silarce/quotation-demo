@@ -19,11 +19,8 @@ import { Class_product } from './classProduct';
 // =======================================================================
 class Class_accessories {
   constructor({
-    //
     reRender,
     data = emptyAccessoriesOri(),
-    // delSelf,
-    // copySelf,
     // calcOptionsAllprice,
     prod,
     isNew = true,
@@ -31,8 +28,6 @@ class Class_accessories {
   }: {
     reRender: TreRender;
     data?: Taccessories;
-    // delSelf: () => void;
-    // copySelf: () => void;
     // calcOptionsAllprice: () => void;
     prod: Class_product;
     isNew?: boolean;
@@ -47,11 +42,8 @@ class Class_accessories {
     this._prod = prod;
     this.key = key;
 
-    // this.delSelf = delSelf;
-    // this.copySelf = copySelf;
-
     this.delSelf = () => prod.delAcce(key);
-    this.copySelf = () => prod.copyAcce(key);
+    // this.copySelf = () => prod.copyAcce(key);
 
     if (isNew) {
       setTimeout(() => {
@@ -74,7 +66,7 @@ class Class_accessories {
   identificationId;
 
   delSelf: () => void;
-  copySelf: () => void;
+  // copySelf: () => void; // 拿掉copySelf是因為同樣的選配應該是唯一的，不可以重複
   // readonly calcOptionsAllprice;
 
   makeFormatValueDontTriggerTwice = false;
@@ -83,7 +75,7 @@ class Class_accessories {
 
   reNewMethod() {
     this.delSelf = () => this._prod.delAcce(this.key);
-    this.copySelf = () => this._prod.copyAcce(this.key);
+    // this.copySelf = () => this._prod.copyAcce(this.key);
   }
 
   // --------------------------------------------------------------------
