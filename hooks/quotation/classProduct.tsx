@@ -660,6 +660,10 @@ class Class_product {
 
   // ---------------------------------------------------------
 
+  editItemName(v: string) {
+    this._prodData.itemName = v;
+  }
+
   // 選配設定
 
   accessoriesList: { [key: string]: Class_accessories } = {};
