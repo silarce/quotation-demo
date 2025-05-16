@@ -256,7 +256,7 @@ const CopyDelBtnBox = ({
         className={classNames(
           //
           scss.svgBtn,
-          hiddenDelCopy && scss.hidden,
+          (!copy || hiddenDelCopy) && scss.hidden,
           disabled && scss.disabledBtn,
           scss.plus
         )}
