@@ -3419,8 +3419,8 @@ class Class_product {
 
     const WG_mm = calcProductWG({
       fullWidth: this.fullWidth_mm,
-      gapA: this._doorGeneralSpecs!.gapA,
-      gapC: this._doorGeneralSpecs!.gapC,
+      gapA: this._doorGeneralSpecs?.gapA || 0,
+      gapC: this._doorGeneralSpecs?.gapC || 0,
     });
 
     this._prodData.WG = new Decimal(WG_mm).div(1000).toString();
