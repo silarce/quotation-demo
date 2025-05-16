@@ -3410,15 +3410,28 @@ class Class_product {
     this._prodData.guideRailsOpening = theGuideRail?.guideRailsOpening ?? '';
     this._prodData.guideRailG = theGuideRail?.width ?? 0;
 
-    this.W = String(
-      calcW({
-        WG: Number(this._prodData.WG) || 0,
-        G: Number(this.guildRailG) || 0,
-      })
-    );
+    // this.W = String(
+    //   calcW({
+    //     WG: Number(this._prodData.WG) || 0,
+    //     G: Number(this.guildRailG) || 0,
+    //   })
+    // );
+
+    const WG_mm = calcProductWG({
+      fullWidth: this.fullWidth_mm,
+      gapA: this._doorGeneralSpecs!.gapA,
+      gapC: this._doorGeneralSpecs!.gapC,
+    });
+
+    this._prodData.WG = new Decimal(WG_mm).div(1000).toString();
+
+    this.addParams_cgs({
+      dontClearProd: true,
+      onlyUpdateSpec: true,
+    });
 
     this.callAllReq();
-    this.callRetrieveCreProdCom();
+    // this.callRetrieveCreProdCom();
 
     this.reRender();
   }
