@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { notification } from 'antd';
 
-import { axi2 } from '../_axiosCreator';
+import { axi_netCore } from '../_axiosCreator';
 import { AxiosError } from 'axios';
 
 import { TemployeeDto, apiGetEmployee_id } from '../api_employee';
@@ -97,7 +97,7 @@ type TgetAccountPayableByProps = XOR<
 const apiGetBankAccount = async () => {
   const api = `/${subRoot}/GetBankAccount`;
 
-  return axi2.get<TaccountantPresetDto[]>(api).catch((err: AxiosError) => {
+  return axi_netCore.get<TaccountantPresetDto[]>(api).catch((err: AxiosError) => {
     myAlert.err({ title: '取得銀行帳戶資料失敗', content: err.message });
 
     return Promise.reject(err);
@@ -139,7 +139,7 @@ const useGetBankAccount = () => {
 const apiPostBankAccount = async (data: TcreateAccountantPresetDto) => {
   const api = `/${subRoot}/AddBankAccount`;
 
-  return axi2.post<string>(api, data).catch((err: AxiosError) => {
+  return axi_netCore.post<string>(api, data).catch((err: AxiosError) => {
     myAlert.err({ title: '新增銀行帳戶資料失敗', content: err.message });
 
     return Promise.reject(err);
@@ -149,7 +149,7 @@ const apiPostBankAccount = async (data: TcreateAccountantPresetDto) => {
 const apiPatchBankAccount = async (data: TupdateAccountantPresetDto) => {
   const api = `/${subRoot}/UpdateBankAccount`;
 
-  return axi2.post<string>(api, data).catch((err: AxiosError) => {
+  return axi_netCore.post<string>(api, data).catch((err: AxiosError) => {
     myAlert.err({ title: '更新銀行帳戶資料失敗', content: err.message });
 
     return Promise.reject(err);
@@ -167,7 +167,7 @@ const apiGetApplyPayment = async () => {
     id: 'all',
   };
 
-  return axi2
+  return axi_netCore
     .get<TapplyPayment_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -184,7 +184,7 @@ const apiGetApplyPaymentById = async (id: string) => {
     id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TapplyPayment_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -198,7 +198,7 @@ const apiGetApplyPaymentById = async (id: string) => {
 const apiPostAddApplyPayment = async (data: TcreateApplyPayment_Dto) => {
   const api = `/${subRoot}/AddApplyPayment`;
 
-  return axi2
+  return axi_netCore
     .post<string>(api, data)
     .then(({ data: id }) => id)
     .catch((err: AxiosError) => {
@@ -212,7 +212,7 @@ const apiPostAddApplyPayment = async (data: TcreateApplyPayment_Dto) => {
 const apiPatchUpdateApplyPayment = async (data: TupdateApplyPayment_Dto) => {
   const api = `/${subRoot}/UpdateApplyPayment`;
 
-  return axi2.post(api, data).catch((err: AxiosError) => {
+  return axi_netCore.post(api, data).catch((err: AxiosError) => {
     myAlert.err({ title: '更新支出單失敗', content: err.message });
 
     return Promise.reject(err);
@@ -226,7 +226,7 @@ const apiGetApplyPaymentDetail = async (apply_payment_id: string) => {
     apply_payment_id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TpurchaseInvoice_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -243,7 +243,7 @@ const apiDeleteApplyPaymentDetail = async (id: string) => {
     id,
   };
 
-  return axi2.post(api, data).catch((err: AxiosError) => {
+  return axi_netCore.post(api, data).catch((err: AxiosError) => {
     myAlert.err({ title: '刪除支出單明細失敗', content: err.message });
 
     return Promise.reject(err);
@@ -491,7 +491,7 @@ const apiGetPurchaseCollectTicket = async () => {
     id: 'all',
   };
 
-  return axi2
+  return axi_netCore
     .get<TpurchaseCollectTicket_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -508,7 +508,7 @@ const apiGetPurchaseCollectTicketById = async (id: string) => {
     id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TpurchaseCollectTicket_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -522,7 +522,7 @@ const apiGetPurchaseCollectTicketById = async (id: string) => {
 const apiPostAddPurchaseCollectTicket = async (data: TcreatePurchaseCollectTicket_Dto) => {
   const api = `/${subRoot}/AddPurchaseCollectTicket`;
 
-  return axi2
+  return axi_netCore
     .post<string>(api, data)
     .then(({ data: id }) => id)
     .catch((err: AxiosError) => {
@@ -536,7 +536,7 @@ const apiPostAddPurchaseCollectTicket = async (data: TcreatePurchaseCollectTicke
 const apiPatchUpdatePurchaseCollectTicket = async (data: TupdatePurchaseCollectTicket_Dto) => {
   const api = `/${subRoot}/UpdatePurchaseCollectTicket`;
 
-  return axi2.post(api, data).catch((err: AxiosError) => {
+  return axi_netCore.post(api, data).catch((err: AxiosError) => {
     myAlert.err({ title: '更新進貨收票失敗', content: err.message });
 
     return Promise.reject(err);
@@ -550,7 +550,7 @@ const apiGetPurchaseCollectTicketDetailByTicketId = async (id: string) => {
     ticket_id: id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TpurchaseCollectTicketDetail_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -567,7 +567,7 @@ const apiGetUnpaidProdreceiptByInvoiceNumber = async (invoice_number: string | u
     invoice_number,
   };
 
-  return axi2
+  return axi_netCore
     .get<Tprodreceipt_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -822,7 +822,7 @@ const apiGetPaymentOrder = async () => {
     id: 'all',
   };
 
-  return axi2
+  return axi_netCore
     .get<Tpayment_order_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -837,7 +837,7 @@ const apiGetPaymentOrderById = async (id: string) => {
     id,
   };
 
-  return axi2
+  return axi_netCore
     .get<Tpayment_order_Dto>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -850,7 +850,7 @@ const apiGetPaymentOrderById = async (id: string) => {
 const apiPostAddPaymentOrder = async (body: TcreatePaymentOrder_Dto) => {
   const api = `/${subRoot}/AddPaymentOrder`;
 
-  return axi2
+  return axi_netCore
     .post<string>(api, body)
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -865,7 +865,7 @@ const apiDeletePaymentOrderById = async (id: string) => {
     id,
   };
 
-  return axi2.post(api, body).catch((err: AxiosError) => {
+  return axi_netCore.post(api, body).catch((err: AxiosError) => {
     return Promise.reject(err);
   });
 };
@@ -877,7 +877,7 @@ const apiGetPaymentOrderDetailByPaymentOrderId = async (payment_order_id: string
     payment_order_id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TpaymentOrderDetail_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -1054,7 +1054,7 @@ const apiGetAccountPayableBy = async (props: TgetAccountPayableByProps) => {
 
   const { api, params } = apiLookup[key];
 
-  return axi2
+  return axi_netCore
     .get<Taccount_payable_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -1128,7 +1128,7 @@ const apiGetAccountPayableBySupplierId = async (supplier_uuid: string) => {
     supplier_uuid,
   };
 
-  return axi2
+  return axi_netCore
     .get<Taccount_payable_Dto[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -1191,7 +1191,7 @@ const apiGetSearchAccountPayableByInvoiceNumber = (invoice_number: string) => {
     invoice_number,
   };
 
-  return axi2
+  return axi_netCore
     .get<Taccount_payable_Dto>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -1275,7 +1275,7 @@ const apiGetAccountPayableStatisticsByIdOrDate = async ({ id, date }: XOR<{ id: 
     date,
   };
 
-  return axi2
+  return axi_netCore
     .get<Taccount_payable_statistics[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -1351,7 +1351,7 @@ const apiGetAccountPayableStatisticsDetailByStatisticsId = async (statistics_id:
     statistics_id,
   };
 
-  return axi2
+  return axi_netCore
     .get<Taccount_payable_statistics_detail[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -1430,7 +1430,7 @@ const apiPostAddAccountPayableStatistics = async ({
     account_payable_uuids: account_payable_uuids.join(','),
   };
 
-  return axi2
+  return axi_netCore
     .post<string>(api, body)
     .then(({ data }) => {
       myAlert.success({ title: '新增應付帳款統計表成功' });
@@ -1457,7 +1457,7 @@ const apiUpdateAccountPayableStatisticsById = async (body: {
 }) => {
   const api = `/${subRoot}/UpdateAccountPayableStatisticsById`;
 
-  return axi2
+  return axi_netCore
     .post<string>(api, body)
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -1474,7 +1474,7 @@ const apiDeleteAccountPayableStatisticsById = async (id: string) => {
     id,
   };
 
-  return axi2
+  return axi_netCore
     .post<string>(api, body)
     .then(({ data }) => data)
     .catch((err: AxiosError) => {

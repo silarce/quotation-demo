@@ -4,7 +4,7 @@ import { notification } from 'antd';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { axi2 } from '../_axiosCreator';
+import { axi_netCore } from '../_axiosCreator';
 import { AxiosError } from 'axios';
 
 import type {
@@ -27,7 +27,7 @@ const apiGetFlow = (username: string) => {
     username,
   };
 
-  return axi2
+  return axi_netCore
     .get<TreviewFlow[] | ''>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -42,7 +42,7 @@ const apiGetReviewFlow = (user_id: string) => {
     user_id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TreviewFlow[]>(api, { params })
     .then(({ data }) => data)
     .catch((err: AxiosError) => {
@@ -57,7 +57,7 @@ const apiGetReviewById = ({ document_uuid, document_id }: { document_uuid: strin
     document_id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TgetReviewById[] | undefined>(api, { params })
     .then(({ data }) => {
       // 沒有資料時會收到空字串
@@ -74,7 +74,7 @@ const apiAddReview = (body: TaddReview) => {
   const api = `${subRoot}/AddReview`;
 
   return (
-    axi2
+    axi_netCore
       // 回應id
       .post<string>(api, body)
       .then(() => {
@@ -110,7 +110,7 @@ const apiGetReviewBack = (
     document_id,
   };
 
-  return axi2
+  return axi_netCore
     .post(api, body)
     .then(() => {
       showSuccess && myAlert.success({ title: '抽單完成' });
@@ -148,7 +148,7 @@ const apiGetReviewBackForAnyStatus = (
     document_id,
   };
 
-  return axi2
+  return axi_netCore
     .post(api, body)
     .then(() => {
       showSuccess && myAlert.success({ title: '抽單完成' });
@@ -172,7 +172,7 @@ const apiGetReviewHistory = (id: string) => {
     id,
   };
 
-  return axi2
+  return axi_netCore
     .get<unknown>(api, { params })
     .then(() => {})
     .catch((err) => {
@@ -186,7 +186,7 @@ const apiGetReview = async (user_id: string) => {
     user_id,
   };
 
-  return axi2
+  return axi_netCore
     .get<TgetReview[] | undefined>(api, { params })
     .then(({ data }) => data || undefined)
     .catch((err) => Promise.reject(err));

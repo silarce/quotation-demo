@@ -1120,8 +1120,6 @@ const useClassProdList = ({
     copy.replaceId(newKey);
     copy.clearRootProductId();
 
-    copy.editItemName(`${copy.itemName}-copy`);
-
     copy.delSelf = () => {
       delSelf_prod(list, newKey);
       calcQuotationAvgDiscount();
