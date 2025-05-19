@@ -11,7 +11,7 @@ const axi = axios.create({
   withCredentials: true,
 });
 
-const axi2 = axios.create({
+const axi_netCore = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_NETCORE_URL,
 
   // .netCore後端沒有登入的行為，沒有取得cookie，自然也不用帶cookie。帶了反而CORS
@@ -125,7 +125,7 @@ axi.interceptors.response.use(
 
 // =================================================================================
 
-axi2.interceptors.request.use(
+axi_netCore.interceptors.request.use(
   (config) => {
     // req攔截器
 
@@ -159,7 +159,7 @@ axi2.interceptors.request.use(
   }
 );
 
-axi2.interceptors.response.use(
+axi_netCore.interceptors.response.use(
   (res) => {
     return res;
   },
@@ -192,5 +192,5 @@ axi2.interceptors.response.use(
 );
 
 // =================================================================================
-export { axi, axi2 };
+export { axi, axi_netCore };
 export type { AxiosError };
