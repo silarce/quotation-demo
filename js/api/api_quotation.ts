@@ -1086,7 +1086,7 @@ export const useGetContract_id = (
   // 是否為跳過合約生成的工程聯絡單
   // 以/engineering/engineering-contact/independent建立的合約沒有合約審核表
   // 因此以verifyFormId判斷
-  const contactThatSkipContract = !res?.content.verifyFormId;
+  const contactThatSkipContract = res ? !res.content.verifyFormId : undefined;
 
   return {
     data: res,
