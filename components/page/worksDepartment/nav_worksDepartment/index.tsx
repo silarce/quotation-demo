@@ -10,18 +10,25 @@ import { erpFeaturesLookup } from 'components/Layer/SideNav/pathList/type';
 
 import scss from './index.module.scss';
 
+import { TdocType } from 'js/api/dtoTypes';
+
 // =======================================================================
 
 type LinkProps = Parameters<typeof Link>[0];
 type MyLinkProps = Omit<LinkProps, 'href'> & {
   href?: LinkProps['href'];
   routerName: string;
+  extraQuery?: ParsedUrlQuery;
 };
 
 interface Tquery extends ParsedUrlQuery {
   contractId: string;
   version: string | undefined;
 }
+
+// =======================================================================
+
+const documentType: TdocType = '保固書';
 
 // =======================================================================
 
@@ -64,7 +71,11 @@ const Nav_worksDepartment = ({ contactThatSkipContract = false }: { contactThatS
         {!contactThatSkipContract && <MyLink routerName="meetingMinutes">會議記錄</MyLink>}
         <MyLink routerName="listOfDeliveryOrders">{'調(退)貨單列表'}</MyLink>
         {!contactThatSkipContract && <MyLink routerName="memorandum">備忘錄</MyLink>}
-        {!contactThatSkipContract && <MyLink routerName="certifiedDocument">保固書</MyLink>}
+        {!contactThatSkipContract && (
+          <MyLink routerName="certifiedDocument" extraQuery={{ documentType }}>
+            保固書
+          </MyLink>
+        )}
       </div>
     );
   }
@@ -83,7 +94,7 @@ const Nav_worksDepartment = ({ contactThatSkipContract = false }: { contactThatS
 
 // =======================================================================
 
-const MyLink = ({ className, children, routerName, ...props }: MyLinkProps) => {
+const MyLink = ({ className, children, routerName, extraQuery, ...props }: MyLinkProps) => {
   const router = useRouter();
   // 只留這兩個property，其他都不要
   const { contractId, version } = router.query as Tquery;
@@ -101,7 +112,7 @@ const MyLink = ({ className, children, routerName, ...props }: MyLinkProps) => {
       className={classNames(scss.link, isActive && scss.active, className)}
       href={{
         pathname: route + routerName,
-        query: query,
+        query: { ...query, ...extraQuery },
       }}
       {...props}
     >
