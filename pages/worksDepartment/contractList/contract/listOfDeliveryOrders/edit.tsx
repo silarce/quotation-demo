@@ -6,7 +6,6 @@ import _ from 'lodash';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 import EditTransfer, {
@@ -245,10 +244,6 @@ export default function Edit({ userInfo, isReadonly }: { userInfo: TuserDto; isR
 
   // ----------------------------------------------------
 
-  // const tagCallback = () => {
-  //   return `新增調(退)貨單 ${contract?.content.quotationNumber}`;
-  // };
-
   const panelList_add: TpanelList = [
     {
       type: 'redButton',
@@ -396,14 +391,6 @@ export default function Edit({ userInfo, isReadonly }: { userInfo: TuserDto; isR
 
   return (
     <SubLayer isLoading_all={isLoading || isFetching_contract || isFetching_engineeringContact || isFetching_exchange}>
-      {/* <PageHeader
-        showReturnBtn={isReadonly ? false : disabled}
-        panelList={isReadonly ? undefined : panelList}
-        createTagLable={tagCallback}
-        contractNumber={contract?.content.quotationNumber}
-        linkForbidden={isReadonly}
-        contactThatSkipContract={contactThatSkipContract}
-      /> */}
       <div>
         <PageHeader02 tag={`新增調(退)貨單 ${contract?.content.quotationNumber}`} panelList={panelList} />
         {!isReadonly && <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />}

@@ -3,8 +3,7 @@ import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
@@ -101,12 +100,6 @@ export default function EditRequirementRecord() {
 
   return (
     <SubLayer isLoading_subLayer={isFetching_contract}>
-      {/* <PageHeader
-        showReturnBtn={disabled}
-        panelList={[]}
-        contractNumber={data_contract?.contractNumber ?? '---'}
-        contactThatSkipContract={contactThatSkipContract}
-      /> */}
       <div>
         <PageHeader02 panelList={panelList} tag={`合約編號 ${data_contract?.contractNumber ?? ''}`} />
         <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />

@@ -1,7 +1,6 @@
 import moment from 'moment';
 
 // global gear
-// import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // css

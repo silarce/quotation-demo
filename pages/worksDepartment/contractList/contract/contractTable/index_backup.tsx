@@ -6,8 +6,7 @@ import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-// import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // api
@@ -344,12 +343,6 @@ export default function ContracTable({
   // -------------------------------------------------------------
   return (
     <SubLayer isLoading_subLayer={isLoading}>
-      {/* <PageHeader
-        //  panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-        contactThatSkipContract={contactThatSkipContract}
-      /> */}
-
       <div>
         <PageHeader02
           tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`}

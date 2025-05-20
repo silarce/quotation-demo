@@ -7,7 +7,6 @@ import moment from 'moment';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contracList/contract/dispatchList/profile';
@@ -819,12 +818,6 @@ export default function EditDispatchList() {
 
   return (
     <SubLayer isLoading_all={isLoading || isFetching_contract || isFetching_dispatching}>
-      {/* <PageHeader
-        showReturnBtn={disabled}
-        panelList={panelList}
-        contactThatSkipContract={contactThatSkipContract}
-        contractNumber={contract?.contractNumber ?? ''}
-      /> */}
       <div>
         <PageHeader02 tag={`合約編號 ${contract?.contractNumber ?? ''}`} panelList={panelList} />
         <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />

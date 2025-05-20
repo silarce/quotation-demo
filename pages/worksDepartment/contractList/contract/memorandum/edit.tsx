@@ -8,7 +8,6 @@ import { AxiosError } from 'axios';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
@@ -326,13 +325,6 @@ export default function Edit() {
 
   return (
     <SubLayer isLoading_all={isFectching} isLoading_subLayer={isFetching_contract || isFetching_rootMemorandum}>
-      {/* <PageHeader
-        showReturnBtn={!(isNew || isReply)}
-        panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-        contactThatSkipContract={contactThatSkipContract}
-      /> */}
-
       <div>
         <PageHeader02 panelList={panelList} tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`} />
         <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />

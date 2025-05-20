@@ -8,7 +8,6 @@ import moment from 'moment';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 
 // layer
-// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
@@ -496,17 +495,6 @@ export default function Worksheet({
         isFetching_finalProduct
       }
     >
-      {/* {!isReadonly && (
-        <PageHeader
-          showReturnBtn={disabled}
-          panelList={panelList}
-          contractNumber={engineeringContact?.contractNumber ?? ''}
-          contactThatSkipContract={contactThatSkipContract}
-        />
-      )}
-
-      {isReadonly && <PageHeader02 tag={engineeringContact?.contractNumber ?? ''} panelList={panelList} />} */}
-
       <div>
         <PageHeader02 tag={`報價編號 ${engineeringContact?.contractNumber ?? ''}`} panelList={panelList} />
         {!isReadonly && <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />}

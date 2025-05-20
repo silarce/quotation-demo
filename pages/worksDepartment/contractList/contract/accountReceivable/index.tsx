@@ -1,14 +1,9 @@
-// 設計圖
-// https://www.figma.com/design/9Gix0Odt4g7ahSOQMysmVh/%E4%B8%89%E4%B9%85?node-id=1282-40444&t=bXAfdnwklJLF2pZu-0
-
-import { useState, useEffect, useMemo, createContext, use } from 'react';
+import { useState, useEffect, useMemo, createContext } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-// import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
@@ -34,7 +29,6 @@ import WarrantyDate from 'components/page/worksDepartment/contracList/contract/a
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // api
 import {
@@ -63,7 +57,7 @@ import { AxiosError } from 'axios';
 
 import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
 
-import PdfTemplate_accountReceivable from 'components/page/worksDepartment/contracList/contract/accountReceivable/pdfTemplate';
+// import PdfTemplate_accountReceivable from 'components/page/worksDepartment/contracList/contract/accountReceivable/pdfTemplate';
 
 import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
@@ -547,12 +541,6 @@ export default function AccountReceivable({
   if (!accountReceivable) {
     return (
       <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
-        {/* <PageHeader
-          panelList={panelList}
-          contractNumber={engineeringContact?.contractNumber ?? ''}
-          contactThatSkipContract={contactThatSkipContract}
-        /> */}
-
         <div>
           <PageHeader02 panelList={panelList} tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`} />
           <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
@@ -565,14 +553,6 @@ export default function AccountReceivable({
 
   return (
     <SubLayer isLoading_all={isFetching_contract || isFetching_finalProduct || isFetching_req}>
-      {/* {showSubPageHeader && (
-        <PageHeader
-          contractNumber={engineeringContact?.contractNumber ?? '---'}
-          contactThatSkipContract={contactThatSkipContract}
-        />
-      )}
-      {!showSubPageHeader && <PageHeader02 tag={`合約編號 ${engineeringContact?.contractNumber ?? '---'}`} />} */}
-
       <div>
         <PageHeader02 tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`} panelList={returnPanel} />
         <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />

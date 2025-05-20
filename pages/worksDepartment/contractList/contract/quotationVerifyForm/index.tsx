@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-// import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
@@ -59,11 +58,6 @@ export default function QuotationVerifyForm() {
   // MARK: RENDER
   return (
     <SubLayer isLoading_subLayer={isFetching}>
-      {/* <PageHeader
-        //  panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-        contactThatSkipContract={contactThatSkipContract}
-      /> */}
       <div>
         <PageHeader02
           panelList={usePanel_returnWorksDepartmentContractList()}

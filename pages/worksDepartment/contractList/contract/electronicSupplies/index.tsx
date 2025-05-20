@@ -6,7 +6,6 @@ import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
@@ -116,11 +115,6 @@ export default function ElectronicSupplies() {
 
   return (
     <SubLayer isLoading_subLayer={isFetching_electronicSupplies || isFetching_contract}>
-      {/* <PageHeader
-        panelList={panelArr}
-        contractNumber={contractNumber ?? '---'}
-        contactThatSkipContract={contactThatSkipContract}
-      /> */}
       <div>
         <PageHeader02 panelList={panelArr} tag={`合約編號 ${contractNumber ?? ''}`} />
         <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />

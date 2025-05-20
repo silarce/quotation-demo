@@ -9,7 +9,6 @@ import { useRouter } from 'next/router';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
-// import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
 import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
@@ -120,13 +119,6 @@ export default function WorkContactDoc() {
         <PageHeader02 tag={`合約編號 ${workContactContractNumber}`} panelList={panelList} />
         <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
       </div>
-
-      {/* <PageHeader
-        showReturnBtn={!(isShowPattern || !disabled)}
-        panelList={panelList}
-        contractNumber={workContactContractNumber}
-        contactThatSkipContract={contactThatSkipContract}
-      /> */}
 
       <div>
         <WorkContactDoc_component
