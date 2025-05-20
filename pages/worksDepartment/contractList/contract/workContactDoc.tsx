@@ -7,10 +7,12 @@ import { useRouter } from 'next/router';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // component
-import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+// import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
+
 import WorkContactDoc_component, {
   TimperativeHandle,
   TonStateChange,
@@ -20,6 +22,8 @@ import WorkContactDoc_component, {
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { useGetContract_id } from 'js/api/api_quotation';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ============================================================================
 type Tquery = {
@@ -77,6 +81,7 @@ export default function WorkContactDoc() {
       label: contactThatSkipContract ? '編輯' : '編輯聯絡人',
       onClick: () => ref_workContact.current.setDisabled(false),
     },
+    ...usePanel_returnWorksDepartmentContractList(),
   ];
   const panelList_02: TpanelList = [
     {
@@ -109,16 +114,19 @@ export default function WorkContactDoc() {
   const panelList = isShowPattern ? panelList_pattern : disabled ? panelList_01 : panelList_02;
 
   // ----------------------------------------------------------------------------
-
-  // ----------------------------------------------------------------------------
   return (
     <SubLayer isLoading_all={isFetching || isLoading}>
-      <PageHeader
+      <div>
+        <PageHeader02 tag={`合約編號 ${workContactContractNumber}`} panelList={panelList} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
+
+      {/* <PageHeader
         showReturnBtn={!(isShowPattern || !disabled)}
         panelList={panelList}
         contractNumber={workContactContractNumber}
         contactThatSkipContract={contactThatSkipContract}
-      />
+      /> */}
 
       <div>
         <WorkContactDoc_component

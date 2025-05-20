@@ -6,7 +6,9 @@ import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // antd
 import { Select as AntdSelect, SelectProps } from 'antd';
@@ -52,6 +54,8 @@ import {
 } from 'components/page/worksDepartment/electronicSupplies/hook/useElectronicSuppliesRequirement';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ==================================================================
 
@@ -375,6 +379,7 @@ export default function EditElectronicSuppliesPickup({
         router.back();
       },
     },
+    ...usePanel_returnWorksDepartmentContractList(),
   ];
 
   const panelList_enabled: TpanelList = [
@@ -453,12 +458,16 @@ export default function EditElectronicSuppliesPickup({
     <SubLayer isLoading_subLayer={isFetching_pickup || isFetching_electronicSupplies}>
       {CustomPageHeader && <CustomPageHeader disabled={disabled} />}
       {!CustomPageHeader && (
-        <PageHeader
-          showReturnBtn={disabled}
-          panelList={panelList}
-          contractNumber={contractNumber ?? '---'}
-          contactThatSkipContract={contactThatSkipContract}
-        />
+        // <PageHeader
+        //   showReturnBtn={disabled}
+        //   panelList={panelList}
+        //   contractNumber={contractNumber ?? '---'}
+        //   contactThatSkipContract={contactThatSkipContract}
+        // />
+        <div>
+          <PageHeader02 tag={`合約編號 ${contractNumber ?? ''}`} panelList={panelList} />
+          <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+        </div>
       )}
 
       <div className={scss.container}>

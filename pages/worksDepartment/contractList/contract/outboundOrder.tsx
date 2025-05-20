@@ -11,7 +11,9 @@ import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+// import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
 import OrderTable, {
@@ -60,6 +62,7 @@ import {
   TdeliveryStatusInstallationItem,
 } from 'js/api/dtoTypes';
 
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 // =====================================================================
 
 type TproductWorksheetList = {
@@ -669,10 +672,17 @@ export default function OutboundOrder({
 
   return (
     <SubLayer isLoading_all={isLoading || isFetching_contract || isFetching_finalProduct}>
-      <PageHeader
+      {/* <PageHeader
         contractNumber={engineeringContact?.contractNumber ?? ''}
         contactThatSkipContract={contactThatSkipContract}
-      />
+      /> */}
+      <div>
+        <PageHeader02
+          panelList={usePanel_returnWorksDepartmentContractList()}
+          tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`}
+        />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
 
       <div>
         <div className={style.outboundOrder}>

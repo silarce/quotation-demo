@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
-import classNames from 'classnames';
 
 import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
 import SupplyTable, {
@@ -52,6 +53,9 @@ import {
 import { TemployeeDto } from 'js/api/dtoTypes';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
+
 // ==================================================================
 
 import {
@@ -318,6 +322,7 @@ export default function EditRequirementRecord() {
         router.back();
       },
     },
+    ...usePanel_returnWorksDepartmentContractList(),
   ];
 
   const panelList_enabled: TpanelList = [
@@ -433,12 +438,17 @@ export default function EditRequirementRecord() {
         isFetching_contract || isFetching_requirementRecord || isFetching_defaultElectronicSuppliesRequirement
       }
     >
-      <PageHeader
+      {/* <PageHeader
         showReturnBtn={disabled}
         panelList={panelList}
         contractNumber={data_contract?.contractNumber ?? '---'}
         contactThatSkipContract={contactThatSkipContract}
-      />
+      /> */}
+
+      <div>
+        <PageHeader02 panelList={panelList} tag={`合約編號 ${contractNumber}`} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
 
       <div className={scss.container}>
         {/* info */}

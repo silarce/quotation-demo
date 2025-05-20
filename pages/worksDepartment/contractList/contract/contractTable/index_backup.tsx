@@ -6,7 +6,9 @@ import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+// import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // api
 import { useGetEngineeringContact } from 'js/api/api_engineering';
@@ -17,6 +19,8 @@ import { TerpFeatureDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './index.module.scss';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ========================================================================
 
@@ -340,11 +344,19 @@ export default function ContracTable({
   // -------------------------------------------------------------
   return (
     <SubLayer isLoading_subLayer={isLoading}>
-      <PageHeader
+      {/* <PageHeader
         //  panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}
         contactThatSkipContract={contactThatSkipContract}
-      />
+      /> */}
+
+      <div>
+        <PageHeader02
+          tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`}
+          panelList={usePanel_returnWorksDepartmentContractList()}
+        />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
 
       <div className={scss.main}>
         <div className={scss.tableContainer}>

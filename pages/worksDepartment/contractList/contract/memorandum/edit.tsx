@@ -8,7 +8,9 @@ import { AxiosError } from 'axios';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+// import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // antd
 import { Image } from 'antd';
@@ -51,6 +53,8 @@ import { TcustomerDto } from 'js/api/dtoTypes';
 
 // utils
 import { getBase64 } from 'js/utils/helpers/getBase64';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ====================================================================
 
@@ -296,7 +300,7 @@ export default function Edit() {
 
   // ---------------------------------------------------------------------------
 
-  const panelList = panelListSwitcher({
+  const panelList = usePanelListSwitcher({
     isReply: isReply,
     setIsReply: setIsReply,
     isNew,
@@ -322,12 +326,18 @@ export default function Edit() {
 
   return (
     <SubLayer isLoading_all={isFectching} isLoading_subLayer={isFetching_contract || isFetching_rootMemorandum}>
-      <PageHeader
+      {/* <PageHeader
         showReturnBtn={!(isNew || isReply)}
         panelList={panelList}
         contractNumber={engineeringContact?.contractNumber ?? ''}
         contactThatSkipContract={contactThatSkipContract}
-      />
+      /> */}
+
+      <div>
+        <PageHeader02 panelList={panelList} tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
+
       {/* pt-[1px]是為了處理 margin collapse */}
       <div className={'pt-[1px]'}>
         <div ref={ref_anchor} />
@@ -925,7 +935,7 @@ const ReplyMemorandum = forwardRef(ReplyMemorandum_pre);
 // ██   ██ ██      ██   ██ ██    ██ ██      ██      ██   ██
 // ██   ██ ███████ ██████   ██████   ██████ ███████ ██   ██
 
-const panelListSwitcher = ({
+const usePanelListSwitcher = ({
   isReply,
   setIsReply,
   isNew,
@@ -978,6 +988,7 @@ const panelListSwitcher = ({
       label: '返回',
       onClick: turnBack,
     },
+    ...usePanel_returnWorksDepartmentContractList(),
   ];
 
   const panelList02_abled: TpanelList = [
