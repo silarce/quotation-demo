@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
 import Table_main from 'components/page/worksDepartment/electronicSupplies/demandForm/table_main';
@@ -31,6 +32,8 @@ import { useGetContract_id } from 'js/api/api_quotation';
 // import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 import { useDemandForm } from 'components/page/worksDepartment/electronicSupplies/demandForm/useDemandForm';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ==================================================================
 type Tquery = {
@@ -80,6 +83,11 @@ export default function EditRequirementRecord() {
 
   // ------------------------------------------------------------------
 
+  const returnPanel = usePanel_returnWorksDepartmentContractList();
+  const panelList = disabled ? returnPanel : undefined;
+
+  // ------------------------------------------------------------------
+
   // region useEffect
 
   useEffect(() => {
@@ -92,12 +100,10 @@ export default function EditRequirementRecord() {
 
   return (
     <SubLayer isLoading_subLayer={isFetching_contract}>
-      <PageHeader
-        showReturnBtn={disabled}
-        panelList={[]}
-        contractNumber={data_contract?.contractNumber ?? '---'}
-        contactThatSkipContract={contactThatSkipContract}
-      />
+      <div>
+        <PageHeader02 panelList={panelList} tag={`合約編號 ${data_contract?.contractNumber ?? ''}`} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
 
       <div className={scss.main}>
         <div>

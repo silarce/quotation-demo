@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
 import Table01, { Ttable } from 'components/global/gear/table/table01';
@@ -21,6 +22,8 @@ import { useGetMemorandum } from 'js/api/api_memorandum';
 import { Tparams } from 'js/api/dtoTypes';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ============================================================================
 
@@ -269,16 +272,17 @@ export default function Memorandum() {
         });
       },
     },
+    ...usePanel_returnWorksDepartmentContractList(),
   ];
 
   // ---------------------------------------------------------------------------
   return (
     <SubLayer bodyOverflowY="scroll" isLoading_subLayer={isFetching_memorandum || isFetching_contract}>
-      <PageHeader
-        panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-        contactThatSkipContract={contactThatSkipContract}
-      />
+      <div>
+        <PageHeader02 tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`} panelList={panelList} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
+
       <div>
         <Wrapper_tab
           className={'m-auto'}
