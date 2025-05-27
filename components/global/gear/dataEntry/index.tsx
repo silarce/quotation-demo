@@ -167,9 +167,9 @@ const DatePicker = ({
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
   disabled && (suffixIcon.suffixIcon = null);
 
-  const transformDate = (date: Moment | null | undefined) => {
+  function transformDate<D = Moment | null | undefined>(date: D) {
     return twDate && date ? moment(date)?.subtract(1911, 'year') : date;
-  };
+  }
 
   // 改變ant-picker-year-btn的格式
   // locale_copy.lang.yearFormat = 'yy年';
@@ -196,7 +196,7 @@ const DatePicker = ({
       {...suffixIcon}
       locale={locale_copy}
       format={(theMoment) => {
-        const value = twDate && theMoment ? moment(theMoment)?.subtract(1911, 'year') : theMoment;
+        const value = transformDate(theMoment);
 
         return value.format('yy-MM-DD');
       }}
