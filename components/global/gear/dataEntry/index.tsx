@@ -155,8 +155,13 @@ const DatePicker = ({
   onChange,
   className,
   disabled,
+  returnSpanWhenDisabled = {},
   ...props
-}: DatePickerProps & { twDate?: boolean }) => {
+}: DatePickerProps & {
+  //
+  twDate?: boolean;
+  returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
+}) => {
   //送undefined進去也會使原本的suffixIcon消失，所以這樣處理
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
   disabled && (suffixIcon.suffixIcon = null);
@@ -166,6 +171,10 @@ const DatePicker = ({
 
   const value = twDate && _value ? moment(_value)?.subtract(1911, 'year') : _value;
   const defaultValue = twDate && _defaultValue ? moment(_defaultValue)?.subtract(1911, 'year') : _defaultValue;
+
+  if (disabled && returnSpanWhenDisabled) {
+    return <span>{value?.format('yy-MM-DD')}</span>;
+  }
 
   return (
     <AntdDatePicker
@@ -239,10 +248,16 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
   disabled,
   suffixIcon,
   hideSuffixIconWhenDisabled = true,
+  returnSpanWhenDisabled = {},
   ...props
 }: AntdSelectProps<Value, Option> & {
   hideSuffixIconWhenDisabled?: boolean;
+  returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
 }) {
+  if (disabled && returnSpanWhenDisabled) {
+    return <span>{props.value?.toString()}</span>;
+  }
+
   return (
     <AntdSelect<Value, Option>
       disabled={disabled}

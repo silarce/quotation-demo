@@ -36,6 +36,9 @@
 // textarea
 .textarea {
   width: 100%;
+  &:disabled{
+    cursor:auto;
+  }
 }
 
 .datepicker {
@@ -86,6 +89,7 @@
 .antdSelect.antdSelect.antdSelect.antdSelect {
   display: flex;
   font-size: inherit;
+
   :global(.ant-select-selector) {
     background-color: transparent;
     padding: unset;
