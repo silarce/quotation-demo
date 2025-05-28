@@ -48,7 +48,7 @@ import {
 } from 'js/api/api_quotation';
 
 // css
-import scss from './contractReviewForm.module.scss';
+import scss from './contractVerifyForm.module.scss';
 
 // type
 import {
@@ -132,7 +132,7 @@ const style_body = {
 
 // region START
 
-function ContractReviewForm({
+function ContractVerifyForm({
   showModal,
   ...props_reviewForm
 }: Tprops_reviewForm & {
@@ -2136,5 +2136,5 @@ const useDefaultPaymentRatio_quotationContent = (
 // ============================================================================
 // ============================================================================
 
-export default ContractReviewForm;
+export default ContractVerifyForm;
 export { ReviewForm, useDefaultPaymentRatio_quotationContent };
