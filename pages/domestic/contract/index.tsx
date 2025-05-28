@@ -10,7 +10,7 @@ import PageHeader02, { TpanelList, Tlink } from 'components/PageHeader/PageHeade
 // components
 import ContractList from 'components/page/domestic/contract/contractList';
 // composition
-import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
+import ContractVerifyForm from 'components/composition/contractVerifyForm/contractVerifyForm';
 
 // option
 import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistrict';
@@ -239,7 +239,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
         />
       </div>
 
-      <ContractReviewForm
+      <ContractVerifyForm
         showModal={!!activeContractId}
         readOnly={true}
         contractId={activeContractId}
