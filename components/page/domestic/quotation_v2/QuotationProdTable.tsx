@@ -589,6 +589,10 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
               const classAccessory = activedClassAccessoryDict[acceKey];
 
+              if (!classAccessory) {
+                return null;
+              }
+
               const nodeConfig_name = classAccessory.nodeConfig['name'];
 
               const left = (
