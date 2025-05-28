@@ -3,8 +3,8 @@ import { useRouter } from 'next/router';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
-import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // composition
 import MeetingMinutes_contract, { TimperativeHandle, Tstate } from 'components/composition/meetingMinutes/contract';
@@ -14,18 +14,9 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
 import { useGetContract_id } from 'js/api/api_quotation';
-import {
-  // TupdateEngineeringDeliveryList,
-  // TupdateDeliveryStatus,
-  // TupdateEngineeringDeliveryStatusDto,
-  useGetEngineeringContact,
-  // useGetEngineeringDeliveryList,
-  // apiPatchEngineeringDeliveryList,
-  // TcreateEngineeringDeliveryStatusDto,
-  // apiPostDeliveryStatus,
-  // apiPatchDeliveryStatus,
-  // apiDeleteDeliveryStatus,
-} from 'js/api/api_engineering';
+import { useGetEngineeringContact } from 'js/api/api_engineering';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ============================================================================
 type Tquery = {
@@ -97,25 +88,10 @@ export default function MeetingMinutes() {
 
   // ---------------------------------------------------------------------------
 
-  const panelList: TpanelList = (() => {
-    // const panelList_list: TpanelList = [
-    //   {
-    //     type: 'myButton',
-    //     label: '新增',
-    //     onClick: () => {
-    //       ref.current?.add();
-    //     },
-    //   },
-    // ];
+  const returnPanel = usePanel_returnWorksDepartmentContractList();
 
+  const panelList: TpanelList = (() => {
     const panelList_read: TpanelList = [
-      // {
-      //   type: 'myButton',
-      //   label: '編輯',
-      //   onClick: () => {
-      //     ref.current?.edit();
-      //   },
-      // },
       {
         type: 'myButton',
         label: '返回',
@@ -123,41 +99,8 @@ export default function MeetingMinutes() {
           ref.current?.toList();
         },
       },
+      ...returnPanel,
     ];
-
-    // const panelList_edit: TpanelList = [
-    //   {
-    //     type: 'redButton',
-    //     label: '確定',
-    //     onClick: () => {
-    //       ref.current?.reqPostPatch();
-    //     },
-    //   },
-    //   {
-    //     type: 'myButton',
-    //     label: '取消',
-    //     onClick: () => {
-    //       ref.current?.cancelEdit();
-    //     },
-    //   },
-    // ];
-
-    // const panelList_add: TpanelList = [
-    //   {
-    //     type: 'redButton',
-    //     label: '確定',
-    //     onClick: () => {
-    //       ref.current?.reqPostPatch();
-    //     },
-    //   },
-    //   {
-    //     type: 'myButton',
-    //     label: '返回',
-    //     onClick: () => {
-    //       ref.current?.toList();
-    //     },
-    //   },
-    // ];
 
     const { isAdd, isEdit, isRead } = meetingMinutesState ?? {};
 
@@ -165,17 +108,16 @@ export default function MeetingMinutes() {
       return panelList_read;
     }
 
-    return [];
+    return [...returnPanel];
   })();
 
   // ---------------------------------------------------------------------------
   return (
     <SubLayer isLoading_all={isLoading || meetingMinutesState?.isLoading || isFetching_contract}>
-      <PageHeader
-        panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-        contactThatSkipContract={contactThatSkipContract}
-      />
+      <div>
+        <PageHeader02 panelList={panelList} tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
 
       <div>
         <MeetingMinutes_contract ref={ref} onStateChange={onMeetingMinutesStateChange} />

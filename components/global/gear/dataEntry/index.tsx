@@ -2,6 +2,7 @@ import { useRef } from 'react';
 
 import classNames from 'classnames';
 import _ from 'lodash';
+import { Moment } from 'moment';
 
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
@@ -149,44 +150,55 @@ const Textarea = ({ className, ...props }: TextareaAutosizeProps) => {
 
 // MARK:DatePicker
 const DatePicker = ({
-  value: _value,
-  defaultValue: _defaultValue,
+  // value: _value,
+  // defaultValue: _defaultValue,
   twDate = true,
-  onChange,
+  // onChange,
   className,
   disabled,
+  returnSpanWhenDisabled = {},
   ...props
-}: DatePickerProps & { twDate?: boolean }) => {
+}: DatePickerProps & {
+  //
+  twDate?: boolean;
+  returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
+}) => {
   //送undefined進去也會使原本的suffixIcon消失，所以這樣處理
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
   disabled && (suffixIcon.suffixIcon = null);
 
-  // 改變ant-picker-year-btn的格式
-  locale_copy.lang.yearFormat = 'yy年';
+  function transformDate<D = Moment | null | undefined>(date: D) {
+    return twDate && date ? moment(date)?.subtract(1911, 'year') : date;
+  }
 
-  const value = twDate && _value ? moment(_value)?.subtract(1911, 'year') : _value;
-  const defaultValue = twDate && _defaultValue ? moment(_defaultValue)?.subtract(1911, 'year') : _defaultValue;
+  // 改變ant-picker-year-btn的格式
+  // locale_copy.lang.yearFormat = 'yy年';
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  locale_copy.lang.yearFormat = (
+    date: Moment // yearFormat的型別是string，但實際上也可以是callback函式
+  ) => {
+    const year = transformDate(date)?.year();
+
+    return `${year}年`;
+  };
+
+  if (disabled && returnSpanWhenDisabled) {
+    const value = transformDate(props.value);
+
+    return <span>{value?.format('yy-MM-DD')}</span>;
+  }
 
   return (
     <AntdDatePicker
       className={classNames(scss.datepicker, className)}
       disabled={disabled}
-      onChange={
-        onChange
-          ? (_valueMoment) => {
-              const valueMoment = (twDate ? moment(_valueMoment)?.add(1911, 'year') : _valueMoment) ?? null;
-              const isoString = valueMoment?.toISOString() ?? '';
-              onChange(valueMoment, isoString);
-            }
-          : undefined
-      }
-      value={value}
-      defaultValue={defaultValue}
-      //
       {...suffixIcon}
       locale={locale_copy}
       format={(theMoment) => {
-        return theMoment.format('yy-MM-DD');
+        const value = transformDate(theMoment);
+
+        return value.format('yy-MM-DD');
       }}
       {...props}
     />
@@ -239,10 +251,16 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
   disabled,
   suffixIcon,
   hideSuffixIconWhenDisabled = true,
+  returnSpanWhenDisabled = {},
   ...props
 }: AntdSelectProps<Value, Option> & {
   hideSuffixIconWhenDisabled?: boolean;
+  returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
 }) {
+  if (disabled && returnSpanWhenDisabled) {
+    return <span>{props.value?.toString()}</span>;
+  }
+
   return (
     <AntdSelect<Value, Option>
       disabled={disabled}

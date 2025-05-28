@@ -8,8 +8,9 @@ import moment from 'moment';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 
 // layer
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
-import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
+
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // component
@@ -80,6 +81,8 @@ import WorksheetForm_w13456 from 'components/page/worksDepartment/contracList/co
 
 import { useControl_pdf } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_pdf';
 import { useControl_profile } from 'components/page/worksDepartment/contracList/contract/workSheet/hook/useControl_profile';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ====================================================================
 
@@ -441,6 +444,8 @@ export default function Worksheet({
     },
   ];
 
+  panelList_notAllow.push(...usePanel_returnWorksDepartmentContractList());
+
   const panelList = disabled ? panelList_notAllow : panelList_allow;
 
   // -----------------------------------------------------------------------
@@ -490,16 +495,10 @@ export default function Worksheet({
         isFetching_finalProduct
       }
     >
-      {!isReadonly && (
-        <PageHeader
-          showReturnBtn={disabled}
-          panelList={panelList}
-          contractNumber={engineeringContact?.contractNumber ?? ''}
-          contactThatSkipContract={contactThatSkipContract}
-        />
-      )}
-
-      {isReadonly && <PageHeader02 tag={engineeringContact?.contractNumber ?? ''} panelList={panelList} />}
+      <div>
+        <PageHeader02 tag={`報價編號 ${engineeringContact?.contractNumber ?? ''}`} panelList={panelList} />
+        {!isReadonly && <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />}
+      </div>
 
       <div>
         <WorkSheetProfile control={control_profile} disabled={true} />

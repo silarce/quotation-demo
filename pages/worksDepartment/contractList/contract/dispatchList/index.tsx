@@ -8,7 +8,8 @@ import moment from 'moment';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
 import List from 'components/page/worksDepartment/contracList/contract/dispatchList/list';
@@ -26,6 +27,8 @@ import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './dispatchList.module.scss';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ==============================================================
 
@@ -150,16 +153,16 @@ export default function DispatchList() {
           },
         }),
     },
+    ...usePanel_returnWorksDepartmentContractList(),
   ];
 
   // ----------------------------------------------------------
   return (
     <SubLayer isLoading_subLayer={isFetching_contract || isFetching_engineeringContact}>
-      <PageHeader
-        panelList={panelList}
-        contractNumber={contract?.contractNumber ?? ''}
-        contactThatSkipContract={contactThatSkipContract}
-      />
+      <div>
+        <PageHeader02 panelList={panelList} tag={`合約編號 ${contract?.contractNumber ?? ''}`} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
 
       <div className={scss.body}>
         <div className={scss.profile}>
