@@ -1092,7 +1092,11 @@ function ReviewForm({
               className="mt-1 w-full"
               textareaProps={{
                 disabled: disabled,
-                ...register('note'),
+                placeholder: '',
+                value: watchData.note ?? '',
+                onChange: (e) => {
+                  setValue('note', e.target.value);
+                },
               }}
             />
           </div>
