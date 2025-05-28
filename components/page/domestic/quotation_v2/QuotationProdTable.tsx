@@ -589,6 +589,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
               const classAccessory = activedClassAccessoryDict[acceKey];
 
+              // FIXME 有時classAccessory會是undefined，未知原因
               if (!classAccessory) {
                 return null;
               }
