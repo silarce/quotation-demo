@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
 import { ReviewForm } from 'components/composition/contractReviewForm/contractReviewForm';
@@ -11,6 +12,8 @@ import { ReviewForm } from 'components/composition/contractReviewForm/contractRe
 // api
 // import { useGetEngineeringContact } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ------------------------------------------------------------------------
 
@@ -41,19 +44,7 @@ export default function QuotationVerifyForm() {
     ],
   });
 
-  const {
-    //
-    engineeringContact,
-    contractNumber,
-    content,
-  } = contract ?? {};
-
-  const {
-    //
-    verifyForm,
-    projectName,
-    total,
-  } = content ?? {};
+  const { engineeringContact } = contract ?? {};
 
   // ------------------------------------------------------------------------
 
@@ -67,11 +58,13 @@ export default function QuotationVerifyForm() {
   // MARK: RENDER
   return (
     <SubLayer isLoading_subLayer={isFetching}>
-      <PageHeader
-        //  panelList={panelList}
-        contractNumber={engineeringContact?.contractNumber ?? ''}
-        contactThatSkipContract={contactThatSkipContract}
-      />
+      <div>
+        <PageHeader02
+          panelList={usePanel_returnWorksDepartmentContractList()}
+          tag={`合約編號 ${engineeringContact?.contractNumber ?? ''}`}
+        />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
 
       <div className="w-[1000px]">
         <ReviewForm

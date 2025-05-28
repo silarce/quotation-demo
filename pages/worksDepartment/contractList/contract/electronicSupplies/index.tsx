@@ -6,7 +6,8 @@ import classNames from 'classnames';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader, { TpanelList } from 'components/page/worksDepartment/contracList/contract/gear/PageHeader';
+import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
 import SupplyList from 'components/page/worksDepartment/electronicSupplies/supplyList';
@@ -26,6 +27,8 @@ import { useElectronicSupplies_id } from 'js/api/api_engineering';
 import scss from './electronicSupplies.module.scss';
 
 import { useCalcDoorModal } from 'components/page/worksDepartment/electronicSupplies/hook/useCalcDoorModal';
+
+import { usePanel_returnWorksDepartmentContractList } from 'components/page/worksDepartment/hook/usePanel_returnWorksDepartmentContractList';
 
 // ------------------------------------------------------------------
 
@@ -112,11 +115,11 @@ export default function ElectronicSupplies() {
 
   return (
     <SubLayer isLoading_subLayer={isFetching_electronicSupplies || isFetching_contract}>
-      <PageHeader
-        panelList={panelArr}
-        contractNumber={contractNumber ?? '---'}
-        contactThatSkipContract={contactThatSkipContract}
-      />
+      <div>
+        <PageHeader02 panelList={panelArr} tag={`合約編號 ${contractNumber ?? ''}`} />
+        <Nav_worksDepartment contactThatSkipContract={contactThatSkipContract} />
+      </div>
+
       <div className={scss.container}>
         <Profile
           projectNumber={projectNumber}
@@ -191,6 +194,8 @@ const usePanelList = ({
   const query = router.query as Tquery;
   const { listName = 'itemList', contractId } = query;
 
+  const returnPanel = usePanel_returnWorksDepartmentContractList();
+
   // const [panelList_itemList, setPanelList_itemList] = useState<TpanelList>([]);
   const [panelList_itemList, dispatchPanelList_itemList] = useReducer(reducer_itemList, []);
 
@@ -241,7 +246,7 @@ const usePanelList = ({
     requirementRecord: panelList_requirementRecord,
   };
 
-  const panelArr = listName ? list[listName] : [];
+  const panelArr = listName ? [...list[listName], ...returnPanel] : [...returnPanel];
 
   return {
     panelArr,
