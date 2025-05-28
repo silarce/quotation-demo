@@ -28,9 +28,9 @@ import QuotationPdf_part, {
   usePdfPart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import ContractReviewForm, {
+import ContractVerifyForm, {
   useDefaultPaymentRatio_quotationContent,
-} from 'components/composition/contractReviewForm/contractReviewForm';
+} from 'components/composition/contractVerifyForm/contractVerifyForm';
 // import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 // import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 // import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -1081,7 +1081,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/*  */}
         {/*  */}
 
-        <ContractReviewForm
+        <ContractVerifyForm
           showModal={reviewFormShow}
           readOnly={state_status === 'Pending' && isSendToReview_pending}
           onCancel={() => setReviewFormShow(false)}
