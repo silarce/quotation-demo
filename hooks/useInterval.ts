@@ -39,3 +39,5 @@ const useInterval = (
     };
   }, [interval]);
 };
+
+export { useInterval };
