@@ -1,5 +1,5 @@
 // 報價單
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 
 import Decimal from 'decimal.js';
@@ -54,7 +54,6 @@ import {
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 import { useHistory } from 'components/page/domestic/quotation_v2/hook/useHistory';
 import { usePanel } from 'components/page/domestic/quotation_v2/hook/usePanel';
-import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
 
 // abstraction
 import { createProps_payInfo } from 'components/page/domestic/quotation_v2/method/createProps_payInfo';
@@ -69,8 +68,9 @@ import scss from './index.module.scss';
 
 // ======================================================================
 
-// component and hook
+// component and data hook
 import {
+  Tstate_profile,
   useProfile,
   createProps_profileForm,
   Traw_profile,
@@ -86,15 +86,23 @@ import QuotationAttachment from 'components/page/domestic/quotation_v2/Quotation
 import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
 import QuotationPayInfo from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 import {
-  useQuotationProduct,
+  TstateProdDict,
   TprodSource,
+  useQuotationProduct,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationProdTable';
 //
 import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
 import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther';
 //
+import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
 
+// ======================================================================
+// ======================================================================
+
+import { useInterval } from 'hooks/useInterval';
+
+// ======================================================================
 // ======================================================================
 
 // region TYPE
@@ -239,6 +247,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     doorModelSummery,
     doorModelSummery_reduceModified,
     checkIsIterativeProdValid,
+    //
+    exportState: exportState_product,
+    restoreState: restoreState_product,
   } = useQuotationProduct({
     raw_quotationProductArr: prodArr,
     raw_quotationDiscount: content?.discount,
@@ -252,13 +263,16 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
-  const instance_quotationPrice = useQuotationTotalPrice({
+  const instance_quotationTotalPrice = useQuotationTotalPrice({
     raw_quotationContent: content,
     disabled,
   });
-
-  const { state_quotationTotal, setQuotationPriceTotal, setTuneTotal, setCurrency, setExchangeRate } =
-    instance_quotationPrice;
+  const {
+    state_quotationTotal,
+    setQuotationPriceTotal,
+    exportState: exportState_quotationPrice,
+    restoreState: restoreState_quotationPrice,
+  } = instance_quotationTotalPrice;
 
   const { avgDiscount } = instance_quotationProduct;
 
@@ -266,7 +280,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     quotationDiscount: state_quotationDiscount, // 總折數
   } = instance_quotationProduct;
 
-  const { state_profile, setState_profile } = useProfile({
+  const {
+    state_profile,
+    setState_profile,
+    restoreState: restoreState_profile,
+  } = useProfile({
     disabled,
     profile: quotationType === 'newAttachment' ? contractProfile : content,
   });
@@ -319,6 +337,85 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
+
+  const backupState = () => {
+    const storageItemName = 'backup-' + (quotationId || contentId || 'newQuotation');
+
+    const {
+      state_quotationDiscount,
+      prodKeyArr,
+      cellKeyArr,
+      cellKeyArr_component,
+      cellKeyArr_accessory,
+      state_prodDict,
+      state_iterativeProdDict,
+    } = exportState_product();
+
+    const { state_quotationTotal, haveTax } = exportState_quotationPrice();
+
+    const stateForRestore = {
+      type: 'quotation',
+      backupTime: new Date().toISOString(),
+
+      status: state_status,
+      profile: state_profile,
+      product: {
+        state_quotationDiscount,
+        prodKeyArr,
+        cellKeyArr,
+        cellKeyArr_component,
+        cellKeyArr_accessory,
+        state_prodDict,
+        state_iterativeProdDict,
+      },
+      quotationPrice: {
+        state_quotationTotal,
+        haveTax,
+      },
+    };
+    const json = JSON.stringify(stateForRestore);
+
+    window.localStorage.setItem(storageItemName, json);
+  };
+
+  const storageItemName = 'backup-' + (quotationId || contentId || 'newQuotation');
+  const isBackupAvailable = useMemo(() => {
+    return !!window.localStorage.getItem(storageItemName);
+  }, [storageItemName]);
+
+  const restoreAllState = !isBackupAvailable
+    ? undefined
+    : () => {
+        // const storageItemName = 'backup-' + (quotationId || contentId || 'newQuotation');
+        const json = window.localStorage.getItem(storageItemName)!;
+
+        const restoreAllState = () => {
+          const stateForRestore = JSON.parse(json) as {
+            type: 'quotation';
+            backupTime: string;
+            status: TquotationContentDto['status'];
+            profile: Tstate_profile;
+            product: Partial<ReturnType<typeof exportState_product>>;
+            quotationPrice: Partial<ReturnType<typeof exportState_quotationPrice>>;
+          };
+
+          restoreState_profile(stateForRestore.profile);
+          setState_status(stateForRestore.status);
+          restoreState_product(stateForRestore.product);
+          restoreState_quotationPrice(stateForRestore.quotationPrice);
+        };
+
+        setDisabled(false);
+        restoreAllState();
+      };
+
+  useInterval(backupState, { interval: 5000, stop: disabled });
+
+  // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
 
   // region REQUEST
@@ -743,7 +840,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   const props_payInfo = createProps_payInfo({
-    instance_quotationPrice,
+    instance_quotationPrice: instance_quotationTotalPrice,
     kit_payInfo,
     state_quotationDiscount,
     disabled,
@@ -751,7 +848,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     isAttach,
   });
 
-  // MARK:usePanel
+  // MARK:
   const { panelList, customeRight } = usePanel({
     disabled,
 
@@ -805,6 +902,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     //
     isQuotationExpired,
     quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
+    //
+    restoreAllState: restoreAllState,
   });
 
   const history = useHistory({

@@ -37,6 +37,10 @@ const useProfile = ({ disabled, profile }: { disabled: boolean; profile: Traw_pr
 
   const [state, setState] = useState<Tstate_profile>(defaultState);
 
+  const restoreState = (backupState: Tstate_profile) => {
+    setState(backupState);
+  };
+
   useEffect(() => {
     setState(defaultState);
   }, [defaultState, disabled]);
@@ -44,6 +48,7 @@ const useProfile = ({ disabled, profile }: { disabled: boolean; profile: Traw_pr
   return {
     state_profile: state,
     setState_profile: setState,
+    restoreState,
   };
 }; // useQuotation
 
@@ -277,4 +282,4 @@ const createProps_profileForm = ({
 // ===========================================================================
 export { useProfile, createProps_profileForm };
 
-export type { Traw_profile };
+export type { Traw_profile, Tstate_profile };

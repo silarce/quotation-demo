@@ -268,12 +268,6 @@ const useQuotationProduct = ({
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
 
-  useEffect(() => {
-    if (state_prodDict['d630c1be-c96a-46f9-bdd9-40d333295397']) {
-      console.log(state_prodDict['d630c1be-c96a-46f9-bdd9-40d333295397'].data_prod.price);
-    }
-  }, [state_prodDict]);
-
   const [state_iterativeProdDict, setState_iterativeProdDict] = useState<TstateProdDict>(
     defaultState_iterative_copy.stateProdDict
   );
@@ -597,19 +591,41 @@ const useQuotationProduct = ({
     return !IsIterativeProdInvalid;
   };
 
-  // const calcProductBody_2 = () => {
-  //   const body_normal = _calcProductBody({
-  //     prodKeyArr,
-  //     createClassProd,
-  //     state_prodDict,
-  //   });
+  const exportState = () => {
+    return {
+      state_quotationDiscount,
+      prodKeyArr,
+      activeProdKey,
+      activeProdKey_iterative,
+      cellKeyArr,
+      cellKeyArr_component,
+      cellKeyArr_accessory,
+      state_prodDict,
+      state_iterativeProdDict,
+    };
+  };
 
-  //   const body_iterative = _calcProductBody({
-  //     prodKeyArr: prodKeyArr_iterative,
-  //     createClassProd: createClassProd_iterative,
-  //     state_prodDict: state_iterativeProdDict,
-  //   });
-  // };
+  const restoreState = (props: {
+    state_quotationDiscount?: typeof state_quotationDiscount;
+    prodKeyArr?: typeof prodKeyArr;
+    activeProdKey?: typeof activeProdKey;
+    activeProdKey_iterative?: typeof activeProdKey_iterative;
+    cellKeyArr?: typeof cellKeyArr;
+    cellKeyArr_component?: typeof cellKeyArr_component;
+    cellKeyArr_accessory?: typeof cellKeyArr_accessory;
+    state_prodDict?: typeof state_prodDict;
+    state_iterativeProdDict?: typeof state_iterativeProdDict;
+  }) => {
+    props.state_quotationDiscount && setState_quotationDiscount(props.state_quotationDiscount);
+    props.prodKeyArr && setProdKeyArr(props.prodKeyArr);
+    props.activeProdKey && setActiveProdKey(props.activeProdKey);
+    props.activeProdKey_iterative && setActiveProdKey_iterative(props.activeProdKey_iterative);
+    props.cellKeyArr && setCellKeyArr(props.cellKeyArr);
+    props.cellKeyArr_component && setCellKeyArr_component(props.cellKeyArr_component);
+    props.cellKeyArr_accessory && setCellKeyArr_accessory(props.cellKeyArr_accessory);
+    props.state_prodDict && setState_prodDict(props.state_prodDict);
+    props.state_iterativeProdDict && setState_iterativeProdDict(props.state_iterativeProdDict);
+  };
 
   // -----------------------------------------------------------------------
   // region useEffect
@@ -712,6 +728,7 @@ const useQuotationProduct = ({
     //
     modifyProd: throwErr,
     resetModify: throwErr,
+    //
   };
 
   const instance_iterative: Tinstance_useQuotationProduct | null = !isIterativeProdExist
@@ -780,6 +797,8 @@ const useQuotationProduct = ({
     doorModelSummery,
     doorModelSummery_reduceModified,
     checkIsIterativeProdValid,
+    exportState,
+    restoreState,
   };
 };
 
