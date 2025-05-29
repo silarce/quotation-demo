@@ -494,7 +494,7 @@ const calcPayment = (state: Tstate_payment) => {
 
   const completedPart_d = new Decimal(contractTotalPrice).minus(pendingTasks);
   const unpaidPayment_d = new Decimal(completedPart_d).minus(receivedPayment).minus(extraIncome).minus(totalDeduction);
-  const finalPayment_d = completedPart_d.div(taxRate).mul(finalPaymentPercent).div(100).toDecimalPlaces(0);
+  const finalPayment_d = completedPart_d.mul(taxRate).mul(finalPaymentPercent).div(100).toDecimalPlaces(0);
   const paymentPending_d = new Decimal(unpaidPayment_d).minus(finalPayment_d);
 
   return {
