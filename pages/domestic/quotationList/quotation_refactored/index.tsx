@@ -771,7 +771,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       setDisabled(false);
     },
     btnCancelOnClick: () => {
-      setDisabled(true);
+      myAlert.confirm({
+        title: '確定要取消編輯?',
+        content: '所有未儲存的變更將會被捨棄',
+        props: {
+          onOk: () => {
+            setDisabled(true);
+          },
+        },
+      });
     },
     btnPatchOnClick: handlePatch,
     btnPostOnClick: handlePost,
