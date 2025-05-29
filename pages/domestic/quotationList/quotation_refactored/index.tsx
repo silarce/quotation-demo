@@ -5,62 +5,26 @@ import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
+// layer
+import SubLayer from 'components/Layer/SubLayer/SubLayer';
+
 // components
-
-// import QuotationProfile, { Tcontrol_profile } from 'components/page/domestic/quotation/quotationProfile';
-import QuotationSinature_3, {
-  TemployeeDto,
-  Tcontroll_signature,
-} from 'components/page/domestic/quotation/quotationSinature_3';
-
-// import QuotationPdf, {
-//   quotationContentToBasicInfo,
-//   quotationProdToTableProdList,
-// } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new2';
-
 import QuotationPdf, {
   useModalQuotationPdf,
 } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
-
-import QuotationPdf_part, {
-  TmainProduct,
-  Tpart,
-  usePdfPart,
-} from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
+import QuotationPdf_part, { usePdfPart } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import ContractReviewForm, {
-  useDefaultPaymentRatio_quotationContent,
-} from 'components/composition/contractReviewForm/contractReviewForm';
-// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
-// import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
-// import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
-// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
-// import Summary, {
-//   TsummaryControl,
-//   TpayInfoControl,
-// } from 'components/page/domestic/quotation/quotation/summary/summary';
-// import DoorSummary from 'components/page/domestic/quotation/doorSummary';
+import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
+import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
+import VersionLabel from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/versionLabel';
 
 // global gear
-import PageHeader02, { TtagList, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
+import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-// import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
-// import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01'; // import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-// import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
-// import ThreeButtonModal from 'components/global/gear/modal/simpleModal/multButtonModal';
-// import CustomerSelector from 'components/global/gear/modal/customerSelector';
-import SignatureBar, { Tcontrol_signatureBar, TsignatureBarItem } from 'components/global/gear/signatureBar_v2';
+import SignatureBar, { Tcontrol_signatureBar } from 'components/global/gear/signatureBar_v2';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-// import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-
-import {
-  init_variable,
-  calcNTDToForeignCurrency,
-  checkIsReviewer,
-  parseQuotationContentSituation,
-} from 'components/page/domestic/quotation/function/utils_quotation';
 
 // config
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -70,107 +34,74 @@ import {
   TquotationDto,
   TquotationContentDto,
   TquotationContractDto,
-  // TcreateQuotationContentDto,
-  // useGetQuotation_id,
-  // useGetQuotation_id_2,
   useGetQuotation_id_3,
   useGetContract_id_forAttach,
   useIterativeContractProduct,
-  apiQuotationModify,
-  // apiPostQuotation,
-  // apiPatchQuotation,
-  // apiQuotationSubmitReview,
-  // apiQuotationReview,
-  // apiQuotationUnlock,
-  //
-  // useQuotation_id_attachments,
-  // apiPostQuotation_id_attachments,
-  // apiDelQuotation_id_attachments,
-  //
-  // useGetQuotationContent_id,
-  //
-  // apiPatchQuotationToPending,
-  // apiPostCopyQuotation,
-  // apiPatchQuotationContent_id_progress,
-  // TquotationProductDto,
+  parseProdAction,
 } from 'js/api/api_quotation';
 
-// hook
-// import { useProductList } from 'hooks/quotation/useProduct';
-// import { useSummary, Tstate_summary } from 'components/page/domestic/quotation/hook/useSummary';
-
 // type
+import { TuserDto, TemployeeDto } from 'js/api/dtoTypes';
 
-import { TuserDto } from 'js/api/dtoTypes';
-
-import SubLayer from 'components/Layer/SubLayer/SubLayer';
-
+// utils
 import { calcW } from 'js/utils/product/calc';
+import {
+  init_variable,
+  parseQuotationContentSituation,
+} from 'components/page/domestic/quotation/function/utils_quotation';
+
+// hook
+import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
+import { useHistory } from 'components/page/domestic/quotation_v2/hook/useHistory';
+import { usePanel } from 'components/page/domestic/quotation_v2/hook/usePanel';
+import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
+
+// abstraction
+import { createProps_payInfo } from 'components/page/domestic/quotation_v2/method/createProps_payInfo';
+import { kit_req } from 'components/page/domestic/quotation_v2/method/kit_req';
+import {
+  calcQtyModify,
+  calcPriceDiscount_percent,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/calcProd';
+
+// css
+import scss from './index.module.scss';
 
 // ======================================================================
 
-// region REFACTOR IMPORT
-
-import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
-
-import type { TstateTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
-import { useHistory } from 'components/page/domestic/quotation_v2/hook/useHistory';
-import { usePanel } from 'components/page/domestic/quotation_v2/hook/usePanel';
-
-import { createProps_payInfo } from 'components/page/domestic/quotation_v2/method/createProps_payInfo';
-
+// component and hook
 import {
   useProfile,
   createProps_profileForm,
   Traw_profile,
 } from 'components/page/domestic/quotation_v2/hook/useProfile';
 import QuotationProfile from 'components/page/domestic/quotation_v2/QuotationProfile';
-
+//
 import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
 import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRemark';
-
+//
 import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
 import QuotationAttachment from 'components/page/domestic/quotation_v2/QuotationAttachment';
-
+//
 import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
-import QuotationPayInfo, { Tprops_quotationPayInfo } from 'components/page/domestic/quotation_v2/QuotationPayInfo';
-
+import QuotationPayInfo from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 import {
   useQuotationProduct,
   TprodSource,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationProdTable';
-
+//
 import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
 import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther';
+//
 
-import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
-
-import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
-
-import { kit_req } from 'components/page/domestic/quotation_v2/method/kit_req';
-
-import VersionLabel from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/versionLabel';
-
-// css
-import scss from './index.module.scss';
-
-import { parseProdAction } from 'js/api/api_quotation';
-
-import {
-  calcQtyModify,
-  calcProdRemain,
-  calcPriceDiscount_percent,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/calcProd';
-
-// ======================================================================
 // ======================================================================
 
 // region TYPE
 
-// 沒有id- 新增報價單
-// 有id，其他都沒有- 編輯報價單
-// 有id，有contentId- 編輯報價單，但是以指定content取代latestContent
+// 沒有id - 新增報價單
+// 有id，其他都沒有 - 編輯報價單
+// 有id，有contentId - 編輯報價單，但是以指定content取代latestContent
 interface Tquery {
   id?: string;
   // 從查詢報價單的展開列表點進來的話query裡就會有contentId
@@ -210,47 +141,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   let quotationType: TquotationType = undefined;
 
-  // const isNewQuotation = !quotationId && !contentId;
-  // const isQuotation = !!quotationId && !contentId;
-
-  // const isNewAttachmentQuotation = isNewQuotation && !!contractId;
-
   // ----------------------------------------------------------------------
 
-  let {
-    // reviewSalesEmployeeId,
-    // reviewWorkDirectorEmployeeId,
-    // reviewCashierEmployeeId,
-    // reviewSupervisorEmployeeId,
-    // reviewSalesManagerEmployeeId,
-    // reviewManagerEmployeeId,
-    // isReviewer,
-    // isSales,
-    // isWorkDirector,
-    // isCashier,
-    // isSupervisor,
-    // eslint-disable-next-line prefer-const
-    // isSalesManagerEmployee,
-    // isManager,
-    // salesReviewedAt,
-    // supervisorReviewedAt,
-    // salesManagerReviewedAt,
-    // workDirectorReviewedAt,
-    // cashierReviewedAt,
-    managerReviewedAt,
-    toSalesAt,
-    toSupervisorAt,
-    // toSalesManagerAt,
-    // toWorkDirectorAt,
-    toCashierAt,
-    // toManagerAt,
-    // isSendToReview,
-    // isSendToReview_pending,
-    isAttach,
-    isAllReviewedBeforePending,
-    // version,
-    // editNotes,
-  } = init_variable();
+  let { managerReviewedAt, toSalesAt, toSupervisorAt, toCashierAt, isAttach, isAllReviewedBeforePending } =
+    init_variable();
 
   // ----------------------------------------------------------------------
 
@@ -260,14 +154,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     //
     instatnce_getQuotationId3,
     content,
-    attachedToContract,
     contractProfile,
-
     prodArr,
     iterativeContractProductArr,
-
     prodArrForPDf,
-
     isQuotationExpired,
     latestSubContract,
     parentSubContract,
@@ -284,21 +174,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const {
     isFetching: isFetching_update,
-    //
+
     raw: quotationData,
     update: update_quotation,
-    // attachment
     attachmentArr,
-    // domain,
-    //
     isDesignatedContent,
-    //
-    // reqPost,
-    // reqPatch,
     reqReview,
     reqUnlock,
     reqPatchReviewer,
-    reqCopyQuotation,
     reqPatchQuotationContent_id_progress,
     reqToPending,
   } = instatnce_getQuotationId3;
@@ -308,10 +191,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   managerReviewedAt = content?.managerReviewedAt;
   toSalesAt = content?.toSalesAt;
   toSupervisorAt = content?.toSupervisorAt;
-  // toSalesManagerAt = content?.toSalesManagerAt;
-  // toWorkDirectorAt = content?.toWorkDirectorAt;
   toCashierAt = content?.toCashierAt;
-  // toManagerAt = content?.toManagerAt;
 
   const agentEmployee = !quotationId ? userInfo?.employee : content?.agentEmployee;
 
@@ -371,13 +251,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       });
     },
   });
-
-  // const instance_iterativeContractProduct = useQuotationProduct({
-  //   raw_quotationProductArr: iterativeContractProductArr,
-  //   raw_quotationDiscount: undefined,
-  //   disabled,
-  //   onProdAllTotalChange: () => {},
-  // });
 
   const instance_quotationPrice = useQuotationTotalPrice({
     raw_quotationContent: content,
@@ -1398,8 +1271,6 @@ const useData = () => {
         G: prod.guideRailG || 0, // 若是特殊門，guideRailG應該會是0
       });
       W = new Decimal(W).div(1000).toString() as `${number}`;
-
-      console.log('WWWW', W);
 
       acc[key] = {
         ...prod,
