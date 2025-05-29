@@ -263,6 +263,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
+  const {
+    avgDiscount,
+    quotationDiscount: state_quotationDiscount, // 總折數
+  } = instance_quotationProduct;
+
   const instance_quotationTotalPrice = useQuotationTotalPrice({
     raw_quotationContent: content,
     disabled,
@@ -270,15 +275,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const {
     state_quotationTotal,
     setQuotationPriceTotal,
-    exportState: exportState_quotationPrice,
-    restoreState: restoreState_quotationPrice,
+    exportState: exportState_quotationTotalPrice,
+    restoreState: restoreState_quotationTotalPrice,
   } = instance_quotationTotalPrice;
-
-  const { avgDiscount } = instance_quotationProduct;
-
-  const {
-    quotationDiscount: state_quotationDiscount, // 總折數
-  } = instance_quotationProduct;
 
   const {
     state_profile,
@@ -290,18 +289,22 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   const {
+    annoKitArr,
     annoArr,
     addAnno,
     openSelector: openSelector_anno,
+    restoreState: restoreState_anno,
   } = useAnnotations({
     disabled: true,
     raw_remarkArr: content?.annotations,
   });
 
   const {
+    quotationRangeKitArr,
     quotationRangeArr,
     addQuotationRange,
     openSelector: openSelector_qr,
+    restoreState: restoreState_quotationRange,
   } = useQuotationRange({
     disabled: true,
     raw_remarkArr: content?.quotationRanges,
@@ -320,7 +323,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     },
   });
 
-  const { state: state_payInfo, kit: kit_payInfo } = usePayInfo({
+  const {
+    state: state_payInfo,
+    kit: kit_payInfo,
+
+    exportState: exportState_payInfo,
+    restoreState: restoreState_payInfo,
+  } = usePayInfo({
     disabled,
     raw: content,
   });
@@ -336,6 +345,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       });
     },
   });
+  const { state_otherArr, restoreState: restoreState_other } = instance_useQuotationOther;
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -354,14 +364,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       state_iterativeProdDict,
     } = exportState_product();
 
-    const { state_quotationTotal, haveTax } = exportState_quotationPrice();
-
     const stateForRestore = {
       type: 'quotation',
       backupTime: new Date().toISOString(),
 
       status: state_status,
-      profile: state_profile,
       product: {
         state_quotationDiscount,
         prodKeyArr,
@@ -371,10 +378,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         state_prodDict,
         state_iterativeProdDict,
       },
-      quotationPrice: {
-        state_quotationTotal,
-        haveTax,
-      },
+      quotationTotalPrice: exportState_quotationTotalPrice({ exportCopy: false }),
+      profile: state_profile,
+
+      annoArr,
+      quotationRangeArr,
+
+      payInfo: exportState_payInfo({ exportCopy: false }),
+      other: state_otherArr,
     };
     const json = JSON.stringify(stateForRestore);
 
@@ -397,15 +408,25 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             type: 'quotation';
             backupTime: string;
             status: TquotationContentDto['status'];
-            profile: Tstate_profile;
             product: Partial<ReturnType<typeof exportState_product>>;
-            quotationPrice: Partial<ReturnType<typeof exportState_quotationPrice>>;
+            quotationTotalPrice: ReturnType<typeof exportState_quotationTotalPrice>;
+            profile: Tstate_profile;
+            annoArr: typeof annoArr;
+            quotationRangeArr: typeof quotationRangeArr;
+            payInfo: ReturnType<typeof exportState_payInfo>;
+            state_otherArr: typeof state_otherArr;
           };
 
-          restoreState_profile(stateForRestore.profile);
           setState_status(stateForRestore.status);
+
           restoreState_product(stateForRestore.product);
-          restoreState_quotationPrice(stateForRestore.quotationPrice);
+          restoreState_quotationTotalPrice(stateForRestore.quotationTotalPrice);
+
+          restoreState_profile(stateForRestore.profile);
+          restoreState_anno(stateForRestore.annoArr);
+          restoreState_quotationRange(stateForRestore.quotationRangeArr);
+          restoreState_payInfo(stateForRestore.payInfo);
+          restoreState_other(stateForRestore.state_otherArr);
         };
 
         setDisabled(false);
@@ -435,8 +456,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       instance_useQuotationOther,
       state_profile,
       state_payInfo,
-      annoArr: annoArr.map((anno) => anno.value),
-      quotationRangeArr: quotationRangeArr.map((qr) => qr.value),
+      annoArr: annoKitArr.map((anno) => anno.value),
+      quotationRangeArr: quotationRangeKitArr.map((qr) => qr.value),
       setIsFetching,
       createFileArr,
       update_quotation: async () => {
@@ -947,8 +968,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     setState_status(status);
   }, [content]);
 
-  // ----------------------------------------------------------------------
-
   // MARK: RENDER
   return (
     <SubLayer isLoading_all={isFetching_update || isFetching}>
@@ -1032,14 +1051,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             <QuotationRemark
               label="備註"
               disabled={disabled}
-              remarkArr={annoArr}
+              remarkArr={annoKitArr}
               onUpponAddClick={openSelector_anno}
               onAddClick={addAnno}
             />
             <QuotationRemark
               label="報價範圍"
               disabled={disabled}
-              remarkArr={quotationRangeArr}
+              remarkArr={quotationRangeKitArr}
               onUpponAddClick={openSelector_qr}
               onAddClick={addQuotationRange}
             />

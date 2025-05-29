@@ -31,6 +31,22 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefine
 
   const kit = useMemo(() => createKit({ state, setState }), [state]);
 
+  const exportState = ({
+    exportCopy = false,
+  }: {
+    exportCopy?: boolean;
+  } = {}) => {
+    if (exportCopy) {
+      return _.cloneDeep(state);
+    }
+
+    return state;
+  };
+
+  const restoreState = (backupState: Tstate) => {
+    setState(backupState);
+  };
+
   useEffect(() => {
     setState(defaultState);
   }, [defaultState, disabled]);
@@ -39,6 +55,8 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefine
     state,
     setState,
     kit,
+    exportState,
+    restoreState,
   };
 };
 

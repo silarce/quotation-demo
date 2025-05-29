@@ -102,6 +102,10 @@ const useQuotationOther = ({
     });
   };
 
+  const restoreState = (backupState: Tstate) => {
+    setState(backupState);
+  };
+
   useEffect(() => {
     setState(_.cloneDeep(defaultState));
   }, [defaultState, disabled]);
@@ -113,6 +117,8 @@ const useQuotationOther = ({
     calcAllOtherTotalPrice,
     addOther,
     removeOther,
+
+    restoreState,
   };
 };
 
