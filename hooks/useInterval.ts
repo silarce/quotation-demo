@@ -10,16 +10,33 @@ const useInterval = (
       console.error(e);
       myAlert.notify.error({ message: 'useInterval回調函式發生錯誤', description: e.message });
     },
+    stop = false,
+  }: {
+    interval?: number;
+    immediate?: boolean;
+    onError?: (e: Error) => void;
+    stop?: boolean;
   } = {}
 ) => {
   // 為了使fuc更新時不會因為範疇不同導致執行舊的fuc
   const ref_fuc = useRef(fuc);
   ref_fuc.current = fuc;
 
+  const ref_stop = useRef(stop);
+  ref_stop.current = stop;
+
   useEffect(() => {
+    const run = () => {
+      if (ref_stop.current) {
+        return;
+      }
+
+      ref_fuc.current();
+    };
+
     if (immediate) {
       try {
-        ref_fuc.current();
+        run();
       } catch (e) {
         onError(e as Error);
       }
@@ -27,7 +44,7 @@ const useInterval = (
 
     const intervalToken = setInterval(() => {
       try {
-        ref_fuc.current();
+        run();
       } catch (e) {
         onError(e as Error);
         clearInterval(intervalToken);
