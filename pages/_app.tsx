@@ -27,6 +27,7 @@ import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
+import { useClearBackup } from 'hooks/useBackup';
 
 // -----------------------------------------------------------------------------------
 
@@ -93,6 +94,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
   useGlobalErrorCatcher();
+  useClearBackup();
 
   // ----------------------------------------------------------------------------
 
