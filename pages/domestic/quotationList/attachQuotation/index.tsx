@@ -38,7 +38,7 @@ import QuotationPdf_part, {
   Tpart,
 } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
+import ContractVerifyForm from 'components/composition/contractVerifyForm/contractVerifyForm';
 import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
@@ -1958,7 +1958,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       />
 
       {/* 合約審核表 */}
-      <ContractReviewForm
+      <ContractVerifyForm
         showModal={reviewFormShow}
         readOnly={status === 'Pending' && isSendToReview_pending}
         onCancel={() => setReviewFormShow(false)}

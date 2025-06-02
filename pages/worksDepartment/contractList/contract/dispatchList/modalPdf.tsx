@@ -308,7 +308,7 @@ const c03 = 40 * magnification;
 const c04 = c03 + 50 * magnification;
 const c05 = c02 + c02 + c04;
 const c06 = c04 + c02 - c03 + c6c10Adjust;
-const c07 = 'auto';
+
 const c08 = 35 * magnification;
 
 const c09 = 120 * magnification;
@@ -318,6 +318,9 @@ const c09 = 120 * magnification;
 const c10 = c04 + c08 - c6c10Adjust;
 const c11 = c0 + c02 + c04 + c02 + c04 + c02 + c04;
 const c12 = c08 + c09;
+
+// const c07 = 'auto';
+const c07 = c06 + c10 + c09;
 
 const Cell00 = ({ className, children }: { className?: string; children?: React.ReactNode }) => {
   return (

@@ -14,9 +14,21 @@ import QuotationPdf, {
 } from 'components/page/domestic/pdf/quotationPdf/quotationPdf_new3/modal_quotationPdf';
 import QuotationPdf_part, { usePdfPart } from 'components/page/domestic/pdf/quotationPdf_part/quotationPdf_part';
 import QuotationStateSel from 'components/page/domestic/budget/quotationStateSel';
-import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
+
 import DoorSummary from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/doorSummary';
 import VersionLabel from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/versionLabel';
+import ContractVerifyForm, {
+  useDefaultPaymentRatio_quotationContent,
+} from 'components/composition/contractVerifyForm/contractVerifyForm';
+// import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
+// import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
+// import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
+// import Table_others from 'components/page/domestic/quotation/quotation/product/table_others';
+// import Summary, {
+//   TsummaryControl,
+//   TpayInfoControl,
+// } from 'components/page/domestic/quotation/quotation/summary/summary';
+// import DoorSummary from 'components/page/domestic/quotation/doorSummary';
 
 // global gear
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -1081,7 +1093,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/*  */}
         {/*  */}
 
-        <ContractReviewForm
+        <ContractVerifyForm
           showModal={reviewFormShow}
           readOnly={state_status === 'Pending' && isSendToReview_pending}
           onCancel={() => setReviewFormShow(false)}

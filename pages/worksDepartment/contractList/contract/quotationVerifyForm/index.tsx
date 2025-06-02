@@ -7,7 +7,7 @@ import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // component
-import { ReviewForm } from 'components/composition/contractReviewForm/contractReviewForm';
+import { ReviewForm } from 'components/composition/contractVerifyForm/contractVerifyForm';
 
 // api
 // import { useGetEngineeringContact } from 'js/api/api_engineering';

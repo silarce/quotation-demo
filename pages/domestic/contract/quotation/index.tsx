@@ -49,7 +49,7 @@ import Table_com from 'components/page/domestic/quotation/quotation/product/tabl
 import Table_accessories from 'components/page/domestic/contract/table/table_accessories';
 import Table_others from 'components/page/domestic/contract/table/table_others';
 
-import ContractReviewForm from 'components/composition/contractReviewForm/contractReviewForm';
+import ContractVerifyForm from 'components/composition/contractVerifyForm/contractVerifyForm';
 
 import Summary, {
   TsummaryControl,
@@ -989,7 +989,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           placeholder={inputModalConfig?.placeholder}
         />
 
-        <ContractReviewForm
+        <ContractVerifyForm
           showModal={reviewFormShow}
           isInContract={true}
           contractId={contract?.id}
