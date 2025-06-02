@@ -23,6 +23,8 @@ interface TpaymentMethod {
   totalPaymentRatio: `${number}` | '';
 }
 
+type TexportState = Tstate;
+
 // ===========================================================================
 
 const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefined | null }) => {
@@ -30,6 +32,22 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefine
   const [state, setState] = useState<Tstate>(defaultState);
 
   const kit = useMemo(() => createKit({ state, setState }), [state]);
+
+  const exportState = ({
+    exportCopy = false,
+  }: {
+    exportCopy?: boolean;
+  } = {}) => {
+    if (exportCopy) {
+      return _.cloneDeep(state);
+    }
+
+    return state;
+  };
+
+  const restoreState = (backupState: TexportState) => {
+    setState(backupState);
+  };
 
   useEffect(() => {
     setState(defaultState);
@@ -39,6 +57,8 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefine
     state,
     setState,
     kit,
+    exportState,
+    restoreState,
   };
 };
 
@@ -140,4 +160,4 @@ const createDefaultPaymentMethod = () => {
 
 // ===========================================================================
 export { usePayInfo };
-export type { Tstate as Tstate_payInfo };
+export type { TexportState, Tstate as Tstate_payInfo };

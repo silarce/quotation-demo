@@ -56,17 +56,21 @@ const useRemark = ({ disabled, raw_remarkArr }: Tprops) => {
     }
   };
 
+  const restoreState = (backupState: string[]) => {
+    setRemarkArr(backupState);
+  };
+
   useEffect(() => {
     setRemarkArr(raw_remarkArr || []);
   }, [raw_remarkArr, disabled]);
 
-  return { remarkArr, editRemark, delRemark, addRemark };
+  return { remarkArr, editRemark, delRemark, addRemark, restoreState };
 };
 
 const useAnnotations = (props: Tprops) => {
-  const { remarkArr, editRemark, delRemark, addRemark } = useRemark(props);
+  const { remarkArr, editRemark, delRemark, addRemark, restoreState } = useRemark(props);
 
-  const annoArr = remarkArr.map((value, index) => {
+  const annoKitArr = remarkArr.map((value, index) => {
     return {
       value,
       onChange: (v: string) => {
@@ -103,16 +107,18 @@ const useAnnotations = (props: Tprops) => {
   };
 
   return {
-    annoArr,
+    annoKitArr,
+    annoArr: remarkArr,
     addAnno: addRemark,
     openSelector,
+    restoreState,
   };
 };
 
 const useQuotationRange = (props: Tprops) => {
-  const { remarkArr, editRemark, delRemark, addRemark } = useRemark(props);
+  const { remarkArr, editRemark, delRemark, addRemark, restoreState } = useRemark(props);
 
-  const quotationRangeArr = remarkArr.map((value, index) => {
+  const quotationRangeKitArr = remarkArr.map((value, index) => {
     return {
       value,
       onChange: (v: string) => {
@@ -149,9 +155,11 @@ const useQuotationRange = (props: Tprops) => {
   };
 
   return {
-    quotationRangeArr,
+    quotationRangeKitArr,
+    quotationRangeArr: remarkArr,
     addQuotationRange: addRemark,
     openSelector,
+    restoreState,
   };
 };
 

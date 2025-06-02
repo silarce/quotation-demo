@@ -190,6 +190,19 @@ interface Tinstance_useQuotationProduct {
   isIterativeProdExist: boolean;
 }
 
+interface TexportState {
+  state_quotationDiscount: `${number}` | '';
+  prodKeyArr: string[];
+  state_prodDict: TstateProdDict;
+  state_iterativeProdDict: TstateProdDict;
+
+  // activeProdKey: string | undefined;
+  // activeProdKey_iterative: string | undefined;
+  // cellKeyArr: TcellKey[];
+  // cellKeyArr_component: TcellKey_component[];
+  // cellKeyArr_accessory: TcellKey_accessory[];
+}
+
 // ================================================================================
 
 const nodeConfig_component_origin = createNodeConfig_component();
@@ -267,12 +280,6 @@ const useQuotationProduct = ({
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
-
-  useEffect(() => {
-    if (state_prodDict['d630c1be-c96a-46f9-bdd9-40d333295397']) {
-      console.log(state_prodDict['d630c1be-c96a-46f9-bdd9-40d333295397'].data_prod.price);
-    }
-  }, [state_prodDict]);
 
   const [state_iterativeProdDict, setState_iterativeProdDict] = useState<TstateProdDict>(
     defaultState_iterative_copy.stateProdDict
@@ -597,19 +604,31 @@ const useQuotationProduct = ({
     return !IsIterativeProdInvalid;
   };
 
-  // const calcProductBody_2 = () => {
-  //   const body_normal = _calcProductBody({
-  //     prodKeyArr,
-  //     createClassProd,
-  //     state_prodDict,
-  //   });
+  const exportState = (): TexportState => {
+    return {
+      state_quotationDiscount,
+      prodKeyArr,
+      state_prodDict,
+      state_iterativeProdDict,
+      // activeProdKey,
+      // activeProdKey_iterative,
+      // cellKeyArr,
+      // cellKeyArr_component,
+      // cellKeyArr_accessory,
+    };
+  };
 
-  //   const body_iterative = _calcProductBody({
-  //     prodKeyArr: prodKeyArr_iterative,
-  //     createClassProd: createClassProd_iterative,
-  //     state_prodDict: state_iterativeProdDict,
-  //   });
-  // };
+  const restoreState = (props: Partial<TexportState>) => {
+    props.state_quotationDiscount && setState_quotationDiscount(props.state_quotationDiscount);
+    props.prodKeyArr && setProdKeyArr(props.prodKeyArr);
+    props.state_prodDict && setState_prodDict(props.state_prodDict);
+    props.state_iterativeProdDict && setState_iterativeProdDict(props.state_iterativeProdDict);
+    // props.activeProdKey && setActiveProdKey(props.activeProdKey);
+    // props.activeProdKey_iterative && setActiveProdKey_iterative(props.activeProdKey_iterative);
+    // props.cellKeyArr && setCellKeyArr(props.cellKeyArr);
+    // props.cellKeyArr_component && setCellKeyArr_component(props.cellKeyArr_component);
+    // props.cellKeyArr_accessory && setCellKeyArr_accessory(props.cellKeyArr_accessory);
+  };
 
   // -----------------------------------------------------------------------
   // region useEffect
@@ -712,6 +731,7 @@ const useQuotationProduct = ({
     //
     modifyProd: throwErr,
     resetModify: throwErr,
+    //
   };
 
   const instance_iterative: Tinstance_useQuotationProduct | null = !isIterativeProdExist
@@ -780,6 +800,8 @@ const useQuotationProduct = ({
     doorModelSummery,
     doorModelSummery_reduceModified,
     checkIsIterativeProdValid,
+    exportState,
+    restoreState,
   };
 };
 
@@ -787,6 +809,8 @@ const useQuotationProduct = ({
 //
 
 // ================================================================================
+
+// type TexportState = ReturnType<ReturnType<typeof useQuotationProduct>['exportState']>;
 
 export type {
   Tinstance_useQuotationProduct,
@@ -800,5 +824,6 @@ export type {
   TsetAccessory,
   TclassPsuedoComponentDict,
   TprodSource,
+  TexportState,
 };
 export { useQuotationProduct, ClassProd };

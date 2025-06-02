@@ -13,6 +13,8 @@ type Tinstance_useQuotationOther = ReturnType<typeof useQuotationOther>;
 
 type Tstate = TstateOther[];
 
+type TexportState = Tstate;
+
 // ===========================================================================
 
 const useQuotationOther = ({
@@ -102,6 +104,10 @@ const useQuotationOther = ({
     });
   };
 
+  const restoreState = (backupState: TexportState) => {
+    setState(backupState);
+  };
+
   useEffect(() => {
     setState(_.cloneDeep(defaultState));
   }, [defaultState, disabled]);
@@ -113,6 +119,8 @@ const useQuotationOther = ({
     calcAllOtherTotalPrice,
     addOther,
     removeOther,
+
+    restoreState,
   };
 };
 
@@ -176,4 +184,4 @@ const formatToBody_other = (state_otherArr: TstateOther[]) => {
 
 // ===========================================================================
 export { useQuotationOther };
-export type { TstateOther, Tinstance_useQuotationOther, TsetOther };
+export type { TstateOther, Tinstance_useQuotationOther, TsetOther, TexportState };

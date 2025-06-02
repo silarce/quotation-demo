@@ -52,6 +52,8 @@ interface Tprops {
   //
   isQuotationExpired: boolean;
   quotationExpiredInfo: string;
+  //
+  restoreAllState: undefined | null | (() => void);
 }
 
 // ================================================================================
@@ -95,6 +97,8 @@ const usePanel = ({
 
   isQuotationExpired,
   quotationExpiredInfo,
+  //
+  restoreAllState,
 }: Tprops) => {
   const router = useRouter();
 
@@ -191,6 +195,13 @@ const usePanel = ({
     label: '返回',
     onClick: () => router.back(),
   };
+  const panel_restore: TpanelList[number] = restoreAllState
+    ? {
+        type: 'myButton',
+        label: '回復備份狀態並編輯',
+        onClick: restoreAllState,
+      }
+    : null;
 
   // -----------------------------------------------------------------------
 
@@ -222,13 +233,18 @@ const usePanel = ({
     isOldQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
     isOldQuotation && isReviewer ? panel_review : null,
     isOldQuotation ? panel_submit : null,
+
     isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
+
+    status === 'Pending' ? null : panel_restore,
     status === 'Pending' ? null : panel_edit,
+
     status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
+
     panel_return,
   ];
 
-  const panelList_disabled_content: TpanelList = [panel_edit, panel_return];
+  const panelList_disabled_content: TpanelList = [panel_restore, panel_edit, panel_return];
 
   const panelList_disabled: TpanelList = isDesignatedContent
     ? panelList_disabled_content
