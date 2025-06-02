@@ -25,15 +25,15 @@ const useInterval = (
   const ref_stop = useRef(stop);
   ref_stop.current = stop;
 
+  const run = () => {
+    if (ref_stop.current) {
+      return;
+    }
+
+    ref_fuc.current();
+  };
+
   useEffect(() => {
-    const run = () => {
-      if (ref_stop.current) {
-        return;
-      }
-
-      ref_fuc.current();
-    };
-
     if (immediate) {
       try {
         run();
@@ -41,7 +41,9 @@ const useInterval = (
         onError(e as Error);
       }
     }
+  }, [stop, immediate]);
 
+  useEffect(() => {
     const intervalToken = setInterval(() => {
       try {
         run();
@@ -54,7 +56,7 @@ const useInterval = (
     return () => {
       clearInterval(intervalToken);
     };
-  }, [interval]);
+  }, [interval, stop]);
 };
 
 export { useInterval };
