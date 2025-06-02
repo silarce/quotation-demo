@@ -415,7 +415,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         }, 0);
       };
 
-  useInterval(backupState, { interval: 5000, stop: disabled });
+  useInterval(backupState, {
+    immediate: true,
+    interval: 5000,
+    stop: disabled,
+  });
 
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
@@ -428,29 +432,36 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   //
   //
 
-  const { reqPostQuotation, reqPatchQuotation, reqCloneQuotation, reqModifyQuotation, reqPatchModifiedQuotation } =
-    kit_req({
-      userId,
-      quotationId,
-      contractId,
-      instance_quotationProduct,
-      instance_quotationProduct_iterative: instance_iterative,
-      instance_useQuotationOther,
-      state_profile,
-      state_payInfo,
-      annoArr: annoKitArr.map((anno) => anno.value),
-      quotationRangeArr: quotationRangeKitArr.map((qr) => qr.value),
-      setIsFetching,
-      createFileArr,
-      update_quotation: async () => {
-        await update_quotation();
-      },
-      setDisabled,
-      state_quotationTotal,
-      instatnce_getQuotationId3,
-      status: state_status,
-      calcProductBody,
-    });
+  const {
+    reqPostQuotation,
+    reqPatchQuotation,
+
+    reqModifyQuotation,
+    reqPatchModifiedQuotation,
+
+    reqCloneQuotation,
+  } = kit_req({
+    userId,
+    quotationId,
+    contractId,
+    instance_quotationProduct,
+    instance_quotationProduct_iterative: instance_iterative,
+    instance_useQuotationOther,
+    state_profile,
+    state_payInfo,
+    annoArr: annoKitArr.map((anno) => anno.value),
+    quotationRangeArr: quotationRangeKitArr.map((qr) => qr.value),
+    setIsFetching,
+    createFileArr,
+    update_quotation: async () => {
+      await update_quotation();
+    },
+    setDisabled,
+    state_quotationTotal,
+    instatnce_getQuotationId3,
+    status: state_status,
+    calcProductBody,
+  });
 
   // MARK:更新報價單
   const handlePatch = () => {
@@ -463,6 +474,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       onConfirm: async (editNote) => {
         destroy();
         const { newQuotation } = await reqPatchQuotation({ editNote });
+        clearBackup && clearBackup();
 
         if (newQuotation) {
           const {
@@ -492,6 +504,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       onConfirm: async (editNote) => {
         destroy();
         const { newQuotation } = await reqPostQuotation({ editNote });
+        clearBackup && clearBackup();
 
         if (newQuotation) {
           const {
@@ -522,6 +535,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       onConfirm: async (editNote) => {
         destroy();
         const newQuotation = await reqModifyQuotation({ editNote });
+        clearBackup && clearBackup();
 
         if (newQuotation) {
           const { contentId, contractId, ...rest } = query;
@@ -555,6 +569,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       onConfirm: async (editNote) => {
         destroy();
         const newQuotation = await reqPatchModifiedQuotation({ editNote });
+        clearBackup && clearBackup();
 
         if (newQuotation) {
           update_quotation();
@@ -869,6 +884,20 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     //
     btnEditOnClick: () => {
       setDisabled(false);
+
+      if (backup) {
+        myAlert.confirm({
+          title: '確定不回復編輯狀態而編輯報價單?',
+          content: '編輯狀態將會被覆蓋',
+          props: {
+            onOk: () => {
+              setDisabled(false);
+            },
+          },
+        });
+      } else {
+        setDisabled(false);
+      }
     },
     btnCancelOnClick: () => {
       myAlert.confirm({
@@ -877,6 +906,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         props: {
           onOk: () => {
             setDisabled(true);
+            clearBackup && clearBackup();
           },
         },
       });
@@ -1118,6 +1148,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             setShowEmployeSelector(false);
           }}
         />
+
         {/*  */}
         {/*  */}
         {/*  */}
