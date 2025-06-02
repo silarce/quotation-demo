@@ -190,6 +190,19 @@ interface Tinstance_useQuotationProduct {
   isIterativeProdExist: boolean;
 }
 
+interface TexportState {
+  state_quotationDiscount: `${number}` | '';
+  prodKeyArr: string[];
+  state_prodDict: TstateProdDict;
+  state_iterativeProdDict: TstateProdDict;
+
+  // activeProdKey: string | undefined;
+  // activeProdKey_iterative: string | undefined;
+  // cellKeyArr: TcellKey[];
+  // cellKeyArr_component: TcellKey_component[];
+  // cellKeyArr_accessory: TcellKey_accessory[];
+}
+
 // ================================================================================
 
 const nodeConfig_component_origin = createNodeConfig_component();
@@ -591,40 +604,30 @@ const useQuotationProduct = ({
     return !IsIterativeProdInvalid;
   };
 
-  const exportState = () => {
+  const exportState = (): TexportState => {
     return {
       state_quotationDiscount,
       prodKeyArr,
-      activeProdKey,
-      activeProdKey_iterative,
-      cellKeyArr,
-      cellKeyArr_component,
-      cellKeyArr_accessory,
       state_prodDict,
       state_iterativeProdDict,
+      // activeProdKey,
+      // activeProdKey_iterative,
+      // cellKeyArr,
+      // cellKeyArr_component,
+      // cellKeyArr_accessory,
     };
   };
 
-  const restoreState = (props: {
-    state_quotationDiscount?: typeof state_quotationDiscount;
-    prodKeyArr?: typeof prodKeyArr;
-    activeProdKey?: typeof activeProdKey;
-    activeProdKey_iterative?: typeof activeProdKey_iterative;
-    cellKeyArr?: typeof cellKeyArr;
-    cellKeyArr_component?: typeof cellKeyArr_component;
-    cellKeyArr_accessory?: typeof cellKeyArr_accessory;
-    state_prodDict?: typeof state_prodDict;
-    state_iterativeProdDict?: typeof state_iterativeProdDict;
-  }) => {
+  const restoreState = (props: Partial<TexportState>) => {
     props.state_quotationDiscount && setState_quotationDiscount(props.state_quotationDiscount);
     props.prodKeyArr && setProdKeyArr(props.prodKeyArr);
-    props.activeProdKey && setActiveProdKey(props.activeProdKey);
-    props.activeProdKey_iterative && setActiveProdKey_iterative(props.activeProdKey_iterative);
-    props.cellKeyArr && setCellKeyArr(props.cellKeyArr);
-    props.cellKeyArr_component && setCellKeyArr_component(props.cellKeyArr_component);
-    props.cellKeyArr_accessory && setCellKeyArr_accessory(props.cellKeyArr_accessory);
     props.state_prodDict && setState_prodDict(props.state_prodDict);
     props.state_iterativeProdDict && setState_iterativeProdDict(props.state_iterativeProdDict);
+    // props.activeProdKey && setActiveProdKey(props.activeProdKey);
+    // props.activeProdKey_iterative && setActiveProdKey_iterative(props.activeProdKey_iterative);
+    // props.cellKeyArr && setCellKeyArr(props.cellKeyArr);
+    // props.cellKeyArr_component && setCellKeyArr_component(props.cellKeyArr_component);
+    // props.cellKeyArr_accessory && setCellKeyArr_accessory(props.cellKeyArr_accessory);
   };
 
   // -----------------------------------------------------------------------
@@ -807,6 +810,8 @@ const useQuotationProduct = ({
 
 // ================================================================================
 
+// type TexportState = ReturnType<ReturnType<typeof useQuotationProduct>['exportState']>;
+
 export type {
   Tinstance_useQuotationProduct,
   TstateProd,
@@ -819,5 +824,6 @@ export type {
   TsetAccessory,
   TclassPsuedoComponentDict,
   TprodSource,
+  TexportState,
 };
 export { useQuotationProduct, ClassProd };

@@ -1,13 +1,17 @@
 import { useEffect } from 'react';
 import moment from 'moment';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import Router from 'next/router';
 
 // =====================================================================
 
 interface TbackupMetaItem<> {
   identity?: string;
-  updatedAt?: string;
-  clearAt?: string;
+  type?: string;
+  pathnameWhenUpdate?: string;
+
+  updatedAt?: string; // ISO string
+  clearAt?: string; // ISO string
 }
 
 interface Tbackup {
@@ -57,9 +61,11 @@ function useBackup<T = unknown>(
   {
     keyPrefix = 'backup_',
     identity = key,
+    type,
   }: {
     keyPrefix?: string;
     identity?: TbackupMetaItem['identity'];
+    type?: TbackupMetaItem['type'];
   } = {}
 ) {
   const backupKey = `${keyPrefix}${key}`;
@@ -84,13 +90,15 @@ function useBackup<T = unknown>(
     return {};
   }
 
-  const addBackup = (value: T) => {
+  const updateBackup = (value: T) => {
     backupKit.edit(value);
 
     const timeNow = moment();
 
     const meta: TbackupMetaItem = {
       identity,
+      type,
+      pathnameWhenUpdate: Router.pathname,
       updatedAt: timeNow.toISOString(),
       clearAt: timeNow.clone().add(7, 'days').toISOString(),
     };
@@ -108,7 +116,7 @@ function useBackup<T = unknown>(
   return {
     backup,
     backupMeta,
-    addBackup,
+    updateBackup,
     clearBackup,
   };
 }

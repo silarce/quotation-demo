@@ -83,24 +83,36 @@ import QuotationRemark from 'components/page/domestic/quotation_v2/QuotationRema
 import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
 import QuotationAttachment from 'components/page/domestic/quotation_v2/QuotationAttachment';
 //
-import { usePayInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
+import {
+  TexportState as TexportState_payInfo,
+  usePayInfo,
+} from 'components/page/domestic/quotation_v2/hook/usePayInfo';
 import QuotationPayInfo from 'components/page/domestic/quotation_v2/QuotationPayInfo';
 import {
+  TexportState as TexportState_quotationProduct,
   TstateProdDict,
   TprodSource,
   useQuotationProduct,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 import QuotationProdTable from 'components/page/domestic/quotation_v2/QuotationProdTable';
 //
-import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
+import {
+  TexportState as TexportState_quotationContentOther,
+  useQuotationOther,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
 import QuotationOther from 'components/page/domestic/quotation_v2/QuotationOther';
 //
-import { useQuotationTotalPrice } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
+import {
+  TexportState as TexportState_quotationTotalPrice,
+  useQuotationTotalPrice,
+} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationPrice';
 
 // ======================================================================
 // ======================================================================
 
 import { useInterval } from 'hooks/useInterval';
+
+import { useBackup } from 'hooks/useBackup';
 
 // ======================================================================
 // ======================================================================
@@ -119,6 +131,17 @@ interface Tquery {
 // 三個資料來源 quotationId contentId contractId
 
 type TquotationType = 'new' | 'old' | 'newAttachment' | 'oldAttachment' | undefined;
+
+interface Tbackup {
+  status: TquotationContentDto['status'];
+  product: TexportState_quotationProduct;
+  quotationTotalPrice: TexportState_quotationTotalPrice;
+  profile: Tstate_profile;
+  annoArr: string[];
+  quotationRangeArr: string[];
+  payInfo: TexportState_payInfo;
+  other: TexportState_quotationContentOther;
+}
 
 // ======================================================================
 
@@ -351,33 +374,17 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // ----------------------------------------------------------------------
   // ----------------------------------------------------------------------
 
-  const backupState = () => {
-    const storageItemName = 'backup-' + (quotationId || contentId || 'newQuotation');
-
-    const {
-      state_quotationDiscount,
-      prodKeyArr,
-      cellKeyArr,
-      cellKeyArr_component,
-      cellKeyArr_accessory,
-      state_prodDict,
-      state_iterativeProdDict,
-    } = exportState_product();
-
-    const stateForRestore = {
+  const { backup, backupMeta, updateBackup, clearBackup } = useBackup<Tbackup>(
+    quotationId || contentId || 'newQuotation',
+    {
       type: 'quotation',
-      backupTime: new Date().toISOString(),
+    }
+  );
 
+  const backupState = () => {
+    const stateForRestore: Tbackup = {
       status: state_status,
-      product: {
-        state_quotationDiscount,
-        prodKeyArr,
-        cellKeyArr,
-        cellKeyArr_component,
-        cellKeyArr_accessory,
-        state_prodDict,
-        state_iterativeProdDict,
-      },
+      product: exportState_product(),
       quotationTotalPrice: exportState_quotationTotalPrice({ exportCopy: false }),
       profile: state_profile,
 
@@ -387,50 +394,25 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       payInfo: exportState_payInfo({ exportCopy: false }),
       other: state_otherArr,
     };
-    const json = JSON.stringify(stateForRestore);
 
-    window.localStorage.setItem(storageItemName, json);
+    updateBackup && updateBackup(stateForRestore);
   };
 
-  const storageItemName = 'backup-' + (quotationId || contentId || 'newQuotation');
-  const isBackupAvailable = useMemo(() => {
-    return !!window.localStorage.getItem(storageItemName);
-  }, [storageItemName]);
-
-  const restoreAllState = !isBackupAvailable
+  const restoreAllState = !backup
     ? undefined
     : () => {
-        // const storageItemName = 'backup-' + (quotationId || contentId || 'newQuotation');
-        const json = window.localStorage.getItem(storageItemName)!;
-
-        const restoreAllState = () => {
-          const stateForRestore = JSON.parse(json) as {
-            type: 'quotation';
-            backupTime: string;
-            status: TquotationContentDto['status'];
-            product: Partial<ReturnType<typeof exportState_product>>;
-            quotationTotalPrice: ReturnType<typeof exportState_quotationTotalPrice>;
-            profile: Tstate_profile;
-            annoArr: typeof annoArr;
-            quotationRangeArr: typeof quotationRangeArr;
-            payInfo: ReturnType<typeof exportState_payInfo>;
-            state_otherArr: typeof state_otherArr;
-          };
-
-          setState_status(stateForRestore.status);
-
-          restoreState_product(stateForRestore.product);
-          restoreState_quotationTotalPrice(stateForRestore.quotationTotalPrice);
-
-          restoreState_profile(stateForRestore.profile);
-          restoreState_anno(stateForRestore.annoArr);
-          restoreState_quotationRange(stateForRestore.quotationRangeArr);
-          restoreState_payInfo(stateForRestore.payInfo);
-          restoreState_other(stateForRestore.state_otherArr);
-        };
-
         setDisabled(false);
-        restoreAllState();
+
+        setTimeout(() => {
+          setState_status(backup.status);
+          restoreState_product(backup.product);
+          restoreState_quotationTotalPrice(backup.quotationTotalPrice);
+          restoreState_profile(backup.profile);
+          restoreState_anno(backup.annoArr);
+          restoreState_quotationRange(backup.quotationRangeArr);
+          restoreState_payInfo(backup.payInfo);
+          restoreState_other(backup.other);
+        }, 0);
       };
 
   useInterval(backupState, { interval: 5000, stop: disabled });

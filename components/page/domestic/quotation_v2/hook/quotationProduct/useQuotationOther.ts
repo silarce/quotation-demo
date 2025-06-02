@@ -13,6 +13,8 @@ type Tinstance_useQuotationOther = ReturnType<typeof useQuotationOther>;
 
 type Tstate = TstateOther[];
 
+type TexportState = Tstate;
+
 // ===========================================================================
 
 const useQuotationOther = ({
@@ -102,7 +104,7 @@ const useQuotationOther = ({
     });
   };
 
-  const restoreState = (backupState: Tstate) => {
+  const restoreState = (backupState: TexportState) => {
     setState(backupState);
   };
 
@@ -182,4 +184,4 @@ const formatToBody_other = (state_otherArr: TstateOther[]) => {
 
 // ===========================================================================
 export { useQuotationOther };
-export type { TstateOther, Tinstance_useQuotationOther, TsetOther };
+export type { TstateOther, Tinstance_useQuotationOther, TsetOther, TexportState };

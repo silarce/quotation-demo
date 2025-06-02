@@ -11,6 +11,13 @@ import { calcNTDToCurrency } from 'js/utils/currency/calc';
 
 // ===========================================================================
 
+interface TexportState {
+  state_quotationTotal: TstateQuotationTotal;
+  haveTax: boolean;
+}
+
+// ===========================================================================
+
 // MARK: START
 const useQuotationTotalPrice = ({
   raw_quotationContent,
@@ -137,7 +144,7 @@ const useQuotationTotalPrice = ({
     return obj;
   };
 
-  const restoreState = (props: { state_quotationTotal?: TstateQuotationTotal; haveTax?: boolean }) => {
+  const restoreState = (props: Partial<TexportState>) => {
     props.state_quotationTotal && setState_quotationTotal(props.state_quotationTotal);
     props.haveTax !== undefined && _setHaveTax(props.haveTax);
   };
@@ -225,4 +232,5 @@ const calcTotal = ({ state, haveTax }: { state: TstateQuotationTotal; haveTax: b
   };
 };
 
+export type { TexportState };
 export { useQuotationTotalPrice };
