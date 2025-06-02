@@ -371,15 +371,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const { state_otherArr, restoreState: restoreState_other } = instance_useQuotationOther;
 
   // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
 
-  const { backup, backupMeta, updateBackup, clearBackup } = useBackup<Tbackup>(
-    quotationId || contentId || 'newQuotation',
-    {
-      type: 'quotation',
-    }
-  );
+  // MARK: Backup
+
+  const { backup, updateBackup, clearBackup } = useBackup<Tbackup>(quotationId || contentId || 'newQuotation', {
+    type: 'quotation',
+  });
 
   const backupState = () => {
     const stateForRestore: Tbackup = {
@@ -402,7 +399,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     ? undefined
     : () => {
         setDisabled(false);
-
         setTimeout(() => {
           setState_status(backup.status);
           restoreState_product(backup.product);
@@ -422,15 +418,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
-  // ----------------------------------------------------------------------
 
   // region REQUEST
-  //
-  //
-  //
-  //
-  //
 
   const {
     reqPostQuotation,
@@ -1598,4 +1587,5 @@ const useData = () => {
   };
 };
 
+// ===================================================================
 export type { TquotationType };
