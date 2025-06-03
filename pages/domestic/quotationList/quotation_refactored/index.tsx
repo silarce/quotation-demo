@@ -386,7 +386,19 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: Backup
 
-  const { backup, updateBackup, clearBackup } = useBackup<Tbackup>(quotationId || contentId || 'newQuotation', {
+  const key_useBackup = (() => {
+    if (quotationType === 'new') {
+      return 'newQuotation';
+    }
+
+    if (quotationType === 'newAttachment') {
+      return `newAttachmentQuotation-${contractId}`;
+    }
+
+    return contentId || quotationId || undefined;
+  })();
+
+  const { backup, updateBackup, clearBackup } = useBackup<Tbackup>(key_useBackup, {
     type: 'quotation',
   });
 
@@ -410,24 +422,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const restoreAllState = !backup
     ? undefined
     : () => {
-        setDisabled(false);
-        setTimeout(() => {
-          setState_status(backup.status);
-          restoreState_product(backup.product);
-          restoreState_quotationTotalPrice(backup.quotationTotalPrice);
-          restoreState_profile(backup.profile);
-          restoreState_anno(backup.annoArr);
-          restoreState_quotationRange(backup.quotationRangeArr);
-          restoreState_payInfo(backup.payInfo);
-          restoreState_other(backup.other);
-        }, 0);
+        setState_status(backup.status);
+        restoreState_product(backup.product);
+        restoreState_quotationTotalPrice(backup.quotationTotalPrice);
+        restoreState_profile(backup.profile);
+        restoreState_anno(backup.annoArr);
+        restoreState_quotationRange(backup.quotationRangeArr);
+        restoreState_payInfo(backup.payInfo);
+        restoreState_other(backup.other);
       };
-
-  useInterval(backupState, {
-    immediate: true,
-    interval: 5000,
-    stop: disabled,
-  });
 
   // ----------------------------------------------------------------------
 
@@ -474,7 +477,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       width: 500,
       onConfirm: async (editNote) => {
         destroy();
-        const { newQuotation } = await reqPatchQuotation({ editNote });
+        const res = await reqPatchQuotation({ editNote });
+
+        if (!res) {
+          return;
+        }
+
+        const { newQuotation } = res;
+
         clearBackup && clearBackup();
 
         if (newQuotation) {
@@ -504,7 +514,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       width: 500,
       onConfirm: async (editNote) => {
         destroy();
-        const { newQuotation } = await reqPostQuotation({ editNote });
+        // const { newQuotation } = await reqPostQuotation({ editNote });
+        const res = await reqPostQuotation({ editNote });
+
+        if (!res) {
+          return;
+        }
+
+        const { newQuotation } = res;
+
         clearBackup && clearBackup();
 
         if (newQuotation) {
@@ -870,63 +888,25 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // MARK:
   const { panelList, customeRight } = usePanel({
     disabled,
-
-    // isQuotation,
-    // isAttachmentQuotation: isAttach,
-    // isNewQuotation,
-    // isNewAttachmentQuotation,
     quotationType,
-
     isReviewer,
     status: content?.status ?? '',
     isDesignatedContent,
     //
     isAllReviewedBeforePending,
     //
-    btnEditOnClick: () => {
-      setDisabled(false);
+    setDisabled,
 
-      if (backup) {
-        myAlert.confirm({
-          title: '確定不回復編輯狀態而編輯報價單?',
-          content: '編輯狀態將會被覆蓋',
-          props: {
-            onOk: () => {
-              setDisabled(false);
-            },
-          },
-        });
-      } else {
-        setDisabled(false);
-      }
-    },
-    btnCancelOnClick: () => {
-      myAlert.confirm({
-        title: '確定要取消編輯?',
-        content: '所有未儲存的變更將會被捨棄',
-        props: {
-          onOk: () => {
-            setDisabled(true);
-            clearBackup && clearBackup();
-          },
-        },
-      });
-    },
-    btnPatchOnClick: handlePatch,
-    btnPostOnClick: handlePost,
-    btnModifyOnClick: handleModify,
-    btnPatchModifyOnClick: handlePatchModify,
+    handlePatch,
+    handlePost,
+    handleModify,
+    handlePatchModify,
 
-    cloneQuotation: () => {
-      handleClone();
-    },
-    cloneQuotation_relation: () => {
-      handleClone(true);
-    },
+    handleClone,
     handleReqToPending,
 
     handleReview,
-    handleSubmit: preHandleSubmit,
+    preHandleSubmit,
     showVerifyForm: () => setReviewFormShow(true),
     handleReqUnlock,
     //
@@ -938,7 +918,74 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
     //
     restoreAllState: restoreAllState,
+    clearBackup,
   });
+  // const { panelList, customeRight } = usePanel({
+  //   disabled,
+  //   quotationType,
+  //   isReviewer,
+  //   status: content?.status ?? '',
+  //   isDesignatedContent,
+  //   //
+  //   isAllReviewedBeforePending,
+  //   //
+  //   btnEditOnClick: () => {
+  //     setDisabled(false);
+
+  //     if (backup) {
+  //       myAlert.confirm({
+  //         title: '確定不回復編輯狀態而編輯報價單?',
+  //         content: '編輯狀態將會被覆蓋',
+  //         props: {
+  //           onOk: () => {
+  //             setDisabled(false);
+  //           },
+  //         },
+  //       });
+  //     } else {
+  //       setDisabled(false);
+  //     }
+  //   },
+  //   btnCancelOnClick: () => {
+  //     myAlert.confirm({
+  //       title: '確定要取消編輯?',
+  //       content: '所有未儲存的變更將會被捨棄',
+  //       props: {
+  //         onOk: () => {
+  //           setDisabled(true);
+  //           clearBackup && clearBackup();
+  //         },
+  //       },
+  //     });
+  //   },
+
+  //   btnPatchOnClick: handlePatch,
+  //   btnPostOnClick: handlePost,
+  //   btnModifyOnClick: handleModify,
+  //   btnPatchModifyOnClick: handlePatchModify,
+
+  //   cloneQuotation: () => {
+  //     handleClone();
+  //   },
+  //   cloneQuotation_relation: () => {
+  //     handleClone(true);
+  //   },
+  //   handleReqToPending,
+
+  //   handleReview,
+  //   handleSubmit: preHandleSubmit,
+  //   showVerifyForm: () => setReviewFormShow(true),
+  //   handleReqUnlock,
+  //   //
+  //   showPdf,
+  //   showPdf_noDiscount,
+  //   showPdf_part: () => setShow_pdfPart(true),
+  //   //
+  //   isQuotationExpired,
+  //   quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
+  //   //
+  //   restoreAllState: restoreAllState,
+  // });
 
   const history = useHistory({
     quotationData,
@@ -980,6 +1027,17 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
     setState_status(status);
   }, [content]);
+
+  // useEffect(() => {
+  //   if (quotationType === 'new' || quotationType === 'newAttachment') {
+  //     restoreAllState && restoreAllState();
+  //   }
+  // }, [quotationType]);
+
+  useInterval(backupState, {
+    interval: 5000,
+    stop: disabled,
+  });
 
   // MARK: RENDER
   return (
