@@ -111,9 +111,15 @@ const kit_req = ({
       };
     }
 
-    if (!state_profile.customer) {
+    const customer = state_profile.customer;
+
+    if (!customer) {
       myAlert.info({ title: '請選擇客戶' });
+
+      return;
     }
+
+    state_profile.customer = customer;
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
     const {
@@ -131,7 +137,7 @@ const kit_req = ({
 
       // instance_quotationProduct,
       instance_useQuotationOther,
-      state_profile,
+      state_profile: { ...state_profile, customer: customer },
       state_payInfo,
       state_quotationTotal,
       editNote,
@@ -155,14 +161,18 @@ const kit_req = ({
 
   // MARK:reqModifyQuotation
   const reqModifyQuotation = async ({ editNote }: { editNote: string }) => {
+    const customer = state_profile.customer;
+
     if (!instance_quotationProduct_iterative) {
       throw new Error('reqModify錯誤，instance_iterative is undefined');
     } else if (!userId) {
       throw new Error('reqModify錯誤，沒有使用者ID');
     } else if (!contractId) {
       throw new Error('reqModify錯誤，沒有contractId');
-    } else if (!state_profile.customer) {
+    } else if (!customer) {
       myAlert.info({ title: '請選擇客戶' });
+
+      return;
     }
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
@@ -181,7 +191,7 @@ const kit_req = ({
 
       // instance_quotationProduct,
       instance_useQuotationOther,
-      state_profile,
+      state_profile: { ...state_profile, customer },
       state_payInfo,
       state_quotationTotal,
       editNote,
@@ -226,12 +236,16 @@ const kit_req = ({
       throw new Error('reqPatchModifiedQuotation錯誤，沒有quotationId');
     }
 
+    const customer = state_profile.customer;
+
     if (!instance_quotationProduct_iterative) {
       throw new Error('reqModify錯誤，instance_iterative is undefined');
     } else if (!userId) {
       throw new Error('reqModify錯誤，沒有使用者ID');
-    } else if (!state_profile.customer) {
+    } else if (!customer) {
       myAlert.info({ title: '請選擇客戶' });
+
+      return;
     }
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
@@ -250,7 +264,7 @@ const kit_req = ({
 
       // instance_quotationProduct,
       instance_useQuotationOther,
-      state_profile,
+      state_profile: { ...state_profile, customer },
       state_payInfo,
       state_quotationTotal,
       editNote,
@@ -307,8 +321,12 @@ const kit_req = ({
       return empty;
     }
 
-    if (!state_profile.customer) {
+    const customer = state_profile.customer;
+
+    if (!customer) {
       myAlert.info({ title: '請選擇客戶' });
+
+      return;
     }
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
@@ -325,7 +343,7 @@ const kit_req = ({
       quotationProductArr,
       totalQty,
       instance_useQuotationOther,
-      state_profile,
+      state_profile: { ...state_profile, customer: customer },
       state_payInfo,
       state_quotationTotal,
       editNote,
@@ -432,7 +450,13 @@ const createBody = ({
 
   // instance_quotationProduct: Tinstance_useQuotationProduct;
   instance_useQuotationOther: Tinstance_useQuotationOther;
-  state_profile: Tstate_profile;
+
+  // state_profile: Tstate_profile;
+
+  state_profile: Omit<Tstate_profile, 'customer'> & {
+    customer: NonNullable<Tstate_profile['customer']>;
+  };
+
   state_payInfo: Tstate_payInfo;
   state_quotationTotal: TstateTotalPrice;
   editNote: string;

@@ -1,39 +1,20 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
 // type
-
-import type {
-  TquotationContentDto,
-  TquotationProductDto,
-  TquotationProductComponentDto,
-  TquotationProductAccessoryDto,
-} from 'js/api/dtoTypes';
-
-import type {
-  TstateProd,
-  TsetProd,
-  //
-  // TstateProdData,
-  TstateProdDict,
-  //
-  // TstateComponentData,
-  // TcomponentRawDataDict,
-  Tdata_componentDict,
-  TsetComponent,
-  //
-  TstateAccessoryData,
-  TsetAccessory,
-  //
-  //
-  //
-  TstateTotalPrice as TstateQuotationTotal,
-  Tstate_quotaionDiscount,
-} from './type';
+import type { TquotationContentDto } from 'js/api/dtoTypes';
+import type { TstateTotalPrice as TstateQuotationTotal } from './type';
 
 import { taxRate } from 'config/config_common';
 import { calcNTDToCurrency } from 'js/utils/currency/calc';
+
+// ===========================================================================
+
+interface TexportState {
+  state_quotationTotal: TstateQuotationTotal;
+  haveTax: boolean;
+}
 
 // ===========================================================================
 
@@ -47,7 +28,6 @@ const useQuotationTotalPrice = ({
 }) => {
   const defaultState = useDefaultState({ raw_quotationContent: raw_quotationContent });
 
-  // const [state_quotationDiscount, setState_quotationDiscount] = useState<Tstate_quotaionDiscount>('100');
   const [state_quotationTotal, setState_quotationTotal] = useState<TstateQuotationTotal>(defaultState);
 
   const [haveTax, _setHaveTax] = useState(false);
@@ -147,15 +127,33 @@ const useQuotationTotalPrice = ({
     });
   };
 
+  const exportState = ({
+    exportCopy = true,
+  }: {
+    exportCopy?: boolean;
+  } = {}) => {
+    const obj = {
+      state_quotationTotal,
+      haveTax,
+    };
+
+    if (exportCopy) {
+      return _.cloneDeep(obj);
+    }
+
+    return obj;
+  };
+
+  const restoreState = (props: Partial<TexportState>) => {
+    props.state_quotationTotal && setState_quotationTotal(props.state_quotationTotal);
+    props.haveTax !== undefined && _setHaveTax(props.haveTax);
+  };
+
   // ---------------------------------------------------------------------------
 
   useEffect(() => {
     setState_quotationTotal(defaultState);
   }, [defaultState, disabled]);
-
-  // useEffect(() => {
-  //   setState_quotationDiscount((raw_quotationContent?.discount ?? '100') as `${number}` | '');
-  // }, [raw_quotationContent?.discount, disabled]);
 
   useEffect(() => {
     let haveTax = true;
@@ -178,6 +176,9 @@ const useQuotationTotalPrice = ({
     setExchangeRate,
     haveTax,
     setHaveTax,
+    //
+    exportState,
+    restoreState,
   };
 };
 
@@ -196,9 +197,6 @@ const useDefaultState = ({ raw_quotationContent: raw }: { raw_quotationContent: 
 
     const defaultState: TstateQuotationTotal = {
       prodPriceTotal,
-      //
-      // quotationDiscount: (raw?.discount ?? '100') as `${number}` | '',
-      // averageDiscount: Number(raw?.averageDiscount ?? '100'),
       tuneTotal,
       subTotal,
       salesTax: Number(raw?.salesTax ?? '0'),
@@ -234,4 +232,5 @@ const calcTotal = ({ state, haveTax }: { state: TstateQuotationTotal; haveTax: b
   };
 };
 
+export type { TexportState };
 export { useQuotationTotalPrice };
