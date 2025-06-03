@@ -183,20 +183,6 @@ const usePanel = ({
     label: '編輯',
     onClick: () => {
       setDisabled(false);
-
-      if (restoreAllState) {
-        myAlert.confirm({
-          title: '確定不回復編輯狀態而編輯報價單?',
-          content: '編輯狀態將會被覆蓋',
-          props: {
-            onOk: () => {
-              setDisabled(false);
-            },
-          },
-        });
-      } else {
-        setDisabled(false);
-      }
     },
   };
 
@@ -212,8 +198,19 @@ const usePanel = ({
     type: 'myButton',
     label: '返回',
     onClick: () => {
-      clearBackup && clearBackup();
-      Router.back();
+      let content = '所有未儲存的變更將會被捨棄';
+      clearBackup && (content = content + '，備份資料也將被清除');
+
+      myAlert.confirm({
+        title: '確定要返回?',
+        content: content,
+        props: {
+          onOk: () => {
+            clearBackup && clearBackup();
+            Router.back();
+          },
+        },
+      });
     },
   };
 
@@ -254,7 +251,7 @@ const usePanel = ({
 
   const panel_restore: TpanelItem = {
     type: 'myButton',
-    label: '回復備份狀態並編輯',
+    label: '回復備份狀態',
     onClick: () => {
       restoreAllState && restoreAllState();
     },
@@ -296,18 +293,17 @@ const usePanel = ({
   //
   //
 
-  const panelList_edited: TpanelList = [restoreAllState ? panel_restore : null, panel_edit];
+  // const panelList_edited: TpanelList = [restoreAllState ? panel_restore : null, panel_edit];
+  const panelList_edited: TpanelList = [panel_edit];
 
   const panelList_abled: TpanelList = [
-    {
-      new: panel_post,
-      old: panel_patch,
-      newAttachment: panel_modify,
-      oldAttachment: panel_patchModify,
-      undefined: null,
+    ...{
+      new: [panel_post, restoreAllState ? panel_restore : null, panel_returnAndClearBackup],
+      old: [panel_patch, restoreAllState ? panel_restore : null, panel_cancelEdit],
+      newAttachment: [panel_modify, restoreAllState ? panel_restore : null, panel_cancelEdit],
+      oldAttachment: [panel_patchModify, restoreAllState ? panel_restore : null, panel_cancelEdit],
+      undefined: [],
     }[quotationType || 'undefined'],
-
-    quotationType === 'new' ? panel_returnAndClearBackup : panel_cancelEdit,
   ];
 
   const panelList_disabled_quotation: TpanelList = [

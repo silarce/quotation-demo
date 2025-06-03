@@ -386,7 +386,19 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: Backup
 
-  const { backup, updateBackup, clearBackup } = useBackup<Tbackup>(quotationId || contentId || 'newQuotation', {
+  const key_useBackup = (() => {
+    if (quotationType === 'new') {
+      return 'newQuotation';
+    }
+
+    if (quotationType === 'newAttachment') {
+      return `newAttachmentQuotation-${contractId}`;
+    }
+
+    return contentId || quotationId || undefined;
+  })();
+
+  const { backup, updateBackup, clearBackup } = useBackup<Tbackup>(key_useBackup, {
     type: 'quotation',
   });
 
@@ -410,17 +422,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const restoreAllState = !backup
     ? undefined
     : () => {
-        setDisabled(false);
-        setTimeout(() => {
-          setState_status(backup.status);
-          restoreState_product(backup.product);
-          restoreState_quotationTotalPrice(backup.quotationTotalPrice);
-          restoreState_profile(backup.profile);
-          restoreState_anno(backup.annoArr);
-          restoreState_quotationRange(backup.quotationRangeArr);
-          restoreState_payInfo(backup.payInfo);
-          restoreState_other(backup.other);
-        }, 0);
+        setState_status(backup.status);
+        restoreState_product(backup.product);
+        restoreState_quotationTotalPrice(backup.quotationTotalPrice);
+        restoreState_profile(backup.profile);
+        restoreState_anno(backup.annoArr);
+        restoreState_quotationRange(backup.quotationRangeArr);
+        restoreState_payInfo(backup.payInfo);
+        restoreState_other(backup.other);
       };
 
   // ----------------------------------------------------------------------
@@ -1004,11 +1013,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     setState_status(status);
   }, [content]);
 
-  useEffect(() => {
-    if (quotationType === 'new' || quotationType === 'newAttachment') {
-      restoreAllState && restoreAllState();
-    }
-  }, [quotationType]);
+  // useEffect(() => {
+  //   if (quotationType === 'new' || quotationType === 'newAttachment') {
+  //     restoreAllState && restoreAllState();
+  //   }
+  // }, [quotationType]);
 
   useInterval(backupState, {
     interval: 5000,
