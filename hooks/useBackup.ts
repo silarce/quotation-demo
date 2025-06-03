@@ -6,7 +6,7 @@ import Router from 'next/router';
 // =====================================================================
 
 type TstorageKit<T = unknown> = ReturnType<typeof localStorageKit<T>>;
-interface TbackupMetaItem<> {
+interface TbackupMetaItem {
   identity?: string;
   type?: string;
   pathnameWhenUpdate?: string;
@@ -58,7 +58,7 @@ function localStorageKit<T = unknown>(key: string) {
 // 預想使用情境為給時常壞掉的page在編輯state時可以備份
 // 以便在壞掉後快速復原
 function useBackup<T = unknown>(
-  key: string | undefined = 'undefinedBackupKey',
+  key: string | undefined,
   {
     keyPrefix = 'backup_',
     identity = key,
@@ -71,12 +71,70 @@ function useBackup<T = unknown>(
 ) {
   const backupKey = `${keyPrefix}${key}`;
 
+  const [, setForceRender] = useState(0);
+
   const [backupKit, setBackupKit] = useState<TstorageKit<T>>(() => localStorageKit<T>(backupKey));
   const backup = backupKit.localStorageItem || null;
 
   const backupMetaKit: TstorageKit<Tbackup> = localStorageKit<Tbackup>(key_backupMeta);
   const backupMetaDict = backupMetaKit.localStorageItem || {};
   const backupMeta = backupMetaDict[backupKey];
+
+  const updateBackup = (value: T) => {
+    if (!key) {
+      myAlert.notify.error({
+        message: '無法更新備份，key未定義',
+      });
+
+      return;
+    }
+
+    try {
+      backupKit.edit(value);
+    } catch (error) {
+      myAlert.notify.error({
+        message: '更新備份失敗',
+      });
+      console.error('更新備份失敗:', error);
+
+      return;
+    }
+
+    const timeNow = moment();
+
+    const meta: TbackupMetaItem = {
+      identity,
+      type,
+      pathnameWhenUpdate: Router.pathname,
+      updatedAt: timeNow.toISOString(),
+      clearAt: timeNow.clone().add(7, 'days').toISOString(),
+    };
+
+    try {
+      backupMetaKit.edit({ ...backupMetaDict, [backupKey]: meta });
+    } catch (error) {
+      myAlert.notify.error({
+        message: '更新backupMeta失敗',
+      });
+      console.error('更新備份Meta失敗:', error);
+    }
+  };
+
+  const clearBackup = () => {
+    if (!key) {
+      myAlert.notify.error({
+        message: '無法清除備份，key未定義',
+      });
+
+      return;
+    }
+
+    backupKit.clear();
+
+    const copy_meta = { ...backupMetaDict };
+    delete copy_meta[backupKey];
+    backupMetaKit.edit(copy_meta);
+  };
 
   useEffect(() => {
     setBackupKit(localStorageKit<T>(backupKey));
@@ -90,39 +148,33 @@ function useBackup<T = unknown>(
     }
   }, [backupMeta?.identity, identity]);
 
-  if (!key) {
-    return {};
-  }
-
-  const updateBackup = (value: T) => {
-    backupKit.edit(value);
-
-    const timeNow = moment();
-
-    const meta: TbackupMetaItem = {
-      identity,
-      type,
-      pathnameWhenUpdate: Router.pathname,
-      updatedAt: timeNow.toISOString(),
-      clearAt: timeNow.clone().add(7, 'days').toISOString(),
+  useEffect(() => {
+    const forceRender = () => {
+      setForceRender((prev) => prev + 1);
     };
-    backupMetaKit.edit({ ...backupMetaDict, [backupKey]: meta });
-  };
 
-  const clearBackup = () => {
-    backupKit.clear();
+    window.addEventListener('storage', forceRender);
 
-    const copy_meta = { ...backupMetaDict };
-    delete copy_meta[backupKey];
-    backupMetaKit.edit(copy_meta);
-  };
+    return () => {
+      window.removeEventListener('storage', forceRender);
+    };
+  }, []);
 
-  return {
-    backup,
-    backupMeta,
-    updateBackup,
-    clearBackup,
-  };
+  if (!key) {
+    return {
+      backup: undefined,
+      backupMeta,
+      updateBackup,
+      clearBackup,
+    };
+  } else {
+    return {
+      backup,
+      backupMeta,
+      updateBackup,
+      clearBackup,
+    };
+  }
 }
 
 // 預期會放在_app，每次進入page時就檢查是否有備份過期並清除
