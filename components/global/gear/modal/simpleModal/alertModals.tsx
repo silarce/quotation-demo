@@ -42,8 +42,8 @@ export const ModalInfo02 = ({
   props,
   className,
 }: {
-  title?: string | number;
-  content?: string | number;
+  title?: React.ReactNode;
+  content?: React.ReactNode;
   props?: ModalFuncProps;
   className?: string;
 }) => {
