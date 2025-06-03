@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import { TpanelList } from 'components/PageHeader/PageHeader02/PanelList';
 
 import Dropdown from 'components/global/gear/dropdown/Dropdown';
@@ -14,94 +14,116 @@ import iconRedLock from 'public/image/icon/redLock.svg';
 import type { TquotationType } from 'pages/domestic/quotationList/quotation_refactored';
 
 // ================================================================================
+
+type TpanelItem = TpanelList[number];
+
 interface Tprops {
   disabled: boolean;
   quotationType: TquotationType;
-
-  // isQuotation: boolean;
-  // isAttachmentQuotation: boolean;
-  // isNewQuotation: boolean;
-  // isNewAttachmentQuotation: boolean;
-
   isReviewer: boolean | undefined | null;
   status: string;
   isDesignatedContent: boolean;
-  //
   isAllReviewedBeforePending: boolean;
+  isQuotationExpired: boolean;
+  quotationExpiredInfo: React.ReactNode;
   //
-  btnEditOnClick: () => void;
-  btnCancelOnClick: () => void;
+  setDisabled: (disabled: boolean) => void;
+  handlePatch: () => void;
+  handlePost: () => void;
+  handleModify: () => void;
+  handlePatchModify: () => void;
 
-  btnPatchOnClick: () => void;
-  btnModifyOnClick: () => void;
-  btnPostOnClick: () => void;
-  btnPatchModifyOnClick: () => void;
-
-  cloneQuotation: () => void;
-  cloneQuotation_relation: () => void;
+  handleClone: (isRelationQuotation?: boolean | undefined) => Promise<void>;
 
   handleReqToPending: () => void;
   handleReview: () => void;
-  handleSubmit: () => void;
+  preHandleSubmit: () => void;
   showVerifyForm: () => void;
+
   handleReqUnlock: () => void;
-  //
   showPdf: () => void;
   showPdf_noDiscount: () => void;
   showPdf_part: () => void;
-  //
-  isQuotationExpired: boolean;
-  quotationExpiredInfo: string;
-  //
+
   restoreAllState: undefined | null | (() => void);
+  clearBackup: undefined | null | (() => void);
 }
 
-// ================================================================================
+// interface Tprops {
+//   disabled: boolean;
+//   quotationType: TquotationType;
+
+//   // isQuotation: boolean;
+//   // isAttachmentQuotation: boolean;
+//   // isNewQuotation: boolean;
+//   // isNewAttachmentQuotation: boolean;
+
+//   isReviewer: boolean | undefined | null;
+//   status: string;
+//   isDesignatedContent: boolean;
+//   //
+//   isAllReviewedBeforePending: boolean;
+//   //
+//   btnEditOnClick: () => void;
+//   btnCancelOnClick: () => void;
+
+//   btnPatchOnClick: () => void;
+//   btnModifyOnClick: () => void;
+//   btnPostOnClick: () => void;
+//   btnPatchModifyOnClick: () => void;
+
+//   cloneQuotation: () => void;
+//   cloneQuotation_relation: () => void;
+
+//   handleReqToPending: () => void;
+//   handleReview: () => void;
+//   handleSubmit: () => void;
+//   showVerifyForm: () => void;
+//   handleReqUnlock: () => void;
+//   //
+//   showPdf: () => void;
+//   showPdf_noDiscount: () => void;
+//   showPdf_part: () => void;
+//   //
+//   isQuotationExpired: boolean;
+//   quotationExpiredInfo: string;
+//   //
+//   restoreAllState: undefined | null | (() => void);
+// }
 
 // ================================================================================
 
 const usePanel = ({
   disabled,
   quotationType,
-  // isQuotation,
-  // isAttachmentQuotation,
-  // isNewQuotation,
-  // isNewAttachmentQuotation,
-
   isReviewer,
   status,
   isDesignatedContent,
+  isAllReviewedBeforePending,
+  isQuotationExpired,
+  quotationExpiredInfo,
+  //
+  setDisabled,
+  clearBackup,
+  handlePatch,
+  handlePost,
+  handleModify,
+  handlePatchModify,
 
-  btnEditOnClick,
-  btnCancelOnClick,
+  handleClone,
 
-  btnPatchOnClick,
-  btnPostOnClick,
-  btnModifyOnClick,
-  btnPatchModifyOnClick,
+  handleReqToPending,
+  handleReview,
+  preHandleSubmit,
+  showVerifyForm,
 
-  cloneQuotation,
-  cloneQuotation_relation,
+  handleReqUnlock,
   showPdf,
   showPdf_noDiscount,
   showPdf_part,
 
-  isAllReviewedBeforePending,
-
-  handleReqToPending,
-
-  handleReview,
-  handleSubmit,
-  showVerifyForm,
-  handleReqUnlock,
-
-  isQuotationExpired,
-  quotationExpiredInfo,
-  //
   restoreAllState,
 }: Tprops) => {
-  const router = useRouter();
-
   const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
 
   const notAllowCopy =
@@ -113,46 +135,78 @@ const usePanel = ({
     quotationType === 'oldAttachment' ||
     isQuotationExpired;
 
-  // -----------------------------------------------------------------------
+  //
 
-  const { label_update, btnUpdateOnClick } = (() => {
-    let label_update = '更新報價單';
-
-    let btnUpdateOnClick = btnPatchOnClick;
-
-    if (quotationType === 'new') {
-      btnUpdateOnClick = btnPostOnClick;
-      label_update = '新建報價單';
-    } else if (quotationType === 'newAttachment') {
-      btnUpdateOnClick = btnModifyOnClick;
-      label_update = '新建追加追減報價單';
-    } else if (quotationType === 'oldAttachment') {
-      btnUpdateOnClick = btnPatchModifyOnClick;
-      label_update = '更新追加追減報價單';
-    }
-
-    return { label_update, btnUpdateOnClick };
-  })();
-
-  let label_cancel = '取消';
-  let onClick_cancel = btnCancelOnClick;
-
-  if (quotationType === 'new') {
-    label_cancel = '返回';
-    onClick_cancel = () => router.back();
-  }
-
-  const panel_update: TpanelList[number] = {
+  const panel_patch: TpanelItem = {
     type: 'redButton',
-    label: label_update,
-    onClick: btnUpdateOnClick,
+    label: '更新報價單',
+    onClick: handlePatch,
   };
-  const panel_cancel: TpanelList[number] = {
+
+  const panel_post: TpanelItem = {
+    type: 'redButton',
+    label: '新建報價單',
+    onClick: handlePost,
+  };
+
+  const panel_modify: TpanelItem = {
+    type: 'redButton',
+    label: '新建追加追減報價單',
+    onClick: handleModify,
+  };
+
+  const panel_patchModify: TpanelItem = {
+    type: 'redButton',
+    label: '更新追加追減報價單',
+    onClick: handlePatchModify,
+  };
+
+  const panel_cancelEdit: TpanelItem = {
     type: 'myButton',
-    label: label_cancel,
-    onClick: onClick_cancel,
+    label: '取消',
+    onClick: () => {
+      myAlert.confirm({
+        title: '確定要取消編輯?',
+        content: '所有未儲存的變更將會被捨棄',
+        props: {
+          onOk: () => {
+            setDisabled(true);
+            clearBackup && clearBackup();
+          },
+        },
+      });
+    },
   };
-  const panel_turnToPending: TpanelList[number] = {
+
+  const panel_edit: TpanelItem = {
+    type: 'myButton',
+    label: '編輯',
+    onClick: () => {
+      setDisabled(false);
+
+      if (restoreAllState) {
+        myAlert.confirm({
+          title: '確定不回復編輯狀態而編輯報價單?',
+          content: '編輯狀態將會被覆蓋',
+          props: {
+            onOk: () => {
+              setDisabled(false);
+            },
+          },
+        });
+      } else {
+        setDisabled(false);
+      }
+    },
+  };
+
+  const panel_return: TpanelItem = {
+    type: 'myButton',
+    label: '返回',
+    onClick: () => Router.back(),
+  };
+
+  const panel_turnToPending: TpanelItem = {
     type: 'redButton',
     label: '轉為準合約',
     onClick: () => {
@@ -164,53 +218,58 @@ const usePanel = ({
       });
     },
   };
-  const panel_review: TpanelList[number] = {
+  const panel_review: TpanelItem = {
     type: 'myButton',
     label: '審核',
     onClick: handleReview,
   };
-  const panel_submit: TpanelList[number] = {
+  const panel_submit: TpanelItem = {
     type: 'myButton',
     label: '送審',
-    onClick: handleSubmit,
+    onClick: preHandleSubmit,
   };
-  const panel_showVerifyForm: TpanelList[number] = {
+  const panel_showVerifyForm: TpanelItem = {
     type: 'myButton',
     label: '合約審核表',
     onClick: showVerifyForm,
   };
-  const panel_edit: TpanelList[number] = {
-    type: 'myButton',
-    label: '編輯',
-    onClick: btnEditOnClick,
-  };
-  const panel_unlock: TpanelList[number] = {
+
+  const panel_unlock: TpanelItem = {
     type: 'myButton',
     label: '解除鎖定並退回發包',
     img: iconRedLock.src,
     onClick: handleReqUnlock,
   };
-  const panel_return: TpanelList[number] = {
-    type: 'myButton',
-    label: '返回',
-    onClick: () => router.back(),
-  };
-  const panel_restore: TpanelList[number] = restoreAllState
-    ? {
-        type: 'myButton',
-        label: '回復備份狀態並編輯',
-        onClick: restoreAllState,
-      }
-    : null;
 
-  // -----------------------------------------------------------------------
+  const panel_restore: TpanelItem = {
+    type: 'myButton',
+    label: '回復備份狀態並編輯',
+    onClick: () => {
+      restoreAllState && restoreAllState();
+    },
+  };
+
+  const panel_expired: TpanelItem = {
+    type: 'redButton',
+    label: '報價單過期',
+    onClick: () => {
+      myAlert.info({ title: '報價單過期', content: quotationExpiredInfo });
+    },
+  };
+
+  //
+  //
 
   const customeRight: React.ReactNode[] = [
     notAllowCopy ? null : (
       <CloneQuotation
         key="CloneQuotation"
-        cloneQuotation={cloneQuotation}
-        cloneQuotation_relation={cloneQuotation_relation}
+        cloneQuotation={() => {
+          handleClone();
+        }}
+        cloneQuotation_relation={() => {
+          handleClone(true);
+        }}
       />
     ),
     !disabled ? null : (
@@ -223,49 +282,250 @@ const usePanel = ({
     ),
   ];
 
+  //
+  //
+
+  const panelList_edited: TpanelList = [restoreAllState ? panel_restore : null, panel_edit];
+
   const panelList_abled: TpanelList = [
-    //
-    panel_update,
-    panel_cancel,
+    {
+      new: panel_post,
+      old: panel_patch,
+      newAttachment: panel_modify,
+      oldAttachment: panel_patchModify,
+      undefined: null,
+    }[quotationType || 'undefined'],
+
+    quotationType === 'new' ? panel_return : panel_cancelEdit,
   ];
 
   const panelList_disabled_quotation: TpanelList = [
     isOldQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
     isOldQuotation && isReviewer ? panel_review : null,
     isOldQuotation ? panel_submit : null,
-
     isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
-
-    status === 'Pending' ? null : panel_restore,
-    status === 'Pending' ? null : panel_edit,
-
+    ...(status === 'Pending' ? [] : panelList_edited),
     status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
-
     panel_return,
   ];
 
-  const panelList_disabled_content: TpanelList = [panel_restore, panel_edit, panel_return];
+  const panelList_disabled_content: TpanelList = [...panelList_edited, panel_return];
 
   const panelList_disabled: TpanelList = isDesignatedContent
     ? panelList_disabled_content
     : panelList_disabled_quotation;
 
-  const panelList_expired: TpanelList = [
-    {
-      type: 'redButton',
-      label: '報價單過期',
-      onClick: () => {
-        myAlert.info({ title: '報價單過期', content: quotationExpiredInfo });
-      },
-    },
-    panel_return,
-  ];
+  const panelList_expired: TpanelList = [panel_expired, panel_return];
 
-  // const panelList = disabled ? panelList_disabled : panelList_abled;
+  //
   const panelList = isQuotationExpired ? panelList_expired : disabled ? panelList_disabled : panelList_abled;
+  //
 
   return { panelList, customeRight };
 };
+
+// const usePanel = ({
+//   disabled,
+//   quotationType,
+
+//   isReviewer,
+//   status,
+//   isDesignatedContent,
+
+//   btnEditOnClick,
+//   btnCancelOnClick,
+
+//   btnPatchOnClick,
+//   btnPostOnClick,
+//   btnModifyOnClick,
+//   btnPatchModifyOnClick,
+
+//   cloneQuotation,
+//   cloneQuotation_relation,
+//   showPdf,
+//   showPdf_noDiscount,
+//   showPdf_part,
+
+//   isAllReviewedBeforePending,
+
+//   handleReqToPending,
+
+//   handleReview,
+//   handleSubmit,
+//   showVerifyForm,
+//   handleReqUnlock,
+
+//   isQuotationExpired,
+//   quotationExpiredInfo,
+//   //
+//   restoreAllState,
+// }: Tprops) => {
+//   const router = useRouter();
+
+//   const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
+
+//   const notAllowCopy =
+//     !disabled ||
+//     status === 'Pending' ||
+//     isDesignatedContent ||
+//     quotationType === 'new' ||
+//     quotationType === 'newAttachment' ||
+//     quotationType === 'oldAttachment' ||
+//     isQuotationExpired;
+
+//   // -----------------------------------------------------------------------
+
+//   const { label_update, btnUpdateOnClick } = (() => {
+//     let label_update = '更新報價單';
+
+//     let btnUpdateOnClick = btnPatchOnClick;
+
+//     if (quotationType === 'new') {
+//       btnUpdateOnClick = btnPostOnClick;
+//       label_update = '新建報價單';
+//     } else if (quotationType === 'newAttachment') {
+//       btnUpdateOnClick = btnModifyOnClick;
+//       label_update = '新建追加追減報價單';
+//     } else if (quotationType === 'oldAttachment') {
+//       btnUpdateOnClick = btnPatchModifyOnClick;
+//       label_update = '更新追加追減報價單';
+//     }
+
+//     return { label_update, btnUpdateOnClick };
+//   })();
+
+//   let label_cancel = '取消';
+//   let onClick_cancel = btnCancelOnClick;
+
+//   if (quotationType === 'new') {
+//     label_cancel = '返回';
+//     onClick_cancel = () => router.back();
+//   }
+
+//   const panel_update: TpanelItem = {
+//     type: 'redButton',
+//     label: label_update,
+//     onClick: btnUpdateOnClick,
+//   };
+//   const panel_cancel: TpanelItem = {
+//     type: 'myButton',
+//     label: label_cancel,
+//     onClick: onClick_cancel,
+//   };
+//   const panel_turnToPending: TpanelItem = {
+//     type: 'redButton',
+//     label: '轉為準合約',
+//     onClick: () => {
+//       myAlert.confirm({
+//         title: '確定轉為準合約',
+//         props: {
+//           onOk: handleReqToPending,
+//         },
+//       });
+//     },
+//   };
+//   const panel_review: TpanelItem = {
+//     type: 'myButton',
+//     label: '審核',
+//     onClick: handleReview,
+//   };
+//   const panel_submit: TpanelItem = {
+//     type: 'myButton',
+//     label: '送審',
+//     onClick: handleSubmit,
+//   };
+//   const panel_showVerifyForm: TpanelItem = {
+//     type: 'myButton',
+//     label: '合約審核表',
+//     onClick: showVerifyForm,
+//   };
+//   const panel_edit: TpanelItem = {
+//     type: 'myButton',
+//     label: '編輯',
+//     onClick: btnEditOnClick,
+//   };
+//   const panel_unlock: TpanelItem = {
+//     type: 'myButton',
+//     label: '解除鎖定並退回發包',
+//     img: iconRedLock.src,
+//     onClick: handleReqUnlock,
+//   };
+//   const panel_return: TpanelItem = {
+//     type: 'myButton',
+//     label: '返回',
+//     onClick: () => router.back(),
+//   };
+//   const panel_restore: TpanelItem = restoreAllState
+//     ? {
+//         type: 'myButton',
+//         label: '回復備份狀態並編輯',
+//         onClick: restoreAllState,
+//       }
+//     : null;
+
+//   // -----------------------------------------------------------------------
+
+//   const customeRight: React.ReactNode[] = [
+//     notAllowCopy ? null : (
+//       <CloneQuotation
+//         key="CloneQuotation"
+//         cloneQuotation={cloneQuotation}
+//         cloneQuotation_relation={cloneQuotation_relation}
+//       />
+//     ),
+//     !disabled ? null : (
+//       <ExportQuotation
+//         key="ExportQuotation"
+//         showPdf={showPdf}
+//         setShowPdf_part={showPdf_part}
+//         showPdf_noDiscount={showPdf_noDiscount}
+//       />
+//     ),
+//   ];
+
+//   const panelList_abled: TpanelList = [
+//     //
+//     panel_update,
+//     panel_cancel,
+//   ];
+
+//   const panelList_disabled_quotation: TpanelList = [
+//     isOldQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
+//     isOldQuotation && isReviewer ? panel_review : null,
+//     isOldQuotation ? panel_submit : null,
+
+//     isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
+
+//     status === 'Pending' ? null : panel_restore,
+//     status === 'Pending' ? null : panel_edit,
+
+//     status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
+
+//     panel_return,
+//   ];
+
+//   const panelList_disabled_content: TpanelList = [panel_restore, panel_edit, panel_return];
+
+//   const panelList_disabled: TpanelList = isDesignatedContent
+//     ? panelList_disabled_content
+//     : panelList_disabled_quotation;
+
+//   const panelList_expired: TpanelList = [
+//     {
+//       type: 'redButton',
+//       label: '報價單過期',
+//       onClick: () => {
+//         myAlert.info({ title: '報價單過期', content: quotationExpiredInfo });
+//       },
+//     },
+//     panel_return,
+//   ];
+
+//   // const panelList = disabled ? panelList_disabled : panelList_abled;
+//   const panelList = isQuotationExpired ? panelList_expired : disabled ? panelList_disabled : panelList_abled;
+
+//   return { panelList, customeRight };
+// };
 
 // ================================================================================
 
@@ -325,5 +585,9 @@ const CloneQuotation = ({
   );
 };
 
+// ================================================================================
+// ================================================================================
+
+// ================================================================================
 // ================================================================================
 export { usePanel };
