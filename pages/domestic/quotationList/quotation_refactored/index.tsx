@@ -477,7 +477,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       width: 500,
       onConfirm: async (editNote) => {
         destroy();
-        const { newQuotation } = await reqPatchQuotation({ editNote });
+        const res = await reqPatchQuotation({ editNote });
+
+        if (!res) {
+          return;
+        }
+
+        const { newQuotation } = res;
+
         clearBackup && clearBackup();
 
         if (newQuotation) {
@@ -507,7 +514,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       width: 500,
       onConfirm: async (editNote) => {
         destroy();
-        const { newQuotation } = await reqPostQuotation({ editNote });
+        // const { newQuotation } = await reqPostQuotation({ editNote });
+        const res = await reqPostQuotation({ editNote });
+
+        if (!res) {
+          return;
+        }
+
+        const { newQuotation } = res;
+
         clearBackup && clearBackup();
 
         if (newQuotation) {
