@@ -104,7 +104,6 @@ const usePanel = ({
   quotationExpiredInfo,
   //
   setDisabled,
-  clearBackup,
   handlePatch,
   handlePost,
   handleModify,
@@ -123,6 +122,7 @@ const usePanel = ({
   showPdf_part,
 
   restoreAllState,
+  clearBackup,
 }: Tprops) => {
   const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
 
@@ -203,7 +203,18 @@ const usePanel = ({
   const panel_return: TpanelItem = {
     type: 'myButton',
     label: '返回',
-    onClick: () => Router.back(),
+    onClick: () => {
+      Router.back();
+    },
+  };
+
+  const panel_returnAndClearBackup: TpanelItem = {
+    type: 'myButton',
+    label: '返回',
+    onClick: () => {
+      clearBackup && clearBackup();
+      Router.back();
+    },
   };
 
   const panel_turnToPending: TpanelItem = {
@@ -296,7 +307,7 @@ const usePanel = ({
       undefined: null,
     }[quotationType || 'undefined'],
 
-    quotationType === 'new' ? panel_return : panel_cancelEdit,
+    quotationType === 'new' ? panel_returnAndClearBackup : panel_cancelEdit,
   ];
 
   const panelList_disabled_quotation: TpanelList = [
