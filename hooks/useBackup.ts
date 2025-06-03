@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import moment from 'moment';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import Router from 'next/router';
 
 // =====================================================================
 
+type TstorageKit<T = unknown> = ReturnType<typeof localStorageKit<T>>;
 interface TbackupMetaItem<> {
   identity?: string;
   type?: string;
@@ -64,19 +65,22 @@ function useBackup<T = unknown>(
     type,
   }: {
     keyPrefix?: string;
-    identity?: TbackupMetaItem['identity'];
+    identity?: TbackupMetaItem['identity']; // 放key、id、或其他用於識別的唯一值
     type?: TbackupMetaItem['type'];
   } = {}
 ) {
   const backupKey = `${keyPrefix}${key}`;
 
-  const backupKit = localStorageKit<T>(backupKey);
-  const backupMetaKit = localStorageKit<Tbackup>(key_backupMeta);
-
+  const [backupKit, setBackupKit] = useState<TstorageKit<T>>(() => localStorageKit<T>(backupKey));
   const backup = backupKit.localStorageItem || null;
 
+  const backupMetaKit: TstorageKit<Tbackup> = localStorageKit<Tbackup>(key_backupMeta);
   const backupMetaDict = backupMetaKit.localStorageItem || {};
   const backupMeta = backupMetaDict[backupKey];
+
+  useEffect(() => {
+    setBackupKit(localStorageKit<T>(backupKey));
+  }, [backupKey]);
 
   useEffect(() => {
     if (backupMeta && backupMeta.identity !== identity) {
