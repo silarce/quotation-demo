@@ -672,37 +672,38 @@ class ClassProd {
   }
 
   get isComponentValid() {
-    return true;
+    if (this.isSpecial) {
+      return {
+        isValid: true,
+        invalidMessage: undefined,
+        itemName: this.data.itemName,
+      };
+    }
 
-    // 目前isComponentValid只會為true，未來要再製作
-    // 除了檢查材料配件是否齊全，還要檢查RAW跟BOM有沒有資料
+    const validComQty = this.doorModelName === 'W2' ? 5 : 8;
 
-    // 參考
-    // get isComponentOk() {
-    //   const componentBodyArr = this.comBodyArr;
-    //   let isComponentBreak = false;
+    const classComponentArr = Object.values(this.classComponentDict);
 
-    //   if (this.isSpecialProd) {
-    //     isComponentBreak = false;
-    //     // WARNING W2判斷
-    //   } else if (this.isW2 && componentBodyArr.length !== 5) {
-    //     isComponentBreak = true;
-    //   } else if (!this.isW2 && componentBodyArr.length !== 8) {
-    //     isComponentBreak = true;
-    //   }
+    const comQty = classComponentArr.length;
 
-    //   componentBodyArr.forEach((com) => {
-    //     if (!com.componentId) {
-    //       isComponentBreak = true;
-    //     }
-    //   });
+    if (validComQty !== comQty) {
+      return {
+        isValid: false,
+        invalidMessage: `${this.data.itemName}的材料配件數量不正確，應為${validComQty}個，但有${comQty}個`,
+        itemName: this.data.itemName,
+      };
+    }
 
-    //   // if (isComponentBreak) {
-    //   //   myAlert.err({ title: '主產品無材料配件或無componentId', content: `項目:${this.itemName}` });
-    //   // }
+    const inValidComponen = classComponentArr.filter((com) => !com.isValid);
+    const inValidComponentName = inValidComponen.length === 0 ? undefined : inValidComponen.join(', ');
 
-    //   return !isComponentBreak;
-    // }
+    if (inValidComponentName) {
+      return {
+        isValid: false,
+        invalidMessage: `${this.data.itemName}的材料配件不正確，${inValidComponentName}`,
+        itemName: this.data.itemName,
+      };
+    }
   }
 
   // endregion COMPONENT

@@ -592,7 +592,6 @@ const useQuotationProduct = ({
       prodKeyArr,
       state_prodDict,
       state_iterativeProdDict,
-      createClassProd,
     });
   };
 

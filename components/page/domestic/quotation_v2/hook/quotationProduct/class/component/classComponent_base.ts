@@ -274,6 +274,18 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
 
   // -----------------------------------------------------------------------
 
+  get isValid() {
+    const { rawData, bom } = this.state;
+
+    if (!rawData || !bom) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // -----------------------------------------------------------------------
+
   // 這個方案的型別搞不定，因此不採用，不然應該是這樣處理比較好
   // reset(data_component: TstateComponentData<T>) {
   //   this.state = {

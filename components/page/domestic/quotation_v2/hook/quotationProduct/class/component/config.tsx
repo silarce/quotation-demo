@@ -77,7 +77,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
     },
     number: {
       label: '代號',
-      style: { width: 100 },
+      style: { width: 110 },
       createNode({ disabled, classComponent }) {
         return classComponent.number;
       },

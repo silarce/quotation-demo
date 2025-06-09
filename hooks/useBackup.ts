@@ -134,6 +134,8 @@ function useBackup<T = unknown>(
     const copy_meta = { ...backupMetaDict };
     delete copy_meta[backupKey];
     backupMetaKit.edit(copy_meta);
+
+    setBackupKit(() => localStorageKit<T>(backupKey));
   };
 
   useEffect(() => {

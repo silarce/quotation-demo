@@ -1,6 +1,5 @@
-import type { TstateProd, TstateProdDict } from '../type';
+import type { TstateProd, TstateProdDict, TcomponentRawDataDict, TstateComponentData } from '../type';
 import Decimal from 'decimal.js';
-import { ClassProd } from '../useQuotationProduct';
 
 import type {
   TcreateQuotationProductComponentDto,
@@ -15,19 +14,16 @@ const calcProductBody = ({
   prodKeyArr,
   state_prodDict,
   state_iterativeProdDict,
-
-  createClassProd,
 }: {
   prodKeyArr: string[];
   state_prodDict: TstateProdDict;
   state_iterativeProdDict: TstateProdDict;
-
-  createClassProd: (stateProd: TstateProd) => ClassProd;
 }) => {
   const totalQty_decimal = new Decimal(0);
   let isAllDoorModalValid = true;
 
   let stateProdArr = prodKeyArr.map((key) => state_prodDict[key]);
+
   stateProdArr = stateProdArr.map((stateProd, index) => {
     const { doorModelName, quantity } = stateProd.data_prod;
     totalQty_decimal.add(quantity || 0);
@@ -77,39 +73,23 @@ const calcProductBody = ({
       return copy;
     });
 
-  // const invalidComponentArr: number[] = [];
-
-  // const classProdArr = prodKeyArr.map((key) => {
-  //   return createClassProd(state_prodDict[key]);
-  // });
-
-  // const stateArr = classProdArr.map((classProd, index) => {
-  //   const { state: stateProd, isComponentValid } = classProd;
-
-  //   // 目前isComponentValid只會為true，未來要再製作
-  //   if (!isComponentValid) {
-  //     const indexNumber = index + 1; // 給使用者看得流水號
-  //     invalidComponentArr.push(indexNumber);
-  //   }
-
-  //   const { doorModelName, quantity } = stateProd.data_prod;
-  //   totalQty_decimal.add(quantity || 0);
-
-  //   !doorModelName && (isAllDoorModalValid = false);
-
-  //   stateProd.data_prod.order = index;
-
-  //   return stateProd;
-  // });
-
   const quotationProductArr = stateProdArr.map((stateProd) => formatProdStateToBody(stateProd));
   const quotationProductArr_iterative = stateProdArr_iterative.map((stateProd) => formatProdStateToBody(stateProd));
 
+  const invalidMessageArr = stateProdArr
+    .map((stateProd) => {
+      return isPordComponentValid(stateProd)?.invalidMessage;
+    })
+    .filter((item) => item !== undefined);
+
   return {
     quotationProductArr: [...quotationProductArr, ...quotationProductArr_iterative],
-    isAllDoorModalValid,
     // invalidComponentArr,
     totalQty: totalQty_decimal.toNumber(),
+    //
+    isAllDoorModalValid,
+    isValid: invalidMessageArr.length === 0,
+    invalidMessageArr,
   };
 };
 
@@ -352,6 +332,57 @@ const formatProdStateToBody = (stateProd: TstateProd) => {
   };
 
   return formated;
+};
+
+// =====================================================================
+
+// 泛型引數隨便選一個，這裡選"slat"
+const isComponentValid = (componentState: TstateComponentData<keyof TcomponentRawDataDict>) => {
+  const { rawData, bom } = componentState;
+
+  if (!rawData || !bom) {
+    return false;
+  }
+
+  return true;
+};
+
+const isPordComponentValid = (prodState: TstateProd) => {
+  const isSpecial = !prodState.doorModel;
+  const itemName = prodState.data_prod.itemName;
+
+  if (isSpecial) {
+    return {
+      isValid: true,
+      invalidMessage: undefined,
+      itemName: itemName,
+    };
+  }
+
+  const validComQty = prodState.data_prod.doorModelName === 'W2' ? 5 : 8;
+
+  const classComponentArr = Object.values(prodState.data_componentDict);
+
+  const comQty = classComponentArr.length;
+
+  if (validComQty !== comQty) {
+    return {
+      isValid: false,
+      invalidMessage: `${itemName}的材料配件數量不正確，應為${validComQty}個，但有${comQty}個`,
+      itemName: itemName,
+    };
+  }
+
+  const inValidComponen = classComponentArr.filter((com) => !isComponentValid(com));
+  const inValidComponentName = inValidComponen.length === 0 ? undefined : inValidComponen.join(', ');
+
+  if (inValidComponentName) {
+    return {
+      isValid: false,
+      invalidMessage: `${itemName}的材料配件不正確，${inValidComponentName}`,
+      itemName: itemName,
+    };
+  }
 };
 
 // =====================================================================

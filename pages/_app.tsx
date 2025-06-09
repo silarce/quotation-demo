@@ -28,6 +28,7 @@ import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalCo
 
 import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // -----------------------------------------------------------------------------------
 
@@ -105,6 +106,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false);
   const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
   const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature } = useApiErpFeaturesMe();
+  const {
+    //
+    setUserInfo: setUserInfo_global,
+    setErpFeature: setErpFeature_global,
+  } = useGlobal_userInfo();
 
   // ----------------------------------------------------------------------------
 
@@ -133,6 +139,8 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       await apiLogout();
       setUserInfo(undefined);
       setErpFeature(undefined);
+      setUserInfo_global(undefined);
+      setErpFeature_global(undefined);
     } catch {
       myAlert.err({ title: '登出失敗' });
     }
@@ -161,6 +169,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       globalState_review.update_2();
     }
   }, [userInfo]);
+
+  useEffect(() => {
+    setUserInfo_global(userInfo);
+    setErpFeature_global(userErpFeature);
+  }, [userInfo, userErpFeature]);
 
   useEffect(() => {
     optionalConfig.init();
