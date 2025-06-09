@@ -1,44 +1,18 @@
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { useQuotationOther } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationOther';
-import {
-  // useQuotationProduct,
-  Tinstance_useQuotationProduct,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
-// import { useProfile, createProps_profileForm } from 'components/page/domestic/quotation_v2/hook/useProfile';
-// import { useAnnotations, useQuotationRange } from 'components/page/domestic/quotation_v2/hook/useRemark';
-// import { useAttachment } from 'components/page/domestic/quotation_v2/hook/useAttachment';
-import {
-  //  usePayInfo,
-  Tstate_payInfo,
-} from 'components/page/domestic/quotation_v2/hook/usePayInfo';
+import { Tinstance_useQuotationProduct } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
+
+import { Tstate_payInfo } from 'components/page/domestic/quotation_v2/hook/usePayInfo';
 
 import type { Tstate_profile } from 'components/page/domestic/quotation_v2/type_quotation';
 
 // api
 import {
-  // TquotationDto,
   TquotationContentDto,
   TcreateQuotationContentDto,
   TcreateQuotationProductDto,
-  // useGetQuotation_id,
-  // useGetQuotation_id_2,
   useGetQuotation_id_3,
-  // apiPostQuotation,
-  // apiPatchQuotation,
-  // apiQuotationSubmitReview,
-  // apiQuotationReview,
-  // apiQuotationUnlock,
-  // //
-  // useQuotation_id_attachments,
-  // apiPostQuotation_id_attachments,
-  // apiDelQuotation_id_attachments,
-  // //
-  // useGetQuotationContent_id,
-  // //
-  // apiPatchQuotationToPending,
-  // apiPostCopyQuotation,
-  // apiPatchQuotationContent_id_progress,
   apiQuotationModify,
   apiPostQuotation_id_attachments,
   apiPatchModifyQuotation,
@@ -68,9 +42,9 @@ const kit_req = ({
   state_payInfo,
   annoArr,
   quotationRangeArr,
-  setIsFetching,
+  // setIsFetching,
   createFileArr,
-  update_quotation,
+  // update_quotation,
   setDisabled,
   state_quotationTotal,
   instatnce_getQuotationId3,
@@ -98,8 +72,7 @@ const kit_req = ({
   status: TquotationContentDto['status'];
   calcProductBody: TcalcProductBody;
 }) => {
-  const { reqPost, reqPatch, reqReview, reqUnlock, reqPatchReviewer, reqCopyQuotation, reqToPending } =
-    instatnce_getQuotationId3;
+  const { reqPost, reqPatch, reqCopyQuotation } = instatnce_getQuotationId3;
 
   // MARK: reqPostQuotation
   const reqPostQuotation = async ({ editNote }: { editNote: string }) => {
@@ -122,12 +95,23 @@ const kit_req = ({
     state_profile.customer = customer;
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+
     const {
       quotationProductArr,
-      isAllDoorModalValid,
-      //  invalidComponentArr,
       totalQty,
+
+      isValid,
+      invalidMessageArr,
     } = calcProductBody();
+
+    if (!isValid) {
+      myAlert.warning({
+        title: '部分主產品材料配件無效',
+        content: <span className="whitespace-pre-wrap">{invalidMessageArr.join('\n')}</span>,
+      });
+
+      return;
+    }
 
     const body = createBody({
       quotationDiscount: quotationDiscount || '0',
@@ -135,7 +119,6 @@ const kit_req = ({
       quotationProductArr,
       totalQty,
 
-      // instance_quotationProduct,
       instance_useQuotationOther,
       state_profile: { ...state_profile, customer: customer },
       state_payInfo,
@@ -145,7 +128,6 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
-      // calcProductBody,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -176,12 +158,23 @@ const kit_req = ({
     }
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+
     const {
       quotationProductArr,
-      isAllDoorModalValid,
-      //  invalidComponentArr,
       totalQty,
+
+      isValid,
+      invalidMessageArr,
     } = calcProductBody();
+
+    if (!isValid) {
+      myAlert.warning({
+        title: '部分主產品材料配件無效',
+        content: <span className="whitespace-pre-wrap">{invalidMessageArr.join('\n')}</span>,
+      });
+
+      return;
+    }
 
     const body = createBody({
       quotationDiscount: quotationDiscount || '0',
@@ -189,7 +182,6 @@ const kit_req = ({
       quotationProductArr,
       totalQty,
 
-      // instance_quotationProduct,
       instance_useQuotationOther,
       state_profile: { ...state_profile, customer },
       state_payInfo,
@@ -199,12 +191,10 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
-      // calcProductBody,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
 
-    // const { isUpdated, newQuotation } = await reqPost({ body, attachmentArr });
     const newQuotation = await apiQuotationModify(contractId, body);
     const contentId = newQuotation.latestContent.id;
 
@@ -221,12 +211,6 @@ const kit_req = ({
     }
 
     return newQuotation;
-
-    // if (isUpdated) {
-    //   setDisabled(true);
-    // }
-
-    // return { newQuotation };
   };
 
   // MARK:reqPatchModifiedQuotation
@@ -249,12 +233,23 @@ const kit_req = ({
     }
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+
     const {
       quotationProductArr,
-      // isAllDoorModalValid,
-      //  invalidComponentArr,
       totalQty,
+
+      isValid,
+      invalidMessageArr,
     } = calcProductBody();
+
+    if (!isValid) {
+      myAlert.warning({
+        title: '部分主產品材料配件無效',
+        content: <span className="whitespace-pre-wrap">{invalidMessageArr.join('\n')}</span>,
+      });
+
+      return;
+    }
 
     const body = createBody({
       quotationDiscount: quotationDiscount || '0',
@@ -262,7 +257,6 @@ const kit_req = ({
       quotationProductArr,
       totalQty,
 
-      // instance_quotationProduct,
       instance_useQuotationOther,
       state_profile: { ...state_profile, customer },
       state_payInfo,
@@ -272,7 +266,6 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
-      // calcProductBody,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -296,8 +289,6 @@ const kit_req = ({
     }
 
     return newQuotation;
-
-    // apiPatchModifyQuotation
   };
 
   // -----------------------------------------------------------------------
@@ -330,12 +321,23 @@ const kit_req = ({
     }
 
     const { quotationDiscount, avgDiscount } = instance_quotationProduct;
+
     const {
       quotationProductArr,
-      isAllDoorModalValid,
-      //  invalidComponentArr,
       totalQty,
+
+      isValid,
+      invalidMessageArr,
     } = calcProductBody();
+
+    if (!isValid) {
+      myAlert.warning({
+        title: '部分主產品材料配件無效',
+        content: <span className="whitespace-pre-wrap">{invalidMessageArr.join('\n')}</span>,
+      });
+
+      return;
+    }
 
     const body = createBody({
       quotationDiscount: quotationDiscount || '0',
@@ -351,12 +353,7 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
-      // calcProductBody,
     });
-
-    // const shouldUpdate = false;
-
-    // setIsFetching(true);
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
 
@@ -371,27 +368,6 @@ const kit_req = ({
       newAttachmentArr,
       isUpdated,
     };
-
-    // try {
-    //   const updatedQuotation = await apiPatchQuotation(body, quotationId);
-    //   const latestContentId = updatedQuotation.latestContent.id;
-    //   shouldUpdate = true;
-    //   const fileArr = await createFileArr();
-
-    //   for (const file of fileArr) {
-    //     const formData = new FormData();
-    //     formData.append('file', file);
-    //     await apiPostQuotation_id_attachments(latestContentId, formData);
-    //   }
-    // } catch (error) {
-    // } finally {
-    //   if (shouldUpdate) {
-    //     await update_quotation();
-    //     setDisabled(true);
-    //   }
-
-    //   setIsFetching(false);
-    // }
   };
 
   // MARK:reqCloneQuotation
@@ -430,7 +406,6 @@ const createBody = ({
   avgDiscount,
   quotationProductArr,
   totalQty,
-  // instance_quotationProduct,
   instance_useQuotationOther,
   state_profile,
   state_payInfo,
@@ -440,18 +415,13 @@ const createBody = ({
   annoArr,
   quotationRangeArr,
   status,
-}: // calcProductBody,
-{
+}: {
   quotationDiscount: `${number}`;
   avgDiscount: number;
   quotationProductArr: TcreateQuotationProductDto[];
   totalQty: number;
-  // calcProductBody: TcalcProductBody;
 
-  // instance_quotationProduct: Tinstance_useQuotationProduct;
   instance_useQuotationOther: Tinstance_useQuotationOther;
-
-  // state_profile: Tstate_profile;
 
   state_profile: Omit<Tstate_profile, 'customer'> & {
     customer: NonNullable<Tstate_profile['customer']>;
@@ -465,20 +435,7 @@ const createBody = ({
   quotationRangeArr: string[];
   status: TquotationContentDto['status'];
 }) => {
-  // const { quotationDiscount, avgDiscount } = instance_quotationProduct;
-
-  // const {
-  //   quotationProductArr,
-  //   isAllDoorModalValid,
-  //   //  invalidComponentArr,
-  //   totalQty,
-  // } = calcProductBody();
-
   const { formatToBody_other } = instance_useQuotationOther;
-
-  // if (status === 'Pending') {
-  //   return myAlert.info({ title: '在準合約階段不可以編輯報價單' });
-  // }
 
   const {
     projectName,
