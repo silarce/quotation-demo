@@ -293,7 +293,6 @@ const usePanel = ({
   //
   //
 
-  // const panelList_edited: TpanelList = [restoreAllState ? panel_restore : null, panel_edit];
   const panelList_edited: TpanelList = [panel_edit];
 
   const panelList_abled: TpanelList = [

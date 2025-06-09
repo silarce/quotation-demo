@@ -182,8 +182,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   const userId = userInfo?.employee?.id;
 
-  let quotationType: TquotationType = undefined;
-
   // ----------------------------------------------------------------------
 
   let { managerReviewedAt, toSalesAt, toSupervisorAt, toCashierAt, isAttach, isAllReviewedBeforePending } =
@@ -208,8 +206,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   isAttach = !!iterativeContractProductArr?.length;
 
+  let quotationType: TquotationType = undefined;
+
   !quotationId && !contentId && (quotationType = 'new');
-  quotationId && !contentId && (quotationType = 'old');
+  (quotationId || contentId) && (quotationType = 'old');
   quotationType === 'new' && !!contractId && (quotationType = 'newAttachment');
   quotationType === 'old' && !!iterativeContractProductArr?.length && (quotationType = 'oldAttachment');
 
