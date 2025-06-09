@@ -111,8 +111,8 @@ export const ModalWarning = ({
   props,
   className,
 }: {
-  title?: string | number;
-  content?: string | number;
+  title?: React.ReactNode;
+  content?: React.ReactNode;
   props?: ModalFuncProps;
   className?: string;
 }) => {
