@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
+import { useInView } from 'react-intersection-observer';
+
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -233,8 +235,9 @@ export default function ContractList_forDepartment({ targetUrl }: { targetUrl: s
       target?.scrollIntoView({
         block: 'center',
       });
-
-      setHadMoved(true);
+      setTimeout(() => {
+        setHadMoved(true);
+      }, 500);
     }
   }, [!!rawData_page]);
 
@@ -247,8 +250,10 @@ export default function ContractList_forDepartment({ targetUrl }: { targetUrl: s
         <ContractList
           targetUrl={targetUrl}
           //
-          viewRef={viewRef_bottom}
-          viewRef_top={viewRef_top}
+          viewRef={hadMoved ? viewRef_bottom : undefined}
+          viewRef_top={hadMoved ? viewRef_top : undefined}
+          // viewRef={viewRef_bottom}
+          // viewRef_top={viewRef_top}
           contractArr={contractArr}
           ref={ref_container}
           activeContractId={activeContractId}

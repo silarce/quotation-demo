@@ -813,20 +813,30 @@ export const useContract_infinite_topBottom = ({
     await apiGetContract(params)
       .then(async (firstRes) => {
         if (!rawDataList) {
-          const secondRes = await apiGetContract({ ...params, page: params.page + 1 });
+          // const secondRes = await apiGetContract({ ...params, page: params.page + 1 });
+
+          const { hasPreviousPage, hasNextPage } = firstRes.meta;
+
+          const [prePageRes, secondRes] = await Promise.all([
+            hasPreviousPage ? apiGetContract({ ...params, page: params.page - 1 }) : undefined,
+            hasNextPage ? apiGetContract({ ...params, page: params.page + 1 }) : undefined,
+          ]);
 
           return {
+            prePageRes,
             firstRes,
             secondRes,
           };
         }
 
         return {
+          prePageRes: undefined,
           firstRes,
           secondRes: undefined,
         };
       })
-      .then(({ firstRes, secondRes }) => {
+      .then(({ prePageRes, firstRes, secondRes }) => {
+        const { data: raw_data_0st, meta: meta_0st } = prePageRes ?? {};
         const { data: raw_data_1st, meta: meta_1st } = firstRes;
         const { data: raw_data_2nd, meta: meta_2nd } = secondRes ?? {};
 
@@ -842,8 +852,15 @@ export const useContract_infinite_topBottom = ({
           return acc;
         }, {} as { [id: string]: TquotationContractDto });
 
+        const list_0nd = raw_data_0st?.reduce((acc, item) => {
+          acc[item.id] = item;
+
+          return acc;
+        }, {} as { [id: string]: TquotationContractDto });
+
         setRawDataList((state) => ({
           ...state,
+          ...list_0nd,
           ...list_1st,
           ...list_2nd,
         }));
@@ -854,6 +871,10 @@ export const useContract_infinite_topBottom = ({
 
           if (meta_2nd?.page && list_2nd) {
             copy[`${meta_2nd.page}`] = list_2nd;
+          }
+
+          if (meta_0st?.page && list_0nd) {
+            copy[`${meta_0st.page}`] = list_0nd;
           }
 
           return copy;
@@ -880,7 +901,8 @@ export const useContract_infinite_topBottom = ({
       return;
     }
 
-    const pageArr = _.sortBy(Object.keys(rawData_page));
+    const pageArr = _.sortBy(Object.keys(rawData_page).map((item) => Number(item)));
+
     const nextPage = Number(pageArr[pageArr.length - 1]) + 1;
 
     if (nextPage > meta?.pageCount) {
@@ -895,7 +917,7 @@ export const useContract_infinite_topBottom = ({
       return;
     }
 
-    const pageArr = _.sortBy(Object.keys(rawData_page));
+    const pageArr = _.sortBy(Object.keys(rawData_page).map((item) => Number(item)));
     const prevPage = Number(pageArr[0]) - 1;
 
     // 決定不考慮第零頁甚至負數頁的情形
@@ -923,6 +945,7 @@ export const useContract_infinite_topBottom = ({
   useEffect(() => {
     inView_top && prevPage();
   }, [inView_top]);
+
   useEffect(() => {
     inView_bottom && nextPage();
   }, [inView_bottom]);
