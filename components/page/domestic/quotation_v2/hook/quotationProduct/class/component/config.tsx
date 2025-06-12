@@ -219,8 +219,12 @@ const createNodeConfig_component = (): TnodeConfig_component => {
               placeholder: '',
               value,
               type,
+              min: 0,
+              step: 0,
               onChange(e) {
-                classComponent.price = e.target.value as `${number}` | '';
+                if (e.target.validity.valid) {
+                  classComponent.price = e.target.value as `${number}` | '';
+                }
               },
             },
           },
