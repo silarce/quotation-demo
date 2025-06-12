@@ -886,8 +886,13 @@ const nodeConfig_origin: TnodeConfig = {
           props: {
             type: 'number',
             value: classProd.quantity,
+            min: 0,
+            step: 0,
+
             onChange: (e) => {
-              classProd.quantity = e.target.value as `${number}` | '';
+              if (e.target.validity.valid) {
+                classProd.quantity = e.target.value as `${number}` | '';
+              }
             },
           },
         },
