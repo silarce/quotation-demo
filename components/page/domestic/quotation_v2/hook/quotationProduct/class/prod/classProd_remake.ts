@@ -1295,7 +1295,7 @@ class ClassProd {
     return this.data.discount;
   }
   set discount(value) {
-    value = `${fixedToFloat3(value || 0)}`;
+    // value = `${fixedToFloat3(value || 0)}`;
     this.data.discount = value;
 
     const { distributionBoxUnitPrice, distributionBoxTotalPrice, installationFeeUnitPrice, installationFeeTotalPrice } =
