@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 // gear
 import InputSel, { TinputSelProps, inputLocaleStringSwitcher } from 'components/global/gear/inputAndSel_v2/inputSel';
 import { InputSel_prod } from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
@@ -94,8 +92,12 @@ const createNodeConfig_accessory = (): TnodeConfig_accessory => {
               className: 'text-right',
               value,
               type,
+              min: 0,
+              step: 0,
               onChange(e) {
-                classAcce.price = e.target.value as `${number}` | '';
+                if (e.target.validity.valid) {
+                  classAcce.price = e.target.value as `${number}` | '';
+                }
               },
             },
           },
