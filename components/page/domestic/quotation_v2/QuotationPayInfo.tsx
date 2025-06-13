@@ -264,11 +264,28 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
             <span className="relative">{'匯率(外幣兌新台幣)'}</span>
             <div>
               <input
+                className={classNames(
+                  'bg-transparent',
+                  scss.input_exchangeRate,
+                  (disabled || exchangeRate.disabled) && scss.noBaseLine
+                )}
                 type="number"
+                required={!currency?.value || currency.value === 'TWD 新臺幣' ? false : true}
+                min={0.000000000001} // 大於0
+                step={'any'}
                 onWheel={(e) => e.currentTarget.blur()}
-                className={classNames('bg-transparent', (disabled || exchangeRate.disabled) && scss.noBaseLine)}
                 value={exchangeRate.value}
-                onChange={(e) => exchangeRate.onChange?.(e.target.value as TnumberStr)}
+                onChange={(e) => {
+                  e.target.setCustomValidity('');
+
+                  exchangeRate.onChange?.(e.target.value as TnumberStr);
+
+                  if (Number(e.target.value) === 0) {
+                    e.target.setCustomValidity('匯率不能為0');
+                  }
+
+                  e.target.reportValidity();
+                }}
                 readOnly={disabled || exchangeRate.disabled}
               />
             </div>

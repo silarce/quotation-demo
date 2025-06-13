@@ -137,3 +137,9 @@
 
   gap: 2px;
 }
+
+.input_exchangeRate {
+  &:invalid {
+    background-color: pink;
+  }
+}
