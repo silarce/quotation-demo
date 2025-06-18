@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, forwardRef, useMemo, useImperativeHandle } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, forwardRef, useMemo, useImperativeHandle } from 'react';
 
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
@@ -9,10 +9,13 @@ import { dlPdf, getA4Rect } from 'js/utils/dlPdf';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-// ========================================================================
-// MARK:PdfTable
+import type { XOR } from 'ts-essentials';
 
-interface Tprops_pdfTable<PROPS = any> {
+import SquareBtn from '../gear/button/larrysBtn/squarebtn';
+
+// ========================================================================
+
+type Tprops_pdfTable<PROPS = any> = {
   fileName: string;
 
   scale?: number;
@@ -20,35 +23,66 @@ interface Tprops_pdfTable<PROPS = any> {
   paddingTop?: number;
   paddingBottom?: number;
   ISO216?: string;
+  showPanel?: boolean;
 
   centerFullHeight?: boolean;
 
-  Top?: React.ComponentType<{
-    pageIndex: number;
-    pageCount: number;
-  }>;
-
-  Bottom?: React.ComponentType<{
-    pageIndex: number;
-    pageCount: number;
-  }>;
-
-  center: {
-    propsArr: PROPS[];
-    Render: React.ComponentType<
-      PROPS & {
+  Top?: Ttop;
+  Bottom?: Tbottom;
+} & XOR<
+  {
+    center: {
+      propsArr: PROPS[];
+      Render: React.ComponentType<
+        PROPS & {
+          pageIndex: number;
+          pageCount: number;
+        }
+      >;
+    };
+  },
+  {
+    center_indivisible: {
+      propsArr: PROPS[];
+      Render_propsArr?: React.ComponentType<{
+        propsArr: PROPS[];
         pageIndex: number;
         pageCount: number;
-      }
-    >;
-  };
-}
+      }>;
+      template?: (refs: {
+        ref_thead: React.RefObject<HTMLElement>;
+        ref_centerRowArr: React.MutableRefObject<(HTMLElement | null)[]>;
+      }) => React.ReactNode;
+    };
+  }
+>;
+
+type Ttop = React.ComponentType<{
+  pageIndex: number;
+  pageCount: number;
+}>;
+
+type Tbottom = React.ComponentType<{
+  pageIndex: number;
+  pageCount: number;
+}>;
 
 interface Timperativehandle_pdfTable {
   download: () => void;
 }
 
 // ========================================================================
+
+// MARK: START
+
+// 要節省效能，以下proerty都要用useMemo處理過
+// Top
+// Bottom
+// propsArr_raw
+// Render
+// Render_propsArr
+// template
+
 function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.ForwardedRef<Timperativehandle_pdfTable>) {
   const {
     fileName,
@@ -56,23 +90,27 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
     scale = 2,
     horizontal = false,
     ISO216 = 'a4',
+    showPanel = true,
 
     centerFullHeight,
     Top,
     Bottom,
     center,
+    center_indivisible,
   } = props;
 
-  const { propsArr, Render } = center;
+  const { propsArr: propsArr_raw } = center || center_indivisible;
+  const { Render } = center || {};
+  const { Render_propsArr, template } = center_indivisible || {};
 
   const ref_top = useRef<HTMLDivElement>(null);
   const ref_bottom = useRef<HTMLDivElement>(null);
-  const ref_center = useRef<(null | HTMLDivElement)[]>([]);
   const ref_page = useRef<(null | HTMLDivElement)[]>([]);
 
-  //
-  //
-  const [render, setRender] = useState(0);
+  const ref_thead = useRef<HTMLElement>(null);
+  const ref_centerRowArr = useRef<(null | HTMLElement)[]>([]);
+
+  const [isReady, setIsReady] = useState<boolean>(false);
 
   const [topHeight, setTopHeight] = useState(0);
   const [bottomHeight, setBottomHeight] = useState(0);
@@ -98,7 +136,7 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
   // ----------------------------------------------------------------------
 
   const propsArrArr = useMemo(() => {
-    if (!ref_center.current.length) {
+    if (!ref_centerRowArr.current.length || !isReady) {
       return [];
     }
 
@@ -106,16 +144,18 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
     let tempArr: PROPS[] = [];
     let cumulativeHeight = new Decimal(0);
 
-    propsArr.forEach((props, index) => {
-      const ele = ref_center.current[index];
+    const errorIndexArr: number[] = [];
+
+    propsArr_raw.forEach((props, index) => {
+      const ele = ref_centerRowArr.current[index];
 
       if (!ele) {
-        myAlert.notify.error({ message: `第${index}資料有誤` });
+        errorIndexArr.push(index);
 
         return;
       }
 
-      const isLatest = index === propsArr.length - 1;
+      const isLatest = index === propsArr_raw.length - 1;
 
       const { height } = ele.getBoundingClientRect();
 
@@ -133,11 +173,14 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
       if (isLatest) {
         propsArrArr.push(tempArr);
       }
-      //
     });
 
+    if (errorIndexArr.length > 0) {
+      myAlert.notify.error({ message: `第${errorIndexArr.join(', ')}資料有誤` });
+    }
+
     return propsArrArr;
-  }, [propsArr, render]);
+  }, [isReady, propsArr_raw, tbodyHeight]);
 
   // ----------------------------------------------------------------------
 
@@ -151,14 +194,24 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
   };
 
   // ----------------------------------------------------------------------
-  useEffect(() => {
-    setTopHeight(ref_top.current?.getBoundingClientRect().height ?? 0);
-    setBottomHeight(ref_bottom.current?.getBoundingClientRect().height ?? 0);
-  }, [render]);
 
   useEffect(() => {
-    setRender((prev) => prev + 1);
-  }, []);
+    setIsReady(false);
+    ref_centerRowArr.current = [];
+  }, [Top, Bottom, propsArr_raw, Render, Render_propsArr, template]);
+
+  useLayoutEffect(() => {
+    if (!isReady) {
+      setIsReady(true);
+    }
+  }, [isReady]);
+
+  useEffect(() => {
+    if (isReady) {
+      setTopHeight(ref_top.current?.getBoundingClientRect().height ?? 0);
+      setBottomHeight(ref_bottom.current?.getBoundingClientRect().height ?? 0);
+    }
+  }, [isReady]);
 
   // ----------------------------------------------------------------------
 
@@ -174,6 +227,19 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
 
   return (
     <div>
+      {showPanel && (
+        <div className={scss.panel}>
+          <SquareBtn
+            sharp="long"
+            onClick={() => {
+              handel_dlPdf();
+            }}
+          >
+            下載PDF
+          </SquareBtn>
+        </div>
+      )}
+
       {propsArrArr.map((propsArr, index) => {
         const pageIndex = index + 1;
         const pageCount = propsArrArr.length;
@@ -187,7 +253,7 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
             pageStyle={pageStyle}
           >
             {Top && (
-              <div ref={ref_top}>
+              <div>
                 <Top pageIndex={pageIndex} pageCount={pageCount} />
               </div>
             )}
@@ -197,17 +263,20 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
                 height: centerFullHeight ? tbodyHeight.toNumber() + 'px' : 'auto',
               }}
             >
-              {propsArr.map((props, index) => {
-                return (
-                  <div key={index}>
-                    <Render pageIndex={pageIndex} pageCount={pageCount} {...props} />
-                  </div>
-                );
-              })}
+              {Render &&
+                propsArr.map((props, index) => {
+                  return (
+                    <div key={index}>
+                      <Render pageIndex={pageIndex} pageCount={pageCount} {...props} />
+                    </div>
+                  );
+                })}
+
+              {Render_propsArr && <Render_propsArr propsArr={propsArr} pageIndex={pageIndex} pageCount={pageCount} />}
             </div>
 
             {Bottom && (
-              <div ref={ref_bottom} className={scss.bottom}>
+              <div className={scss.bottom}>
                 <Bottom pageIndex={pageIndex} pageCount={pageCount} />
               </div>
             )}
@@ -223,18 +292,26 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
             </div>
           )}
 
-          {propsArr.map((data, index) => {
-            return (
-              <div
-                key={index}
-                ref={(ele) => {
-                  ref_center.current[index] = ele;
-                }}
-              >
-                <Render {...data} pageIndex={0} pageCount={0} />
-              </div>
-            );
-          })}
+          {!template &&
+            Render &&
+            propsArr_raw.map((data, index) => {
+              return (
+                <div
+                  key={index}
+                  ref={(ele) => {
+                    ref_centerRowArr.current[index] = ele;
+                  }}
+                >
+                  <Render {...data} pageIndex={0} pageCount={0} />
+                </div>
+              );
+            })}
+
+          {template &&
+            template({
+              ref_thead,
+              ref_centerRowArr,
+            })}
 
           {Bottom && (
             <div ref={ref_bottom}>
@@ -243,11 +320,16 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
           )}
         </Page>
       </div>
-      {/*  */}
     </div>
   );
 }
 
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
+// =========================================================================
 // =========================================================================
 // =========================================================================
 // =========================================================================
