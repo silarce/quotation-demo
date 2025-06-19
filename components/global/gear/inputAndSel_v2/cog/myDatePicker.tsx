@@ -50,6 +50,7 @@ export default function MyDatePicker({
       <DatePicker
         locale={locale}
         format={(theMoment) => {
+          console.log(theMoment);
           const twDate = convertDate_reduce1911(theMoment.toISOString());
 
           const picker = antdProps?.picker;
