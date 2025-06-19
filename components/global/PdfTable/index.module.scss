@@ -19,6 +19,7 @@
 .panel {
   position: sticky;
   top: 0;
+  z-index: 1;
   background-color: theme("colors.bgc01");
   padding: 10px;
   border-bottom: solid 1px theme("colors.border");

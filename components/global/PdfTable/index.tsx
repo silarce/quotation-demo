@@ -24,6 +24,8 @@ type Tprops_pdfTable<PROPS = any> = {
   paddingBottom?: number;
   ISO216?: string;
   showPanel?: boolean;
+  // style_panel?: React.CSSProperties;
+  attr_panel?: React.HTMLAttributes<HTMLDivElement>;
 
   centerFullHeight?: boolean;
 
@@ -91,6 +93,7 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
     horizontal = false,
     ISO216 = 'a4',
     showPanel = true,
+    attr_panel,
 
     centerFullHeight,
     Top,
@@ -114,6 +117,7 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
 
   const [topHeight, setTopHeight] = useState(0);
   const [bottomHeight, setBottomHeight] = useState(0);
+  const [theadHeight, setTheadHeight] = useState(0);
 
   // ----------------------------------------------------------------------
 
@@ -131,7 +135,12 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
     paddingBottom: paddingBottom + 'px',
   };
 
-  const tbodyHeight = new Decimal(pageStyle.height).sub(topHeight).sub(bottomHeight).sub(paddingTop).sub(paddingBottom);
+  const tbodyHeight = new Decimal(pageStyle.height)
+    .sub(topHeight)
+    .sub(bottomHeight)
+    .sub(theadHeight)
+    .sub(paddingTop)
+    .sub(paddingBottom);
 
   // ----------------------------------------------------------------------
 
@@ -210,6 +219,7 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
     if (isReady) {
       setTopHeight(ref_top.current?.getBoundingClientRect().height ?? 0);
       setBottomHeight(ref_bottom.current?.getBoundingClientRect().height ?? 0);
+      setTheadHeight(ref_thead.current?.getBoundingClientRect().height ?? 0);
     }
   }, [isReady]);
 
@@ -228,7 +238,7 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
   return (
     <div>
       {showPanel && (
-        <div className={scss.panel}>
+        <div {...attr_panel} className={classNames(scss.panel, attr_panel?.className)}>
           <SquareBtn
             sharp="long"
             onClick={() => {
