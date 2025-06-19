@@ -612,10 +612,10 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
               );
 
               return (
-                <QuotationRow_dnd_memo
-                  rerenderTrigger01={classAccessory.state}
-                  rerenderTrigger02={disabled}
-                  rerenderTrigger03={cellKeyArr_accessory}
+                <QuotationRow_dnd
+                  // rerenderTrigger01={classAccessory.state}
+                  // rerenderTrigger02={disabled}
+                  // rerenderTrigger03={cellKeyArr_accessory}
                   key={acceKey}
                   id={acceKey}
                   index={index}
@@ -638,7 +638,7 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
                       </Cell>
                     );
                   })}
-                </QuotationRow_dnd_memo>
+                </QuotationRow_dnd>
               );
             })}
           </Table_dnd>
