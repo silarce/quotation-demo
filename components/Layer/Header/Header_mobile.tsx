@@ -29,7 +29,7 @@ import scss from './header_mobile.module.scss';
 import { LayerCtx } from 'components/Layer/Layer';
 
 // 路由表
-import {sidePathList} from '../SideNav/pathList/side';
+import { sidePathList } from '../SideNav/pathList/side';
 
 // ================================================================
 
@@ -157,7 +157,7 @@ const PanelBody = () => {
               className={scss.nav}
               defaultActiveKey={[linkList.defaultCollapse || '0']}
               ghost
-              onChange={() => { }}
+              onChange={() => {}}
             >
               <Panel header={label} key={`${index}`}>
                 <ul>
