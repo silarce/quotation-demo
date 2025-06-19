@@ -296,7 +296,7 @@ const inputStyle01 = {
   showBaseline: 'auto' as const,
 };
 const inputStyle02 = {
-  captionWidth: '110px',
+  captionWidth: '120px',
   gap: '24px',
   captionClassName: scss.inputCaption,
   captionColor: 'main' as const,
