@@ -75,15 +75,11 @@ export default function Nav() {
               <Image src={icon} alt={label + subLabel} />
               <span>{label}</span>
 
-              <Badge
-                key={index}
-                className={scss.badge}
-                // 用<></>包起來的原因
-                // https://github.com/ant-design/ant-design/issues/40340
-                count={<>{reviewQty}</>}
-
-                // offset={[10, -7]}
-              />
+              {reviewQty && (
+                <Badge key={reviewQty} className={scss.badge}>
+                  <span className={scss.reviewQty}>{reviewQty}</span>
+                </Badge>
+              )}
             </Link>
           );
         }
