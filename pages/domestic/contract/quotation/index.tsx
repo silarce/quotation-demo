@@ -1321,7 +1321,10 @@ const usePanelList = ({
 
               try {
                 setIsLoading(true);
-                await apiPostEngineeringContact({ contractId: id });
+                await apiPostEngineeringContact({
+                  contractId: id,
+                  contractor: contract?.content.customer?.name,
+                });
                 myAlert.success({ title: '新增工程聯絡單成功' });
               } catch (error) {
                 const err = error as Error;
