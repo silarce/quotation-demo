@@ -4,8 +4,8 @@ import classNames from 'classnames';
 import scss from './dropdown.module.scss';
 
 type Tprops = Omit<DropDownProps, 'overlay'> & {
-  itemArr?: React.ReactNode[];
-  props_menu?: Tprops_menu;
+  // itemArr?: React.ReactNode[];
+  // props_menu?: Tprops_menu;
   className_labeWrapper?: string;
 };
 
@@ -17,8 +17,8 @@ export default function Dropdown(props?: Tprops) {
     className,
     className_labeWrapper,
     children,
-    itemArr,
-    props_menu,
+    // itemArr,
+    // props_menu,
     ...dropdownProps
   } = props ?? {};
 
@@ -28,7 +28,7 @@ export default function Dropdown(props?: Tprops) {
       trigger={['click']}
       {...dropdownProps}
       className={classNames(scss.dropdown, className)}
-      overlay={<Menu itemArr={itemArr} {...props_menu} />}
+      // overlay={<Menu itemArr={itemArr} {...props_menu} />}
     >
       <div className={classNames(scss.label, className_labeWrapper)}>{children}</div>
     </Antd_Dropdown>

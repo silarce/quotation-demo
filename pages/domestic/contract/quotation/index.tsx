@@ -757,19 +757,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
   const customeRight = [
     <Dropdown
       key="1"
-      // placement="bottomRight"
-      itemArr={[
-        //
-        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => showPdf()}>
-          匯出報價單
-        </MyButton_v2>,
-        <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
-          單價分析
-        </MyButton_v2>,
-        <MyButton_v2 key="3" img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
-          {'匯出報價單(無折扣)'}
-        </MyButton_v2>,
-      ]}
+      menu={{
+        items: [
+          {
+            key: '1',
+            label: (
+              <MyButton_v2 className={'!w-full'} img={iconUpload.src} onClick={() => showPdf()}>
+                匯出報價單
+              </MyButton_v2>
+            ),
+          },
+          {
+            key: '2',
+            label: (
+              <MyButton_v2 className={'!w-full'} img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
+                單價分析
+              </MyButton_v2>
+            ),
+          },
+          {
+            key: '3',
+            label: (
+              <MyButton_v2 className={'!w-full'} img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
+                {'匯出報價單(無折扣)'}
+              </MyButton_v2>
+            ),
+          },
+        ],
+      }}
     >
       匯出
     </Dropdown>,
@@ -1306,7 +1321,10 @@ const usePanelList = ({
 
               try {
                 setIsLoading(true);
-                await apiPostEngineeringContact({ contractId: id });
+                await apiPostEngineeringContact({
+                  contractId: id,
+                  contractor: contract?.content.customer?.name,
+                });
                 myAlert.success({ title: '新增工程聯絡單成功' });
               } catch (error) {
                 const err = error as Error;

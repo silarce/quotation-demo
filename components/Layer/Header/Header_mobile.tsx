@@ -29,7 +29,7 @@ import scss from './header_mobile.module.scss';
 import { LayerCtx } from 'components/Layer/Layer';
 
 // 路由表
-import {sidePathList} from '../SideNav/pathList/side';
+import { sidePathList } from '../SideNav/pathList/side';
 
 // ================================================================
 
@@ -70,7 +70,7 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
 
   return (
     <>
-      <Drawer className={scss.menu} visible={showMenu} width={317} closable={false}>
+      <Drawer className={scss.menu} open={showMenu} width={317} closable={false}>
         {/* close btn */}
         <Image className="absolute top-[21px] right-[26px] w-[18px]" src={iconCross} alt="close" onClick={closeMenu} />
         {/*  */}
@@ -157,7 +157,7 @@ const PanelBody = () => {
               className={scss.nav}
               defaultActiveKey={[linkList.defaultCollapse || '0']}
               ghost
-              onChange={() => { }}
+              onChange={() => {}}
             >
               <Panel header={label} key={`${index}`}>
                 <ul>
