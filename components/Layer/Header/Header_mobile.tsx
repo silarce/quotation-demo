@@ -70,7 +70,7 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
 
   return (
     <>
-      <Drawer className={scss.menu} visible={showMenu} width={317} closable={false}>
+      <Drawer className={scss.menu} open={showMenu} width={317} closable={false}>
         {/* close btn */}
         <Image className="absolute top-[21px] right-[26px] w-[18px]" src={iconCross} alt="close" onClick={closeMenu} />
         {/*  */}

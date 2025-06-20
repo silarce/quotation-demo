@@ -2116,24 +2116,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
     (status === 'Budget' || status === 'Bidding' || status === 'Contracting' || 'Pending' || 'TempPending') ? (
       <Dropdown
         key="0"
-        // placement="bottomRight"
-        itemArr={[
-          //
-          <MyButton_v2 key="1" onClick={() => setCustomerSelectorShow(true)}>
-            一般複製
-          </MyButton_v2>,
-          <MyButton_v2
-            key="2"
-            onClick={() =>
-              setCustomerSelectorShow({
-                show: true,
-                isRelationQuotation: true,
-              })
-            }
-          >
-            關聯報價
-          </MyButton_v2>,
-        ]}
+        menu={{
+          items: [
+            {
+              key: '0',
+              label: (
+                <MyButton_v2 className={'!w-full'} onClick={() => setCustomerSelectorShow(true)}>
+                  一般複製
+                </MyButton_v2>
+              ),
+            },
+            {
+              key: '1',
+              label: (
+                <MyButton_v2
+                  className={'!w-full'}
+                  onClick={() =>
+                    setCustomerSelectorShow({
+                      show: true,
+                      isRelationQuotation: true,
+                    })
+                  }
+                >
+                  關聯報價
+                </MyButton_v2>
+              ),
+            },
+          ],
+        }}
       >
         複製報價單
       </Dropdown>
@@ -2141,19 +2151,34 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
     <Dropdown
       key="1"
-      // placement="bottomRight"
-      itemArr={[
-        //
-        <MyButton_v2 key="1" img={iconUpload.src} onClick={() => showPdf()}>
-          匯出報價單
-        </MyButton_v2>,
-        <MyButton_v2 key="2" img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
-          單價分析
-        </MyButton_v2>,
-        <MyButton_v2 key="3" img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
-          {'匯出報價單(無折扣)'}
-        </MyButton_v2>,
-      ]}
+      menu={{
+        items: [
+          {
+            key: '0',
+            label: (
+              <MyButton_v2 className={'!w-full'} img={iconUpload.src} onClick={() => showPdf()}>
+                匯出報價單
+              </MyButton_v2>
+            ),
+          },
+          {
+            key: '1',
+            label: (
+              <MyButton_v2 className={'!w-full'} img={iconUpload.src} onClick={() => setShowPdf_part(true)}>
+                單價分析
+              </MyButton_v2>
+            ),
+          },
+          {
+            key: '2',
+            label: (
+              <MyButton_v2 className={'!w-full'} img={iconUpload.src} onClick={() => showPdf_noDiscount()}>
+                {'匯出報價單(無折扣)'}
+              </MyButton_v2>
+            ),
+          },
+        ],
+      }}
     >
       匯出
     </Dropdown>,

@@ -97,7 +97,7 @@ export default function ChangePwPanel({ visible, onCancel }: { visible: boolean;
   return (
     <Modal
       className={scss.antdModalChangePw}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       maskClosable={true}
