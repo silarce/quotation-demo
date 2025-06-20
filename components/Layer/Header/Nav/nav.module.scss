@@ -51,5 +51,12 @@
     top: -5px;
     right: 0px;
     transform: translate(50%, -50%);
+    .reviewQty {
+      background-color: red;
+      color: white;
+      border-radius: 999px; // 兩邊圓
+      padding: 0px 5px; // 左右多一點
+      font-size: 12px;
+    }
   }
 }
