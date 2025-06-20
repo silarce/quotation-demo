@@ -3197,6 +3197,7 @@ export type TupdateEngineeringContactDto = Pick<
 export type TcreateEngineeringContactDto = {
   quotationId?: string | null; // 報價單ID
   contractId?: string | null; // 合約ID
+  contractor?: string | null; // 承包商
 };
 
 export type TsubmitEngineeringContactDto = {
