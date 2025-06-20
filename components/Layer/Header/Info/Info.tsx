@@ -75,15 +75,24 @@ export default function Info() {
         <div className={scss.language}>
           <Dropdown
             className={scss.dropdown}
-            props_menu={{
-              itemArr: [
-                //
-                <span key="01" onClick={() => changeLanguage('zh-TW')}>
-                  繁體中文
-                </span>,
-                <span key="02" onClick={() => changeLanguage('en')}>
-                  English
-                </span>,
+            menu={{
+              items: [
+                {
+                  key: '0',
+                  label: (
+                    <span onClick={() => changeLanguage('zh-TW')} className={'!w-full'}>
+                      繁體中文
+                    </span>
+                  ),
+                },
+                {
+                  key: '1',
+                  label: (
+                    <span onClick={() => changeLanguage('en')} className={'!w-full'}>
+                      English
+                    </span>
+                  ),
+                },
               ],
             }}
           >
@@ -102,17 +111,22 @@ export default function Info() {
 
         <Dropdown
           className={scss.gear}
-          props_menu={{
-            itemArr: [
-              <div key="0" className="flex gap-2 cursor-auto" onClick={(e) => e.stopPropagation()}>
-                <span>使用新版報價單</span>
-                <Switch
-                  onChange={(isChecked) => {
-                    setIsQuotation2(isChecked);
-                  }}
-                  checked={isQuotation2}
-                />
-              </div>,
+          menu={{
+            items: [
+              {
+                key: '0',
+                label: (
+                  <div className="flex gap-2 cursor-auto" onClick={(e) => e.stopPropagation()}>
+                    <span>使用新版報價單</span>
+                    <Switch
+                      onChange={(isChecked) => {
+                        setIsQuotation2(isChecked);
+                      }}
+                      checked={isQuotation2}
+                    />
+                  </div>
+                ),
+              },
             ],
           }}
         >
