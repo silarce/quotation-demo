@@ -404,6 +404,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   const backupState = () => {
+    const payInfo_pre = exportState_payInfo({ exportCopy: false });
+    const payInfo = {
+      ...payInfo_pre,
+      // moment是class，不能轉為JSON
+      deliveryDate: payInfo_pre.deliveryDate ? payInfo_pre.deliveryDate.toISOString() : null,
+    };
+
     const stateForRestore: Tbackup = {
       status: state_status,
       product: exportState_product(),
@@ -413,7 +420,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       annoArr,
       quotationRangeArr,
 
-      payInfo: exportState_payInfo({ exportCopy: false }),
+      payInfo: payInfo,
       other: state_otherArr,
     };
 
