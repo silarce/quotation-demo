@@ -75,6 +75,7 @@ type Tprofile = {
   contractorPrincipal: string;
   contractorContactNumber: string;
   contractorFaxNumber: string;
+  scheduledProgress: string;
 };
 
 type TonStateChange = (props: {
@@ -319,6 +320,7 @@ function PreWorkContactDoc_component(
       contractorContactNumber,
       contractorFaxNumber,
       contactInfo,
+      scheduledProgress,
     } = engineeringContact;
 
     if (annotations) {
@@ -346,6 +348,7 @@ function PreWorkContactDoc_component(
       contractorPrincipal,
       contractorContactNumber,
       contractorFaxNumber,
+      scheduledProgress: scheduledProgress ?? '',
     });
   };
 
@@ -1024,6 +1027,13 @@ const useControl_profile = ({
         onAddClick,
         arr: contactPersonsArr,
       },
+      scheduledProgress: {
+        value: profile?.scheduledProgress ?? '',
+        onChange: (v) => {
+          profileChange('scheduledProgress', v);
+        },
+        // disabled: readonly,
+      },
     };
 
     return control_profile;
@@ -1049,6 +1059,7 @@ const emptyProfile = (): Tprofile => ({
   contractorPrincipal: '',
   contractorContactNumber: '',
   contractorFaxNumber: '',
+  scheduledProgress: '',
 });
 
 // ================================================================================

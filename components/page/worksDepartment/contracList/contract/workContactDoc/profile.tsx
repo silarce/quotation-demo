@@ -83,6 +83,7 @@ type Tcontroll = {
     onAddClick: () => void;
     arr: TcontactItem[];
   };
+  scheduledProgress: TcontrollItem;
 };
 
 export type { Tcontroll, TprojectPatternStatus };
@@ -116,6 +117,7 @@ export default function Profile({
     contactNumber,
     faxNumber,
     contactPersons,
+    scheduledProgress,
   } = controll;
 
   return (
@@ -245,6 +247,16 @@ export default function Profile({
                 </Fragment>
               );
             })}
+          </div>
+          <br />
+          <div>
+            <InputSel
+              disabled={scheduledProgress.disabled || disabled}
+              label={'預定進度'}
+              placeholder=""
+              inputProps={{ ...scheduledProgress }}
+              {...inputStyle01}
+            />
           </div>
         </div>
       </div>
