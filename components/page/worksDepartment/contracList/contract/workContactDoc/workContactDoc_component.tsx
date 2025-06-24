@@ -904,7 +904,8 @@ const useControl_profile = ({
       addressBarProps: {
         inputSelProps: {
           caption: '工程地點',
-          disabled: readonly,
+          disabled: readonly || disabled,
+          showBaseline: 'auto',
         },
         addressProps: {
           zipCode: {
@@ -1041,7 +1042,7 @@ const useControl_profile = ({
         onChange: (v) => {
           profileChange('abbreviation', v);
         },
-        disabled: readonly,
+        // disabled: readonly,
       },
     };
 
