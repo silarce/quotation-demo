@@ -1,5 +1,5 @@
 // 報價單
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 
 import Decimal from 'decimal.js';
@@ -183,6 +183,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   const userId = userInfo?.employee?.id;
 
   // ----------------------------------------------------------------------
+  const ref_quotationPayInfo = useRef<HTMLFormElement>(null);
 
   let { managerReviewedAt, toSalesAt, toSupervisorAt, toCashierAt, isAttach, isAllReviewedBeforePending } =
     init_variable();
@@ -403,6 +404,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   });
 
   const backupState = () => {
+    const payInfo_pre = exportState_payInfo({ exportCopy: false });
+    const payInfo = {
+      ...payInfo_pre,
+      // moment是class，不能轉為JSON
+      deliveryDate: payInfo_pre.deliveryDate ? payInfo_pre.deliveryDate.toISOString() : null,
+    };
+
     const stateForRestore: Tbackup = {
       status: state_status,
       product: exportState_product(),
@@ -412,7 +420,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       annoArr,
       quotationRangeArr,
 
-      payInfo: exportState_payInfo({ exportCopy: false }),
+      payInfo: payInfo,
       other: state_otherArr,
     };
 
@@ -469,6 +477,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:更新報價單
   const handlePatch = () => {
+    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+      myAlert.info({
+        title: '付款資訊未正確填寫',
+      });
+
+      return;
+    }
+
     const { destroy } = myAlert.input({
       props_input: {
         isTextArea: true,
@@ -506,6 +522,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:新增報價單
   const handlePost = () => {
+    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+      myAlert.info({
+        title: '付款資訊未正確填寫',
+      });
+
+      return;
+    }
+
     const { destroy } = myAlert.input({
       props_input: {
         isTextArea: true,
@@ -545,6 +569,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:追加追減報價單
   const handleModify = () => {
+    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+      myAlert.info({
+        title: '付款資訊未正確填寫',
+      });
+
+      return;
+    }
+
     const { destroy } = myAlert.input({
       props_input: {
         isTextArea: true,
@@ -573,6 +605,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:更新追加追減報價單
   const handlePatchModify = () => {
+    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+      myAlert.info({
+        title: '付款資訊未正確填寫',
+      });
+
+      return;
+    }
+
     if (!checkIsIterativeProdValid()) {
       myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
 
@@ -1137,10 +1177,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             <QuotationAttachment disabled={disabled} fileArr={fileInfoKitArr} addFile={addFile} />
           </div>
           {/* 付款資訊 */}
-          <div className={scss.right}>
+          <form ref={ref_quotationPayInfo}>
             {/* <div className="w-[400px] border border-border">付款資訊</div> */}
+
             <QuotationPayInfo disabled={disabled} form={props_payInfo} />
-          </div>
+          </form>
         </div>
         <SignatureBar
           //

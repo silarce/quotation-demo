@@ -23,7 +23,10 @@ interface TpaymentMethod {
   totalPaymentRatio: `${number}` | '';
 }
 
-type TexportState = Tstate;
+// type TexportState = Tstate;
+type TexportState = Omit<Tstate, 'deliveryDate'> & {
+  deliveryDate: string | null;
+};
 
 // ===========================================================================
 
@@ -46,7 +49,13 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefine
   };
 
   const restoreState = (backupState: TexportState) => {
-    setState(backupState);
+    const { deliveryLocation, deliveryDate, paymentMethodArr } = backupState;
+
+    setState({
+      deliveryLocation,
+      paymentMethodArr,
+      deliveryDate: deliveryDate ? moment(backupState.deliveryDate) : null,
+    });
   };
 
   useEffect(() => {

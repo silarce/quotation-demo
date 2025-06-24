@@ -75,6 +75,8 @@ type Tprofile = {
   contractorPrincipal: string;
   contractorContactNumber: string;
   contractorFaxNumber: string;
+  scheduledProgress: string;
+  projectAbbreviation: string;
 };
 
 type TonStateChange = (props: {
@@ -319,6 +321,8 @@ function PreWorkContactDoc_component(
       contractorContactNumber,
       contractorFaxNumber,
       contactInfo,
+      scheduledProgress,
+      projectAbbreviation,
     } = engineeringContact;
 
     if (annotations) {
@@ -346,6 +350,8 @@ function PreWorkContactDoc_component(
       contractorPrincipal,
       contractorContactNumber,
       contractorFaxNumber,
+      scheduledProgress: scheduledProgress ?? '',
+      projectAbbreviation: projectAbbreviation ?? '',
     });
   };
 
@@ -898,7 +904,8 @@ const useControl_profile = ({
       addressBarProps: {
         inputSelProps: {
           caption: '工程地點',
-          disabled: readonly,
+          disabled: readonly || disabled,
+          showBaseline: 'auto',
         },
         addressProps: {
           zipCode: {
@@ -1024,6 +1031,19 @@ const useControl_profile = ({
         onAddClick,
         arr: contactPersonsArr,
       },
+      scheduledProgress: {
+        value: profile?.scheduledProgress ?? '',
+        onChange: (v) => {
+          profileChange('scheduledProgress', v);
+        },
+      },
+      projectAbbreviation: {
+        value: profile?.projectAbbreviation ?? '',
+        onChange: (v) => {
+          profileChange('projectAbbreviation', v);
+        },
+        // disabled: readonly,
+      },
     };
 
     return control_profile;
@@ -1049,6 +1069,8 @@ const emptyProfile = (): Tprofile => ({
   contractorPrincipal: '',
   contractorContactNumber: '',
   contractorFaxNumber: '',
+  scheduledProgress: '',
+  projectAbbreviation: '',
 });
 
 // ================================================================================

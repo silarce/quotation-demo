@@ -83,6 +83,8 @@ type Tcontroll = {
     onAddClick: () => void;
     arr: TcontactItem[];
   };
+  scheduledProgress: TcontrollItem;
+  projectAbbreviation: TcontrollItem;
 };
 
 export type { Tcontroll, TprojectPatternStatus };
@@ -116,6 +118,8 @@ export default function Profile({
     contactNumber,
     faxNumber,
     contactPersons,
+    scheduledProgress,
+    projectAbbreviation,
   } = controll;
 
   return (
@@ -127,6 +131,12 @@ export default function Profile({
             disabled={projectName.disabled || disabled}
             label="工程名稱"
             inputProps={{ ...projectName }}
+            {...inputStyle01}
+          />
+          <InputSel
+            disabled={projectAbbreviation.disabled || disabled}
+            label="工程簡稱"
+            inputProps={{ ...projectAbbreviation }}
             {...inputStyle01}
           />
           <InputSel
@@ -246,6 +256,16 @@ export default function Profile({
               );
             })}
           </div>
+          <br />
+          <div>
+            <InputSel
+              disabled={scheduledProgress.disabled || disabled}
+              label={'預定進度'}
+              placeholder=""
+              inputProps={{ ...scheduledProgress }}
+              {...inputStyle01}
+            />
+          </div>
         </div>
       </div>
 
@@ -296,7 +316,7 @@ const inputStyle01 = {
   showBaseline: 'auto' as const,
 };
 const inputStyle02 = {
-  captionWidth: '110px',
+  captionWidth: '120px',
   gap: '24px',
   captionClassName: scss.inputCaption,
   captionColor: 'main' as const,

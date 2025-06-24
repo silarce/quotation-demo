@@ -77,7 +77,7 @@ export default function WorkContactDoc() {
     { type: 'myButton', label: '匯出工程聯絡單', onClick: () => ref_workContact.current.openPdf() },
     {
       type: 'myButton',
-      label: contactThatSkipContract ? '編輯' : '編輯聯絡人',
+      label: '編輯',
       onClick: () => ref_workContact.current.setDisabled(false),
     },
     ...usePanel_returnWorksDepartmentContractList(),

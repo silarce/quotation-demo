@@ -1,10 +1,9 @@
-import Router, { useRouter } from 'next/router';
+import Router from 'next/router';
 import { TpanelList } from 'components/PageHeader/PageHeader02/PanelList';
 
 import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
@@ -547,19 +546,34 @@ const ExportQuotation = ({
   return (
     <Dropdown
       key="1"
-      // placement="bottomRight"
-      itemArr={[
-        //
-        <MyButton_v2 key="1" img={iconUpload.src} onClick={showPdf}>
-          匯出報價單
-        </MyButton_v2>,
-        <MyButton_v2 key="2" img={iconUpload.src} onClick={setShowPdf_part}>
-          單價分析
-        </MyButton_v2>,
-        <MyButton_v2 key="3" img={iconUpload.src} onClick={showPdf_noDiscount}>
-          {'匯出報價單(無折扣)'}
-        </MyButton_v2>,
-      ]}
+      menu={{
+        items: [
+          {
+            key: '0',
+            label: (
+              <MyButton_v2 img={iconUpload.src} onClick={showPdf} className={'!w-full'}>
+                匯出報價單
+              </MyButton_v2>
+            ),
+          },
+          {
+            key: '1',
+            label: (
+              <MyButton_v2 img={iconUpload.src} onClick={setShowPdf_part} className={'!w-full'}>
+                單價分析
+              </MyButton_v2>
+            ),
+          },
+          {
+            key: '2',
+            label: (
+              <MyButton_v2 img={iconUpload.src} onClick={showPdf_noDiscount} className={'!w-full'}>
+                {'匯出報價單(無折扣)'}
+              </MyButton_v2>
+            ),
+          },
+        ],
+      }}
     >
       匯出
     </Dropdown>
@@ -576,23 +590,31 @@ const CloneQuotation = ({
   return (
     <Dropdown
       key="0"
-      itemArr={[
-        //
-        <MyButton_v2 key="1" onClick={cloneQuotation}>
-          一般複製
-        </MyButton_v2>,
-        <MyButton_v2 key="2" onClick={cloneQuotation_relation}>
-          關聯報價
-        </MyButton_v2>,
-      ]}
+      menu={{
+        items: [
+          {
+            key: '0',
+            label: (
+              <MyButton_v2 className={'!w-full'} onClick={cloneQuotation}>
+                一般複製
+              </MyButton_v2>
+            ),
+          },
+          {
+            key: '1',
+            label: (
+              <MyButton_v2 className={'!w-full'} onClick={cloneQuotation_relation}>
+                關聯報價
+              </MyButton_v2>
+            ),
+          },
+        ],
+      }}
     >
       複製報價單
     </Dropdown>
   );
 };
-
-// ================================================================================
-// ================================================================================
 
 // ================================================================================
 // ================================================================================
