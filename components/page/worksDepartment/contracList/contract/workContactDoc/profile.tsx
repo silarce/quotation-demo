@@ -84,7 +84,7 @@ type Tcontroll = {
     arr: TcontactItem[];
   };
   scheduledProgress: TcontrollItem;
-  abbreviation: TcontrollItem;
+  projectAbbreviation: TcontrollItem;
 };
 
 export type { Tcontroll, TprojectPatternStatus };
@@ -119,7 +119,7 @@ export default function Profile({
     faxNumber,
     contactPersons,
     scheduledProgress,
-    abbreviation,
+    projectAbbreviation,
   } = controll;
 
   return (
@@ -134,9 +134,9 @@ export default function Profile({
             {...inputStyle01}
           />
           <InputSel
-            disabled={abbreviation.disabled || disabled}
+            disabled={projectAbbreviation.disabled || disabled}
             label="工程簡稱"
-            inputProps={{ ...abbreviation }}
+            inputProps={{ ...projectAbbreviation }}
             {...inputStyle01}
           />
           <InputSel

@@ -76,7 +76,7 @@ type Tprofile = {
   contractorContactNumber: string;
   contractorFaxNumber: string;
   scheduledProgress: string;
-  abbreviation: string;
+  projectAbbreviation: string;
 };
 
 type TonStateChange = (props: {
@@ -322,7 +322,7 @@ function PreWorkContactDoc_component(
       contractorFaxNumber,
       contactInfo,
       scheduledProgress,
-      abbreviation,
+      projectAbbreviation,
     } = engineeringContact;
 
     if (annotations) {
@@ -351,7 +351,7 @@ function PreWorkContactDoc_component(
       contractorContactNumber,
       contractorFaxNumber,
       scheduledProgress: scheduledProgress ?? '',
-      abbreviation: abbreviation ?? '',
+      projectAbbreviation: projectAbbreviation ?? '',
     });
   };
 
@@ -1037,10 +1037,10 @@ const useControl_profile = ({
           profileChange('scheduledProgress', v);
         },
       },
-      abbreviation: {
-        value: profile?.abbreviation ?? '',
+      projectAbbreviation: {
+        value: profile?.projectAbbreviation ?? '',
         onChange: (v) => {
-          profileChange('abbreviation', v);
+          profileChange('projectAbbreviation', v);
         },
         // disabled: readonly,
       },
@@ -1070,7 +1070,7 @@ const emptyProfile = (): Tprofile => ({
   contractorContactNumber: '',
   contractorFaxNumber: '',
   scheduledProgress: '',
-  abbreviation: '',
+  projectAbbreviation: '',
 });
 
 // ================================================================================

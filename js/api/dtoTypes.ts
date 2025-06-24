@@ -3107,7 +3107,7 @@ export type TengineeringContactDto = {
   colorStatus: '編輯中' | '審核中' | '已核准' | null;
 
   scheduledProgress: string | null; // 預定進度
-  abbreviation: string | null; // 預定進度
+  projectAbbreviation: string | null; // 工程簡稱
 
   // 工務 ID
   // reviewWorkerEmployeeId: string | null; // 棄用
@@ -3195,7 +3195,7 @@ export type TupdateEngineeringContactDto = Pick<
       | 'constructionSiteContactNumber'
       | 'annotations'
       | 'scheduledProgress'
-      | 'abbreviation'
+      | 'projectAbbreviation'
     >
   >;
 
