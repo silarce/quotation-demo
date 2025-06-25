@@ -68,7 +68,7 @@
     "@types/react-big-calendar": "^1.6.1",
     "@types/react-dom": "^19.1.6",
     "@types/react-slick": "^0.23.10",
-    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
     "autoprefixer": "^10.4.19",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "eslint": "^9.29.0",

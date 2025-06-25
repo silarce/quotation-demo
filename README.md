@@ -92,5 +92,16 @@ dayjs
 moment
 moment-timezone
 
+如果ESLing發生這樣的錯誤，應該是因為
+@typescript-eslint/no-unused-vars 
+TypeError: Cannot use 'in' operator to search for 'type' in undefined
+應該是eslint-config-next不支援 @typescript-eslint/eslint-plugin的版本
+把@typescript-eslint/eslint-plugin降版本試試
+
+
+
+
+
+
 
 
