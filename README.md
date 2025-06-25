@@ -75,9 +75,18 @@ react-i18next
 @types/react-dom
 eslint-config-next
 react-select
+@typescript-eslint/eslint-plugin
+eslint
+eslint-config-prettier
+eslint-plugin-prettier
+
+
+
 
 安裝套件
-adayjs
+dayjs
+@eslint/eslintrc
+@eslint/js
 
 移除套件
 moment
