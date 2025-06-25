@@ -79,7 +79,9 @@ react-select
 安裝套件
 adayjs
 
-
+移除套件
+moment
+moment-timezone
 
 
 
