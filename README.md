@@ -74,6 +74,7 @@ react-i18next
 @types/react
 @types/react-dom
 eslint-config-next
+react-select
 
 安裝套件
 adayjs
