@@ -30,6 +30,16 @@ import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(isBetween);
+dayjs.extend(duration);
+dayjs.extend(utc);
+dayjs.locale('zh-tw');
+
 // -----------------------------------------------------------------------------------
 
 import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
@@ -60,7 +70,7 @@ const AppContext = createContext<TappContext>(null!);
 
 // =============================================================================
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
