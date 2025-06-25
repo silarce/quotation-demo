@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 
 import { axi_netCore } from '../_axiosCreator';
+
 import { AxiosError } from 'axios';
 
 import type { TengineerContactExport } from './_schemas';
+
+import { useEngineeringContactAttachments } from '../api_engineering';
 
 // ==========================================================
 
@@ -19,7 +22,7 @@ const apiGetEngineerContactExport = async (contactId: string) => {
   return axi_netCore.get<TengineerContactExport>(api, { params }).then(({ data }) => data);
 };
 
-const useApiGetEngineerContactExport = (
+const useApiEngineerContactExport = (
   contactId: string | undefined,
   {
     autoUpdate = true,
@@ -29,6 +32,30 @@ const useApiGetEngineerContactExport = (
 ) => {
   const [isFetching, setIsFetching] = useState(false);
   const [data, setData] = useState<TengineerContactExport | null>();
+
+  const {
+    floorPlanPatternArr,
+    designDiagramPatternArr,
+    colorCardPatternArr,
+    pattern_constructionArr,
+    pattern_detailArr,
+    updateAll: updateAllAttachment,
+  } = useEngineeringContactAttachments(contactId);
+
+  const patternList = {
+    floorPlan: floorPlanPatternArr,
+    designDiagram: designDiagramPatternArr,
+    colorCard: colorCardPatternArr,
+    construction: pattern_constructionArr,
+    detail: pattern_detailArr,
+  };
+
+  const hasPattern =
+    floorPlanPatternArr.length > 0 ||
+    designDiagramPatternArr.length > 0 ||
+    colorCardPatternArr.length > 0 ||
+    pattern_constructionArr.length > 0 ||
+    pattern_detailArr.length > 0;
 
   const update = async () => {
     if (!contactId) {
@@ -42,6 +69,7 @@ const useApiGetEngineerContactExport = (
     try {
       const data = await apiGetEngineerContactExport(contactId);
       setData(data);
+      await updateAllAttachment();
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error('API Error:', error.message);
@@ -62,9 +90,11 @@ const useApiGetEngineerContactExport = (
   return {
     isFetching,
     engineerContactExport: data,
+    patternList,
+    hasPattern,
     update,
   };
 };
 
-export { useApiGetEngineerContactExport };
+export { useApiEngineerContactExport };
 export type { TengineerContactExport };
