@@ -248,6 +248,7 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
         page={0}
         allPage={prodArrArr.length}
         hasPattern={hasPattern}
+        hasPattern_bool={hasPattern_bool}
       />
 
       {prodArrArr.map((prodArr, index) => {
@@ -263,6 +264,7 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
             page={index + 1}
             allPage={prodArrArr.length}
             hasPattern={hasPattern}
+            hasPattern_bool={hasPattern_bool}
           />
         );
       })}
@@ -347,13 +349,13 @@ const Body_pre = (
           boxB,
           materialName,
           materialSurface,
-          guidRail: guideRail,
+          guideRail: guideRail,
           closingType,
           horsepower,
           quantity,
-          notes,
+          note: notes,
 
-          guidRailThickness: thickness,
+          guideRailThickness: thickness,
           bounceDoorWidth,
         } = prod;
 
@@ -483,6 +485,7 @@ const PdfTemp_pre = (
     page,
     allPage,
     hasPattern,
+    hasPattern_bool,
   }: {
     className?: string;
     isTemplate?: boolean;
@@ -494,6 +497,7 @@ const PdfTemp_pre = (
     page: React.ReactNode;
     allPage: React.ReactNode;
     hasPattern: ThasPattern;
+    hasPattern_bool: boolean;
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
@@ -556,7 +560,12 @@ const PdfTemp_pre = (
       <div ref={ref} className={classNames(scss.a4Container, className)} style={{ ...a4Style }}>
         <Header ref={ref_header} infoArr={infoArr} page={page} allPage={allPage} />
         <Body ref={ref_body} productArr={productArr} />
-        <Footer ref={ref_footer} annotations={annotations ?? []} hasPattern={hasPattern} hasPattern_bool={} />
+        <Footer
+          ref={ref_footer}
+          annotations={annotations ?? []}
+          hasPattern={hasPattern}
+          hasPattern_bool={hasPattern_bool}
+        />
       </div>
     </div>
   );

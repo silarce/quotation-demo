@@ -461,6 +461,8 @@ interface TengineerContactExport {
   address: string; // 工程地點
   projectPrincipal: string; // 工地負責人
   projectContent: string; // 工程內容
+  annotations: string[];
+  constructionSitePrincipalContactNumber: string;
   productDetails: {
     id: string; // quotation_productId
     productSpec: string; // 產品規格(api組for匯出)
@@ -470,12 +472,14 @@ interface TengineerContactExport {
     boxB: number; // 捲箱高度(組產品規格用)
     doorModelName: string; // 門型
     materialName: string; // 材質
-    guidRailThickness: number; // 厚度(門軌厚度)
+    guideRailThickness: number; // 厚度(門軌厚度)
     materialSurface: string; // 表面(當表面為烤漆或氟碳)
-    guidRail: string; // 門軌
+    guideRail: string; // 門軌
     closingType: string; // 開關方式
     horsepower: string; // 馬力數
     quantity: string; // 數量
+    note: string;
+    bounceDoorWidth: string;
   }[];
 }
 
