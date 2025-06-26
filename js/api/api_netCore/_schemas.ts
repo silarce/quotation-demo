@@ -461,7 +461,8 @@ interface TengineerContactExport {
   address: string; // 工程地點
   projectPrincipal: string; // 工地負責人
   projectContent: string; // 工程內容
-  annotations: string[];
+  // annotations: string[];
+  annotations: string; // JSON.stringify(string[])
   constructionSitePrincipalContactNumber: string;
   productDetails: {
     id: string; // quotation_productId

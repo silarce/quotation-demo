@@ -173,3 +173,7 @@ $infoLeftWidth: calc($itemName + $size + $doorModelName + $material + $thickness
   border: 0;
   overflow: hidden;
 }
+
+.wrapper {
+  padding: 40px;
+}

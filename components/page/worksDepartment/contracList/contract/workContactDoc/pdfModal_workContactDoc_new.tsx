@@ -5,14 +5,13 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 // antd
-import { Modal, ModalProps } from 'antd';
 
 // gear
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // css
-import scss from './pdfModal_workContactDoc.module.scss';
+import scss from './pdfModal_workContactDoc_new.module.scss';
 
 // import { ThasPattern } from './projectPattern';
 
@@ -76,16 +75,14 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
     //
     projectName,
     productDetails,
-    // annotations, // api還沒給
+    annotations: annotations_pre,
   } = engineerContactExport ?? {};
-
-  const annotations: string[] = ['api還沒給'];
+  const annotations = JSON.parse(annotations_pre ?? '[]') as string[];
 
   // --------------------------------------------------------------------------
   const ref_pdf = useRef<(HTMLDivElement | null)[]>([]);
 
   const [prodArrArr, setProdArrArr] = useState<TproductDetails[]>([]);
-  // --------------------------------------------------------------------------
 
   // ========================================================================
 
@@ -154,10 +151,8 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
       projectPrincipal,
       projectContent,
 
-      // constructionSitePrincipalContactNumber, // api還沒給
+      constructionSitePrincipalContactNumber,
     } = engineerContactExport;
-
-    const constructionSitePrincipalContactNumber = 'api還沒給';
 
     const wholeAddress = address;
 
@@ -233,41 +228,43 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
   }, [engineerContactExport]);
 
   return (
-    <div className={scss.body}>
-      <MyButton_v2 onClick={dlPdf}>下載</MyButton_v2>
-      <br />
-      <br />
+    <div className={scss.wrapper}>
+      <div className={scss.body}>
+        <MyButton_v2 onClick={dlPdf}>下載</MyButton_v2>
+        <br />
+        <br />
 
-      <PdfTemp
-        isTemplate={true}
-        infoArr={infoArr}
-        productArr={productDetails}
-        // annotations={engineeringContact?.annotations}
-        annotations={annotations}
-        onChunkProdArrArrCreated={setProdArrArr}
-        page={0}
-        allPage={prodArrArr.length}
-        hasPattern={hasPattern}
-        hasPattern_bool={hasPattern_bool}
-      />
+        <PdfTemp
+          isTemplate={true}
+          infoArr={infoArr}
+          productArr={productDetails}
+          // annotations={engineeringContact?.annotations}
+          annotations={annotations}
+          onChunkProdArrArrCreated={setProdArrArr}
+          page={0}
+          allPage={prodArrArr.length}
+          hasPattern={hasPattern}
+          hasPattern_bool={hasPattern_bool}
+        />
 
-      {prodArrArr.map((prodArr, index) => {
-        return (
-          <PdfTemp
-            key={index}
-            ref={(ele) => {
-              ref_pdf.current[index] = ele;
-            }}
-            infoArr={infoArr}
-            productArr={prodArr}
-            annotations={annotations}
-            page={index + 1}
-            allPage={prodArrArr.length}
-            hasPattern={hasPattern}
-            hasPattern_bool={hasPattern_bool}
-          />
-        );
-      })}
+        {prodArrArr.map((prodArr, index) => {
+          return (
+            <PdfTemp
+              key={index}
+              ref={(ele) => {
+                ref_pdf.current[index] = ele;
+              }}
+              infoArr={infoArr}
+              productArr={prodArr}
+              annotations={annotations}
+              page={index + 1}
+              allPage={prodArrArr.length}
+              hasPattern={hasPattern}
+              hasPattern_bool={hasPattern_bool}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -551,7 +548,7 @@ const PdfTemp_pre = (
     });
 
     //
-  }, [ref_header, ref_body, ref_footer]);
+  }, [ref_header, ref_body, ref_footer, productArr]);
 
   // 如果要設定container的height、paddingTop、paddingBottome等會影響到高度的樣式
   // 到上面的a4Style設定
