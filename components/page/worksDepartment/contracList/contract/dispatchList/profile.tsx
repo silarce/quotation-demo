@@ -73,6 +73,7 @@ type Tcontrol = {
 
   projectName: string;
   projectNumber: string;
+  projectAbbreviation: string;
   // 承包商
   contractor: string;
   // 承包商聯絡人
@@ -136,6 +137,12 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           className="col-span-2"
           caption="工程名稱"
           node={<span className={'break-all'}>{control.projectName}</span>}
+        />
+        <InputSel
+          {...config_inputSel_readOnly}
+          className="col-span-2"
+          caption="工程簡稱"
+          node={<span className={'break-all'}>{control.projectAbbreviation}</span>}
         />
 
         <InputSel

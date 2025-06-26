@@ -167,26 +167,9 @@ export default function DispatchList() {
       <div className={scss.body}>
         <div className={scss.profile}>
           <div className={scss.left}>
-            <InputSel
-              caption="工程名稱"
-              {...config_inputSel}
-              inputProps={{
-                props: {
-                  defaultValue: engineeringContact?.projectName,
-                  readOnly: true,
-                },
-              }}
-            />
-            <InputSel
-              caption="承包商"
-              {...config_inputSel}
-              inputProps={{
-                props: {
-                  defaultValue: engineeringContact?.contractor,
-                  readOnly: true,
-                },
-              }}
-            />
+            <InputSel caption="工程名稱" {...config_inputSel} node={engineeringContact?.projectName} />
+            <InputSel caption="工程簡稱" {...config_inputSel} node={engineeringContact?.projectAbbreviation} />
+            <InputSel caption="承包商" {...config_inputSel} node={engineeringContact?.contractor} />
             <InputSel
               caption="聯絡人"
               {...config_inputSel}
