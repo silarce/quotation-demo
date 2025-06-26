@@ -116,7 +116,7 @@ export default function DispatchList() {
   // ----------------------------------------------------
   const tabArr = [
     {
-      label: '已派工',
+      label: '待派工',
       isActive: tab === 'notCompleted',
       onClick: () => {
         router.push({
