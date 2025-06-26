@@ -64,7 +64,8 @@ next.js13.2.2沒有這個問題
 
 ---
 2025-06-25
-升級react、antd、next.js與其他相關套件
+
+更新套件
 @ant-design/icons
 antd
 next
@@ -79,6 +80,7 @@ react-select
 eslint
 eslint-config-prettier
 eslint-plugin-prettier
+
 
 
 
