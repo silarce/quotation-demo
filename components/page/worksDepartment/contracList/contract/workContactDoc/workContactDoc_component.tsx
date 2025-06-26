@@ -20,7 +20,8 @@ import ProjectPattern, {
   TpatternReviewProcess,
   TpatternReviewStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
-import PdfModal from './pdfModal_workContactDoc';
+// import PdfModal from './pdfModal_workContactDoc';
+import PdfModal from './pdfModal_workContactDoc_new';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -146,7 +147,7 @@ function PreWorkContactDoc_component(
 
   const [showAnnoSelector, setShowAnnoSelector] = useState(false);
   const [isShowPattern, setIsShowPattern] = useState(false);
-  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  // const [pdfModalVisible, setPdfModalVisible] = useState(false);
 
   const { profile, setProfile, profileChange } = useProfile();
   const { contactArr, setContactArr, onAddClick } = useContactArr();
@@ -355,6 +356,18 @@ function PreWorkContactDoc_component(
     });
   };
 
+  const openPdf = () => {
+    if (!engineeringContactId) {
+      myAlert.info({ title: '沒有engineeringContactId' });
+
+      return;
+    }
+
+    myAlert.clear({
+      content: <PdfModal engineeringContactId={engineeringContactId} />,
+    });
+  };
+
   // ----------------------------------------------------------------------------
 
   // region PROPS
@@ -463,7 +476,7 @@ function PreWorkContactDoc_component(
       reqPost,
       closePattern: () => setIsShowPattern(false),
       setDisabled,
-      openPdf: () => setPdfModalVisible(true),
+      openPdf: openPdf,
     })
   );
 
@@ -473,13 +486,13 @@ function PreWorkContactDoc_component(
 
   return (
     <div>
-      <PdfModal
+      {/* <PdfModal
         visible={pdfModalVisible}
         onCancel={() => setPdfModalVisible(false)}
         engineeringContact={engineeringContact}
         productArr={productArr_forPdf}
         hasPattern={hasPattern}
-      />
+      /> */}
 
       {/*  */}
       {/*  */}

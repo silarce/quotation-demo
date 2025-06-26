@@ -18,6 +18,14 @@ const axi_netCore = axios.create({
   // withCredentials: true,
 });
 
+// 叫做monkey是因為這系列api的製作者叫monkey
+const axi_monkey = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_NETCORE_URL,
+
+  // .netCore後端沒有登入的行為，沒有取得cookie，自然也不用帶cookie。帶了反而CORS
+  // withCredentials: true,
+});
+
 export const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // =================================================================================
@@ -192,5 +200,51 @@ axi_netCore.interceptors.response.use(
 );
 
 // =================================================================================
-export { axi, axi_netCore };
+
+axi_monkey.interceptors.request.use(
+  (config) => {
+    // req攔截器
+
+    return config;
+  },
+  (err) => {
+    // req錯誤攔截器
+    return Promise.reject(err);
+  }
+);
+
+axi_monkey.interceptors.response.use(
+  (res) => {
+    return res;
+  },
+  (err) => {
+    const { status } = err.response ?? {};
+
+    switch (status) {
+      case 401:
+        myAlert.warning({
+          title: '系統提醒',
+          content: '登入過期，請重新登入',
+          props: {
+            onOk: () => {
+              window.location.reload();
+            },
+            onCancel: () => {
+              window.location.reload();
+            },
+          },
+        });
+        console.log('401，沒有權限');
+        break;
+
+      default:
+        console.log(err.message);
+    }
+
+    return Promise.reject(err);
+  }
+);
+
+// =================================================================================
+export { axi, axi_netCore, axi_monkey };
 export type { AxiosError };
