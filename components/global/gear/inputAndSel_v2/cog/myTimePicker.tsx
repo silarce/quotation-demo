@@ -1,9 +1,8 @@
 import classNames from 'classnames';
 
-import moment from 'moment';
+import dayjs from 'dayjs';
 // antd
 import { TimePicker, TimePickerProps } from 'antd';
-import 'moment/locale/zh-tw';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 // css
@@ -21,8 +20,8 @@ export default function MyTimePicker({ wrapperClassName, wrapperStyle, props }: 
       <TimePicker
         locale={locale}
         format="HH-mm"
-        defaultValue={moment('00:00', 'HH-mm')}
-        bordered={false}
+        defaultValue={dayjs('00:00', 'HH-mm')}
+        variant="borderless"
         showNow={false}
         autoComplete="off"
         suffixIcon={null}

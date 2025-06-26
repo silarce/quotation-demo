@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
@@ -184,8 +184,6 @@ export default function PaymentRecordSelector({
 
       return;
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
   // ==================================================
@@ -336,7 +334,7 @@ const RowArr = ({
 
         const theNoteMaturityDate = !noteMaturityDate
           ? ''
-          : moment(convertDate_reduce1911(noteMaturityDate)).format('yy-MM-DD');
+          : dayjs(convertDate_reduce1911(noteMaturityDate)).format('yy-MM-DD');
 
         const ref = index === dataArr.length - 3 ? viewRef_bottom : undefined;
 

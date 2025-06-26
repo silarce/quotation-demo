@@ -1,7 +1,7 @@
 import { useState, useRef, Fragment, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Modal } from 'antd';
@@ -1353,7 +1353,7 @@ const props_invoiceBook: TselectorProps<TaccountantInvoiceBookDto> = {
   ],
   filter: ([dateStr]) => {
     const { year, month } = (() => {
-      const date_m = moment(dateStr);
+      const date_m = dayjs(dateStr);
 
       if (!date_m.isValid()) {
         return {

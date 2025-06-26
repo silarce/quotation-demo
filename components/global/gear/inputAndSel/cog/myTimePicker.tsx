@@ -1,19 +1,11 @@
-import {
-  useRef,
-  useEffect,
-  ChangeEvent,
-  InputHTMLAttributes,
-  CSSProperties,
-  FocusEvent,
-  Dispatch,
-  SetStateAction,
-} from 'react';
+import { useRef, useEffect, Dispatch, SetStateAction } from 'react';
 import classNames from 'classnames';
 
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 // antd
-import { TimePicker } from 'antd';
-import 'moment/locale/zh-tw';
+import { TimePicker, TimePickerProps } from 'antd';
+import type { PickerRef } from 'rc-picker';
+
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 // css
@@ -24,7 +16,7 @@ export type TtimePickerProps = {
   boxClassName?: string;
   timePickerClassName?: string;
   onChange?: (timeString: string) => void;
-  onChange02?: (moment: moment.Moment | null, timeString: string) => void;
+  onChange02?: (dayjs: Dayjs, timeString: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
   focusTrigger?: boolean;
@@ -41,7 +33,7 @@ export default function MyTimePicker({
   placeholder?: string;
   disabled?: boolean | undefined;
 }) {
-  const ref = useRef<HTMLInputElement>(null!);
+  const ref = useRef<PickerRef>(null);
 
   const { value, boxClassName, timePickerClassName, onChange, onChange02, onFocus, onBlur, focusTrigger } =
     timePickerProps;
@@ -56,15 +48,29 @@ export default function MyTimePicker({
     onBlur?.();
   };
 
-  const theOnChange = (() => {
+  const theOnChange: TimePickerProps['onChange'] = (() => {
     if (onChange02) {
-      return onChange02;
+      const func: TimePickerProps['onChange'] = (dayjs: Dayjs, dateString: string | string[]) => {
+        if (typeof dateString === 'string') {
+          onChange02(dayjs, value);
+        } else {
+          alert('dateString is not a string');
+        }
+      };
+
+      return func;
     }
 
     if (onChange) {
-      return (moment: moment.Moment | null, dateString: string) => {
-        onChange(dateString);
+      const func: TimePickerProps['onChange'] = (_: Dayjs, dateString: string | string[]) => {
+        if (typeof dateString === 'string') {
+          onChange(value);
+        } else {
+          alert('dateString is not a string');
+        }
       };
+
+      return func;
     }
 
     return undefined;
@@ -72,25 +78,27 @@ export default function MyTimePicker({
 
   useEffect(() => {
     if (focusTrigger) {
-      ref.current.focus();
+      ref.current?.focus();
     }
   }, [focusTrigger]);
 
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
-  // 將stateValue轉為moment物件
+
   const theValue = (() => {
-    const themoment = moment(value);
+    const theDayjs = dayjs(value);
     let theValue;
 
-    if (themoment.format('YYYY-MM-DD HH:mm:ss') === 'Invalid date') {
+    if (theDayjs.format('YYYY-MM-DD HH:mm:ss') === 'Invalid date') {
       theValue = undefined;
     } else {
-      theValue = themoment;
+      theValue = theDayjs;
     }
 
     return theValue;
   })();
+
+  // RefObject<PickerRef | null>
 
   return (
     <div className={classNames(scss.timePickerBox, boxClassName)}>
@@ -101,10 +109,10 @@ export default function MyTimePicker({
         locale={locale}
         value={theValue}
         placeholder={placeholder ?? 'HH:mm'}
-        defaultValue={moment('00:00', 'HH-mm')}
+        defaultValue={dayjs('00:00', 'HH-mm')}
         format="HH-mm"
         disabled={disabled}
-        bordered={false}
+        variant="borderless"
         showNow={false}
         autoComplete="off"
         onChange={theOnChange}

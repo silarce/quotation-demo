@@ -2,7 +2,7 @@ import { useRef } from 'react';
 
 import classNames from 'classnames';
 import _ from 'lodash';
-import { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
@@ -22,10 +22,8 @@ import type { CheckboxGroupProps } from 'antd/lib/checkbox';
 import type { RadioGroupProps } from 'antd/lib/radio';
 import type { DefaultOptionType, BaseOptionType } from 'antd/lib/select';
 
-import 'moment/locale/zh-tw';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 const locale_copy = _.cloneDeep(locale);
-import moment from 'moment';
 
 import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
 
@@ -167,8 +165,8 @@ const DatePicker = ({
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
   disabled && (suffixIcon.suffixIcon = null);
 
-  function transformDate<D = Moment | null | undefined>(date: D) {
-    return twDate && date ? moment(date)?.subtract(1911, 'year') : date;
+  function transformDate<D extends Dayjs | null | undefined = Dayjs | null | undefined>(date: D) {
+    return twDate && date ? dayjs(date)?.subtract(1911, 'year') : date;
   }
 
   // 改變ant-picker-year-btn的格式
@@ -176,7 +174,7 @@ const DatePicker = ({
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   locale_copy.lang.yearFormat = (
-    date: Moment // yearFormat的型別是string，但實際上也可以是callback函式
+    date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
   ) => {
     const year = transformDate(date)?.year();
 
@@ -195,8 +193,8 @@ const DatePicker = ({
       disabled={disabled}
       {...suffixIcon}
       locale={locale_copy}
-      format={(theMoment) => {
-        const value = transformDate(theMoment);
+      format={(theDayjs) => {
+        const value = transformDate(theDayjs);
 
         return value.format('yy-MM-DD');
       }}

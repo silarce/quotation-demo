@@ -1,9 +1,8 @@
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { DatePicker, DatePickerProps } from 'antd';
-import 'moment/locale/zh-tw';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 // utils
@@ -49,14 +48,14 @@ export default function MyDatePicker({
     <div className={classNames(scss.datePickerBox, wrapperClassName)} style={wrapperStyle}>
       <DatePicker
         locale={locale}
-        format={(theMoment) => {
-          const twDate = convertDate_reduce1911(theMoment.toISOString());
+        format={(theDayjs) => {
+          const twDate = convertDate_reduce1911(theDayjs.toISOString());
 
           const picker = antdProps?.picker;
 
           const format = picker === 'year' ? 'yy' : picker === 'month' ? 'yy-MM' : 'yy-MM-DD';
 
-          return moment(twDate).format(format);
+          return dayjs(twDate).format(format);
         }}
         autoComplete="off"
         bordered={false}
