@@ -347,13 +347,13 @@ const Body_pre = (
           boxB,
           materialName,
           materialSurface,
-          guideRail,
+          guidRail: guideRail,
           closingType,
           horsepower,
           quantity,
           notes,
 
-          thickness,
+          guidRailThickness: thickness,
           bounceDoorWidth,
         } = prod;
 
