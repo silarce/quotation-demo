@@ -28,7 +28,7 @@ const useApiEngineerContactExport = (
     autoUpdate = true,
   }: {
     autoUpdate?: boolean;
-  }
+  } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
   const [data, setData] = useState<TengineerContactExport | null>();
@@ -50,7 +50,15 @@ const useApiEngineerContactExport = (
     detail: pattern_detailArr,
   };
 
-  const hasPattern =
+  const hasPattern = {
+    floorPlan: floorPlanPatternArr.length > 0,
+    designDiagram: designDiagramPatternArr.length > 0,
+    colorCard: colorCardPatternArr.length > 0,
+    construction: pattern_constructionArr.length > 0,
+    detail: pattern_detailArr.length > 0,
+  };
+
+  const hasPattern_bool =
     floorPlanPatternArr.length > 0 ||
     designDiagramPatternArr.length > 0 ||
     colorCardPatternArr.length > 0 ||
@@ -92,6 +100,7 @@ const useApiEngineerContactExport = (
     engineerContactExport: data,
     patternList,
     hasPattern,
+    hasPattern_bool,
     update,
   };
 };
