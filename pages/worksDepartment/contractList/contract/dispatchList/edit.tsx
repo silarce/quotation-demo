@@ -537,6 +537,10 @@ export default function EditDispatchList() {
 
       projectName: state_profile.projectName,
       projectNumber: state_profile.projectNumber,
+      // projectName: engineeringContact?.projectName ?? '',
+      // projectNumber: engineeringContact?.projectNumber ?? '',
+      projectAbbreviation: engineeringContact?.projectAbbreviation ?? '',
+
       contractor: state_profile.contractor,
       contractorContactPerson: {
         value: state_profile.contractorContactPerson,
@@ -706,7 +710,8 @@ export default function EditDispatchList() {
 
     const data_pdf: Tdata_pdf = {
       idNumber: dispatching?.idNumber ?? '',
-      customerName: contract?.content.projectName ?? '',
+      // customerName: contract?.content.projectName ?? '',
+      customerName: (engineeringContact?.projectAbbreviation || contract?.content.projectName) ?? '',
       // phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
       phoneNumber: contactPerson2 ?? '',
 
