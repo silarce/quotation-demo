@@ -470,6 +470,10 @@ function ReviewForm({
       const index = Number(index_str);
       const reviewerIdentity = reviewerIdentityArr[index];
 
+      if (!reviewerIdentity) {
+        continue;
+      }
+
       const body: TreviewQuotationContentDto = {
         reviewResult,
       };
@@ -496,6 +500,10 @@ function ReviewForm({
       }
 
       await apiQuotationReview({ id: quotationId, body });
+
+      if (!reviewResult) {
+        break;
+      }
 
       const shouldBreak = reviewerIdentityArr[index] && !reviewerIdentityArr[index + 1];
 
