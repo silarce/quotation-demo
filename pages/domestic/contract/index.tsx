@@ -48,13 +48,7 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 export default function Contract({ userInfo }: { userInfo: TuserDto }) {
   const router = useRouter();
   const query = router.query as Tquery;
-  const {
-    //
-    county,
-    customerName,
-    keyWord,
-    source = 'all',
-  } = query;
+  const { county, customerName, keyWord, source = 'all' } = query;
 
   const userId = userInfo.employee?.id;
 
@@ -96,9 +90,7 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
     //
     data: data_contractArr_employee = [],
     update: update_contractArr_employee,
-  } = useGetContract_employee(userId, {
-    customParams: params,
-  });
+  } = useGetContract_employee(userId);
 
   const dataArr = source === 'all' ? dataArr_infinite : data_contractArr_employee;
 
@@ -208,11 +200,13 @@ export default function Contract({ userInfo }: { userInfo: TuserDto }) {
     doSearch,
   };
 
-  const panelList: TpanelList = [
+  const panelList_all: TpanelList = [
     {
       searchGroup,
     },
   ];
+
+  const panelList = source === 'all' ? panelList_all : undefined;
 
   // -----------------------------------------------------------------------
 
