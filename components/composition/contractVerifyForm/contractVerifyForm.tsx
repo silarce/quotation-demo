@@ -289,17 +289,11 @@ function ReviewForm({
 
   // ----------------------------------------------------------------------------
 
-  const {
-    isReviewer,
-    isManager,
-    isWorkDirector,
-    isCashier,
-    // isSalesManager,
-    isSupervisor,
-  } = checkIsReviewer({
-    userInfo,
-    quotationContent,
-  });
+  const { isReviewer, reviewerIdentityArr, isManager, isWorkDirector, isCashier, isSalesManager, isSupervisor } =
+    checkIsReviewer({
+      userInfo,
+      quotationContent,
+    });
 
   // ----------------------------------------------------------------------------
 
@@ -422,26 +416,96 @@ function ReviewForm({
       return;
     }
 
-    const body: TreviewQuotationContentDto = {
-      reviewResult,
-    };
+    // const body: TreviewQuotationContentDto = {
+    //   reviewResult,
+    // };
 
-    isManager
-      ? (body.reviewManagerEmployeeId = userId)
-      : isWorkDirector
-      ? (body.reviewWorkDirectorEmployeeId = userId)
-      : isCashier
-      ? (body.reviewCashierEmployeeId = userId)
-      : // : isSalesManager
-      // ? (body.reviewSalesManagerEmployeeId = userId)
-      isSupervisor
-      ? (body.reviewSupervisorEmployeeId = userId)
-      : null;
+    // {
+    //   isManager
+    //     ? (body.reviewManagerEmployeeId = userId)
+    //     : isCashier
+    //     ? (body.reviewCashierEmployeeId = userId)
+    //     : isWorkDirector
+    //     ? (body.reviewWorkDirectorEmployeeId = userId)
+    //     : isSalesManager
+    //     ? (body.reviewSalesManagerEmployeeId = userId)
+    //     : isSupervisor
+    //     ? (body.reviewSupervisorEmployeeId = userId)
+    //     : null;
 
-    await apiQuotationReview({ id: quotationId, body }).then(async () => {
-      await update();
-      onConfirm && onConfirm();
-    });
+    //   await apiQuotationReview({ id: quotationId, body }).then(async () => {
+    //     await update();
+    //     onConfirm && onConfirm();
+    //   });
+    // }
+
+    // {
+    //   if (isManager) {
+    //     body.reviewManagerEmployeeId = userId;
+    //   }
+
+    //   if (isCashier) {
+    //     body.reviewCashierEmployeeId = userId;
+    //   }
+
+    //   if (isWorkDirector) {
+    //     body.reviewWorkDirectorEmployeeId = userId;
+    //   }
+
+    //   if (isSalesManager) {
+    //     body.reviewSalesManagerEmployeeId = userId;
+    //   }
+
+    //   if (isSupervisor) {
+    //     body.reviewSupervisorEmployeeId = userId;
+    //   }
+
+    //   await apiQuotationReview({ id: quotationId, body }).then(async () => {
+    //     await update();
+    //     onConfirm && onConfirm();
+    //   });
+    // }
+
+    for (const index_str in reviewerIdentityArr) {
+      const index = Number(index_str);
+      const reviewerIdentity = reviewerIdentityArr[index];
+
+      const body: TreviewQuotationContentDto = {
+        reviewResult,
+      };
+
+      switch (reviewerIdentity) {
+        case 'supervisor':
+          body.reviewSupervisorEmployeeId = userId;
+          break;
+        case 'salesManager':
+          body.reviewSalesManagerEmployeeId = userId;
+          break;
+        case 'workDirector':
+          body.reviewWorkDirectorEmployeeId = userId;
+          break;
+        case 'cashier':
+          body.reviewCashierEmployeeId = userId;
+          break;
+        case 'manager':
+          body.reviewManagerEmployeeId = userId;
+          break;
+
+        default:
+          break;
+      }
+
+      await apiQuotationReview({ id: quotationId, body });
+
+      const shouldBreak = reviewerIdentityArr[index] && !reviewerIdentityArr[index + 1];
+
+      if (shouldBreak) {
+        break;
+      }
+    }
+
+    await update();
+    onConfirm && onConfirm();
   };
 
   // ----------------------------------------------------------------------------
@@ -1765,6 +1829,7 @@ const checkIsReviewer = ({
     toWorkDirectorAt,
     toCashierAt,
     toManagerAt,
+    toSalesManagerAt,
 
     supervisorReviewedAt,
     workDirectorReviewedAt,
@@ -1775,14 +1840,23 @@ const checkIsReviewer = ({
     reviewWorkDirectorEmployee,
     reviewCashierEmployee,
     reviewManagerEmployee,
+
+    reviewSalesManagerEmployee,
   } = quotationContent ?? {};
 
   const userId = userInfo?.employee?.id;
 
-  let isSupervisor = reviewSupervisorEmployee?.id && reviewSupervisorEmployee.id === userId;
-  let isWorkDirector = reviewWorkDirectorEmployee?.id && reviewWorkDirectorEmployee.id === userId;
-  let isCashier = reviewCashierEmployee?.id && reviewCashierEmployee.id === userId;
-  let isManager = reviewManagerEmployee?.id && reviewManagerEmployee.id === userId;
+  const supervisorId = reviewSupervisorEmployee?.id;
+  const salesManagerId = reviewSalesManagerEmployee?.id;
+  const workDirectorId = reviewWorkDirectorEmployee?.id;
+  const cashierId = reviewCashierEmployee?.id;
+  const managerId = reviewManagerEmployee?.id;
+
+  let isSupervisor = supervisorId && supervisorId === userId;
+  let isSalesManager = salesManagerId && salesManagerId === userInfo?.employee?.id;
+  let isWorkDirector = workDirectorId && workDirectorId === userId;
+  let isCashier = cashierId && cashierId === userId;
+  let isManager = managerId && managerId === userId;
 
   let isReviewer = false;
 
@@ -1793,23 +1867,74 @@ const checkIsReviewer = ({
     isManager = false;
   };
 
+  // if (isSupervisor && toSupervisorAt) {
+  //   reset();
+  //   isReviewer = true;
+  //   isSupervisor = true;
+  //   supervisorId === managerId && (isManager = true);
+  // } else if (isSalesManager && toSalesManagerAt) {
+  //   reset();
+  //   isReviewer = true;
+  //   isSalesManager = true;
+  //   salesManagerId === managerId && (isManager = true);
+  // } else if (isWorkDirector && toWorkDirectorAt) {
+  //   reset();
+  //   isReviewer = true;
+  //   isWorkDirector = true;
+  //   workDirectorId === managerId && (isManager = true);
+  // } else if (isCashier && toCashierAt) {
+  //   reset();
+  //   isReviewer = true;
+  //   isCashier = true;
+  //   cashierId === managerId && (isManager = true);
+  // } else if (isManager && toManagerAt) {
+  //   reset();
+  //   isReviewer = true;
+  //   isManager = true;
+  // }
+
   if (isSupervisor && toSupervisorAt) {
-    reset();
+    // reset();
     isReviewer = true;
     isSupervisor = true;
-  } else if (isWorkDirector && toWorkDirectorAt) {
-    reset();
+    // supervisorId === managerId && (isManager = true);
+  }
+
+  if (isSalesManager && toSalesManagerAt) {
+    // reset();
+    isReviewer = true;
+    isSalesManager = true;
+    // salesManagerId === managerId && (isManager = true);
+  }
+
+  if (isWorkDirector && toWorkDirectorAt) {
+    // reset();
     isReviewer = true;
     isWorkDirector = true;
-  } else if (isCashier && toCashierAt) {
-    reset();
+    // workDirectorId === managerId && (isManager = true);
+  }
+
+  if (isCashier && toCashierAt) {
+    // reset();
     isReviewer = true;
     isCashier = true;
-  } else if (isManager && toManagerAt) {
-    reset();
+    // cashierId === managerId && (isManager = true);
+  }
+
+  if (isManager && toManagerAt) {
+    // reset();
     isReviewer = true;
     isManager = true;
   }
+
+  // 這是審核流程順序，順序不可以隨意變動
+  const reviewerIdentityArr: (string | false | undefined)[] = [
+    isSupervisor && 'supervisor',
+    isSalesManager && 'salesManager',
+    isWorkDirector && 'workDirector',
+    isCashier && 'cashier',
+    isManager && 'manager',
+  ];
 
   if (supervisorReviewedAt && workDirectorReviewedAt && cashierReviewedAt && managerReviewedAt) {
     reset();
@@ -1822,6 +1947,8 @@ const checkIsReviewer = ({
     isWorkDirector,
     isCashier,
     isSupervisor,
+    isSalesManager,
+    reviewerIdentityArr,
   };
 };
 
