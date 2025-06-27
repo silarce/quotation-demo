@@ -996,19 +996,16 @@ export const useContract_infinite_topBottom = ({
   };
 }; //  useContract_infinite_topBottom
 
-export const apiGetContract_employee = async (employeeId: string, params?: Tparams) => {
+export const apiGetContract_employee = async (employeeId: string) => {
   const api = `/quotation/contracts/employee/${employeeId}`;
 
   return axi
-    .get<TquotationContractDto[]>(api, { params })
+    .get<TquotationContractDto[]>(api)
     .then(({ data }) => data)
     .catch((err) => Promise.reject(err.message));
 };
 
-export const useGetContract_employee = (
-  employeeId: string | undefined,
-  { customParams }: { customParams?: Tparams } = {}
-) => {
+export const useGetContract_employee = (employeeId: string | undefined) => {
   const [res, setRes] = useState<TquotationContractDto[]>();
 
   const update = async () => {
@@ -1017,7 +1014,7 @@ export const useGetContract_employee = (
     }
 
     try {
-      const newRes = await apiGetContract_employee(employeeId, customParams);
+      const newRes = await apiGetContract_employee(employeeId);
 
       if (newRes) {
         setRes(newRes);
