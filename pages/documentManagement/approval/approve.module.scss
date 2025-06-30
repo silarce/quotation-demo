@@ -1,0 +1,46 @@
+.body {
+  display: grid;
+  // grid-template-rows: 1fr 190px;
+  grid-template-rows: 1fr fit-content(100%);
+  align-content: space-between;
+
+  padding: 2%;
+
+  height: 100%;
+  overflow: auto;
+}
+
+.iframe {
+  height: 100%;
+  width: 100%;
+  border: solid 1px theme("colors.border");
+}
+
+.tabs {
+  // margin: 10px;
+  margin-top: 20px;
+  border: solid 1px theme("colors.border");
+  :global(.ant-tabs-content-holder) {
+    overflow: auto;
+  }
+}
+
+.approvePanel {
+  // padding: 10px;
+  // padding-top: 0;
+  .btnBar {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  // 清除 Antd Table td 的 padding
+  :global(.ant-table-tbody > tr > td) {
+    padding: 10px !important;
+  }
+
+  :global(.ant-table-thead > tr > th) {
+    padding: 10px !important;
+  }
+}
