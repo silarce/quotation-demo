@@ -66,7 +66,14 @@ const Response = () => {
 const History = () => {
   return (
     <div className={scss.approvePanel}>
-      <Table dataSource={fakeData} columns={columns} />
+      <Table
+        dataSource={fakeData}
+        columns={columns}
+        pagination={false}
+        scroll={{
+          y: 200,
+        }}
+      />
     </div>
   );
 };
@@ -104,11 +111,25 @@ const fakeData: TfakeData[] = [
     note: '- -',
   },
   {
-    step: 'HT審核',
+    step: 'HR審核',
     reviewer: '陳小強',
     status: '待簽核',
     reviewTime: '- -',
     note: '- -',
+  },
+  {
+    step: '財務審核',
+    reviewer: '林小芳',
+    status: '待簽核',
+    reviewTime: '- -',
+    note: '- -',
+  },
+  {
+    step: '完成',
+    reviewer: '系統',
+    status: '已完成',
+    reviewTime: '2023-10-16 10:00',
+    note: '流程已結束',
   },
 ];
 
