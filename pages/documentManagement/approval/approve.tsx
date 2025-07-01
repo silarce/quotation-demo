@@ -1,15 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
-
 import classNames from 'classnames';
-
-import SubLayer from 'components/Layer/SubLayer/SubLayer';
-import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
 
 import { Tabs } from 'antd';
 
-import DataEntry, { Textarea } from 'components/global/gear/dataEntry';
-import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-import Row, { Cell } from 'components/global/gear/table/row';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -33,9 +25,7 @@ export default function Approve() {
   ];
 
   return (
-    <SubLayer>
-      <PageHeader02 tag="審核" />
-
+    <div className={scss.wrapper}>
       <div className={scss.body}>
         <iframe src="/setting/company-info" className={scss.iframe} />
 
@@ -66,7 +56,7 @@ export default function Approve() {
           //
         />
       </div>
-    </SubLayer>
+    </div>
   );
 }
 
@@ -101,7 +91,7 @@ const History = () => {
         columns={columns}
         pagination={false}
         scroll={{
-          y: 200,
+          y: 160,
         }}
         onHeaderRow={() => {
           return {
@@ -214,12 +204,5 @@ const Btn_fong = ({
 }: React.HTMLAttributes<HTMLButtonElement> & {
   theme?: 'a' | 'b';
 }) => {
-  return (
-    <button
-      //
-      // className={classNames(scss_fong.btn_fong, className)}
-      className={classNames(scss_fong[theme], className)}
-      {...props}
-    />
-  );
+  return <button className={classNames(scss_fong[theme], className)} {...props} />;
 };

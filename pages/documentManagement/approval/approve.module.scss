@@ -1,11 +1,16 @@
+.wrapper {
+  height: calc(100% - 29px);
+  padding: 24px;
+  margin: 17px;
+  margin-top: 12px;
+  border: solid 1px theme("colors.border02");
+  border-radius: theme("border.radius.normal");
+}
+
 .body {
   display: grid;
-  // grid-template-rows: 1fr 190px;
   grid-template-rows: 1fr fit-content(100%);
   align-content: space-between;
-
-  padding: 2%;
-
   height: 100%;
   overflow: auto;
 }
@@ -13,24 +18,17 @@
 .iframe {
   height: 100%;
   width: 100%;
-  border: solid 1px theme("colors.border02");
 }
 
 .tabs {
-  margin-top: 20px;
+  margin-top: 24px;
   border: solid 1px theme("colors.border02");
   border-radius: theme("border.radius.normal");
   padding: 24px;
   box-shadow: theme("boxShadow.02");
-
-  // :global(.ant-tabs-content-holder) {
-  //   overflow: auto;
-  // }
 }
 
 .approvePanel {
-  // padding: 10px;
-  // padding-top: 0;
   .btnBar {
     margin-top: 10px;
     display: flex;
@@ -47,7 +45,6 @@
     flex: 0 0 1;
     width: 106px;
     font-weight: 500;
-    // font-size: 14px;
     color: theme("colors.text02");
   }
   .entryBox {
@@ -77,9 +74,6 @@
       box-shadow: inset 0px -1px 0px 0px #616161;
       font-weight: 600;
 
-      // &:global(.ant-table-cell-scrollbar:not([rowspan])) {
-      //   box-shadow: none;
-      // }
       &::before {
         all: unset;
         display: none;
