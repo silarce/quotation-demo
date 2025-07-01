@@ -1,0 +1,12 @@
+.container {
+  border: solid 1px theme("colors.border");
+  border-radius: 8px;
+  overflow: hidden; /* 外層隱藏溢出 */
+  position: relative;
+
+  > div {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+  }
+}
