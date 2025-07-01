@@ -150,9 +150,9 @@ function ModalPdf_pre({
               <Cell06 className={classNames(scss.noPaddingY, scss.justifyStart)}>{data.phoneNumber}</Cell06>
               <div className={scss['cell_09-10']}>
                 <Cell10 className={scss.noPaddingY}>工程編號</Cell10>
-                <Cell09 className={scss.noPaddingY}>{data.projectNumber}</Cell09>
+                <Cell09 className={classNames(scss.noPaddingY, scss.justifyStart)}>{data.projectNumber}</Cell09>
                 <Cell10 className={scss.noPaddingY}>管制卡編號</Cell10>
-                <Cell09 className={scss.noPaddingY}></Cell09>
+                <Cell09 className={classNames(scss.noPaddingY, scss.justifyStart)}></Cell09>
               </div>
             </Row>
 
