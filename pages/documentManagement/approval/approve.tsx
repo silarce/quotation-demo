@@ -1,3 +1,5 @@
+import { useState, useEffect, useMemo } from 'react';
+
 import classNames from 'classnames';
 
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -12,10 +14,24 @@ import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import scss from './approve.module.scss';
+import scss_fong from './btn_fong.module.scss';
 
 // ===========================================================================
 
 export default function Approve() {
+  const items = [
+    {
+      key: 'a',
+      label: '單據回覆',
+      children: <Response />,
+    },
+    {
+      key: 'b',
+      label: '單據歷史',
+      children: <History />,
+    },
+  ];
+
   return (
     <SubLayer>
       <PageHeader02 tag="審核" />
@@ -23,22 +39,31 @@ export default function Approve() {
       <div className={scss.body}>
         <iframe src="/setting/company-info" className={scss.iframe} />
 
-        {/* <ApprovePanel /> */}
-
         <Tabs
           className={classNames(scss.tabs)}
-          items={[
-            {
-              key: '0',
-              label: '單據回覆',
-              children: <Response />,
-            },
-            {
-              key: '1',
-              label: '單據歷史',
-              children: <History />,
-            },
-          ]}
+          items={items}
+          renderTabBar={(props, DefaultTabBar) => {
+            const { onTabClick } = props;
+
+            const reactNode = items.map((item) => {
+              const { key } = item;
+
+              return (
+                <Btn_fong
+                  key={key}
+                  theme="b"
+                  onClick={(e) => {
+                    onTabClick(key, e);
+                  }}
+                >
+                  {item.label}
+                </Btn_fong>
+              );
+            });
+
+            return <div className="flex gap-[12px] mb-[24px]">{reactNode}</div>;
+          }}
+          //
         />
       </div>
     </SubLayer>
@@ -48,16 +73,19 @@ export default function Approve() {
 const Response = () => {
   return (
     <div className={scss.approvePanel}>
-      <div className="text-xl font-semibold">主管</div>
+      <div className="text-base font-semibold mb-[14.5px]">主管</div>
 
-      <DataEntry caption="主管回覆">
-        <DataEntry.Input />
-      </DataEntry>
+      <div className={scss.inputWrapper}>
+        <div className={scss.caption}>主管回覆 :</div>
+        <div className={scss.entryBox}>
+          <input className={scss.input} type="text" />
+        </div>
+      </div>
 
       <div className={scss.btnBar}>
-        <SquareBtn sharp="mini">返回</SquareBtn>
-        <SquareBtn sharp="mini">駁回</SquareBtn>
-        <SquareBtn sharp="mini">同意</SquareBtn>
+        <Btn_fong>返回</Btn_fong>
+        <Btn_fong>駁回</Btn_fong>
+        <Btn_fong>同意</Btn_fong>
       </div>
     </div>
   );
@@ -67,11 +95,23 @@ const History = () => {
   return (
     <div className={scss.approvePanel}>
       <Table
+        className={scss.antdTable}
         dataSource={fakeData}
+        rowKey="step"
         columns={columns}
         pagination={false}
         scroll={{
           y: 200,
+        }}
+        onHeaderRow={() => {
+          return {
+            className: scss.theadTr,
+          };
+        }}
+        onRow={() => {
+          return {
+            className: scss.rowTr,
+          };
         }}
       />
     </div>
@@ -138,7 +178,7 @@ const columns: ColumnsType<TfakeData> = [
     key: 'step',
     dataIndex: 'step',
     title: '關卡',
-    width: '150px',
+    width: '100px',
   },
   {
     key: 'reviewer',
@@ -164,3 +204,22 @@ const columns: ColumnsType<TfakeData> = [
     title: '簽核意見',
   },
 ];
+
+// ===========================================================================
+
+const Btn_fong = ({
+  className,
+  theme = 'a',
+  ...props
+}: React.HTMLAttributes<HTMLButtonElement> & {
+  theme?: 'a' | 'b';
+}) => {
+  return (
+    <button
+      //
+      // className={classNames(scss_fong.btn_fong, className)}
+      className={classNames(scss_fong[theme], className)}
+      {...props}
+    />
+  );
+};
