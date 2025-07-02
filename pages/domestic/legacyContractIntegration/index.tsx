@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Link from 'next/link';
 
 // layer
@@ -206,7 +206,7 @@ export default function LegacyContractIntegration() {
               });
 
               const dateStr = item.createdAt
-                ? moment(convertDate_reduce1911(item.createdAt)).format('yy-MM-DD')
+                ? dayjs(convertDate_reduce1911(item.createdAt)).format('yy-MM-DD')
                 : '無日期';
 
               const quotationContent: TBodyItemContent = {

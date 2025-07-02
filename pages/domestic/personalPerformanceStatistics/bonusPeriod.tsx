@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -48,8 +48,8 @@ type Tquery = {
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
 type TstatePeriod = {
-  startDate: Moment | null;
-  dueDate: Moment | null;
+  startDate: Dayjs | null;
+  dueDate: Dayjs | null;
 };
 
 // ========================================================================
@@ -62,7 +62,7 @@ export default function BonusPeriod() {
   const query = router.query as Tquery;
   const { year: twYear = String(new Date().getFullYear() - 1911) } = query;
   const year = Number(twYear) + 1911;
-  const thisYear = moment().year();
+  const thisYear = dayjs().year();
 
   let isNewestPeriod1231 = false;
   let isAllowPost = false;
@@ -76,8 +76,8 @@ export default function BonusPeriod() {
       order: 'DESC',
       filter: {
         startDate: {
-          $gte: moment().year(year).startOf('year').toISOString(),
-          $lte: moment().year(year).endOf('year').toISOString(),
+          $gte: dayjs().year(year).startOf('year').toISOString(),
+          $lte: dayjs().year(year).endOf('year').toISOString(),
         },
       },
     };
@@ -85,7 +85,7 @@ export default function BonusPeriod() {
 
   const { data: periodArr, update: update_cycle } = useGetReportForm_settlementCycle(params);
 
-  const newestPeriodDueDate_m = periodArr?.[0]?.dueDate ? moment(periodArr[0].dueDate) : null;
+  const newestPeriodDueDate_m = periodArr?.[0]?.dueDate ? dayjs(periodArr[0].dueDate) : null;
 
   isNewestPeriod1231 = newestPeriodDueDate_m?.month() === 11 && newestPeriodDueDate_m?.date() === 31;
   isAllowPost = year === thisYear && !isNewestPeriod1231;
@@ -104,17 +104,17 @@ export default function BonusPeriod() {
 
     const latesPeriod = periodArr?.[0];
     // const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day') : null;
-    const nextStartDate_m = latesPeriod?.dueDate ? moment(latesPeriod.dueDate).add(1, 'day').startOf('day') : null;
+    const nextStartDate_m = latesPeriod?.dueDate ? dayjs(latesPeriod.dueDate).add(1, 'day').startOf('day') : null;
 
     let nextStartDate = nextStartDate_m && nextStartDate_m.toISOString();
-    !nextStartDate && (nextStartDate = moment().startOf('year').toISOString());
+    !nextStartDate && (nextStartDate = dayjs().startOf('year').toISOString());
 
-    const newDueDate = moment(nextStartDate).endOf('month').toISOString();
+    const newDueDate = dayjs(nextStartDate).endOf('month').toISOString();
 
     // 後端取得年月的時候沒有把時區的因素算進去，因此後端取得dueDate的"日"時會少一天
     // 改送YYYY/MM/DD給後端，方便後端取得正確的台灣時區年月
-    const nextStartDateYYMMDD = moment(nextStartDate).format('YYYY/MM/DD');
-    const newDueDateYYMMDD = moment(newDueDate).format('YYYY/MM/DD');
+    const nextStartDateYYMMDD = dayjs(nextStartDate).format('YYYY/MM/DD');
+    const newDueDateYYMMDD = dayjs(newDueDate).format('YYYY/MM/DD');
 
     const body: TcreateSettlementCycleDto = {
       startDate: nextStartDateYYMMDD,
@@ -259,8 +259,8 @@ const Row = ({
   const [disabled, setDisabled] = useState(true);
   const [state_period, setState_period] = useState<TstatePeriod>({ startDate: null, dueDate: null });
 
-  const now = moment();
-  const dueDate_m = moment(data_period.dueDate).endOf('day');
+  const now = dayjs();
+  const dueDate_m = dayjs(data_period.dueDate).endOf('day');
   let periodStatus: '可結算' | '已結算' | '結算週期未結束' = '可結算';
 
   if (data_period.status !== 'set') {
@@ -321,8 +321,8 @@ const Row = ({
   useEffect(() => {
     if (disabled) {
       setState_period({
-        startDate: data_period.startDate ? moment(data_period.startDate) : null,
-        dueDate: data_period.dueDate ? moment(data_period.dueDate) : null,
+        startDate: data_period.startDate ? dayjs(data_period.startDate) : null,
+        dueDate: data_period.dueDate ? dayjs(data_period.dueDate) : null,
       });
     }
   }, [data_period, disabled]);

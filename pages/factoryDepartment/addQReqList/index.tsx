@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import _ from 'lodash';
 import scss from './addQReqList.module.scss';
 import Thead01 from '../ui/table/thead01';
@@ -49,2952 +49,3006 @@ import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-
 import { title } from 'process';
 
 type Tquery = {
-    wareHouseId: string | undefined;
+  wareHouseId: string | undefined;
 };
 
 export default function AddQReqList() {
-    //#region ===========【頁面參數】
-    const [pagename, setPagename] = useState<string>("詢價")
-    const [statusarea, setStatusarea] = useState<boolean>(false)
-    const [excelopen, setExcelopen] = useState<boolean>(false)
-    const [printopen, setPrintopen] = useState<boolean>(false)
-    const [reviewopen, setReviewopen] = useState<boolean>(false)
-    const [transtitle, setTranTitle] = useState<string>("")
-    const [transopen, setTransopen] = useState<boolean>(false)
+  //#region ===========【頁面參數】
+  const [pagename, setPagename] = useState<string>('詢價');
+  const [statusarea, setStatusarea] = useState<boolean>(false);
+  const [excelopen, setExcelopen] = useState<boolean>(false);
+  const [printopen, setPrintopen] = useState<boolean>(false);
+  const [reviewopen, setReviewopen] = useState<boolean>(false);
+  const [transtitle, setTranTitle] = useState<string>('');
+  const [transopen, setTransopen] = useState<boolean>(false);
 
-    //#endregion
+  //#endregion
 
-    //#region ===========【路由參數】
-    const router = useRouter();
-    const {
-        firstin,
-        item
-    } = router.query;
+  //#region ===========【路由參數】
+  const router = useRouter();
+  const { firstin, item } = router.query;
 
-    const parsedItem = item ? JSON.parse(item as string) : null;
-    //#endregion
+  const parsedItem = item ? JSON.parse(item as string) : null;
+  //#endregion
 
-    //#region ===========【登入者】
-    const { userInfo } = useContext(AppContext);
-    const { erpFeature } = useContext(AppContext);
-    //#endregion
+  //#region ===========【登入者】
+  const { userInfo } = useContext(AppContext);
+  const { erpFeature } = useContext(AppContext);
+  //#endregion
 
-    //#region ===========【變數宣告】
-    //資料列宣告
-    const [data, setData] = useState<any[]>([]);
-    const [data1, setData1] = useState<any[]>([]);
-    const [data2, setData2] = useState<any[]>([]);
-    const [data2restore, setData2Restore] = useState<any[]>([]);
-    const [modaldata, setModalData] = useState<any[]>([]);
-    const [searchbardata, setSearchBarData] = useState<any[]>([]);
-    const [searchdata, setSearchdata] = useState<any[]>([]);
-    const [data3, setData3] = useState<any[]>([]);
-    const [customerdata, setCustomerdata] = useState<any[]>([]);
-    const [prbardata, setPrbarData] = useState<any[]>([]);
-    const [data4, setData4] = useState<any[]>([]);
+  //#region ===========【變數宣告】
+  //資料列宣告
+  const [data, setData] = useState<any[]>([]);
+  const [data1, setData1] = useState<any[]>([]);
+  const [data2, setData2] = useState<any[]>([]);
+  const [data2restore, setData2Restore] = useState<any[]>([]);
+  const [modaldata, setModalData] = useState<any[]>([]);
+  const [searchbardata, setSearchBarData] = useState<any[]>([]);
+  const [searchdata, setSearchdata] = useState<any[]>([]);
+  const [data3, setData3] = useState<any[]>([]);
+  const [customerdata, setCustomerdata] = useState<any[]>([]);
+  const [prbardata, setPrbarData] = useState<any[]>([]);
+  const [data4, setData4] = useState<any[]>([]);
 
-    const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-    const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const specRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const wantinquantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const suppliername1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const unitprice1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const awarded1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const suppliername2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const unitprice2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const awarded2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const suppliername3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const unitprice3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const awarded3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const specRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const wantinquantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const suppliername1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const unitprice1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const awarded1Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const suppliername2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const unitprice2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const awarded2Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const suppliername3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const unitprice3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const awarded3Refs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [searchproduct, setSearchProduct] = useState<string>("");
+  const [searchproduct, setSearchProduct] = useState<string>('');
 
-    // const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
-    // const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
-    // const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
-    // const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
-    const [idin, setidin] = useState<string>("");
-    const [uuidin, setuuidin] = useState<string>("");
+  // const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
+  // const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
+  // const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
+  // const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
+  const [idin, setidin] = useState<string>('');
+  const [uuidin, setuuidin] = useState<string>('');
 
-    const [create_atin, setCreate_atin] = useState<string>("");
-    const [create_byin, setCreate_byin] = useState<string>("");
-    const [notein, setNotein] = useState<string>("");
-    const [need_datein, setNeed_datein] = useState<string>("");
-    const [statusin, setStatusin] = useState<string>("");
-    const [suppliernamein, setSuppliernamein] = useState<string>("");
-    const [supplierphonein, setSupplierphonein] = useState<string>("");
-    const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
-    const [supplieraddressin, setSupplieraddressin] = useState<string>("");
-    const [supplierfaxin, setSupplierfaxin] = useState<string>("");
-    const [supplieridin, setSupplieridin] = useState<string>("");
-    const [supplieruuidin, setSupplieruuidin] = useState<string>("");
-    const [suppliercontactin, setSuppliercontactin] = useState<string>("");
-    const [shippingaddressin, setShippingaddressin] = useState<string>("");
-    const [suppliername2in, setSuppliername2in] = useState<string>("");
-    const [supplierphone2in, setSupplierphone2in] = useState<string>("");
-    const [suppliertaxid2in, setSuppliertaxid2in] = useState<string>("");
-    const [supplieraddress2in, setSupplieraddress2in] = useState<string>("");
-    const [supplierfax2in, setSupplierfax2in] = useState<string>("");
-    const [supplierid2in, setSupplierid2in] = useState<string>("");
-    const [supplieruuid2in, setSupplieruuid2in] = useState<string>("");
-    const [suppliercontact2in, setSuppliercontact2in] = useState<string>("");
-    const [shippingaddress2in, setShippingaddress2in] = useState<string>("");
-    const [suppliername3in, setSuppliername3in] = useState<string>("");
-    const [supplierphone3in, setSupplierphone3in] = useState<string>("");
-    const [suppliertaxid3in, setSuppliertaxid3in] = useState<string>("");
-    const [supplieraddress3in, setSupplieraddress3in] = useState<string>("");
-    const [supplierfax3in, setSupplierfax3in] = useState<string>("");
-    const [supplierid3in, setSupplierid3in] = useState<string>("");
-    const [supplieruuid3in, setSupplieruuid3in] = useState<string>("");
-    const [suppliercontact3in, setSuppliercontact3in] = useState<string>("");
-    const [shippingaddress3in, setShippingaddress3in] = useState<string>("");
-    const [invoicein, setInvoicein] = useState<string>("");
-    const [selectedValue, setSelectedValue] = useState('請選擇類別');
-    const [currentsupplier, setCurrentSupplier] = useState(1);
+  const [create_atin, setCreate_atin] = useState<string>('');
+  const [create_byin, setCreate_byin] = useState<string>('');
+  const [notein, setNotein] = useState<string>('');
+  const [need_datein, setNeed_datein] = useState<string>('');
+  const [statusin, setStatusin] = useState<string>('');
+  const [suppliernamein, setSuppliernamein] = useState<string>('');
+  const [supplierphonein, setSupplierphonein] = useState<string>('');
+  const [suppliertaxidin, setSuppliertaxidin] = useState<string>('');
+  const [supplieraddressin, setSupplieraddressin] = useState<string>('');
+  const [supplierfaxin, setSupplierfaxin] = useState<string>('');
+  const [supplieridin, setSupplieridin] = useState<string>('');
+  const [supplieruuidin, setSupplieruuidin] = useState<string>('');
+  const [suppliercontactin, setSuppliercontactin] = useState<string>('');
+  const [shippingaddressin, setShippingaddressin] = useState<string>('');
+  const [suppliername2in, setSuppliername2in] = useState<string>('');
+  const [supplierphone2in, setSupplierphone2in] = useState<string>('');
+  const [suppliertaxid2in, setSuppliertaxid2in] = useState<string>('');
+  const [supplieraddress2in, setSupplieraddress2in] = useState<string>('');
+  const [supplierfax2in, setSupplierfax2in] = useState<string>('');
+  const [supplierid2in, setSupplierid2in] = useState<string>('');
+  const [supplieruuid2in, setSupplieruuid2in] = useState<string>('');
+  const [suppliercontact2in, setSuppliercontact2in] = useState<string>('');
+  const [shippingaddress2in, setShippingaddress2in] = useState<string>('');
+  const [suppliername3in, setSuppliername3in] = useState<string>('');
+  const [supplierphone3in, setSupplierphone3in] = useState<string>('');
+  const [suppliertaxid3in, setSuppliertaxid3in] = useState<string>('');
+  const [supplieraddress3in, setSupplieraddress3in] = useState<string>('');
+  const [supplierfax3in, setSupplierfax3in] = useState<string>('');
+  const [supplierid3in, setSupplierid3in] = useState<string>('');
+  const [supplieruuid3in, setSupplieruuid3in] = useState<string>('');
+  const [suppliercontact3in, setSuppliercontact3in] = useState<string>('');
+  const [shippingaddress3in, setShippingaddress3in] = useState<string>('');
+  const [invoicein, setInvoicein] = useState<string>('');
+  const [selectedValue, setSelectedValue] = useState('請選擇類別');
+  const [currentsupplier, setCurrentSupplier] = useState(1);
 
+  //編輯時保留原始資料
+  const [originalsuppliername, setOriginalsuppliername] = useState<string>('');
+  const [originalsupplierphone, setOriginalsupplierphone] = useState<string>('');
+  const [originalsuppliertaxid, setOriginalsuppliertaxid] = useState<string>('');
+  const [originalsupplieraddress, setOriginalsupplieraddress] = useState<string>('');
+  const [originalshippingaddress, setOriginalshippingaddress] = useState<string>('');
+  const [originalinvoice, setOriginalInvoice] = useState<string>('');
+  const [originalcreate_at, setOriginalcreate_at] = useState<string>('');
+  const [originalneed_date, setOriginalneed_date] = useState<string>('');
+  const [originalnote, setOriginalnote] = useState<string>('');
+  const [originaldata2, setOriginaldata2] = useState<any[]>([]);
+  const [originalsuppliername2, setOriginalsuppliername2] = useState<string>('');
+  const [originalsupplierphone2, setOriginalsupplierphone2] = useState<string>('');
+  const [originalsuppliertaxid2, setOriginalsuppliertaxid2] = useState<string>('');
+  const [originalsupplieraddress2, setOriginalsupplieraddress2] = useState<string>('');
+  const [originalshippingaddress2, setOriginalshippingaddress2] = useState<string>('');
+  const [originalsuppliername3, setOriginalsuppliername3] = useState<string>('');
+  const [originalsupplierphone3, setOriginalsupplierphone3] = useState<string>('');
+  const [originalsuppliertaxid3, setOriginalsuppliertaxid3] = useState<string>('');
+  const [originalsupplieraddress3, setOriginalsupplieraddress3] = useState<string>('');
+  const [originalshippingaddress3, setOriginalshippingaddress3] = useState<string>('');
 
-    //編輯時保留原始資料
-    const [originalsuppliername, setOriginalsuppliername] = useState<string>("");
-    const [originalsupplierphone, setOriginalsupplierphone] = useState<string>("");
-    const [originalsuppliertaxid, setOriginalsuppliertaxid] = useState<string>("");
-    const [originalsupplieraddress, setOriginalsupplieraddress] = useState<string>("");
-    const [originalshippingaddress, setOriginalshippingaddress] = useState<string>("");
-    const [originalinvoice, setOriginalInvoice] = useState<string>("");
-    const [originalcreate_at, setOriginalcreate_at] = useState<string>("");
-    const [originalneed_date, setOriginalneed_date] = useState<string>("");
-    const [originalnote, setOriginalnote] = useState<string>("");
-    const [originaldata2, setOriginaldata2] = useState<any[]>([]);
-    const [originalsuppliername2, setOriginalsuppliername2] = useState<string>("");
-    const [originalsupplierphone2, setOriginalsupplierphone2] = useState<string>("");
-    const [originalsuppliertaxid2, setOriginalsuppliertaxid2] = useState<string>("");
-    const [originalsupplieraddress2, setOriginalsupplieraddress2] = useState<string>("");
-    const [originalshippingaddress2, setOriginalshippingaddress2] = useState<string>("");
-    const [originalsuppliername3, setOriginalsuppliername3] = useState<string>("");
-    const [originalsupplierphone3, setOriginalsupplierphone3] = useState<string>("");
-    const [originalsuppliertaxid3, setOriginalsuppliertaxid3] = useState<string>("");
-    const [originalsupplieraddress3, setOriginalsupplieraddress3] = useState<string>("");
-    const [originalshippingaddress3, setOriginalshippingaddress3] = useState<string>("");
+  //搜尋
+  const [keyword1, setKeyword1] = useState<string>('');
+  const [keyword2, setKeyword2] = useState<string>('');
+  const [keyword3, setKeyword3] = useState<string>('');
 
-    //搜尋
-    const [keyword1, setKeyword1] = useState<string>("");
-    const [keyword2, setKeyword2] = useState<string>("");
-    const [keyword3, setKeyword3] = useState<string>("");
+  // 預設截止日期為今天，起始日期為今天往前推30天
+  const defaultEndDate = dayjs();
+  const defaultStartDate = dayjs().subtract(30, 'days');
 
-    // 預設截止日期為今天，起始日期為今天往前推30天
-    const defaultEndDate = moment();
-    const defaultStartDate = moment().subtract(30, 'days');
+  // 使用 Moment 類型作為狀態
+  const [keywordstartdate, setKeywordstartdate] = useState<Dayjs | null>(defaultStartDate);
+  const [keywordenddate, setKeywordenddate] = useState<Dayjs | null>(defaultEndDate);
 
-    // 使用 Moment 類型作為狀態
-    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
-    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
+  //手key
+  const [currentindex, setCurrentIndex] = useState<number>(0);
+  const [handinputname, setHandinputname] = useState<string>('');
+  const [handinputspec, setHandinputspec] = useState<string>('');
+  const [handinputquantity, setHandinputquantity] = useState<string>('');
+  const [handinputunit, setHandinputunit] = useState<string>('');
+  const [handinputnote, setHandinputnote] = useState<string>('');
+  const [handinputproductid, setHandinputproductid] = useState<string>('');
+  const [handinputproductuuid, setHandinputproductuuid] = useState<string>('');
 
-    //手key
-    const [currentindex, setCurrentIndex] = useState<number>(0);
-    const [handinputname, setHandinputname] = useState<string>("");
-    const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<string>("");
-    const [handinputunit, setHandinputunit] = useState<string>("");
-    const [handinputnote, setHandinputnote] = useState<string>("");
-    const [handinputproductid, setHandinputproductid] = useState<string>("");
-    const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
+  //編輯狀態
+  const [editstatus, setEditStatus] = useState<boolean>(false);
+  const [editrowid, setEditRowId] = useState<number>(0);
+  const [isEditing, setIsEditing] = useState(true);
 
-    //編輯狀態
-    const [editstatus, setEditStatus] = useState<boolean>(false);
-    const [editrowid, setEditRowId] = useState<number>(0);
-    const [isEditing, setIsEditing] = useState(true);
+  // 計算總價
+  const [totalprice1, setTotalPrice1] = useState<string>('');
+  const [taxprice1, setTaxPrice1] = useState<string>('');
+  const [totalpayprice1, setTotalPayPrice1] = useState<string>('');
 
+  //#endregion
 
-    // 計算總價
-    const [totalprice1, setTotalPrice1] = useState<string>("");
-    const [taxprice1, setTaxPrice1] = useState<string>("");
-    const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
+  //#region ===========【上方功能列】
+  //搜尋
+  const doSearch = (valueArr: (string | Toption | null)[]) => {
+    // const keywordWhpname = valueArr[0] as string;
+    // const keywordMaterialnumber = valueArr[1] as string;
+    // const keywordSpec = valueArr[2] as string;
+    // searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
+  };
 
-    //#endregion
-
-    //#region ===========【上方功能列】
-    //搜尋
-    const doSearch = (valueArr: (string | Toption | null)[]) => {
-        // const keywordWhpname = valueArr[0] as string;
-        // const keywordMaterialnumber = valueArr[1] as string;
-        // const keywordSpec = valueArr[2] as string;
-        // searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
-    };
-
-    //按鈕
-    //新增按鈕
-    const panelList: TpanelList = [
-        {
-
-            type: 'myButton',
-            label: '返回',
-            onClick: () => {
-                myAlert.confirm({
-                    title: `確定要返回嗎?`,
-                    content: <>
-                        <h1>未儲存的資料將不會保留</h1>
-                    </>,
-                    props: {
-                        onOk: () => {
-                            router.back();
-                        }
-                    }
-                });
+  //按鈕
+  //新增按鈕
+  const panelList: TpanelList = [
+    {
+      type: 'myButton',
+      label: '返回',
+      onClick: () => {
+        myAlert.confirm({
+          title: `確定要返回嗎?`,
+          content: (
+            <>
+              <h1>未儲存的資料將不會保留</h1>
+            </>
+          ),
+          props: {
+            onOk: () => {
+              router.back();
             },
+          },
+        });
+      },
+    },
+  ];
+  //#endregion
 
+  //#region ===========【監控畫面大小】
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  useEffect(() => {
+    // 定義事件處理器
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    // 在元件掛載時設置事件監聽器
+    window.addEventListener('resize', handleResize);
+
+    // 在元件卸載時移除事件監聽器
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  //#endregion
+
+  //#region ===========【收折效果】
+  const [isExpanded, setIsExpanded] = useState(true); // 控制是否展開
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+  //#endregion
+
+  //#region ===========【頁面進入】
+  //local開發時會多次觸發，上線後不影響，但開發時覺得很煩，所以加了這個
+  const hasFetchedData = useRef(false);
+
+  useEffect(() => {
+    console.log(userInfo);
+
+    if (!hasFetchedData.current) {
+      getProduct();
+      setCreate_atin(dayjs().format('YYYY-MM-DD') || '');
+      setCreate_byin(userInfo?.employee?.chName.toString() || '');
+      getCustomers();
+      GetReviewFlow(); //審核
+      hasFetchedData.current = true;
+    }
+  }, []);
+
+  // useEffect(() => {
+  //     console.log(parsedItem);
+  //     setuuidin(parsedItem?.id);
+  //     setidin(parsedItem?.quotereqid)
+  //     GetDetailById(parsedItem?.id);
+  //     // GetReviewById(parsedItem?.quoterequuid);
+  //     // GetReviewHistory(parsedItem?.quoterequuid);
+  //     // GetTransById(parsedItem?.purchaseorderid);
+  //     // getPRequisition();
+  //     setCreate_byin(parsedItem?.create_by);
+  //     setCreate_atin(parsedItem?.create_at);
+  //     setNeed_datein(parsedItem?.need_date);
+  //     setStatusin(parsedItem?.status);
+  //     setNotein(parsedItem?.note);
+  //     setInvoicein(parsedItem?.invoice);
+  //     setSupplieridin(parsedItem?.supplierid);
+  //     setSuppliernamein(parsedItem?.suppliername);
+  //     setSupplieraddressin(parsedItem?.supplieraddress);
+  //     setSupplierphonein(parsedItem?.supplierphone);
+  //     setSuppliertaxidin(parsedItem?.suppliertaxid);
+  //     setShippingaddressin(parsedItem?.shippingaddress);
+  //     setSupplierfaxin(parsedItem?.supplierfax);
+  //     setSuppliercontactin(parsedItem?.suppliercontact);
+  //     setSupplierid2in(parsedItem?.supplierid2);
+  //     setSuppliername2in(parsedItem?.suppliername2);
+  //     setSupplieraddress2in(parsedItem?.supplieraddress2);
+  //     setSupplierphone2in(parsedItem?.supplierphone2);
+  //     setSuppliertaxid2in(parsedItem?.suppliertaxid2);
+  //     setShippingaddress2in(parsedItem?.shippingaddress2);
+  //     setSupplierfax2in(parsedItem?.supplierfax2);
+  //     setSuppliercontact2in(parsedItem?.suppliercontact2);
+  //     setSupplierid3in(parsedItem?.supplierid3);
+  //     setSuppliername3in(parsedItem?.suppliername3);
+  //     setSupplieraddress3in(parsedItem?.supplieraddress3);
+  //     setSupplierphone3in(parsedItem?.supplierphone3);
+  //     setSuppliertaxid3in(parsedItem?.suppliertaxid3);
+  //     setShippingaddress3in(parsedItem?.shippingaddress3);
+  //     setSupplierfax3in(parsedItem?.supplierfax3);
+  //     setSuppliercontact3in(parsedItem?.suppliercontact3);
+
+  // }, [item]);
+  //#endregion
+
+  //#region ===========【API】
+
+  //以ID取單據
+  const GetDetailById = async (id: any) => {
+    try {
+      // setIsLoading(true);
+      const conditionModel = {
+        quoterequuid: id as string | undefined,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/NewGetQuotereqDetail?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const responsedata = await response.json();
+      // setData1(data);
+
+      console.log(responsedata);
+      setData2(responsedata);
+      // return responsedata
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  //更新單據
+  const Update = async () => {
+    try {
+      const data = {
+        suppliername: suppliernamein,
+        supplierphone: supplierphonein,
+        suppliertaxid: suppliertaxidin,
+        supplieraddress: supplieraddressin,
+        supplierid: supplieridin,
+        shippingaddress: shippingaddressin,
+        suppliercontact: suppliercontactin,
+        supplierfax: supplierfaxin,
+        supplieruuid: supplieruuidin,
+      };
+
+      const conditionModel = {
+        quotereqid: idin,
+        quoterequuid: uuidin,
+        create_at: create_atin,
+        need_date: need_datein,
+        note: notein,
+        supplierid: supplieridin,
+        suppliername: suppliernamein,
+        supplierphone: supplierphonein,
+        suppliertaxid: suppliertaxidin,
+        supplieraddress: supplieraddressin,
+        suppliercontact: suppliercontactin,
+        supplierfax: supplierfaxin,
+        shippingaddress: shippingaddressin,
+        supplierid2: supplierid2in,
+        suppliername2: suppliername2in,
+        supplierphone2: supplierphone2in,
+        suppliertaxid2: suppliertaxid2in,
+        supplieraddress2: supplieraddress2in,
+        suppliercontact2: suppliercontact2in,
+        supplierfax2: supplierfax2in,
+        supplierid3: supplierid3in,
+        suppliername3: suppliername3in,
+        supplierphone3: supplierphone3in,
+        suppliertaxid3: suppliertaxid3in,
+        supplieraddress3: supplieraddress3in,
+        suppliercontact3: suppliercontact3in,
+        supplierfax3: supplierfax3in,
+        data2: data2,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const response = await fetch(`${setting.apipath}/WareHouse/NewUpdateAddQuotereq`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-    ];
-    //#endregion
+        body: JSON.stringify(inputModel),
+      });
 
-    //#region ===========【監控畫面大小】
-    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
 
-    useEffect(() => {
-        // 定義事件處理器
-        const handleResize = () => {
-            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-        };
+      const result = await response.json();
 
-        // 在元件掛載時設置事件監聽器
-        window.addEventListener('resize', handleResize);
+      if (result.success) {
+        // 成功，顯示提示
+        myAlert.success({ title: result.message });
+        GetDetailById(uuidin);
+        // getPRequisition();
+      } else {
+        // 失敗，顯示錯誤提示
+        console.log(result.message);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      // setError(error.message);
+      console.log(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
 
-        // 在元件卸載時移除事件監聽器
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-    //#endregion
+  //作廢單據(採購單改用POST)
+  const Delete = async () => {
+    try {
+      const conditionModel = {
+        id: uuidin as string | undefined,
+        data2: data2,
+      };
 
-    //#region ===========【收折效果】
-    const [isExpanded, setIsExpanded] = useState(true); // 控制是否展開
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
 
-    const toggleExpand = () => {
-        setIsExpanded(!isExpanded);
-    };
-    //#endregion
+      // const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      // const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder?${queryParams}`);
+      const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
 
-    //#region ===========【頁面進入】
-    //local開發時會多次觸發，上線後不影響，但開發時覺得很煩，所以加了這個
-    const hasFetchedData = useRef(false);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
 
-    useEffect(() => {
-        console.log(userInfo);
-        if (!hasFetchedData.current) {
-            getProduct();
-            setCreate_atin(moment().format('YYYY-MM-DD') || '');
-            setCreate_byin(userInfo?.employee?.chName.toString() || '');
-            getCustomers();
-            GetReviewFlow();//審核
-            hasFetchedData.current = true;
-        }
-    }, []);
+      const result = await response.json();
 
-    // useEffect(() => {
-    //     console.log(parsedItem);
-    //     setuuidin(parsedItem?.id);
-    //     setidin(parsedItem?.quotereqid)
-    //     GetDetailById(parsedItem?.id);
-    //     // GetReviewById(parsedItem?.quoterequuid);
-    //     // GetReviewHistory(parsedItem?.quoterequuid);
-    //     // GetTransById(parsedItem?.purchaseorderid);
-    //     // getPRequisition();
-    //     setCreate_byin(parsedItem?.create_by);
-    //     setCreate_atin(parsedItem?.create_at);
-    //     setNeed_datein(parsedItem?.need_date);
-    //     setStatusin(parsedItem?.status);
-    //     setNotein(parsedItem?.note);
-    //     setInvoicein(parsedItem?.invoice);
-    //     setSupplieridin(parsedItem?.supplierid);
-    //     setSuppliernamein(parsedItem?.suppliername);
-    //     setSupplieraddressin(parsedItem?.supplieraddress);
-    //     setSupplierphonein(parsedItem?.supplierphone);
-    //     setSuppliertaxidin(parsedItem?.suppliertaxid);
-    //     setShippingaddressin(parsedItem?.shippingaddress);
-    //     setSupplierfaxin(parsedItem?.supplierfax);
-    //     setSuppliercontactin(parsedItem?.suppliercontact);
-    //     setSupplierid2in(parsedItem?.supplierid2);
-    //     setSuppliername2in(parsedItem?.suppliername2);
-    //     setSupplieraddress2in(parsedItem?.supplieraddress2);
-    //     setSupplierphone2in(parsedItem?.supplierphone2);
-    //     setSuppliertaxid2in(parsedItem?.suppliertaxid2);
-    //     setShippingaddress2in(parsedItem?.shippingaddress2);
-    //     setSupplierfax2in(parsedItem?.supplierfax2);
-    //     setSuppliercontact2in(parsedItem?.suppliercontact2);
-    //     setSupplierid3in(parsedItem?.supplierid3);
-    //     setSuppliername3in(parsedItem?.suppliername3);
-    //     setSupplieraddress3in(parsedItem?.supplieraddress3);
-    //     setSupplierphone3in(parsedItem?.supplierphone3);
-    //     setSuppliertaxid3in(parsedItem?.suppliertaxid3);
-    //     setShippingaddress3in(parsedItem?.shippingaddress3);
-    //     setSupplierfax3in(parsedItem?.supplierfax3);
-    //     setSuppliercontact3in(parsedItem?.suppliercontact3);
+      if (result.success) {
+        // 成功，顯示提示
+        myAlert.success({ title: result.message });
+        router.push({
+          pathname: `/factoryDepartment/POrderList`,
+        });
+      } else {
+        // 失敗，顯示錯誤提示
+        console.log(result.message);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      setError(error.message);
+      console.log(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
 
-    // }, [item]);
-    //#endregion
+  //取物料
+  const getProduct = async () => {
+    try {
+      setIsLoading(true);
 
-    //#region ===========【API】
+      const conditionModel = {};
 
-    //以ID取單據
-    const GetDetailById = async (id: any) => {
-        try {
-            // setIsLoading(true);
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      setData(data);
+      setModalData(data);
+      setSearchBarData(data);
+
+      console.log(erpFeature);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取廠商
+  const getCustomers = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {};
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/WareHouse/GetCustomers?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const responseData = await response.json();
+
+      // 提取唯一的縣市選項
+      const uniqueCounties = Array.from(new Set(responseData.map((item: any) => item.county))) as string[];
+      setCountyOptions(uniqueCounties);
+
+      // 設置客戶資料
+      setCustomerdata(responseData);
+
+      // 設置篩選後的資料
+      setFilteredData2(responseData);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取得IP
+  const Print = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {};
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+
+      if (!response.ok) {
+        myAlert.warning({ title: '請檢查列印程式是否開啟' });
+      }
+
+      const data = await response.text();
+      console.log(data);
+      sentToPrint(data);
+    } catch (error: any) {
+      setError(error.message);
+      myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //列印單據
+  const sentToPrint = async (ip: any) => {
+    myAlert.confirm({
+      title: '確定要列印單據嗎?',
+      content: <></>,
+      props: {
+        onOk: async () => {
+          try {
             const conditionModel = {
-                quoterequuid: id as string | undefined,
+              id: idin,
+              type: 'purchaseorder',
+              clientip: ip,
+              data: [],
             };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetQuotereqDetail?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const responsedata = await response.json();
-            // setData1(data);
-
-            console.log(responsedata);
-            setData2(responsedata);
-            // return responsedata
-
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-    };
-
-    //更新單據
-    const Update = async () => {
-        try {
-
-            const data = {
-                suppliername: suppliernamein,
-                supplierphone: supplierphonein,
-                suppliertaxid: suppliertaxidin,
-                supplieraddress: supplieraddressin,
-                supplierid: supplieridin,
-                shippingaddress: shippingaddressin,
-                suppliercontact: suppliercontactin,
-                supplierfax: supplierfaxin,
-                supplieruuid: supplieruuidin,
-            };
-
-            const conditionModel = {
-                quotereqid: idin,
-                quoterequuid: uuidin,
-                create_at: create_atin,
-                need_date: need_datein,
-                note: notein,
-                supplierid: supplieridin,
-                suppliername: suppliernamein,
-                supplierphone: supplierphonein,
-                suppliertaxid: suppliertaxidin,
-                supplieraddress: supplieraddressin,
-                suppliercontact: suppliercontactin,
-                supplierfax: supplierfaxin,
-                shippingaddress: shippingaddressin,
-                supplierid2: supplierid2in,
-                suppliername2: suppliername2in,
-                supplierphone2: supplierphone2in,
-                suppliertaxid2: suppliertaxid2in,
-                supplieraddress2: supplieraddress2in,
-                suppliercontact2: suppliercontact2in,
-                supplierfax2: supplierfax2in,
-                supplierid3: supplierid3in,
-                suppliername3: suppliername3in,
-                supplierphone3: supplierphone3in,
-                suppliertaxid3: suppliertaxid3in,
-                supplieraddress3: supplieraddress3in,
-                suppliercontact3: suppliercontact3in,
-                supplierfax3: supplierfax3in,
-                data2: data2,
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/NewUpdateAddQuotereq`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message });
-                GetDetailById(uuidin);
-                // getPRequisition();
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-        } catch (error: any) {
-            // setError(error.message);
-            console.log(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-
-    };
-
-    //作廢單據(採購單改用POST)
-    const Delete = async () => {
-
-        try {
-            const conditionModel = {
-                id: uuidin as string | undefined,
-                data2: data2
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            // const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            // const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder?${queryParams}`);
-            const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePurchaseOrder`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message });
-                router.push({
-                    pathname: `/factoryDepartment/POrderList`,
-                });
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-
-
-
-
-        } catch (error: any) {
-            setError(error.message);
-            console.log(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-    };
-
-    //取物料
-    const getProduct = async () => {
-        try {
-            setIsLoading(true);
-
-            const conditionModel = {
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setData(data);
-            setModalData(data);
-            setSearchBarData(data);
-
-            console.log(erpFeature);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    //取廠商
-    const getCustomers = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {};
 
             const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
+              TypeName: 'ERP',
+              ServiceName: 'WareHouseService',
+              FunctionName: 'no',
+              FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+            console.log(JSON.stringify(inputModel));
 
-            const response = await fetch(`${setting.apipath}/WareHouse/GetCustomers?${queryParams}`);
+            const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(inputModel),
+            });
+
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+              throw new Error('Failed to fetch data');
             }
 
-            const responseData = await response.json();
-
-            // 提取唯一的縣市選項
-            const uniqueCounties = Array.from(new Set(responseData.map((item: any) => item.county))) as string[];
-            setCountyOptions(uniqueCounties);
-
-            // 設置客戶資料
-            setCustomerdata(responseData);
-
-            // 設置篩選後的資料
-            setFilteredData2(responseData);
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    //取得IP
-    const Print = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
-            if (!response.ok) {
-                myAlert.warning({ title: '請檢查列印程式是否開啟' })
-            }
             const data = await response.text();
             console.log(data);
-            sentToPrint(data);
 
-        } catch (error: any) {
-            setError(error.message);
-            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
+            await new Promise((resolve) => setTimeout(resolve, 500));
 
-    //列印單據
-    const sentToPrint = async (ip: any) => {
-        myAlert.confirm({
-            title: '確定要列印單據嗎?',
-            content: <>
-            </>,
-            props: {
-                onOk: async () => {
-                    try {
-                        const conditionModel = {
-                            id: idin,
-                            type: "purchaseorder",
-                            clientip: ip,
-                            data: []
-                        };
-
-                        var inputModel = {
-                            TypeName: 'ERP',
-                            ServiceName: 'WareHouseService',
-                            FunctionName: 'no',
-                            FilterConditions: JSON.stringify(conditionModel),
-                        };
-
-                        console.log(JSON.stringify(inputModel));
-
-                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(inputModel)
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch data');
-                        }
-                        const data = await response.text();
-                        console.log(data);
-
-                        await new Promise(resolve => setTimeout(resolve, 500));
-
-
-
-
-
-
-                        const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: data
-                        });
-
-                        if (!response2.ok) {
-                            throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
-                        }
-
-                        const data2 = await response2.text();
-                        console.log("Received from print4:", data2);
-
-
-
-                    } catch (error: any) {
-                        // setError(error.message);
-                        console.log(error.message);
-                    }
-                    finally {
-                        // setIsLoading(false);
-                    }
-                }
-            }
-        });
-
-
-    };
-
-    //匯出單據
-    const Excel = async (id: any, type2: any, quoid: any) => {
-        try {
-
-            setIsLoading(true);
-            const conditionModel = {
-                id: id,
-                type: 'quotereq',
-                type2: type2,
-                quoterequuid: quoid
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
+            const response2 = await fetch('http://127.0.0.1:5050/api/print/print3', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: data,
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            // 將響應轉換為 Blob
-            const blob = await response.blob();
-
-            // 創建一個 URL 來下載 Blob
-            const url = window.URL.createObjectURL(blob);
-
-            // 創建一個下載鏈接
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `三久建材_比價單_${id}.xls`); // 設置文件名
-
-            // 將鏈接添加到 DOM 並觸發點擊下載
-            document.body.appendChild(link);
-            link.click();
-
-            // 清除鏈接和 URL 物件
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-
-        } catch (error) {
-            console.error('Download failed:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    //複製單據(同新增單據)
-    const Add = async () => {
-        if (data2.length === 0) {
-            myAlert.warning({ title: `${pagename}項目不可為空` })
-            return;
-        }
-        // return;
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                create_at: create_atin,
-                need_date: moment(need_datein).format('YYYY-MM-DD'),
-                create_by: userInfo?.employee?.id.toString(),
-                note: notein,
-                supplierid: supplieridin,
-                suppliername: suppliernamein,
-                supplierphone: supplierphonein,
-                suppliertaxid: suppliertaxidin,
-                supplieraddress: supplieraddressin,
-                suppliercontact: suppliercontactin,
-                supplierfax: supplierfaxin,
-                shippingaddress: shippingaddressin,
-                supplierid2: supplierid2in,
-                suppliername2: suppliername2in,
-                supplierphone2: supplierphone2in,
-                suppliertaxid2: suppliertaxid2in,
-                supplieraddress2: supplieraddress2in,
-                suppliercontact2: suppliercontact2in,
-                supplierfax2: supplierfax2in,
-                supplierid3: supplierid3in,
-                suppliername3: suppliername3in,
-                supplierphone3: supplierphone3in,
-                suppliertaxid3: suppliertaxid3in,
-                supplieraddress3: supplieraddress3in,
-                suppliercontact3: suppliercontact3in,
-                supplierfax3: supplierfax3in,
-                data2: data2
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/NewAddQuotereq`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message });
-                setidin(result.id);
-                setuuidin(result.uuid);
-                setStatusin("編輯中");
-                router.push({
-                    pathname: `/factoryDepartment/QReqList`,
-                    query: {
-                    },
-                });
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-    //單據結案
-    const Close = async (type: any) => {
-        try {
-            const conditionModel = {
-                purchaseorderuuid: uuidin,
-                type: type,
-                username: userInfo?.employee?.id.toString(),
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/sentPOToReview?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setStatusin("已結案");
-
-        } catch (error: any) {
-            console.log(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-    }
-
-    //#endregion
-
-    //#region ===========【審核】
-    const [review_flow, setReview_flow] = useState<string>("");
-    const [reviewbar, setReviewbar] = useState<boolean>(false);
-    const [reviewdata, setReviewdata] = useState<any[]>([]);
-    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
-    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
-    const [documenttitle, setDocumenttitle] = useState<string>("");
-    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
-
-    //取全部的自訂流程
-    const GetReviewFlow = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                user_id: userInfo?.employee?.id.toString()
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const text = await response.text();
-            if (!text) {
-                // console.log('No data returned');
-                setReviewdata([]);
-                return;
-            }
-
-            const data = JSON.parse(text);
-            setReviewdata(data);
-
-
-        } catch (error: any) {
-            console.log(error);
-            // setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-
-    }
-
-    //取單據的審核流程
-    const GetReviewById = async (document_uuid: any) => {
-        try {
-            setReviewflowdata([]);
-            setReviewflowdata2([]);
-            // setIsLoading(true);
-
-            const conditionModel = {
-                document_uuid: document_uuid
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
-
-            // 檢查響應狀態
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            // 檢查響應內容是否為空
-            const text = await response.text();
-            if (text.trim() === '') {
-                // console.log('No data returned');
-                return;
-            }
-
-            // 解析 JSON
-            const data = JSON.parse(text);
-
-            console.log(data);
-
-            // 檢查資料是否存在且有效
-            if (data && data.length > 0) {
-                setReviewflowdata(data);
-            } else {
-                console.log('No valid data');
-            }
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            // setIsLoading(false);
-        }
-    };
-
-    const [value, setValue] = useState<number | null>(null);
-    const onChange = (e: any) => {
-        setValue(e.target.value);
-    };
-
-    const setReview = async (item: any) => {
-        setReview_flow(item.id);
-        setReviewflowdata2(item.stages);
-    }
-
-    const sentToReview = async (type: any) => {
-
-        try {
-            // if (review_flow === "") {
-            //     setReviewbar(true);
-            //     handleChoseflow();
-            // }
-            // else {
-            const review_query = {
-                purchaseorderuuid: uuidin,
-                purchaseorderid: idin,
-                create_at: create_atin,
-                create_by: create_byin,
-                status: '編輯中',
-                need_date: need_datein,
-                note: notein,
-                firstin: 1,
-            };
-
-            const conditionModel = {
-                document_id: idin,
-                document_uuid: uuidin,
-                document_type: pagename,
-                review_id: review_flow,
-                query: review_query,
-                user_id: userInfo?.employee?.id.toString(),
-                document_title: documenttitle
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            console.log(JSON.stringify(conditionModel));
-
-            const response = await fetch(`${setting.apipath}/Review/AddReview`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setReviewflowdata([]);
-            GetReviewById(uuidin);
-
-
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            //改變單據狀態
-            const conditionModel2 = {
-                type: type,
-                purchaseorderuuid: uuidin,
-                username: userInfo?.employee?.id.toString()
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel2),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
             if (!response2.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data2 = await response2.json();
-
-            GetDetailById(uuidin);
-            GetReviewById(uuidin)
-            setStatusin("審核中");
-            setReviewbar(false);
-
-
-
-
-
-
-            // }
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-
-    }
-
-    const handleChoseflow = () => {
-        setReviewbar(true);
-        setDocumenttitle(`【詢價單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
-    }
-
-    const handleGetReviewBack = () => {
-        myAlert.confirm({
-            title: '確定要抽單嗎?',
-            props: {
-                onOk: async () => {
-                    try {
-                        setIsLoading(true);
-                        const conditionModel = {
-                            document_uuid: uuidin,
-                        };
-
-                        var inputModel = {
-                            TypeName: 'ERP',
-                            ServiceName: 'WareHouseService',
-                            FunctionName: 'no',
-                            FilterConditions: JSON.stringify(conditionModel),
-                        };
-
-
-                        const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(inputModel)
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch data');
-                        }
-
-                        setReviewflowdata([]);
-                        setStatusin("編輯中");
-                        setReview_flow("");
-                        setValue(null);
-                        GetReviewHistory(uuidin);
-
-                    } catch (error: any) {
-                        console.log(error.message);
-                    }
-                    finally {
-                        setIsLoading(false);
-                    }
-                }
-            }
-        });
-    }
-
-    const GetReviewHistory = async (id: any) => {
-        try {
-            const conditionModel = {
-                document_uuid: id
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+              throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
             }
 
-            const text = await response.text();
-            if (!text) {
-                // console.log('No data returned');
-                setReviewhistorydata([]);
-                return;
-            }
-
-            const data = JSON.parse(text);
-            setReviewhistorydata(data);
-            console.log(reviewhistroydata);
-
-
-        } catch (error: any) {
-            console.log(error);
-        }
-        finally {
+            const data2 = await response2.text();
+            console.log('Received from print4:', data2);
+          } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+          } finally {
             // setIsLoading(false);
-        }
+          }
+        },
+      },
+    });
+  };
+
+  //匯出單據
+  const Excel = async (id: any, type2: any, quoid: any) => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        id: id,
+        type: 'quotereq',
+        type2: type2,
+        quoterequuid: quoid,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      // 將響應轉換為 Blob
+      const blob = await response.blob();
+
+      // 創建一個 URL 來下載 Blob
+      const url = window.URL.createObjectURL(blob);
+
+      // 創建一個下載鏈接
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `三久建材_比價單_${id}.xls`); // 設置文件名
+
+      // 將鏈接添加到 DOM 並觸發點擊下載
+      document.body.appendChild(link);
+      link.click();
+
+      // 清除鏈接和 URL 物件
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      setIsLoading(false);
     }
-    //#endregion
+  };
 
-    //#region ===========【單據功能區】
-    //新增
-    const handleAdd = () => {
-        Add();
+  //複製單據(同新增單據)
+  const Add = async () => {
+    if (data2.length === 0) {
+      myAlert.warning({ title: `${pagename}項目不可為空` });
+
+      return;
     }
 
-    //編輯
-    const handleEdit = () => {
-    };
+    // return;
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        create_at: create_atin,
+        need_date: dayjs(need_datein).format('YYYY-MM-DD'),
+        create_by: userInfo?.employee?.id.toString(),
+        note: notein,
+        supplierid: supplieridin,
+        suppliername: suppliernamein,
+        supplierphone: supplierphonein,
+        suppliertaxid: suppliertaxidin,
+        supplieraddress: supplieraddressin,
+        suppliercontact: suppliercontactin,
+        supplierfax: supplierfaxin,
+        shippingaddress: shippingaddressin,
+        supplierid2: supplierid2in,
+        suppliername2: suppliername2in,
+        supplierphone2: supplierphone2in,
+        suppliertaxid2: suppliertaxid2in,
+        supplieraddress2: supplieraddress2in,
+        suppliercontact2: suppliercontact2in,
+        supplierfax2: supplierfax2in,
+        supplierid3: supplierid3in,
+        suppliername3: suppliername3in,
+        supplierphone3: supplierphone3in,
+        suppliertaxid3: suppliertaxid3in,
+        supplieraddress3: supplieraddress3in,
+        suppliercontact3: suppliercontact3in,
+        supplierfax3: supplierfax3in,
+        data2: data2,
+      };
 
-    //取消編輯
-    const handleCancel = () => {
-    };
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
 
-    //作廢單據
-    const handleDelete = () => {
-        myAlert.confirm({
-            title: '確定刪除嗎?',
-            props: {
-                onOk: () => {
-                    Delete();
-                }
-            }
-        })
-    }
+      const response = await fetch(`${setting.apipath}/WareHouse/NewAddQuotereq`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
 
-    //複製單據
-    const handleCopy = () => {
-        myAlert.confirm({
-            title: '確定複製嗎?',
-            props: {
-                onOk: () => {
-                    Add();
-                }
-            }
-        })
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
 
-    }
+      const result = await response.json();
 
-    //結案
-    const handleClose = async () => {
-        Close("結案");
-    }
-
-    //列印單據
-    const handlePrint = () => {
-        Print();
-    }
-
-    //匯出單據
-    const handleExport = () => {
-        Excel(idin, "", "")
-    }
-
-
-    //#endregion
-
-    //#region ===========【明細功能區】
-    // 新增明細
-    const handleAddDetail = () => {
-
-        const emptyDetail = {
-            detail_name: "",
-            detail_note: "",
-            detail_productid: "",
-            detail_quantity: "",
-            detail_spec: "",
-            detail_unit: "",
-            supplier1_name: suppliernamein,
-            supplier1_unitprice: "",
-            supplier1_awarded: "",
-            supplier2_name: suppliername2in,
-            supplier2_unitprice: "",
-            supplier2_awarded: "",
-            supplier3_name: suppliername3in,
-            supplier3_unitprice: "",
-            supplier3_awarded: "",
-        };
-
-        // 將空資料新增進陣列
-        setData2((prevData) => [...prevData, emptyDetail]);
-
-    };
-
-    // 從明細移除
-    const handleRemoveDetail = (index: number, item: any) => {
-        myAlert.confirm({
-            title: '確定移除?',
-            props: {
-                onOk: () => {
-                    const updatedData = data2.filter((_, i) => i !== index);
-                    setData2(updatedData);
-                }
-            }
+      if (result.success) {
+        // 成功，顯示提示
+        myAlert.success({ title: result.message });
+        setidin(result.id);
+        setuuidin(result.uuid);
+        setStatusin('編輯中');
+        router.push({
+          pathname: `/factoryDepartment/QReqList`,
+          query: {},
         });
-    };
+      } else {
+        // 失敗，顯示錯誤提示
+        console.log(result.message);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    //更新明細資料
-    const handleStringChange = (index: number, key: string, value: string) => {
-        const updatedData2 = [...data2];  // 使用淺拷貝
-        updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
-        setData2(updatedData2);  // 更新data2
+  //單據結案
+  const Close = async (type: any) => {
+    try {
+      const conditionModel = {
+        purchaseorderuuid: uuidin,
+        type: type,
+        username: userInfo?.employee?.id.toString(),
+      };
 
-        if (key === 'detail_productid' || key === 'detail_name' || key === 'detail_spec') {
-            const filters = {
-                productid: updatedData2[index].detail_productid?.trim().toLowerCase() || "",
-                name: updatedData2[index].detail_name?.trim().toLowerCase() || "",
-                spec: updatedData2[index].detail_spec?.trim().toLowerCase() || ""
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/sentPOToReview?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      setStatusin('已結案');
+    } catch (error: any) {
+      console.log(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  //#endregion
+
+  //#region ===========【審核】
+  const [review_flow, setReview_flow] = useState<string>('');
+  const [reviewbar, setReviewbar] = useState<boolean>(false);
+  const [reviewdata, setReviewdata] = useState<any[]>([]);
+  const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+  const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+  const [documenttitle, setDocumenttitle] = useState<string>('');
+  const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
+
+  //取全部的自訂流程
+  const GetReviewFlow = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        user_id: userInfo?.employee?.id.toString(),
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const text = await response.text();
+
+      if (!text) {
+        // console.log('No data returned');
+        setReviewdata([]);
+
+        return;
+      }
+
+      const data = JSON.parse(text);
+      setReviewdata(data);
+    } catch (error: any) {
+      console.log(error);
+      // setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取單據的審核流程
+  const GetReviewById = async (document_uuid: any) => {
+    try {
+      setReviewflowdata([]);
+      setReviewflowdata2([]);
+      // setIsLoading(true);
+
+      const conditionModel = {
+        document_uuid: document_uuid,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+      // 檢查響應狀態
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      // 檢查響應內容是否為空
+      const text = await response.text();
+
+      if (text.trim() === '') {
+        // console.log('No data returned');
+        return;
+      }
+
+      // 解析 JSON
+      const data = JSON.parse(text);
+
+      console.log(data);
+
+      // 檢查資料是否存在且有效
+      if (data && data.length > 0) {
+        setReviewflowdata(data);
+      } else {
+        console.log('No valid data');
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  const [value, setValue] = useState<number | null>(null);
+
+  const onChange = (e: any) => {
+    setValue(e.target.value);
+  };
+
+  const setReview = async (item: any) => {
+    setReview_flow(item.id);
+    setReviewflowdata2(item.stages);
+  };
+
+  const sentToReview = async (type: any) => {
+    try {
+      // if (review_flow === "") {
+      //     setReviewbar(true);
+      //     handleChoseflow();
+      // }
+      // else {
+      const review_query = {
+        purchaseorderuuid: uuidin,
+        purchaseorderid: idin,
+        create_at: create_atin,
+        create_by: create_byin,
+        status: '編輯中',
+        need_date: need_datein,
+        note: notein,
+        firstin: 1,
+      };
+
+      const conditionModel = {
+        document_id: idin,
+        document_uuid: uuidin,
+        document_type: pagename,
+        review_id: review_flow,
+        query: review_query,
+        user_id: userInfo?.employee?.id.toString(),
+        document_title: documenttitle,
+      };
+
+      let inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      console.log(JSON.stringify(conditionModel));
+
+      const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      setReviewflowdata([]);
+      GetReviewById(uuidin);
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      //改變單據狀態
+      const conditionModel2 = {
+        type: type,
+        purchaseorderuuid: uuidin,
+        username: userInfo?.employee?.id.toString(),
+      };
+
+      inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel2),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+
+      if (!response2.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data2 = await response2.json();
+
+      GetDetailById(uuidin);
+      GetReviewById(uuidin);
+      setStatusin('審核中');
+      setReviewbar(false);
+
+      // }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChoseflow = () => {
+    setReviewbar(true);
+    setDocumenttitle(`【詢價單】【${idin}】_${userInfo?.employee?.chName.toString()}`);
+  };
+
+  const handleGetReviewBack = () => {
+    myAlert.confirm({
+      title: '確定要抽單嗎?',
+      props: {
+        onOk: async () => {
+          try {
+            setIsLoading(true);
+            const conditionModel = {
+              document_uuid: uuidin,
             };
 
-            if (Object.values(filters).some(filter => filter !== "")) {
-                const filtered = data.filter(item =>
-                    (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
-                    (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
-                    (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
-                );
+            const inputModel = {
+              TypeName: 'ERP',
+              ServiceName: 'WareHouseService',
+              FunctionName: 'no',
+              FilterConditions: JSON.stringify(conditionModel),
+            };
 
-                setFilteredData(filtered);
-                setShowSuggestions(true);
-            } else {
-                setShowSuggestions(false);
+            const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(inputModel),
+            });
+
+            if (!response.ok) {
+              throw new Error('Failed to fetch data');
             }
-        }
-    };
 
-    //focus選中的明細
-    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-    const handleRowClick = (itemId: string) => {
-        setSelectedItemId(itemId);
-    };
+            setReviewflowdata([]);
+            setStatusin('編輯中');
+            setReview_flow('');
+            setValue(null);
+            GetReviewHistory(uuidin);
+          } catch (error: any) {
+            console.log(error.message);
+          } finally {
+            setIsLoading(false);
+          }
+        },
+      },
+    });
+  };
 
-    // 明細異動處理
-    useEffect(() => {
-        // console.log(data1);
+  const GetReviewHistory = async (id: any) => {
+    try {
+      const conditionModel = {
+        document_uuid: id,
+      };
 
-        // 每次 data2 更新時，重新計算總價和稅金
-        let totalprice = 0;
-        data2.forEach((element) => {
-            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
-            const price = typeof element.totalprice === 'string'
-                ? parseFloat(element.totalprice.replace(/,/g, ''))
-                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
-            console.log(price); // 顯示正確的數字格式
-            totalprice += price; // 將其加總
-        });
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
 
-        console.log(totalprice); // 應顯示正確的加總結果
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-        // 四捨五入總價到小數點第二位
-        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
-        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
 
-        // 計算稅金，四捨五入到小數點第二位
-        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
-        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
 
-        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
-        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
-        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      const text = await response.text();
 
-    }, [data2]);
+      if (!text) {
+        // console.log('No data returned');
+        setReviewhistorydata([]);
 
-    //#endregion
+        return;
+      }
 
-    //#region ===========【物料篩選】
-    interface DataItem {
-        id: string;
-        productid: string;
-        spec: string | null; // spec 可能為 null
-        name: string;
-        unit: string;
+      const data = JSON.parse(text);
+      setReviewhistorydata(data);
+      console.log(reviewhistroydata);
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      // setIsLoading(false);
     }
+  };
+  //#endregion
 
-    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const isSelectingRef = useRef(false);
+  //#region ===========【單據功能區】
+  //新增
+  const handleAdd = () => {
+    Add();
+  };
 
-    useEffect(() => {
+  //編輯
+  const handleEdit = () => {};
 
-        if (isSelectingRef.current) return;
+  //取消編輯
+  const handleCancel = () => {};
 
-        let filtered = searchbardata;
-        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
-            if (handinputproductuuid) {
-                let filtered = searchbardata;
-                filtered = searchbardata.filter(item =>
-                    item.id.includes(handinputproductuuid)
-                );
-            }
-            if (handinputproductid) {
-                filtered = filtered.filter(item =>
-                    item.productid.includes(handinputproductid)
-                );
-            }
+  //作廢單據
+  const handleDelete = () => {
+    myAlert.confirm({
+      title: '確定刪除嗎?',
+      props: {
+        onOk: () => {
+          Delete();
+        },
+      },
+    });
+  };
 
-            if (handinputname) {
-                filtered = filtered.filter(item =>
-                    item.name.includes(handinputname)
-                );
-            }
+  //複製單據
+  const handleCopy = () => {
+    myAlert.confirm({
+      title: '確定複製嗎?',
+      props: {
+        onOk: () => {
+          Add();
+        },
+      },
+    });
+  };
 
-            if (handinputspec) {
-                filtered = filtered.filter(item =>
-                    item.spec && item.spec.includes(handinputspec)
-                );
-            }
+  //結案
+  const handleClose = async () => {
+    Close('結案');
+  };
 
-            setFilteredData(filtered);
-            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
+  //列印單據
+  const handlePrint = () => {
+    Print();
+  };
 
-        }
-        else {
-            setHandinputproductuuid('');
-            setFilteredData([]);
-            setShowSuggestions(false);
-        }
-    }, [handinputproductid, handinputname, handinputspec]);
+  //匯出單據
+  const handleExport = () => {
+    Excel(idin, '', '');
+  };
 
+  //#endregion
 
-    //點選物料
-    const handleSelect = (selectedItem: any) => {
-        const updatedData2 = [...data2];
-        const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
-        updatedData2[index] = {
-            ...updatedData2[index],
-            detail_productuuid: selectedItem.id,
-            detail_productid: selectedItem.productid,
-            detail_name: selectedItem.name,
-            detail_spec: selectedItem.spec,
-            detail_unit: selectedItem.unit,
-        };
-        setData2(updatedData2);
-
-        // 清除建議選單
-        setFilteredData([]);
-        setShowSuggestions(false);
+  //#region ===========【明細功能區】
+  // 新增明細
+  const handleAddDetail = () => {
+    const emptyDetail = {
+      detail_name: '',
+      detail_note: '',
+      detail_productid: '',
+      detail_quantity: '',
+      detail_spec: '',
+      detail_unit: '',
+      supplier1_name: suppliernamein,
+      supplier1_unitprice: '',
+      supplier1_awarded: '',
+      supplier2_name: suppliername2in,
+      supplier2_unitprice: '',
+      supplier2_awarded: '',
+      supplier3_name: suppliername3in,
+      supplier3_unitprice: '',
+      supplier3_awarded: '',
     };
 
-    //點選物料後控制，使用ESC關閉等狀態監控
-    const dropdownRef = useRef<HTMLUListElement | null>(null);
-    useEffect(() => {
-        // 按下 ESC 鍵關閉下拉選單
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
-                setFilteredData([]);
-                if (dropdownRef.current) {
-                    dropdownRef.current.style.display = 'none';
-                }
-            }
-        };
+    // 將空資料新增進陣列
+    setData2((prevData) => [...prevData, emptyDetail]);
+  };
 
-        // 為整個 document 添加事件監聽器
-        document.addEventListener('keydown', handleKeyDown);
+  // 從明細移除
+  const handleRemoveDetail = (index: number, item: any) => {
+    myAlert.confirm({
+      title: '確定移除?',
+      props: {
+        onOk: () => {
+          const updatedData = data2.filter((_, i) => i !== index);
+          setData2(updatedData);
+        },
+      },
+    });
+  };
 
-        // 清理事件監聽器
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
-    //#endregion
+  //更新明細資料
+  const handleStringChange = (index: number, key: string, value: string) => {
+    const updatedData2 = [...data2]; // 使用淺拷貝
+    updatedData2[index] = { ...updatedData2[index], [key]: value }; // 確保更改的只是副本
+    setData2(updatedData2); // 更新data2
 
-    //#region ===========【廠商篩選】
-    const [isFilterVisible, setIsFilterVisible] = useState(false);
-    const [customerbar, setCustomerbar] = useState(false);
-    const [countyOptions, setCountyOptions] = useState<string[]>([]);
-    const [filteredData2, setFilteredData2] = useState<any[]>([]);
-    const [filteredData4, setFilteredData4] = useState<any[]>([]);
-    const [filters, setFilters] = useState({
-        county: '',
-        name: '',
-        contact: '',
-        customer_number: ''
+    if (key === 'detail_productid' || key === 'detail_name' || key === 'detail_spec') {
+      const filters = {
+        productid: updatedData2[index].detail_productid?.trim().toLowerCase() || '',
+        name: updatedData2[index].detail_name?.trim().toLowerCase() || '',
+        spec: updatedData2[index].detail_spec?.trim().toLowerCase() || '',
+      };
+
+      if (Object.values(filters).some((filter) => filter !== '')) {
+        const filtered = data.filter(
+          (item) =>
+            (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
+            (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
+            (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
+        );
+
+        setFilteredData(filtered);
+        setShowSuggestions(true);
+      } else {
+        setShowSuggestions(false);
+      }
+    }
+  };
+
+  //focus選中的明細
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  const handleRowClick = (itemId: string) => {
+    setSelectedItemId(itemId);
+  };
+
+  // 明細異動處理
+  useEffect(() => {
+    // console.log(data1);
+
+    // 每次 data2 更新時，重新計算總價和稅金
+    let totalprice = 0;
+    data2.forEach((element) => {
+      // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+      const price =
+        typeof element.totalprice === 'string'
+          ? parseFloat(element.totalprice.replace(/,/g, ''))
+          : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+      console.log(price); // 顯示正確的數字格式
+      totalprice += price; // 將其加總
     });
 
+    console.log(totalprice); // 應顯示正確的加總結果
 
-    // 根據篩選條件更新資料
-    useEffect(() => {
-        const filtered = customerdata.filter(item =>
-            (filters.county === '' || item.county === filters.county) &&
-            (filters.name === '' || item.name.toLowerCase().includes(filters.name.toLowerCase())) &&
-            (filters.contact === '' || item.contact.toLowerCase().includes(filters.contact.toLowerCase())) &&
-            (filters.customer_number === '' || item.customer_number.toLowerCase().includes(filters.customer_number.toLowerCase()))
-        );
-        setFilteredData2(filtered);
-    }, [filters, customerdata]); // 加上 customerdata 確保資料變化時觸發
+    // 四捨五入總價到小數點第二位
+    const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+    setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
+    // 計算稅金，四捨五入到小數點第二位
+    const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;
+    setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-    // 手key輸入過濾
-    useEffect(() => {
-        setFilteredData4(
-            customerdata.filter((item) => {
-                if (currentsupplier === 1) {
-                    return (
-                        (!supplieridin || (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
-                        (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
-                    );
-                }
-                if (currentsupplier === 2) {
-                    return (
-                        (!supplierid2in || (item?.customer_number && item.customer_number.toLowerCase().includes(supplierid2in.toLowerCase()))) &&
-                        (!suppliername2in || (item?.name && item.name.toLowerCase().includes(suppliername2in.toLowerCase())))
-                    );
-                }
-                if (currentsupplier === 3) {
-                    return (
-                        (!supplierid3in || (item?.customer_number && item.customer_number.toLowerCase().includes(supplierid3in.toLowerCase()))) &&
-                        (!suppliername3in || (item?.name && item.name.toLowerCase().includes(suppliername3in.toLowerCase())))
-                    );
-                }
-                return false; // 預設不符合條件的情況
-            })
-        );
-    }, [supplieridin, suppliernamein, supplierid2in, suppliername2in, supplierid3in, suppliername3in, currentsupplier, customerdata]); 
+    // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+    const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
+    setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  }, [data2]);
 
-    //#endregion
+  //#endregion
 
+  //#region ===========【物料篩選】
+  interface DataItem {
+    id: string;
+    productid: string;
+    spec: string | null; // spec 可能為 null
+    name: string;
+    unit: string;
+  }
 
-    //#region  ===========【請購帶入功能區】
-    const [prbar, setPrbar] = useState(false);
+  const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const isSelectingRef = useRef(false);
 
+  useEffect(() => {
+    if (isSelectingRef.current) {
+      return;
+    }
 
+    let filtered = searchbardata;
 
-    //#endregion
+    if (handinputproductid !== '' || handinputname !== '' || handinputspec != '') {
+      if (handinputproductuuid) {
+        let filtered = searchbardata;
+        filtered = searchbardata.filter((item) => item.id.includes(handinputproductuuid));
+      }
 
-    return (
-        <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={"新增" + pagename + "單"} panelList={panelList}
-                customeRight={[
+      if (handinputproductid) {
+        filtered = filtered.filter((item) => item.productid.includes(handinputproductid));
+      }
 
-                    <>
-                        <button
-                            className={scss.shortredsquarebtn}
-                            style={{
-                                display: `${status === "" ? '' : 'none'}`
-                            }}
-                            onClick={() => {
-                                // console.log(data2);
-                                handleAdd();
+      if (handinputname) {
+        filtered = filtered.filter((item) => item.name.includes(handinputname));
+      }
 
-                            }}
-                        >
-                            儲存
-                        </button>
-                    </>
+      if (handinputspec) {
+        filtered = filtered.filter((item) => item.spec && item.spec.includes(handinputspec));
+      }
 
-                ]
-                }
-                customeLeft={
-                    [
-                        <>
-                            {/* 編輯按鈕 */}
-                            {/* {statusin === "編輯中" && !isEditing && ( */}
+      setFilteredData(filtered);
+      setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
+    } else {
+      setHandinputproductuuid('');
+      setFilteredData([]);
+      setShowSuggestions(false);
+    }
+  }, [handinputproductid, handinputname, handinputspec]);
 
-                            <>
-                                {printopen && (
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handlePrint();
-                                        }}
-                                        title="列印單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        列印
-                                    </button>
-                                )}
-                                {excelopen && (
+  //點選物料
+  const handleSelect = (selectedItem: any) => {
+    const updatedData2 = [...data2];
+    const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
+    updatedData2[index] = {
+      ...updatedData2[index],
+      detail_productuuid: selectedItem.id,
+      detail_productid: selectedItem.productid,
+      detail_name: selectedItem.name,
+      detail_spec: selectedItem.spec,
+      detail_unit: selectedItem.unit,
+    };
+    setData2(updatedData2);
 
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handleExport();
-                                        }}
-                                        title="匯出單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        Excel
-                                    </button>
-                                )}
-                                {statusin === "編輯中" && isEditing && (
+    // 清除建議選單
+    setFilteredData([]);
+    setShowSuggestions(false);
+  };
 
-                                    <>
-                                        <button
-                                            className={scss.shortsquarebtn}
-                                            style={{
-                                            }}
-                                            onClick={() => {
-                                                setPrbar(!prbar);
-                                            }}
-                                        >
-                                            <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
-                                                ☰
-                                            </span>
-                                            請購項目
-                                        </button>
-                                    </>
-                                )}
-                            </>
-                            {/* )} */}
-                        </>
-                    ]} />
-            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.right}>
-                    <div className={scss.content}>
-                        <div className={scss.head_body}>
-                            <div>
-                                <div className={scss.head_content1}>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption={`${pagename}單號`}
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: idin || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="建立人員"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: create_byin,
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            caption="建立日期"
-                                            className="global_tip_must"
-                                            disabled={!isEditing}
-                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            datePickerProps={{
-                                                props: {
-                                                    value: create_atin ? moment(create_atin) : null,
-                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
-                                                },
-                                            }}
-                                        />
+  //點選物料後控制，使用ESC關閉等狀態監控
+  const dropdownRef = useRef<HTMLUListElement | null>(null);
+  useEffect(() => {
+    // 按下 ESC 鍵關閉下拉選單
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.keyCode === 27) {
+        // ESC 鍵的 keyCode 是 27
+        setFilteredData([]);
 
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                    </div>
-                                </div>
-                                <div className={scss.head_content2}>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商1編號"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplieridin,
-                                                    onChange: (e) => {
-                                                        const value = e.target.value;
-                                                        setCurrentSupplier(1);
-                                                        setSupplieridin(value); // 僅更新 supplieridin
-                                                        setIsFilterVisible(true);  // 隱藏篩選區域
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商1名稱"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliernamein,
-                                                    // onChange: (e) => { setSuppliernamein(e.target.value) }
-                                                    onChange: (e) => {
-                                                        const value = e.target.value;
-                                                        setCurrentSupplier(1);
-                                                        setSuppliernamein(value); // 僅更新 suppliernamein
-                                                        setIsFilterVisible(true);  // 隱藏篩選區域
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商1地址"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplieraddressin,
-                                                    onChange: (e) => { setSupplieraddressin(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商1電話"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplierphonein,
-                                                    onChange: (e) => { setSupplierphonein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商1聯絡人"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliercontactin,
-                                                    onChange: (e) => { setSuppliercontactin(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <button
-                                            style={{
-                                                display: `${isEditing ? '' : 'none'}`,
-                                                width: '39px',
-                                                backgroundColor: '#f5f5f5',
-                                                border: '1px solid #c1c1c1',
-                                                borderRadius: '3px',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease',
-                                                fontWeight: 'bolder'
-                                            }}
-                                            onMouseOver={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
-                                                e.currentTarget.style.borderColor = '#a1a1a1';
-                                            }}
-                                            onMouseOut={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                                e.currentTarget.style.borderColor = '#c1c1c1';
-                                            }}
-                                            onClick={() => {
-                                                setCurrentSupplier(1);
-                                                setCustomerbar(true);
-                                            }}
-                                        >
-                                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                        </button>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="備註說明"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: notein,
-                                                    onChange: (e) => { setNotein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商2編號"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplierid2in,
-                                                    onChange: (e) => {
-                                                        const value = e.target.value;
-                                                        setCurrentSupplier(2);
-                                                        setSupplierid2in(value); // 僅更新 supplieridin
-                                                        setIsFilterVisible(true);  // 隱藏篩選區域
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商2名稱"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliername2in,
-                                                    // onChange: (e) => { setSuppliername2in(e.target.value) }
-                                                    onChange: (e) => {
-                                                        const value = e.target.value;
-                                                        setCurrentSupplier(2);
-                                                        setSuppliername2in(value); // 僅更新 supplieridin
-                                                        setIsFilterVisible(true);  // 隱藏篩選區域
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商2地址"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplieraddress2in,
-                                                    onChange: (e) => { setSupplieraddress2in(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商2電話"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplierphone2in,
-                                                    onChange: (e) => { setSupplierphone2in(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商2聯絡人"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliercontact2in,
-                                                    onChange: (e) => { setSuppliercontact2in(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <button
-                                            style={{
-                                                display: `${isEditing ? '' : 'none'}`,
-                                                width: '39px',
-                                                backgroundColor: '#f5f5f5',
-                                                border: '1px solid #c1c1c1',
-                                                borderRadius: '3px',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease',
-                                                fontWeight: 'bolder'
-                                            }}
-                                            onMouseOver={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
-                                                e.currentTarget.style.borderColor = '#a1a1a1';
-                                            }}
-                                            onMouseOut={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                                e.currentTarget.style.borderColor = '#c1c1c1';
-                                            }}
-                                            onClick={() => {
-                                                setCurrentSupplier(2);
-                                                setCustomerbar(true);
-                                            }}
-                                        >
-                                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商3編號"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplierid3in,
-                                                    onChange: (e) => {
-                                                        const value = e.target.value;
-                                                        setCurrentSupplier(3);
-                                                        setSupplierid3in(value); // 僅更新 supplieridin
-                                                        setIsFilterVisible(true);  // 隱藏篩選區域
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商3名稱"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliername3in,
-                                                    // onChange: (e) => { setSuppliername3in(e.target.value) }
-                                                    onChange: (e) => {
-                                                        const value = e.target.value;
-                                                        setCurrentSupplier(3);
-                                                        setSuppliername3in(value); // 僅更新 supplieridin
-                                                        setIsFilterVisible(true);  // 隱藏篩選區域
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商3地址"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplieraddress3in,
-                                                    onChange: (e) => { setSupplieraddress3in(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商3電話"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplierphone3in,
-                                                    onChange: (e) => { setSupplierphone3in(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商3聯絡人"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliercontact3in,
-                                                    onChange: (e) => { setSuppliercontact3in(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <button
-                                            style={{
-                                                display: `${isEditing ? '' : 'none'}`,
-                                                width: '39px',
-                                                backgroundColor: '#f5f5f5',
-                                                border: '1px solid #c1c1c1',
-                                                borderRadius: '3px',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease',
-                                                fontWeight: 'bolder'
-                                            }}
-                                            onMouseOver={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
-                                                e.currentTarget.style.borderColor = '#a1a1a1';
-                                            }}
-                                            onMouseOut={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                                e.currentTarget.style.borderColor = '#c1c1c1';
-                                            }}
-                                            onClick={() => {
-                                                setCurrentSupplier(3);
-                                                setCustomerbar(true);
-                                            }}
-                                        >
-                                            <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                        </button>
+        if (dropdownRef.current) {
+          dropdownRef.current.style.display = 'none';
+        }
+      }
+    };
 
+    // 為整個 document 添加事件監聽器
+    document.addEventListener('keydown', handleKeyDown);
 
-                                    </div>
-                                </div>
-                                <div
-                                    style={{
-                                        position: 'relative',
-                                        width: '50%',
-                                        padding: '10px',
-                                        // border: '1px solid #ccc',
-                                        borderRadius: '4px',
-                                    }}
-                                >
-                                    {(suppliernamein || supplieridin || suppliername2in || supplierid2in || suppliername3in || supplierid3in) && filteredData4.length > 0 && isFilterVisible && (
-                                        <div
-                                            style={{
-                                                position: 'absolute',
-                                                top: '100%',
-                                                left: 0,
-                                                width: '100%',
-                                                backgroundColor: 'white',
-                                                border: '1px solid #ccc',
-                                                borderRadius: '4px',
-                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                                                zIndex: 1005,
-                                                maxHeight: '300px',
-                                                overflowY: 'auto',
-                                            }}
-                                        >
-                                            {filteredData4.map((_item, index) => (
-                                                <div
-                                                    key={index}
-                                                    onClick={() => {
-                                                        if (currentsupplier === 1) {
-                                                            setSuppliernamein(_item.name || '');
-                                                            setSupplieraddressin(
-                                                                (_item.county || '') +
-                                                                (_item.district || '') +
-                                                                (_item.address || '')
-                                                            );
-                                                            setSupplierphonein(_item.phone || '');
-                                                            setSuppliertaxidin(_item.tax_id || '');
-                                                            setSupplieridin(_item.customer_number || '');
-                                                            setSupplierfaxin(_item.fax || '');
-                                                            setSuppliercontactin(_item.contact || '');
-                                                            setSupplieruuidin(_item.id || '');
-                                                            setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
-                                                            setIsFilterVisible(false);
-                                                        } else if (currentsupplier === 2) {
-                                                            setSuppliername2in(_item.name || '');
-                                                            setSupplieraddress2in(
-                                                                (_item.county || '') +
-                                                                (_item.district || '') +
-                                                                (_item.address || '')
-                                                            );
-                                                            setSupplierphone2in(_item.phone || '');
-                                                            setSuppliertaxid2in(_item.tax_id || '');
-                                                            setSupplierid2in(_item.customer_number || '');
-                                                            setSupplierfax2in(_item.fax || '');
-                                                            setSuppliercontact2in(_item.contact || '');
-                                                            setSupplieruuid2in(_item.id || '');
-                                                            setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
-                                                            setIsFilterVisible(false);
-                                                        } else if (currentsupplier === 3) {
-                                                            setSuppliername3in(_item.name || '');
-                                                            setSupplieraddress3in(
-                                                                (_item.county || '') +
-                                                                (_item.district || '') +
-                                                                (_item.address || '')
-                                                            );
-                                                            setSupplierphone3in(_item.phone || '');
-                                                            setSuppliertaxid3in(_item.tax_id || '');
-                                                            setSupplierid3in(_item.customer_number || '');
-                                                            setSupplierfax3in(_item.fax || '');
-                                                            setSuppliercontact3in(_item.contact || '');
-                                                            setSupplieruuid3in(_item.id || '');
-                                                            setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
-                                                            setIsFilterVisible(false);
-                                                        }
-                                                    }}
-                                                    style={{
-                                                        padding: '10px',
-                                                        cursor: 'pointer',
-                                                        borderBottom: '1px solid #f0f0f0',
-                                                    }}
-                                                >
-                                                    <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
-                                                        {_item.name} {_item.conta}
-                                                    </div>
-                                                    <div style={{ fontSize: '16px', color: '#888' }}>
-                                                        {_item.county} {_item.district} {_item.address}
-                                                    </div>
-                                                    <div style={{ fontSize: '16px', color: '#555' }}>
-                                                        聯絡人: {_item.contact}
-                                                    </div>
+    // 清理事件監聽器
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  //#endregion
 
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div>
-                                {statusarea && (
-                                    <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="小計"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { textAlign: 'right' },
-                                                    value: totalprice1 || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="營業稅"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { textAlign: 'right' },
-                                                    value: taxprice1 || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="應付金額"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { textAlign: 'right' },
-                                                    value: totalpayprice1 || ' ',
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div
-                            style={{
-                                paddingTop: `${prbar ? '18px' : '0px'}`,
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                {pagename}項目
-                            </span>
-                        </div>
-                        <div className={scss.head_content1}>
+  //#region ===========【廠商篩選】
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [customerbar, setCustomerbar] = useState(false);
+  const [countyOptions, setCountyOptions] = useState<string[]>([]);
+  const [filteredData2, setFilteredData2] = useState<any[]>([]);
+  const [filteredData4, setFilteredData4] = useState<any[]>([]);
+  const [filters, setFilters] = useState({
+    county: '',
+    name: '',
+    contact: '',
+    customer_number: '',
+  });
 
-                            <InputSel
-                                {...inputSelProps}
-                                caption="品項數量"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        type: "number",
-                                        // style: { color: 'red' },
-                                        value: data2.length,
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+  // 根據篩選條件更新資料
+  useEffect(() => {
+    const filtered = customerdata.filter(
+      (item) =>
+        (filters.county === '' || item.county === filters.county) &&
+        (filters.name === '' || item.name.toLowerCase().includes(filters.name.toLowerCase())) &&
+        (filters.contact === '' || item.contact.toLowerCase().includes(filters.contact.toLowerCase())) &&
+        (filters.customer_number === '' ||
+          item.customer_number.toLowerCase().includes(filters.customer_number.toLowerCase()))
+    );
+    setFilteredData2(filtered);
+  }, [filters, customerdata]); // 加上 customerdata 確保資料變化時觸發
 
-                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
-                                {/* <Thead01 type={'AddPR_ReqList'} /> */}
-                                <div className={scss.thead20}>
-                                    <span>
+  // 手key輸入過濾
+  useEffect(() => {
+    setFilteredData4(
+      customerdata.filter((item) => {
+        if (currentsupplier === 1) {
+          return (
+            (!supplieridin ||
+              (item?.customer_number && item.customer_number.toLowerCase().includes(supplieridin.toLowerCase()))) &&
+            (!suppliernamein || (item?.name && item.name.toLowerCase().includes(suppliernamein.toLowerCase())))
+          );
+        }
 
-                                    </span>
-                                    <span>序</span>
-                                    <span>料號</span>
-                                    <span>品名</span>
-                                    <span>規格</span>
-                                    <span>數量</span>
-                                    <span>單位</span>
-                                    <span>廠商1</span>
-                                    <span>單價1</span>
-                                    <span>成交否1</span>
-                                    <span>廠商2</span>
-                                    <span>單價2</span>
-                                    <span>成交否2</span>
-                                    <span>廠商3</span>
-                                    <span>單價3</span>
-                                    <span>成交否3</span>
-                                    <span>備註(用途說明)</span>
-                                    <span></span>
-                                </div>
-                                {data2 && (
-                                    data2.map((_item, index) => {
-                                        // const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
-                                        // _item.totalprice = Totalprice
-                                        // if (_item.wantinquantity === 0) {
-                                        //     const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.alreadyinquantity);
-                                        //     _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
-                                        // }
-                                        return (
-                                            <CellWithBar key={index} className={scss.panelHeader20}>
-                                                <div className={scss.row01}>
-                                                    <span>
-                                                        <button style={{ display: (isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
-                                                            {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
-                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                        </button>
-                                                    </span>
-                                                    <span>{index + 1}</span>
-                                                    <span>
-                                                        <input
-                                                            ref={productidRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.detail_productid !== undefined ? _item.detail_productid : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "detail_productid", e.target.value);
-                                                                setCurrentIndex(index);
-                                                                // setHandinputproductid(e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={nameRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.detail_name !== undefined ? _item.detail_name : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "detail_name", e.target.value);
-                                                                setCurrentIndex(index);
-                                                                // setHandinputname(e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={specRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.detail_spec !== undefined ? _item.detail_spec : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "detail_spec", e.target.value);
-                                                                setCurrentIndex(index);
-                                                                // setHandinputspec(e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={quantityRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.detail_quantity : Number(_item.detail_quantity).toLocaleString()}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "detail_quantity", e.target.value); {/* 處理變更 */ }
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={unitRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.detail_unit !== undefined ? _item.detail_unit : ''}
-                                                            // readOnly
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "detail_unit", e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={suppliername1Refs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={(_item.supplier1_name !== undefined && _item.supplier1_name !== '') ? _item.supplier1_name : suppliernamein}
-                                                            readOnly
-                                                        // readOnly={!isEditing}
-                                                        // onChange={(e) => {
-                                                        //     handleStringChange(index, "detail_unit", e.target.value);
-                                                        // }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={unitprice1Refs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.supplier1_unitprice !== undefined ? _item.supplier1_unitprice : ''}
-                                                            // readOnly
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "supplier1_unitprice", e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={awarded1Refs.current[index]}
-                                                            type="checkbox"
-                                                            checked={_item.supplier1_awarded || false}  // 如果是 `true`，勾選；否則不勾選
-                                                            style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }}  // 編輯模式下可點擊
-                                                            disabled={!isEditing}  // 若不是編輯模式，禁用 checkbox
-                                                            onChange={(e) => {
-                                                                const newData = [...data2];
-                                                                const newAwardedValue = e.target.checked;
-                                                                newData[index] = {
-                                                                    ...newData[index],
-                                                                    supplier1_awarded: newAwardedValue,  // 更新 supplier1_awarded
-                                                                    supplier2_awarded: false,  // 取消其他兩個勾選
-                                                                    supplier3_awarded: false,
-                                                                };
-                                                                setData2(newData);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={suppliername2Refs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={(_item.supplier2_name !== undefined && _item.supplier2_name !== '') ? _item.supplier2_name : suppliername2in}
-                                                            readOnly
-                                                        // readOnly={!isEditing}
-                                                        // onChange={(e) => {
-                                                        //     handleStringChange(index, "detail_unit", e.target.value);
-                                                        // }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={unitprice2Refs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.supplier2_unitprice !== undefined ? _item.supplier2_unitprice : ''}
-                                                            // readOnly
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "supplier2_unitprice", e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={awarded2Refs.current[index]}
-                                                            type="checkbox"
-                                                            checked={_item.supplier2_awarded || false}  // 如果是 `true`，勾選；否則不勾選
-                                                            style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }}  // 編輯模式下可點擊
-                                                            disabled={!isEditing}  // 若不是編輯模式，禁用 checkbox
-                                                            onChange={(e) => {
-                                                                const newData = [...data2];
-                                                                const newAwardedValue = e.target.checked;
-                                                                newData[index] = {
-                                                                    ...newData[index],
-                                                                    supplier1_awarded: false,  // 取消其他兩個勾選
-                                                                    supplier2_awarded: newAwardedValue,  // 更新 supplier2_awarded
-                                                                    supplier3_awarded: false,
-                                                                };
-                                                                setData2(newData);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={suppliername3Refs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={(_item.supplier3_name !== undefined && _item.supplier3_name !== '') ? _item.supplier3_name : suppliername3in}
-                                                            readOnly
-                                                        // readOnly={!isEditing}
-                                                        // onChange={(e) => {
-                                                        //     handleStringChange(index, "detail_unit", e.target.value);
-                                                        // }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={unitprice3Refs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.supplier3_unitprice !== undefined ? _item.supplier3_unitprice : ''}
-                                                            // readOnly
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "supplier3_unitprice", e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={awarded3Refs.current[index]}
-                                                            type="checkbox"
-                                                            checked={_item.supplier3_awarded || false}  // 如果是 `true`，勾選；否則不勾選
-                                                            style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }}  // 編輯模式下可點擊
-                                                            disabled={!isEditing}  // 若不是編輯模式，禁用 checkbox
-                                                            onChange={(e) => {
-                                                                const newData = [...data2];
-                                                                const newAwardedValue = e.target.checked;
-                                                                newData[index] = {
-                                                                    ...newData[index],
-                                                                    supplier1_awarded: false,  // 取消其他兩個勾選
-                                                                    supplier2_awarded: false,
-                                                                    supplier3_awarded: newAwardedValue,  // 更新 supplier3_awarded
-                                                                };
-                                                                setData2(newData);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={noteRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.detail_note !== undefined ? _item.detail_note : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "detail_note", e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
+        if (currentsupplier === 2) {
+          return (
+            (!supplierid2in ||
+              (item?.customer_number && item.customer_number.toLowerCase().includes(supplierid2in.toLowerCase()))) &&
+            (!suppliername2in || (item?.name && item.name.toLowerCase().includes(suppliername2in.toLowerCase())))
+          );
+        }
 
+        if (currentsupplier === 3) {
+          return (
+            (!supplierid3in ||
+              (item?.customer_number && item.customer_number.toLowerCase().includes(supplierid3in.toLowerCase()))) &&
+            (!suppliername3in || (item?.name && item.name.toLowerCase().includes(suppliername3in.toLowerCase())))
+          );
+        }
 
-                                                </div>
-                                            </CellWithBar>
-                                        );
+        return false; // 預設不符合條件的情況
+      })
+    );
+  }, [
+    supplieridin,
+    suppliernamein,
+    supplierid2in,
+    suppliername2in,
+    supplierid3in,
+    suppliername3in,
+    currentsupplier,
+    customerdata,
+  ]);
 
-                                    })
-                                )}
-                            </div>
-                            {isEditing && (
-                                <span style={{ paddingLeft: '22px', position: 'relative' }}>
-                                    <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }}>
-                                        <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
-                                        新增品項
-                                    </button>
-                                </span>
-                            )}
-                        </div>
-                        <div className={scss.body_foot1}>
-                            <div>
-                                {filteredData.length > 0 && (
-                                    <ul ref={dropdownRef}
-                                        style={{
-                                            border: '1px solid #c1c1c1',
-                                            maxHeight: '300px',
-                                            overflowY: 'auto',
-                                            marginTop: '0px',
-                                            position: 'sticky',  /* 設置為sticky */
-                                            bottom: '0',  /* 固定在底部 */
-                                            left: '20px',
-                                            width: '1000px',
-                                            backgroundColor: 'white',
-                                            zIndex: 1004,
-                                            display: `${showSuggestions ? '' : 'none'}`  /* 根據showSuggestions控制顯示 */
-                                        }}>
-                                        {filteredData.map(item => (
-                                            <li
-                                                key={item.id}
-                                                onClick={() => handleSelect(item)}
-                                                style={{
-                                                    fontSize: '16px',
-                                                    cursor: 'pointer',
-                                                    padding: '8px',
-                                                    border: '1px solid #c1c1c1',
-                                                    display: 'flex', // 使用 flexbox
-                                                    justifyContent: 'space-between', // 在項目之間創建間距
-                                                    alignItems: 'center' // 垂直置中
-                                                }}
-                                            >
-                                                <span style={{ flex: '1 1 20%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                    {item.productid}
-                                                </span>
-                                                <span style={{ flex: '1 1 47%' }}> {/* 40% 的寬度，根據需要調整 */}
-                                                    {item.name}
-                                                </span>
-                                                <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                    {item.spec}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                            <div>
+  //#endregion
 
-                            </div>
-                            <div>
-                            </div>
-                        </div>
-                        {reviewopen && (
-                            <>
-                                <div
-                                    style={{
-                                        paddingTop: '18px',
-                                        paddingBottom: '18px'
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            height: '50px',
-                                            backgroundColor: '#f5f5f5',
-                                            display: 'flex',
-                                            justifyContent: 'center', // 水平置中
-                                            alignItems: 'center',     // 垂直置中
-                                            fontSize: '18px'
-                                        }}
-                                    >
-                                        審核流程
-                                    </span>
-                                </div>
-                                {/* <div className={scss.body_foot2}> */}
+  //#region  ===========【請購帶入功能區】
+  const [prbar, setPrbar] = useState(false);
 
-                                <div>
-                                    {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
-                                        <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                            尚未送審
-                                        </div>
-                                    ) : (
-                                        reviewflowdata.map((item, index) => (
-                                            <div
-                                                key={index}
-                                                style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-evenly', // 水平均分
-                                                    alignItems: 'center', // 垂直置中
-                                                    gap: '10px',
-                                                }}
-                                            >
-                                                {item.stages.map((stage: any, stageIndex: any) => (
-                                                    <div
-                                                        key={stageIndex}
-                                                        style={{
-                                                            flex: 1, // 平均分配空間
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            alignItems: 'left', // 子項目置中
-                                                            textAlign: 'center', // 文字置中
-                                                            margin: '0 10px',
-                                                        }}
-                                                    >
-                                                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
-                                                            {stage.review_title}
-                                                        </span>
-                                                        <div
-                                                            style={{
-                                                                fontSize: '18px',
-                                                                display: 'flex', // 使名字和圖示並排
-                                                                alignItems: 'center', // 讓它們垂直對齊
-                                                                textAlign: 'left', // 讓文字靠左對齊
-                                                            }}
-                                                        >
-                                                            <span>{stage.review_person}</span>
-                                                            {stage.review_time !== "0001-01-01T00:00:00" && (
-                                                                <span style={{ paddingLeft: '5px' }}>
-                                                                    <img
-                                                                        src={icon_review.src}
-                                                                        alt="review_status"
-                                                                        style={{
-                                                                            width: '25px',
-                                                                            height: '25px',
-                                                                        }}
-                                                                    />
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ))
-                                    )}
+  //#endregion
 
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
-                                    {reviewflowdata2.length > 0 ? (
-                                        reviewflowdata2.map((item, index) => (
-                                            <div key={index} style={{
-                                                flex: 1, // 平均分配空間
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'left', // 子項目置中
-                                                textAlign: 'center', // 文字置中
-                                                margin: '0 10px',
-                                            }}>
-                                                <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
-                                                    {item.stage_user_title}
-                                                </span>
-                                                <div style={{
-                                                    fontSize: '18px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    textAlign: 'left',
-                                                }}>
-                                                    <span>{item.stage_user_name}</span>
-                                                    {/* 如果有需要顯示圖示，在此處添加 */}
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : (
+  return (
+    <SubLayer isLoading_subLayer={isLoading} className="overflow-hidden">
+      <PageHeader02
+        tag={'新增' + pagename + '單'}
+        panelList={panelList}
+        customeRight={[
+          <>
+            <button
+              className={scss.shortredsquarebtn}
+              style={{
+                display: `${status === '' ? '' : 'none'}`,
+              }}
+              onClick={() => {
+                // console.log(data2);
+                handleAdd();
+              }}
+            >
+              儲存
+            </button>
+          </>,
+        ]}
+        customeLeft={[
+          <>
+            {/* 編輯按鈕 */}
+            {/* {statusin === "編輯中" && !isEditing && ( */}
 
-                                        <></>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                        {/* </div> */}
-                        {transopen && (
-                            <>
-                                <div
-                                    style={{
-                                        paddingTop: '18px',
-                                        paddingBottom: '18px'
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            height: '50px',
-                                            backgroundColor: '#f5f5f5',
-                                            display: 'flex',
-                                            justifyContent: 'center', // 水平置中
-                                            alignItems: 'center',     // 垂直置中
-                                            fontSize: '18px'
-                                        }}
-                                    >
-                                        {transtitle}
-                                    </span>
-                                </div>
-                                {data3.length === 0 ? (
-                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                        尚無紀錄
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className={scss.head_content1}>
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="進貨次數"
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        type: "number",
-                                                        // style: { color: 'red' },
-                                                        value: data3.length,
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
-                                                <div className={scss.thead19}>
-                                                    <span>序</span>
-                                                    <span>單號</span>
-                                                    <span>日期</span>
-                                                    <span>狀態</span>
-                                                    <span>備註</span>
-                                                    <span></span>
-                                                </div>
-
-                                                {data3 && (
-                                                    data3.map((_item: any, index: number) => (
-                                                        <CellWithBar key={index} className={scss.panelHeader19} onClick={() => {
-                                                            // alert(_item.prodreceiptid);
-                                                            myAlert.confirm({
-                                                                title: '確定導向此單據嗎?',
-                                                                content: _item.prodreceiptid,
-                                                                props: {
-                                                                    onOk: () => {
-                                                                        router.push({
-                                                                            pathname: `/factoryDepartment/PReceiptDetail`,
-                                                                            query: {
-                                                                                item: JSON.stringify(_item),
-                                                                            },
-                                                                        });
-                                                                    }
-                                                                }
-                                                            })
-                                                        }}>
-                                                            <div className={scss.row01}>
-                                                                <span>{index + 1}</span>
-                                                                <span>{_item.prodreceiptid}</span>
-                                                                <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                                <span>{_item.status}</span>
-                                                                <span>{_item.note}</span>
-                                                            </div>
-                                                        </CellWithBar>
-                                                    ))
-                                                )}
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        )}
-                        {reviewopen && (
-                            <>
-                                <div
-                                    style={{
-                                        paddingTop: '18px',
-                                        paddingBottom: '18px'
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            height: '50px',
-                                            backgroundColor: '#f5f5f5',
-                                            display: 'flex',
-                                            justifyContent: 'center', // 水平置中
-                                            alignItems: 'center',     // 垂直置中
-                                            fontSize: '18px'
-                                        }}
-                                    >
-                                        審核紀錄
-                                    </span>
-                                </div>
-                                {reviewhistroydata.length === 0 ? (
-                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                        尚無紀錄
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className={scss.head_content1}>
-
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="審核次數"
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        type: "number",
-                                                        // style: { color: 'red' },
-                                                        value: reviewhistroydata.length,
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                                            <div className={scss.body_content1} >
-                                                <div style={{ overflowX: 'auto' }}>
-                                                    <Thead01 type={'ReviewHistory2'} />
-                                                    {reviewhistroydata && (
-                                                        reviewhistroydata.map((_item: any, index: number) => (
-                                                            <CellWithBar key={index} className={scss.panelHeader18} >
-                                                                <div className={scss.row01}>
-                                                                    <span>{index + 1}</span>
-                                                                    <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                                    <span>{_item.document_status}</span>
-                                                                    <span>{_item.current_stage}</span>
-                                                                    <span>{_item.review_person}</span>
-                                                                    <span>{_item.review_memo}</span>
-                                                                </div>
-                                                            </CellWithBar>
-                                                        ))
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                {/* 審核 */}
-                <Modal
-                    visible={reviewbar}
-                    onCancel={() => {
-                        setReviewbar(false)
+            <>
+              {printopen && (
+                <button
+                  className={scss.shortsquarebtn}
+                  onClick={() => {
+                    handlePrint();
+                  }}
+                  title="列印單據"
+                  style={{ margin: '0px 10px' }}
+                >
+                  <span style={{ paddingRight: '5px' }}>
+                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                  </span>
+                  列印
+                </button>
+              )}
+              {excelopen && (
+                <button
+                  className={scss.shortsquarebtn}
+                  onClick={() => {
+                    handleExport();
+                  }}
+                  title="匯出單據"
+                  style={{ margin: '0px 10px' }}
+                >
+                  <span style={{ paddingRight: '5px' }}>
+                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                  </span>
+                  Excel
+                </button>
+              )}
+              {statusin === '編輯中' && isEditing && (
+                <>
+                  <button
+                    className={scss.shortsquarebtn}
+                    style={{}}
+                    onClick={() => {
+                      setPrbar(!prbar);
                     }}
-                    width="1010px"
-                    closable={false}  // 移除右上角的叉叉
-                    style={{ top: 150, }}
-                    bodyStyle={{ padding: 0, height: '300px', overflowY: 'auto' }}
-                    title={
-                        <>
-                            <span style={{ fontSize: '18px' }}>送審主旨</span>
-                            <input placeholder="主旨"
-                                style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
-                                value={documenttitle}
-                                onChange={(e) => { setDocumenttitle(e.target.value) }}
-                            />
-                        </>
-                    }
-                    footer={
-                        <button className={scss.shortredsquarebtn}
+                  >
+                    <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>☰</span>
+                    請購項目
+                  </button>
+                </>
+              )}
+            </>
+            {/* )} */}
+          </>,
+        ]}
+      />
+      <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
+        <div className={scss.right}>
+          <div className={scss.content}>
+            <div className={scss.head_body}>
+              <div>
+                <div className={scss.head_content1}>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption={`${pagename}單號`}
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: idin || ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="建立人員"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: create_byin,
+                        },
+                      }}
+                    />
+                    <InputSel
+                      caption="建立日期"
+                      className="global_tip_must"
+                      disabled={!isEditing}
+                      captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      datePickerProps={{
+                        props: {
+                          value: create_atin ? dayjs(create_atin) : null,
+                          onChange: (e) => {
+                            setCreate_atin(e ? dayjs(e).format('YYYY-MM-DDTHH:mm:ssZ') : '');
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="排版用"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      className="invisible"
+                      inputProps={{
+                        props: {
+                          value: ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="排版用"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      className="invisible"
+                      inputProps={{
+                        props: {
+                          value: ' ',
+                        },
+                      }}
+                    />
+                  </div>
+                  <div></div>
+                </div>
+                <div className={scss.head_content2}>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商1編號"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplieridin,
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            setCurrentSupplier(1);
+                            setSupplieridin(value); // 僅更新 supplieridin
+                            setIsFilterVisible(true); // 隱藏篩選區域
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商1名稱"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliernamein,
+                          // onChange: (e) => { setSuppliernamein(e.target.value) }
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            setCurrentSupplier(1);
+                            setSuppliernamein(value); // 僅更新 suppliernamein
+                            setIsFilterVisible(true); // 隱藏篩選區域
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商1地址"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplieraddressin,
+                          onChange: (e) => {
+                            setSupplieraddressin(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商1電話"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplierphonein,
+                          onChange: (e) => {
+                            setSupplierphonein(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商1聯絡人"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliercontactin,
+                          onChange: (e) => {
+                            setSuppliercontactin(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <button
+                      style={{
+                        display: `${isEditing ? '' : 'none'}`,
+                        width: '39px',
+                        backgroundColor: '#f5f5f5',
+                        border: '1px solid #c1c1c1',
+                        borderRadius: '3px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        fontWeight: 'bolder',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#e0e0e0';
+                        e.currentTarget.style.borderColor = '#a1a1a1';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        e.currentTarget.style.borderColor = '#c1c1c1';
+                      }}
+                      onClick={() => {
+                        setCurrentSupplier(1);
+                        setCustomerbar(true);
+                      }}
+                    >
+                      <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                    </button>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="備註說明"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: notein,
+                          onChange: (e) => {
+                            setNotein(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商2編號"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplierid2in,
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            setCurrentSupplier(2);
+                            setSupplierid2in(value); // 僅更新 supplieridin
+                            setIsFilterVisible(true); // 隱藏篩選區域
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商2名稱"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliername2in,
+                          // onChange: (e) => { setSuppliername2in(e.target.value) }
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            setCurrentSupplier(2);
+                            setSuppliername2in(value); // 僅更新 supplieridin
+                            setIsFilterVisible(true); // 隱藏篩選區域
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商2地址"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplieraddress2in,
+                          onChange: (e) => {
+                            setSupplieraddress2in(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商2電話"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplierphone2in,
+                          onChange: (e) => {
+                            setSupplierphone2in(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商2聯絡人"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliercontact2in,
+                          onChange: (e) => {
+                            setSuppliercontact2in(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <button
+                      style={{
+                        display: `${isEditing ? '' : 'none'}`,
+                        width: '39px',
+                        backgroundColor: '#f5f5f5',
+                        border: '1px solid #c1c1c1',
+                        borderRadius: '3px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        fontWeight: 'bolder',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#e0e0e0';
+                        e.currentTarget.style.borderColor = '#a1a1a1';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        e.currentTarget.style.borderColor = '#c1c1c1';
+                      }}
+                      onClick={() => {
+                        setCurrentSupplier(2);
+                        setCustomerbar(true);
+                      }}
+                    >
+                      <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                    </button>
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商3編號"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplierid3in,
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            setCurrentSupplier(3);
+                            setSupplierid3in(value); // 僅更新 supplieridin
+                            setIsFilterVisible(true); // 隱藏篩選區域
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商3名稱"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliername3in,
+                          // onChange: (e) => { setSuppliername3in(e.target.value) }
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            setCurrentSupplier(3);
+                            setSuppliername3in(value); // 僅更新 supplieridin
+                            setIsFilterVisible(true); // 隱藏篩選區域
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商3地址"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplieraddress3in,
+                          onChange: (e) => {
+                            setSupplieraddress3in(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商3電話"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplierphone3in,
+                          onChange: (e) => {
+                            setSupplierphone3in(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商3聯絡人"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliercontact3in,
+                          onChange: (e) => {
+                            setSuppliercontact3in(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <button
+                      style={{
+                        display: `${isEditing ? '' : 'none'}`,
+                        width: '39px',
+                        backgroundColor: '#f5f5f5',
+                        border: '1px solid #c1c1c1',
+                        borderRadius: '3px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        fontWeight: 'bolder',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#e0e0e0';
+                        e.currentTarget.style.borderColor = '#a1a1a1';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        e.currentTarget.style.borderColor = '#c1c1c1';
+                      }}
+                      onClick={() => {
+                        setCurrentSupplier(3);
+                        setCustomerbar(true);
+                      }}
+                    >
+                      <img src={icon_search.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                    </button>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '50%',
+                    padding: '10px',
+                    // border: '1px solid #ccc',
+                    borderRadius: '4px',
+                  }}
+                >
+                  {(suppliernamein ||
+                    supplieridin ||
+                    suppliername2in ||
+                    supplierid2in ||
+                    suppliername3in ||
+                    supplierid3in) &&
+                    filteredData4.length > 0 &&
+                    isFilterVisible && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '100%',
+                          left: 0,
+                          width: '100%',
+                          backgroundColor: 'white',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                          zIndex: 1005,
+                          maxHeight: '300px',
+                          overflowY: 'auto',
+                        }}
+                      >
+                        {filteredData4.map((_item, index) => (
+                          <div
+                            key={index}
                             onClick={() => {
-                                if (data2.length === 0) {
-                                    myAlert.warning({ title: '尚未加入採購項目' })
-                                    return;
-                                } else if (review_flow === '') {
-                                    myAlert.warning({ title: '請選擇審核流程' })
-                                    return;
-                                }
-                                else {
-                                    sentToReview("審核");
-                                    setReviewbar(false);
-                                    setStatusin("審核中");
-                                }
-                            }}>
-                            送審
-                        </button>
-                    }
-                >
-                    <div style={{ padding: '0px 5px' }} >
-                        <div style={{ maxHeight: '520px', overflow: 'auto' }}>  {/* 新增一個 div 包裹 Radio 群組 */}
-                            <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
-                                <Space direction="vertical">
-                                    {reviewdata.map((_item: any) => (
-                                        <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
-                                            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-                                                <span style={{ width: '150px' }}>
-                                                    {_item.name}
-                                                </span>
-                                                <span style={{ width: '100%' }}>
-                                                    {_item.stages.map((_stage: any, index: number) => (
-                                                        <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
-                                                            {_stage.review_type}：{_stage.stage_user_name}
-                                                            {index < _item.stages.length - 1 && (
-                                                                <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </span>
-                                            </div>
-                                        </Radio>
-                                    ))}
-                                </Space>
-                            </Radio.Group>
-                        </div>
-                    </div>
-                </Modal>
-
-                <Modal
-                    visible={customerbar}
-                    onCancel={() => setCustomerbar(false)}
-                    width="1010px"
-                    closable={true}
-                    style={{ top: 150 }}
-                    bodyStyle={{ padding: '0px', height: '500px', overflowY: 'auto' }}
-                    title={<>廠商查詢</>}
-                    footer={null}
-                >
-                    <div style={{ padding: '0px 20px' }}>
-                        {/* 篩選區域 - 固定在頂部 */}
-                        <div
-                            style={{
-                                position: 'sticky',
-                                top: 0, // 固定在 Modal 內容區的頂部
-                                zIndex: 10, // 確保不會被其他內容蓋住
-                                background: '#fff', // 設置背景，避免滾動時透視
-                                padding: '10px 0', // 增加一點內邊距，美觀調整
+                              if (currentsupplier === 1) {
+                                setSuppliernamein(_item.name || '');
+                                setSupplieraddressin(
+                                  (_item.county || '') + (_item.district || '') + (_item.address || '')
+                                );
+                                setSupplierphonein(_item.phone || '');
+                                setSuppliertaxidin(_item.tax_id || '');
+                                setSupplieridin(_item.customer_number || '');
+                                setSupplierfaxin(_item.fax || '');
+                                setSuppliercontactin(_item.contact || '');
+                                setSupplieruuidin(_item.id || '');
+                                setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                setIsFilterVisible(false);
+                              } else if (currentsupplier === 2) {
+                                setSuppliername2in(_item.name || '');
+                                setSupplieraddress2in(
+                                  (_item.county || '') + (_item.district || '') + (_item.address || '')
+                                );
+                                setSupplierphone2in(_item.phone || '');
+                                setSuppliertaxid2in(_item.tax_id || '');
+                                setSupplierid2in(_item.customer_number || '');
+                                setSupplierfax2in(_item.fax || '');
+                                setSuppliercontact2in(_item.contact || '');
+                                setSupplieruuid2in(_item.id || '');
+                                setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                setIsFilterVisible(false);
+                              } else if (currentsupplier === 3) {
+                                setSuppliername3in(_item.name || '');
+                                setSupplieraddress3in(
+                                  (_item.county || '') + (_item.district || '') + (_item.address || '')
+                                );
+                                setSupplierphone3in(_item.phone || '');
+                                setSuppliertaxid3in(_item.tax_id || '');
+                                setSupplierid3in(_item.customer_number || '');
+                                setSupplierfax3in(_item.fax || '');
+                                setSuppliercontact3in(_item.contact || '');
+                                setSupplieruuid3in(_item.id || '');
+                                setFilters({ ...filters, name: '' }); // 點擊後清空篩選條件
+                                setIsFilterVisible(false);
+                              }
                             }}
+                            style={{
+                              padding: '10px',
+                              cursor: 'pointer',
+                              borderBottom: '1px solid #f0f0f0',
+                            }}
+                          >
+                            <div style={{ fontWeight: 'bold', fontSize: '18px' }}>
+                              {_item.name} {_item.conta}
+                            </div>
+                            <div style={{ fontSize: '16px', color: '#888' }}>
+                              {_item.county} {_item.district} {_item.address}
+                            </div>
+                            <div style={{ fontSize: '16px', color: '#555' }}>聯絡人: {_item.contact}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                </div>
+              </div>
+              <div>
+                {statusarea && (
+                  <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="小計"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          style: { textAlign: 'right' },
+                          value: totalprice1 || ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="營業稅"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          style: { textAlign: 'right' },
+                          value: taxprice1 || ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="應付金額"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          style: { textAlign: 'right' },
+                          value: totalpayprice1 || ' ',
+                        },
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div
+              style={{
+                paddingTop: `${prbar ? '18px' : '0px'}`,
+                paddingBottom: '18px',
+              }}
+            >
+              <span
+                style={{
+                  height: '50px',
+                  backgroundColor: '#f5f5f5',
+                  display: 'flex',
+                  justifyContent: 'center', // 水平置中
+                  alignItems: 'center', // 垂直置中
+                  fontSize: '18px',
+                }}
+              >
+                {pagename}項目
+              </span>
+            </div>
+            <div className={scss.head_content1}>
+              <InputSel
+                {...inputSelProps}
+                caption="品項數量"
+                disabled={true}
+                inputProps={{
+                  props: {
+                    type: 'number',
+                    // style: { color: 'red' },
+                    value: data2.length,
+                  },
+                }}
+              />
+            </div>
+            <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+              <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
+                {/* <Thead01 type={'AddPR_ReqList'} /> */}
+                <div className={scss.thead20}>
+                  <span></span>
+                  <span>序</span>
+                  <span>料號</span>
+                  <span>品名</span>
+                  <span>規格</span>
+                  <span>數量</span>
+                  <span>單位</span>
+                  <span>廠商1</span>
+                  <span>單價1</span>
+                  <span>成交否1</span>
+                  <span>廠商2</span>
+                  <span>單價2</span>
+                  <span>成交否2</span>
+                  <span>廠商3</span>
+                  <span>單價3</span>
+                  <span>成交否3</span>
+                  <span>備註(用途說明)</span>
+                  <span></span>
+                </div>
+                {data2 &&
+                  data2.map((_item, index) => {
+                    // const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                    // _item.totalprice = Totalprice
+                    // if (_item.wantinquantity === 0) {
+                    //     const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.alreadyinquantity);
+                    //     _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
+                    // }
+                    return (
+                      <CellWithBar key={index} className={scss.panelHeader20}>
+                        <div className={scss.row01}>
+                          <span>
+                            <button
+                              style={{ display: isEditing ? '' : 'none' }}
+                              onClick={() => {
+                                handleRemoveDetail(index, _item);
+                              }}
+                            >
+                              {/* <img src={icon_delete.src} alt="remove" style={{ width: '30px', height: '20px' }} /> */}
+                              <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                            </button>
+                          </span>
+                          <span>{index + 1}</span>
+                          <span>
+                            <input
+                              ref={productidRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.detail_productid !== undefined ? _item.detail_productid : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'detail_productid', e.target.value);
+                                setCurrentIndex(index);
+                                // setHandinputproductid(e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={nameRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.detail_name !== undefined ? _item.detail_name : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'detail_name', e.target.value);
+                                setCurrentIndex(index);
+                                // setHandinputname(e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={specRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.detail_spec !== undefined ? _item.detail_spec : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'detail_spec', e.target.value);
+                                setCurrentIndex(index);
+                                // setHandinputspec(e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={quantityRefs.current[index]}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type={isEditing ? 'number' : 'text'}
+                              // value={Number(_item.quantity)}
+                              // value={_item.quantity !== undefined ? _item.quantity : 0}
+                              value={isEditing ? _item.detail_quantity : Number(_item.detail_quantity).toLocaleString()}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'detail_quantity', e.target.value);
+
+                                {
+                                  /* 處理變更 */
+                                }
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={unitRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.detail_unit !== undefined ? _item.detail_unit : ''}
+                              // readOnly
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'detail_unit', e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={suppliername1Refs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={
+                                _item.supplier1_name !== undefined && _item.supplier1_name !== ''
+                                  ? _item.supplier1_name
+                                  : suppliernamein
+                              }
+                              readOnly
+                              // readOnly={!isEditing}
+                              // onChange={(e) => {
+                              //     handleStringChange(index, "detail_unit", e.target.value);
+                              // }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={unitprice1Refs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.supplier1_unitprice !== undefined ? _item.supplier1_unitprice : ''}
+                              // readOnly
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'supplier1_unitprice', e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={awarded1Refs.current[index]}
+                              type="checkbox"
+                              checked={_item.supplier1_awarded || false} // 如果是 `true`，勾選；否則不勾選
+                              style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }} // 編輯模式下可點擊
+                              disabled={!isEditing} // 若不是編輯模式，禁用 checkbox
+                              onChange={(e) => {
+                                const newData = [...data2];
+                                const newAwardedValue = e.target.checked;
+                                newData[index] = {
+                                  ...newData[index],
+                                  supplier1_awarded: newAwardedValue, // 更新 supplier1_awarded
+                                  supplier2_awarded: false, // 取消其他兩個勾選
+                                  supplier3_awarded: false,
+                                };
+                                setData2(newData);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={suppliername2Refs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={
+                                _item.supplier2_name !== undefined && _item.supplier2_name !== ''
+                                  ? _item.supplier2_name
+                                  : suppliername2in
+                              }
+                              readOnly
+                              // readOnly={!isEditing}
+                              // onChange={(e) => {
+                              //     handleStringChange(index, "detail_unit", e.target.value);
+                              // }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={unitprice2Refs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.supplier2_unitprice !== undefined ? _item.supplier2_unitprice : ''}
+                              // readOnly
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'supplier2_unitprice', e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={awarded2Refs.current[index]}
+                              type="checkbox"
+                              checked={_item.supplier2_awarded || false} // 如果是 `true`，勾選；否則不勾選
+                              style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }} // 編輯模式下可點擊
+                              disabled={!isEditing} // 若不是編輯模式，禁用 checkbox
+                              onChange={(e) => {
+                                const newData = [...data2];
+                                const newAwardedValue = e.target.checked;
+                                newData[index] = {
+                                  ...newData[index],
+                                  supplier1_awarded: false, // 取消其他兩個勾選
+                                  supplier2_awarded: newAwardedValue, // 更新 supplier2_awarded
+                                  supplier3_awarded: false,
+                                };
+                                setData2(newData);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={suppliername3Refs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={
+                                _item.supplier3_name !== undefined && _item.supplier3_name !== ''
+                                  ? _item.supplier3_name
+                                  : suppliername3in
+                              }
+                              readOnly
+                              // readOnly={!isEditing}
+                              // onChange={(e) => {
+                              //     handleStringChange(index, "detail_unit", e.target.value);
+                              // }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={unitprice3Refs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.supplier3_unitprice !== undefined ? _item.supplier3_unitprice : ''}
+                              // readOnly
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'supplier3_unitprice', e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={awarded3Refs.current[index]}
+                              type="checkbox"
+                              checked={_item.supplier3_awarded || false} // 如果是 `true`，勾選；否則不勾選
+                              style={{ transform: 'scale(1.5)', cursor: isEditing ? 'pointer' : 'not-allowed' }} // 編輯模式下可點擊
+                              disabled={!isEditing} // 若不是編輯模式，禁用 checkbox
+                              onChange={(e) => {
+                                const newData = [...data2];
+                                const newAwardedValue = e.target.checked;
+                                newData[index] = {
+                                  ...newData[index],
+                                  supplier1_awarded: false, // 取消其他兩個勾選
+                                  supplier2_awarded: false,
+                                  supplier3_awarded: newAwardedValue, // 更新 supplier3_awarded
+                                };
+                                setData2(newData);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={noteRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.detail_note !== undefined ? _item.detail_note : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'detail_note', e.target.value);
+                              }}
+                            />
+                          </span>
+                        </div>
+                      </CellWithBar>
+                    );
+                  })}
+              </div>
+              {isEditing && (
+                <span style={{ paddingLeft: '22px', position: 'relative' }}>
+                  <button
+                    onClick={() => {
+                      handleAddDetail();
+                    }}
+                    style={{ fontSize: '18px' }}
+                  >
+                    <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
+                    新增品項
+                  </button>
+                </span>
+              )}
+            </div>
+            <div className={scss.body_foot1}>
+              <div>
+                {filteredData.length > 0 && (
+                  <ul
+                    ref={dropdownRef}
+                    style={{
+                      border: '1px solid #c1c1c1',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      marginTop: '0px',
+                      position: 'sticky' /* 設置為sticky */,
+                      bottom: '0' /* 固定在底部 */,
+                      left: '20px',
+                      width: '1000px',
+                      backgroundColor: 'white',
+                      zIndex: 1004,
+                      display: `${showSuggestions ? '' : 'none'}` /* 根據showSuggestions控制顯示 */,
+                    }}
+                  >
+                    {filteredData.map((item) => (
+                      <li
+                        key={item.id}
+                        onClick={() => handleSelect(item)}
+                        style={{
+                          fontSize: '16px',
+                          cursor: 'pointer',
+                          padding: '8px',
+                          border: '1px solid #c1c1c1',
+                          display: 'flex', // 使用 flexbox
+                          justifyContent: 'space-between', // 在項目之間創建間距
+                          alignItems: 'center', // 垂直置中
+                        }}
+                      >
+                        <span style={{ flex: '1 1 20%' }}>
+                          {' '}
+                          {/* 30% 的寬度，根據需要調整 */}
+                          {item.productid}
+                        </span>
+                        <span style={{ flex: '1 1 47%' }}>
+                          {' '}
+                          {/* 40% 的寬度，根據需要調整 */}
+                          {item.name}
+                        </span>
+                        <span style={{ flex: '1 1 30%' }}>
+                          {' '}
+                          {/* 30% 的寬度，根據需要調整 */}
+                          {item.spec}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+            {reviewopen && (
+              <>
+                <div
+                  style={{
+                    paddingTop: '18px',
+                    paddingBottom: '18px',
+                  }}
+                >
+                  <span
+                    style={{
+                      height: '50px',
+                      backgroundColor: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center', // 水平置中
+                      alignItems: 'center', // 垂直置中
+                      fontSize: '18px',
+                    }}
+                  >
+                    審核流程
+                  </span>
+                </div>
+                {/* <div className={scss.body_foot2}> */}
+
+                <div>
+                  {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
+                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>尚未送審</div>
+                  ) : (
+                    reviewflowdata.map((item, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-evenly', // 水平均分
+                          alignItems: 'center', // 垂直置中
+                          gap: '10px',
+                        }}
+                      >
+                        {item.stages.map((stage: any, stageIndex: any) => (
+                          <div
+                            key={stageIndex}
+                            style={{
+                              flex: 1, // 平均分配空間
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'left', // 子項目置中
+                              textAlign: 'center', // 文字置中
+                              margin: '0 10px',
+                            }}
+                          >
+                            <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
+                              {stage.review_title}
+                            </span>
+                            <div
+                              style={{
+                                fontSize: '18px',
+                                display: 'flex', // 使名字和圖示並排
+                                alignItems: 'center', // 讓它們垂直對齊
+                                textAlign: 'left', // 讓文字靠左對齊
+                              }}
+                            >
+                              <span>{stage.review_person}</span>
+                              {stage.review_time !== '0001-01-01T00:00:00' && (
+                                <span style={{ paddingLeft: '5px' }}>
+                                  <img
+                                    src={icon_review.src}
+                                    alt="review_status"
+                                    style={{
+                                      width: '25px',
+                                      height: '25px',
+                                    }}
+                                  />
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                  {reviewflowdata2.length > 0 ? (
+                    reviewflowdata2.map((item, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          flex: 1, // 平均分配空間
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'left', // 子項目置中
+                          textAlign: 'center', // 文字置中
+                          margin: '0 10px',
+                        }}
+                      >
+                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
+                          {item.stage_user_title}
+                        </span>
+                        <div
+                          style={{
+                            fontSize: '18px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            textAlign: 'left',
+                          }}
                         >
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '16px' }}>
-                                {/* 縣市篩選 */}
-                                <select
-                                    value={filters.county}
-                                    onChange={(e) => setFilters({ ...filters, county: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc' }}
-                                >
-                                    <option value="">全部縣市</option>
-                                    {countyOptions.map((county, index) => (
-                                        <option key={index} value={county}>{county}</option>
-                                    ))}
-                                </select>
-
-                                {/* 廠商編號篩選 */}
-                                <input
-                                    type="text"
-                                    placeholder="輸入廠商編號"
-                                    value={filters.customer_number}
-                                    onChange={(e) => setFilters({ ...filters, customer_number: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
-                                />
-                                {/* 廠商名稱篩選 */}
-                                <input
-                                    type="text"
-                                    placeholder="輸入公司名稱"
-                                    value={filters.name}
-                                    onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
-                                />
-                            </div>
-
-                            {/* 資料列表 */}
-                            <div className={scss.thead21}>
-                                <span>編號</span>
-                                <span>名稱</span>
-                                <span>地址</span>
-                                <span></span>
-                            </div>
+                          <span>{item.stage_user_name}</span>
+                          {/* 如果有需要顯示圖示，在此處添加 */}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </>
+            )}
+            {/* </div> */}
+            {transopen && (
+              <>
+                <div
+                  style={{
+                    paddingTop: '18px',
+                    paddingBottom: '18px',
+                  }}
+                >
+                  <span
+                    style={{
+                      height: '50px',
+                      backgroundColor: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center', // 水平置中
+                      alignItems: 'center', // 垂直置中
+                      fontSize: '18px',
+                    }}
+                  >
+                    {transtitle}
+                  </span>
+                </div>
+                {data3.length === 0 ? (
+                  <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>尚無紀錄</div>
+                ) : (
+                  <>
+                    <div className={scss.head_content1}>
+                      <InputSel
+                        {...inputSelProps}
+                        caption="進貨次數"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            type: 'number',
+                            // style: { color: 'red' },
+                            value: data3.length,
+                          },
+                        }}
+                      />
+                    </div>
+                    <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                      <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
+                        <div className={scss.thead19}>
+                          <span>序</span>
+                          <span>單號</span>
+                          <span>日期</span>
+                          <span>狀態</span>
+                          <span>備註</span>
+                          <span></span>
                         </div>
 
-                        {filteredData2 && (
-                            filteredData2.map((_item, index) => (
-                                <CellWithBar
-                                    key={index}
-                                    className={scss.panelHeader21}
-                                    onClick={() => {
-                                        const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
-
-                                        if (currentsupplier === 1) {
-                                            setSuppliernamein(safeValue(_item.name));
-                                            setSupplieraddressin(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                            setSupplierphonein(safeValue(_item.phone));
-                                            setSuppliertaxidin(safeValue(_item.tax_id));
-                                            setSupplieridin(safeValue(_item.customer_number));
-                                            setSupplierfaxin(safeValue(_item.fax));
-                                            setSuppliercontactin(safeValue(_item.contact));
-                                            setSupplieruuidin(safeValue(_item.id));
-                                        } else if (currentsupplier === 2) {
-                                            setSuppliername2in(safeValue(_item.name));
-                                            setSupplieraddress2in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                            setSupplierphone2in(safeValue(_item.phone));
-                                            setSuppliertaxid2in(safeValue(_item.tax_id));
-                                            setSupplierid2in(safeValue(_item.customer_number));
-                                            setSupplierfax2in(safeValue(_item.fax));
-                                            setSuppliercontact2in(safeValue(_item.contact));
-                                            setSupplieruuid2in(safeValue(_item.id));
-                                        } else if (currentsupplier === 3) {
-                                            setSuppliername3in(safeValue(_item.name));
-                                            setSupplieraddress3in(safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address));
-                                            setSupplierphone3in(safeValue(_item.phone));
-                                            setSuppliertaxid3in(safeValue(_item.tax_id));
-                                            setSupplierid3in(safeValue(_item.customer_number));
-                                            setSupplierfax3in(safeValue(_item.fax));
-                                            setSuppliercontact3in(safeValue(_item.contact));
-                                            setSupplieruuid3in(safeValue(_item.id));
-                                        }
-
-                                        setCustomerbar(false);
-                                    }}
-                                >
-                                    <div className={scss.row01}>
-                                        <span>{_item.customer_number}</span>
-                                        <span>{_item.name}</span>
-                                        <span>{_item.county}{_item.district}{_item.address}</span>
-                                    </div>
-                                </CellWithBar>
-                            ))
-                        )}
+                        {data3 &&
+                          data3.map((_item: any, index: number) => (
+                            <CellWithBar
+                              key={index}
+                              className={scss.panelHeader19}
+                              onClick={() => {
+                                // alert(_item.prodreceiptid);
+                                myAlert.confirm({
+                                  title: '確定導向此單據嗎?',
+                                  content: _item.prodreceiptid,
+                                  props: {
+                                    onOk: () => {
+                                      router.push({
+                                        pathname: `/factoryDepartment/PReceiptDetail`,
+                                        query: {
+                                          item: JSON.stringify(_item),
+                                        },
+                                      });
+                                    },
+                                  },
+                                });
+                              }}
+                            >
+                              <div className={scss.row01}>
+                                <span>{index + 1}</span>
+                                <span>{_item.prodreceiptid}</span>
+                                <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                <span>{_item.status}</span>
+                                <span>{_item.note}</span>
+                              </div>
+                            </CellWithBar>
+                          ))}
+                      </div>
                     </div>
-                </Modal>
+                  </>
+                )}
+              </>
+            )}
+            {reviewopen && (
+              <>
+                <div
+                  style={{
+                    paddingTop: '18px',
+                    paddingBottom: '18px',
+                  }}
+                >
+                  <span
+                    style={{
+                      height: '50px',
+                      backgroundColor: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center', // 水平置中
+                      alignItems: 'center', // 垂直置中
+                      fontSize: '18px',
+                    }}
+                  >
+                    審核紀錄
+                  </span>
+                </div>
+                {reviewhistroydata.length === 0 ? (
+                  <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>尚無紀錄</div>
+                ) : (
+                  <>
+                    <div className={scss.head_content1}>
+                      <InputSel
+                        {...inputSelProps}
+                        caption="審核次數"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            type: 'number',
+                            // style: { color: 'red' },
+                            value: reviewhistroydata.length,
+                          },
+                        }}
+                      />
+                    </div>
+                    <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                      <div className={scss.body_content1}>
+                        <div style={{ overflowX: 'auto' }}>
+                          <Thead01 type={'ReviewHistory2'} />
+                          {reviewhistroydata &&
+                            reviewhistroydata.map((_item: any, index: number) => (
+                              <CellWithBar key={index} className={scss.panelHeader18}>
+                                <div className={scss.row01}>
+                                  <span>{index + 1}</span>
+                                  <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                  <span>{_item.document_status}</span>
+                                  <span>{_item.current_stage}</span>
+                                  <span>{_item.review_person}</span>
+                                  <span>{_item.review_memo}</span>
+                                </div>
+                              </CellWithBar>
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 審核 */}
+        <Modal
+          visible={reviewbar}
+          onCancel={() => {
+            setReviewbar(false);
+          }}
+          width="1010px"
+          closable={false} // 移除右上角的叉叉
+          style={{ top: 150 }}
+          bodyStyle={{ padding: 0, height: '300px', overflowY: 'auto' }}
+          title={
+            <>
+              <span style={{ fontSize: '18px' }}>送審主旨</span>
+              <input
+                placeholder="主旨"
+                style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                value={documenttitle}
+                onChange={(e) => {
+                  setDocumenttitle(e.target.value);
+                }}
+              />
+            </>
+          }
+          footer={
+            <button
+              className={scss.shortredsquarebtn}
+              onClick={() => {
+                if (data2.length === 0) {
+                  myAlert.warning({ title: '尚未加入採購項目' });
+
+                  return;
+                } else if (review_flow === '') {
+                  myAlert.warning({ title: '請選擇審核流程' });
+
+                  return;
+                } else {
+                  sentToReview('審核');
+                  setReviewbar(false);
+                  setStatusin('審核中');
+                }
+              }}
+            >
+              送審
+            </button>
+          }
+        >
+          <div style={{ padding: '0px 5px' }}>
+            <div style={{ maxHeight: '520px', overflow: 'auto' }}>
+              {' '}
+              {/* 新增一個 div 包裹 Radio 群組 */}
+              <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                <Space direction="vertical">
+                  {reviewdata.map((_item: any) => (
+                    <Radio
+                      key={_item.id}
+                      value={_item.id}
+                      onClick={() => {
+                        setReview(_item);
+                      }}
+                      style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                        <span style={{ width: '150px' }}>{_item.name}</span>
+                        <span style={{ width: '100%' }}>
+                          {_item.stages.map((_stage: any, index: number) => (
+                            <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                              {_stage.review_type}：{_stage.stage_user_name}
+                              {index < _item.stages.length - 1 && (
+                                <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                              )}
+                            </div>
+                          ))}
+                        </span>
+                      </div>
+                    </Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
             </div>
-        </SubLayer >
+          </div>
+        </Modal>
 
-    )
+        <Modal
+          visible={customerbar}
+          onCancel={() => setCustomerbar(false)}
+          width="1010px"
+          closable={true}
+          style={{ top: 150 }}
+          bodyStyle={{ padding: '0px', height: '500px', overflowY: 'auto' }}
+          title={<>廠商查詢</>}
+          footer={null}
+        >
+          <div style={{ padding: '0px 20px' }}>
+            {/* 篩選區域 - 固定在頂部 */}
+            <div
+              style={{
+                position: 'sticky',
+                top: 0, // 固定在 Modal 內容區的頂部
+                zIndex: 10, // 確保不會被其他內容蓋住
+                background: '#fff', // 設置背景，避免滾動時透視
+                padding: '10px 0', // 增加一點內邊距，美觀調整
+              }}
+            >
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '16px' }}>
+                {/* 縣市篩選 */}
+                <select
+                  value={filters.county}
+                  onChange={(e) => setFilters({ ...filters, county: e.target.value })}
+                  style={{ padding: '5px', borderBottom: '1px solid #ccc' }}
+                >
+                  <option value="">全部縣市</option>
+                  {countyOptions.map((county, index) => (
+                    <option key={index} value={county}>
+                      {county}
+                    </option>
+                  ))}
+                </select>
 
+                {/* 廠商編號篩選 */}
+                <input
+                  type="text"
+                  placeholder="輸入廠商編號"
+                  value={filters.customer_number}
+                  onChange={(e) => setFilters({ ...filters, customer_number: e.target.value })}
+                  style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                />
+                {/* 廠商名稱篩選 */}
+                <input
+                  type="text"
+                  placeholder="輸入公司名稱"
+                  value={filters.name}
+                  onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                  style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                />
+              </div>
+
+              {/* 資料列表 */}
+              <div className={scss.thead21}>
+                <span>編號</span>
+                <span>名稱</span>
+                <span>地址</span>
+                <span></span>
+              </div>
+            </div>
+
+            {filteredData2 &&
+              filteredData2.map((_item, index) => (
+                <CellWithBar
+                  key={index}
+                  className={scss.panelHeader21}
+                  onClick={() => {
+                    const safeValue = (value: any) => value || ''; // 確保欄位不為 null 或 undefined
+
+                    if (currentsupplier === 1) {
+                      setSuppliernamein(safeValue(_item.name));
+                      setSupplieraddressin(
+                        safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address)
+                      );
+                      setSupplierphonein(safeValue(_item.phone));
+                      setSuppliertaxidin(safeValue(_item.tax_id));
+                      setSupplieridin(safeValue(_item.customer_number));
+                      setSupplierfaxin(safeValue(_item.fax));
+                      setSuppliercontactin(safeValue(_item.contact));
+                      setSupplieruuidin(safeValue(_item.id));
+                    } else if (currentsupplier === 2) {
+                      setSuppliername2in(safeValue(_item.name));
+                      setSupplieraddress2in(
+                        safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address)
+                      );
+                      setSupplierphone2in(safeValue(_item.phone));
+                      setSuppliertaxid2in(safeValue(_item.tax_id));
+                      setSupplierid2in(safeValue(_item.customer_number));
+                      setSupplierfax2in(safeValue(_item.fax));
+                      setSuppliercontact2in(safeValue(_item.contact));
+                      setSupplieruuid2in(safeValue(_item.id));
+                    } else if (currentsupplier === 3) {
+                      setSuppliername3in(safeValue(_item.name));
+                      setSupplieraddress3in(
+                        safeValue(_item.county) + safeValue(_item.district) + safeValue(_item.address)
+                      );
+                      setSupplierphone3in(safeValue(_item.phone));
+                      setSuppliertaxid3in(safeValue(_item.tax_id));
+                      setSupplierid3in(safeValue(_item.customer_number));
+                      setSupplierfax3in(safeValue(_item.fax));
+                      setSuppliercontact3in(safeValue(_item.contact));
+                      setSupplieruuid3in(safeValue(_item.id));
+                    }
+
+                    setCustomerbar(false);
+                  }}
+                >
+                  <div className={scss.row01}>
+                    <span>{_item.customer_number}</span>
+                    <span>{_item.name}</span>
+                    <span>
+                      {_item.county}
+                      {_item.district}
+                      {_item.address}
+                    </span>
+                  </div>
+                </CellWithBar>
+              ))}
+          </div>
+        </Modal>
+      </div>
+    </SubLayer>
+  );
 }

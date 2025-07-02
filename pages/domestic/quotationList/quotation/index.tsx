@@ -23,7 +23,7 @@
 // 報價單
 import React, { useState, useReducer, useEffect, useContext, useMemo, memo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -173,7 +173,7 @@ type Tprofile = {
   requiredDoorType: string;
   requiredDoorQuantity: string;
   estimatedDiscount: string; // number
-  scheduledProcurementOrBidDate: Moment | null;
+  scheduledProcurementOrBidDate: Dayjs | null;
   type: string;
 };
 
@@ -1901,7 +1901,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(createdAt).toISOString(),
+        isoString: dayjs(createdAt).toISOString(),
       };
     });
   }, [quotationData]);
@@ -2234,7 +2234,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       requiredDoorQuantity: String(latestContent?.requiredDoorQuantity ?? ''),
       estimatedDiscount: latestContent?.estimatedDiscount ?? '',
       scheduledProcurementOrBidDate: latestContent?.scheduledProcurementOrBidDate
-        ? moment(latestContent.scheduledProcurementOrBidDate)
+        ? dayjs(latestContent.scheduledProcurementOrBidDate)
         : null,
       type: latestContent?.type ?? '',
     });

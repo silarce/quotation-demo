@@ -4,14 +4,14 @@ import { EventProps, EventWrapperProps, Calendar, momentLocalizer } from 'react-
 
 import BigCalendar from 'react-big-calendar';
 
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Badge } from 'antd';
 
 import scss from './demo01.module.scss';
 
-const localizer = momentLocalizer(moment);
+const localizer = momentLocalizer(dayjs);
 
 export default function Demo01() {
   const [render, setRender] = useState(false);

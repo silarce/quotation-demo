@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import _, { add } from 'lodash';
 
 import scss from './PEntryDetail.module.scss';
@@ -50,2128 +50,2058 @@ import { textAlign } from 'html2canvas/dist/types/css/property-descriptors/text-
 import { title } from 'process';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 import icon_tray_in_gray from 'public/image/icon/fc_tray_in_gray.svg';
-import { callTray, updateTrayStatus, getTrayStatus } from "../../../js/api/callTrayService";
+import { callTray, updateTrayStatus, getTrayStatus } from '../../../js/api/callTrayService';
 
 export default function PEntryDetail() {
-    //#region ===========【頁面參數】
-    const [pagename, setPagename] = useState<string>("入庫")
-    const [statusarea, setStatusarea] = useState<boolean>(true)
-    const [excelopen, setExcelopen] = useState<boolean>(false)
-    const [printopen, setPrintopen] = useState<boolean>(false)
-    const [reviewopen, setReviewopen] = useState<boolean>(false)
-    const [transtitle, setTranTitle] = useState<string>("")
-    const [transopen, setTransopen] = useState<boolean>(false)
-    //#endregion
-    //#region ===========【路由參數】
-    const router = useRouter();
-    const {
-        firstin,
-        item
-    } = router.query;
+  //#region ===========【頁面參數】
+  const [pagename, setPagename] = useState<string>('入庫');
+  const [statusarea, setStatusarea] = useState<boolean>(true);
+  const [excelopen, setExcelopen] = useState<boolean>(false);
+  const [printopen, setPrintopen] = useState<boolean>(false);
+  const [reviewopen, setReviewopen] = useState<boolean>(false);
+  const [transtitle, setTranTitle] = useState<string>('');
+  const [transopen, setTransopen] = useState<boolean>(false);
+  //#endregion
+  //#region ===========【路由參數】
+  const router = useRouter();
+  const { firstin, item } = router.query;
 
-    const parsedItem = item ? JSON.parse(item as string) : null;
-    //#endregion
+  const parsedItem = item ? JSON.parse(item as string) : null;
+  //#endregion
 
-    //#region ===========【登入者】
-    const { userInfo } = useContext(AppContext);
-    const { erpFeature } = useContext(AppContext);
-    //#endregion
+  //#region ===========【登入者】
+  const { userInfo } = useContext(AppContext);
+  const { erpFeature } = useContext(AppContext);
+  //#endregion
 
-    //#region ===========【變數宣告】
-    //資料列宣告
-    const [data, setData] = useState<any[]>([]);
-    const [data1, setData1] = useState<any[]>([]);
-    const [data2, setData2] = useState<any[]>([]);
-    const [data2restore, setData2Restore] = useState<any[]>([]);
-    const [modaldata, setModalData] = useState<any[]>([]);
-    const [searchbardata, setSearchBarData] = useState<any[]>([]);
-    const [searchdata, setSearchdata] = useState<any[]>([]);
-    const [data3, setData3] = useState<any[]>([]);
-    const [customerdata, setCustomerdata] = useState<any[]>([]);
-    const [prbardata, setPrbarData] = useState<any[]>([]);
-    const [data4, setData4] = useState<any[]>([]);
+  //#region ===========【變數宣告】
+  //資料列宣告
+  const [data, setData] = useState<any[]>([]);
+  const [data1, setData1] = useState<any[]>([]);
+  const [data2, setData2] = useState<any[]>([]);
+  const [data2restore, setData2Restore] = useState<any[]>([]);
+  const [modaldata, setModalData] = useState<any[]>([]);
+  const [searchbardata, setSearchBarData] = useState<any[]>([]);
+  const [searchdata, setSearchdata] = useState<any[]>([]);
+  const [data3, setData3] = useState<any[]>([]);
+  const [customerdata, setCustomerdata] = useState<any[]>([]);
+  const [prbardata, setPrbarData] = useState<any[]>([]);
+  const [data4, setData4] = useState<any[]>([]);
 
-    const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-    const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const specRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const wantinquantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
-    const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const specRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const unitRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const nameRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const noteRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const productidRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const unitpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const totalpriceRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const wantinquantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const po_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
+  const remaining_quantityRefs = useRef(data2.map(() => createRef<HTMLInputElement>()));
 
-    const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [searchproduct, setSearchProduct] = useState<string>("");
+  const [searchproduct, setSearchProduct] = useState<string>('');
 
-    // const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
-    // const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
-    // const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
-    // const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
-    const [idin, setidin] = useState<string>("");
-    const [uuidin, setuuidin] = useState<string>("");
+  // const [purchaseorderuuidin, setPurchaseorderuuidin] = useState<string>("");
+  // const [purchaseorderidin, setPurchaseorderidin] = useState<string>("");
+  // const [purchaserequisitionidin, setPurchaserequisitionidin] = useState<string>('');
+  // const [purchaserequisitionuuidin, setPurchaserequisitionuuidin] = useState<string>('');
+  const [idin, setidin] = useState<string>('');
+  const [uuidin, setuuidin] = useState<string>('');
 
-    const [create_atin, setCreate_atin] = useState<string>("");
-    const [create_byin, setCreate_byin] = useState<string>("");
-    const [notein, setNotein] = useState<string>("");
-    const [need_datein, setNeed_datein] = useState<string>("");
-    const [statusin, setStatusin] = useState<string>("");
-    const [suppliernamein, setSuppliernamein] = useState<string>("");
-    const [supplierphonein, setSupplierphonein] = useState<string>("");
-    const [suppliertaxidin, setSuppliertaxidin] = useState<string>("");
-    const [supplieraddressin, setSupplieraddressin] = useState<string>("");
-    const [supplierfaxin, setSupplierfaxin] = useState<string>("");
-    const [supplieridin, setSupplieridin] = useState<string>("");
-    const [supplieruuidin, setSupplieruuidin] = useState<string>("");
-    const [suppliercontactin, setSuppliercontactin] = useState<string>("");
-    const [shippingaddressin, setShippingaddressin] = useState<string>("");
-    const [invoicein, setInvoicein] = useState<string>("");
-    const [selectedValue, setSelectedValue] = useState('請選擇類別');
-    const [purchaseorderid, setPurchaseorderid] = useState<string>("");
-    const [batchidin, setBatchidin] = useState<string>("");
+  const [create_atin, setCreate_atin] = useState<string>('');
+  const [create_byin, setCreate_byin] = useState<string>('');
+  const [notein, setNotein] = useState<string>('');
+  const [need_datein, setNeed_datein] = useState<string>('');
+  const [statusin, setStatusin] = useState<string>('');
+  const [suppliernamein, setSuppliernamein] = useState<string>('');
+  const [supplierphonein, setSupplierphonein] = useState<string>('');
+  const [suppliertaxidin, setSuppliertaxidin] = useState<string>('');
+  const [supplieraddressin, setSupplieraddressin] = useState<string>('');
+  const [supplierfaxin, setSupplierfaxin] = useState<string>('');
+  const [supplieridin, setSupplieridin] = useState<string>('');
+  const [supplieruuidin, setSupplieruuidin] = useState<string>('');
+  const [suppliercontactin, setSuppliercontactin] = useState<string>('');
+  const [shippingaddressin, setShippingaddressin] = useState<string>('');
+  const [invoicein, setInvoicein] = useState<string>('');
+  const [selectedValue, setSelectedValue] = useState('請選擇類別');
+  const [purchaseorderid, setPurchaseorderid] = useState<string>('');
+  const [batchidin, setBatchidin] = useState<string>('');
 
-    //編輯時保留原始資料
-    const [originalsuppliername, setOriginalsuppliername] = useState<string>("");
-    const [originalsupplierphone, setOriginalsupplierphone] = useState<string>("");
-    const [originalsuppliertaxid, setOriginalsuppliertaxid] = useState<string>("");
-    const [originalsupplieraddress, setOriginalsupplieraddress] = useState<string>("");
-    const [originalshippingaddress, setOriginalshippingaddress] = useState<string>("");
-    const [originalinvoice, setOriginalInvoice] = useState<string>("");
-    const [originalcreate_at, setOriginalcreate_at] = useState<string>("");
-    const [originalneed_date, setOriginalneed_date] = useState<string>("");
-    const [originalnote, setOriginalnote] = useState<string>("");
-    const [originaldata2, setOriginaldata2] = useState<any[]>([]);
+  //編輯時保留原始資料
+  const [originalsuppliername, setOriginalsuppliername] = useState<string>('');
+  const [originalsupplierphone, setOriginalsupplierphone] = useState<string>('');
+  const [originalsuppliertaxid, setOriginalsuppliertaxid] = useState<string>('');
+  const [originalsupplieraddress, setOriginalsupplieraddress] = useState<string>('');
+  const [originalshippingaddress, setOriginalshippingaddress] = useState<string>('');
+  const [originalinvoice, setOriginalInvoice] = useState<string>('');
+  const [originalcreate_at, setOriginalcreate_at] = useState<string>('');
+  const [originalneed_date, setOriginalneed_date] = useState<string>('');
+  const [originalnote, setOriginalnote] = useState<string>('');
+  const [originaldata2, setOriginaldata2] = useState<any[]>([]);
 
-    //搜尋
-    const [keyword1, setKeyword1] = useState<string>("");
-    const [keyword2, setKeyword2] = useState<string>("");
-    const [keyword3, setKeyword3] = useState<string>("");
-    const [keyword4, setKeyword4] = useState<string>("");
-    const [keyword5, setKeyword5] = useState<string>("");
-    const [keyword6, setKeyword6] = useState<string>("");
-    const [keyword7, setKeyword7] = useState<string>("");
-    // 預設截止日期為今天，起始日期為今天往前推30天
-    const defaultEndDate = moment();
-    const defaultStartDate = moment().subtract(30, 'days');
+  //搜尋
+  const [keyword1, setKeyword1] = useState<string>('');
+  const [keyword2, setKeyword2] = useState<string>('');
+  const [keyword3, setKeyword3] = useState<string>('');
+  const [keyword4, setKeyword4] = useState<string>('');
+  const [keyword5, setKeyword5] = useState<string>('');
+  const [keyword6, setKeyword6] = useState<string>('');
+  const [keyword7, setKeyword7] = useState<string>('');
+  // 預設截止日期為今天，起始日期為今天往前推30天
+  const defaultEndDate = dayjs();
+  const defaultStartDate = dayjs().subtract(30, 'days');
 
-    // 使用 Moment 類型作為狀態
-    const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
-    const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
+  // 使用 Moment 類型作為狀態
+  const [keywordstartdate, setKeywordstartdate] = useState<Dayjs | null>(defaultStartDate);
+  const [keywordenddate, setKeywordenddate] = useState<Dayjs | null>(defaultEndDate);
 
-    //手key
-    const [currentindex, setCurrentIndex] = useState<number>(0);
-    const [handinputname, setHandinputname] = useState<string>("");
-    const [handinputspec, setHandinputspec] = useState<string>("");
-    const [handinputquantity, setHandinputquantity] = useState<string>("");
-    const [handinputunit, setHandinputunit] = useState<string>("");
-    const [handinputnote, setHandinputnote] = useState<string>("");
-    const [handinputproductid, setHandinputproductid] = useState<string>("");
-    const [handinputproductuuid, setHandinputproductuuid] = useState<string>("");
+  //手key
+  const [currentindex, setCurrentIndex] = useState<number>(0);
+  const [handinputname, setHandinputname] = useState<string>('');
+  const [handinputspec, setHandinputspec] = useState<string>('');
+  const [handinputquantity, setHandinputquantity] = useState<string>('');
+  const [handinputunit, setHandinputunit] = useState<string>('');
+  const [handinputnote, setHandinputnote] = useState<string>('');
+  const [handinputproductid, setHandinputproductid] = useState<string>('');
+  const [handinputproductuuid, setHandinputproductuuid] = useState<string>('');
 
-    const [editstatus, setEditStatus] = useState<boolean>(false);
-    const [editrowid, setEditRowId] = useState<number>(0);
+  const [editstatus, setEditStatus] = useState<boolean>(false);
+  const [editrowid, setEditRowId] = useState<number>(0);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [isTrans, setIsTrans] = useState(false);
-    const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isTrans, setIsTrans] = useState(false);
+  const [leftbaropen, setLeftbaropen] = useState<boolean>(false);
 
-    // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
-    const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
+  // const [checkfirstin, setCheckFirstIn] = useState<number>(purchaseorderuuidStr ? parseInt(firstin as string) : 0);
+  const [checkfirstin, setCheckFirstIn] = useState<number>(parseInt(firstin as string) || 0);
 
+  // 計算總價
+  const [totalprice1, setTotalPrice1] = useState<string>('');
+  const [taxprice1, setTaxPrice1] = useState<string>('');
+  const [totalpayprice1, setTotalPayPrice1] = useState<string>('');
 
-    // 計算總價
-    const [totalprice1, setTotalPrice1] = useState<string>("");
-    const [taxprice1, setTaxPrice1] = useState<string>("");
-    const [totalpayprice1, setTotalPayPrice1] = useState<string>("");
+  //托盤呼叫
+  const [called, setCalled] = useState(false);
+  const [ip, setIP] = useState<string>('');
+  const [calledTray, setCalledTray] = useState<string>('');
+  const [whid, setWhid] = useState('');
+  const [calledWarehouse, setCalledWarehouse] = useState<string>('');
 
-    //托盤呼叫
-    const [called, setCalled] = useState(false);
-    const [ip, setIP] = useState<string>('');
-    const [calledTray, setCalledTray] = useState<string>('');
-    const [whid, setWhid] = useState('');
-    const [calledWarehouse, setCalledWarehouse] = useState<string>('');
+  //#endregion
 
+  //#region ===========【上方功能列】
+  //搜尋
+  const doSearch = (valueArr: (string | Toption | null)[]) => {
+    // const keywordWhpname = valueArr[0] as string;
+    // const keywordMaterialnumber = valueArr[1] as string;
+    // const keywordSpec = valueArr[2] as string;
+    // searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
+  };
 
+  //按鈕
+  const panelList: TpanelList = [];
+  //#endregion
 
-    //#endregion
+  //#region ===========【監控畫面大小】
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
-    //#region ===========【上方功能列】
-    //搜尋
-    const doSearch = (valueArr: (string | Toption | null)[]) => {
-        // const keywordWhpname = valueArr[0] as string;
-        // const keywordMaterialnumber = valueArr[1] as string;
-        // const keywordSpec = valueArr[2] as string;
-        // searchData(keywordWhpname, keywordMaterialnumber, keywordSpec);
+  useEffect(() => {
+    // 定義事件處理器
+    const handleResize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     };
 
-    //按鈕
-    const panelList: TpanelList = [
+    // 在元件掛載時設置事件監聽器
+    window.addEventListener('resize', handleResize);
 
-    ];
-    //#endregion
-
-    //#region ===========【監控畫面大小】
-    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-
-    useEffect(() => {
-        // 定義事件處理器
-        const handleResize = () => {
-            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-        };
-
-        // 在元件掛載時設置事件監聽器
-        window.addEventListener('resize', handleResize);
-
-        // 在元件卸載時移除事件監聽器
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-    //#endregion
-
-    //#region ===========【頁面進入】
-    //local開發時會多次觸發，上線後不影響，但開發時覺得很煩，所以加了這個
-    const hasFetchedData = useRef(false);
-
-    useEffect(() => {
-        console.log(userInfo);
-        if (!hasFetchedData.current) {
-            getProduct();
-            getCustomers();
-            GetReviewFlow();//審核
-            getPorder();
-            hasFetchedData.current = true;
-        }
-    }, []);
-
-    useEffect(() => {
-        console.log(parsedItem);
-        setuuidin(parsedItem?.prodentryuuid);
-        setidin(parsedItem?.prodentryid)
-        GetDetailById(parsedItem?.prodentryuuid);
-        GetReviewById(parsedItem?.prodentryuuid);
-        GetReviewHistory(parsedItem?.prodentryuuid);
-        setCreate_byin(parsedItem?.create_by);
-        setCreate_atin(parsedItem?.create_at);
-        setNeed_datein(parsedItem?.need_date);
-        setStatusin(parsedItem?.status);
-        setNotein(parsedItem?.note);
-        setSuppliernamein(parsedItem?.suppliername);
-        setSupplieraddressin(parsedItem?.supplieraddress);
-        setSupplierphonein(parsedItem?.supplierphone);
-        setSuppliertaxidin(parsedItem?.suppliertaxid);
-        setShippingaddressin(parsedItem?.shippingaddress);
-        setInvoicein(parsedItem?.invoice);
-        setBatchidin(parsedItem?.batchid);
-
-    }, [item]);
-    //#endregion
-
-    //#region ===========【API】
-
-    //以ID取單據
-    const GetDetailById = async (id: any) => {
-        try {
-            // setIsLoading(true);
-            const conditionModel = {
-                prodentryuuid: id as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdEntryDetailById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const responsedata = await response.json();
-            // setData1(data);
-
-            console.log(responsedata);
-            setData2(responsedata);
-            // return responsedata
-
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
+    // 在元件卸載時移除事件監聽器
+    return () => {
+      window.removeEventListener('resize', handleResize);
     };
+  }, []);
+  //#endregion
 
-    //更新單據
-    const Update = async () => {
-        try {
+  //#region ===========【頁面進入】
+  //local開發時會多次觸發，上線後不影響，但開發時覺得很煩，所以加了這個
+  const hasFetchedData = useRef(false);
 
-            const data = {
-                suppliername: suppliernamein,
-                supplierphone: supplierphonein,
-                suppliertaxid: suppliertaxidin,
-                supplieraddress: supplieraddressin,
-                supplierid: supplieridin,
-                shippingaddress: shippingaddressin,
-                suppliercontact: suppliercontactin,
-                supplierfax: supplierfaxin,
-                supplieruuid: supplieruuidin,
-            };
+  useEffect(() => {
+    console.log(userInfo);
 
+    if (!hasFetchedData.current) {
+      getProduct();
+      getCustomers();
+      GetReviewFlow(); //審核
+      getPorder();
+      hasFetchedData.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log(parsedItem);
+    setuuidin(parsedItem?.prodentryuuid);
+    setidin(parsedItem?.prodentryid);
+    GetDetailById(parsedItem?.prodentryuuid);
+    GetReviewById(parsedItem?.prodentryuuid);
+    GetReviewHistory(parsedItem?.prodentryuuid);
+    setCreate_byin(parsedItem?.create_by);
+    setCreate_atin(parsedItem?.create_at);
+    setNeed_datein(parsedItem?.need_date);
+    setStatusin(parsedItem?.status);
+    setNotein(parsedItem?.note);
+    setSuppliernamein(parsedItem?.suppliername);
+    setSupplieraddressin(parsedItem?.supplieraddress);
+    setSupplierphonein(parsedItem?.supplierphone);
+    setSuppliertaxidin(parsedItem?.suppliertaxid);
+    setShippingaddressin(parsedItem?.shippingaddress);
+    setInvoicein(parsedItem?.invoice);
+    setBatchidin(parsedItem?.batchid);
+  }, [item]);
+  //#endregion
+
+  //#region ===========【API】
+
+  //以ID取單據
+  const GetDetailById = async (id: any) => {
+    try {
+      // setIsLoading(true);
+      const conditionModel = {
+        prodentryuuid: id as string | undefined,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/NewGetProdEntryDetailById?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const responsedata = await response.json();
+      // setData1(data);
+
+      console.log(responsedata);
+      setData2(responsedata);
+      // return responsedata
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  //更新單據
+  const Update = async () => {
+    try {
+      const data = {
+        suppliername: suppliernamein,
+        supplierphone: supplierphonein,
+        suppliertaxid: suppliertaxidin,
+        supplieraddress: supplieraddressin,
+        supplierid: supplieridin,
+        shippingaddress: shippingaddressin,
+        suppliercontact: suppliercontactin,
+        supplierfax: supplierfaxin,
+        supplieruuid: supplieruuidin,
+      };
+
+      const conditionModel = {
+        prodreceiptid: idin,
+        prodreceiptuuid: uuidin,
+        data: data,
+        create_at: create_atin,
+        need_date: need_datein,
+        note: notein,
+        batchid: batchidin,
+        data2: data2,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const response = await fetch(`${setting.apipath}/WareHouse/NewUpdateProdReceiptDetail`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 成功，顯示提示
+        myAlert.success({ title: result.message });
+        GetDetailById(uuidin);
+        getPorder();
+      } else {
+        // 失敗，顯示錯誤提示
+        console.log(result.message);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      // setError(error.message);
+      console.log(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  //作廢單據
+  const Delete = async () => {
+    try {
+      const conditionModel = {
+        id: uuidin as string | undefined,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePEntry?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 成功，顯示提示
+        myAlert.success({ title: result.message });
+        router.push({
+          pathname: `/factoryDepartment/PEntryList`,
+        });
+      } else {
+        // 失敗，顯示錯誤提示
+        console.log(result.message);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  //取物料
+  const getProduct = async () => {
+    try {
+      setIsLoading(true);
+
+      const conditionModel = {};
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      setData(data);
+      setModalData(data);
+      setSearchBarData(data);
+
+      console.log(erpFeature);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取廠商
+  const getCustomers = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {};
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/WareHouse/GetCustomers?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const responseData = await response.json();
+
+      // 提取唯一的縣市選項
+      const uniqueCounties = Array.from(new Set(responseData.map((item: any) => item.county))) as string[];
+      setCountyOptions(uniqueCounties);
+
+      // 設置客戶資料
+      setCustomerdata(responseData);
+
+      // 設置篩選後的資料
+      setFilteredData2(responseData);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取得IP
+  const Print = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {};
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
+
+      if (!response.ok) {
+        myAlert.warning({ title: '請檢查列印程式是否開啟' });
+      }
+
+      const data = await response.text();
+      console.log(data);
+      sentToPrint(data);
+    } catch (error: any) {
+      setError(error.message);
+      myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //列印單據
+  const sentToPrint = async (ip: any) => {
+    myAlert.confirm({
+      title: '確定要列印單據嗎?',
+      content: <></>,
+      props: {
+        onOk: async () => {
+          try {
             const conditionModel = {
-                prodreceiptid: idin,
-                prodreceiptuuid: uuidin,
-                data: data,
-                create_at: create_atin,
-                need_date: need_datein,
-                note: notein,
-                batchid: batchidin,
-                data2: data2
+              id: idin,
+              type: 'purchaseorder',
+              clientip: ip,
+              data: [],
             };
 
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
+            const inputModel = {
+              TypeName: 'ERP',
+              ServiceName: 'WareHouseService',
+              FunctionName: 'no',
+              FilterConditions: JSON.stringify(conditionModel),
             };
 
-            const response = await fetch(`${setting.apipath}/WareHouse/NewUpdateProdReceiptDetail`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
+            console.log(JSON.stringify(inputModel));
+
+            const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(inputModel),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch data');
+              throw new Error('Failed to fetch data');
             }
 
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message });
-                GetDetailById(uuidin);
-                getPorder();
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-        } catch (error: any) {
-            // setError(error.message);
-            console.log(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-
-    };
-
-    //作廢單據
-    const Delete = async () => {
-        try {
-            const conditionModel = {
-                id: uuidin as string | undefined,
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/NewDeletePEntry?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message });
-                router.push({
-                    pathname: `/factoryDepartment/PEntryList`,
-                });
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-
-
-
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            // setIsLoading(false);
-        }
-    };
-
-    //取物料
-    const getProduct = async () => {
-        try {
-            setIsLoading(true);
-
-            const conditionModel = {
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/GetProduct?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setData(data);
-            setModalData(data);
-            setSearchBarData(data);
-
-            console.log(erpFeature);
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    //取廠商
-    const getCustomers = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {};
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/GetCustomers?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const responseData = await response.json();
-
-            // 提取唯一的縣市選項
-            const uniqueCounties = Array.from(new Set(responseData.map((item: any) => item.county))) as string[];
-            setCountyOptions(uniqueCounties);
-
-            // 設置客戶資料
-            setCustomerdata(responseData);
-
-            // 設置篩選後的資料
-            setFilteredData2(responseData);
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    //取得IP
-    const Print = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`http://127.0.0.1:5050/api/print/GetIP?${queryParams}`);
-            if (!response.ok) {
-                myAlert.warning({ title: '請檢查列印程式是否開啟' })
-            }
             const data = await response.text();
             console.log(data);
-            sentToPrint(data);
 
-        } catch (error: any) {
-            setError(error.message);
-            myAlert.warning({ title: '請檢查列印程式是否開啟', content: error.message });
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
+            await new Promise((resolve) => setTimeout(resolve, 500));
 
-    //列印單據
-    const sentToPrint = async (ip: any) => {
-        myAlert.confirm({
-            title: '確定要列印單據嗎?',
-            content: <>
-            </>,
-            props: {
-                onOk: async () => {
-                    try {
-                        const conditionModel = {
-                            id: idin,
-                            type: "purchaseorder",
-                            clientip: ip,
-                            data: []
-                        };
-
-                        var inputModel = {
-                            TypeName: 'ERP',
-                            ServiceName: 'WareHouseService',
-                            FunctionName: 'no',
-                            FilterConditions: JSON.stringify(conditionModel),
-                        };
-
-                        console.log(JSON.stringify(inputModel));
-
-                        const response = await fetch(`${setting.apipath}/WareHouse/Print`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(inputModel)
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch data');
-                        }
-                        const data = await response.text();
-                        console.log(data);
-
-                        await new Promise(resolve => setTimeout(resolve, 500));
-
-
-
-
-
-
-                        const response2 = await fetch("http://127.0.0.1:5050/api/print/print3", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: data
-                        });
-
-                        if (!response2.ok) {
-                            throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
-                        }
-
-                        const data2 = await response2.text();
-                        console.log("Received from print4:", data2);
-
-
-
-                    } catch (error: any) {
-                        // setError(error.message);
-                        console.log(error.message);
-                    }
-                    finally {
-                        // setIsLoading(false);
-                    }
-                }
-            }
-        });
-
-
-    };
-
-    //匯出單據
-    const Excel = async (id: any, type2: any, quoid: any) => {
-        try {
-
-            setIsLoading(true);
-            const conditionModel = {
-                id: id,
-                type: 'purchaseorder',
-                type2: type2,
-                quoterequuid: quoid
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
+            const response2 = await fetch('http://127.0.0.1:5050/api/print/print3', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: data,
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            // 將響應轉換為 Blob
-            const blob = await response.blob();
-
-            // 創建一個 URL 來下載 Blob
-            const url = window.URL.createObjectURL(blob);
-
-            // 創建一個下載鏈接
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
-
-            // 將鏈接添加到 DOM 並觸發點擊下載
-            document.body.appendChild(link);
-            link.click();
-
-            // 清除鏈接和 URL 物件
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-
-        } catch (error) {
-            console.error('Download failed:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    //複製單據(同新增單據)
-    const Add = async () => {
-        if (data2.length === 0) {
-            myAlert.warning({ title: "進貨項目不可為空" })
-            return;
-        }
-        // return;
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                create_at: create_atin,
-                need_date: moment(need_datein).format('YYYY-MM-DD'),
-                create_by: userInfo?.employee?.id.toString(),
-                note: notein,
-                data2: data2,
-                username: userInfo?.employee?.id.toString(),
-                purchaseorderid: purchaseorderid
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/NewAddProdReceipt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message });
-                setidin(result.id);
-                setuuidin(result.uuid);
-                setStatusin("進貨中");
-                router.push({
-                    pathname: `/factoryDepartment/PReceiptList`,
-                    query: {
-                    },
-                });
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    //取請購(轉採購用)
-    const getPorder = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/WareHouse/NewGetPOrderForAddPReceipt?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const responsedata = await response.json();
-
-            setData4(responsedata);
-            setPrbarData(responsedata);
-            console.log(responsedata);
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    //轉換單據
-    const Trans = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                prodreceiptuuid: uuidin,
-                username: userInfo?.employee?.id.toString(),
-                note: notein,
-                data2: data2
-                // create_at: moment().format('YYYY-MM-DD') || '',
-                // need_date: need_datein,
-                // create_by: userInfo?.employee?.id.toString(),
-                // suppliername: suppliernamein,
-                // supplierphone: supplierphonein,
-                // suppliertaxid: suppliertaxidin,
-                // supplieraddress: supplieraddressin,
-                // supplierid: supplieridin,
-                // shippingaddress: shippingaddressin,
-                // suppliercontact: suppliercontactin,
-                // supplierfax: supplierfaxin,
-                // supplieruuid: supplieruuidin,
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/NewTransferPReceiptToPEntry`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const result = await response.json();
-
-            if (result.success) {
-                // 成功，顯示提示
-                myAlert.success({ title: result.message, content: result.id });
-                // setidin(result.id);
-                // setuuidin(result.uuid);
-
-                // router.push({
-                //     pathname: `/factoryDepartment/POrderList`,
-                //     query: {
-                //     },
-                // });
-            } else {
-                // 失敗，顯示錯誤提示
-                console.log(result.message);
-                myAlert.warning({ title: '失敗', content: result.message });
-            }
-
-        } catch (error: any) {
-            setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-
-
-    //#endregion
-
-    //#region ===========【審核】
-    const [review_flow, setReview_flow] = useState<string>("");
-    const [reviewbar, setReviewbar] = useState<boolean>(false);
-    const [reviewdata, setReviewdata] = useState<any[]>([]);
-    const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
-    const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
-    const [documenttitle, setDocumenttitle] = useState<string>("");
-    const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
-
-    //取全部的自訂流程
-    const GetReviewFlow = async () => {
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                user_id: userInfo?.employee?.id.toString()
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const text = await response.text();
-            if (!text) {
-                // console.log('No data returned');
-                setReviewdata([]);
-                return;
-            }
-
-            const data = JSON.parse(text);
-            setReviewdata(data);
-
-
-        } catch (error: any) {
-            console.log(error);
-            // setError(error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-
-    }
-
-    //取單據的審核流程
-    const GetReviewById = async (document_uuid: any) => {
-        try {
-            setReviewflowdata([]);
-            setReviewflowdata2([]);
-            // setIsLoading(true);
-
-            const conditionModel = {
-                document_uuid: document_uuid
-            };
-
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
-
-            // 檢查響應狀態
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            // 檢查響應內容是否為空
-            const text = await response.text();
-            if (text.trim() === '') {
-                // console.log('No data returned');
-                return;
-            }
-
-            // 解析 JSON
-            const data = JSON.parse(text);
-
-            console.log(data);
-
-            // 檢查資料是否存在且有效
-            if (data && data.length > 0) {
-                setReviewflowdata(data);
-            } else {
-                console.log('No valid data');
-            }
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            // setIsLoading(false);
-        }
-    };
-
-    const [value, setValue] = useState<number | null>(null);
-    const onChange = (e: any) => {
-        setValue(e.target.value);
-    };
-
-    const setReview = async (item: any) => {
-        setReview_flow(item.id);
-        setReviewflowdata2(item.stages);
-    }
-
-    const sentToReview = async (type: any) => {
-
-        try {
-            // if (review_flow === "") {
-            //     setReviewbar(true);
-            //     handleChoseflow();
-            // }
-            // else {
-            const review_query = {
-                purchaseorderuuid: uuidin,
-                purchaseorderid: idin,
-                create_at: create_atin,
-                create_by: create_byin,
-                status: '進貨中',
-                need_date: need_datein,
-                note: notein,
-                firstin: 1,
-            };
-
-            const conditionModel = {
-                document_id: idin,
-                document_uuid: uuidin,
-                document_type: pagename,
-                review_id: review_flow,
-                query: review_query,
-                user_id: userInfo?.employee?.id.toString(),
-                document_title: documenttitle
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            console.log(JSON.stringify(conditionModel));
-
-            const response = await fetch(`${setting.apipath}/Review/AddReview`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-            setReviewflowdata([]);
-            GetReviewById(uuidin);
-
-
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            //改變單據狀態
-            const conditionModel2 = {
-                type: type,
-                purchaseorderuuid: uuidin,
-                username: userInfo?.employee?.id.toString()
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel2),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
             if (!response2.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data2 = await response2.json();
-
-            GetDetailById(uuidin);
-            GetReviewById(uuidin)
-            setStatusin("審核中");
-            setReviewbar(false);
-
-
-
-
-
-
-            // }
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-
-    }
-
-    const handleChoseflow = () => {
-        setReviewbar(true);
-        setDocumenttitle(`【請購單】【${idin}】_${userInfo?.employee?.chName.toString()}`)
-    }
-
-    const handleGetReviewBack = () => {
-        myAlert.confirm({
-            title: '確定要抽單嗎?',
-            props: {
-                onOk: async () => {
-                    try {
-                        setIsLoading(true);
-                        const conditionModel = {
-                            document_uuid: uuidin,
-                        };
-
-                        var inputModel = {
-                            TypeName: 'ERP',
-                            ServiceName: 'WareHouseService',
-                            FunctionName: 'no',
-                            FilterConditions: JSON.stringify(conditionModel),
-                        };
-
-
-                        const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(inputModel)
-                        });
-
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch data');
-                        }
-
-                        setReviewflowdata([]);
-                        setStatusin("進貨中");
-                        setReview_flow("");
-                        setValue(null);
-                        GetReviewHistory(uuidin);
-
-                    } catch (error: any) {
-                        console.log(error.message);
-                    }
-                    finally {
-                        setIsLoading(false);
-                    }
-                }
-            }
-        });
-    }
-
-    const GetReviewHistory = async (id: any) => {
-        try {
-            const conditionModel = {
-                document_uuid: id
-            };
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'ReviewService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-
-            const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
+              throw new Error(`Failed to fetch print4 data: ${response2.statusText}`);
             }
 
-            const text = await response.text();
-            if (!text) {
-                // console.log('No data returned');
-                setReviewhistorydata([]);
-                return;
-            }
-
-            const data = JSON.parse(text);
-            setReviewhistorydata(data);
-            console.log(reviewhistroydata);
-
-
-        } catch (error: any) {
-            console.log(error);
-        }
-        finally {
+            const data2 = await response2.text();
+            console.log('Received from print4:', data2);
+          } catch (error: any) {
+            // setError(error.message);
+            console.log(error.message);
+          } finally {
             // setIsLoading(false);
-        }
+          }
+        },
+      },
+    });
+  };
+
+  //匯出單據
+  const Excel = async (id: any, type2: any, quoid: any) => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        id: id,
+        type: 'purchaseorder',
+        type2: type2,
+        quoterequuid: quoid,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const response = await fetch(`${setting.apipath}/WareHouse/download-excel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      // 將響應轉換為 Blob
+      const blob = await response.blob();
+
+      // 創建一個 URL 來下載 Blob
+      const url = window.URL.createObjectURL(blob);
+
+      // 創建一個下載鏈接
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `三久建材_採購單_${id}.xls`); // 設置文件名
+
+      // 將鏈接添加到 DOM 並觸發點擊下載
+      document.body.appendChild(link);
+      link.click();
+
+      // 清除鏈接和 URL 物件
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      setIsLoading(false);
     }
-    //#endregion
+  };
 
-    //#region ===========【單據功能區】
-    //編輯
-    const handleEdit = () => {
-        setOriginalcreate_at(create_atin);
-        setOriginalneed_date(need_datein);
-        setOriginalnote(notein);
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setOriginalsuppliername(suppliernamein);
-        setOriginalsupplieraddress(supplieraddressin);
-        setOriginalsupplierphone(supplierphonein);
-        setOriginalsuppliertaxid(suppliertaxidin);
-        setOriginalshippingaddress(shippingaddressin);
-        setIsEditing(true) // 進入編輯模式
-    };
+  //複製單據(同新增單據)
+  const Add = async () => {
+    if (data2.length === 0) {
+      myAlert.warning({ title: '進貨項目不可為空' });
 
-    //取消編輯
-    const handleCancel = () => {
-        setCreate_atin(originalcreate_at);
-        setNeed_datein(originalneed_date);
-        setNotein(originalnote);
-        setData2([...originaldata2]);  // 確保還原為原始資料
-        setSuppliernamein(originalsuppliername);
-        setSupplieraddressin(originalsupplieraddress);
-        setSupplierphonein(originalsupplierphone);
-        setSuppliertaxidin(originalsuppliertaxid);
-        setShippingaddressin(originalshippingaddress);
-        setIsEditing(false);  // 結束編輯模式
-
-        setIsTrans(false);  //結束進貨模式
-        setPrbar(false);
-    };
-
-    //作廢單據
-    const handleDelete = () => {
-        myAlert.confirm({
-            title: '確定刪除嗎?',
-            props: {
-                onOk: () => {
-                    Delete();
-                }
-            }
-        })
-    }
-
-    const handleCopy = () => {
-        myAlert.confirm({
-            title: '確定複製嗎?',
-            props: {
-                onOk: () => {
-                    Add();
-                }
-            }
-        })
-
-    }
-
-    //編輯進貨
-    const handleEditTrans = () => {
-        setOriginalcreate_at(create_atin);
-        setOriginalneed_date(need_datein);
-        setOriginalnote(notein);
-        setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
-        setOriginalsuppliername(suppliernamein);
-        setOriginalsupplieraddress(supplieraddressin);
-        setOriginalsupplierphone(supplierphonein);
-        setOriginalsuppliertaxid(suppliertaxidin);
-        setOriginalshippingaddress(shippingaddressin);
-        setIsTrans(true);
+      return;
     }
 
-    //新增進貨
-    const handleAddTrans = async () => {
-        await Trans(); // 確保 Trans 完成
-        setIsTrans(false);
-        GetDetailById(uuidin);
-        // GetTransById(idin);//轉換紀錄
-    };
+    // return;
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        create_at: create_atin,
+        need_date: dayjs(need_datein).format('YYYY-MM-DD'),
+        create_by: userInfo?.employee?.id.toString(),
+        note: notein,
+        data2: data2,
+        username: userInfo?.employee?.id.toString(),
+        purchaseorderid: purchaseorderid,
+      };
 
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
 
-    //列印單據
-    const handlePrint = () => {
-        Print();
-    }
+      const response = await fetch(`${setting.apipath}/WareHouse/NewAddProdReceipt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
 
-    //匯出單據
-    const handleExport = () => {
-        Excel(idin, "po", "")
-    }
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
 
+      const result = await response.json();
 
-
-    //#endregion
-
-    //#region ===========【明細功能區】
-    // 新增明細
-    const handleAddDetail = () => {
-
-        const emptyDetail = {
-            purchaserequisitiondetailuuid: "",
-            productuuid: "",
-            productid: "",
-            quantity: 0,
-            totalprice: 0,
-            note: "",
-            purchaserequisitionid: "",
-            unitprice: 0,
-            purchaserequisitionuuid: "",
-            name: "",
-            spec: "",
-            unit: "",
-            suppliername: null,
-            deliverydate: null,
-            status: null,
-            quotereqdetailuuid: null,
-            suppliertaxid: null,
-            supplieraddress: null,
-            supplierphone: null,
-            suppliercontact: null,
-            supplierfax: null,
-            create_at: '',
-            create_by: userInfo?.employee?.id
-        };
-
-        // 將空資料新增進陣列
-        setData2((prevData) => [...prevData, emptyDetail]);
-
-    };
-
-    // 從明細移除
-    const handleRemoveDetail = (index: number, item: any) => {
-        myAlert.confirm({
-            title: '確定移除?',
-            props: {
-                onOk: () => {
-                    const updatedData = data2.filter((_, i) => i !== index);
-                    setData2(updatedData);
-                }
-            }
+      if (result.success) {
+        // 成功，顯示提示
+        myAlert.success({ title: result.message });
+        setidin(result.id);
+        setuuidin(result.uuid);
+        setStatusin('進貨中');
+        router.push({
+          pathname: `/factoryDepartment/PReceiptList`,
+          query: {},
         });
-    };
+      } else {
+        // 失敗，顯示錯誤提示
+        console.log(result.message);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    //更新明細資料
-    const handleStringChange = (index: number, key: string, value: string) => {
-        const updatedData2 = [...data2];  // 使用淺拷貝
-        updatedData2[index] = { ...updatedData2[index], [key]: value };  // 確保更改的只是副本
-        setData2(updatedData2);  // 更新data2
+  //取請購(轉採購用)
+  const getPorder = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {};
 
-        if (key === 'productid' || key === 'name' || key === 'spec') {
-            const filters = {
-                productid: updatedData2[index].productid?.trim().toLowerCase() || "",
-                name: updatedData2[index].name?.trim().toLowerCase() || "",
-                spec: updatedData2[index].spec?.trim().toLowerCase() || ""
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/WareHouse/NewGetPOrderForAddPReceipt?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const responsedata = await response.json();
+
+      setData4(responsedata);
+      setPrbarData(responsedata);
+      console.log(responsedata);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //轉換單據
+  const Trans = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        prodreceiptuuid: uuidin,
+        username: userInfo?.employee?.id.toString(),
+        note: notein,
+        data2: data2,
+        // create_at: moment().format('YYYY-MM-DD') || '',
+        // need_date: need_datein,
+        // create_by: userInfo?.employee?.id.toString(),
+        // suppliername: suppliernamein,
+        // supplierphone: supplierphonein,
+        // suppliertaxid: suppliertaxidin,
+        // supplieraddress: supplieraddressin,
+        // supplierid: supplieridin,
+        // shippingaddress: shippingaddressin,
+        // suppliercontact: suppliercontactin,
+        // supplierfax: supplierfaxin,
+        // supplieruuid: supplieruuidin,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const response = await fetch(`${setting.apipath}/WareHouse/NewTransferPReceiptToPEntry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // 成功，顯示提示
+        myAlert.success({ title: result.message, content: result.id });
+        // setidin(result.id);
+        // setuuidin(result.uuid);
+
+        // router.push({
+        //     pathname: `/factoryDepartment/POrderList`,
+        //     query: {
+        //     },
+        // });
+      } else {
+        // 失敗，顯示錯誤提示
+        console.log(result.message);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //#endregion
+
+  //#region ===========【審核】
+  const [review_flow, setReview_flow] = useState<string>('');
+  const [reviewbar, setReviewbar] = useState<boolean>(false);
+  const [reviewdata, setReviewdata] = useState<any[]>([]);
+  const [reviewflowdata, setReviewflowdata] = useState<any[]>([]);
+  const [reviewflowdata2, setReviewflowdata2] = useState<any[]>([]);
+  const [documenttitle, setDocumenttitle] = useState<string>('');
+  const [reviewhistroydata, setReviewhistorydata] = useState<any[]>([]);
+
+  //取全部的自訂流程
+  const GetReviewFlow = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        user_id: userInfo?.employee?.id.toString(),
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/Review/GetReviewFlow?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const text = await response.text();
+
+      if (!text) {
+        // console.log('No data returned');
+        setReviewdata([]);
+
+        return;
+      }
+
+      const data = JSON.parse(text);
+      setReviewdata(data);
+    } catch (error: any) {
+      console.log(error);
+      // setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取單據的審核流程
+  const GetReviewById = async (document_uuid: any) => {
+    try {
+      setReviewflowdata([]);
+      setReviewflowdata2([]);
+      // setIsLoading(true);
+
+      const conditionModel = {
+        document_uuid: document_uuid,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response = await fetch(`${setting.apipath}/Review/GetReviewById?${queryParams}`);
+
+      // 檢查響應狀態
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      // 檢查響應內容是否為空
+      const text = await response.text();
+
+      if (text.trim() === '') {
+        // console.log('No data returned');
+        return;
+      }
+
+      // 解析 JSON
+      const data = JSON.parse(text);
+
+      console.log(data);
+
+      // 檢查資料是否存在且有效
+      if (data && data.length > 0) {
+        setReviewflowdata(data);
+      } else {
+        console.log('No valid data');
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      // setIsLoading(false);
+    }
+  };
+
+  const [value, setValue] = useState<number | null>(null);
+
+  const onChange = (e: any) => {
+    setValue(e.target.value);
+  };
+
+  const setReview = async (item: any) => {
+    setReview_flow(item.id);
+    setReviewflowdata2(item.stages);
+  };
+
+  const sentToReview = async (type: any) => {
+    try {
+      // if (review_flow === "") {
+      //     setReviewbar(true);
+      //     handleChoseflow();
+      // }
+      // else {
+      const review_query = {
+        purchaseorderuuid: uuidin,
+        purchaseorderid: idin,
+        create_at: create_atin,
+        create_by: create_byin,
+        status: '進貨中',
+        need_date: need_datein,
+        note: notein,
+        firstin: 1,
+      };
+
+      const conditionModel = {
+        document_id: idin,
+        document_uuid: uuidin,
+        document_type: pagename,
+        review_id: review_flow,
+        query: review_query,
+        user_id: userInfo?.employee?.id.toString(),
+        document_title: documenttitle,
+      };
+
+      let inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      console.log(JSON.stringify(conditionModel));
+
+      const response = await fetch(`${setting.apipath}/Review/AddReview`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+      setReviewflowdata([]);
+      GetReviewById(uuidin);
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      //改變單據狀態
+      const conditionModel2 = {
+        type: type,
+        purchaseorderuuid: uuidin,
+        username: userInfo?.employee?.id.toString(),
+      };
+
+      inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel2),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+
+      const response2 = await fetch(`${setting.apipath}/WareHouse/sentPRToReview?${queryParams}`);
+
+      if (!response2.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data2 = await response2.json();
+
+      GetDetailById(uuidin);
+      GetReviewById(uuidin);
+      setStatusin('審核中');
+      setReviewbar(false);
+
+      // }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChoseflow = () => {
+    setReviewbar(true);
+    setDocumenttitle(`【請購單】【${idin}】_${userInfo?.employee?.chName.toString()}`);
+  };
+
+  const handleGetReviewBack = () => {
+    myAlert.confirm({
+      title: '確定要抽單嗎?',
+      props: {
+        onOk: async () => {
+          try {
+            setIsLoading(true);
+            const conditionModel = {
+              document_uuid: uuidin,
             };
 
-            if (Object.values(filters).some(filter => filter !== "")) {
-                const filtered = data.filter(item =>
-                    (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
-                    (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
-                    (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
-                );
+            const inputModel = {
+              TypeName: 'ERP',
+              ServiceName: 'WareHouseService',
+              FunctionName: 'no',
+              FilterConditions: JSON.stringify(conditionModel),
+            };
 
-                setFilteredData(filtered);
-                setShowSuggestions(true);
-            } else {
-                setShowSuggestions(false);
+            const response = await fetch(`${setting.apipath}/Review/GetReviewBack`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(inputModel),
+            });
+
+            if (!response.ok) {
+              throw new Error('Failed to fetch data');
             }
-        }
-    };
 
-    //focus選中的明細
-    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-    const handleRowClick = (itemId: string) => {
-        setSelectedItemId(itemId);
-    };
+            setReviewflowdata([]);
+            setStatusin('進貨中');
+            setReview_flow('');
+            setValue(null);
+            GetReviewHistory(uuidin);
+          } catch (error: any) {
+            console.log(error.message);
+          } finally {
+            setIsLoading(false);
+          }
+        },
+      },
+    });
+  };
 
-    // 明細異動處理
-    useEffect(() => {
-        console.log(data1);
+  const GetReviewHistory = async (id: any) => {
+    try {
+      const conditionModel = {
+        document_uuid: id,
+      };
 
-        // 每次 data2 更新時，重新計算總價和稅金
-        let totalprice = 0;
-        data2.forEach((element) => {
-            // 檢查 totalprice 是不是數字，如果是字串就移除逗號
-            const price = typeof element.totalprice === 'string'
-                ? parseFloat(element.totalprice.replace(/,/g, ''))
-                : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
-            console.log(price); // 顯示正確的數字格式
-            totalprice += price; // 將其加總
-        });
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'ReviewService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
 
-        console.log(totalprice); // 應顯示正確的加總結果
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
 
-        // 四捨五入總價到小數點第二位
-        const roundedTotalPrice = Math.round(totalprice * 100) / 100;
-        setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      const response = await fetch(`${setting.apipath}/Review/GetReviewHistory?${queryParams}`);
 
-        // 計算稅金，四捨五入到小數點第二位
-        const taxPrice = Math.round((roundedTotalPrice * 0.05) * 100) / 100;
-        setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
 
-        // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
-        const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
-        setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+      const text = await response.text();
 
-    }, [data2]);
+      if (!text) {
+        // console.log('No data returned');
+        setReviewhistorydata([]);
 
-    //#endregion
+        return;
+      }
 
-    //#region ===========【物料篩選】
-    interface DataItem {
-        id: string;
-        productid: string;
-        spec: string | null; // spec 可能為 null
-        name: string;
-        unit: string;
+      const data = JSON.parse(text);
+      setReviewhistorydata(data);
+      console.log(reviewhistroydata);
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      // setIsLoading(false);
     }
+  };
+  //#endregion
 
-    const [filteredData, setFilteredData] = useState<DataItem[]>([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const isSelectingRef = useRef(false);
+  //#region ===========【單據功能區】
+  //編輯
+  const handleEdit = () => {
+    setOriginalcreate_at(create_atin);
+    setOriginalneed_date(need_datein);
+    setOriginalnote(notein);
+    setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
+    setOriginalsuppliername(suppliernamein);
+    setOriginalsupplieraddress(supplieraddressin);
+    setOriginalsupplierphone(supplierphonein);
+    setOriginalsuppliertaxid(suppliertaxidin);
+    setOriginalshippingaddress(shippingaddressin);
+    setIsEditing(true); // 進入編輯模式
+  };
 
-    useEffect(() => {
+  //取消編輯
+  const handleCancel = () => {
+    setCreate_atin(originalcreate_at);
+    setNeed_datein(originalneed_date);
+    setNotein(originalnote);
+    setData2([...originaldata2]); // 確保還原為原始資料
+    setSuppliernamein(originalsuppliername);
+    setSupplieraddressin(originalsupplieraddress);
+    setSupplierphonein(originalsupplierphone);
+    setSuppliertaxidin(originalsuppliertaxid);
+    setShippingaddressin(originalshippingaddress);
+    setIsEditing(false); // 結束編輯模式
 
-        if (isSelectingRef.current) return;
+    setIsTrans(false); //結束進貨模式
+    setPrbar(false);
+  };
 
-        let filtered = searchbardata;
-        if (handinputproductid !== "" || handinputname !== "" || handinputspec != "") {
-            if (handinputproductuuid) {
-                let filtered = searchbardata;
-                filtered = searchbardata.filter(item =>
-                    item.id.includes(handinputproductuuid)
-                );
-            }
-            if (handinputproductid) {
-                filtered = filtered.filter(item =>
-                    item.productid.includes(handinputproductid)
-                );
-            }
+  //作廢單據
+  const handleDelete = () => {
+    myAlert.confirm({
+      title: '確定刪除嗎?',
+      props: {
+        onOk: () => {
+          Delete();
+        },
+      },
+    });
+  };
 
-            if (handinputname) {
-                filtered = filtered.filter(item =>
-                    item.name.includes(handinputname)
-                );
-            }
+  const handleCopy = () => {
+    myAlert.confirm({
+      title: '確定複製嗎?',
+      props: {
+        onOk: () => {
+          Add();
+        },
+      },
+    });
+  };
 
-            if (handinputspec) {
-                filtered = filtered.filter(item =>
-                    item.spec && item.spec.includes(handinputspec)
-                );
-            }
+  //編輯進貨
+  const handleEditTrans = () => {
+    setOriginalcreate_at(create_atin);
+    setOriginalneed_date(need_datein);
+    setOriginalnote(notein);
+    setOriginaldata2([...data2]); // 確保保存的是當前資料的副本
+    setOriginalsuppliername(suppliernamein);
+    setOriginalsupplieraddress(supplieraddressin);
+    setOriginalsupplierphone(supplierphonein);
+    setOriginalsuppliertaxid(suppliertaxidin);
+    setOriginalshippingaddress(shippingaddressin);
+    setIsTrans(true);
+  };
 
-            setFilteredData(filtered);
-            setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
+  //新增進貨
+  const handleAddTrans = async () => {
+    await Trans(); // 確保 Trans 完成
+    setIsTrans(false);
+    GetDetailById(uuidin);
+    // GetTransById(idin);//轉換紀錄
+  };
 
-        }
-        else {
-            setHandinputproductuuid('');
-            setFilteredData([]);
-            setShowSuggestions(false);
-        }
-    }, [handinputproductid, handinputname, handinputspec]);
+  //列印單據
+  const handlePrint = () => {
+    Print();
+  };
 
+  //匯出單據
+  const handleExport = () => {
+    Excel(idin, 'po', '');
+  };
 
-    //點選物料
-    const handleSelect = (selectedItem: any) => {
-        const updatedData2 = [...data2];
-        const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
-        updatedData2[index] = {
-            ...updatedData2[index],
-            productuuid: selectedItem.id,
-            productid: selectedItem.productid,
-            name: selectedItem.name,
-            spec: selectedItem.spec,
-            unit: selectedItem.unit,
-        };
-        setData2(updatedData2);
+  //#endregion
 
-        // 清除建議選單
-        setFilteredData([]);
-        setShowSuggestions(false);
+  //#region ===========【明細功能區】
+  // 新增明細
+  const handleAddDetail = () => {
+    const emptyDetail = {
+      purchaserequisitiondetailuuid: '',
+      productuuid: '',
+      productid: '',
+      quantity: 0,
+      totalprice: 0,
+      note: '',
+      purchaserequisitionid: '',
+      unitprice: 0,
+      purchaserequisitionuuid: '',
+      name: '',
+      spec: '',
+      unit: '',
+      suppliername: null,
+      deliverydate: null,
+      status: null,
+      quotereqdetailuuid: null,
+      suppliertaxid: null,
+      supplieraddress: null,
+      supplierphone: null,
+      suppliercontact: null,
+      supplierfax: null,
+      create_at: '',
+      create_by: userInfo?.employee?.id,
     };
 
-    //點選物料後控制，使用ESC關閉等狀態監控
-    const dropdownRef = useRef<HTMLUListElement | null>(null);
-    useEffect(() => {
-        // 按下 ESC 鍵關閉下拉選單
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.keyCode === 27) { // ESC 鍵的 keyCode 是 27
-                setFilteredData([]);
-                if (dropdownRef.current) {
-                    dropdownRef.current.style.display = 'none';
-                }
-            }
-        };
+    // 將空資料新增進陣列
+    setData2((prevData) => [...prevData, emptyDetail]);
+  };
 
-        // 為整個 document 添加事件監聽器
-        document.addEventListener('keydown', handleKeyDown);
+  // 從明細移除
+  const handleRemoveDetail = (index: number, item: any) => {
+    myAlert.confirm({
+      title: '確定移除?',
+      props: {
+        onOk: () => {
+          const updatedData = data2.filter((_, i) => i !== index);
+          setData2(updatedData);
+        },
+      },
+    });
+  };
 
-        // 清理事件監聽器
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
-    //#endregion
+  //更新明細資料
+  const handleStringChange = (index: number, key: string, value: string) => {
+    const updatedData2 = [...data2]; // 使用淺拷貝
+    updatedData2[index] = { ...updatedData2[index], [key]: value }; // 確保更改的只是副本
+    setData2(updatedData2); // 更新data2
 
-    //#region ===========【廠商篩選】
-    const [customerbar, setCustomerbar] = useState(false);
-    const [countyOptions, setCountyOptions] = useState<string[]>([]);
-    const [filteredData2, setFilteredData2] = useState<any[]>([]);
-    const [filters, setFilters] = useState({
-        county: '',
-        name: '',
-        contact: ''
+    if (key === 'productid' || key === 'name' || key === 'spec') {
+      const filters = {
+        productid: updatedData2[index].productid?.trim().toLowerCase() || '',
+        name: updatedData2[index].name?.trim().toLowerCase() || '',
+        spec: updatedData2[index].spec?.trim().toLowerCase() || '',
+      };
+
+      if (Object.values(filters).some((filter) => filter !== '')) {
+        const filtered = data.filter(
+          (item) =>
+            (!filters.productid || item.productid?.toLowerCase().includes(filters.productid)) &&
+            (!filters.name || item.name?.toLowerCase().includes(filters.name)) &&
+            (!filters.spec || item.spec?.toLowerCase().includes(filters.spec))
+        );
+
+        setFilteredData(filtered);
+        setShowSuggestions(true);
+      } else {
+        setShowSuggestions(false);
+      }
+    }
+  };
+
+  //focus選中的明細
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+
+  const handleRowClick = (itemId: string) => {
+    setSelectedItemId(itemId);
+  };
+
+  // 明細異動處理
+  useEffect(() => {
+    console.log(data1);
+
+    // 每次 data2 更新時，重新計算總價和稅金
+    let totalprice = 0;
+    data2.forEach((element) => {
+      // 檢查 totalprice 是不是數字，如果是字串就移除逗號
+      const price =
+        typeof element.totalprice === 'string'
+          ? parseFloat(element.totalprice.replace(/,/g, ''))
+          : parseFloat(element.totalprice) || 0; // 如果是數字，直接轉換
+      console.log(price); // 顯示正確的數字格式
+      totalprice += price; // 將其加總
     });
 
-    // 根據篩選條件更新資料
-    useEffect(() => {
-        const filtered = customerdata.filter(item =>
-            (filters.county === '' || item.county === filters.county) &&
-            (filters.name === '' || item.name.includes(filters.name)) &&
-            (filters.contact === '' || item.contact.includes(filters.contact))
-        );
-        setFilteredData2(filtered);
-    }, [filters]);
+    console.log(totalprice); // 應顯示正確的加總結果
 
-    //#endregion
+    // 四捨五入總價到小數點第二位
+    const roundedTotalPrice = Math.round(totalprice * 100) / 100;
+    setTotalPrice1(roundedTotalPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
-    //#region  ===========【採購帶入功能區】
-    const [prbar, setPrbar] = useState(false);
+    // 計算稅金，四捨五入到小數點第二位
+    const taxPrice = Math.round(roundedTotalPrice * 0.05 * 100) / 100;
+    setTaxPrice1(taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
+    // 計算應付總價（總價 + 稅金），四捨五入到小數點第二位
+    const totalPayPrice = Math.round((roundedTotalPrice + taxPrice) * 100) / 100;
+    setTotalPayPrice1(totalPayPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  }, [data2]);
 
+  //#endregion
 
-    //#endregion
+  //#region ===========【物料篩選】
+  interface DataItem {
+    id: string;
+    productid: string;
+    spec: string | null; // spec 可能為 null
+    name: string;
+    unit: string;
+  }
 
-    //#region ===========【採購單篩選】
+  const [filteredData, setFilteredData] = useState<DataItem[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const isSelectingRef = useRef(false);
 
-    const [filteredData3, setFilteredData3] = useState(data4); // 儲存篩選後的資料
+  useEffect(() => {
+    if (isSelectingRef.current) {
+      return;
+    }
 
-    // 當 keyword5, keyword6, keyword7 變化時進行篩選
-    useEffect(() => {
-        const filteredData = data4.filter((item) => {
-            const matchesKeyword4 = keyword4 ? item.suppliername?.includes(keyword4) : true;
-            const matchesKeyword5 = keyword5 ? item.purchaseorderid?.includes(keyword5) : true;
-            const matchesKeyword6 = keyword6 ? item.name?.includes(keyword6) : true;
-            const matchesKeyword7 = keyword7 ? item.spec?.includes(keyword7) : true;
+    let filtered = searchbardata;
 
-            return matchesKeyword4 && matchesKeyword5 && matchesKeyword6 && matchesKeyword7;
+    if (handinputproductid !== '' || handinputname !== '' || handinputspec != '') {
+      if (handinputproductuuid) {
+        let filtered = searchbardata;
+        filtered = searchbardata.filter((item) => item.id.includes(handinputproductuuid));
+      }
+
+      if (handinputproductid) {
+        filtered = filtered.filter((item) => item.productid.includes(handinputproductid));
+      }
+
+      if (handinputname) {
+        filtered = filtered.filter((item) => item.name.includes(handinputname));
+      }
+
+      if (handinputspec) {
+        filtered = filtered.filter((item) => item.spec && item.spec.includes(handinputspec));
+      }
+
+      setFilteredData(filtered);
+      setShowSuggestions(Boolean(filtered.length > 0 && (handinputproductid || handinputname || handinputspec)));
+    } else {
+      setHandinputproductuuid('');
+      setFilteredData([]);
+      setShowSuggestions(false);
+    }
+  }, [handinputproductid, handinputname, handinputspec]);
+
+  //點選物料
+  const handleSelect = (selectedItem: any) => {
+    const updatedData2 = [...data2];
+    const index = currentindex; // 假設 currentIndex 保存了目前正在編輯的行
+    updatedData2[index] = {
+      ...updatedData2[index],
+      productuuid: selectedItem.id,
+      productid: selectedItem.productid,
+      name: selectedItem.name,
+      spec: selectedItem.spec,
+      unit: selectedItem.unit,
+    };
+    setData2(updatedData2);
+
+    // 清除建議選單
+    setFilteredData([]);
+    setShowSuggestions(false);
+  };
+
+  //點選物料後控制，使用ESC關閉等狀態監控
+  const dropdownRef = useRef<HTMLUListElement | null>(null);
+  useEffect(() => {
+    // 按下 ESC 鍵關閉下拉選單
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.keyCode === 27) {
+        // ESC 鍵的 keyCode 是 27
+        setFilteredData([]);
+
+        if (dropdownRef.current) {
+          dropdownRef.current.style.display = 'none';
+        }
+      }
+    };
+
+    // 為整個 document 添加事件監聽器
+    document.addEventListener('keydown', handleKeyDown);
+
+    // 清理事件監聽器
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  //#endregion
+
+  //#region ===========【廠商篩選】
+  const [customerbar, setCustomerbar] = useState(false);
+  const [countyOptions, setCountyOptions] = useState<string[]>([]);
+  const [filteredData2, setFilteredData2] = useState<any[]>([]);
+  const [filters, setFilters] = useState({
+    county: '',
+    name: '',
+    contact: '',
+  });
+
+  // 根據篩選條件更新資料
+  useEffect(() => {
+    const filtered = customerdata.filter(
+      (item) =>
+        (filters.county === '' || item.county === filters.county) &&
+        (filters.name === '' || item.name.includes(filters.name)) &&
+        (filters.contact === '' || item.contact.includes(filters.contact))
+    );
+    setFilteredData2(filtered);
+  }, [filters]);
+
+  //#endregion
+
+  //#region  ===========【採購帶入功能區】
+  const [prbar, setPrbar] = useState(false);
+
+  //#endregion
+
+  //#region ===========【採購單篩選】
+
+  const [filteredData3, setFilteredData3] = useState(data4); // 儲存篩選後的資料
+
+  // 當 keyword5, keyword6, keyword7 變化時進行篩選
+  useEffect(() => {
+    const filteredData = data4.filter((item) => {
+      const matchesKeyword4 = keyword4 ? item.suppliername?.includes(keyword4) : true;
+      const matchesKeyword5 = keyword5 ? item.purchaseorderid?.includes(keyword5) : true;
+      const matchesKeyword6 = keyword6 ? item.name?.includes(keyword6) : true;
+      const matchesKeyword7 = keyword7 ? item.spec?.includes(keyword7) : true;
+
+      return matchesKeyword4 && matchesKeyword5 && matchesKeyword6 && matchesKeyword7;
+    });
+
+    setFilteredData3(filteredData);
+    setCurrentPage(1); // 當篩選條件改變時，重置當前頁數
+  }, [keyword4, keyword5, keyword6, keyword7, data4]); // 監聽依賴項目
+
+  //#endregion
+
+  //#region ===========【分頁處理】
+  // 頁數相關狀態
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(100); // 每頁顯示的項目數
+
+  // 計算當前頁顯示的資料
+  const currentItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    return filteredData3.slice(startIndex, endIndex);
+  }, [itemsPerPage, currentPage, filteredData3]);
+
+  // 分頁切換處理函數
+  const handlePageChange = (page: any) => {
+    setCurrentPage(page);
+  };
+  //#endregion
+
+  //#region ===========【儲格Modal】
+
+  //#region ===【儲格變數】
+  const [data11, setData11] = useState<any[]>([]);
+  const [whpositionqmodalopen, setWhpositionqmodalopen] = useState<boolean>(false);
+  const [normaldata, setNormalData] = useState<any[]>([]);
+
+  const [whpnumber, setWhpnumber] = useState<string>('');
+  const [whpproductid, setWhpproductid] = useState<string>('');
+  const [whpname, setWhpname] = useState<string>('');
+  const [whpspec, setWhpspec] = useState<string>('');
+  const [whpquantity, setWhpquantity] = useState<string>('');
+  const [maxinboxquantity, setMaxinboxquantity] = useState<number>(0);
+  const [inboxquantity, setInboxquantity] = useState<number>(0);
+  const [traycalled, setTraycalled] = useState<boolean>(false);
+  const [whnamecalled, setWhnamecalled] = useState<string>('');
+  const [traynamecalled, setTraynamecalled] = useState<string>('');
+  const [whpnamecalled, setWhpnamecalled] = useState<string>('');
+  const [selectedOption, setSelectedOption] = useState(''); // 預設選項
+  const [selectWhnamedata, setSelectwhnamedata] = useState<any[]>([]);
+  const [selecttraynamedata, setSelecttraynamedata] = useState<any[]>([]);
+  const [nowname, setNowname] = useState<string>('');
+  const [nowproductid, setNowproductid] = useState<string>('');
+  const [nowspec, setNowspec] = useState<string>('');
+  const [nowquantity, setNowquantity] = useState<string>('');
+  const [nowwhname, setNowwhname] = useState<string>('');
+  const [nowtrayname, setNowtrayname] = useState<string>('');
+  const [nowwhposition, setNowwhposition] = useState<string>('');
+  const [nowentryqty, setNowentryqty] = useState<string>('');
+  const [nowwhpositionuuid, setNowwhpositionuuid] = useState<string>('');
+  const [nowprodentrydetailuuid, setNowprodentrydetailuuid] = useState<string>('');
+  const [modalcheckfirstin, setModalcheckfirstin] = useState<number>(0);
+  const [inventoryid, setInventoryid] = useState<string>('');
+  //倉庫類型
+  const [warehouse_type, setWarehouse_type] = useState<string>('');
+  //滑鼠hover
+  const [hoverInfo, setHoverInfo] = useState<string | null>(null);
+  const [mouseX, setMouseX] = useState('0px');
+  const [mouseY, setMouseY] = useState('0px');
+  //#endregion
+
+  //#region ===【儲格頁面進入】
+  // 滑鼠hover
+  useEffect(() => {
+    // 明確指定參數類型為 Window 的 MouseEvent
+    const handleMouseMove = (event: globalThis.MouseEvent) => {
+      setMouseX(`${event.pageX}px`);
+      setMouseY(`${event.pageY}px`);
+    };
+
+    // 當組件加載時添加事件監聽器
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // 返回一個清理函數，在組件卸載時移除事件監聽器
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []); // 空依賴數組，確保只在組件加載和卸載時運行
+  //#endregion
+
+  //#region ===【儲格API】
+  //取得托盤樣式
+  const GetLayOut = async (whid: any, trayname: any, id: any) => {
+    try {
+      // setIsLoading(true);
+      const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
+        whid: whid as string | undefined,
+        trayname: trayname as string | undefined,
+        id: id as string | undefined,
+      };
+      console.log(conditionModel);
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'test',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      console.log(inputModel);
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const responseData = await response.json();
+
+      console.log(responseData);
+
+      setData11(responseData);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 入庫加庫存
+  const AddWHPositionQuantity = async () => {
+    try {
+      setIsLoading(true);
+      const conditionModel: {
+        whpositionuuid: string | undefined;
+        prodentrydetailuuid: string | undefined;
+        quantity: string | undefined;
+        batchid: string | undefined;
+        type: string | undefined;
+        productid: string | undefined;
+      } = {
+        whpositionuuid: nowwhpositionuuid,
+        prodentrydetailuuid: nowprodentrydetailuuid,
+        quantity: inboxquantity.toString() as string | undefined,
+        batchid: batchidin,
+        type: whpproductid != nowproductid ? 'false' : 'true',
+        productid: nowproductid,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/AddWHPositionQuantity?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+
+      getWhpositionDetailByProductId(nowproductid);
+      setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
+      GetDetailById(uuidin);
+      setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
+      setInboxquantity(0);
+    } catch (error: any) {
+      setError('getProdReceiptDetail:' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const AddNormalInventory = async (id: any, type: any) => {
+    try {
+      setIsLoading(true);
+      const conditionModel = {
+        inventoryid: id,
+        quantity: inboxquantity,
+        type: type,
+        productid: nowproductid,
+        update_by: userInfo?.employee?.chName.toString(),
+        prodentrydetailuuid: nowprodentrydetailuuid,
+        batchid: batchidin,
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const response = await fetch(`${setting.apipath}/WareHouse/AddNormalInventory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(inputModel),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+
+      handleRowClick(id);
+      getWhpositionDetailByProductId(nowproductid);
+      setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
+      GetDetailById(uuidin);
+      setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
+      setInboxquantity(0);
+      GetNormalInventory(whid);
+    } catch (error: any) {
+      setError('getProdReceiptDetail:' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取得儲格物料資訊
+  const getWhpositionDetailByProductId = async (productid: any) => {
+    try {
+      // setIsLoading(true);
+      const conditionModel: {
+        productid: string | undefined;
+        type: string | undefined;
+      } = {
+        productid: productid as string | undefined,
+        type: 'entry',
+      };
+
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/GetWhpositionDetailByProductId?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+
+      if (data.length === 0) {
+        myAlert.warning({
+          title: '查詢結果',
+          content: '目前沒有可存放的儲位資訊',
         });
 
-        setFilteredData3(filteredData);
-        setCurrentPage(1); // 當篩選條件改變時，重置當前頁數
-    }, [keyword4, keyword5, keyword6, keyword7, data4]); // 監聽依賴項目
+        return;
+      }
 
-    //#endregion
+      setData3(data);
 
-    //#region ===========【分頁處理】
-    // 頁數相關狀態
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(100); // 每頁顯示的項目數
+      // handleRowClick(data[0].inventoryid);
+      GetTrayStatus(data[0].whid);
+      GetLayOut(data[0].whid, data[0].trayname, data[0].id);
+      // if (modalcheckfirstin === 0) {
+      //     setWhid(data[0].whid);
+      //     setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+      //     setWhpname(data[0].name);
+      //     setWhpproductid(data[0].productid);
+      //     setWhpspec(data[0].spec);
+      //     setWhpquantity(data[0].quantity);
+      //     setNowwhname(data[0].whname);
+      //     setNowtrayname(data[0].trayname);
+      //     setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
+      // }
 
-    // 計算當前頁顯示的資料
-    const currentItems = useMemo(() => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return filteredData3.slice(startIndex, endIndex);
-    }, [itemsPerPage, currentPage, filteredData3]);
+      const distinctWhnames = data
+        .map((item: { whname: any }) => item.whname) // 提取所有 whname
+        .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index); // 去重
 
-    // 分頁切換處理函數
-    const handlePageChange = (page: any) => {
-        setCurrentPage(page);
-    };
-    //#endregion
+      setSelectwhnamedata(distinctWhnames);
 
-    //#region ===========【儲格Modal】
+      const distincttraynames = data
+        .map((item: { trayname: any }) => item.trayname) // 提取所有 trayname
+        .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index); // 去重
 
-    //#region ===【儲格變數】
-    const [data11, setData11] = useState<any[]>([]);
-    const [whpositionqmodalopen, setWhpositionqmodalopen] = useState<boolean>(false);
-    const [normaldata, setNormalData] = useState<any[]>([]);
-
-    const [whpnumber, setWhpnumber] = useState<string>("");
-    const [whpproductid, setWhpproductid] = useState<string>("");
-    const [whpname, setWhpname] = useState<string>("");
-    const [whpspec, setWhpspec] = useState<string>("");
-    const [whpquantity, setWhpquantity] = useState<string>("");
-    const [maxinboxquantity, setMaxinboxquantity] = useState<number>(0);
-    const [inboxquantity, setInboxquantity] = useState<number>(0);
-    const [traycalled, setTraycalled] = useState<boolean>(false);
-    const [whnamecalled, setWhnamecalled] = useState<string>("");
-    const [traynamecalled, setTraynamecalled] = useState<string>("");
-    const [whpnamecalled, setWhpnamecalled] = useState<string>("");
-    const [selectedOption, setSelectedOption] = useState(''); // 預設選項
-    const [selectWhnamedata, setSelectwhnamedata] = useState<any[]>([]);
-    const [selecttraynamedata, setSelecttraynamedata] = useState<any[]>([]);
-    const [nowname, setNowname] = useState<string>("");
-    const [nowproductid, setNowproductid] = useState<string>("");
-    const [nowspec, setNowspec] = useState<string>("");
-    const [nowquantity, setNowquantity] = useState<string>("");
-    const [nowwhname, setNowwhname] = useState<string>("");
-    const [nowtrayname, setNowtrayname] = useState<string>("");
-    const [nowwhposition, setNowwhposition] = useState<string>("");
-    const [nowentryqty, setNowentryqty] = useState<string>("");
-    const [nowwhpositionuuid, setNowwhpositionuuid] = useState<string>("");
-    const [nowprodentrydetailuuid, setNowprodentrydetailuuid] = useState<string>("");
-    const [modalcheckfirstin, setModalcheckfirstin] = useState<number>(0);
-    const [inventoryid, setInventoryid] = useState<string>("");
-    //倉庫類型
-    const [warehouse_type, setWarehouse_type] = useState<string>('');
-    //滑鼠hover
-    const [hoverInfo, setHoverInfo] = useState<string | null>(null);
-    const [mouseX, setMouseX] = useState('0px');
-    const [mouseY, setMouseY] = useState('0px');
-    //#endregion
-
-    //#region ===【儲格頁面進入】
-    // 滑鼠hover
-    useEffect(() => {
-        // 明確指定參數類型為 Window 的 MouseEvent
-        const handleMouseMove = (event: globalThis.MouseEvent) => {
-            setMouseX(`${event.pageX}px`);
-            setMouseY(`${event.pageY}px`);
-        };
-
-        // 當組件加載時添加事件監聽器
-        window.addEventListener('mousemove', handleMouseMove);
-
-        // 返回一個清理函數，在組件卸載時移除事件監聽器
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-        };
-    }, []); // 空依賴數組，確保只在組件加載和卸載時運行
-    //#endregion
-
-    //#region ===【儲格API】
-    //取得托盤樣式
-    const GetLayOut = async (whid: any, trayname: any, id: any) => {
-        try {
-
-            // setIsLoading(true);
-            const conditionModel: { whid: string | undefined; trayname: string | undefined; id: string | undefined } = {
-                whid: whid as string | undefined,
-                trayname: trayname as string | undefined,
-                id: id as string | undefined
-            };
-            console.log(conditionModel);
-            const inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'test',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            console.log(inputModel);
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/GetTrayLayOutById?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-
-            const responseData = await response.json();
-
-            console.log(responseData);
-
-            setData11(responseData);
-
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // 入庫加庫存
-    const AddWHPositionQuantity = async () => {
-
-        try {
-            setIsLoading(true);
-            const conditionModel: {
-                whpositionuuid: string | undefined,
-                prodentrydetailuuid: string | undefined,
-                quantity: string | undefined,
-                batchid: string | undefined,
-                type: string | undefined,
-                productid: string | undefined
-            } = {
-                whpositionuuid: nowwhpositionuuid,
-                prodentrydetailuuid: nowprodentrydetailuuid,
-                quantity: inboxquantity.toString() as string | undefined,
-                batchid: batchidin,
-                type: whpproductid != nowproductid ? 'false' : 'true',
-                productid: nowproductid
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/AddWHPositionQuantity?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-
-            getWhpositionDetailByProductId(nowproductid);
-            setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
-            GetDetailById(uuidin);
-            setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
-            setInboxquantity(0);
-
-        } catch (error: any) {
-            setError("getProdReceiptDetail:" + error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    const AddNormalInventory = async (id: any, type: any) => {
-
-        try {
-            setIsLoading(true);
-            const conditionModel = {
-                inventoryid: id,
-                quantity: inboxquantity,
-                type: type,
-                productid: nowproductid,
-                update_by: userInfo?.employee?.chName.toString(),
-                prodentrydetailuuid: nowprodentrydetailuuid,
-                batchid: batchidin
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const response = await fetch(`${setting.apipath}/WareHouse/AddNormalInventory`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(inputModel)
-            });
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-
-            handleRowClick(id);
-            getWhpositionDetailByProductId(nowproductid);
-            setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
-            GetDetailById(uuidin);
-            setWhpquantity((parseInt(whpquantity) + inboxquantity).toString());
-            setInboxquantity(0);
-            GetNormalInventory(whid);
-
-        } catch (error: any) {
-            setError("getProdReceiptDetail:" + error.message);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    //取得儲格物料資訊
-    const getWhpositionDetailByProductId = async (productid: any) => {
-        try {
-            // setIsLoading(true);
-            const conditionModel: {
-                productid: string | undefined
-                type: string | undefined
-            } = {
-                productid: productid as string | undefined,
-                type: "entry"
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/GetWhpositionDetailByProductId?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: "查詢結果",
-                    content: "目前沒有可存放的儲位資訊"
-                });
-                return;
-            }
-
-            setData3(data);
-
-
-
-            // handleRowClick(data[0].inventoryid);
-            GetTrayStatus(data[0].whid);
-            GetLayOut(data[0].whid, data[0].trayname, data[0].id);
-            // if (modalcheckfirstin === 0) {
-            //     setWhid(data[0].whid);
-            //     setWhpnumber(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-            //     setWhpname(data[0].name);
-            //     setWhpproductid(data[0].productid);
-            //     setWhpspec(data[0].spec);
-            //     setWhpquantity(data[0].quantity);
-            //     setNowwhname(data[0].whname);
-            //     setNowtrayname(data[0].trayname);
-            //     setNowwhposition(recodeWhpid(data[0].length, data[0].width, data[0].childlength, data[0].childwidth));
-            // }
-
-
-
-            const distinctWhnames = data
-                .map((item: { whname: any; }) => item.whname)  // 提取所有 whname
-                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
-
-            setSelectwhnamedata(distinctWhnames);
-
-            const distincttraynames = data
-                .map((item: { trayname: any; }) => item.trayname)  // 提取所有 trayname
-                .filter((value: any, index: any, self: string | any[]) => self.indexOf(value) === index);  // 去重
-
-
-            setSelecttraynamedata(distincttraynames);
-
-
-
-        } catch (error: any) {
-            myAlert.err({
-                title: "prodEntry(getWhpositionDetailByProductId)",
-                content: error.message
-            })
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    // 取得一般倉庫資訊
-    const GetNormalInventory = async (whid: any) => {
-        try {
-            // setIsLoading(true);
-            const conditionModel = {
-                // productid: productid as string | undefined,
-                // type: "entry",
-                whid: whid
-            };
-
-
-            var inputModel = {
-                TypeName: 'ERP',
-                ServiceName: 'WareHouseService',
-                FunctionName: 'no',
-                FilterConditions: JSON.stringify(conditionModel),
-            };
-
-            const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
-            const response = await fetch(`${setting.apipath}/WareHouse/GetNormalInventory?${queryParams}`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch data');
-            }
-            const data = await response.json();
-
-            if (data.length === 0) {
-                myAlert.warning({
-                    title: "查詢結果",
-                    content: "目前沒有可存放的儲位資訊"
-                });
-                return;
-            }
-
-            setNormalData(data);
-
-
-
-        } catch (error: any) {
-            myAlert.err({
-                title: "prodEntry(getWhpositionDetailByProductId)",
-                content: error.message
-            })
-        }
-        finally {
-            setIsLoading(false);
-        }
+      setSelecttraynamedata(distincttraynames);
+    } catch (error: any) {
+      myAlert.err({
+        title: 'prodEntry(getWhpositionDetailByProductId)',
+        content: error.message,
+      });
+    } finally {
+      setIsLoading(false);
     }
-    //取得托盤呼叫狀態
-    const GetTrayStatus = async (whid: string) => {
-        try {
-            // setIsLoading(true);
+  };
 
-            const trayStatus = await getTrayStatus(setting.apipath, whid);
+  // 取得一般倉庫資訊
+  const GetNormalInventory = async (whid: any) => {
+    try {
+      // setIsLoading(true);
+      const conditionModel = {
+        // productid: productid as string | undefined,
+        // type: "entry",
+        whid: whid,
+      };
 
-            // 更新狀態
-            setCalled(trayStatus.called);
-            setIP(trayStatus.ip);
-            setCalledTray(trayStatus.trayname); // trayname 可正常取值
-            setCalledWarehouse(trayStatus.whname);
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
+      const inputModel = {
+        TypeName: 'ERP',
+        ServiceName: 'WareHouseService',
+        FunctionName: 'no',
+        FilterConditions: JSON.stringify(conditionModel),
+      };
+
+      const queryParams = new URLSearchParams({ Input: JSON.stringify(inputModel) }).toString();
+      const response = await fetch(`${setting.apipath}/WareHouse/GetNormalInventory?${queryParams}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+
+      const data = await response.json();
+
+      if (data.length === 0) {
+        myAlert.warning({
+          title: '查詢結果',
+          content: '目前沒有可存放的儲位資訊',
+        });
+
+        return;
+      }
+
+      setNormalData(data);
+    } catch (error: any) {
+      myAlert.err({
+        title: 'prodEntry(getWhpositionDetailByProductId)',
+        content: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //取得托盤呼叫狀態
+  const GetTrayStatus = async (whid: string) => {
+    try {
+      // setIsLoading(true);
+
+      const trayStatus = await getTrayStatus(setting.apipath, whid);
+
+      // 更新狀態
+      setCalled(trayStatus.called);
+      setIP(trayStatus.ip);
+      setCalledTray(trayStatus.trayname); // trayname 可正常取值
+      setCalledWarehouse(trayStatus.whname);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //更新托盤呼叫狀態
+  const UpdateTrayStatus = async () => {
+    try {
+      setIsLoading(true);
+
+      const conditionModel = {
+        whid: whid,
+        called: !called,
+        trayname: nowtrayname,
+        called_by: userInfo?.employee?.id,
+      };
+
+      const result = await updateTrayStatus(setting.apipath, conditionModel);
+
+      if (result.success) {
+        // 成功，更新狀態
+        setCalled(!called);
+      } else {
+        // 失敗，顯示錯誤提示
+        setCalled(false);
+        myAlert.warning({ title: '失敗', content: result.message });
+      }
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 呼叫托盤
+  const CallTray = async () => {
+    try {
+      setIsLoading(true);
+
+      // 設定基礎參數
+      const baseURL = setting.env === 'prod' ? `https://${ip}/` : 'https://localhost:44383/WareHouse/';
+      const deviceName = 'Device1';
+      const trayNumber = nowtrayname;
+      const trayCommand = '100';
+      const regAddress = '253';
+      const cmdValue = '1';
+
+      // 使用 callTray 服務
+      await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 退回托盤
+  const CallTrayBack = async () => {
+    try {
+      setIsLoading(true);
+
+      // 設定基礎參數
+      const baseURL = setting.env === 'prod' ? `https://${ip}/` : 'https://localhost:44383/WareHouse/';
+      const deviceName = 'Device1';
+      const trayNumber = nowtrayname;
+      const trayCommand = '200';
+      const regAddress = '253';
+      const cmdValue = '1';
+
+      // 使用 callTray 服務
+      await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //#endregion
+
+  //#region ===【儲格功能區】
+
+  // 關閉Modal
+  const handleModalClose = async () => {
+    setWhpositionqmodalopen(false);
+    setSelectedItemId(null);
+  };
+
+  // 入庫加庫存
+  const handleaddquantity = () => {
+    if (warehouse_type === '立體倉庫') {
+      myAlert.confirm({
+        title: `確定要入到此儲格嗎?: ${nowwhname}-${nowtrayname}-${nowwhposition}`,
+        props: {
+          onOk: () => {
+            AddWHPositionQuantity();
+          },
+        },
+      });
+    } else {
+      myAlert.confirm({
+        title: `確定要入到此倉庫嗎?: ${nowwhname}`,
+        props: {
+          onOk: () => {
+            const type = nowproductid === whpproductid ? true : false;
+            AddNormalInventory(inventoryid, type);
+          },
+        },
+      });
+    }
+  };
+
+  const handleinbox = (item: any) => {
+    setWhpnumber('');
+    setWhpproductid('');
+    setWhpname('');
+    setWhpspec('');
+    setWhpquantity('');
+    setData3([]);
+    setData11([]);
+    getWhpositionDetailByProductId(item.productid);
+    setWhpositionqmodalopen(!whpositionqmodalopen);
+    setNowproductid(item.productid);
+    setNowname(item.name);
+    setNowspec(item.spec);
+    setNowquantity(item.quantity);
+    setNowentryqty(item.entry_qty);
+    setNowprodentrydetailuuid(item.id);
+  };
+
+  const handleGetLayOut = (item: any) => {
+    setWarehouse_type(item?.type);
+
+    if (item.type === '立體倉庫') {
+      handleRowClick(item.inventoryid);
+      GetTrayStatus(item.whid); //取得托盤呼叫狀態
+      setWhid(item.whid);
+      setNowwhname(item.whname);
+      setNowtrayname(item.trayname);
+      setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+      GetLayOut(item.whid, item.trayname, item.id);
+
+      if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
+        setInboxquantity(0);
+      }
+
+      setNowwhpositionuuid(item.id);
+      setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+      setWhpname(item.name);
+      setWhpproductid(item.productid);
+      setWhpspec(item.spec);
+      setWhpquantity(item.quantity);
+      setWhid(item.whid);
+      setNowwhname(item.whname);
+      setNowtrayname(item.trayname);
+      setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
+    } else {
+      // alert(item.inventoryid);
+      handleRowClick(item.inventoryid);
+      // GetNormalInventory(item.productid);
+      // alert("目前還沒有一般儲存功能");
+      // alert(item.inventoryid);
+      // getWhpositionDetailByProductId(nowproductid);
+      // setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
+      // GetDetailById(uuidin);
+      setTraynamecalled('');
+      setWhpnumber('');
+      setWhpproductid(item.productid);
+      setWhpspec(item.spec);
+      setWhpquantity(item.quantity);
+      setInboxquantity(0);
+      GetNormalInventory(item.whid);
+      setWhid(item.whid);
+      setNowwhname(item.whname);
+      setNowwhposition('');
+      setInventoryid(item.inventoryid);
+      setNowtrayname('');
+    }
+  };
+
+  //呼叫托盤
+  const handleCall = async () => {
+    await GetTrayStatus(whid);
+
+    if (called === true) {
+      myAlert.warning({ title: '請先收回托盤' });
+
+      return;
+    } else {
+      myAlert.confirm({
+        title: `呼叫: ${nowtrayname}`,
+        content: '請勿靠近設備!!',
+        props: {
+          onOk: async () => {
+            await CallTray();
+            UpdateTrayStatus();
+          },
+        },
+      });
+    }
+  };
+
+  //退回托盤
+  const handleBack = async () => {
+    await GetTrayStatus(whid);
+
+    if (called === false) {
+      myAlert.warning({ title: '托盤已退回' });
+
+      return;
+    } else {
+      myAlert.confirm({
+        title: `退回: ${calledTray}`,
+        content: '請勿靠近設備!!',
+        props: {
+          onOk: async () => {
+            await CallTrayBack();
+            UpdateTrayStatus();
+          },
+        },
+      });
+    }
+  };
+
+  //#endregion
+
+  //#region ===【邏輯】
+  //儲格編碼轉換
+  const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
+    const convertToAlpha = (num: number): string => {
+      return String.fromCharCode(65 + num - 1);
     };
 
-    //更新托盤呼叫狀態
-    const UpdateTrayStatus = async () => {
-        try {
-            setIsLoading(true);
-
-            const conditionModel = {
-                whid: whid,
-                called: !called,
-                trayname: nowtrayname,
-                called_by: userInfo?.employee?.id,
-            };
-
-            const result = await updateTrayStatus(setting.apipath, conditionModel);
-
-            if (result.success) {
-                // 成功，更新狀態
-                setCalled(!called);
-            } else {
-                // 失敗，顯示錯誤提示
-                setCalled(false);
-                myAlert.warning({ title: "失敗", content: result.message });
-            }
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
+    const convertToNumber = (num: number, pad: number): string => {
+      return num.toString().padStart(pad, '0');
     };
 
-    // 呼叫托盤
-    const CallTray = async () => {
-        try {
-            setIsLoading(true);
-
-            // 設定基礎參數
-            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
-            const deviceName = "Device1";
-            const trayNumber = nowtrayname;
-            const trayCommand = "100";
-            const regAddress = "253";
-            const cmdValue = "1";
-
-            // 使用 callTray 服務
-            await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
+    const alphaIncrement = (alpha: string): string => {
+      if (alpha === 'Z') {
+        return 'A';
+      } else {
+        return String.fromCharCode(alpha.charCodeAt(0) + 1);
+      }
     };
 
-    // 退回托盤
-    const CallTrayBack = async () => {
-        try {
-            setIsLoading(true);
-
-            // 設定基礎參數
-            const baseURL = setting.env === "prod" ? `https://${ip}/` : "https://localhost:44383/WareHouse/";
-            const deviceName = "Device1";
-            const trayNumber = nowtrayname;
-            const trayCommand = "200";
-            const regAddress = "253";
-            const cmdValue = "1";
-
-            // 使用 callTray 服務
-            await callTray(baseURL, deviceName, trayNumber, trayCommand, regAddress, cmdValue);
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setIsLoading(false);
-        }
+    const numberIncrement = (num: number, max: number, pad: number): string => {
+      if (num >= max) {
+        return convertToNumber(1, pad);
+      } else {
+        return convertToNumber(num + 1, pad);
+      }
     };
 
+    let newlength = '';
+    let newwidth = '';
+    let newchildlength = '';
+    let newchildwidth = '';
 
-    //#endregion
-
-    //#region ===【儲格功能區】
-
-    // 關閉Modal
-    const handleModalClose = async () => {
-        setWhpositionqmodalopen(false);
-        setSelectedItemId(null);
+    // 處理 length 的增量
+    if (length === '1') {
+      newlength = 'A';
+    } else {
+      newlength = convertToAlpha(parseInt(length, 10));
     }
 
-    // 入庫加庫存
-    const handleaddquantity = () => {
-        if (warehouse_type === '立體倉庫') {
-            myAlert.confirm({
-                title: `確定要入到此儲格嗎?: ${nowwhname}-${nowtrayname}-${nowwhposition}`,
-                props: {
-                    onOk: () => {
-                        AddWHPositionQuantity();
-                    }
-                }
-            });
-        } else {
-            myAlert.confirm({
-                title: `確定要入到此倉庫嗎?: ${nowwhname}`,
-                props: {
-                    onOk: () => {
-                        const type = nowproductid === whpproductid ? true : false;
-                        AddNormalInventory(inventoryid, type);
-                    }
-                }
-            });
-        }
+    // 處理 width 的增量
+    if (width === '1') {
+      newwidth = '001';
+    } else {
+      newwidth = convertToNumber(parseInt(width, 10), 3);
     }
 
-    const handleinbox = (item: any) => {
-        setWhpnumber('');
-        setWhpproductid('');
-        setWhpname('');
-        setWhpspec('');
-        setWhpquantity('');
-        setData3([]);
-        setData11([]);
-        getWhpositionDetailByProductId(item.productid);
-        setWhpositionqmodalopen(!whpositionqmodalopen);
-        setNowproductid(item.productid);
-        setNowname(item.name);
-        setNowspec(item.spec);
-        setNowquantity(item.quantity);
-        setNowentryqty(item.entry_qty);
-        setNowprodentrydetailuuid(item.id);
+    // 處理 childlength 的增量
+    if (childlength === '1') {
+      newchildlength = 'A';
+    } else {
+      newchildlength = convertToAlpha(parseInt(childlength, 10));
     }
 
-    const handleGetLayOut = (item: any) => {
-        setWarehouse_type(item?.type);
-        if (item.type === '立體倉庫') {
-            handleRowClick(item.inventoryid);
-            GetTrayStatus(item.whid);//取得托盤呼叫狀態
-            setWhid(item.whid);
-            setNowwhname(item.whname);
-            setNowtrayname(item.trayname);
-            setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-            GetLayOut(item.whid, item.trayname, item.id)
-            if (recodeWhpid(item.length, item.width, item.childlength, item.childwidth) != nowwhposition) {
-                setInboxquantity(0);
-            }
-            setNowwhpositionuuid(item.id);
-            setWhpnumber(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-            setWhpname(item.name);
-            setWhpproductid(item.productid);
-            setWhpspec(item.spec);
-            setWhpquantity(item.quantity);
-            setWhid(item.whid);
-            setNowwhname(item.whname);
-            setNowtrayname(item.trayname);
-            setNowwhposition(recodeWhpid(item.length, item.width, item.childlength, item.childwidth));
-        }
-        else {
-            // alert(item.inventoryid);
-            handleRowClick(item.inventoryid);
-            // GetNormalInventory(item.productid);
-            // alert("目前還沒有一般儲存功能");
-            // alert(item.inventoryid);
-            // getWhpositionDetailByProductId(nowproductid);
-            // setNowentryqty((parseInt(nowentryqty) + inboxquantity).toString());
-            // GetDetailById(uuidin);
-            setTraynamecalled('');
-            setWhpnumber('');
-            setWhpproductid(item.productid);
-            setWhpspec(item.spec);
-            setWhpquantity(item.quantity);
-            setInboxquantity(0);
-            GetNormalInventory(item.whid);
-            setWhid(item.whid);
-            setNowwhname(item.whname);
-            setNowwhposition('');
-            setInventoryid(item.inventoryid);
-            setNowtrayname('');
-        }
+    // 處理 childwidth 的增量
+    if (childwidth === '1') {
+      newchildwidth = '1';
+    } else {
+      newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
     }
 
-    //呼叫托盤
-    const handleCall = async () => {
-        await GetTrayStatus(whid);
-        if (called === true) {
-            myAlert.warning({ title: '請先收回托盤' });
-            return;
-        } else {
-            myAlert.confirm({
-                title: `呼叫: ${nowtrayname}`,
-                content: '請勿靠近設備!!',
-                props: {
-                    onOk: async () => {
-                        await CallTray();
-                        UpdateTrayStatus();
-                    }
-                }
-            });
-
-        }
+    // 增量操作
+    if (childlength !== '1' && newchildwidth === '001') {
+      newchildlength = alphaIncrement(newchildlength);
     }
 
-    //退回托盤
-    const handleBack = async () => {
-        await GetTrayStatus(whid);
-        if (called === false) {
-            myAlert.warning({ title: '托盤已退回' });
-            return;
-        } else {
-            myAlert.confirm({
-                title: `退回: ${calledTray}`,
-                content: '請勿靠近設備!!',
-                props: {
-                    onOk: async () => {
-                        await CallTrayBack();
-                        UpdateTrayStatus();
-                    }
-                }
-            });
-
-        }
+    if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
+      newwidth = numberIncrement(parseInt(width), 100, 3);
     }
 
-    //#endregion
+    if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
+      newlength = alphaIncrement(newlength);
+    }
 
-    //#region ===【邏輯】
-    //儲格編碼轉換
-    const recodeWhpid = (length: any, width: any, childlength: any, childwidth: any) => {
-        const convertToAlpha = (num: number): string => {
-            return String.fromCharCode(65 + num - 1);
-        };
+    return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
+  };
 
-        const convertToNumber = (num: number, pad: number): string => {
-            return num.toString().padStart(pad, '0');
-        };
-
-        const alphaIncrement = (alpha: string): string => {
-            if (alpha === 'Z') {
-                return 'A';
-            } else {
-                return String.fromCharCode(alpha.charCodeAt(0) + 1);
-            }
-        };
-
-        const numberIncrement = (num: number, max: number, pad: number): string => {
-            if (num >= max) {
-                return convertToNumber(1, pad);
-            } else {
-                return convertToNumber(num + 1, pad);
-            }
-        };
-
-        let newlength = '';
-        let newwidth = '';
-        let newchildlength = '';
-        let newchildwidth = '';
-
-        // 處理 length 的增量
-        if (length === '1') {
-            newlength = 'A';
-        } else {
-            newlength = convertToAlpha(parseInt(length, 10));
-        }
-
-        // 處理 width 的增量
-        if (width === '1') {
-            newwidth = '001';
-        } else {
-            newwidth = convertToNumber(parseInt(width, 10), 3);
-        }
-
-        // 處理 childlength 的增量
-        if (childlength === '1') {
-            newchildlength = 'A';
-        } else {
-            newchildlength = convertToAlpha(parseInt(childlength, 10));
-        }
-
-        // 處理 childwidth 的增量
-        if (childwidth === '1') {
-            newchildwidth = '1';
-        } else {
-            newchildwidth = numberIncrement(parseInt(childwidth), 100, 1);
-        }
-
-        // 增量操作
-        if (childlength !== '1' && newchildwidth === '001') {
-            newchildlength = alphaIncrement(newchildlength);
-        }
-
-        if (width !== '1' && newchildlength === 'A' && newchildwidth === '1') {
-            newwidth = numberIncrement(parseInt(width), 100, 3);
-        }
-
-        if (length !== '1' && newwidth === '001' && newchildlength === 'A' && newchildwidth === '1') {
-            newlength = alphaIncrement(newlength);
-        }
-
-        return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
-    };
-
-
-
-    //#endregion
-    //#endregion
-    return (
-        <SubLayer isLoading_subLayer={isLoading} className='overflow-hidden'>
-            <PageHeader02 tag={pagename + "單" + "：" + statusin} panelList={panelList}
-                customeRight={[
-                    <>
-                        {/* <button
+  //#endregion
+  //#endregion
+  return (
+    <SubLayer isLoading_subLayer={isLoading} className="overflow-hidden">
+      <PageHeader02
+        tag={pagename + '單' + '：' + statusin}
+        panelList={panelList}
+        customeRight={[
+          <>
+            {/* <button
                             className={scss.shortsquarebtn}
                             onClick={() => {
                                 handleCopy();
@@ -2180,60 +2110,63 @@ export default function PEntryDetail() {
                         >
                             複製
                         </button> */}
-                        {statusin === "進貨中" && isTrans && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定新增嗎?',
-                                            content: <>
-                                                <h1>請確認入庫數量</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleAddTrans()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    新增入庫
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-                            </>
-                        )}
-                        {/* 編輯按鈕 */}
-                        {statusin === "入庫中" && !isEditing && !isTrans && (
-
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        handleDelete();
-                                    }}
-                                    title="刪除單據"
-                                >
-                                    刪除
-                                </button>
-                                {/* <button
+            {statusin === '進貨中' && isTrans && (
+              <>
+                <button
+                  className={scss.shortredsquarebtn}
+                  onClick={() => {
+                    myAlert.confirm({
+                      title: '確定新增嗎?',
+                      content: (
+                        <>
+                          <h1>請確認入庫數量</h1>
+                        </>
+                      ),
+                      props: {
+                        onOk: () => {
+                          handleAddTrans();
+                        },
+                      },
+                    });
+                  }}
+                >
+                  新增入庫
+                </button>
+                <button
+                  className={scss.shortsquarebtn}
+                  onClick={() => {
+                    myAlert.confirm({
+                      title: '確定要取消嗎?',
+                      content: (
+                        <>
+                          <h1>未儲存的資料將不會保留</h1>
+                        </>
+                      ),
+                      props: {
+                        onOk: () => {
+                          handleCancel();
+                        },
+                      },
+                    });
+                  }}
+                >
+                  取消
+                </button>
+              </>
+            )}
+            {/* 編輯按鈕 */}
+            {statusin === '入庫中' && !isEditing && !isTrans && (
+              <>
+                <button
+                  className={scss.shortredsquarebtn}
+                  onClick={() => {
+                    handleDelete();
+                  }}
+                  title="刪除單據"
+                >
+                  刪除
+                </button>
+                {/* <button
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         handleEditTrans();
@@ -2242,7 +2175,7 @@ export default function PEntryDetail() {
                                 >
                                     入庫
                                 </button> */}
-                                {/* <button
+                {/* <button
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         setReviewbar(true);
@@ -2253,7 +2186,7 @@ export default function PEntryDetail() {
                                     審核流程
                                 </button> */}
 
-                                {/* <button
+                {/* <button
                                     className={scss.shortsquarebtn}
                                     onClick={() => {
                                         handleEdit()
@@ -2261,152 +2194,146 @@ export default function PEntryDetail() {
                                 >
                                     編輯
                                 </button> */}
-                            </>
-                        )}
+              </>
+            )}
 
-                        {statusin === "審核中" && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
-                                    title="單據抽回"
-                                    onClick={() => { handleGetReviewBack() }}>
-                                    抽單
-                                </button>
-
-                            </>
-                        )}
-                        {(!isEditing && !isTrans) && (
-                            <>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: `確定要返回嗎?`,
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    router.back();
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    返回
-                                </button >
-                            </>
-                        )}
-                        {/* 儲存按鈕 */}
-                        {statusin === "進貨中" && isEditing && (
-                            <>
-                                <button
-                                    className={scss.shortredsquarebtn}
-                                    onClick={() => {
-                                        console.log(data2);
-                                        // return;
-                                        setIsEditing(false); // 儲存後結束編輯模式
-                                        Update()
-
-                                        // NewAddPurchaseRequisition(); // 實際儲存邏輯
-                                    }}
-                                >
-                                    儲存
-                                </button>
-                                <button
-                                    className={scss.shortsquarebtn}
-                                    onClick={() => {
-                                        myAlert.confirm({
-                                            title: '確定要取消嗎?',
-                                            content: <>
-                                                <h1>未儲存的資料將不會保留</h1>
-                                            </>,
-                                            props: {
-                                                onOk: () => {
-                                                    handleCancel()
-                                                }
-                                            }
-                                        })
-                                    }}
-                                >
-                                    取消
-                                </button>
-
-                            </>
-
-                        )}
-                    </>
-
-
-                ]
-                }
-                customeLeft={
-                    [
+            {statusin === '審核中' && (
+              <>
+                <button
+                  className={scss.shortredsquarebtn}
+                  style={{ display: `${statusin === '審核中' ? '' : 'none'}` }}
+                  title="單據抽回"
+                  onClick={() => {
+                    handleGetReviewBack();
+                  }}
+                >
+                  抽單
+                </button>
+              </>
+            )}
+            {!isEditing && !isTrans && (
+              <>
+                <button
+                  className={scss.shortsquarebtn}
+                  onClick={() => {
+                    myAlert.confirm({
+                      title: `確定要返回嗎?`,
+                      content: (
                         <>
-                            {/* 編輯按鈕 */}
-                            {/* {statusin === "進貨中" && !isEditing && ( */}
-
-                            <>
-
-                                {printopen && (
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handlePrint();
-                                        }}
-                                        title="列印單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        列印
-                                    </button>
-                                )}
-                                {excelopen && (
-
-                                    <button
-                                        className={scss.shortsquarebtn}
-                                        onClick={() => {
-                                            handleExport();
-                                        }}
-                                        title="匯出單據"
-                                        style={{ margin: '0px 10px' }}
-                                    >
-                                        <span style={{ paddingRight: '5px' }}>
-                                            <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
-                                        </span>
-                                        Excel
-                                    </button>
-                                )}
-                                {statusin === "進貨中" && isEditing && (
-
-                                    <span style={{ fontSize: '18px', padding: '0px 10px' }}>
-
-                                        <button
-                                            className={scss.shortsquarebtn}
-                                            style={{
-                                            }}
-                                            onClick={() => {
-                                                setPrbar(!prbar);
-                                            }}
-                                        >
-                                            <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>
-                                                ☰
-                                            </span>
-                                            採購項目
-                                        </button>
-                                    </span>
-                                )}
-                            </>
-                            {/* )} */}
+                          <h1>未儲存的資料將不會保留</h1>
                         </>
-                    ]} />
-            <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
-                <div className={scss.right}>
-                    <div className={scss.content}>
-                        {/* <div className={scss.head_head1}>
+                      ),
+                      props: {
+                        onOk: () => {
+                          router.back();
+                        },
+                      },
+                    });
+                  }}
+                >
+                  返回
+                </button>
+              </>
+            )}
+            {/* 儲存按鈕 */}
+            {statusin === '進貨中' && isEditing && (
+              <>
+                <button
+                  className={scss.shortredsquarebtn}
+                  onClick={() => {
+                    console.log(data2);
+                    // return;
+                    setIsEditing(false); // 儲存後結束編輯模式
+                    Update();
+
+                    // NewAddPurchaseRequisition(); // 實際儲存邏輯
+                  }}
+                >
+                  儲存
+                </button>
+                <button
+                  className={scss.shortsquarebtn}
+                  onClick={() => {
+                    myAlert.confirm({
+                      title: '確定要取消嗎?',
+                      content: (
+                        <>
+                          <h1>未儲存的資料將不會保留</h1>
+                        </>
+                      ),
+                      props: {
+                        onOk: () => {
+                          handleCancel();
+                        },
+                      },
+                    });
+                  }}
+                >
+                  取消
+                </button>
+              </>
+            )}
+          </>,
+        ]}
+        customeLeft={[
+          <>
+            {/* 編輯按鈕 */}
+            {/* {statusin === "進貨中" && !isEditing && ( */}
+
+            <>
+              {printopen && (
+                <button
+                  className={scss.shortsquarebtn}
+                  onClick={() => {
+                    handlePrint();
+                  }}
+                  title="列印單據"
+                  style={{ margin: '0px 10px' }}
+                >
+                  <span style={{ paddingRight: '5px' }}>
+                    <img src={icon_print.src} alt="search" style={{ height: '20px', width: '20px' }} />
+                  </span>
+                  列印
+                </button>
+              )}
+              {excelopen && (
+                <button
+                  className={scss.shortsquarebtn}
+                  onClick={() => {
+                    handleExport();
+                  }}
+                  title="匯出單據"
+                  style={{ margin: '0px 10px' }}
+                >
+                  <span style={{ paddingRight: '5px' }}>
+                    <img src={icon_export.src} alt="Excel" style={{ height: '20px', width: '20px' }} />
+                  </span>
+                  Excel
+                </button>
+              )}
+              {statusin === '進貨中' && isEditing && (
+                <span style={{ fontSize: '18px', padding: '0px 10px' }}>
+                  <button
+                    className={scss.shortsquarebtn}
+                    style={{}}
+                    onClick={() => {
+                      setPrbar(!prbar);
+                    }}
+                  >
+                    <span style={{ fontWeight: 'bolder', padding: '0px 5px' }}>☰</span>
+                    採購項目
+                  </button>
+                </span>
+              )}
+            </>
+            {/* )} */}
+          </>,
+        ]}
+      />
+      <div className={scss.container} style={{ height: `${windowSize.height - 198}px` }}>
+        <div className={scss.right}>
+          <div className={scss.content}>
+            {/* <div className={scss.head_head1}>
                             <div>
                                 <button className={scss.squarebtn} onClick={() => { setSearchmodalopen(!searchmodalopen) }} title="查尋單據">
                                     <img src={icon_search.src} alt="search" style={{ height: '20px', width: '20px' }} />
@@ -2456,48 +2383,50 @@ export default function PEntryDetail() {
                                 </button>
                             </div>
                         </div> */}
-                        <div className={scss.head_body}>
-                            <div>
-                                <div className={scss.head_content0}>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption={`${pagename}單號`}
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: idin || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="建立人員"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: create_byin,
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            caption="建立日期"
-                                            className="global_tip_must"
-                                            disabled={!isEditing}
-                                            captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            datePickerProps={{
-                                                props: {
-                                                    value: create_atin ? moment(create_atin) : null,
-                                                    onChange: (e) => { setCreate_atin(e ? moment(e).format('YYYY-MM-DDTHH:mm:ssZ') : '') }
-                                                },
-                                            }}
-                                        />
-                                        {/* <InputSel
+            <div className={scss.head_body}>
+              <div>
+                <div className={scss.head_content0}>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption={`${pagename}單號`}
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: idin || ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="建立人員"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: create_byin,
+                        },
+                      }}
+                    />
+                    <InputSel
+                      caption="建立日期"
+                      className="global_tip_must"
+                      disabled={!isEditing}
+                      captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      datePickerProps={{
+                        props: {
+                          value: create_atin ? dayjs(create_atin) : null,
+                          onChange: (e) => {
+                            setCreate_atin(e ? dayjs(e).format('YYYY-MM-DDTHH:mm:ssZ') : '');
+                          },
+                        },
+                      }}
+                    />
+                    {/* <InputSel
                                             caption="請購類別"
                                             captionStyle={{ fontSize: '18px', fontWeight: 'normal' }}
                                             wrapperStyle={{ marginBottom: '10px' }}
@@ -2526,36 +2455,35 @@ export default function PEntryDetail() {
                                                 },
                                             }}
                                         /> */}
-
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ paddingBottom: '10px' }}
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        {/* <InputSel
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="排版用"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      className="invisible"
+                      inputProps={{
+                        props: {
+                          value: ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="排版用"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ paddingBottom: '10px' }}
+                      disabled={true}
+                      className="invisible"
+                      inputProps={{
+                        props: {
+                          value: ' ',
+                        },
+                      }}
+                    />
+                    {/* <InputSel
                                             {...inputSelProps}
                                             caption="申請部門"
                                             captionStyle={{ fontSize: '18px' }}
@@ -2567,7 +2495,7 @@ export default function PEntryDetail() {
                                                 },
                                             }}
                                         /> */}
-                                        {/* <InputSel
+                    {/* <InputSel
                                             caption="需用日期"
                                             className="global_tip_must"
                                             disabled={!isEditing}
@@ -2580,66 +2508,73 @@ export default function PEntryDetail() {
                                                 },
                                             }}
                                         /> */}
-
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="發票號碼"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: invoicein,
-                                                    onChange: (e) => { setInvoicein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div className={scss.head_content2}>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商統編"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliertaxidin,
-                                                    onChange: (e) => { setSuppliertaxidin(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商名稱"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: suppliernamein,
-                                                    onChange: (e) => { setSuppliernamein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商地址"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplieraddressin,
-                                                    onChange: (e) => { setSupplieraddressin(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                        {/* <InputSel
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="發票號碼"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: invoicein,
+                          onChange: (e) => {
+                            setInvoicein(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className={scss.head_content2}>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商統編"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliertaxidin,
+                          onChange: (e) => {
+                            setSuppliertaxidin(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商名稱"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: suppliernamein,
+                          onChange: (e) => {
+                            setSuppliernamein(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商地址"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplieraddressin,
+                          onChange: (e) => {
+                            setSupplieraddressin(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                    {/* <InputSel
                                             {...inputSelProps}
                                             caption="收貨地址"
                                             captionStyle={{ fontSize: '18px' }}
@@ -2652,1173 +2587,1231 @@ export default function PEntryDetail() {
                                                 },
                                             }}
                                         /> */}
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="備註說明"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: notein,
-                                                    onChange: (e) => { setNotein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="廠商電話"
-                                            captionStyle={{ fontSize: '18px' }}
-                                            wrapperStyle={{ marginBottom: '10px' }}
-                                            disabled={!isEditing}
-                                            inputProps={{
-                                                props: {
-                                                    value: supplierphonein,
-                                                    onChange: (e) => { setSupplierphonein(e.target.value) }
-                                                },
-                                            }}
-                                        />
-
-                                    </div>
-                                    <div>
-                                        <button
-                                            style={{
-                                                display: `${isEditing ? '' : 'none'}`,
-                                                width: '39px',
-                                                backgroundColor: '#f5f5f5',
-                                                border: '1px solid #c1c1c1',
-                                                borderRadius: '3px',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease',
-                                                fontWeight: 'bolder'
-                                            }}
-                                            onMouseOver={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#e0e0e0';
-                                                e.currentTarget.style.borderColor = '#a1a1a1';
-                                            }}
-                                            onMouseOut={(e) => {
-                                                e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                                e.currentTarget.style.borderColor = '#c1c1c1';
-                                            }}
-                                            onClick={() => {
-                                                setCustomerbar(true);
-                                            }}
-                                        >
-                                            ⋯
-                                        </button>
-
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                {statusarea && (
-                                    <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="小計"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { textAlign: 'right' },
-                                                    value: totalprice1 || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="營業稅"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { textAlign: 'right' },
-                                                    value: taxprice1 || ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="應付金額"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    style: { textAlign: 'right' },
-                                                    value: totalpayprice1 || ' ',
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        {prbar && (
-                            <>
-
-                                <div
-                                    style={{ paddingBottom: '18px' }}
-                                >
-                                    <span
-                                        style={{
-                                            height: '50px',
-                                            backgroundColor: '#f5f5f5',
-                                            display: 'flex',
-                                            justifyContent: 'center', // 水平置中
-                                            alignItems: 'center',     // 垂直置中
-                                            fontSize: '18px'
-                                        }}
-                                    >
-                                        採購項目
-                                    </span>
-                                </div>
-                                <div>
-
-
-                                    <div className={scss.head_content1}>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="採購數量"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    type: "number",
-                                                    value: data4.length,
-                                                },
-                                            }}
-                                        />
-                                        {/* 搜尋欄位：依廠商 (下拉選單，distinct) */}
-                                        <select
-                                            id="vendorSelect"
-                                            value={keyword4}
-                                            onChange={(e) => setKeyword4(e.target.value)}
-                                            style={{
-                                                borderRight: "1px solid rgb(168, 168, 168)",
-                                                padding: "5px",
-                                                fontSize: "18px",
-                                            }}
-                                        >
-                                            <option value="">請選擇廠商</option>
-                                            {Array.from(
-                                                new Set(data4.map((vendor) => vendor.suppliername))
-                                            ).map((suppliername, index) => (
-                                                <option key={index} value={suppliername}>
-                                                    {suppliername}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        {/* 搜尋欄位：依單號 */}
-                                        <InputSel
-                                            {...inputSelProps}
-                                            inputProps={{
-                                                props: {
-                                                    style: {
-                                                        borderRight: '1px solid rgb(168, 168, 168)'
-                                                    },
-                                                    type: "text",
-                                                    value: keyword5,
-                                                    placeholder: "輸入單號",
-                                                    onChange: (e) => setKeyword5(e.target.value),
-                                                },
-                                            }}
-                                        />
-                                        {/* 搜尋欄位：依品項規格 */}
-                                        <InputSel
-                                            {...inputSelProps}
-                                            inputProps={{
-                                                props: {
-                                                    style: { borderRight: '1px solid rgb(168, 168, 168)' },
-                                                    type: "text",
-                                                    value: keyword6,
-                                                    placeholder: "輸入品名",
-                                                    onChange: (e) => setKeyword6(e.target.value),
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            inputProps={{
-                                                props: {
-                                                    type: "text",
-                                                    value: keyword7,
-                                                    placeholder: "輸入規格",
-                                                    onChange: (e) => setKeyword7(e.target.value),
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px', height: '350px' }}>
-
-                                        <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
-                                            <div className={scss.thead22}>
-                                                <span></span>
-                                                <span>序</span>
-                                                <span>採購單號</span>
-                                                <span>廠商</span>
-                                                <span>料號</span>
-                                                <span>品名</span>
-                                                <span>規格</span>
-                                                <span>數量</span>
-                                                <span>已進貨</span>
-                                                <span>剩餘數量</span>
-                                                <span>單位</span>
-                                                <span>單價</span>
-                                                <span>總價</span>
-                                                <span>備註(用途說明)</span>
-                                                <span></span>
-                                            </div>
-                                            {currentItems && currentItems.map((_item, index) => {
-                                                const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
-                                                _item.totalprice = Totalprice;
-
-                                                // 檢查是否已存在於 data2 中
-                                                const isChecked = data2.some(item => item.id === _item.id);
-                                                const handleCheckboxChange = (checked: any) => {
-
-                                                    if (checked) {
-                                                        // 如果 data2 非空且供應商名稱不同，顯示錯誤並中止
-                                                        if (data2.length > 0 && suppliernamein !== _item.suppliername) {
-                                                            myAlert.warning({ title: "不同供應商品項" });
-                                                            return;
-                                                        }
-
-                                                        // 複製 _item 並將剩餘數量取代原本的數量
-                                                        const updatedItem = { ..._item, quantity: _item.remaining_quantity };
-
-                                                        // 加入到 data2
-                                                        setData2(prevData2 => [...prevData2, updatedItem]);
-
-                                                        // 加入到 purchaseorderid
-                                                        setPurchaseorderid(prevIds => {
-                                                            const ids = prevIds ? prevIds.split(",") : [];
-                                                            if (!ids.includes(_item.purchaseorderid)) {
-                                                                ids.push(_item.purchaseorderid);
-                                                            }
-                                                            return ids.join(",");
-                                                        });
-
-                                                        // 設定供應商相關資訊
-                                                        setSuppliernamein(_item.suppliername);
-                                                        setSupplieraddressin(_item.supplieraddress);
-                                                        setSuppliertaxidin(_item.suppliertaxid);
-                                                        setSupplierphonein(_item.supplierphone);
-                                                        setShippingaddressin(_item.shippingaddress);
-                                                    } else {
-                                                        // 從 data2 中移除
-                                                        setData2(prevData2 => prevData2.filter(item => item.id !== _item.id));
-
-                                                        // 從 purchaseorderid 中移除
-                                                        setPurchaseorderid(prevIds => {
-                                                            const ids = prevIds ? prevIds.split(",") : [];
-                                                            const updatedIds = ids.filter(id => id !== _item.purchaseorderid);
-                                                            return updatedIds.join(",");
-                                                        });
-
-                                                        // 如果移除後 data2 為空，清除供應商相關資訊
-                                                        if (data2.length === 1) { // 因為移除前會有一筆資料
-                                                            setSuppliernamein('');
-                                                            setSupplieraddressin('');
-                                                            setSuppliertaxidin('');
-                                                            setSupplierphonein('');
-                                                            setShippingaddressin('');
-                                                        }
-                                                    }
-                                                };
-
-
-                                                return (
-                                                    <CellWithBar key={index} className={scss.panelHeader22}>
-                                                        <div className={scss.row01}>
-                                                            <span>
-                                                                {/* <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
-                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                        </button> */}
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={isChecked}
-                                                                    onChange={(e) => handleCheckboxChange(e.target.checked)}
-                                                                    style={{
-                                                                        transform: 'scale(1.5)',
-                                                                        margin: '5px',
-                                                                        cursor: 'pointer'
-                                                                    }}
-                                                                />
-
-                                                            </span>
-                                                            <span>{index + 1}</span>
-                                                            <span>{_item.purchaseorderid}</span>
-                                                            <span>{_item.suppliername}</span>
-                                                            <span>
-                                                                <input
-                                                                    ref={productidRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.productid !== undefined ? _item.productid : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={nameRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.name !== undefined ? _item.name : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={specRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.spec !== undefined ? _item.spec : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={po_quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                        color: '#ea1833'
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.receipt_quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-
-                                                            <span>
-                                                                <input
-                                                                    ref={remaining_quantityRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.remaining_quantity}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={unitRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.unit !== undefined ? _item.unit : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={unitpriceRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.unitprice}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={totalpriceRefs.current[index]}
-                                                                    style={{
-                                                                        backgroundColor: 'transparent',
-                                                                        width: '95%',
-                                                                    }}
-                                                                    type={'text'}
-                                                                    value={_item.totalprice}
-                                                                    readOnly
-
-                                                                />
-                                                            </span>
-                                                            <span>
-                                                                <input
-                                                                    ref={noteRefs.current[index]}
-                                                                    style={{ backgroundColor: 'transparent', width: '95%' }}
-                                                                    type="text"
-                                                                    value={_item.note !== undefined ? _item.note : ''}
-                                                                    readOnly
-                                                                />
-                                                            </span>
-                                                        </div>
-                                                    </CellWithBar>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                    <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
-                                        {/* 分頁控制 */}
-                                        <Pagination
-                                            current={currentPage} // 當前頁碼
-                                            total={filteredData3.length} // 總數據量
-                                            pageSize={itemsPerPage} // 每頁顯示的數量
-                                            onChange={handlePageChange} // 處理頁面切換
-                                            showSizeChanger // 顯示頁數選擇器
-                                            pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
-                                            onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
-                                        />
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                        <div
-                            style={{
-                                paddingTop: `${prbar ? '18px' : '0px'}`,
-                                paddingBottom: '18px'
-                            }}
-                        >
-                            <span
-                                style={{
-                                    height: '50px',
-                                    backgroundColor: '#f5f5f5',
-                                    display: 'flex',
-                                    justifyContent: 'center', // 水平置中
-                                    alignItems: 'center',     // 垂直置中
-                                    fontSize: '18px'
-                                }}
-                            >
-                                {pagename}項目
-                            </span>
-                        </div>
-                        <div className={scss.head_content1}>
-
-                            <InputSel
-                                {...inputSelProps}
-                                caption="品項數量"
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        type: "number",
-                                        // style: { color: 'red' },
-                                        value: data2.length,
-                                    },
-                                }}
-                            />
-                        </div>
-                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-
-                            <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
-                                {/* <Thead01 type={'AddPR_ReqList'} /> */}
-                                <div className={scss.thead20}>
-                                    <span>
-
-                                    </span>
-                                    <span>序</span>
-                                    <span>料號</span>
-                                    <span>品名</span>
-                                    <span>規格</span>
-                                    <span>數量</span>
-                                    <span>已入庫</span>
-                                    <span>剩餘</span>
-                                    <span>單位</span>
-                                    <span>單價</span>
-                                    <span>總價</span>
-                                    <span>備註(用途說明)</span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                                {data2 && (
-                                    data2.map((_item, index) => {
-                                        const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
-                                        _item.totalprice = Totalprice
-                                        if (_item.wantinquantity === 0) {
-                                            const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.entry_qty);
-                                            _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
-                                        }
-                                        return (
-                                            <CellWithBar key={index} className={scss.panelHeader20}>
-                                                <div className={scss.row01}>
-                                                    <span>
-                                                        {/* <button style={{ display: (statusin === "進貨中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
-                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
-                                                        </button> */}
-                                                        <button
-                                                            onClick={() => handleinbox(_item)}
-                                                            style={{
-                                                                width: '30px',  // 調整按鈕大小，與圖片更匹配
-                                                                height: '30px', // 調整按鈕大小，與圖片更匹配
-                                                                border: '1px solid #ccc',
-                                                                display: `${!isEditing ? 'flex' : 'none'}`,  // 根據 isEditing 顯示或隱藏按鈕
-                                                                justifyContent: 'center',
-                                                                alignItems: 'center',
-                                                                cursor: 'pointer',
-                                                                borderRadius: '5px',
-                                                                transition: 'background-color 0.3s'  // 添加過渡效果
-                                                            }}
-                                                            onMouseEnter={(e) => {
-                                                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
-                                                            }}
-                                                            onMouseLeave={(e) => {
-                                                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={`${parseInt(_item.wantinquantity) === 0 ? icon_tray_in_gray.src : icon_tray_in.src}`}
-                                                                alt="tray"
-                                                                style={{
-                                                                    width: '20px',  // 根據按鈕大小調整圖片尺寸
-                                                                    height: '20px', // 根據按鈕大小調整圖片尺寸
-                                                                    objectFit: 'contain',  // 確保圖片不會被拉伸
-                                                                    backgroundColor: 'transparent',  // 圖片背景透明
-                                                                    border: 'none'  // 確保圖片沒有邊框
-                                                                }}
-                                                            />
-                                                        </button>
-                                                    </span>
-                                                    <span>{index + 1}</span>
-                                                    <span>
-                                                        <input
-                                                            ref={productidRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.productid !== undefined ? _item.productid : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "productid", e.target.value);
-                                                                setCurrentIndex(index);
-                                                                // setHandinputproductid(e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={nameRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.name !== undefined ? _item.name : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "name", e.target.value);
-                                                                setCurrentIndex(index);
-                                                                // setHandinputname(e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={specRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.spec !== undefined ? _item.spec : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "spec", e.target.value);
-                                                                setCurrentIndex(index);
-                                                                // setHandinputspec(e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={quantityRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.quantity : Number(_item.quantity ?? 0).toLocaleString()}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "quantity", e.target.value); {/* 處理變更 */ }
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>{_item.entry_qty ?? 0}</span>
-                                                    <span>
-                                                        <input
-                                                            ref={wantinquantityRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isTrans ? "1px solid black" : "",
-                                                                width: '95%',
-                                                                color: `${isTrans ? '#ea1833' : '#14256a'}`
-                                                            }}
-                                                            type={isTrans ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isTrans ? _item.wantinquantity : Number(_item.wantinquantity ?? 0).toLocaleString()}
-                                                            readOnly={!isTrans}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "wantinquantity", e.target.value); {/* 處理變更 */ }
-                                                                setCurrentIndex(index);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={unitRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.unit !== undefined ? _item.unit : ''}
-                                                            // readOnly
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "unit", e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={unitpriceRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.unitprice : Number(_item.unitprice).toLocaleString()}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                // handleStringChange(index, "unitprice", e.target.value); {/* 處理變更 */ }
-                                                                const newData = [...data2];
-                                                                const newUnitprice = e.target.value;
-                                                                newData[index] = {
-                                                                    ...newData[index],
-                                                                    unitprice: isEditing ? newUnitprice : parseFloat(newUnitprice.replace(/,/g, ''))
-
-                                                                };
-                                                                setData2(newData);
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={totalpriceRefs.current[index]}
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                // borderBottom: isEditing ? "1px solid black" : "",
-                                                                width: '95%',
-                                                            }}
-                                                            type={isEditing ? 'number' : 'text'}
-                                                            // value={Number(_item.quantity)}
-                                                            // value={_item.quantity !== undefined ? _item.quantity : 0}
-                                                            value={isEditing ? _item.totalprice : Number(_item.totalprice).toLocaleString()}
-                                                            // readOnly={!isEditing}
-                                                            readOnly
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "totalprice", e.target.value); {/* 處理變更 */ }
-                                                            }}
-                                                        />
-                                                    </span>
-                                                    <span>
-                                                        <input
-                                                            ref={noteRefs.current[index]}
-                                                            // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
-                                                            // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
-                                                            style={{ backgroundColor: 'transparent', borderBottom: (isEditing ? "1px solid black" : ""), width: '95%' }}
-                                                            type="text"
-                                                            value={_item.note !== undefined ? _item.note : ''}
-                                                            // readOnly
-                                                            // readOnly={!(index + 1 === editrowid && editstatus === true)}
-                                                            readOnly={!isEditing}
-                                                            onChange={(e) => {
-                                                                handleStringChange(index, "note", e.target.value);
-                                                            }}
-                                                        />
-                                                    </span>
-
-
-                                                </div>
-                                            </CellWithBar>
-                                        );
-
-                                    })
-                                )}
-                            </div>
-                            {statusin === "進貨中" && isEditing && (
-                                <span style={{ paddingLeft: '22px', position: 'relative' }}>
-                                    <button onClick={() => { handleAddDetail() }} style={{ fontSize: '18px' }}>
-                                        <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
-                                        新增品項
-                                    </button>
-                                </span>
-                            )}
-                        </div>
-                        <div className={scss.body_foot1}>
-                            <div>
-                                {filteredData.length > 0 && (
-                                    <ul ref={dropdownRef}
-                                        style={{
-                                            border: '1px solid #c1c1c1',
-                                            maxHeight: '300px',
-                                            overflowY: 'auto',
-                                            marginTop: '0px',
-                                            position: 'sticky',  /* 設置為sticky */
-                                            bottom: '0',  /* 固定在底部 */
-                                            left: '20px',
-                                            width: '1000px',
-                                            backgroundColor: 'white',
-                                            zIndex: 1004,
-                                            display: `${showSuggestions ? '' : 'none'}`  /* 根據showSuggestions控制顯示 */
-                                        }}>
-                                        {filteredData.map(item => (
-                                            <li
-                                                key={item.id}
-                                                onClick={() => handleSelect(item)}
-                                                style={{
-                                                    fontSize: '16px',
-                                                    cursor: 'pointer',
-                                                    padding: '8px',
-                                                    border: '1px solid #c1c1c1',
-                                                    display: 'flex', // 使用 flexbox
-                                                    justifyContent: 'space-between', // 在項目之間創建間距
-                                                    alignItems: 'center' // 垂直置中
-                                                }}
-                                            >
-                                                <span style={{ flex: '1 1 20%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                    {item.productid}
-                                                </span>
-                                                <span style={{ flex: '1 1 47%' }}> {/* 40% 的寬度，根據需要調整 */}
-                                                    {item.name}
-                                                </span>
-                                                <span style={{ flex: '1 1 30%' }}> {/* 30% 的寬度，根據需要調整 */}
-                                                    {item.spec}
-                                                </span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                            <div>
-
-                            </div>
-                            <div>
-                            </div>
-                        </div>
-                        {reviewopen && (
-                            <>
-                                <div
-                                    style={{
-                                        paddingTop: '18px',
-                                        paddingBottom: '18px'
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            height: '50px',
-                                            backgroundColor: '#f5f5f5',
-                                            display: 'flex',
-                                            justifyContent: 'center', // 水平置中
-                                            alignItems: 'center',     // 垂直置中
-                                            fontSize: '18px'
-                                        }}
-                                    >
-                                        審核流程
-                                    </span>
-                                </div>
-                                {/* <div className={scss.body_foot2}> */}
-                                <div>
-                                    {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
-                                        <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                            尚未送審
-                                        </div>
-                                    ) : (
-                                        reviewflowdata.map((item, index) => (
-                                            <div
-                                                key={index}
-                                                style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-evenly', // 水平均分
-                                                    alignItems: 'center', // 垂直置中
-                                                    gap: '10px',
-                                                }}
-                                            >
-                                                {item.stages.map((stage: any, stageIndex: any) => (
-                                                    <div
-                                                        key={stageIndex}
-                                                        style={{
-                                                            flex: 1, // 平均分配空間
-                                                            display: 'flex',
-                                                            flexDirection: 'column',
-                                                            alignItems: 'left', // 子項目置中
-                                                            textAlign: 'center', // 文字置中
-                                                            margin: '0 10px',
-                                                        }}
-                                                    >
-                                                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
-                                                            {stage.review_title}
-                                                        </span>
-                                                        <div
-                                                            style={{
-                                                                fontSize: '18px',
-                                                                display: 'flex', // 使名字和圖示並排
-                                                                alignItems: 'center', // 讓它們垂直對齊
-                                                                textAlign: 'left', // 讓文字靠左對齊
-                                                            }}
-                                                        >
-                                                            <span>{stage.review_person}</span>
-                                                            {stage.review_time !== "0001-01-01T00:00:00" && (
-                                                                <span style={{ paddingLeft: '5px' }}>
-                                                                    <img
-                                                                        src={icon_review.src}
-                                                                        alt="review_status"
-                                                                        style={{
-                                                                            width: '25px',
-                                                                            height: '25px',
-                                                                        }}
-                                                                    />
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ))
-                                    )}
-
-                                </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
-                                    {reviewflowdata2.length > 0 ? (
-                                        reviewflowdata2.map((item, index) => (
-                                            <div key={index} style={{
-                                                flex: 1, // 平均分配空間
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'left', // 子項目置中
-                                                textAlign: 'center', // 文字置中
-                                                margin: '0 10px',
-                                            }}>
-                                                <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
-                                                    {item.stage_user_title}
-                                                </span>
-                                                <div style={{
-                                                    fontSize: '18px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    textAlign: 'left',
-                                                }}>
-                                                    <span>{item.stage_user_name}</span>
-                                                    {/* 如果有需要顯示圖示，在此處添加 */}
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : (
-
-                                        <></>
-                                    )}
-                                </div>
-                                {/* </div> */}
-
-                                <div
-                                    style={{
-                                        paddingTop: '18px',
-                                        paddingBottom: '18px'
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            height: '50px',
-                                            backgroundColor: '#f5f5f5',
-                                            display: 'flex',
-                                            justifyContent: 'center', // 水平置中
-                                            alignItems: 'center',     // 垂直置中
-                                            fontSize: '18px'
-                                        }}
-                                    >
-                                        審核紀錄
-                                    </span>
-                                </div>
-                                {reviewhistroydata.length === 0 ? (
-                                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>
-                                        尚無紀錄
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className={scss.head_content1}>
-
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="審核次數"
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        type: "number",
-                                                        // style: { color: 'red' },
-                                                        value: reviewhistroydata.length,
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                        <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
-                                            <div className={scss.body_content1} >
-                                                <div style={{ overflowX: 'auto' }}>
-                                                    <Thead01 type={'ReviewHistory2'} />
-                                                    {reviewhistroydata && (
-                                                        reviewhistroydata.map((_item: any, index: number) => (
-                                                            <CellWithBar key={index} className={scss.panelHeader18} >
-                                                                <div className={scss.row01}>
-                                                                    <span>{index + 1}</span>
-                                                                    <span>{getTaiwanDateStr(_item.create_at)}</span>
-                                                                    <span>{_item.document_status}</span>
-                                                                    <span>{_item.current_stage}</span>
-                                                                    <span>{_item.review_person}</span>
-                                                                    <span>{_item.review_memo}</span>
-                                                                </div>
-                                                            </CellWithBar>
-                                                        ))
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        )}
-                    </div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="備註說明"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: notein,
+                          onChange: (e) => {
+                            setNotein(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="廠商電話"
+                      captionStyle={{ fontSize: '18px' }}
+                      wrapperStyle={{ marginBottom: '10px' }}
+                      disabled={!isEditing}
+                      inputProps={{
+                        props: {
+                          value: supplierphonein,
+                          onChange: (e) => {
+                            setSupplierphonein(e.target.value);
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <button
+                      style={{
+                        display: `${isEditing ? '' : 'none'}`,
+                        width: '39px',
+                        backgroundColor: '#f5f5f5',
+                        border: '1px solid #c1c1c1',
+                        borderRadius: '3px',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        fontWeight: 'bolder',
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.backgroundColor = '#e0e0e0';
+                        e.currentTarget.style.borderColor = '#a1a1a1';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        e.currentTarget.style.borderColor = '#c1c1c1';
+                      }}
+                      onClick={() => {
+                        setCustomerbar(true);
+                      }}
+                    >
+                      ⋯
+                    </button>
+                  </div>
                 </div>
-
-                {/* 審核 */}
-                <Modal
-                    visible={reviewbar}
-                    onCancel={() => {
-                        setReviewbar(false)
+              </div>
+              <div>
+                {statusarea && (
+                  <div style={{ backgroundColor: '#f5f5f5', padding: '10px 24px' }}>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="小計"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          style: { textAlign: 'right' },
+                          value: totalprice1 || ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="營業稅"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          style: { textAlign: 'right' },
+                          value: taxprice1 || ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="應付金額"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          style: { textAlign: 'right' },
+                          value: totalpayprice1 || ' ',
+                        },
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            {prbar && (
+              <>
+                <div style={{ paddingBottom: '18px' }}>
+                  <span
+                    style={{
+                      height: '50px',
+                      backgroundColor: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center', // 水平置中
+                      alignItems: 'center', // 垂直置中
+                      fontSize: '18px',
                     }}
-                    width="1010px"
-                    closable={false}  // 移除右上角的叉叉
-                    style={{ top: 150, }}
-                    bodyStyle={{ padding: 0, height: '300px', overflowY: 'auto' }}
-                    title={
-                        <>
-                            <span style={{ fontSize: '18px' }}>送審主旨</span>
-                            <input placeholder="主旨"
-                                style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
-                                value={documenttitle}
-                                onChange={(e) => { setDocumenttitle(e.target.value) }}
-                            />
-                        </>
-                    }
-                    footer={
-                        <button className={scss.shortredsquarebtn}
-                            onClick={() => {
-                                if (data2.length === 0) {
-                                    myAlert.warning({ title: '尚未加入採購項目' })
-                                    return;
-                                } else if (review_flow === '') {
-                                    myAlert.warning({ title: '請選擇審核流程' })
-                                    return;
-                                }
-                                else {
-                                    sentToReview("審核");
-                                    setReviewbar(false);
-                                    setStatusin("審核中");
-                                }
-                            }}>
-                            送審
-                        </button>
-                    }
-                >
-                    <div style={{ padding: '0px 5px' }} >
-                        <div style={{ maxHeight: '520px', overflow: 'auto' }}>  {/* 新增一個 div 包裹 Radio 群組 */}
-                            <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
-                                <Space direction="vertical">
-                                    {reviewdata.map((_item: any) => (
-                                        <Radio key={_item.id} value={_item.id} onClick={() => { setReview(_item) }} style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }} >
-                                            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-                                                <span style={{ width: '150px' }}>
-                                                    {_item.name}
-                                                </span>
-                                                <span style={{ width: '100%' }}>
-                                                    {_item.stages.map((_stage: any, index: number) => (
-                                                        <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
-                                                            {_stage.review_type}：{_stage.stage_user_name}
-                                                            {index < _item.stages.length - 1 && (
-                                                                <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </span>
-                                            </div>
-                                        </Radio>
-                                    ))}
-                                </Space>
-                            </Radio.Group>
-                        </div>
-                    </div>
-                </Modal>
+                  >
+                    採購項目
+                  </span>
+                </div>
+                <div>
+                  <div className={scss.head_content1}>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="採購數量"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          type: 'number',
+                          value: data4.length,
+                        },
+                      }}
+                    />
+                    {/* 搜尋欄位：依廠商 (下拉選單，distinct) */}
+                    <select
+                      id="vendorSelect"
+                      value={keyword4}
+                      onChange={(e) => setKeyword4(e.target.value)}
+                      style={{
+                        borderRight: '1px solid rgb(168, 168, 168)',
+                        padding: '5px',
+                        fontSize: '18px',
+                      }}
+                    >
+                      <option value="">請選擇廠商</option>
+                      {Array.from(new Set(data4.map((vendor) => vendor.suppliername))).map((suppliername, index) => (
+                        <option key={index} value={suppliername}>
+                          {suppliername}
+                        </option>
+                      ))}
+                    </select>
 
-                <Modal
-                    visible={customerbar}
-                    onCancel={() => setCustomerbar(false)}
-                    width="1010px"
-                    closable={false} // 移除右上角的叉叉
-                    style={{ top: 150 }}
-                    bodyStyle={{ padding: 0, height: '500px', overflowY: 'auto' }}
-                    title={
-                        <>
-
-                            {/* 篩選區域 */}
-                            <div style={{ display: 'flex', gap: '10px', padding: '10px', alignItems: 'center', fontSize: '16px' }}>
-                                {/* 縣市篩選 */}
-                                <select
-                                    value={filters.county}
-                                    onChange={(e) => setFilters({ ...filters, county: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc' }}
-                                >
-                                    <option value="">全部縣市</option>
-                                    {countyOptions.map((county, index) => (
-                                        <option key={index} value={county}>{county}</option>
-                                    ))}
-                                </select>
-
-                                {/* 公司名稱篩選 */}
-                                <input
-                                    type="text"
-                                    placeholder="輸入公司名稱"
-                                    value={filters.name}
-                                    onChange={(e) => setFilters({ ...filters, name: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
-                                />
-
-                                {/* 聯絡人篩選 */}
-                                <input
-                                    type="text"
-                                    placeholder="輸入聯絡人名稱"
-                                    value={filters.contact}
-                                    onChange={(e) => setFilters({ ...filters, contact: e.target.value })}
-                                    style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
-                                />
-                            </div>
-                        </>
-                    }
-                    footer={null}
-                >
-
-
-                    {/* 資料列表 */}
-                    <div className={scss.thead21}>
-                        <span>名稱</span>
-                        <span>地址</span>
-                        <span>統編</span>
+                    {/* 搜尋欄位：依單號 */}
+                    <InputSel
+                      {...inputSelProps}
+                      inputProps={{
+                        props: {
+                          style: {
+                            borderRight: '1px solid rgb(168, 168, 168)',
+                          },
+                          type: 'text',
+                          value: keyword5,
+                          placeholder: '輸入單號',
+                          onChange: (e) => setKeyword5(e.target.value),
+                        },
+                      }}
+                    />
+                    {/* 搜尋欄位：依品項規格 */}
+                    <InputSel
+                      {...inputSelProps}
+                      inputProps={{
+                        props: {
+                          style: { borderRight: '1px solid rgb(168, 168, 168)' },
+                          type: 'text',
+                          value: keyword6,
+                          placeholder: '輸入品名',
+                          onChange: (e) => setKeyword6(e.target.value),
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      inputProps={{
+                        props: {
+                          type: 'text',
+                          value: keyword7,
+                          placeholder: '輸入規格',
+                          onChange: (e) => setKeyword7(e.target.value),
+                        },
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      border: '1px solid rgb(168, 168, 168)',
+                      marginLeft: '20px',
+                      marginRight: '20px',
+                      height: '350px',
+                    }}
+                  >
+                    <div className={scss.body_content1} style={{ overflowX: 'auto' }}>
+                      <div className={scss.thead22}>
                         <span></span>
-                    </div>
-                    {filteredData2 && (
-                        filteredData2.map((_item: any, index: number) => (
-                            <CellWithBar key={index} className={scss.panelHeader21}
-                                onClick={() => {
-                                    setSuppliernamein(_item.name);
-                                    setSupplieraddressin(_item.county + _item.district + _item.address);
-                                    setSupplierphonein(_item.phone);
-                                    setSuppliertaxidin(_item.tax_id);
-                                    setSupplieridin(_item.customer_number);
-                                    setSupplierfaxin(_item.fax);
-                                    setSuppliercontactin(_item.contact);
-                                    setSupplieruuidin(_item.id);
-                                    setCustomerbar(false);
-                                }}>
-                                <div className={scss.row01}>
-                                    <span>{_item.name}</span>
-                                    <span>{_item.county}{_item.district}{_item.address}</span>
-                                    <span>{_item.contact}</span>
-                                    <span>{_item.review_person}</span>
-                                    <span>{_item.review_memo}</span>
-                                </div>
-                            </CellWithBar>
-                        ))
-                    )}
-                </Modal>
+                        <span>序</span>
+                        <span>採購單號</span>
+                        <span>廠商</span>
+                        <span>料號</span>
+                        <span>品名</span>
+                        <span>規格</span>
+                        <span>數量</span>
+                        <span>已進貨</span>
+                        <span>剩餘數量</span>
+                        <span>單位</span>
+                        <span>單價</span>
+                        <span>總價</span>
+                        <span>備註(用途說明)</span>
+                        <span></span>
+                      </div>
+                      {currentItems &&
+                        currentItems.map((_item, index) => {
+                          const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                          _item.totalprice = Totalprice;
 
-                <Modal
-                    visible={whpositionqmodalopen}
-                    footer={null}
-                    onCancel={handleModalClose}
-                    // width="2000px"
-                    width="100%"
-                    maskClosable={false}
-                    style={{ top: 70 }}
-                >
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginBottom: '16px', width: '1500px' }}>
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="料號"
-                                className='align-bottom'
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: nowproductid ? nowproductid : ' '
-                                    },
-                                }}
-                            />
-                        </span>
-                        <span style={{ fontSize: '16px' }}>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="名稱"
-                                className='align-bottom'
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: nowname ? nowname : ' '
-                                    },
-                                }}
-                            />
-                        </span>
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="規格"
-                                className='align-bottom'
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: nowspec ? nowspec : ' '
-                                    },
-                                }}
-                            />
-                        </span>
-                        <span style={{ fontSize: '16px', color: '#14256a' }}>
-                            <InputSel
-                                {...inputSelProps}
-                                caption="數量"
-                                className='align-bottom'
-                                disabled={true}
-                                inputProps={{
-                                    props: {
-                                        value: nowquantity ? nowquantity : ' '
-                                    },
-                                }}
-                            />
-                        </span>
+                          // 檢查是否已存在於 data2 中
+                          const isChecked = data2.some((item) => item.id === _item.id);
+
+                          const handleCheckboxChange = (checked: any) => {
+                            if (checked) {
+                              // 如果 data2 非空且供應商名稱不同，顯示錯誤並中止
+                              if (data2.length > 0 && suppliernamein !== _item.suppliername) {
+                                myAlert.warning({ title: '不同供應商品項' });
+
+                                return;
+                              }
+
+                              // 複製 _item 並將剩餘數量取代原本的數量
+                              const updatedItem = { ..._item, quantity: _item.remaining_quantity };
+
+                              // 加入到 data2
+                              setData2((prevData2) => [...prevData2, updatedItem]);
+
+                              // 加入到 purchaseorderid
+                              setPurchaseorderid((prevIds) => {
+                                const ids = prevIds ? prevIds.split(',') : [];
+
+                                if (!ids.includes(_item.purchaseorderid)) {
+                                  ids.push(_item.purchaseorderid);
+                                }
+
+                                return ids.join(',');
+                              });
+
+                              // 設定供應商相關資訊
+                              setSuppliernamein(_item.suppliername);
+                              setSupplieraddressin(_item.supplieraddress);
+                              setSuppliertaxidin(_item.suppliertaxid);
+                              setSupplierphonein(_item.supplierphone);
+                              setShippingaddressin(_item.shippingaddress);
+                            } else {
+                              // 從 data2 中移除
+                              setData2((prevData2) => prevData2.filter((item) => item.id !== _item.id));
+
+                              // 從 purchaseorderid 中移除
+                              setPurchaseorderid((prevIds) => {
+                                const ids = prevIds ? prevIds.split(',') : [];
+                                const updatedIds = ids.filter((id) => id !== _item.purchaseorderid);
+
+                                return updatedIds.join(',');
+                              });
+
+                              // 如果移除後 data2 為空，清除供應商相關資訊
+                              if (data2.length === 1) {
+                                // 因為移除前會有一筆資料
+                                setSuppliernamein('');
+                                setSupplieraddressin('');
+                                setSuppliertaxidin('');
+                                setSupplierphonein('');
+                                setShippingaddressin('');
+                              }
+                            }
+                          };
+
+                          return (
+                            <CellWithBar key={index} className={scss.panelHeader22}>
+                              <div className={scss.row01}>
+                                <span>
+                                  {/* <button style={{ display: (statusin === "編輯中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
+                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                        </button> */}
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => handleCheckboxChange(e.target.checked)}
+                                    style={{
+                                      transform: 'scale(1.5)',
+                                      margin: '5px',
+                                      cursor: 'pointer',
+                                    }}
+                                  />
+                                </span>
+                                <span>{index + 1}</span>
+                                <span>{_item.purchaseorderid}</span>
+                                <span>{_item.suppliername}</span>
+                                <span>
+                                  <input
+                                    ref={productidRefs.current[index]}
+                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                    type="text"
+                                    value={_item.productid !== undefined ? _item.productid : ''}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={nameRefs.current[index]}
+                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                    type="text"
+                                    value={_item.name !== undefined ? _item.name : ''}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={specRefs.current[index]}
+                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                    type="text"
+                                    value={_item.spec !== undefined ? _item.spec : ''}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={quantityRefs.current[index]}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      width: '95%',
+                                    }}
+                                    type={'text'}
+                                    value={_item.quantity}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={po_quantityRefs.current[index]}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      width: '95%',
+                                      color: '#ea1833',
+                                    }}
+                                    type={'text'}
+                                    value={_item.receipt_quantity}
+                                    readOnly
+                                  />
+                                </span>
+
+                                <span>
+                                  <input
+                                    ref={remaining_quantityRefs.current[index]}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      width: '95%',
+                                    }}
+                                    type={'text'}
+                                    value={_item.remaining_quantity}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={unitRefs.current[index]}
+                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                    type="text"
+                                    value={_item.unit !== undefined ? _item.unit : ''}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={unitpriceRefs.current[index]}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      width: '95%',
+                                    }}
+                                    type={'text'}
+                                    value={_item.unitprice}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={totalpriceRefs.current[index]}
+                                    style={{
+                                      backgroundColor: 'transparent',
+                                      width: '95%',
+                                    }}
+                                    type={'text'}
+                                    value={_item.totalprice}
+                                    readOnly
+                                  />
+                                </span>
+                                <span>
+                                  <input
+                                    ref={noteRefs.current[index]}
+                                    style={{ backgroundColor: 'transparent', width: '95%' }}
+                                    type="text"
+                                    value={_item.note !== undefined ? _item.note : ''}
+                                    readOnly
+                                  />
+                                </span>
+                              </div>
+                            </CellWithBar>
+                          );
+                        })}
                     </div>
-                    <div className={scss.modal_container}>
-                        <div className={scss.modal_left}>
-                            <div className={scss.modal_content}>
-                                <div>
-                                    {/* <span style={{ fontSize: '18px', }}>倉庫：</span>
+                  </div>
+                  <div style={{ marginLeft: '20px', marginRight: '20px', marginTop: '10px' }}>
+                    {/* 分頁控制 */}
+                    <Pagination
+                      current={currentPage} // 當前頁碼
+                      total={filteredData3.length} // 總數據量
+                      pageSize={itemsPerPage} // 每頁顯示的數量
+                      onChange={handlePageChange} // 處理頁面切換
+                      showSizeChanger // 顯示頁數選擇器
+                      pageSizeOptions={['5', '10', '20', '50', '100']} // 可選的每頁顯示數量
+                      onShowSizeChange={(current, size) => setItemsPerPage(size)} // 更新每頁顯示數量
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+            <div
+              style={{
+                paddingTop: `${prbar ? '18px' : '0px'}`,
+                paddingBottom: '18px',
+              }}
+            >
+              <span
+                style={{
+                  height: '50px',
+                  backgroundColor: '#f5f5f5',
+                  display: 'flex',
+                  justifyContent: 'center', // 水平置中
+                  alignItems: 'center', // 垂直置中
+                  fontSize: '18px',
+                }}
+              >
+                {pagename}項目
+              </span>
+            </div>
+            <div className={scss.head_content1}>
+              <InputSel
+                {...inputSelProps}
+                caption="品項數量"
+                disabled={true}
+                inputProps={{
+                  props: {
+                    type: 'number',
+                    // style: { color: 'red' },
+                    value: data2.length,
+                  },
+                }}
+              />
+            </div>
+            <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+              <div className={scss.body_content1} style={{ overflowX: 'auto', position: 'relative' }}>
+                {/* <Thead01 type={'AddPR_ReqList'} /> */}
+                <div className={scss.thead20}>
+                  <span></span>
+                  <span>序</span>
+                  <span>料號</span>
+                  <span>品名</span>
+                  <span>規格</span>
+                  <span>數量</span>
+                  <span>已入庫</span>
+                  <span>剩餘</span>
+                  <span>單位</span>
+                  <span>單價</span>
+                  <span>總價</span>
+                  <span>備註(用途說明)</span>
+                  <span></span>
+                  <span></span>
+                </div>
+                {data2 &&
+                  data2.map((_item, index) => {
+                    const Totalprice = parseFloat(_item.quantity) * parseFloat(_item.unitprice);
+                    _item.totalprice = Totalprice;
+
+                    if (_item.wantinquantity === 0) {
+                      const RemainingQuantity = parseFloat(_item.quantity) - parseFloat(_item.entry_qty);
+                      _item.wantinquantity = RemainingQuantity > 0 ? RemainingQuantity : 0;
+                    }
+
+                    return (
+                      <CellWithBar key={index} className={scss.panelHeader20}>
+                        <div className={scss.row01}>
+                          <span>
+                            {/* <button style={{ display: (statusin === "進貨中" && isEditing) ? '' : 'none' }} onClick={() => { handleRemoveDetail(index, _item) }}>
+                                                            <img src={icon_delete.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
+                                                        </button> */}
+                            <button
+                              onClick={() => handleinbox(_item)}
+                              style={{
+                                width: '30px', // 調整按鈕大小，與圖片更匹配
+                                height: '30px', // 調整按鈕大小，與圖片更匹配
+                                border: '1px solid #ccc',
+                                display: `${!isEditing ? 'flex' : 'none'}`, // 根據 isEditing 顯示或隱藏按鈕
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                                borderRadius: '5px',
+                                transition: 'background-color 0.3s', // 添加過渡效果
+                              }}
+                              onMouseEnter={(e) => {
+                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                              }}
+                              onMouseLeave={(e) => {
+                                (e.target as HTMLButtonElement).style.backgroundColor = 'white';
+                              }}
+                            >
+                              <img
+                                src={`${
+                                  parseInt(_item.wantinquantity) === 0 ? icon_tray_in_gray.src : icon_tray_in.src
+                                }`}
+                                alt="tray"
+                                style={{
+                                  width: '20px', // 根據按鈕大小調整圖片尺寸
+                                  height: '20px', // 根據按鈕大小調整圖片尺寸
+                                  objectFit: 'contain', // 確保圖片不會被拉伸
+                                  backgroundColor: 'transparent', // 圖片背景透明
+                                  border: 'none', // 確保圖片沒有邊框
+                                }}
+                              />
+                            </button>
+                          </span>
+                          <span>{index + 1}</span>
+                          <span>
+                            <input
+                              ref={productidRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.productid !== undefined ? _item.productid : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'productid', e.target.value);
+                                setCurrentIndex(index);
+                                // setHandinputproductid(e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={nameRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.name !== undefined ? _item.name : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'name', e.target.value);
+                                setCurrentIndex(index);
+                                // setHandinputname(e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={specRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.spec !== undefined ? _item.spec : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'spec', e.target.value);
+                                setCurrentIndex(index);
+                                // setHandinputspec(e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={quantityRefs.current[index]}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type={isEditing ? 'number' : 'text'}
+                              // value={Number(_item.quantity)}
+                              // value={_item.quantity !== undefined ? _item.quantity : 0}
+                              value={isEditing ? _item.quantity : Number(_item.quantity ?? 0).toLocaleString()}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'quantity', e.target.value);
+
+                                {
+                                  /* 處理變更 */
+                                }
+                              }}
+                            />
+                          </span>
+                          <span>{_item.entry_qty ?? 0}</span>
+                          <span>
+                            <input
+                              ref={wantinquantityRefs.current[index]}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isTrans ? '1px solid black' : '',
+                                width: '95%',
+                                color: `${isTrans ? '#ea1833' : '#14256a'}`,
+                              }}
+                              type={isTrans ? 'number' : 'text'}
+                              // value={Number(_item.quantity)}
+                              // value={_item.quantity !== undefined ? _item.quantity : 0}
+                              value={
+                                isTrans ? _item.wantinquantity : Number(_item.wantinquantity ?? 0).toLocaleString()
+                              }
+                              readOnly={!isTrans}
+                              onChange={(e) => {
+                                handleStringChange(index, 'wantinquantity', e.target.value);
+
+                                {
+                                  /* 處理變更 */
+                                }
+
+                                setCurrentIndex(index);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={unitRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.unit !== undefined ? _item.unit : ''}
+                              // readOnly
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'unit', e.target.value);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={unitpriceRefs.current[index]}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type={isEditing ? 'number' : 'text'}
+                              // value={Number(_item.quantity)}
+                              // value={_item.quantity !== undefined ? _item.quantity : 0}
+                              value={isEditing ? _item.unitprice : Number(_item.unitprice).toLocaleString()}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                // handleStringChange(index, "unitprice", e.target.value); {/* 處理變更 */ }
+                                const newData = [...data2];
+                                const newUnitprice = e.target.value;
+                                newData[index] = {
+                                  ...newData[index],
+                                  unitprice: isEditing ? newUnitprice : parseFloat(newUnitprice.replace(/,/g, '')),
+                                };
+                                setData2(newData);
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={totalpriceRefs.current[index]}
+                              style={{
+                                backgroundColor: 'transparent',
+                                // borderBottom: isEditing ? "1px solid black" : "",
+                                width: '95%',
+                              }}
+                              type={isEditing ? 'number' : 'text'}
+                              // value={Number(_item.quantity)}
+                              // value={_item.quantity !== undefined ? _item.quantity : 0}
+                              value={isEditing ? _item.totalprice : Number(_item.totalprice).toLocaleString()}
+                              // readOnly={!isEditing}
+                              readOnly
+                              onChange={(e) => {
+                                handleStringChange(index, 'totalprice', e.target.value);
+
+                                {
+                                  /* 處理變更 */
+                                }
+                              }}
+                            />
+                          </span>
+                          <span>
+                            <input
+                              ref={noteRefs.current[index]}
+                              // style={{ backgroundColor: 'transparent', borderBottom: (index + 1 === editrowid && editstatus === true ? "1px solid black" : ""), width: '95%' }}
+                              // style={{ backgroundColor: 'transparent', width: '95%', borderBottom: '1px solid black' }}
+                              style={{
+                                backgroundColor: 'transparent',
+                                borderBottom: isEditing ? '1px solid black' : '',
+                                width: '95%',
+                              }}
+                              type="text"
+                              value={_item.note !== undefined ? _item.note : ''}
+                              // readOnly
+                              // readOnly={!(index + 1 === editrowid && editstatus === true)}
+                              readOnly={!isEditing}
+                              onChange={(e) => {
+                                handleStringChange(index, 'note', e.target.value);
+                              }}
+                            />
+                          </span>
+                        </div>
+                      </CellWithBar>
+                    );
+                  })}
+              </div>
+              {statusin === '進貨中' && isEditing && (
+                <span style={{ paddingLeft: '22px', position: 'relative' }}>
+                  <button
+                    onClick={() => {
+                      handleAddDetail();
+                    }}
+                    style={{ fontSize: '18px' }}
+                  >
+                    <img src={icon_add.src} alt="add" style={{ width: '25px', height: '25px' }} />
+                    新增品項
+                  </button>
+                </span>
+              )}
+            </div>
+            <div className={scss.body_foot1}>
+              <div>
+                {filteredData.length > 0 && (
+                  <ul
+                    ref={dropdownRef}
+                    style={{
+                      border: '1px solid #c1c1c1',
+                      maxHeight: '300px',
+                      overflowY: 'auto',
+                      marginTop: '0px',
+                      position: 'sticky' /* 設置為sticky */,
+                      bottom: '0' /* 固定在底部 */,
+                      left: '20px',
+                      width: '1000px',
+                      backgroundColor: 'white',
+                      zIndex: 1004,
+                      display: `${showSuggestions ? '' : 'none'}` /* 根據showSuggestions控制顯示 */,
+                    }}
+                  >
+                    {filteredData.map((item) => (
+                      <li
+                        key={item.id}
+                        onClick={() => handleSelect(item)}
+                        style={{
+                          fontSize: '16px',
+                          cursor: 'pointer',
+                          padding: '8px',
+                          border: '1px solid #c1c1c1',
+                          display: 'flex', // 使用 flexbox
+                          justifyContent: 'space-between', // 在項目之間創建間距
+                          alignItems: 'center', // 垂直置中
+                        }}
+                      >
+                        <span style={{ flex: '1 1 20%' }}>
+                          {' '}
+                          {/* 30% 的寬度，根據需要調整 */}
+                          {item.productid}
+                        </span>
+                        <span style={{ flex: '1 1 47%' }}>
+                          {' '}
+                          {/* 40% 的寬度，根據需要調整 */}
+                          {item.name}
+                        </span>
+                        <span style={{ flex: '1 1 30%' }}>
+                          {' '}
+                          {/* 30% 的寬度，根據需要調整 */}
+                          {item.spec}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+            {reviewopen && (
+              <>
+                <div
+                  style={{
+                    paddingTop: '18px',
+                    paddingBottom: '18px',
+                  }}
+                >
+                  <span
+                    style={{
+                      height: '50px',
+                      backgroundColor: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center', // 水平置中
+                      alignItems: 'center', // 垂直置中
+                      fontSize: '18px',
+                    }}
+                  >
+                    審核流程
+                  </span>
+                </div>
+                {/* <div className={scss.body_foot2}> */}
+                <div>
+                  {reviewflowdata.length === 0 && reviewflowdata2.length === 0 ? (
+                    <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>尚未送審</div>
+                  ) : (
+                    reviewflowdata.map((item, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-evenly', // 水平均分
+                          alignItems: 'center', // 垂直置中
+                          gap: '10px',
+                        }}
+                      >
+                        {item.stages.map((stage: any, stageIndex: any) => (
+                          <div
+                            key={stageIndex}
+                            style={{
+                              flex: 1, // 平均分配空間
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'left', // 子項目置中
+                              textAlign: 'center', // 文字置中
+                              margin: '0 10px',
+                            }}
+                          >
+                            <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '400', textAlign: 'left' }}>
+                              {stage.review_title}
+                            </span>
+                            <div
+                              style={{
+                                fontSize: '18px',
+                                display: 'flex', // 使名字和圖示並排
+                                alignItems: 'center', // 讓它們垂直對齊
+                                textAlign: 'left', // 讓文字靠左對齊
+                              }}
+                            >
+                              <span>{stage.review_person}</span>
+                              {stage.review_time !== '0001-01-01T00:00:00' && (
+                                <span style={{ paddingLeft: '5px' }}>
+                                  <img
+                                    src={icon_review.src}
+                                    alt="review_status"
+                                    style={{
+                                      width: '25px',
+                                      height: '25px',
+                                    }}
+                                  />
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-around', gap: '10px' }}>
+                  {reviewflowdata2.length > 0 ? (
+                    reviewflowdata2.map((item, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          flex: 1, // 平均分配空間
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'left', // 子項目置中
+                          textAlign: 'center', // 文字置中
+                          margin: '0 10px',
+                        }}
+                      >
+                        <span style={{ fontSize: '20px', color: '#14256a', fontWeight: '500', textAlign: 'left' }}>
+                          {item.stage_user_title}
+                        </span>
+                        <div
+                          style={{
+                            fontSize: '18px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            textAlign: 'left',
+                          }}
+                        >
+                          <span>{item.stage_user_name}</span>
+                          {/* 如果有需要顯示圖示，在此處添加 */}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                {/* </div> */}
+
+                <div
+                  style={{
+                    paddingTop: '18px',
+                    paddingBottom: '18px',
+                  }}
+                >
+                  <span
+                    style={{
+                      height: '50px',
+                      backgroundColor: '#f5f5f5',
+                      display: 'flex',
+                      justifyContent: 'center', // 水平置中
+                      alignItems: 'center', // 垂直置中
+                      fontSize: '18px',
+                    }}
+                  >
+                    審核紀錄
+                  </span>
+                </div>
+                {reviewhistroydata.length === 0 ? (
+                  <div style={{ textAlign: 'center', fontSize: '20px', color: '#888' }}>尚無紀錄</div>
+                ) : (
+                  <>
+                    <div className={scss.head_content1}>
+                      <InputSel
+                        {...inputSelProps}
+                        caption="審核次數"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            type: 'number',
+                            // style: { color: 'red' },
+                            value: reviewhistroydata.length,
+                          },
+                        }}
+                      />
+                    </div>
+                    <div style={{ border: '1px solid rgb(168, 168, 168)', marginLeft: '20px', marginRight: '20px' }}>
+                      <div className={scss.body_content1}>
+                        <div style={{ overflowX: 'auto' }}>
+                          <Thead01 type={'ReviewHistory2'} />
+                          {reviewhistroydata &&
+                            reviewhistroydata.map((_item: any, index: number) => (
+                              <CellWithBar key={index} className={scss.panelHeader18}>
+                                <div className={scss.row01}>
+                                  <span>{index + 1}</span>
+                                  <span>{getTaiwanDateStr(_item.create_at)}</span>
+                                  <span>{_item.document_status}</span>
+                                  <span>{_item.current_stage}</span>
+                                  <span>{_item.review_person}</span>
+                                  <span>{_item.review_memo}</span>
+                                </div>
+                              </CellWithBar>
+                            ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 審核 */}
+        <Modal
+          visible={reviewbar}
+          onCancel={() => {
+            setReviewbar(false);
+          }}
+          width="1010px"
+          closable={false} // 移除右上角的叉叉
+          style={{ top: 150 }}
+          bodyStyle={{ padding: 0, height: '300px', overflowY: 'auto' }}
+          title={
+            <>
+              <span style={{ fontSize: '18px' }}>送審主旨</span>
+              <input
+                placeholder="主旨"
+                style={{ padding: '10px', fontSize: '18px', border: '1px solid gray', height: '100%', width: '100%' }}
+                value={documenttitle}
+                onChange={(e) => {
+                  setDocumenttitle(e.target.value);
+                }}
+              />
+            </>
+          }
+          footer={
+            <button
+              className={scss.shortredsquarebtn}
+              onClick={() => {
+                if (data2.length === 0) {
+                  myAlert.warning({ title: '尚未加入採購項目' });
+
+                  return;
+                } else if (review_flow === '') {
+                  myAlert.warning({ title: '請選擇審核流程' });
+
+                  return;
+                } else {
+                  sentToReview('審核');
+                  setReviewbar(false);
+                  setStatusin('審核中');
+                }
+              }}
+            >
+              送審
+            </button>
+          }
+        >
+          <div style={{ padding: '0px 5px' }}>
+            <div style={{ maxHeight: '520px', overflow: 'auto' }}>
+              {' '}
+              {/* 新增一個 div 包裹 Radio 群組 */}
+              <Radio.Group onChange={onChange} value={value} style={{ paddingTop: '5px' }}>
+                <Space direction="vertical">
+                  {reviewdata.map((_item: any) => (
+                    <Radio
+                      key={_item.id}
+                      value={_item.id}
+                      onClick={() => {
+                        setReview(_item);
+                      }}
+                      style={{ fontSize: '18px', width: '1000px', borderBottom: '1px solid #ccc', padding: '5px' }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                        <span style={{ width: '150px' }}>{_item.name}</span>
+                        <span style={{ width: '100%' }}>
+                          {_item.stages.map((_stage: any, index: number) => (
+                            <div key={_stage.stage_order} style={{ display: 'inline-block' }}>
+                              {_stage.review_type}：{_stage.stage_user_name}
+                              {index < _item.stages.length - 1 && (
+                                <img src={icon_arrow_right.src} alt="arrow" style={{ height: '20px', width: '20px' }} />
+                              )}
+                            </div>
+                          ))}
+                        </span>
+                      </div>
+                    </Radio>
+                  ))}
+                </Space>
+              </Radio.Group>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          visible={customerbar}
+          onCancel={() => setCustomerbar(false)}
+          width="1010px"
+          closable={false} // 移除右上角的叉叉
+          style={{ top: 150 }}
+          bodyStyle={{ padding: 0, height: '500px', overflowY: 'auto' }}
+          title={
+            <>
+              {/* 篩選區域 */}
+              <div style={{ display: 'flex', gap: '10px', padding: '10px', alignItems: 'center', fontSize: '16px' }}>
+                {/* 縣市篩選 */}
+                <select
+                  value={filters.county}
+                  onChange={(e) => setFilters({ ...filters, county: e.target.value })}
+                  style={{ padding: '5px', borderBottom: '1px solid #ccc' }}
+                >
+                  <option value="">全部縣市</option>
+                  {countyOptions.map((county, index) => (
+                    <option key={index} value={county}>
+                      {county}
+                    </option>
+                  ))}
+                </select>
+
+                {/* 公司名稱篩選 */}
+                <input
+                  type="text"
+                  placeholder="輸入公司名稱"
+                  value={filters.name}
+                  onChange={(e) => setFilters({ ...filters, name: e.target.value })}
+                  style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                />
+
+                {/* 聯絡人篩選 */}
+                <input
+                  type="text"
+                  placeholder="輸入聯絡人名稱"
+                  value={filters.contact}
+                  onChange={(e) => setFilters({ ...filters, contact: e.target.value })}
+                  style={{ padding: '5px', borderBottom: '1px solid #ccc', flex: '1' }}
+                />
+              </div>
+            </>
+          }
+          footer={null}
+        >
+          {/* 資料列表 */}
+          <div className={scss.thead21}>
+            <span>名稱</span>
+            <span>地址</span>
+            <span>統編</span>
+            <span></span>
+          </div>
+          {filteredData2 &&
+            filteredData2.map((_item: any, index: number) => (
+              <CellWithBar
+                key={index}
+                className={scss.panelHeader21}
+                onClick={() => {
+                  setSuppliernamein(_item.name);
+                  setSupplieraddressin(_item.county + _item.district + _item.address);
+                  setSupplierphonein(_item.phone);
+                  setSuppliertaxidin(_item.tax_id);
+                  setSupplieridin(_item.customer_number);
+                  setSupplierfaxin(_item.fax);
+                  setSuppliercontactin(_item.contact);
+                  setSupplieruuidin(_item.id);
+                  setCustomerbar(false);
+                }}
+              >
+                <div className={scss.row01}>
+                  <span>{_item.name}</span>
+                  <span>
+                    {_item.county}
+                    {_item.district}
+                    {_item.address}
+                  </span>
+                  <span>{_item.contact}</span>
+                  <span>{_item.review_person}</span>
+                  <span>{_item.review_memo}</span>
+                </div>
+              </CellWithBar>
+            ))}
+        </Modal>
+
+        <Modal
+          visible={whpositionqmodalopen}
+          footer={null}
+          onCancel={handleModalClose}
+          // width="2000px"
+          width="100%"
+          maskClosable={false}
+          style={{ top: 70 }}
+        >
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0px', marginBottom: '16px', width: '1500px' }}>
+            <span style={{ fontSize: '16px', color: '#14256a' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="料號"
+                className="align-bottom"
+                disabled={true}
+                inputProps={{
+                  props: {
+                    value: nowproductid ? nowproductid : ' ',
+                  },
+                }}
+              />
+            </span>
+            <span style={{ fontSize: '16px' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="名稱"
+                className="align-bottom"
+                disabled={true}
+                inputProps={{
+                  props: {
+                    value: nowname ? nowname : ' ',
+                  },
+                }}
+              />
+            </span>
+            <span style={{ fontSize: '16px', color: '#14256a' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="規格"
+                className="align-bottom"
+                disabled={true}
+                inputProps={{
+                  props: {
+                    value: nowspec ? nowspec : ' ',
+                  },
+                }}
+              />
+            </span>
+            <span style={{ fontSize: '16px', color: '#14256a' }}>
+              <InputSel
+                {...inputSelProps}
+                caption="數量"
+                className="align-bottom"
+                disabled={true}
+                inputProps={{
+                  props: {
+                    value: nowquantity ? nowquantity : ' ',
+                  },
+                }}
+              />
+            </span>
+          </div>
+          <div className={scss.modal_container}>
+            <div className={scss.modal_left}>
+              <div className={scss.modal_content}>
+                <div>
+                  {/* <span style={{ fontSize: '18px', }}>倉庫：</span>
                                 <select
                                     value={selectedOption}
                                     style={{ fontSize: '18px', borderBottom: '1px solid #c1c1c1' }}
@@ -3843,236 +3836,288 @@ export default function PEntryDetail() {
                                         </option>
                                     ))}
                                 </select> */}
-                                    <Thead01 type={'ProdEntryWhpositionList'} />
-                                    {data3 && (
-                                        data3.map((_item: any, index: number) => (
-                                            <CellWithBar key={index} className={scss.panelHeader26}>
-                                                <div
-                                                    key={index}
-                                                    className={`${scss.row01} ${_item.inventoryid === selectedItemId ? scss.selectedRow : ''}`}
-                                                    onClick={() => handleGetLayOut(_item)}
-                                                >
-                                                    <span>{index + 1}</span>
-                                                    <span>{_item.whname}</span>
-                                                    <span>{_item.trayname}</span>
-                                                    <span>{_item.type === '一般倉庫' ? '' : `${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}</span>
-                                                    <span style={{ color: `${_item.productid != nowproductid ? 'red' : 'black'}` }}>{_item.productid}</span>
-                                                    <span style={{ color: `${_item.quantity === 0 ? 'red' : 'black'}` }}>{_item.quantity}</span>
-                                                    <span>
-                                                        {/* <button onClick={() => {  }}>
+                  <Thead01 type={'ProdEntryWhpositionList'} />
+                  {data3 &&
+                    data3.map((_item: any, index: number) => (
+                      <CellWithBar key={index} className={scss.panelHeader26}>
+                        <div
+                          key={index}
+                          className={`${scss.row01} ${_item.inventoryid === selectedItemId ? scss.selectedRow : ''}`}
+                          onClick={() => handleGetLayOut(_item)}
+                        >
+                          <span>{index + 1}</span>
+                          <span>{_item.whname}</span>
+                          <span>{_item.trayname}</span>
+                          <span>
+                            {_item.type === '一般倉庫'
+                              ? ''
+                              : `${recodeWhpid(_item.length, _item.width, _item.childlength, _item.childwidth)}`}
+                          </span>
+                          <span style={{ color: `${_item.productid != nowproductid ? 'red' : 'black'}` }}>
+                            {_item.productid}
+                          </span>
+                          <span style={{ color: `${_item.quantity === 0 ? 'red' : 'black'}` }}>{_item.quantity}</span>
+                          <span>
+                            {/* <button onClick={() => {  }}>
                                                         <img src={icon_fc_inbox.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                     </button> */}
-                                                    </span>
-                                                </div>
-                                            </CellWithBar>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
+                          </span>
                         </div>
-                        <div className={scss.modal_right}>
-                            {warehouse_type ? (
-                                warehouse_type === '立體倉庫' ? (
-                                    <>
-                                        <div className={scss.modal_right_head}>
-
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="倉庫編號"
-                                                className='align-bottom'
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        value: nowwhname ? warehouse_type + " " + nowwhname : ' '
-                                                    },
+                      </CellWithBar>
+                    ))}
+                </div>
+              </div>
+            </div>
+            <div className={scss.modal_right}>
+              {warehouse_type ? (
+                warehouse_type === '立體倉庫' ? (
+                  <>
+                    <div className={scss.modal_right_head}>
+                      <InputSel
+                        {...inputSelProps}
+                        caption="倉庫編號"
+                        className="align-bottom"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            value: nowwhname ? warehouse_type + ' ' + nowwhname : ' ',
+                          },
+                        }}
+                      />
+                      <InputSel
+                        {...inputSelProps}
+                        caption="托盤編號"
+                        className="align-bottom"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            value: nowtrayname ? nowtrayname : ' ',
+                          },
+                        }}
+                      />
+                      <InputSel
+                        {...inputSelProps}
+                        caption="儲格編號"
+                        className="align-bottom"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            value: nowwhposition ? nowwhposition : ' ',
+                          },
+                        }}
+                      />
+                    </div>
+                    <div className={scss.modal_right_content}>
+                      {data11.map((Data, index) => (
+                        <table key={index} className={scss.traytable} style={{ border: 'solid 1px black' }}>
+                          <tbody>
+                            <tr className={scss.tr}>
+                              {Data.widthdata.map((item: any, index: number) => (
+                                <td
+                                  key={index}
+                                  className={scss.td}
+                                  style={{
+                                    backgroundColor: item.color,
+                                    color: item.color === '#ea1833' ? '#FFFFFF' : 'black',
+                                  }}
+                                >
+                                  {item.childtraylayoutmodel &&
+                                    item.childtraylayoutmodel.map((childitem: any) => (
+                                      <table className={scss.childtraytable} key={item.childlengthid}>
+                                        <tbody>
+                                          <tr className={scss.childtraytabletr}>
+                                            {childitem.childwidthdata.map((childDataItem: any) => (
+                                              <td
+                                                className={scss.childtraytabletd}
+                                                key={childDataItem.id}
+                                                style={{
+                                                  backgroundColor: childDataItem.color,
+                                                  height:
+                                                    item.childtraylayoutmodel.length > 1
+                                                      ? 85 / item.childtraylayoutmodel.length
+                                                      : '89px',
                                                 }}
-                                            />
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="托盤編號"
-                                                className='align-bottom'
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        value: nowtrayname ? nowtrayname : ' '
-                                                    },
-                                                }}
-                                            />
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="儲格編號"
-                                                className='align-bottom'
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        value: nowwhposition ? nowwhposition : ' '
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                        <div className={scss.modal_right_content}>
-                                            {data11.map((Data) => (
-                                                <table className={scss.traytable} style={{ border: 'solid 1px black' }}>
-                                                    <tbody>
-                                                        <tr className={scss.tr}>
-                                                            {Data.widthdata.map((item: any) => (
-                                                                <td className={scss.td} style={{ backgroundColor: item.color, color: item.color === '#ea1833' ? '#FFFFFF' : 'black' }}>
-                                                                    {item.childtraylayoutmodel && item.childtraylayoutmodel.map((childitem: any) => (
-                                                                        <table className={scss.childtraytable} key={item.childlengthid}>
-                                                                            <tbody>
-                                                                                <tr className={scss.childtraytabletr}>
-                                                                                    {childitem.childwidthdata.map((childDataItem: any) => (
-                                                                                        <td className={scss.childtraytabletd} key={childDataItem.id} style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}>
-                                                                                            <button className={scss.childtraytabletdButton}
-                                                                                                style={{ backgroundColor: childDataItem.color, height: item.childtraylayoutmodel.length > 1 ? 85 / item.childtraylayoutmodel.length : '89px' }}
-                                                                                                onMouseEnter={() => setHoverInfo(`${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`)}
-                                                                                                onMouseLeave={() => setHoverInfo(null)}
-                                                                                            >
-                                                                                                {`${recodeWhpid(childDataItem.length, childDataItem.width, childDataItem.childlength, childDataItem.childwidth)}\n`}<br />
-                                                                                            </button>
-                                                                                        </td>
-                                                                                    ))}
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    ))}
-                                                                </td>
-                                                            ))}
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            ))}
-                                            {hoverInfo && (
-                                                <div
-                                                    style={{
-                                                        backgroundColor: '#dfdcdc',
-                                                        position: 'fixed',
-                                                        top: mouseY,
-                                                        left: mouseX,
-                                                        transform: 'translate(10%, 60%)',
-                                                        padding: '5px',
-                                                        borderRadius: '5px',
-                                                        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                                                        zIndex: '1002',
-                                                        whiteSpace: 'pre-line', // 控制換行的 CSS 屬性
-                                                        fontSize: '16px'
-                                                    }}
+                                              >
+                                                <button
+                                                  className={scss.childtraytabletdButton}
+                                                  style={{
+                                                    backgroundColor: childDataItem.color,
+                                                    height:
+                                                      item.childtraylayoutmodel.length > 1
+                                                        ? 85 / item.childtraylayoutmodel.length
+                                                        : '89px',
+                                                  }}
+                                                  onMouseEnter={() =>
+                                                    setHoverInfo(
+                                                      `${childDataItem.productid}\n${childDataItem.productname}\n${childDataItem.productspec}\n${childDataItem.quantity}`
+                                                    )
+                                                  }
+                                                  onMouseLeave={() => setHoverInfo(null)}
                                                 >
-                                                    {hoverInfo}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className={scss.modal_right_head}>
+                                                  {`${recodeWhpid(
+                                                    childDataItem.length,
+                                                    childDataItem.width,
+                                                    childDataItem.childlength,
+                                                    childDataItem.childwidth
+                                                  )}\n`}
+                                                  <br />
+                                                </button>
+                                              </td>
+                                            ))}
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    ))}
+                                </td>
+                              ))}
+                            </tr>
+                          </tbody>
+                        </table>
+                      ))}
+                      {hoverInfo && (
+                        <div
+                          style={{
+                            backgroundColor: '#dfdcdc',
+                            position: 'fixed',
+                            top: mouseY,
+                            left: mouseX,
+                            transform: 'translate(10%, 60%)',
+                            padding: '5px',
+                            borderRadius: '5px',
+                            boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                            zIndex: '1002',
+                            whiteSpace: 'pre-line', // 控制換行的 CSS 屬性
+                            fontSize: '16px',
+                          }}
+                        >
+                          {hoverInfo}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={scss.modal_right_head}>
+                      <InputSel
+                        {...inputSelProps}
+                        caption="倉庫編號"
+                        className="align-bottom"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            value: nowwhname ? warehouse_type + ' ' + nowwhname : ' ',
+                          },
+                        }}
+                      />
+                      <InputSel
+                        {...inputSelProps}
+                        caption="托盤編號"
+                        className="align-bottom"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            value: nowtrayname ? nowtrayname : ' ',
+                          },
+                        }}
+                      />
+                      <InputSel
+                        {...inputSelProps}
+                        caption="儲格編號"
+                        className="align-bottom"
+                        disabled={true}
+                        inputProps={{
+                          props: {
+                            value: nowwhposition ? nowwhposition : ' ',
+                          },
+                        }}
+                      />
+                    </div>
+                    <div className={scss.modal_right_content2}>
+                      <div className={scss.body_content1}>
+                        <div className={scss.thead30}>
+                          <span>序</span>
+                          <span>料號</span>
+                          <span>品名</span>
+                          <span>規格</span>
+                          <span>數量</span>
+                          <span></span>
+                        </div>
 
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="倉庫編號"
-                                                className='align-bottom'
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        value: nowwhname ? warehouse_type + " " + nowwhname : ' '
-                                                    },
-                                                }}
-                                            />
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="托盤編號"
-                                                className='align-bottom'
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        value: nowtrayname ? nowtrayname : ' '
-                                                    },
-                                                }}
-                                            />
-                                            <InputSel
-                                                {...inputSelProps}
-                                                caption="儲格編號"
-                                                className='align-bottom'
-                                                disabled={true}
-                                                inputProps={{
-                                                    props: {
-                                                        value: nowwhposition ? nowwhposition : ' '
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                        <div className={scss.modal_right_content2}>
-                                            <div className={scss.body_content1}>
-                                                <div className={scss.thead30}>
-                                                    <span>序</span>
-                                                    <span>料號</span>
-                                                    <span>品名</span>
-                                                    <span>規格</span>
-                                                    <span>數量</span>
-                                                    <span></span>
-                                                </div>
-
-                                                {normaldata && (
-                                                    normaldata.map((_item: any, index: number) => (
-                                                        <CellWithBar key={index} className={scss.panelHeader30}>
-                                                            <div
-                                                                key={index}
-                                                                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                                                // style={{backgroundColor:'red'}}
-                                                                style={{ backgroundColor: `${_item.inventoryid === inventoryid ? '#ea1833' : ''}` }}
-                                                            >
-                                                                <span>{index + 1}</span>
-                                                                <span>{_item.productid}</span>
-                                                                <span>{_item.name}</span>
-                                                                <span>{_item.spec}</span>
-                                                                <span>{_item.quantity}</span>
-                                                                <span></span>
-                                                                <span>
-                                                                    {/* <button onClick={() => {  }}>
+                        {normaldata &&
+                          normaldata.map((_item: any, index: number) => (
+                            <CellWithBar key={index} className={scss.panelHeader30}>
+                              <div
+                                key={index}
+                                className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                // style={{backgroundColor:'red'}}
+                                style={{ backgroundColor: `${_item.inventoryid === inventoryid ? '#ea1833' : ''}` }}
+                              >
+                                <span>{index + 1}</span>
+                                <span>{_item.productid}</span>
+                                <span>{_item.name}</span>
+                                <span>{_item.spec}</span>
+                                <span>{_item.quantity}</span>
+                                <span></span>
+                                <span>
+                                  {/* <button onClick={() => {  }}>
                                                         <img src={icon_fc_inbox.src} alt="cancel" style={{ width: '30px', height: '20px' }} />
                                                         </button> */}
-                                                                </span>
-                                                            </div>
-                                                        </CellWithBar>
-                                                    ))
-                                                )}
-                                            </div>
-                                        </div>
-                                    </>
-                                )) : <div></div>}
-                        </div>
+                                </span>
+                              </div>
+                            </CellWithBar>
+                          ))}
+                      </div>
                     </div>
-                    <div className={scss.modal_container2}>
-                        <div className={scss.modal_bottom}>
-                            <div className={scss.modal_content}>
-                                <div className={scss.traymodal_head_head1}>
-                                    <div>
-                                        <button
-                                            className={
-                                                called
-                                                    ? (data3.length === 0 || (warehouse_type === '一般倉庫' || warehouse_type === '') ? scss.disabledbtn : scss.greenbutton)
-                                                    : (data3.length === 0 || (warehouse_type === '一般倉庫' || warehouse_type === '') ? scss.disabledbtn : scss.redbtn)
-                                            }
-                                            onClick={() => {
-                                                if (warehouse_type !== '一般倉庫') { // 只在不是一般倉庫的情況下觸發操作
-                                                    if (called) {
-                                                        if (data3.length !== 0) handleBack();
-                                                    } else {
-                                                        if (data3.length !== 0) handleCall();
-                                                    }
-                                                }
-                                            }}
-                                            disabled={(warehouse_type === '一般倉庫' || warehouse_type === '') ? true : false}
-                                        // style={{ display: `${warehouse_type === '一般倉庫' ? 'none' : ''}` }}
-                                        >
-                                            {called
-                                                ? (data3.length === 0 || warehouse_type === '一般倉庫' ? `收回托盤收回托盤(${calledTray})` : `收回托盤(${calledTray})`)
-                                                : (data3.length === 0 || warehouse_type === '一般倉庫' ? `呼叫托盤(${nowtrayname})` : `呼叫托盤(${nowtrayname})`)}
-                                        </button>
-
-                                    </div>
-                                    <div style={{ paddingTop: '5px' }}>
-                                        {/* <InputSel
+                  </>
+                )
+              ) : (
+                <div></div>
+              )}
+            </div>
+          </div>
+          <div className={scss.modal_container2}>
+            <div className={scss.modal_bottom}>
+              <div className={scss.modal_content}>
+                <div className={scss.traymodal_head_head1}>
+                  <div>
+                    <button
+                      className={
+                        called
+                          ? data3.length === 0 || warehouse_type === '一般倉庫' || warehouse_type === ''
+                            ? scss.disabledbtn
+                            : scss.greenbutton
+                          : data3.length === 0 || warehouse_type === '一般倉庫' || warehouse_type === ''
+                          ? scss.disabledbtn
+                          : scss.redbtn
+                      }
+                      onClick={() => {
+                        if (warehouse_type !== '一般倉庫') {
+                          // 只在不是一般倉庫的情況下觸發操作
+                          if (called) {
+                            if (data3.length !== 0) {
+                              handleBack();
+                            }
+                          } else {
+                            if (data3.length !== 0) {
+                              handleCall();
+                            }
+                          }
+                        }
+                      }}
+                      disabled={warehouse_type === '一般倉庫' || warehouse_type === '' ? true : false}
+                      // style={{ display: `${warehouse_type === '一般倉庫' ? 'none' : ''}` }}
+                    >
+                      {called
+                        ? data3.length === 0 || warehouse_type === '一般倉庫'
+                          ? `收回托盤收回托盤(${calledTray})`
+                          : `收回托盤(${calledTray})`
+                        : data3.length === 0 || warehouse_type === '一般倉庫'
+                        ? `呼叫托盤(${nowtrayname})`
+                        : `呼叫托盤(${nowtrayname})`}
+                    </button>
+                  </div>
+                  <div style={{ paddingTop: '5px' }}>
+                    {/* <InputSel
                                             {...inputSelProps}
                                             caption="目前呼叫"
                                             className='align-bottom'
@@ -4083,164 +4128,163 @@ export default function PEntryDetail() {
                                                 },
                                             }}
                                         /> */}
-                                    </div>
-                                    <div style={{ paddingTop: '5px' }}>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="入庫進度"
-                                            className='align-bottom'
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: `${nowentryqty} / ${nowquantity}`
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                    <div style={{ textAlign: 'right' }}>
-                                        {/* <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && called === true) ? '' : 'none'}` }}> */}
-                                        <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity) ? '' : 'none'}` }}>
-                                            <button className={scss.redbtn} onClick={() => { handleaddquantity() }}>確認入庫</button>
-                                        </span>
-                                        {/* <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || called === false) ? '' : 'none'}` }}> */}
-                                        <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity) ? '' : 'none'}` }}>
-                                            <button className={scss.disabledbtn}>確認入庫</button>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div className={scss.traymodal_head_content1}>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="儲格編號"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: whpnumber ? whpnumber : ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="物料編號"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: whpproductid ? whpproductid : ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="物料名稱"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: whpname ? whpname : ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="物料規格"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: whpspec ? whpspec : ' ',
-                                                },
-                                            }}
-                                        />
-
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="儲位數量"
-                                            disabled={true}
-                                            inputProps={{
-                                                props: {
-                                                    value: whpquantity.toString() ? whpquantity.toString() : ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="入庫數量"
-                                            // disabled={(called === true && nowentryqty < nowquantity) ? false : true}
-                                            disabled={(nowentryqty < nowquantity) ? false : true}
-                                            inputProps={{
-                                                props: {
-                                                    type: "number",
-                                                    // min: 0, // 設置最小值為0
-                                                    // step: 1, // 設置步進值，默認為1
-                                                    max: parseInt(nowquantity) - parseInt(nowentryqty), // 設置最大值
-                                                    style: { color: 'red' },
-                                                    value: inboxquantity ? inboxquantity : '',
-                                                    // onChange: handleInputChange
-                                                    onChange: (e) => setInboxquantity(parseInt(e.target.value)),
-
-                                                },
-                                            }}
-                                        />
-                                        <span style={{ color: '#ea1833' }}>
-                                            ※不可超過入庫單該品項的數量
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <InputSel
-                                            {...inputSelProps}
-                                            caption="排版用"
-                                            disabled={true}
-                                            className='invisible'
-                                            inputProps={{
-                                                props: {
-                                                    value: ' ',
-                                                },
-                                            }}
-                                        />
-                                        流程順序：選取儲位{'>'}呼叫托盤{'>'}輸入要放置儲位的數量{'>'}確認入庫<br />
-                                        (1).入庫前請確認入庫數量是否正確<br />
-                                        (2).入庫後不可更動，需另外申請庫存調整。
-                                    </div>
-                                </div>
-                                <div className={scss.modal_head_content2}>
-                                    <div></div>
-                                    <div style={{ textAlign: 'right' }}>
-
-                                    </div>
-                                    <div></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
-
-
+                  </div>
+                  <div style={{ paddingTop: '5px' }}>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="入庫進度"
+                      className="align-bottom"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: `${nowentryqty} / ${nowquantity}`,
+                        },
+                      }}
+                    />
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    {/* <span style={{ display: `${(inboxquantity != 0 && nowentryqty < nowquantity && called === true) ? '' : 'none'}` }}> */}
+                    <span style={{ display: `${inboxquantity != 0 && nowentryqty < nowquantity ? '' : 'none'}` }}>
+                      <button
+                        className={scss.redbtn}
+                        onClick={() => {
+                          handleaddquantity();
+                        }}
+                      >
+                        確認入庫
+                      </button>
+                    </span>
+                    {/* <span style={{ display: `${(inboxquantity === 0 || nowentryqty === nowquantity || called === false) ? '' : 'none'}` }}> */}
+                    <span style={{ display: `${inboxquantity === 0 || nowentryqty === nowquantity ? '' : 'none'}` }}>
+                      <button className={scss.disabledbtn}>確認入庫</button>
+                    </span>
+                  </div>
+                </div>
+                <div className={scss.traymodal_head_content1}>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="儲格編號"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: whpnumber ? whpnumber : ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="物料編號"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: whpproductid ? whpproductid : ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="物料名稱"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: whpname ? whpname : ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="物料規格"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: whpspec ? whpspec : ' ',
+                        },
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="排版用"
+                      disabled={true}
+                      className="invisible"
+                      inputProps={{
+                        props: {
+                          value: ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="儲位數量"
+                      disabled={true}
+                      inputProps={{
+                        props: {
+                          value: whpquantity.toString() ? whpquantity.toString() : ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="排版用"
+                      disabled={true}
+                      className="invisible"
+                      inputProps={{
+                        props: {
+                          value: ' ',
+                        },
+                      }}
+                    />
+                    <InputSel
+                      {...inputSelProps}
+                      caption="入庫數量"
+                      // disabled={(called === true && nowentryqty < nowquantity) ? false : true}
+                      disabled={nowentryqty < nowquantity ? false : true}
+                      inputProps={{
+                        props: {
+                          type: 'number',
+                          // min: 0, // 設置最小值為0
+                          // step: 1, // 設置步進值，默認為1
+                          max: parseInt(nowquantity) - parseInt(nowentryqty), // 設置最大值
+                          style: { color: 'red' },
+                          value: inboxquantity ? inboxquantity : '',
+                          // onChange: handleInputChange
+                          onChange: (e) => setInboxquantity(parseInt(e.target.value)),
+                        },
+                      }}
+                    />
+                    <span style={{ color: '#ea1833' }}>※不可超過入庫單該品項的數量</span>
+                  </div>
+                  <div>
+                    <InputSel
+                      {...inputSelProps}
+                      caption="排版用"
+                      disabled={true}
+                      className="invisible"
+                      inputProps={{
+                        props: {
+                          value: ' ',
+                        },
+                      }}
+                    />
+                    流程順序：選取儲位{'>'}呼叫托盤{'>'}輸入要放置儲位的數量{'>'}確認入庫
+                    <br />
+                    (1).入庫前請確認入庫數量是否正確
+                    <br />
+                    (2).入庫後不可更動，需另外申請庫存調整。
+                  </div>
+                </div>
+                <div className={scss.modal_head_content2}>
+                  <div></div>
+                  <div style={{ textAlign: 'right' }}></div>
+                  <div></div>
+                </div>
+              </div>
             </div>
-        </SubLayer >
-
-    )
-
+          </div>
+        </Modal>
+      </div>
+    </SubLayer>
+  );
 }

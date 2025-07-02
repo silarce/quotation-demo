@@ -10,7 +10,7 @@ import { NextRouter } from 'next/router';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -488,7 +488,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: content?.type ?? '',
         },
         scheduledProcurementOrBidDate: {
-          value: content?.estimatedDiscount ? moment(content.estimatedDiscount) : null,
+          value: content?.estimatedDiscount ? dayjs(content.estimatedDiscount) : null,
         },
 
         trackProgress: {
@@ -694,7 +694,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     };
 
     return { control_signature };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract?.content]);
 
   const appendixParams = {
