@@ -6,7 +6,8 @@ import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import scss from './approve.module.scss';
-import scss_fong from './btn_fong.module.scss';
+import Btn_fong from 'components/global/gear/button/btn_fong';
+import DataEntry, { Input, DataEntry_fong } from 'components/global/gear/dataEntry';
 
 // ===========================================================================
 
@@ -41,7 +42,7 @@ export default function Approve() {
               return (
                 <Btn_fong
                   key={key}
-                  theme="b"
+                  theme="large"
                   onClick={(e) => {
                     onTabClick(key, e);
                   }}
@@ -65,12 +66,14 @@ const Response = () => {
     <div className={scss.approvePanel}>
       <div className="text-base font-semibold mb-[14.5px]">主管</div>
 
-      <div className={scss.inputWrapper}>
-        <div className={scss.caption}>主管回覆 :</div>
-        <div className={scss.entryBox}>
-          <input className={scss.input} type="text" />
-        </div>
-      </div>
+      <DataEntry_fong
+        caption="主管回覆 :"
+        captionStyle={{
+          width: '106px',
+        }}
+      >
+        <input type="text" />
+      </DataEntry_fong>
 
       <div className={scss.btnBar}>
         <Btn_fong>返回</Btn_fong>
@@ -196,13 +199,3 @@ const columns: ColumnsType<TfakeData> = [
 ];
 
 // ===========================================================================
-
-const Btn_fong = ({
-  className,
-  theme = 'a',
-  ...props
-}: React.HTMLAttributes<HTMLButtonElement> & {
-  theme?: 'a' | 'b';
-}) => {
-  return <button className={classNames(scss_fong[theme], className)} {...props} />;
-};
