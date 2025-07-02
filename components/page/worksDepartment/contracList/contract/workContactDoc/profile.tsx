@@ -262,7 +262,10 @@ export default function Profile({
               disabled={scheduledProgress.disabled || disabled}
               label={'預定進度'}
               placeholder=""
-              inputProps={{ ...scheduledProgress }}
+              textareaProps={{
+                allowNewLineByUser: true,
+                ...scheduledProgress,
+              }}
               {...inputStyle01}
             />
           </div>

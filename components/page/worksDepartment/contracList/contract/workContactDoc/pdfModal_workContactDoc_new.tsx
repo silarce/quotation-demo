@@ -76,6 +76,7 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
     projectName,
     productDetails,
     annotations: annotations_pre,
+    scheduledProgress = '',
   } = engineerContactExport ?? {};
   const annotations = JSON.parse(annotations_pre ?? '[]') as string[];
 
@@ -240,6 +241,7 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
           productArr={productDetails}
           // annotations={engineeringContact?.annotations}
           annotations={annotations}
+          scheduledProgress={scheduledProgress}
           onChunkProdArrArrCreated={setProdArrArr}
           page={0}
           allPage={prodArrArr.length}
@@ -257,6 +259,7 @@ export default function PdfModal({ engineeringContactId }: Tprops) {
               infoArr={infoArr}
               productArr={prodArr}
               annotations={annotations}
+              scheduledProgress={scheduledProgress}
               page={index + 1}
               allPage={prodArrArr.length}
               hasPattern={hasPattern}
@@ -401,9 +404,15 @@ const Body_pre = (
 const Footer_pre = (
   {
     annotations,
+    scheduledProgress,
     hasPattern,
     hasPattern_bool,
-  }: { annotations: string[]; hasPattern: ThasPattern; hasPattern_bool: boolean },
+  }: {
+    annotations: string[];
+    hasPattern: ThasPattern;
+    hasPattern_bool: boolean;
+    scheduledProgress: string;
+  },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
   return (
@@ -424,14 +433,7 @@ const Footer_pre = (
           <div>
             <span>預定進度：</span>
           </div>
-          <ul>
-            {/* {engineeringContact?.annotations?.map((str, index) => {
-          return <li key={index}>{str}</li>;
-        })} */}
-            {/* <li>{'(1)TEST'}</li>
-            <li>{'(2)TEST'}</li>
-            <li>{'(3)TEST'}</li> */}
-          </ul>
+          <div className="whitespace-pre-wrap">{scheduledProgress}</div>
         </div>
 
         <div>圖面</div>
@@ -478,6 +480,7 @@ const PdfTemp_pre = (
     infoArr = [],
     productArr,
     annotations = [],
+    scheduledProgress,
     onChunkProdArrArrCreated,
     page,
     allPage,
@@ -490,6 +493,7 @@ const PdfTemp_pre = (
     infoArr: Tinfo[] | undefined;
     productArr: TproductDetails | undefined;
     annotations: string[] | undefined | null;
+    scheduledProgress: string;
     onChunkProdArrArrCreated?: (chunkProdArrArr: TproductDetails[]) => void;
     page: React.ReactNode;
     allPage: React.ReactNode;
@@ -562,6 +566,7 @@ const PdfTemp_pre = (
           annotations={annotations ?? []}
           hasPattern={hasPattern}
           hasPattern_bool={hasPattern_bool}
+          scheduledProgress={scheduledProgress}
         />
       </div>
     </div>

@@ -464,6 +464,7 @@ interface TengineerContactExport {
   // annotations: string[];
   annotations: string; // JSON.stringify(string[])
   constructionSitePrincipalContactNumber: string;
+  scheduledProgress: string; // 預定進度
   productDetails: {
     id: string; // quotation_productId
     productSpec: string; // 產品規格(api組for匯出)
