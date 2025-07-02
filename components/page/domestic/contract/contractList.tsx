@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 import _ from 'lodash';
 
@@ -65,7 +65,7 @@ export default function ContractList({
 
     const obj: TsubContract = {
       contractNumber: subContract.contractNumber ?? '---',
-      createdAt: moment(subContract.content.createdAt).format('YYYY-MM-DD'),
+      createdAt: dayjs(subContract.content.createdAt).format('YYYY-MM-DD'),
       projectName: subContract.content.projectName,
       verifyForm: (
         <span

@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 
 // antd
@@ -126,7 +126,7 @@ export default function BudgetList({
             const processChain = quotationToReiviewChain(content);
 
             return {
-              date: moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
+              date: dayjs(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
               editNotes,
               discount: averageDiscount ?? '',
               doorQty: String(quantity),

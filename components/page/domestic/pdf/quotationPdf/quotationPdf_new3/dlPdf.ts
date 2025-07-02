@@ -1,6 +1,6 @@
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // global gear
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
@@ -56,7 +56,7 @@ const dlPdf = async ({
     doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
   }
 
-  const today = moment().format('yyyy-MM-DD');
+  const today = dayjs().format('yyyy-MM-DD');
   doc.save(`${fileName}_${today}.pdf`);
   showRootLoading(false);
 };

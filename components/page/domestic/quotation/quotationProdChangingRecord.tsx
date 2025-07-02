@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 
 import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
@@ -73,7 +73,7 @@ export default function TheQuotationProdChangingRecord({
 
           const record = {
             quotationId: content.quotationNumber,
-            date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
+            date: dayjs(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
             priceChange: `${contentTotal}`,
             remark: content.editNotes,
           };

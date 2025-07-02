@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 
 // antd
@@ -90,7 +90,7 @@ export default function QuotationRecord({ subContract }: { subContract: Tquotati
 
             const changeInfo = {
               quotationId: content.quotationNumber,
-              date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
+              date: dayjs(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
               priceChange: content.subTotal,
               remark: content.editNotes,
             };

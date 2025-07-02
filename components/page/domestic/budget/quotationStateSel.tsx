@@ -1,6 +1,6 @@
 // 報價單
 import React, { FocusEvent, useState, useRef } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -122,7 +122,7 @@ export default function QuotationStateSel({
       <div className={`${scss.historyList} ${showHistory}`} ref={historyListRef}>
         {history.map((item, index, arr) => {
           const { state_from, state_to, isoString } = item;
-          const mDate = moment(isoString);
+          const mDate = dayjs(isoString);
           const dateString = mDate.format('YYYY-MM-DD');
           const timeString = mDate.format('HH:mm:ss');
 

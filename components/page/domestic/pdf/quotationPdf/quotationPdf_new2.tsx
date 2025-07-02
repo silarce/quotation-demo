@@ -1,5 +1,5 @@
 import React, { useState, useRef, Fragment } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -226,7 +226,7 @@ export default function QuotationPdf({
     const total_num = Number(total.replaceAll(',', ''));
 
     const quotationDate_tw = (() => {
-      const m_quotationDate = moment(quotationDate);
+      const m_quotationDate = dayjs(quotationDate);
       const isValid = m_quotationDate.isValid();
 
       if (!isValid) {
@@ -239,7 +239,7 @@ export default function QuotationPdf({
     })();
 
     const tradingDate_tw = (() => {
-      const m_tradingDate = moment(tradingDate);
+      const m_tradingDate = dayjs(tradingDate);
       const isValid = m_tradingDate.isValid();
 
       if (!isValid) {
@@ -842,7 +842,7 @@ export default function QuotationPdf({
       });
 
       const id = quotationNumber;
-      const today = moment().format('yyyy-MM-DD');
+      const today = dayjs().format('yyyy-MM-DD');
       link.download = `${id}_${today}.xlsx`;
       link.href = URL.createObjectURL(blobData);
       link.click();
@@ -860,7 +860,7 @@ export default function QuotationPdf({
     // const customerName = customer.name;
 
     // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
-    const dateString = moment(quotationDate).subtract(1911, 'year').format('yy-MM-DD');
+    const dateString = dayjs(quotationDate).subtract(1911, 'year').format('yy-MM-DD');
 
     return {
       quotationId: quotationNumber,
@@ -1360,7 +1360,7 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
 
   const allAddress = county + district + address;
 
-  const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+  const tradingDate = dayjs(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
   const control_basicInfo: Tcontrol_basicInfo = {
     quotationDate,
@@ -1523,7 +1523,7 @@ const legacyContractToBasicInfo = ({
 
   const allAddress = projectCity + projectDistrict + projectAddress;
 
-  const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+  const tradingDate = dayjs(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
 
   const control_basicInfo: Tcontrol_basicInfo = {
     quotationDate: '', // 舊合約沒有報價日期
