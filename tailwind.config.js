@@ -12,8 +12,10 @@ module.exports = {
         main: "#14256a",
         sub: "#404040",
         text: "#404040",
+        text02: "#212121",
         active: "#ea1833",
         border: "#c1c1c1",
+        border02: "#616161",
         bgc01: "#f5f5f5",
         bgc02: "#fcfcfc",
         hoverBgc: "#ecf1ff",
@@ -40,6 +42,15 @@ module.exports = {
       },
       width: {
         table: "1100px"
+      },
+      border:{
+        radius:{
+          normal: "8px",
+        }
+      },
+      boxShadow:{
+        "01":"0px 3px 3px 0px #61616133",
+        "02":"0px 4px 4px 0px #00000040"
       }
     },
     screens: {
