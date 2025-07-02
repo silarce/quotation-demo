@@ -16,28 +16,28 @@
 .childrenWrapper {
   flex: 1;
   align-self: flex-end;
-
   width: auto;
   height: fit-content;
-  border-bottom: solid 1px transparent;
   background-color: transparent;
   > * {
     display: block;
   }
-
   * {
     background-color: transparent;
   }
   &.showBorder {
-    border-bottom-color: black;
+    border-color: black;
+  }
+  &.showBorder2 {
+    border-color: theme("colors.border02");
   }
 }
 
 // textarea
 .textarea {
   width: 100%;
-  &:disabled{
-    cursor:auto;
+  &:disabled {
+    cursor: auto;
   }
 }
 
