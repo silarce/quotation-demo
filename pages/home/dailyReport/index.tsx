@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 // layer
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -226,7 +226,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
   };
 
   const update_calendar_thisMonth = async () => {
-    const now = moment();
+    const now = dayjs();
     const filter = filterCre_nextAndPrevMonth(now);
 
     try {
@@ -461,7 +461,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       showRootLoading(false);
 
       if (isCalendar) {
-        const now = moment();
+        const now = dayjs();
         const dynamicFilter = filterCre_nextAndPrevMonth(now);
         await update_calendar(dynamicFilter);
       } else {
@@ -519,11 +519,11 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
 
       const postBody = item.postBody;
       postBody.order = index;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       postBody.arrivalTime = setDateToReportDate(postBody.arrivalTime!);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       postBody.departureTime = setDateToReportDate(postBody.departureTime!);
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
       postBody.departureWorksiteTime = setDateToReportDate(postBody.departureWorksiteTime!);
 
       return postBody;
@@ -532,7 +532,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
     try {
       showRootLoading(true);
       await apiPatchDailyReports_my({
-        date: moment(theDate).format('YYYY-MM-DD'),
+        date: dayjs(theDate).format('YYYY-MM-DD'),
         body: {
           // 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
           // reviewerIds,
@@ -544,7 +544,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
       myAlert.success({ title: '更新日報表完成' });
 
       if (isCalendar) {
-        const now = moment();
+        const now = dayjs();
         const dynamicFilter = filterCre_nextAndPrevMonth(now);
         await update_calendar(dynamicFilter);
       } else {
@@ -644,7 +644,7 @@ export default function DailyReport({ userInfo }: { userInfo: TuserDto }) {
         ...query,
         isUserReviewed: searchObj.isUserReviewed,
         // date: searchObj.date,
-        date: searchObj.date ? moment(searchObj.date).format('YYYY-MM-DD') : undefined,
+        date: searchObj.date ? dayjs(searchObj.date).format('YYYY-MM-DD') : undefined,
         keyWord: searchObj.keyWord,
         // isMine,
         // isCalendar: isCalendar ? 'true' : undefined,
@@ -946,7 +946,7 @@ const TheSearchBar = ({
           datePickerProps: {
             props: {
               placeholder: '101-01-01',
-              value: searchObj?.date ? moment(searchObj?.date) : null,
+              value: searchObj?.date ? dayjs(searchObj?.date) : null,
               onChange: (m) => {
                 onChange_date(m?.toISOString() || '');
               },

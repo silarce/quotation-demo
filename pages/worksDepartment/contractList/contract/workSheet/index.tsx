@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 
@@ -805,7 +805,7 @@ const useProductCard = ({
             review.document_status === '核准' && (currentStageIndex = review.stages.length - 1);
             const currentStage = review.stages[currentStageIndex];
 
-            const reviewAt_timeStamp = moment(currentStage.review_time).unix();
+            const reviewAt_timeStamp = dayjs(currentStage.review_time).unix();
             const isReviewed = reviewAt_timeStamp > 0;
 
             reviewStatus.label = currentStage.review_person;

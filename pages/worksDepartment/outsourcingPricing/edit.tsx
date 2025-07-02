@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Link from 'next/link';
 
 // layer
@@ -139,7 +139,7 @@ export default function OutsourcingPricingEdit({
 
   const { ReviewFlow, reqAddReview, reviewFlow, isAllReviewPass } = useReviewFlow({
     uuid: data_payment?.id,
-    document_id: data_payment?.createdAt ? moment(data_payment.createdAt).format('YYYY-MM-DD hh:mm:ss') : '',
+    document_id: data_payment?.createdAt ? dayjs(data_payment.createdAt).format('YYYY-MM-DD hh:mm:ss') : '',
   });
 
   const isReviewing = !!reviewFlow;
@@ -354,7 +354,7 @@ export default function OutsourcingPricingEdit({
 
     const { date: paymentDate } = data_payment ?? {};
 
-    const date = paymentDate ? moment(paymentDate) : null;
+    const date = paymentDate ? dayjs(paymentDate) : null;
     const year = date && date.year() - 1911;
     const month = date && date.month() + 1;
 

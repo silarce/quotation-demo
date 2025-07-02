@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // global gear
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -69,8 +69,8 @@ export default function WdContractList() {
   // =====================================================================
 
   const params: Tparams = useMemo(() => {
-    const yearStart = year ? moment().year(Number(year)).startOf('year').toISOString() : undefined;
-    const yearEnd = year ? moment().year(Number(year)).endOf('year').toISOString() : undefined;
+    const yearStart = year ? dayjs().year(Number(year)).startOf('year').toISOString() : undefined;
+    const yearEnd = year ? dayjs().year(Number(year)).endOf('year').toISOString() : undefined;
 
     const params: Tparams = {
       pageSize: 99999,
@@ -173,7 +173,6 @@ export default function WdContractList() {
     });
 
     return list;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   // ===================================================

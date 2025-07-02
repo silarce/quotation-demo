@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, forwardRef, useRef, useImperativeHandle, Fragment, memo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import { useInView } from 'react-intersection-observer';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { AxiosError } from 'axios';
@@ -403,7 +403,7 @@ const Info = ({
   recipient_value: string;
   recipient_onClick?: (() => void) | undefined;
 
-  replyDate_value: Moment | null;
+  replyDate_value: Dayjs | null;
 
   poster_value: string;
   poster_onClick?: (() => void) | undefined;
@@ -615,7 +615,7 @@ const OneMemorandum = ({
             <Info
               disabled={true}
               recipient_value={recipient?.name ?? ''}
-              replyDate_value={memorandumDate ? moment(memorandumDate) : null}
+              replyDate_value={memorandumDate ? dayjs(memorandumDate) : null}
               poster_value={poster?.name ?? ''}
               issueNumber_value={issueNumber ?? ''}
               purpose_value={purpose ?? ''}
@@ -823,7 +823,7 @@ const ReplyMemorandum_pre = (
         <Info
           recipient_value={state_memorandum.recipient?.name ?? ''}
           recipient_onClick={() => setSelectorAction('reciver')}
-          replyDate_value={moment(state_memorandum.postDate)}
+          replyDate_value={dayjs(state_memorandum.postDate)}
           poster_value={state_memorandum.poster?.name ?? ''}
           poster_onClick={() => setSelectorAction('sender')}
           issueNumber_value={state_memorandum.issueNumber ?? ''}
