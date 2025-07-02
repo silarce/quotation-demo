@@ -1,13 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
+import { useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
-
-import { createUseInfinite } from './createUseInfinite';
 
 import type {
   Tparams,
@@ -96,8 +92,8 @@ export const apiPostTodo = async (body: TcreateTodoDto[], { callAlert = true }: 
   const api = '/todo';
 
   // 後端收的不是ISOstring，送ISOstring的話會因為時區的問題而get錯誤的日期
-  body[0].notificationDate = moment(body[0].notificationDate).format('yyyy-MM-DD');
-  body[0].entryDate = moment(body[0].entryDate).format('yyyy-MM-DD');
+  body[0].notificationDate = dayjs(body[0].notificationDate).format('yyyy-MM-DD');
+  body[0].entryDate = dayjs(body[0].entryDate).format('yyyy-MM-DD');
 
   return axi
     .post(api, body)
@@ -125,8 +121,8 @@ export const apiPatchTodo = async (body: TupdateTodoDto[], { callAlert = true }:
   const api = '/todo';
 
   // 後端收的不是ISOstring，送ISOstring的話會因為時區的問題而get錯誤的日期
-  body[0].notificationDate = moment(body[0].notificationDate).format('yyyy-MM-DD');
-  body[0].entryDate = moment(body[0].entryDate).format('yyyy-MM-DD');
+  body[0].notificationDate = dayjs(body[0].notificationDate).format('yyyy-MM-DD');
+  body[0].entryDate = dayjs(body[0].entryDate).format('yyyy-MM-DD');
 
   return axi
     .patch(api, body)

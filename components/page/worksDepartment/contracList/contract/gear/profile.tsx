@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // global gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -77,7 +77,7 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
         showBaseline="auto"
         datePickerProps={{
           props: {
-            value: controll.info.dispatchDate.value ? moment(controll.info.dispatchDate.value) : null,
+            value: controll.info.dispatchDate.value ? dayjs(controll.info.dispatchDate.value) : null,
             onChange: (m) => {
               controll.info.dispatchDate.onChange(m?.toISOString() ?? '');
             },
@@ -107,7 +107,7 @@ export default function Profile({ disabled, controll }: { disabled: boolean; con
         showBaseline="auto"
         datePickerProps={{
           props: {
-            value: controll.info.requirementsDate.value ? moment(controll.info.requirementsDate.value) : null,
+            value: controll.info.requirementsDate.value ? dayjs(controll.info.requirementsDate.value) : null,
             onChange: (m) => {
               controll.info.requirementsDate.onChange(m?.toISOString() ?? '');
             },

@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 
@@ -416,7 +416,7 @@ const PanelBody = ({
             caption="通知日期"
             datePickerProps={{
               props: {
-                value: state_todo.notificationDate ? moment(state_todo.notificationDate) : null,
+                value: state_todo.notificationDate ? dayjs(state_todo.notificationDate) : null,
                 onChange: (date) => changeState_todo('notificationDate', date?.toISOString() ?? ''),
               },
             }}
@@ -429,7 +429,7 @@ const PanelBody = ({
             caption="預計進場日期"
             datePickerProps={{
               props: {
-                value: state_todo.entryDate ? moment(state_todo.entryDate) : null,
+                value: state_todo.entryDate ? dayjs(state_todo.entryDate) : null,
                 onChange: (date) => changeState_todo('entryDate', date?.toISOString() ?? ''),
               },
             }}

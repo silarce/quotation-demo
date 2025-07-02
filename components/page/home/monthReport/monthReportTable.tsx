@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 // antd
 import { Badge } from 'antd';
@@ -28,12 +28,9 @@ export default function MonthReportTable({
   employeeIdArr: string[] | undefined;
   pushReportId: (reportId: string) => void;
 }) {
-  const ref_main = useRef<HTMLDivElement>(null);
-  const [ref, setRef] = useState(ref_main);
-
   const { weekDays: dayArr, holidayLookup_month } = useMemo(() => {
     const weekDays = [];
-    const date = moment(isoDate).startOf('month');
+    const date = dayjs(isoDate).startOf('month');
     const year = date.year();
     const month = (date.month() + 1) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
     const daysInMonth = date.daysInMonth();
@@ -98,7 +95,7 @@ export default function MonthReportTable({
             const statisticsObj = (() => {
               const obj: { [key: string]: TaccountingReportStatistic } = {};
               statistic.forEach((item) => {
-                const dateDay = moment(item.date).date();
+                const dateDay = dayjs(item.date).date();
                 obj[dateDay] = item;
               });
 
@@ -225,7 +222,7 @@ const Side = ({
   dayArr: {
     day: number;
     date: string;
-    dateMoment: moment.Moment;
+    dateMoment: Dayjs;
   }[];
   holidayLookup_month: (typeof holidaysLookup)[number][number];
 }) => {

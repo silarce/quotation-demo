@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 
 // antd
@@ -68,7 +68,7 @@ export default function EditDispatch({
   const [showSelector, setShowSelector] = useState(false);
   const { tasks, note, pricingMethod } = controll;
 
-  const dispatchDate_m = moment(dispatchDate);
+  const dispatchDate_m = dayjs(dispatchDate);
   dispatchDate = dispatchDate_m.isValid() ? dispatchDate_m.format('YYYY-MM-DD') : '9999-01-01';
 
   // ----------------------------------------------------------------------

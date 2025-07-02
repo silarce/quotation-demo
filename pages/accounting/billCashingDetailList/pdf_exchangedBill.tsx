@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import { Modal, ModalProps } from 'antd';
 
@@ -17,7 +17,7 @@ export default function Pdf_exchangedBill(
       <div>
         <div>批次兌現單</div>
         <div>
-          <p>兌現日期:{moment(cashExchangeDate).format('YYYY-MM-DD')}</p>
+          <p>兌現日期:{dayjs(cashExchangeDate).format('YYYY-MM-DD')}</p>
           <p></p>
           <p>兌現帳戶:{cashExchangeAccount}</p>
           <p>兌現單號:{sheetNumber}</p>

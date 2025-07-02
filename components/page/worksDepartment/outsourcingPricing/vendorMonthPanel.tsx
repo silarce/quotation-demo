@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import TabCarousel02, {
   Tcontrol_tabCarousel,
@@ -167,7 +167,7 @@ const getPaymentDateList = (paymentArr: ToutsourcingPaymentDto[]) => {
   } = {};
 
   paymentArr.forEach((payment) => {
-    const date = moment(payment.date);
+    const date = dayjs(payment.date);
 
     const year = date.year().toString();
     const month = (date.month() + 1).toString();

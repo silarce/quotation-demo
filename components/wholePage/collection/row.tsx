@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 
 // component
@@ -116,10 +116,9 @@ const Row = ({
   const limitedDate =
     state_accountant.insertDate ??
     (postProps &&
-      moment({
-        year: postProps.year,
-        month: postProps.month - 1,
-      }));
+      dayjs()
+        .year(postProps.year)
+        .month(postProps.month - 1));
 
   // 匯入發票匯入紙本時的額度
   const quota = data_accountant ? calcQuota(data_accountant) : 0;
@@ -236,7 +235,7 @@ const Row = ({
     // const isPaperImported = incomeBill.some((bill) => bill.isPaperImported);
 
     setState_accountant({
-      insertDate: insertDate ? moment(insertDate) : null,
+      insertDate: insertDate ? dayjs(insertDate) : null,
       importAccountingNumber: importAccountingNumber ?? '',
       noteNumber: noteNumber ?? '',
       accountingNumber: accountingNumber ?? ' ',
@@ -245,9 +244,9 @@ const Row = ({
       notes: notes ?? '',
       isImported: isImported,
       accountsReceivableDeduction: accountsReceivableDeduction,
-      noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
-      receiptCollectionDate: receiptCollectionDate ? moment(receiptCollectionDate) : null,
-      receiptEstimatedDate: receiptEstimatedDate ? moment(receiptEstimatedDate) : null,
+      noteMaturityDate: noteMaturityDate ? dayjs(noteMaturityDate) : null,
+      receiptCollectionDate: receiptCollectionDate ? dayjs(receiptCollectionDate) : null,
+      receiptEstimatedDate: receiptEstimatedDate ? dayjs(receiptEstimatedDate) : null,
       currency: currency,
       exchangeRate: String(exchangeRate || ''),
       currencyValue: String(currencyValue || ''),

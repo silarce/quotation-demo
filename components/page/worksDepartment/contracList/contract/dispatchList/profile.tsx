@@ -1,6 +1,6 @@
 import { useState, Fragment } from 'react';
 import classNames from 'classnames';
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 
 // global gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -37,9 +37,9 @@ type TcontrolItem_str = {
 };
 
 type TcontrolItem_moment = {
-  value: Moment | null;
+  value: Dayjs | null;
   disabled?: boolean;
-  onChange: (e: Moment | null) => void;
+  onChange: (e: Dayjs | null) => void;
 };
 
 type Toption_pointContactPerson = Toption & { phoneNumber: string | undefined };

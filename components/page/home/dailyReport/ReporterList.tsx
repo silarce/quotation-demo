@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Badge } from 'antd';
@@ -47,7 +47,7 @@ export default function ReporterList({
     <div className={scss.container}>
       {groupReportArr.map((group, gIndex) => {
         const { date, reportArr } = group;
-        const twDate = moment(convertDate_reduce1911(date)).format('y-MM-DD');
+        const twDate = dayjs(convertDate_reduce1911(date)).format('y-MM-DD');
 
         return (
           <div key={gIndex}>
@@ -72,7 +72,7 @@ export default function ReporterList({
 
               const { date, employee, id: reportId, reviewStatus } = report;
               const { chName, id: employeeId } = employee;
-              const twDate = moment(convertDate_reduce1911(date)).format('y-MM-DD');
+              const twDate = dayjs(convertDate_reduce1911(date)).format('y-MM-DD');
 
               const tab: Ttab = {
                 reportId,

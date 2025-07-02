@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
 // antd
@@ -8,13 +8,9 @@ import { Checkbox, Popover, Button, Switch, Select } from 'antd';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-// import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import MyButton_rounded from 'components/global/gear/button/myButton_rounded';
 
 import { TemployeeDto, ToutsourcingDto, TdeliveryStatusInstallationItem } from 'js/api/dtoTypes';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-import { Toption } from 'js/utils/options/options';
 import { optionsCreator_deliveryStatusInstallationItem } from 'js/utils/options/productOptions';
 
 // icon
@@ -611,7 +607,7 @@ const Panel = ({
           disabled={disabled}
           datePickerProps={{
             props: {
-              value: state.shippingDate ? moment(state.shippingDate) : undefined,
+              value: state.shippingDate ? dayjs(state.shippingDate) : undefined,
               onChange: (v) => {
                 setState((state) => ({
                   ...state,
@@ -712,7 +708,7 @@ const Panel = ({
           disabled={disabled}
           datePickerProps={{
             props: {
-              value: state.installationDate ? moment(state.installationDate) : undefined,
+              value: state.installationDate ? dayjs(state.installationDate) : undefined,
               onChange: (v) => {
                 setState((state) => ({
                   ...state,
