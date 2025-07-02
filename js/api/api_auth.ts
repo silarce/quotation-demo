@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { axi } from './_axiosCreator';
+import { axi, axi_monkey } from './_axiosCreator';
 import _ from 'lodash';
 
 // type
@@ -46,6 +46,8 @@ export const useApiAuthMe = () => {
     const res = await apiAuthMe();
 
     if (res) {
+      axi_monkey.defaults.headers.common['Sessionid'] = res.latestSessionId;
+
       if (res.employee) {
         res.employee.jobs = _.sortBy(res.employee.jobs, (job) => ['grade', 'department.createdAt']);
       }

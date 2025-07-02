@@ -1,0 +1,100 @@
+.customScrollContainer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+}
+
+.scrollContent {
+  flex: 1;
+  height: 100%;
+  overflow: scroll; /* 同時支援 X 和 Y 軸滾動 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
+
+  /* 隱藏 Webkit 滾動條 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollbarTrack {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.customScrollContainer:hover .scrollbarTrack {
+  opacity: 1;
+}
+
+.scrollbarThumb {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  &.dragging {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* 水平滾動條軌道 */
+.scrollbarTrackHorizontal {
+  position: absolute;
+  left: 4px;
+  right: 16px; /* 避免與垂直滾動條重疊 */
+  bottom: 4px;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.customScrollContainer:hover .scrollbarTrackHorizontal {
+  opacity: 1;
+}
+
+/* 水平滾動條滑塊 */
+.scrollbarThumbHorizontal {
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  &.dragging {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+// ========================================================================
+
+.container {
+  overflow: hidden; /* 隱藏原生滾動條 */
+  position: relative;
+  border: solid 1px theme("colors.border");
+  border-radius: 8px;
+}
+.container_noBorder {
+  overflow: hidden; /* 隱藏原生滾動條 */
+  position: relative;
+}

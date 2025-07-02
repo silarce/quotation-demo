@@ -5,26 +5,27 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 // antd
-import { Modal, ModalProps } from 'antd';
 
 // gear
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // css
-import scss from './pdfModal_workContactDoc.module.scss';
+import scss from './pdfModal_workContactDoc_new.module.scss';
 
-import { TengineeringContactDto, TquotationProductDto } from 'js/api/dtoTypes';
-import { ThasPattern } from './projectPattern';
+// import { ThasPattern } from './projectPattern';
+
+import { TengineerContactExport, useApiEngineerContactExport } from 'js/api/api_netCore/api_engineer';
 
 // ==============================================================================
 
 type Tprops = {
-  visible: boolean;
-  onCancel: () => void;
-  engineeringContact: TengineeringContactDto | undefined;
-  productArr: TquotationProductDto[];
-  hasPattern: ThasPattern;
+  // visible: boolean;
+  // onCancel: () => void;
+  // engineeringContact: TengineeringContactDto | undefined;
+  // productArr: TquotationProductDto[];
+  // hasPattern: ThasPattern;
+  engineeringContactId: string;
 };
 
 type Tinfo = {
@@ -44,6 +45,13 @@ type TinfoList = {
   projectContent: Tinfo;
 };
 
+type ThasPattern = {
+  floorPlan: boolean;
+  designDiagram: boolean;
+};
+
+type TproductDetails = TengineerContactExport['productDetails'];
+
 // ==============================================================================
 
 const a4Height = 2000;
@@ -57,26 +65,25 @@ const a4Style = {
 };
 
 // ==============================================================================
-export default function PdfModal({
+export default function PdfModal({ engineeringContactId }: Tprops) {
   //
-  visible,
-  onCancel,
-  engineeringContact,
-  productArr,
-  hasPattern,
-}: Tprops) {
-  //
+
+  const { engineerContactExport, patternList, hasPattern, hasPattern_bool } =
+    useApiEngineerContactExport(engineeringContactId);
+
+  const {
+    //
+    projectName,
+    productDetails,
+    annotations: annotations_pre,
+    scheduledProgress = '',
+  } = engineerContactExport ?? {};
+  const annotations = JSON.parse(annotations_pre ?? '[]') as string[];
 
   // --------------------------------------------------------------------------
   const ref_pdf = useRef<(HTMLDivElement | null)[]>([]);
 
-  // --------------------------------------------------------------------------
-
-  const [prodArrArr, setProdArrArr] = useState<TquotationProductDto[][]>([]);
-
-  // --------------------------------------------------------------------------
-
-  const testProductArr = productArr;
+  const [prodArrArr, setProdArrArr] = useState<TproductDetails[]>([]);
 
   // ========================================================================
 
@@ -121,13 +128,13 @@ export default function PdfModal({
       doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
     }
 
-    doc.save(`工程聯絡單_${engineeringContact?.projectName}.pdf`);
+    doc.save(`工程聯絡單_${projectName}.pdf`);
     showRootLoading(false);
   };
 
   // ========================================================================
   const { infoArr } = useMemo(() => {
-    if (!engineeringContact) {
+    if (!engineerContactExport) {
       return {};
     }
 
@@ -140,17 +147,15 @@ export default function PdfModal({
       contractorPrincipal,
       constructionSiteContactNumber,
       constructionSiteFaxNumber,
-      // wholeAddress,
-      zipCode,
-      county,
-      district,
+
       address,
       projectPrincipal,
       projectContent,
-      constructionSitePrincipalContactNumber,
-    } = engineeringContact;
 
-    const wholeAddress = zipCode + county + district + address;
+      constructionSitePrincipalContactNumber,
+    } = engineerContactExport;
+
+    const wholeAddress = address;
 
     const info: TinfoList = {
       projectName: {
@@ -221,18 +226,10 @@ export default function PdfModal({
     };
 
     //
-  }, [engineeringContact]);
+  }, [engineerContactExport]);
 
   return (
-    <Modal
-      //
-      visible={visible}
-      onCancel={onCancel}
-      footer={null}
-      closable={false}
-      width={'fit-content'}
-      destroyOnClose={true}
-    >
+    <div className={scss.wrapper}>
       <div className={scss.body}>
         <MyButton_v2 onClick={dlPdf}>下載</MyButton_v2>
         <br />
@@ -241,12 +238,15 @@ export default function PdfModal({
         <PdfTemp
           isTemplate={true}
           infoArr={infoArr}
-          productArr={testProductArr}
-          annotations={engineeringContact?.annotations}
+          productArr={productDetails}
+          // annotations={engineeringContact?.annotations}
+          annotations={annotations}
+          scheduledProgress={scheduledProgress}
           onChunkProdArrArrCreated={setProdArrArr}
           page={0}
           allPage={prodArrArr.length}
           hasPattern={hasPattern}
+          hasPattern_bool={hasPattern_bool}
         />
 
         {prodArrArr.map((prodArr, index) => {
@@ -258,15 +258,17 @@ export default function PdfModal({
               }}
               infoArr={infoArr}
               productArr={prodArr}
-              annotations={engineeringContact?.annotations}
+              annotations={annotations}
+              scheduledProgress={scheduledProgress}
               page={index + 1}
               allPage={prodArrArr.length}
               hasPattern={hasPattern}
+              hasPattern_bool={hasPattern_bool}
             />
           );
         })}
       </div>
-    </Modal>
+    </div>
   );
 }
 
@@ -326,10 +328,18 @@ const Header_pre = (
   );
 };
 
-const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: React.ForwardedRef<HTMLDivElement>) => {
+const Body_pre = (
+  {
+    productArr,
+  }: {
+    //
+    productArr: TproductDetails | undefined;
+  },
+  ref: React.ForwardedRef<HTMLDivElement>
+) => {
   return (
     <div ref={ref} className={scss.body}>
-      {productArr.map((prod, index) => {
+      {(productArr ?? []).map((prod, index) => {
         const {
           id,
           itemName,
@@ -339,13 +349,13 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
           boxB,
           materialName,
           materialSurface,
-          guideRail,
+          guideRail: guideRail,
           closingType,
           horsepower,
           quantity,
-          notes,
+          note: notes,
 
-          thickness,
+          guideRailThickness: thickness,
           bounceDoorWidth,
         } = prod;
 
@@ -392,11 +402,19 @@ const Body_pre = ({ productArr }: { productArr: TquotationProductDto[] }, ref: R
 };
 
 const Footer_pre = (
-  { annotations, hasPattern }: { annotations: string[]; hasPattern: ThasPattern },
+  {
+    annotations,
+    scheduledProgress,
+    hasPattern,
+    hasPattern_bool,
+  }: {
+    annotations: string[];
+    hasPattern: ThasPattern;
+    hasPattern_bool: boolean;
+    scheduledProgress: string;
+  },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
-  const hasPattern_bool = Object.values(hasPattern).some((bool) => bool);
-
   return (
     <div ref={ref} className={scss.footer}>
       <div className={scss.note}>
@@ -415,24 +433,17 @@ const Footer_pre = (
           <div>
             <span>預定進度：</span>
           </div>
-          <ul>
-            {/* {engineeringContact?.annotations?.map((str, index) => {
-          return <li key={index}>{str}</li>;
-        })} */}
-            {/* <li>{'(1)TEST'}</li>
-            <li>{'(2)TEST'}</li>
-            <li>{'(3)TEST'}</li> */}
-          </ul>
+          <div className="whitespace-pre-wrap">{scheduledProgress}</div>
         </div>
 
         <div>圖面</div>
         <div>備註</div>
 
         <div>設計圖</div>
-        <div>{hasPattern.hasDesign && 'V'}</div>
+        <div>{hasPattern.designDiagram && 'V'}</div>
 
         <div>簽認圖</div>
-        <div>{hasPattern.hasFloor && 'V'}</div>
+        <div>{hasPattern.floorPlan && 'V'}</div>
 
         <div>無圖面</div>
         <div>{!hasPattern_bool && 'V'}</div>
@@ -465,26 +476,29 @@ const Footer_pre = (
 const PdfTemp_pre = (
   {
     className,
-    // style,
     isTemplate,
     infoArr = [],
     productArr,
     annotations = [],
+    scheduledProgress,
     onChunkProdArrArrCreated,
     page,
     allPage,
     hasPattern,
+    hasPattern_bool,
   }: {
     className?: string;
     isTemplate?: boolean;
     // style?: React.CSSProperties;
     infoArr: Tinfo[] | undefined;
-    productArr: TquotationProductDto[];
+    productArr: TproductDetails | undefined;
     annotations: string[] | undefined | null;
-    onChunkProdArrArrCreated?: (chunkProdArrArr: TquotationProductDto[][]) => void;
+    scheduledProgress: string;
+    onChunkProdArrArrCreated?: (chunkProdArrArr: TproductDetails[]) => void;
     page: React.ReactNode;
     allPage: React.ReactNode;
     hasPattern: ThasPattern;
+    hasPattern_bool: boolean;
   },
   ref: React.ForwardedRef<HTMLDivElement>
 ) => {
@@ -497,9 +511,9 @@ const PdfTemp_pre = (
       return;
     }
 
-    const prodList: { [id: string]: TquotationProductDto } = {};
+    const prodList: { [id: string]: TproductDetails[number] } = {};
 
-    productArr.forEach((prod) => {
+    productArr?.forEach((prod) => {
       prodList[prod.id] = prod;
     });
 
@@ -511,8 +525,8 @@ const PdfTemp_pre = (
     const bodyRowsCollection = (ref_body.current?.querySelectorAll('[data-component="row"]') ?? []) as HTMLDivElement[];
     const rowArr = [...bodyRowsCollection];
 
-    const chunkProdArrArr: TquotationProductDto[][] = [];
-    let tempArr: TquotationProductDto[] = [];
+    const chunkProdArrArr: TproductDetails[] = [];
+    let tempArr: TproductDetails = [];
     let tempHeight = 0;
 
     rowArr.forEach((ele, index) => {
@@ -538,7 +552,7 @@ const PdfTemp_pre = (
     });
 
     //
-  }, [ref_header, ref_body, ref_footer]);
+  }, [ref_header, ref_body, ref_footer, productArr]);
 
   // 如果要設定container的height、paddingTop、paddingBottome等會影響到高度的樣式
   // 到上面的a4Style設定
@@ -547,7 +561,13 @@ const PdfTemp_pre = (
       <div ref={ref} className={classNames(scss.a4Container, className)} style={{ ...a4Style }}>
         <Header ref={ref_header} infoArr={infoArr} page={page} allPage={allPage} />
         <Body ref={ref_body} productArr={productArr} />
-        <Footer ref={ref_footer} annotations={annotations ?? []} hasPattern={hasPattern} />
+        <Footer
+          ref={ref_footer}
+          annotations={annotations ?? []}
+          hasPattern={hasPattern}
+          hasPattern_bool={hasPattern_bool}
+          scheduledProgress={scheduledProgress}
+        />
       </div>
     </div>
   );

@@ -20,7 +20,8 @@ import ProjectPattern, {
   TpatternReviewProcess,
   TpatternReviewStatus,
 } from 'components/page/worksDepartment/contracList/contract/workContactDoc/projectPattern';
-import PdfModal from './pdfModal_workContactDoc';
+// import PdfModal from './pdfModal_workContactDoc';
+import PdfModal from './pdfModal_workContactDoc_new';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -75,6 +76,8 @@ type Tprofile = {
   contractorPrincipal: string;
   contractorContactNumber: string;
   contractorFaxNumber: string;
+  scheduledProgress: string;
+  projectAbbreviation: string;
 };
 
 type TonStateChange = (props: {
@@ -144,7 +147,7 @@ function PreWorkContactDoc_component(
 
   const [showAnnoSelector, setShowAnnoSelector] = useState(false);
   const [isShowPattern, setIsShowPattern] = useState(false);
-  const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  // const [pdfModalVisible, setPdfModalVisible] = useState(false);
 
   const { profile, setProfile, profileChange } = useProfile();
   const { contactArr, setContactArr, onAddClick } = useContactArr();
@@ -319,6 +322,8 @@ function PreWorkContactDoc_component(
       contractorContactNumber,
       contractorFaxNumber,
       contactInfo,
+      scheduledProgress,
+      projectAbbreviation,
     } = engineeringContact;
 
     if (annotations) {
@@ -346,6 +351,20 @@ function PreWorkContactDoc_component(
       contractorPrincipal,
       contractorContactNumber,
       contractorFaxNumber,
+      scheduledProgress: scheduledProgress ?? '',
+      projectAbbreviation: projectAbbreviation ?? '',
+    });
+  };
+
+  const openPdf = () => {
+    if (!engineeringContactId) {
+      myAlert.info({ title: '沒有engineeringContactId' });
+
+      return;
+    }
+
+    myAlert.clear({
+      content: <PdfModal engineeringContactId={engineeringContactId} />,
     });
   };
 
@@ -457,7 +476,7 @@ function PreWorkContactDoc_component(
       reqPost,
       closePattern: () => setIsShowPattern(false),
       setDisabled,
-      openPdf: () => setPdfModalVisible(true),
+      openPdf: openPdf,
     })
   );
 
@@ -467,13 +486,13 @@ function PreWorkContactDoc_component(
 
   return (
     <div>
-      <PdfModal
+      {/* <PdfModal
         visible={pdfModalVisible}
         onCancel={() => setPdfModalVisible(false)}
         engineeringContact={engineeringContact}
         productArr={productArr_forPdf}
         hasPattern={hasPattern}
-      />
+      /> */}
 
       {/*  */}
       {/*  */}
@@ -898,7 +917,8 @@ const useControl_profile = ({
       addressBarProps: {
         inputSelProps: {
           caption: '工程地點',
-          disabled: readonly,
+          disabled: readonly || disabled,
+          showBaseline: 'auto',
         },
         addressProps: {
           zipCode: {
@@ -1024,6 +1044,19 @@ const useControl_profile = ({
         onAddClick,
         arr: contactPersonsArr,
       },
+      scheduledProgress: {
+        value: profile?.scheduledProgress ?? '',
+        onChange: (v) => {
+          profileChange('scheduledProgress', v);
+        },
+      },
+      projectAbbreviation: {
+        value: profile?.projectAbbreviation ?? '',
+        onChange: (v) => {
+          profileChange('projectAbbreviation', v);
+        },
+        // disabled: readonly,
+      },
     };
 
     return control_profile;
@@ -1049,6 +1082,8 @@ const emptyProfile = (): Tprofile => ({
   contractorPrincipal: '',
   contractorContactNumber: '',
   contractorFaxNumber: '',
+  scheduledProgress: '',
+  projectAbbreviation: '',
 });
 
 // ================================================================================

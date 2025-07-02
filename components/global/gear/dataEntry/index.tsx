@@ -33,6 +33,45 @@ import scss from './index.module.scss';
 
 // =============================================================================
 
+type TdataEntryProps = {
+  caption?: React.ReactNode;
+  captionClassName?: string;
+  captionStyle?: React.CSSProperties; // captionWrapperProps中的style會蓋掉captionStyle
+  captionMr?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  captionWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+
+  showBorder?: boolean;
+  childrenWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+
+  prefix?: React.ReactNode;
+  prefixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+
+  suffix?: React.ReactNode;
+  suffixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+
+  isMust?: boolean;
+  fontSize?: 12 | 14 | 16 | 18 | 20 | 22;
+  //
+  //
+
+  theme?: 'normal' | 'fong';
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'>;
+
+type TdataEntrycontainerProps = React.ComponentProps<typeof DataEntryContainer>;
+type TinputProps = React.ComponentProps<typeof Input>;
+type TtextareaProps = React.ComponentProps<typeof Textarea>;
+type TdatePickerProps = React.ComponentProps<typeof DatePicker>;
+type TtimePickerProps = React.ComponentProps<typeof TimePicker>;
+type TcheckboxProps = React.ComponentProps<typeof Checkbox>;
+type TcheckboxGroupProps = React.ComponentProps<typeof CheckboxGroup>;
+type TradioProps = React.ComponentProps<typeof Radio>;
+type TradioGroupProps = React.ComponentProps<typeof RadioGroup>;
+type TselectProps = React.ComponentProps<typeof Select>;
+type Tselect_rsProps = React.ComponentProps<typeof Select_rs>;
+type TinputSelectProps = React.ComponentProps<typeof InputSelect>;
+
+// =============================================================================
+
 // MARK:Container
 const DataEntryContainer = ({
   caption,
@@ -51,83 +90,68 @@ const DataEntryContainer = ({
   suffixWrapperProps: { className: className_suffix, ...suffixWrapperProps } = {},
 
   isMust,
-  fontSize = 18,
   //
   className,
   children,
+  //
+  theme = 'normal',
+
+  // fontSize = 18,
+  fontSize = theme === 'fong' ? 14 : 18,
   ...props_container
-}: {
-  caption?: React.ReactNode;
-  captionClassName?: string;
-  captionStyle?: React.CSSProperties; // captionWrapperProps中的style會蓋掉captionStyle
-  captionMr?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-  captionWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+}: TdataEntryProps) => {
+  const className_fontSize = `f${fontSize}`;
 
-  showBorder?: boolean;
-  childrenWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
-
-  prefix?: React.ReactNode;
-  prefixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
-
-  suffix?: React.ReactNode;
-  suffixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
-
-  isMust?: boolean;
-  fontSize?: 12 | 14 | 16 | 18 | 20 | 22;
-} & Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'>) =>
-  // 過陣子確認沒有問題就把這個被註解的型別刪掉
-  //  & React.HTMLAttributes<HTMLLabelElement>
-  {
-    const className_fontSize = `f${fontSize}`;
-
-    return (
-      // 當children有多個form元素時會造成一些麻煩(同時被focus)，所以決定把label替換為div
-      // 過陣子確認沒有問題就把這個label刪掉
-      // <label className={classNames(scss.container, className)} {...props_container}>
-      <div className={classNames(scss.container, className)} {...props_container}>
-        {caption !== undefined && (
-          <div
-            className={classNames(
-              'w-[100px] text-main font-medium',
-              `mr-${captionMr}`,
-              className_fontSize,
-              scss.captionWrapper,
-              captionClassName,
-              className_caption
-            )}
-            style={captionStyle}
-            {...captionWrapperProps}
-          >
-            {caption}
-          </div>
-        )}
-        {prefix && (
-          <div className={classNames('mr-1', className_fontSize, className_prefix)} {...prefixWrapperProps}>
-            {prefix}
-          </div>
-        )}
+  return (
+    <div className={classNames(scss.container, className, theme === 'fong' && ['items-center'])} {...props_container}>
+      {caption !== undefined && (
         <div
           className={classNames(
-            scss.childrenWrapper,
+            'w-[100px]  font-medium',
+            `mr-${captionMr}`,
+            scss.captionWrapper,
             className_fontSize,
-            showBorder && scss.showBorder,
-            className_childrenWrapper
+            captionClassName,
+            className_caption,
+            theme === 'normal' && ['text-main'],
+            theme === 'fong' && ['text-text02']
           )}
-          {...childrenWrapperProps}
+          style={captionStyle}
+          {...captionWrapperProps}
         >
-          {children}
+          {caption}
         </div>
-        {suffix && (
-          <div className={classNames('ml-1', className_fontSize, className_suffix)} {...suffixWrapperProps}>
-            {suffix}
-          </div>
+      )}
+      {prefix && (
+        <div className={classNames('mr-1', className_fontSize, className_prefix)} {...prefixWrapperProps}>
+          {prefix}
+        </div>
+      )}
+      <div
+        className={classNames(
+          scss.childrenWrapper,
+          className_fontSize,
+          className_childrenWrapper,
+          showBorder && scss.showBorder,
+          'border-b border-transparent',
+          //
+          theme === 'normal' && [showBorder && scss.showBorder],
+          theme === 'fong' && [showBorder && scss.showBorder2, 'border-[1px] p-[12px] rounded-lg']
         )}
-        {/*  */}
-        {isMust && <MustTip />}
+        {...childrenWrapperProps}
+      >
+        {children}
       </div>
-      // </label>
-    );
-  };
+      {suffix && (
+        <div className={classNames('ml-1', className_fontSize, className_suffix)} {...suffixWrapperProps}>
+          {suffix}
+        </div>
+      )}
+      {/*  */}
+      {isMust && <MustTip />}
+    </div>
+  );
+};
 
 // MARK:Input
 const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => {
@@ -321,6 +345,8 @@ function Select_rs<
   );
 }
 
+Select_rs.findOption = findOption;
+
 // MARK:InputSelect
 function InputSelect<
   O extends { [key: string]: any; value: string; label: React.ReactNode } = { value: string; label: React.ReactNode }
@@ -448,6 +474,12 @@ function findOption<Option extends { value: unknown; label: React.ReactNode }>({
 
 // =============================================================================
 
+// 目前搭配Input運作正常
+// 其他表單元件等到確實要用時再說
+const DataEntry_fong = (props: Omit<TdataEntryProps, 'theme'>) => <DataEntryContainer {...props} theme="fong" />;
+
+// =============================================================================
+
 DataEntryContainer.Input = Input;
 DataEntryContainer.Textarea = Textarea;
 DataEntryContainer.DatePicker = DatePicker;
@@ -460,26 +492,15 @@ DataEntryContainer.Select = Select;
 DataEntryContainer.Select_rs = Select_rs;
 DataEntryContainer.InputSelect = InputSelect;
 
-Select_rs.findOption = findOption;
+DataEntry_fong.Input = Input;
 
 const DataEntry = DataEntryContainer;
 
-type TdataEntrycontainerProps = React.ComponentProps<typeof DataEntryContainer>;
-type TinputProps = React.ComponentProps<typeof Input>;
-type TtextareaProps = React.ComponentProps<typeof Textarea>;
-type TdatePickerProps = React.ComponentProps<typeof DatePicker>;
-type TtimePickerProps = React.ComponentProps<typeof TimePicker>;
-type TcheckboxProps = React.ComponentProps<typeof Checkbox>;
-type TcheckboxGroupProps = React.ComponentProps<typeof CheckboxGroup>;
-type TradioProps = React.ComponentProps<typeof Radio>;
-type TradioGroupProps = React.ComponentProps<typeof RadioGroup>;
-type TselectProps = React.ComponentProps<typeof Select>;
-type Tselect_rsProps = React.ComponentProps<typeof Select_rs>;
-type TinputSelectProps = React.ComponentProps<typeof InputSelect>;
+// =========================================================================
 
 export default DataEntry;
+export { DataEntryContainer, DataEntry_fong };
 export {
-  DataEntryContainer,
   Input,
   Textarea,
   DatePicker,
