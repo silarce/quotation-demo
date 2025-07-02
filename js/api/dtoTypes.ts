@@ -143,6 +143,7 @@ export type TuserDto = {
   updatedAt: string;
   username: string;
   employee?: TemployeeDto & Required<Pick<TemployeeDto, 'jobs'>>;
+  latestSessionId: string;
 };
 
 export type TuserDto_login = {
@@ -152,6 +153,7 @@ export type TuserDto_login = {
   isActive: boolean;
   updatedAt: string;
   username: string;
+  latestSessionId: string; // 過期的latestSessionId，不使用
 };
 
 export type TUserPasswordDto = {
