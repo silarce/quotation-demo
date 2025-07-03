@@ -54,6 +54,7 @@ import '../styles/globals.scss';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用的
 import 'slick-carousel/slick/slick.css'; // react-slick
 import 'slick-carousel/slick/slick-theme.css'; // react-slick
+import 'antd/dist/reset.css';
 // -----------------------------------------------------------------------------------
 // i18n
 import 'hooks/i18n';
@@ -266,7 +267,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // ------------------------------------------------------------------
   return (
-    <AntdConfigProvider autoInsertSpaceInButton={false}>
+    <AntdConfigProvider button={{ autoInsertSpace: false }}>
       <Head>
         <title>三久ERP</title>
       </Head>
