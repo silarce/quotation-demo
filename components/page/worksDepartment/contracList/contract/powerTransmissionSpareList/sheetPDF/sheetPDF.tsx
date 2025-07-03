@@ -129,7 +129,12 @@ export default function SheetPDF({
       <div className={scss.panelBar}>
         <MyButton_v2 label="下載PDF" onClick={dlPdf} />
       </div>
-      <div ref={(ele) => (refPdf.current[0] = ele)} className={scss.container}>
+      <div
+        ref={(ele) => {
+          refPdf.current[0] = ele;
+        }}
+        className={scss.container}
+      >
         <p className={scss.title}>送電備品料單</p>
         {/*  */}
         <div className={scss.infoBar}>

@@ -56,8 +56,8 @@ const MonthVendorPanel = ({
   const { tabArr, defaultCarouselIndex } = useMemo(() => {
     //
     const dateArr = getAllMonthByRange({
-      start: 2022,
-      end: undefined,
+      start: new Date('2022/01/01'),
+      end: new Date(),
     }).reverse();
 
     let defaultCarouselIndex = -1;

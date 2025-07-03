@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from 'dayjs';
 
-function getAllMonthByRange({ start, end }: { start: Dayjs; end: Dayjs }): string[] {
+function getAllMonthByRange({ start, end }: { start: Dayjs | Date; end: Dayjs | Date }): string[] {
   const startDate = dayjs(start);
   const endDate = dayjs(end);
   const currentDate = startDate.clone();
@@ -18,7 +18,7 @@ type TyearMonthList = {
   [year: number]: number[];
 };
 
-function getAllyearMonthListByRange({ start, end }: { start: Dayjs; end: Dayjs }) {
+function getAllyearMonthListByRange({ start, end }: { start: Dayjs | Date; end: Dayjs | Date }) {
   const startDate = dayjs(start);
   const endDate = dayjs(end);
 

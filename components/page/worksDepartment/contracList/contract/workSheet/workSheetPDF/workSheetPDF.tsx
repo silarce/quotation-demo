@@ -164,7 +164,12 @@ export default function WorkSheetPDF({
             <div key={index}>
               {index !== 0 && <hr className=" border-black" />}
 
-              <div ref={(ele) => (refPdf.current[index] = ele)} className={scss.container}>
+              <div
+                ref={(ele) => {
+                  refPdf.current[index] = ele;
+                }}
+                className={scss.container}
+              >
                 <div>
                   <Title page={index + 1} pageCount={pageCount} />
                   <Info {...control.info} />
@@ -191,7 +196,12 @@ export default function WorkSheetPDF({
             <div key={index}>
               {index !== 0 && <hr className=" border-black" />}
 
-              <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
+              <div
+                ref={(ele) => {
+                  refPdf.current[page - 1] = ele;
+                }}
+                className={scss.container}
+              >
                 <div>
                   <Title page={page} pageCount={pageCount} />
                   <Info {...control.info} />
@@ -211,7 +221,12 @@ export default function WorkSheetPDF({
             <div key={index}>
               {index !== 0 && <hr className=" border-black" />}
 
-              <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
+              <div
+                ref={(ele) => {
+                  refPdf.current[page - 1] = ele;
+                }}
+                className={scss.container}
+              >
                 <div>
                   <Title page={page} pageCount={pageCount} />
                   <Info {...control.info} />
