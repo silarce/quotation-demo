@@ -257,9 +257,9 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '請選擇派工日期' });
     }
 
-    if (!workerId[0]) {
-      return myAlert.info({ title: '請選擇工務人員' });
-    }
+    // if (!workerId[0]) {
+    //   return myAlert.info({ title: '請選擇工務人員' });
+    // }
 
     if (!state_pricingMethod.pricingMethod) {
       return myAlert.info({ title: '請選擇派工批價' });
