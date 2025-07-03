@@ -59,7 +59,7 @@ export default function DispatchList() {
   } = useGetEngineeringContact(engineeringContactId);
 
   const params: Tparams = {
-    populate: ['todoList', 'workerEmployee'],
+    populate: ['todoList', 'workerEmployee', 'outsourcing'],
     filter: {
       contractId: { $eq: contractId },
       isCompleted: { $eq: tab === 'completed' ? true : false },
@@ -98,6 +98,8 @@ export default function DispatchList() {
         return {
           dispatchDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD'),
           workerNameArr: item.workerEmployee.map((worker) => worker.chName || worker.enName),
+          outsourcingNameArr: item.outsourcing.map((worker) => worker.name),
+
           tasks: item.tasks,
           href: {
             pathname: `${router.pathname}/edit`,
