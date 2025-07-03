@@ -1,4 +1,4 @@
-import { useState, useEffect, MouseEvent, useMemo, forwardRef } from 'react';
+import { useEffect, useMemo, forwardRef } from 'react';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
 
@@ -18,8 +18,6 @@ import style from './contractList.module.scss';
 
 // globalState
 import { useUrlHistory } from 'hooks/globalState/useUrlHistory';
-
-const { Panel } = Collapse;
 
 // ========================
 
@@ -123,41 +121,14 @@ function ContractList_pre(
       <Thead />
 
       <Collapse
-        //
         expandIcon={() => null}
         accordion={true}
         destroyOnHidden={true}
         onChange={changeActive}
         activeKey={activeContractId}
-      >
-        {contractArr.map((item, index) => {
+        items={contractArr.map((item, index) => {
           const { contractId } = item;
           const isActive = activeContractId === contractId;
-
-          // const handleIconDetailClick = (e: MouseEvent) => {
-          //   e.stopPropagation();
-          //   router.replace({
-          //     query: {
-          //       ...router.query,
-          //       activeContractId: contractId,
-          //       activeContractPage: item.page,
-          //     },
-          //   });
-
-          //   history_contractList.set({
-          //     pathname: router.pathname,
-          //     query: {
-          //       ...router.query,
-          //       activeContractId: contractId,
-          //       activeContractPage: String(item.page),
-          //     },
-          //   });
-
-          //   router.push({
-          //     pathname: targetUrl,
-          //     query: { contractId, version: 1 },
-          //   });
-          // };
 
           const detailLinkProps: Parameters<typeof PanelHeader>[0]['detailLinkProps'] = {
             onClick: (e) => {
@@ -189,27 +160,18 @@ function ContractList_pre(
 
           const theViewRef = index <= 3 ? viewRef_top : index > contractArr.length - 3 ? viewRef : undefined;
 
-          return (
-            <Panel
-              id={contractId}
-              key={contractId}
-              className={style.panel}
-              header={
-                <PanelHeader
-                  //
-                  viewRef={theViewRef}
-                  contract={item}
-                  isActive={isActive}
-                  // onIconDetailClick={handleIconDetailClick}
-                  detailLinkProps={detailLinkProps}
-                />
-              }
-            >
-              <PanelBody contractDetailArr={contractDetailArr} />
-            </Panel>
-          );
+          return {
+            id: contractId,
+            key: contractId,
+            className: style.panel,
+            label: (
+              <PanelHeader viewRef={theViewRef} contract={item} isActive={isActive} detailLinkProps={detailLinkProps} />
+            ),
+
+            children: <PanelBody contractDetailArr={contractDetailArr} />,
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }
