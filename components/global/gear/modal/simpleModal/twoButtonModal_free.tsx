@@ -38,7 +38,7 @@ export default function TwoButtonModal_free({
       centered={true}
       width={400}
       onCancel={onCancel}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       footer={
         <TwoBtnFooter
           {...{

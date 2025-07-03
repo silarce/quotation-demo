@@ -272,7 +272,7 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
         className={scss.container}
         closable={false}
         centered={true}
-        destroyOnClose={true}
+        destroyOnHidden={true}
         footer={null}
         onCancel={onCancel}
       >

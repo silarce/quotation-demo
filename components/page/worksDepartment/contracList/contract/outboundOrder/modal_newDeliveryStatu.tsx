@@ -138,7 +138,7 @@ export default function Modal_newDeliveryStatu({
   // -----------------------------------------------------------------------------
 
   return (
-    <Modal visible={visible} onCancel={onCancel} footer={null} destroyOnClose={true} width={800}>
+    <Modal visible={visible} onCancel={onCancel} footer={null} destroyOnHidden={true} width={800}>
       <div className={scss.body}>
         <p className={scss.caption}>批次新增管理單</p>
 

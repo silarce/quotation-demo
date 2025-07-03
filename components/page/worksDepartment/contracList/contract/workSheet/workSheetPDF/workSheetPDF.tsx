@@ -133,7 +133,7 @@ export default function WorkSheetPDF({
       footer={null}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       width={'auto'}
       wrapClassName={scss.antdModalWrapper}
       onCancel={onCancel}

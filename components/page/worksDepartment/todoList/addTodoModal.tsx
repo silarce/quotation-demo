@@ -124,7 +124,7 @@ export default function AddTodoModal({
     <Modal
       className={classNames(scss.antdModal)}
       visible={visible}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       footer={null}
       closable={false}
       width={800}

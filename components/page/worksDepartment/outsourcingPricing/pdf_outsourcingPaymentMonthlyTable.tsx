@@ -232,7 +232,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
   // MARK: RENDER
 
   return (
-    <Modal {...modalProps} width="fit-content" footer={null} destroyOnClose={true}>
+    <Modal {...modalProps} width="fit-content" footer={null} destroyOnHidden={true}>
       <SquareBtn onClick={handleDownloadPdf}>下載PDF</SquareBtn>
       <br />
       <br />

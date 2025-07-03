@@ -926,7 +926,7 @@ export default function QuotationPdf({
       closable={false}
       centered={true}
       width={'fit-content'}
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <div className={scss.panel}>
         <div className={scss.left}>

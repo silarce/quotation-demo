@@ -57,7 +57,7 @@ export default function GridPanel({
       closable={false}
       centered={true}
       width={620}
-      // destroyOnClose={true}
+      // destroyOnHidden={true}
       onCancel={onCancel}
       footer={<TwoBtnFooter {...{ onConfirm: theOnConfirm, onCancel }} />}
     >

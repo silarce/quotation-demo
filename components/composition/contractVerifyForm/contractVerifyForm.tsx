@@ -146,7 +146,7 @@ function ContractVerifyForm({
       visible={showModal}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       footer={null}
       // width="1000px"
       width="fit-content"

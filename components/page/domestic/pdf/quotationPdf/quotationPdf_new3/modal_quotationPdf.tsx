@@ -185,7 +185,7 @@ export default function Modal_quotationPdf({
       width="fit-content"
       footer={null}
       closable={false}
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <div className={scss.body}>
         <div>

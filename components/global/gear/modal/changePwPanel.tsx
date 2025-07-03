@@ -103,7 +103,7 @@ export default function ChangePwPanel({ visible, onCancel }: { visible: boolean;
       maskClosable={true}
       footer={null}
       onCancel={theOnCancel}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       afterClose={theOnCancel}
     >
       <div className={scss.header}>

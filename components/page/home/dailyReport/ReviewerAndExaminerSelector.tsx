@@ -132,7 +132,7 @@ export default function ReviewerAndExaminerSelector({
       visible={visible}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       onCancel={onCancel}
       footer={null}
       width={rwd1023 ? '80vw' : '800px'}

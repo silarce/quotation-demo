@@ -59,7 +59,7 @@ export default function InputModal({
       centered={true}
       width={405}
       onCancel={onCancel}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       footer={<TwoBtnFooter onConfirm={theOnConfirm} onCancel={theOnCancel} />}
     >
       <p className={scss.title}>{title}</p>

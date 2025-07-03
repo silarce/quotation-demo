@@ -57,7 +57,7 @@ export default function SelectorShell({
       visible={visible}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       onCancel={onCancel}
       footer={null}
       width={width}

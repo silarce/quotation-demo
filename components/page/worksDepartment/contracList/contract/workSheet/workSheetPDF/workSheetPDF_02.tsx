@@ -258,7 +258,7 @@ export default function WorkSheetPDF_02({
       footer={null}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       width={'auto'}
       // width={'420mm'}
       wrapClassName={scss.antdModalWrapper}
