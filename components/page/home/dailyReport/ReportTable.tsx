@@ -415,7 +415,7 @@ export default function ReportTable({
   return (
     <Drawer
       className={scss.drawer}
-      visible={!!itemList}
+      open={!!itemList}
       // getContainer={false}
       getContainer={rwd1023 ? undefined : false}
       width={'100%'}

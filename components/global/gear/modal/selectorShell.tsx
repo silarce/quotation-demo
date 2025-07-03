@@ -23,7 +23,7 @@ export type { TsearcbBarProps, TinputSelProp_search };
 export default function SelectorShell({
   children,
   label,
-  visible,
+  open,
   onConfirm,
   onCancel,
   className,
@@ -36,7 +36,7 @@ export default function SelectorShell({
 }: {
   children: ReactNode;
   label?: string;
-  visible: boolean;
+  open: boolean;
   onConfirm: () => void;
   onCancel: () => void;
   className?: string;
@@ -54,7 +54,7 @@ export default function SelectorShell({
   return (
     <Modal
       className={classNames(scss.modal, className)}
-      visible={visible}
+      open={open}
       closable={false}
       centered={true}
       destroyOnHidden={true}

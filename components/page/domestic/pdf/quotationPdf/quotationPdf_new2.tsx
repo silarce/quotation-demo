@@ -920,7 +920,7 @@ export default function QuotationPdf({
     <Modal
       className={scss.quotationPdf}
       // wrapClassName={style.modal}
-      visible={isVisable}
+      open={isVisable}
       onCancel={onCancel}
       footer={null}
       closable={false}

@@ -3730,7 +3730,7 @@ export default function PKingDetail() {
 
         {/* 審核 */}
         <Modal
-          visible={reviewbar}
+          open={reviewbar}
           onCancel={() => {
             setReviewbar(false);
           }}
@@ -3811,7 +3811,7 @@ export default function PKingDetail() {
         </Modal>
 
         <Modal
-          visible={customerbar}
+          open={customerbar}
           onCancel={() => setCustomerbar(false)}
           width="1010px"
           closable={false} // 移除右上角的叉叉
@@ -3897,7 +3897,7 @@ export default function PKingDetail() {
         </Modal>
 
         <Modal
-          visible={whpositionqmodalopen}
+          open={whpositionqmodalopen}
           footer={null}
           onCancel={handleModalClose}
           // width="2000px"

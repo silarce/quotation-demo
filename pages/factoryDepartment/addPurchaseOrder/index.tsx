@@ -2487,7 +2487,7 @@ export default function AddPurchaseOrder() {
           onCrossClick={SearchModalClose}
         >
           {/* <Modal
-                        visible={searchmodalopen}
+                        open={searchmodalopen}
                         footer={null}
                         onCancel={SearchModalClose}
                         width="1000px"

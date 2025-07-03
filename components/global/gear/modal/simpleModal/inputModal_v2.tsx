@@ -12,7 +12,7 @@ import scss from './simpleModal.module.scss';
 
 // =====================================================
 type TinputModalProps = {
-  visible: boolean;
+  open: boolean;
   title: string;
   className?: string;
   tip?: string;
@@ -26,7 +26,7 @@ export type { TinputModalProps };
 
 // =====================================================
 export default function InputModal({
-  visible,
+  open: visible,
   title,
   className,
   tip,
@@ -54,7 +54,7 @@ export default function InputModal({
   return (
     <Modal
       className={classNames(scss.inputModal, className)}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       width={405}

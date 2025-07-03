@@ -100,7 +100,7 @@ export default function TextListEditor({
       {/*  */}
       <ModalListSelectorWithSearch
         label={`請選擇${label}`}
-        visible={showAdd}
+        open={showAdd}
         onCancel={onCancel}
         onConfirm={onConfirm}
         onSearch={searchAlternate}

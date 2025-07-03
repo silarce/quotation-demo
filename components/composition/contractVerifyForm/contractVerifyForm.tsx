@@ -143,7 +143,7 @@ function ContractVerifyForm({
   return (
     <Modal
       className={scss.modal}
-      visible={showModal}
+      open={showModal}
       closable={false}
       centered={true}
       destroyOnHidden={true}

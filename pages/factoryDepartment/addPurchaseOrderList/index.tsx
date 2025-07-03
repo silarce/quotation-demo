@@ -1746,7 +1746,7 @@ export default function AddPurchaseOrderList() {
         </div>
 
         <Modal
-          visible={customerbar}
+          open={customerbar}
           onCancel={() => setCustomerbar(false)}
           width="1010px"
           closable={true}

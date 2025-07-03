@@ -253,8 +253,7 @@ export default function WorkSheetPDF_02({
   // ---------------------------------------------------------------------
   return (
     <Modal
-      //
-      visible={isShow}
+      open={isShow}
       footer={null}
       closable={false}
       centered={true}

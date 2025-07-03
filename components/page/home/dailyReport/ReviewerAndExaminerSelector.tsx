@@ -129,7 +129,7 @@ export default function ReviewerAndExaminerSelector({
   return (
     <Modal
       className={classNames(scss.modal)}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       destroyOnHidden={true}

@@ -3239,7 +3239,7 @@ export default function PReceiptDetail() {
 
         {/* 審核 */}
         <Modal
-          visible={reviewbar}
+          open={reviewbar}
           onCancel={() => {
             setReviewbar(false);
           }}
@@ -3320,7 +3320,7 @@ export default function PReceiptDetail() {
         </Modal>
 
         <Modal
-          visible={customerbar}
+          open={customerbar}
           onCancel={() => setCustomerbar(false)}
           width="1010px"
           closable={true}

@@ -838,7 +838,7 @@ export default function EditDispatchList() {
         />
       </div>
 
-      <ModalPdf visible={showPdf} onCancel={() => setShowPdf(false)} data={data_pdf} />
+      <ModalPdf open={showPdf} onCancel={() => setShowPdf(false)} data={data_pdf} />
     </SubLayer>
   );
 }

@@ -538,7 +538,7 @@ export default function Worksheet({
         {/* main */}
       </div>
       <InputModal
-        visible={!!inputModalProps}
+        open={!!inputModalProps}
         title={inputModalProps?.title ?? ''}
         onConfirm={inputModalProps?.onConfirm}
         placeholder="請輸入分配數量"

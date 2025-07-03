@@ -496,7 +496,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           onClick: () => {
             setInputModalConfig({
-              visible: true,
+              open: true,
               title: '追蹤進度',
               placeholder: '請輸入追蹤進度',
               onConfirm: async (v) => {
@@ -522,7 +522,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           onClick: () => {
             setInputModalConfig({
-              visible: true,
+              open: true,
               title: '工程進度',
               placeholder: '請輸入工程進度',
               onConfirm: async (v) => {
@@ -996,7 +996,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         )}
 
         <InputModal
-          visible={!!inputModalConfig?.visible}
+          open={!!inputModalConfig?.open}
           onConfirm={inputModalConfig?.onConfirm}
           onCancel={inputModalConfig?.onCancel}
           title={inputModalConfig?.title ?? ''}
@@ -1026,7 +1026,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       <QuotationPdf
         //
-        visible={visible_pdf}
+        open={visible_pdf}
         onCancel={hidePdf}
         pdfData={pdfData}
         fileName={contract?.contractNumber ?? ''}

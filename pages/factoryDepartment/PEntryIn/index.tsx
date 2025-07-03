@@ -1250,7 +1250,7 @@ export default function PEntryIn() {
           ))}
 
         <Modal
-          visible={whpositionqmodalopen}
+          open={whpositionqmodalopen}
           footer={null}
           onCancel={handleModalClose}
           // width="2000px"

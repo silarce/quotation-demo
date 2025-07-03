@@ -117,7 +117,7 @@ export default function SheetPDF({
   return (
     <Modal
       //
-      visible={isShow}
+      open={isShow}
       footer={null}
       closable={false}
       centered={true}

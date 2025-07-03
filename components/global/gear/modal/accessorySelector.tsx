@@ -82,8 +82,6 @@ export default function AccessorySelector({
     };
 
     updateAcceArr();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal, modelName]);
 
   useEffect(() => {
@@ -166,7 +164,7 @@ export default function AccessorySelector({
   return (
     <SelectorShell
       label={label ?? ''}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       // onSearch={onSearch}

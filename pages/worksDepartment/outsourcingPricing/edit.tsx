@@ -771,7 +771,7 @@ export default function OutsourcingPricingEdit({
         <br />
 
         <Pdf_outsourcingPaymentMonthlyTable
-          visible={showPdfModal}
+          open={showPdfModal}
           onCancel={() => setShowPdfModal(false)}
           {...props_pdf}
           // rowArr={fakeRow}

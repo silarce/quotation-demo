@@ -58,7 +58,7 @@ export default function TextareaModal({
   return (
     <Modal
       className={`${scss.textareaModal} ${className}`}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       width={'fit-content'}

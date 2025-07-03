@@ -487,7 +487,7 @@ function PreWorkContactDoc_component(
   return (
     <div>
       {/* <PdfModal
-        visible={pdfModalVisible}
+        open={pdfModalVisible}
         onCancel={() => setPdfModalVisible(false)}
         engineeringContact={engineeringContact}
         productArr={productArr_forPdf}

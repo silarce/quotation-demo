@@ -60,7 +60,7 @@ export default function SelectEmployeePanel({
   return (
     <Modal
       className={style.container}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       width={800}

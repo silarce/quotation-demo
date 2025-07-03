@@ -2156,14 +2156,20 @@ export default function PRequisitionDetail() {
                 </DragableModal> */}
 
         <Modal
-          visible={reviewbar}
+          open={reviewbar}
           onCancel={() => {
             setReviewbar(false);
           }}
           width="1010px"
           closable={false} // 移除右上角的叉叉
           style={{ top: 150 }}
-          bodyStyle={{ padding: 0, height: '300px', overflowY: 'auto' }}
+          styles={{
+            body: {
+              padding: 0,
+              height: '300px',
+              overflowY: 'auto',
+            },
+          }}
           title={
             <>
               <span style={{ fontSize: '18px' }}>送審主旨</span>

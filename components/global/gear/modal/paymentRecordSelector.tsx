@@ -250,7 +250,7 @@ export default function PaymentRecordSelector({
   return (
     <SelectorShell
       label={label ?? ''}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       width={'619px'}

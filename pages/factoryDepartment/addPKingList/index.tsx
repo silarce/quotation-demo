@@ -2154,7 +2154,7 @@ export default function AddPKingList() {
         </div>
 
         <Modal
-          visible={customerbar}
+          open={customerbar}
           onCancel={() => setCustomerbar(false)}
           width="1010px"
           closable={false} // 移除右上角的叉叉

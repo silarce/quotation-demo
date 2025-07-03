@@ -2644,7 +2644,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       {latestContent && (
         <QuotationPdf
-          visible={pdfModalVisible}
+          open={pdfModalVisible}
           pdfData={pdfData}
           onCancel={hidePdf}
           fileName={latestContent.quotationNumber}

@@ -96,8 +96,6 @@ export default function ContractSelector({
 
       return;
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
   // ==================================================
@@ -171,7 +169,7 @@ export default function ContractSelector({
   return (
     <SelectorShell
       label={label ?? ''}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       // onSearch={onSearch}

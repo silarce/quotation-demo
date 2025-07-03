@@ -1012,12 +1012,18 @@ export default function TrayDetail() {
       </div>
 
       <Modal
-        visible={searchbar}
+        open={searchbar}
         onCancel={() => setSearchbar(false)}
         width="1010px"
         closable={false} // 移除右上角的叉叉
         style={{ top: 150 }}
-        bodyStyle={{ padding: 0, height: '500px', overflowY: 'auto' }}
+        styles={{
+          body: {
+            padding: 0,
+            height: '500px',
+            overflowY: 'auto',
+          },
+        }}
         title={
           <>
             {/* 篩選區域 */}

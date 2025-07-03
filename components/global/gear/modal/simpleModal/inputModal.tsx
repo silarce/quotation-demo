@@ -10,7 +10,7 @@ import TwoBtnFooter from 'components/global/gear/modal/footer/twoBtnFooter';
 import style from './simpleModal.module.scss';
 
 export default function InputModal({
-  visible,
+  open: visible,
   setVisible,
   title,
   placeholder,
@@ -19,7 +19,7 @@ export default function InputModal({
   onConfirm,
   onCancel,
 }: {
-  visible: boolean;
+  open: boolean;
   title: string;
   placeholder?: string;
   onConfirm: (value: string) => void;
@@ -54,7 +54,7 @@ export default function InputModal({
   return (
     <Modal
       className={`${style.inputModal} ${className}`}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       width={405}

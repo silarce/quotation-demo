@@ -2779,7 +2779,7 @@ export default function ProductList() {
       </div>
 
       <Modal
-        visible={addmodalopen}
+        open={addmodalopen}
         footer={null}
         onCancel={AddModalClose}
         width="1000px"

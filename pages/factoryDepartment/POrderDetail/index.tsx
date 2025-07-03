@@ -3217,14 +3217,16 @@ export default function POrderDetail() {
 
         {/* 審核 */}
         <Modal
-          visible={reviewbar}
+          open={reviewbar}
           onCancel={() => {
             setReviewbar(false);
           }}
           width="1010px"
           closable={false} // 移除右上角的叉叉
           style={{ top: 150 }}
-          bodyStyle={{ padding: 0, height: '300px', overflowY: 'auto' }}
+          styles={{
+            body: { padding: 0, height: '300px', overflowY: 'auto' },
+          }}
           title={
             <>
               <span style={{ fontSize: '18px' }}>送審主旨</span>
@@ -3298,7 +3300,7 @@ export default function POrderDetail() {
         </Modal>
 
         <Modal
-          visible={customerbar}
+          open={customerbar}
           onCancel={() => setCustomerbar(false)}
           width="1010px"
           closable={true}

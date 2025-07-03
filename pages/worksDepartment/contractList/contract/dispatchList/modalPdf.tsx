@@ -43,7 +43,7 @@ export default function ModalPdf({
   data,
 }: ModalProps & { data: Tdata }) {
   return (
-    <Modal visible={visible} onCancel={onCancel} width={'fit-content'} footer={null} destroyOnHidden={true}>
+    <Modal open={visible} onCancel={onCancel} width={'fit-content'} footer={null} destroyOnHidden={true}>
       <ModalPdf_pre data={data} />
     </Modal>
   );

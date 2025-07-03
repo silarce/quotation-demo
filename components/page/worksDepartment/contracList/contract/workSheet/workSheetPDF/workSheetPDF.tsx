@@ -129,7 +129,7 @@ export default function WorkSheetPDF({
 
   return (
     <Modal
-      visible={isShow}
+      open={isShow}
       footer={null}
       closable={false}
       centered={true}
@@ -236,7 +236,7 @@ export default function WorkSheetPDF({
             </div>
           );
         })}
-        <ClearModal visible={showSelector} width={1000} zIndex={1001} onCancel={() => setShowSelector(false)}>
+        <ClearModal open={showSelector} width={1000} zIndex={1001} onCancel={() => setShowSelector(false)}>
           <div className="p-5">
             {checkedSheetArr.map(({ parentId, parentItemName, itemArr: item }, index) => {
               const { indeterminate, isAllChecked, checkAll, renewItem, options } = createKit(index);

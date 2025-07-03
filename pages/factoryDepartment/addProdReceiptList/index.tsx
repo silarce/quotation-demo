@@ -1796,12 +1796,14 @@ export default function AddProdReceiptList() {
         </div>
 
         <Modal
-          visible={customerbar}
+          open={customerbar}
           onCancel={() => setCustomerbar(false)}
           width="1010px"
           closable={true}
           style={{ top: 150 }}
-          bodyStyle={{ padding: '0px', height: '500px', overflowY: 'auto' }}
+          styles={{
+            body: { padding: '0px', height: '500px', overflowY: 'auto' },
+          }}
           title={<>廠商查詢</>}
           footer={null}
         >

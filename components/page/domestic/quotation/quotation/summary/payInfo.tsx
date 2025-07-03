@@ -378,7 +378,7 @@ export default function PayInfo({
         </div>
       </div>
       <InputModal
-        visible={modalIsShow}
+        open={modalIsShow}
         title="新增付款辦法"
         placeholder="請輸入付款辦法描述"
         onConfirm={(v) => {

@@ -1924,7 +1924,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       {theContent && (
         <QuotationPdf
-          visible={pdfModalVisible}
+          open={pdfModalVisible}
           onCancel={hidePdf}
           pdfData={pdfData}
           fileName={`報價單-${theContent?.quotationNumber}`}

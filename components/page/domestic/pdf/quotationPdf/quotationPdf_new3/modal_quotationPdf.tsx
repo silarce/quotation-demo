@@ -179,14 +179,7 @@ export default function Modal_quotationPdf({
   }
 
   return (
-    <Modal
-      visible={visible}
-      onCancel={onCancel}
-      width="fit-content"
-      footer={null}
-      closable={false}
-      destroyOnHidden={true}
-    >
+    <Modal open={visible} onCancel={onCancel} width="fit-content" footer={null} closable={false} destroyOnHidden={true}>
       <div className={scss.body}>
         <div>
           <MyButton_v2 onClick={handle_dlPdf} className="mr-5">

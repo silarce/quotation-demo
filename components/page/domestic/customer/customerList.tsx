@@ -107,7 +107,7 @@ export default function CustomerList({
 
       <TwoButtonModal
         {...{
-          visible: !!selInfo.id,
+          open: !!selInfo.id,
           text: `請確定要刪除「${selInfo.customerNumber}」「${selInfo.name}」?`,
           onConfirm: deleteEmployee,
           onCancel: closeDelPanel,

@@ -107,7 +107,7 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
         </Collapse>
       </Drawer>
 
-      <ChangePwPanel visible={isShowChangePw} onCancel={() => setIsShowChangePw(false)} />
+      <ChangePwPanel open={isShowChangePw} onCancel={() => setIsShowChangePw(false)} />
     </>
   );
 };
