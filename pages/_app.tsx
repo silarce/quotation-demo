@@ -1,5 +1,7 @@
 import { useState, useEffect, createContext, useCallback } from 'react';
 import type { ReactElement, ReactNode } from 'react';
+import { createRoot } from 'react-dom/client';
+
 import _ from 'lodash';
 
 import Head from 'next/head';
@@ -9,7 +11,7 @@ import type { NextPage } from 'next';
 import { useMediaQuery } from 'react-responsive';
 
 // antd
-import { ConfigProvider as AntdConfigProvider } from 'antd';
+import { ConfigProvider as AntdConfigProvider, unstableSetRender } from 'antd';
 
 // conponents
 import Layer from 'components/Layer/Layer';
@@ -49,7 +51,6 @@ import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
 // -----------------------------------------------------------------------------------
 // 全域 css
 import '../styles/globals.scss';
-import 'antd/dist/antd.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用的
 import 'slick-carousel/slick/slick.css'; // react-slick
 import 'slick-carousel/slick/slick-theme.css'; // react-slick
@@ -57,14 +58,31 @@ import 'slick-carousel/slick/slick-theme.css'; // react-slick
 // i18n
 import 'hooks/i18n';
 
-// 全域moment語系轉換
-import 'moment/locale/zh-tw';
-// moment擴充套件
-import moment_tz from 'moment-timezone';
 // -----------------------------------------------------------------------------------
 
-// 時區設為台北時間
-moment_tz.tz.setDefault('Asia/Taipei');
+// React 19 兼容
+// https://ant.design/docs/react/v5-for-19-cn
+
+// @ant-design/v5-patch-for-react-19不能用
+// 編譯時發生錯誤 (0 , _antd.unstableSetRender) is not a function
+// 所以採用在入口執行unstableSetRender的方案
+// @ant-design/v5-patch-for-react-19 v1.0.3其實是在做同樣的事
+unstableSetRender((node, container) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  container._reactRoot ||= createRoot(container);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const root = container._reactRoot;
+  root.render(node);
+
+  return async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    root.unmount();
+  };
+});
+
+// -----------------------------------------------------------------------------------
 
 const AppContext = createContext<TappContext>(null!);
 
