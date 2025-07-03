@@ -174,7 +174,7 @@ export default function Table_todoList({
 
   return (
     <div>
-      <Collapse className={scss.antdCollapse} destroyInactivePanel={true}>
+      <Collapse className={scss.antdCollapse} destroyOnHidden={true}>
         {Object.values(sortedTodoList).map((item, index) => {
           const { engineeringContact, todoArr, reqPatch, reqDelete, toDispatch } = item;
 

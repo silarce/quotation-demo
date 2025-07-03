@@ -89,7 +89,7 @@ export default function CustomerList({
   // ========================================================
   return (
     <div className={style.customerList}>
-      <Collapse expandIcon={() => <></>} accordion={true} onChange={changeActive}>
+      <Collapse expandIcon={() => null} accordion={true} onChange={changeActive}>
         {customersList.map((data, index) => {
           const isActive = activeIndex === `${index}`;
 

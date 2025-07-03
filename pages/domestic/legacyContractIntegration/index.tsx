@@ -190,7 +190,7 @@ export default function LegacyContractIntegration() {
         <Thead01 />
         <div>
           {/*  */}
-          <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
+          <Collapse expandIcon={() => null} accordion={true} destroyOnHidden={true} onChange={changeActive}>
             {dataArr?.map((item, index, arr) => {
               const discountRate = (() => {
                 const discountRate = Math.round(parseFloat(item.discountRate) * 100);

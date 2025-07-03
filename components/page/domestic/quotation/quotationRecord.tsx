@@ -68,7 +68,7 @@ export default function QuotationRecord({ subContract }: { subContract: Tquotati
       <div className={style.recordList}>
         <Collapse
           className={`${style.collapse} ${style.recordContainer}`}
-          expandIcon={() => <></>}
+          expandIcon={() => null}
           accordion={false}
           activeKey={activePanel}
         >

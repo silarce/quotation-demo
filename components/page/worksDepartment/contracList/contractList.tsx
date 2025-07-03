@@ -124,9 +124,9 @@ function ContractList_pre(
 
       <Collapse
         //
-        expandIcon={() => <></>}
+        expandIcon={() => null}
         accordion={true}
-        destroyInactivePanel={true}
+        destroyOnHidden={true}
         onChange={changeActive}
         activeKey={activeContractId}
       >

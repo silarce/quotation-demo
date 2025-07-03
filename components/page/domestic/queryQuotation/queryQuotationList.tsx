@@ -46,7 +46,7 @@ export default function QueryQuotationList({
     <div className={style.container}>
       <Thead popFormList={popFormList} />
 
-      <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
+      <Collapse expandIcon={() => null} accordion={true} destroyOnHidden={true} onChange={changeActive}>
         {control.panelArr.map((item, index) => {
           const { header, body } = item;
           const isActive = activeIndex === index;

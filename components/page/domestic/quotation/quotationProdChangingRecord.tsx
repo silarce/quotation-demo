@@ -60,9 +60,9 @@ export default function TheQuotationProdChangingRecord({
       </div>
       {/*  */}
       <Collapse
-        expandIcon={() => <></>}
+        expandIcon={() => null}
         accordion={true}
-        destroyInactivePanel={true}
+        destroyOnHidden={true}
         className={style.collapse}
         onChange={changeActive}
       >

@@ -1103,7 +1103,7 @@ const OldQuotationProduction = ({
     // changeOthersKeyArr,
     // addOthers,
     // getOthersPostBodyArr,
-    avgDiscount_withQty,
+    // avgDiscount_withQty,
   } = useProductList({
     productArr: rootContent?.products ?? [],
     others: [],
@@ -1114,12 +1114,11 @@ const OldQuotationProduction = ({
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
-  const targetProd = productList[targetProdKey];
 
   return (
     <Collapse
       className={`${scss.oldQuotationProduction}`}
-      expandIcon={() => <></>}
+      expandIcon={() => null}
       accordion={false}
       activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
     >

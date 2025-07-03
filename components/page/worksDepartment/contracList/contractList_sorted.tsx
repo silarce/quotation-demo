@@ -125,9 +125,9 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
       {/* <Thead /> */}
       <Collapse
         //
-        expandIcon={() => <></>}
+        expandIcon={() => null}
         // accordion={true}
-        destroyInactivePanel={true}
+        destroyOnHidden={true}
       >
         {arr.map((item, index) => {
           const { label, contractArr } = item;
@@ -167,9 +167,9 @@ const List = ({
   return (
     <Collapse
       //
-      expandIcon={() => <></>}
+      expandIcon={() => null}
       // accordion={false}
-      destroyInactivePanel={true}
+      destroyOnHidden={true}
       activeKey={targetContractId}
     >
       {contractArr.map((item) => {

@@ -22,7 +22,7 @@ function Collapse(
 
   return (
     <Antd_Collapse
-      expandIcon={() => <></>}
+      expandIcon={() => null}
       {...antdProps}
       className={classNames(
         //

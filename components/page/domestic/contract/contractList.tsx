@@ -20,8 +20,6 @@ import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 export type { Tcontract };
 
-const { Panel } = Collapse;
-
 export default function ContractList({
   //
   className,
@@ -99,27 +97,21 @@ export default function ContractList({
     <div className={classNames(style.container, className)}>
       <ContractListTop />
       <Collapse
-        //
-        expandIcon={() => <></>}
+        className={style.panel}
+        expandIcon={() => null}
         accordion={true}
-        destroyInactivePanel={true}
+        destroyOnHidden={true}
         onChange={changeActive}
-      >
-        {contractList.map((contract, index) => {
+        items={contractList.map((contract, index) => {
           const isActive = activeIndex === index;
 
-          return (
-            <Panel
-              key={index}
-              //
-              className={style.panel}
-              header={<ListHeader01 contract={contract} isActive={isActive} />}
-            >
-              <ListBody01 memoList={memoArr} />
-            </Panel>
-          );
+          return {
+            key: index,
+            label: <ListHeader01 contract={contract} isActive={isActive} />,
+            children: <ListBody01 memoList={memoArr} />,
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }
