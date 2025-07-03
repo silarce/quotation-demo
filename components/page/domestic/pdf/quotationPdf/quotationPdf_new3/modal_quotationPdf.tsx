@@ -9,7 +9,8 @@ import Image from 'next/image';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // antd
-import Modal, { ModalProps } from 'antd/lib/modal/Modal';
+import Modal from 'antd/lib/modal/Modal';
+import { ModalProps } from 'antd';
 
 // css
 import scss from './quotationPdf.module.scss';

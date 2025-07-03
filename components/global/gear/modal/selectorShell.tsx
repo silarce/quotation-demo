@@ -47,7 +47,7 @@ export default function SelectorShell({
   //
   searcbBarProps?: TsearcbBarProps;
   //
-  otherLeft?: JSX.Element;
+  otherLeft?: React.ReactNode;
 }) {
   // ======================================================
 

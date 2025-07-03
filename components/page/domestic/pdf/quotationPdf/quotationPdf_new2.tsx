@@ -1093,7 +1093,12 @@ const PdfTypeA = ({
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
-            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[index] = ele)}>
+            <div
+              className={`${scss.pdf} ${scss.spaceBetween}`}
+              ref={(ele) => {
+                refPdf.current[index] = ele;
+              }}
+            >
               <div>
                 <Header />
                 <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />
@@ -1116,7 +1121,12 @@ const PdfTypeA = ({
       })}
       {chunkedList.length === 0 && (
         <Fragment>
-          <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+          <div
+            className={`${scss.pdf} ${scss.spaceBetween}`}
+            ref={(ele) => {
+              refPdf.current[0] = ele;
+            }}
+          >
             <div>
               <Header />
               <Profile profileData={profilePram} index={1} pageCount={pageCount} />
@@ -1189,7 +1199,12 @@ const PdfTypeB = ({
   return (
     <>
       {/* 第一頁 */}
-      <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+      <div
+        className={`${scss.pdf} ${scss.spaceBetween}`}
+        ref={(ele) => {
+          refPdf.current[0] = ele;
+        }}
+      >
         <div>
           <Header />
           <Profile profileData={profilePram} index={1} pageCount={pageCount} />
@@ -1211,7 +1226,12 @@ const PdfTypeB = ({
         return (
           <Fragment key={index}>
             <hr className={scss.hr} />
-            <div className={scss.pdf} ref={(ele) => (refPdf.current[index + 1] = ele)}>
+            <div
+              className={scss.pdf}
+              ref={(ele) => {
+                refPdf.current[index + 1] = ele;
+              }}
+            >
               <Header />
               <Profile profileData={profilePram} index={index + 2} pageCount={pageCount} />
               <Table productList={chunk} />

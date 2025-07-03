@@ -153,7 +153,13 @@ export default function QuotationPdf_part({
 
       {chunkedList.map((chunk, index) => {
         return (
-          <div className={scss.pdf} key={index} ref={(ele) => (refPdf.current[index] = ele)}>
+          <div
+            className={scss.pdf}
+            key={index}
+            ref={(ele) => {
+              refPdf.current[index] = ele;
+            }}
+          >
             {/* {index !== 0 && <hr className={scss.hr} />} */}
             {index === 0 && <Header />}
 

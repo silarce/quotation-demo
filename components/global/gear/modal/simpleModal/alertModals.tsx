@@ -402,14 +402,11 @@ const myAlert = {
   input: ModalInput,
   notify: {
     open: notification.open,
-    close: notification.close,
     destroy: notification.destroy,
-
     success: notification.success,
     error: notification.error,
     info: notification.info,
     warning: notification.warning,
-    warn: notification.warn,
   },
 };
 
