@@ -11,7 +11,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // css
-import scss from './modalPdf.module.scss';
+import scss from './pdf_dispatch.module.scss';
 
 // ===============================================================================
 
@@ -36,7 +36,7 @@ let isShowCellNumber = false;
 
 // region START
 
-export default function ModalPdf({
+export default function Pdf_dispatch({
   //
   visible,
   onCancel,
