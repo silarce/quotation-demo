@@ -43,6 +43,7 @@ body {
 
   // font-family: Microsoft JhengHei;
   height: 100%;
+  font-size: 14px;
 }
 
 #__next {
@@ -68,14 +69,6 @@ input {
   // font-family: Microsoft JhengHei;
   color: $colorText;
   outline: none;
-}
-
-span,
-div,
-a,
-input,
-textarea {
-  font-size: 14px;
 }
 
 blockquote,
