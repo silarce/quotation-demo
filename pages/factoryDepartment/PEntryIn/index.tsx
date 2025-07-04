@@ -22,7 +22,8 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import { Button, Collapse, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Modal } from 'antd';
+import { Collapse } from 'components/global/myAntd/collapse';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg';
@@ -60,7 +61,7 @@ import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
-import { Panel } from 'components/global/myAntd/collapse';
+
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 import { callTray, updateTrayStatus, getTrayStatus } from '../../../js/api/callTrayService';
 
@@ -1163,89 +1164,64 @@ export default function PEntryIn() {
         {searchdata &&
           searchdata.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader15}>
-              <Collapse
-                defaultActiveKey={[]}
-                className={scss.customCollapse}
-                // onChange={(key) => {
-                //     if (key.includes("1")) {
-                //         handlePanelClick(_item.prodentryuuid);
-                //     }
-                // }}
+              <div
+                key={index}
+                className={`${scss.row01} ${_item.prodentryuuid === selectedItemId ? scss.selectedRow : ''}`}
               >
-                <Panel
-                  style={{ backgroundColor: 'transparent', border: '0' }}
-                  key="1"
-                  showArrow={false}
-                  header={
-                    <>
-                      <div
-                        key={index}
-                        className={`${scss.row01} 
-                                                ${_item.prodentryuuid === selectedItemId ? scss.selectedRow : ''}`}
-                      >
-                        <span>
-                          {/* <button onClick={() => {
-                                                        handleinbox(_item)
-                                                    }}>
-                                                        <img src={icon_tray_in.src} alt="tray" style={{ width: '30px', height: '20px' }} />
-                                                    </button> */}
-                          <button
-                            onClick={() => handleinbox(_item)}
-                            style={{
-                              width: '30px', // 調整按鈕大小，與圖片更匹配
-                              height: '30px', // 調整按鈕大小，與圖片更匹配
-                              border: '1px solid #ccc',
-                              // backgroundColor: '#f0f0f0',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              cursor: 'pointer',
-                              borderRadius: '5px',
-                              // transition: 'background-color 0.3s'
-                            }}
-                            onMouseEnter={(e) => {
-                              (e.target as HTMLButtonElement).style.backgroundColor = '#e0e0e0';
-                            }}
-                            onMouseLeave={(e) => {
-                              (e.target as HTMLButtonElement).style.backgroundColor = '#f0f0f0';
-                            }}
-                          >
-                            <img
-                              src={icon_tray_in.src}
-                              alt="tray"
-                              style={{
-                                width: '20px', // 根據按鈕大小調整圖片尺寸
-                                height: '20px', // 根據按鈕大小調整圖片尺寸
-                                objectFit: 'contain', // 確保圖片不會被拉伸
-                                // backgroundColor:'white'
-                              }}
-                            />
-                          </button>
-                        </span>
-                        <span>{index + 1}</span>
-                        <span style={{ fontSize: '18px' }}>{_item.detail_prodentryid}</span>
-                        <span>{_item.detail_productid}</span>
-                        <span>{_item.detail_name}</span>
-                        <span>{_item.detail_spec}</span>
-                        <span>{_item.detail_quantity}</span>
-                        <span>{_item.detail_entry_qty}</span>
-                        <span>
-                          <IconDetail
-                            onClick={() => {
-                              router.push({
-                                pathname: `/factoryDepartment/PEntryDetail`,
-                                query: {
-                                  item: JSON.stringify(_item),
-                                },
-                              });
-                            }}
-                          />
-                        </span>
-                      </div>
-                    </>
-                  }
-                ></Panel>
-              </Collapse>
+                <span>
+                  <button
+                    onClick={() => handleinbox(_item)}
+                    style={{
+                      width: '30px', // 調整按鈕大小，與圖片更匹配
+                      height: '30px', // 調整按鈕大小，與圖片更匹配
+                      border: '1px solid #ccc',
+                      // backgroundColor: '#f0f0f0',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      cursor: 'pointer',
+                      borderRadius: '5px',
+                      // transition: 'background-color 0.3s'
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.target as HTMLButtonElement).style.backgroundColor = '#e0e0e0';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.target as HTMLButtonElement).style.backgroundColor = '#f0f0f0';
+                    }}
+                  >
+                    <img
+                      src={icon_tray_in.src}
+                      alt="tray"
+                      style={{
+                        width: '20px', // 根據按鈕大小調整圖片尺寸
+                        height: '20px', // 根據按鈕大小調整圖片尺寸
+                        objectFit: 'contain', // 確保圖片不會被拉伸
+                        // backgroundColor:'white'
+                      }}
+                    />
+                  </button>
+                </span>
+                <span>{index + 1}</span>
+                <span style={{ fontSize: '18px' }}>{_item.detail_prodentryid}</span>
+                <span>{_item.detail_productid}</span>
+                <span>{_item.detail_name}</span>
+                <span>{_item.detail_spec}</span>
+                <span>{_item.detail_quantity}</span>
+                <span>{_item.detail_entry_qty}</span>
+                <span>
+                  <IconDetail
+                    onClick={() => {
+                      router.push({
+                        pathname: `/factoryDepartment/PEntryDetail`,
+                        query: {
+                          item: JSON.stringify(_item),
+                        },
+                      });
+                    }}
+                  />
+                </span>
+              </div>
             </CellWithBar>
           ))}
 

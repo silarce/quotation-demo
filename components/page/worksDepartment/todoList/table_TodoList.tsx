@@ -42,10 +42,6 @@ type TsortedTodoList = {
 
 // =======================================================================
 
-const Panel = Collapse.Panel;
-
-// =======================================================================
-
 export default function Table_todoList({
   todoArr,
   onTodoChange,
@@ -174,17 +170,15 @@ export default function Table_todoList({
 
   return (
     <div>
-      <Collapse className={scss.antdCollapse} destroyOnHidden={true}>
-        {Object.values(sortedTodoList).map((item, index) => {
+      <Collapse
+        className={scss.antdCollapse}
+        destroyOnHidden={true}
+        items={Object.values(sortedTodoList).map((item, index) => {
           const { engineeringContact, todoArr, reqPatch, reqDelete, toDispatch } = item;
 
           const contact = engineeringContact?.contactInfo?.[0];
           const contactPerson = contact?.contactPerson ?? '';
 
-          // !!! 因為worksheet結構改變，這段程式碼已不能使用
-          // const latestRecord = engineeringContact?.contract?.worksheet?.latestRecord;
-          // const itemArr = latestRecord?.contractProductItems;
-          // const qty = itemArr?.length ?? 0;
           const qty = '';
 
           const onAddclick = engineeringContact?.id
@@ -193,36 +187,32 @@ export default function Table_todoList({
               }
             : undefined;
 
-          return (
-            <Panel
-              className={classNames(scss.antdPanel, scss.plus)}
-              key={engineeringContact?.id ?? index}
-              header={
-                <PanelHeader
-                  projectNumber={engineeringContact?.projectNumber ?? ''}
-                  contactPerson={contactPerson}
-                  qty={qty}
-                  projectName={engineeringContact?.projectName ?? ''}
-                  onAddclick={onAddclick}
+          return {
+            key: engineeringContact?.id ?? index,
+            className: classNames(scss.antdPanel, scss.plus),
+            label: (
+              <PanelHeader
+                projectNumber={engineeringContact?.projectNumber ?? ''}
+                contactPerson={contactPerson}
+                qty={qty}
+                projectName={engineeringContact?.projectName ?? ''}
+                onAddclick={onAddclick}
+              />
+            ),
+            children: todoArr.map((todo, index) => {
+              return (
+                <PanelBody
+                  key={todo.id}
+                  todo={todo}
+                  onOkClick={reqPatch}
+                  onDeleteClick={() => reqDelete(index)}
+                  onDispatchClick={() => toDispatch(index)}
                 />
-              }
-            >
-              {todoArr.map((todo, index) => {
-                return (
-                  <PanelBody
-                    //
-                    key={todo.id}
-                    todo={todo}
-                    onOkClick={reqPatch}
-                    onDeleteClick={() => reqDelete(index)}
-                    onDispatchClick={() => toDispatch(index)}
-                  />
-                );
-              })}
-            </Panel>
-          );
+              );
+            }),
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }

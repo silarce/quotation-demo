@@ -36,8 +36,7 @@ import icon_task_open from 'public/image/icon/fc_task_open.svg';
 
 //日期
 import dayjs, { Dayjs } from 'dayjs';
-import { Checkbox, Collapse } from 'antd';
-import { Panel } from 'components/global/myAntd/collapse';
+import { Collapse } from 'components/global/myAntd/collapse';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import Tbody01 from '../ui/table/tbody01';
 
@@ -1394,68 +1393,67 @@ export default function AddProdReceipt() {
                                   margin: '10px', // 增加 margin 讓 checkbox 有更大的空間
                                 }}
                               />
-                              {/* <button onClick={() => { handleToggleProdreceiptdetail(_item, e.target.checked) }}>
-                                                                <img src={icon_add.src} alt="add" style={{ width: '30px', height: '20px' }} />
-                                                            </button> */}
                             </span>
                             <Collapse
                               defaultActiveKey={[]}
                               onChange={() => onChange(_item)}
                               className={scss.customCollapse}
-                            >
-                              <Panel
-                                style={{ backgroundColor: 'transparent', border: '0' }}
-                                key="1"
-                                showArrow={false}
-                                header={
-                                  <div
-                                    key={index}
-                                    className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                                  >
-                                    <span>{index + 1}</span>
-                                    <span>{_item.purchaseOrder.purchaseorderid}</span>
-                                    <span>{_item.purchaseOrder.suppliername}</span>
-                                    <span>{getTaiwanDateStr(_item.purchaseOrder.create_at)}</span>
-                                    <span>{_item.purchaseOrder.totalprice?.toLocaleString()}</span>
-                                    <span>{_item.purchaseOrder.create_by}</span>
-                                    <span>{_item.purchaseOrder.status}</span>
-                                    <span>{_item.purchaseOrder.note}</span>
-                                    <span></span>
-                                  </div>
-                                }
-                              >
-                                <div>
-                                  <table className={scss.detailTable}>
-                                    <thead>
-                                      <tr>
-                                        <th style={{ width: '50px' }}>序</th>
-                                        <th style={{ width: '100px' }}>料號</th>
-                                        <th style={{ width: '300px' }}>名稱</th>
-                                        <th style={{ width: '400px' }}>規格</th>
-                                        <th>已進</th>
-                                        <th>數量</th>
-                                        <th>單價</th>
-                                        <th>金額</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {_item.details.map((detail: any, detailIndex: number) => (
-                                        <tr key={detailIndex}>
-                                          <td style={{ width: '50px' }}>{detailIndex + 1}</td>
-                                          <td style={{ width: '100px' }}>{detail.productid}</td>
-                                          <td style={{ width: '300px' }}>{detail.name}</td>
-                                          <td style={{ width: '400px' }}>{detail.spec}</td>
-                                          <td style={{ color: '#ea1833' }}>{detail.alreadyinquantity}</td>
-                                          <td>{detail.quantity?.toLocaleString()}</td>
-                                          <td>{detail.unitprice?.toLocaleString()}</td>
-                                          <td>{detail.totalprice?.toLocaleString()}</td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </Panel>
-                            </Collapse>
+                              items={[
+                                {
+                                  key: '1',
+                                  style: { backgroundColor: 'transparent', border: '0' },
+                                  showArrow: false,
+                                  label: (
+                                    <div
+                                      key={index}
+                                      className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
+                                    >
+                                      <span>{index + 1}</span>
+                                      <span>{_item.purchaseOrder.purchaseorderid}</span>
+                                      <span>{_item.purchaseOrder.suppliername}</span>
+                                      <span>{getTaiwanDateStr(_item.purchaseOrder.create_at)}</span>
+                                      <span>{_item.purchaseOrder.totalprice?.toLocaleString()}</span>
+                                      <span>{_item.purchaseOrder.create_by}</span>
+                                      <span>{_item.purchaseOrder.status}</span>
+                                      <span>{_item.purchaseOrder.note}</span>
+                                      <span></span>
+                                    </div>
+                                  ),
+                                  children: (
+                                    <div>
+                                      <table className={scss.detailTable}>
+                                        <thead>
+                                          <tr>
+                                            <th style={{ width: '50px' }}>序</th>
+                                            <th style={{ width: '100px' }}>料號</th>
+                                            <th style={{ width: '300px' }}>名稱</th>
+                                            <th style={{ width: '400px' }}>規格</th>
+                                            <th>已進</th>
+                                            <th>數量</th>
+                                            <th>單價</th>
+                                            <th>金額</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {_item.details.map((detail: any, detailIndex: number) => (
+                                            <tr key={detailIndex}>
+                                              <td style={{ width: '50px' }}>{detailIndex + 1}</td>
+                                              <td style={{ width: '100px' }}>{detail.productid}</td>
+                                              <td style={{ width: '300px' }}>{detail.name}</td>
+                                              <td style={{ width: '400px' }}>{detail.spec}</td>
+                                              <td style={{ color: '#ea1833' }}>{detail.alreadyinquantity}</td>
+                                              <td>{detail.quantity?.toLocaleString()}</td>
+                                              <td>{detail.unitprice?.toLocaleString()}</td>
+                                              <td>{detail.totalprice?.toLocaleString()}</td>
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  ),
+                                },
+                              ]}
+                            />
                           </div>
                         </CellWithBar>
                       ))}

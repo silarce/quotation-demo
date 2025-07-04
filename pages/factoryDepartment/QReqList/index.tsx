@@ -23,7 +23,7 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import { Button, Collapse, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Collapse } from 'components/global/myAntd/collapse';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg';
@@ -61,7 +61,6 @@ import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
-import { Panel } from 'components/global/myAntd/collapse';
 
 export default function QReqList() {
   const [pagename, setPagename] = useState<string>('詢價');
@@ -488,7 +487,6 @@ export default function QReqList() {
       <div>
         <Thead01 type={'QReq'} />
         <div>
-          {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
           {searchdata &&
             searchdata.map((_item: any, index: number) => (
               <CellWithBar key={index} className={scss.panelHeader15}>
@@ -500,109 +498,111 @@ export default function QReqList() {
                       handlePanelClick(_item.id);
                     }
                   }}
-                >
-                  <Panel
-                    style={{ backgroundColor: 'transparent', border: '0' }}
-                    key="1"
-                    showArrow={false}
-                    header={
-                      <>
-                        <div
-                          key={index}
-                          className={`${scss.row01} 
+                  items={[
+                    {
+                      key: '1',
+                      style: { backgroundColor: 'transparent', border: '0' },
+                      showArrow: false,
+                      label: (
+                        <>
+                          <div
+                            key={index}
+                            className={`${scss.row01} 
                                                 ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                        >
-                          <span>{index + 1}</span>
-                          <span style={{ fontSize: '18px' }}>{_item.quotereqid}</span>
-                          <span style={{ color: '#ea1833' }}>{_item.status}</span>
-                          <span>{getTaiwanDateStr(_item.create_at)}</span>
-                          <span>{_item.create_by}</span>
-                          <span>{/* {_item.suppliername} */}</span>
-                          <span>
-                            <IconDetail
-                              onClick={() => {
-                                router.push({
-                                  pathname: `/factoryDepartment/QReqDetail`,
-                                  query: {
-                                    item: JSON.stringify(_item),
-                                  },
-                                });
-                              }}
-                            />
-                          </span>
-                        </div>
-                        <div
-                          key={index}
-                          className={`${scss.row02}`}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '20px',
-                            padding: '10px 20px',
-                            cursor: 'pointer',
-                            fontSize: '16px',
-                          }} // 水平排列
-                        >
-                          <span style={{ fontWeight: 'bold' }}>廠商1:</span>{' '}
-                          <span style={{ color: '#5b5a5ad6' }}>{_item.suppliername || '無'}</span>
-                          <span style={{ fontWeight: 'bold', marginLeft: '10px' }}>廠商2:</span>{' '}
-                          <span style={{ color: '#5b5a5ad6' }}>{_item.suppliername2 || '無'}</span>
-                          <span style={{ fontWeight: 'bold', marginLeft: '10px' }}>廠商3:</span>{' '}
-                          <span style={{ color: '#5b5a5ad6' }}> {_item.suppliername3 || '無'}</span>
-                        </div>
-                      </>
-                    }
-                  >
-                    <div style={{ overflowX: 'auto' }}>
-                      <table className={scss.detailTable}>
-                        <thead>
-                          <tr>
-                            <th style={{ width: '50px' }}>序</th>
-                            <th style={{ width: '100px' }}>料號</th>
-                            <th style={{ width: '300px' }}>名稱</th>
-                            <th style={{ width: '400px' }}>規格</th>
-                            <th style={{ width: '150px' }}>數量</th>
-                            <th style={{ width: '80px' }}>單位</th>
-                            <th style={{ width: '400px' }}>成交廠商</th>
-                            <th style={{ width: '150px' }}>成交單價</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {details[_item.id]?.map((detail: any, detailIndex: number) => (
-                            <tr key={detailIndex}>
-                              <td>{detailIndex + 1}</td>
-                              <td>{detail.detail_productid}</td>
-                              <td>{detail.detail_name}</td>
-                              <td>{detail.detail_spec}</td>
-                              <td>{detail.detail_quantity?.toLocaleString()}</td>
-                              <td>{detail.detail_unit}</td>
+                          >
+                            <span>{index + 1}</span>
+                            <span style={{ fontSize: '18px' }}>{_item.quotereqid}</span>
+                            <span style={{ color: '#ea1833' }}>{_item.status}</span>
+                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                            <span>{_item.create_by}</span>
+                            <span>{/* {_item.suppliername} */}</span>
+                            <span>
+                              <IconDetail
+                                onClick={() => {
+                                  router.push({
+                                    pathname: `/factoryDepartment/QReqDetail`,
+                                    query: {
+                                      item: JSON.stringify(_item),
+                                    },
+                                  });
+                                }}
+                              />
+                            </span>
+                          </div>
+                          <div
+                            key={index}
+                            className={`${scss.row02}`}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '20px',
+                              padding: '10px 20px',
+                              cursor: 'pointer',
+                              fontSize: '16px',
+                            }} // 水平排列
+                          >
+                            <span style={{ fontWeight: 'bold' }}>廠商1:</span>{' '}
+                            <span style={{ color: '#5b5a5ad6' }}>{_item.suppliername || '無'}</span>
+                            <span style={{ fontWeight: 'bold', marginLeft: '10px' }}>廠商2:</span>{' '}
+                            <span style={{ color: '#5b5a5ad6' }}>{_item.suppliername2 || '無'}</span>
+                            <span style={{ fontWeight: 'bold', marginLeft: '10px' }}>廠商3:</span>{' '}
+                            <span style={{ color: '#5b5a5ad6' }}> {_item.suppliername3 || '無'}</span>
+                          </div>
+                        </>
+                      ),
+                      children: (
+                        <div style={{ overflowX: 'auto' }}>
+                          <table className={scss.detailTable}>
+                            <thead>
+                              <tr>
+                                <th style={{ width: '50px' }}>序</th>
+                                <th style={{ width: '100px' }}>料號</th>
+                                <th style={{ width: '300px' }}>名稱</th>
+                                <th style={{ width: '400px' }}>規格</th>
+                                <th style={{ width: '150px' }}>數量</th>
+                                <th style={{ width: '80px' }}>單位</th>
+                                <th style={{ width: '400px' }}>成交廠商</th>
+                                <th style={{ width: '150px' }}>成交單價</th>
+                                <th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {details[_item.id]?.map((detail: any, detailIndex: number) => (
+                                <tr key={detailIndex}>
+                                  <td>{detailIndex + 1}</td>
+                                  <td>{detail.detail_productid}</td>
+                                  <td>{detail.detail_name}</td>
+                                  <td>{detail.detail_spec}</td>
+                                  <td>{detail.detail_quantity?.toLocaleString()}</td>
+                                  <td>{detail.detail_unit}</td>
 
-                              {/* 根據 supplier1, supplier2, supplier3 來顯示不同的供應商欄位 */}
-                              <td>
-                                {detail.supplier1_name
-                                  ? detail.supplier1_name
-                                  : detail.supplier2_name
-                                  ? detail.supplier2_name
-                                  : detail.supplier3_name}
-                              </td>
+                                  {/* 根據 supplier1, supplier2, supplier3 來顯示不同的供應商欄位 */}
+                                  <td>
+                                    {detail.supplier1_name
+                                      ? detail.supplier1_name
+                                      : detail.supplier2_name
+                                      ? detail.supplier2_name
+                                      : detail.supplier3_name}
+                                  </td>
 
-                              <td style={{ color: '#ea1833' }}>
-                                {detail.supplier1_unitprice
-                                  ? detail.supplier1_unitprice?.toLocaleString()
-                                  : detail.supplier2_unitprice
-                                  ? detail.supplier2_unitprice?.toLocaleString()
-                                  : detail.supplier3_unitprice
-                                  ? detail.supplier3_unitprice?.toLocaleString()
-                                  : ''}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </Panel>
-                </Collapse>
+                                  <td style={{ color: '#ea1833' }}>
+                                    {detail.supplier1_unitprice
+                                      ? detail.supplier1_unitprice?.toLocaleString()
+                                      : detail.supplier2_unitprice
+                                      ? detail.supplier2_unitprice?.toLocaleString()
+                                      : detail.supplier3_unitprice
+                                      ? detail.supplier3_unitprice?.toLocaleString()
+                                      : ''}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
               </CellWithBar>
             ))}
         </div>

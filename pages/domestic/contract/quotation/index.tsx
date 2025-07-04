@@ -127,12 +127,6 @@ type TpanelListList = {
 };
 
 // =============================================================
-// =============================================================
-// =============================================================
-
-const { Panel } = Collapse;
-
-// =============================================================
 export default function Quotation() {
   const router = useRouter();
   const isReady = router.isReady;
@@ -1120,50 +1114,26 @@ const OldQuotationProduction = ({
       className={`${scss.oldQuotationProduction}`}
       expandIcon={() => null}
       accordion={false}
-      activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
-    >
-      <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
-        <Table_prod
-          disabled={true}
-          prodList={productList}
-          prodCellConfig={prodCellConfig}
-          prodKeyArr={prodKeyArr}
-          changeProdKeyArr={changeProdKeyArr}
-          addProd={() => {}}
-          setTargetProd={setTargetProdKey}
-          discountRate={undefined}
-        />
-
-        {/* <Table_com
-          disabled={true}
-          comList={targetProd?.comList}
-          comCellConfig={comCellConfig}
-          comKeyArr={comKeyArr}
-          changeComKeyArr={changeComKeyArr}
-          defalutVKeyArr={comVKeyArr}
-        /> */}
-
-        {/* <Table_accessories
-          disabled={true}
-          list={targetProd?.accessoriesList}
-          cellConfig={accessoriesCellConfig}
-          keyArr={accessoriesKeyArr}
-          changeKeyArr={changeAccessoriesKeyArr}
-          defalutVKeyArr={targetProd?.accessoriesVKeyArr}
-          onVKeyChange={(keyArr) => {
-            if (targetProd) {
-              targetProd.accessoriesVKeyArr = keyArr;
-            }
-          }}
-          doorModel={targetProd?.doorType}
-          onSelectorConfirm={(arr) => {
-            if (targetProd) {
-              targetProd.addAcce(arr);
-            }
-          }}
-        /> */}
-      </Panel>
-    </Collapse>
+      activeKey={+!isActive}
+      items={[
+        {
+          key: 0,
+          label: <OqpHeader isActive={isActive} panelSwitch={panelSwitch} />,
+          children: (
+            <Table_prod
+              disabled={true}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={() => {}}
+              setTargetProd={setTargetProdKey}
+              discountRate={undefined}
+            />
+          ),
+        },
+      ]}
+    />
   );
 };
 

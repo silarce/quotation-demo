@@ -23,7 +23,7 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import { Button, Collapse, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Collapse } from 'components/global/myAntd/collapse';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg';
@@ -61,7 +61,6 @@ import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
-import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
 export default function PEntryList() {
@@ -588,188 +587,192 @@ export default function PEntryList() {
                       handlePanelClick(_item.prodentryuuid);
                     }
                   }}
-                >
-                  <Panel
-                    style={{ backgroundColor: 'transparent', border: '0' }}
-                    key="1"
-                    showArrow={false}
-                    header={
-                      <>
-                        <div
-                          key={index}
-                          className={`${scss.row01} 
+                  items={[
+                    {
+                      key: '1',
+                      style: { backgroundColor: 'transparent', border: '0' },
+                      showArrow: false,
+                      label: (
+                        <>
+                          <div
+                            key={index}
+                            className={`${scss.row01} 
                                                 ${_item.prodentryuuid === selectedItemId ? scss.selectedRow : ''}`}
-                        >
-                          <span>{index + 1}</span>
-                          <span style={{ fontSize: '18px' }}>{_item.prodentryid}</span>
-                          <span style={{ color: '#ea1833' }}>{_item.status}</span>
-                          <span>{getTaiwanDateStr(_item.create_at)}</span>
-                          <span>{getTaiwanDateStr(_item.need_date)}</span>
-                          <span>{_item.create_by}</span>
-                          <span>{_item.suppliername}</span>
-                          <span>
-                            <IconDetail
-                              onClick={() => {
-                                router.push({
-                                  pathname: `/factoryDepartment/PEntryDetail`,
-                                  query: {
-                                    item: JSON.stringify(_item),
-                                  },
-                                });
-                              }}
-                            />
-                          </span>
-                        </div>
-                        {reviewopen && (
-                          <>
-                            <div
-                              key={index}
-                              className={`${scss.row02}`}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '20px',
-                                padding: '10px 20px',
-                                cursor: 'pointer',
-                              }} // 水平排列
-                            >
-                              {_item.stages.length === 0 ? (
-                                <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
-                              ) : (
-                                _item.stages.map((item: any, index: number) => {
-                                  // 判斷圈圈顏色
-                                  let circleColor = 'gray'; // 預設為灰色
-                                  let textColor = 'gray'; // 預設文字顏色為灰色
+                          >
+                            <span>{index + 1}</span>
+                            <span style={{ fontSize: '18px' }}>{_item.prodentryid}</span>
+                            <span style={{ color: '#ea1833' }}>{_item.status}</span>
+                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                            <span>{getTaiwanDateStr(_item.need_date)}</span>
+                            <span>{_item.create_by}</span>
+                            <span>{_item.suppliername}</span>
+                            <span>
+                              <IconDetail
+                                onClick={() => {
+                                  router.push({
+                                    pathname: `/factoryDepartment/PEntryDetail`,
+                                    query: {
+                                      item: JSON.stringify(_item),
+                                    },
+                                  });
+                                }}
+                              />
+                            </span>
+                          </div>
+                          {reviewopen && (
+                            <>
+                              <div
+                                key={index}
+                                className={`${scss.row02}`}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '20px',
+                                  padding: '10px 20px',
+                                  cursor: 'pointer',
+                                }} // 水平排列
+                              >
+                                {_item.stages.length === 0 ? (
+                                  <div style={{ fontSize: '16px', color: 'gray' }}>未送審</div>
+                                ) : (
+                                  _item.stages.map((item: any, index: number) => {
+                                    // 判斷圈圈顏色
+                                    let circleColor = 'gray'; // 預設為灰色
+                                    let textColor = 'gray'; // 預設文字顏色為灰色
 
-                                  if (item.review_order === 1 || item.review_status === '核准') {
-                                    circleColor = 'green';
-                                    textColor = 'black'; // 綠色的時候文字變為黑色
+                                    if (item.review_order === 1 || item.review_status === '核准') {
+                                      circleColor = 'green';
+                                      textColor = 'black'; // 綠色的時候文字變為黑色
 
-                                    // 如果是核准且存在下一關，設定下一關為簽核中
-                                    if (
-                                      index < _item.stages.length - 1 && // 確保不是最後一關
-                                      _item.stages[index + 1].review_status === '' // 下一關的狀態是空
+                                      // 如果是核准且存在下一關，設定下一關為簽核中
+                                      if (
+                                        index < _item.stages.length - 1 && // 確保不是最後一關
+                                        _item.stages[index + 1].review_status === '' // 下一關的狀態是空
+                                      ) {
+                                        _item.stages[index + 1].review_status = '簽核中';
+                                      }
+                                    } else if (
+                                      item.review_status === '簽核中' &&
+                                      index > 0 &&
+                                      _item.stages[index - 1].review_order + 1 === item.review_order
                                     ) {
-                                      _item.stages[index + 1].review_status = '簽核中';
+                                      circleColor = 'red';
+                                      textColor = 'black'; // 紅色的時候文字變為黑色
                                     }
-                                  } else if (
-                                    item.review_status === '簽核中' &&
-                                    index > 0 &&
-                                    _item.stages[index - 1].review_order + 1 === item.review_order
-                                  ) {
-                                    circleColor = 'red';
-                                    textColor = 'black'; // 紅色的時候文字變為黑色
-                                  }
 
-                                  return (
-                                    <div
-                                      key={index}
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '10px',
-                                      }}
-                                    >
-                                      {/* 灰色框框 */}
+                                    return (
                                       <div
+                                        key={index}
                                         style={{
                                           display: 'flex',
                                           alignItems: 'center',
-                                          backgroundColor: '#f5f5f5',
-                                          borderRadius: '15px',
-                                          padding: '5px 10px',
                                           gap: '10px',
                                         }}
                                       >
-                                        {/* 左邊的圈圈 */}
+                                        {/* 灰色框框 */}
                                         <div
                                           style={{
-                                            width: '10px',
-                                            height: '10px',
-                                            borderRadius: '50%',
-                                            backgroundColor: circleColor,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            backgroundColor: '#f5f5f5',
+                                            borderRadius: '15px',
+                                            padding: '5px 10px',
+                                            gap: '10px',
                                           }}
-                                        ></div>
-                                        {/* 名稱 */}
-                                        <span style={{ color: textColor }}>
-                                          {item.review_status}&nbsp;
-                                          {item.review_person_name}
-                                        </span>
-                                      </div>
-
-                                      {/* 右邊的箭頭，最後一筆不顯示 */}
-                                      {index < _item.stages.length - 1 && (
-                                        <div style={{ fontSize: '20px', color: 'black' }}>
-                                          <svg
-                                            width="32"
-                                            height="11"
-                                            viewBox="0 0 32 11"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <line
-                                              x1="0.5"
-                                              y1="5.5"
-                                              x2="30.5"
-                                              y2="5.5"
-                                              stroke="#404040"
-                                              stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                            ></line>
-                                            <path
-                                              d="M27 2L31 5.5L27 9"
-                                              stroke="#404040"
-                                              stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                            ></path>
-                                          </svg>
+                                        >
+                                          {/* 左邊的圈圈 */}
+                                          <div
+                                            style={{
+                                              width: '10px',
+                                              height: '10px',
+                                              borderRadius: '50%',
+                                              backgroundColor: circleColor,
+                                            }}
+                                          ></div>
+                                          {/* 名稱 */}
+                                          <span style={{ color: textColor }}>
+                                            {item.review_status}&nbsp;
+                                            {item.review_person_name}
+                                          </span>
                                         </div>
-                                      )}
-                                    </div>
-                                  );
-                                })
-                              )}
-                            </div>
-                          </>
-                        )}
-                      </>
-                    }
-                  >
-                    <div>
-                      <table className={scss.detailTable}>
-                        <thead>
-                          <tr>
-                            <th style={{ width: '50px' }}>序</th>
-                            <th style={{ width: '100px' }}>料號</th>
-                            <th style={{ width: '300px' }}>名稱</th>
-                            <th style={{ width: '400px' }}>規格</th>
-                            <th style={{ width: '150px' }}>數量</th>
-                            <th style={{ width: '150px' }}>已入庫</th>
-                            <th style={{ width: '80px' }}>單位</th>
-                            <th style={{ width: '150px' }}>單價</th>
-                            <th>金額</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {details[_item.prodentryuuid]?.map((detail: any, detailIndex: number) => (
-                            <tr key={detailIndex}>
-                              <td style={{ width: '50px' }}>{detailIndex + 1}</td>
-                              <td style={{ width: '100px' }}>{detail.productid}</td>
-                              <td style={{ width: '300px' }}>{detail.name}</td>
-                              <td style={{ width: '400px' }}>{detail.spec}</td>
-                              <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
-                              <td style={{ width: '150px', color: '#ea1833' }}>{detail.entry_qty?.toLocaleString()}</td>
-                              <td style={{ width: '80px' }}>{detail.unit}</td>
-                              <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
-                              <td>{detail.totalprice?.toLocaleString()}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </Panel>
-                </Collapse>
+
+                                        {/* 右邊的箭頭，最後一筆不顯示 */}
+                                        {index < _item.stages.length - 1 && (
+                                          <div style={{ fontSize: '20px', color: 'black' }}>
+                                            <svg
+                                              width="32"
+                                              height="11"
+                                              viewBox="0 0 32 11"
+                                              fill="none"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                              <line
+                                                x1="0.5"
+                                                y1="5.5"
+                                                x2="30.5"
+                                                y2="5.5"
+                                                stroke="#404040"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                              ></line>
+                                              <path
+                                                d="M27 2L31 5.5L27 9"
+                                                stroke="#404040"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                              ></path>
+                                            </svg>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      ),
+                      children: (
+                        <div>
+                          <table className={scss.detailTable}>
+                            <thead>
+                              <tr>
+                                <th style={{ width: '50px' }}>序</th>
+                                <th style={{ width: '100px' }}>料號</th>
+                                <th style={{ width: '300px' }}>名稱</th>
+                                <th style={{ width: '400px' }}>規格</th>
+                                <th style={{ width: '150px' }}>數量</th>
+                                <th style={{ width: '150px' }}>已入庫</th>
+                                <th style={{ width: '80px' }}>單位</th>
+                                <th style={{ width: '150px' }}>單價</th>
+                                <th>金額</th>
+                                <th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {details[_item.prodentryuuid]?.map((detail: any, detailIndex: number) => (
+                                <tr key={detailIndex}>
+                                  <td style={{ width: '50px' }}>{detailIndex + 1}</td>
+                                  <td style={{ width: '100px' }}>{detail.productid}</td>
+                                  <td style={{ width: '300px' }}>{detail.name}</td>
+                                  <td style={{ width: '400px' }}>{detail.spec}</td>
+                                  <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
+                                  <td style={{ width: '150px', color: '#ea1833' }}>
+                                    {detail.entry_qty?.toLocaleString()}
+                                  </td>
+                                  <td style={{ width: '80px' }}>{detail.unit}</td>
+                                  <td style={{ width: '150px' }}>{detail.unitprice?.toLocaleString()}</td>
+                                  <td>{detail.totalprice?.toLocaleString()}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
               </CellWithBar>
             ))}
         </div>

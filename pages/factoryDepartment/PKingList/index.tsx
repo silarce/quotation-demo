@@ -23,7 +23,7 @@ import icon_save from 'public/image/icon/fc_save.svg';
 import icon_cancel from 'public/image/icon/fc_cancel.svg';
 import icon_delete from 'public/image/icon/fc_delete.svg';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg';
-import { Button, Collapse, DatePicker, Modal, Radio, RadioChangeEvent, Space } from 'antd';
+import { Collapse } from 'components/global/myAntd/collapse';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg';
@@ -61,7 +61,6 @@ import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
-import { Panel } from 'components/global/myAntd/collapse';
 
 export default function PKingList() {
   //#region ===========【頁面參數】
@@ -490,7 +489,6 @@ export default function PKingList() {
       <div>
         <Thead01 type={'PKing'} />
         <div>
-          {/* <Tbody01 type={'PurchaseRequisition'} data={searchdata} error={error} traycalled={undefined} traycalledname={undefined} traytransfer={undefined} url={undefined} whnamecalled={undefined} /> */}
           {searchdata &&
             searchdata.map((_item: any, index: number) => (
               <CellWithBar key={index} className={scss.panelHeader15}>
@@ -502,93 +500,95 @@ export default function PKingList() {
                       handlePanelClick(_item.id);
                     }
                   }}
-                >
-                  <Panel
-                    style={{ backgroundColor: 'transparent', border: '0' }}
-                    key="1"
-                    showArrow={false}
-                    header={
-                      <>
-                        <div
-                          key={index}
-                          className={`${scss.row01} 
+                  items={[
+                    {
+                      key: '1',
+                      style: { backgroundColor: 'transparent', border: '0' },
+                      showArrow: false,
+                      label: (
+                        <>
+                          <div
+                            key={index}
+                            className={`${scss.row01} 
                                                 ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                        >
-                          <span>{index + 1}</span>
-                          <span style={{ fontSize: '18px' }}>{_item.pickinglistid}</span>
-                          <span style={{ color: '#ea1833' }}>{_item.status}</span>
-                          <span>{getTaiwanDateStr(_item.create_at)}</span>
-                          <span>{_item.create_by}</span>
-                          <span>{_item.note}</span>
-                          <span></span>
-                          <span>
-                            <IconDetail
-                              onClick={() => {
-                                router.push({
-                                  pathname: `/factoryDepartment/PKingDetail`,
-                                  query: {
-                                    item: JSON.stringify(_item),
-                                  },
-                                });
-                              }}
-                            />
-                          </span>
+                          >
+                            <span>{index + 1}</span>
+                            <span style={{ fontSize: '18px' }}>{_item.pickinglistid}</span>
+                            <span style={{ color: '#ea1833' }}>{_item.status}</span>
+                            <span>{getTaiwanDateStr(_item.create_at)}</span>
+                            <span>{_item.create_by}</span>
+                            <span>{_item.note}</span>
+                            <span></span>
+                            <span>
+                              <IconDetail
+                                onClick={() => {
+                                  router.push({
+                                    pathname: `/factoryDepartment/PKingDetail`,
+                                    query: {
+                                      item: JSON.stringify(_item),
+                                    },
+                                  });
+                                }}
+                              />
+                            </span>
+                          </div>
+                          {reviewopen && (
+                            <>
+                              <div
+                                key={index}
+                                className={`${scss.row02}`}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '20px',
+                                  padding: '10px 20px',
+                                  cursor: 'pointer',
+                                }} // 水平排列
+                              ></div>
+                            </>
+                          )}
+                        </>
+                      ),
+                      children: (
+                        <div>
+                          <table className={scss.detailTable}>
+                            <thead>
+                              <tr>
+                                <th style={{ width: '50px' }}>序</th>
+                                <th style={{ width: '100px' }}>料號</th>
+                                <th style={{ width: '300px' }}>名稱</th>
+                                <th style={{ width: '400px' }}>規格</th>
+                                <th style={{ width: '150px' }}>數量</th>
+                                <th style={{ width: '150px' }}>已領</th>
+                                <th style={{ width: '80px' }}>單位</th>
+                                <th style={{ width: '150px' }}>領料人員</th>
+                                <th></th>
+                                <th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {details[_item.id]?.map((detail: any, detailIndex: number) => (
+                                <tr key={detailIndex}>
+                                  <td style={{ width: '50px' }}>{detailIndex + 1}</td>
+                                  <td style={{ width: '100px' }}>{detail.productid}</td>
+                                  <td style={{ width: '300px' }}>{detail.name}</td>
+                                  <td style={{ width: '400px' }}>{detail.spec}</td>
+                                  <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
+                                  <td style={{ width: '150px', color: '#ea1833' }}>
+                                    {detail.picking_qty?.toLocaleString()}
+                                  </td>
+                                  <td style={{ width: '80px' }}>{detail.unit}</td>
+                                  <td style={{ width: '150px' }}>{detail.picking_by}</td>
+                                  <td></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                        {reviewopen && (
-                          <>
-                            <div
-                              key={index}
-                              className={`${scss.row02}`}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '20px',
-                                padding: '10px 20px',
-                                cursor: 'pointer',
-                              }} // 水平排列
-                            ></div>
-                          </>
-                        )}
-                      </>
-                    }
-                  >
-                    <div>
-                      <table className={scss.detailTable}>
-                        <thead>
-                          <tr>
-                            <th style={{ width: '50px' }}>序</th>
-                            <th style={{ width: '100px' }}>料號</th>
-                            <th style={{ width: '300px' }}>名稱</th>
-                            <th style={{ width: '400px' }}>規格</th>
-                            <th style={{ width: '150px' }}>數量</th>
-                            <th style={{ width: '150px' }}>已領</th>
-                            <th style={{ width: '80px' }}>單位</th>
-                            <th style={{ width: '150px' }}>領料人員</th>
-                            <th></th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {details[_item.id]?.map((detail: any, detailIndex: number) => (
-                            <tr key={detailIndex}>
-                              <td style={{ width: '50px' }}>{detailIndex + 1}</td>
-                              <td style={{ width: '100px' }}>{detail.productid}</td>
-                              <td style={{ width: '300px' }}>{detail.name}</td>
-                              <td style={{ width: '400px' }}>{detail.spec}</td>
-                              <td style={{ width: '150px' }}>{detail.quantity?.toLocaleString()}</td>
-                              <td style={{ width: '150px', color: '#ea1833' }}>
-                                {detail.picking_qty?.toLocaleString()}
-                              </td>
-                              <td style={{ width: '80px' }}>{detail.unit}</td>
-                              <td style={{ width: '150px' }}>{detail.picking_by}</td>
-                              <td></td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </Panel>
-                </Collapse>
+                      ),
+                    },
+                  ]}
+                />
               </CellWithBar>
             ))}
         </div>
