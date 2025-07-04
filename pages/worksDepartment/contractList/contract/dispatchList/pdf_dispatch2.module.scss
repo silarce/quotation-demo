@@ -17,7 +17,6 @@ $c10: 0.4fr;
 .pdf {
   padding: 50px;
   padding-top: 100px;
-  font-size: 30px;
 }
 
 .title {
@@ -26,6 +25,7 @@ $c10: 0.4fr;
   font-size: 36px;
   font-weight: 500;
   margin-bottom: 0;
+  line-height: 60px;
   span {
     font-family: "DFKai-SB" !important;
   }
@@ -34,7 +34,6 @@ $c10: 0.4fr;
 .top {
   display: grid;
   grid-template-columns: calc($c1 + $c2 + $c3 + $c4 + $c5 + $c6 + $c7 + $c8 + $c9 + $c10) $c11;
-  // margin-bottom: 5px;
   justify-items: flex-end;
   line-height: 30px;
 }
@@ -61,10 +60,14 @@ $c10: 0.4fr;
 }
 
 .cell {
+  padding-left: 5px;
+  padding-right: 5px;
   border-width: 0 $borderWidth $borderWidth 0;
   border-style: solid;
   border-color: theme("colors.border02");
   overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
 .signatureBar {
@@ -74,4 +77,13 @@ $c10: 0.4fr;
     display: grid;
     align-content: space-between;
   }
+}
+
+.px12 {
+  padding: 0 12px;
+}
+
+.noXPadding {
+  padding-left: 0;
+  padding-right: 0;
 }

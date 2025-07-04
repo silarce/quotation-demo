@@ -798,7 +798,7 @@ export default function EditDispatchList() {
           width: 'fit-content',
           content: (
             <div>
-              <Pdf_dispatch2 />
+              <Pdf_dispatch2 data={data_pdf} />
             </div>
           ),
         });
