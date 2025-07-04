@@ -14,6 +14,7 @@ import EditDispatch, {
   Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
 import Pdf_dispatch, { Tdata_pdf } from './pdf_dispatch';
+import Pdf_dispatch2 from './pdf_dispatch2';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -784,6 +785,20 @@ export default function EditDispatchList() {
           content: (
             <div className="m-5">
               <Pdf_dispatch data={data_pdf} />
+            </div>
+          ),
+        });
+      },
+    },
+    {
+      type: 'myButton',
+      label: '匯出2',
+      onClick: () => {
+        myAlert.clear({
+          width: 'fit-content',
+          content: (
+            <div>
+              <Pdf_dispatch2 />
             </div>
           ),
         });
