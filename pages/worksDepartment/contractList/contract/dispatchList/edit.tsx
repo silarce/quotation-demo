@@ -95,8 +95,6 @@ export default function EditDispatchList() {
   const [disabled, setDisabled] = useState(true);
   const theDiasbled = !dispatchingId ? false : disabled;
 
-  const [showPdf, setShowPdf] = useState(false);
-
   // ---------------------------------------------------------
   const [state_profile, setState_profile] = useState<Tstate_profile>(emptyState_profile());
 
@@ -780,7 +778,16 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '匯出',
-      onClick: () => setShowPdf(true),
+      onClick: () => {
+        myAlert.clear({
+          width: 'fit-content',
+          content: (
+            <div className="m-5">
+              <Pdf_dispatch data={data_pdf} />
+            </div>
+          ),
+        });
+      },
     },
     {
       type: 'myButton',
@@ -840,8 +847,6 @@ export default function EditDispatchList() {
           }
         />
       </div>
-
-      <Pdf_dispatch visible={showPdf} onCancel={() => setShowPdf(false)} data={data_pdf} />
     </SubLayer>
   );
 }
