@@ -18,8 +18,14 @@ type TyearMonthList = {
   [year: number]: number[];
 };
 
-function getAllyearMonthListByRange({ start, end }: { start: Dayjs | Date; end: Dayjs | Date }) {
-  const startDate = dayjs(start);
+function getAllyearMonthListByRange({
+  start,
+  end,
+}: {
+  start: Dayjs | Date | undefined;
+  end: Dayjs | Date | undefined;
+}) {
+  let startDate = dayjs(start);
   const endDate = dayjs(end);
 
   const dateObj: TyearMonthList = {};
@@ -36,7 +42,7 @@ function getAllyearMonthListByRange({ start, end }: { start: Dayjs | Date; end: 
       dateObj[year].push(month);
     }
 
-    startDate.add(1, 'month');
+    startDate = startDate.add(1, 'month');
   }
 
   return dateObj;
