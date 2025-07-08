@@ -58,11 +58,9 @@ export default function MyDatePicker({
           return dayjs(twDate).format(format);
         }}
         autoComplete="off"
-        bordered={false}
+        variant="borderless"
         inputReadOnly={true}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore // 明明就有showToday，但是ts表示沒有
-        showToday={false}
+        showNow={false}
         //
         {...antdProps}
         //
