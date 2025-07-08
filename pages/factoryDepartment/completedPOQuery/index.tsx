@@ -61,7 +61,6 @@ import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
 import icon_arrow_right2 from 'public/image/icon/longArrow.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 import icon_clear from 'public/image/icon/fc_clear.svg';
-import { Panel } from 'components/global/myAntd/collapse';
 import icon_tray_in from 'public/image/icon/fc_tray_in.svg';
 
 export default function CompletedPOQuery() {

@@ -42,7 +42,6 @@ import icon_task_open from 'public/image/icon/fc_task_open.svg';
 import icon_task_close from 'public/image/icon/fc_task_close.svg';
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
 import icon_add from 'public/image/icon/fc_add2.svg';
-import { Panel } from 'components/global/myAntd/collapse';
 
 type Tquery = {
   wareHouseId: string | undefined;
