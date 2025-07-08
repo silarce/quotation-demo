@@ -27,11 +27,10 @@ type Tcontroll_item_num = {
 };
 
 type TpricingMethodControll = {
-  value: string;
+  value: '合約內' | '合約辦理追加' | '贈送' | '修繕計價' | '其他' | '保固內' | '';
   note: string;
-  onChange: (v: string) => void;
+  onChange: (v: TpricingMethodControll['value']) => void;
   onInputChange: (v: string) => void;
-  // subOnChange: (v: string) => void;
 };
 
 type Tcontroll = {
@@ -154,9 +153,10 @@ export default function EditDispatch({
           <Radio value={'合約內'}>合約內</Radio>
           <Radio value={'合約辦理追加'}>合約辦理追加</Radio>
           <Radio value={'贈送'}>贈送</Radio>
+          <Radio value={'保固內'}>保固內</Radio>
 
           <Radio
-            value={`修理費用`}
+            value={`修繕計價`}
             onChange={(e) => {
               const currentTarget = e.nativeEvent.currentTarget as HTMLDivElement;
               const fixFee = currentTarget.querySelector('#dispatch-fixFee') as HTMLInputElement;
@@ -164,18 +164,21 @@ export default function EditDispatch({
             }}
           >
             <span className={scss.myLabel}>
-              <span>修理費用</span>
+              <span>修繕計價</span>
               <input
                 id="dispatch-fixFee"
                 disabled={disabled}
-                type="text"
                 autoComplete="off"
-                value={(pricingMethod.value === '修理費用' && pricingMethod.note) || ''}
+                value={(pricingMethod.value === '修繕計價' && pricingMethod.note) || ''}
                 onChange={(e) => {
-                  pricingMethod.value === '修理費用' && pricingMethod.onInputChange(e.target.value);
+                  const isPositiveInteger = checkIsPositiveInteger(e.target.value);
+
+                  if (checkAndReport(e, isPositiveInteger)) {
+                    pricingMethod.value === '修繕計價' && pricingMethod.onInputChange(e.target.value);
+                  }
                 }}
                 onClick={() => {
-                  pricingMethod.onChange('修理費用');
+                  pricingMethod.onChange('修繕計價');
                 }}
               />
             </span>

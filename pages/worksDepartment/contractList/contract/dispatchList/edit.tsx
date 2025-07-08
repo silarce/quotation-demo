@@ -80,7 +80,7 @@ type Tstate_profile = {
 };
 
 type Tstate_pricingMethod = {
-  pricingMethod: string;
+  pricingMethod: '合約內' | '合約辦理追加' | '贈送' | '修繕計價' | '其他' | '保固內' | '';
   note: string;
 };
 
@@ -701,10 +701,12 @@ export default function EditDispatchList() {
       value: state_pricingMethod.pricingMethod,
       note: state_pricingMethod.note,
       onChange: (str) => {
-        setState_pricingMethod({
-          pricingMethod: str,
-          note: '',
-        });
+        if (str !== state_pricingMethod.pricingMethod) {
+          setState_pricingMethod({
+            pricingMethod: str,
+            note: '',
+          });
+        }
       },
       onInputChange: (str) => {
         setState_pricingMethod((state) => ({
@@ -854,6 +856,24 @@ export default function EditDispatchList() {
       gateRemote,
       gateControllerKey,
       gateMotorKey,
+      //
+      合約內: state_pricingMethod.pricingMethod === '合約內',
+      合約追加: state_pricingMethod.pricingMethod === '合約辦理追加',
+      修繕計價: state_pricingMethod.pricingMethod === '修繕計價',
+      贈送: state_pricingMethod.pricingMethod === '贈送',
+      保固內: state_pricingMethod.pricingMethod === '保固內',
+      其他: state_pricingMethod.pricingMethod === '其他',
+      金額: (() => {
+        if (state_pricingMethod.pricingMethod === '修繕計價') {
+          if (state_pricingMethod.note === '') {
+            return state_pricingMethod.note;
+          }
+
+          return Number(state_pricingMethod.note).toLocaleString();
+        }
+
+        return '';
+      })(),
     };
 
     return data_pdf;
