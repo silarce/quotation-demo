@@ -21,6 +21,10 @@ type Tcontroll_item = {
   value: string;
   onChange: (v: string) => void;
 };
+type Tcontroll_item_num = {
+  value: `${number}` | '';
+  onChange: (v: `${number}` | '') => void;
+};
 
 type TpricingMethodControll = {
   value: string;
@@ -38,6 +42,15 @@ type Tcontroll = {
     value: boolean;
     onChange: (v: boolean) => void;
   };
+  //
+  rollingOther: Tcontroll_item;
+  rollingKeyNumber: Tcontroll_item;
+  rollingRemote: Tcontroll_item_num;
+  rollingKey: Tcontroll_item_num;
+  gateOther: Tcontroll_item;
+  gateRemote: Tcontroll_item_num;
+  gateControllerKey: Tcontroll_item_num;
+  gateMotorKey: Tcontroll_item_num;
 };
 
 export type { Tcontroll, TpricingMethodControll };
@@ -66,7 +79,21 @@ export default function EditDispatch({
   workerIdArr?: string[];
 }) {
   const [showSelector, setShowSelector] = useState(false);
-  const { tasks, note, pricingMethod } = controll;
+  const {
+    tasks,
+    note,
+    pricingMethod,
+
+    rollingRemote, // '捲門遙控器數量'
+    rollingKey, // '捲門鑰匙數量'
+    rollingKeyNumber,
+    rollingOther,
+
+    gateRemote, // '大門遙控器數量'
+    gateControllerKey, // '大門控制箱鑰匙數量'
+    gateMotorKey, // '馬達鑰匙數量'
+    gateOther,
+  } = controll;
 
   const dispatchDate_m = moment(dispatchDate);
   dispatchDate = dispatchDate_m.isValid() ? dispatchDate_m.format('YYYY-MM-DD') : '9999-01-01';
@@ -181,7 +208,145 @@ export default function EditDispatch({
           </Radio>
         </Radio.Group>
       </div>
+      {/*  */}
+      <div>
+        <div>
+          <p className="text-2xl font-semibold text-main mb-0">捲門</p>
+          <div className="flex gap-2">
+            <InputSel
+              caption="遙控器數量"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: rollingRemote.value,
+                  onChange: (e) => {
+                    const isPositiveInteger = checkIsPositiveInteger(e.target.value);
 
+                    if (checkAndReport(e, isPositiveInteger)) {
+                      rollingRemote.onChange(e.target.value as `${number}` | '');
+                    }
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption="鑰匙號碼"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: rollingKeyNumber.value,
+                  onChange: (e) => {
+                    rollingKeyNumber.onChange(e.target.value);
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption="鑰匙數量"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: rollingKey.value,
+                  onChange: (e) => {
+                    const isPositiveInteger = checkIsPositiveInteger(e.target.value);
+
+                    if (checkAndReport(e, isPositiveInteger)) {
+                      rollingKey.onChange(e.target.value as `${number}` | '');
+                    }
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption="其他"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: rollingOther.value,
+                  onChange: (e) => {
+                    rollingOther.onChange(e.target.value);
+                  },
+                },
+              }}
+            />
+          </div>
+        </div>
+        <div>
+          <p className="text-2xl font-semibold text-main mb-0">大門</p>
+          <div className="flex gap-2">
+            <InputSel
+              caption="遙控器數量"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: gateRemote.value,
+                  onChange: (e) => {
+                    const isPositiveInteger = checkIsPositiveInteger(e.target.value);
+
+                    if (checkAndReport(e, isPositiveInteger)) {
+                      gateRemote.onChange(e.target.value as `${number}` | '');
+                    }
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption="控箱鑰匙數量"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: gateControllerKey.value,
+                  onChange: (e) => {
+                    const isPositiveInteger = checkIsPositiveInteger(e.target.value);
+
+                    if (checkAndReport(e, isPositiveInteger)) {
+                      gateControllerKey.onChange(e.target.value as `${number}` | '');
+                    }
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption="馬達鑰匙數量"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: gateMotorKey.value,
+                  onChange: (e) => {
+                    const isPositiveInteger = checkIsPositiveInteger(e.target.value);
+
+                    if (checkAndReport(e, isPositiveInteger)) {
+                      gateMotorKey.onChange(e.target.value as `${number}` | '');
+                    }
+                  },
+                },
+              }}
+            />
+            <InputSel
+              caption="其他"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: gateOther.value,
+                  onChange: (e) => {
+                    gateOther.onChange(e.target.value);
+                  },
+                },
+              }}
+            />
+          </div>
+        </div>
+      </div>
+      <br />
+      {/*  */}
       {/* 備註下次注意事項 */}
       <div className={scss.precaution}>
         <div className={scss.subTitle}>
@@ -244,3 +409,24 @@ export default function EditDispatch({
     </div>
   );
 }
+
+// ============================================================================
+
+const checkIsPositiveInteger = (v: string | number) => {
+  const num = Number(v);
+
+  return Number.isInteger(num) && num >= 0;
+};
+
+const checkAndReport = (e: React.ChangeEvent<HTMLInputElement>, isPositiveInteger: boolean) => {
+  if (!isPositiveInteger) {
+    e.target.setCustomValidity('請輸入正整數');
+    e.target.reportValidity();
+
+    return false;
+  } else {
+    e.target.setCustomValidity('');
+
+    return true;
+  }
+};
