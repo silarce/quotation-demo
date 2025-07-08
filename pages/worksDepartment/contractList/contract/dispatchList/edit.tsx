@@ -80,7 +80,7 @@ type Tstate_profile = {
 };
 
 type Tstate_pricingMethod = {
-  pricingMethod: string;
+  pricingMethod: '合約內' | '合約辦理追加' | '贈送' | '修繕計價' | '其他' | '';
   note: string;
 };
 
