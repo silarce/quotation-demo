@@ -92,8 +92,8 @@ export const apiPostTodo = async (body: TcreateTodoDto[], { callAlert = true }: 
   const api = '/todo';
 
   // 後端收的不是ISOstring，送ISOstring的話會因為時區的問題而get錯誤的日期
-  body[0].notificationDate = dayjs(body[0].notificationDate).format('yyyy-MM-DD');
-  body[0].entryDate = dayjs(body[0].entryDate).format('yyyy-MM-DD');
+  body[0].notificationDate = dayjs(body[0].notificationDate).format('YYYY-MM-DD');
+  body[0].entryDate = dayjs(body[0].entryDate).format('YYYY-MM-DD');
 
   return axi
     .post(api, body)
