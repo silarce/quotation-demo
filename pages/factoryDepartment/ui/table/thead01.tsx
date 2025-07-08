@@ -4,8 +4,8 @@ interface TheadProps {
   type: string;
 }
 
-const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
-  if (type === "WareHouse") {
+const Thead01 = ({ type }: TheadProps): React.ReactNode | null => {
+  if (type === 'WareHouse') {
     return (
       <div className={style.thead}>
         <span></span>
@@ -20,7 +20,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>{/* 按鈕格 留白 */}</span>
       </div>
     );
-  } else if (type === "WHPosition") {
+  } else if (type === 'WHPosition') {
     return (
       <div className={style.thead3}>
         <span>儲位編碼</span>
@@ -32,7 +32,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
       </div>
     );
-  } else if (type === "Tray") {
+  } else if (type === 'Tray') {
     return (
       <div className={style.thead2}>
         <span>設備編號</span>
@@ -44,8 +44,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>建立時間</span>
         <span>{/* 按鈕格 留白 */}</span>
       </div>
-    )
-  } else if (type === "materialList") {
+    );
+  } else if (type === 'materialList') {
     return (
       <div className={style.thead4}>
         <span>物料名稱</span>
@@ -56,8 +56,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>托盤</span>
         {/* <span>按鈕格 留白</span> */}
       </div>
-    )
-  } else if (type === "GetMatWarehouseList") {
+    );
+  } else if (type === 'GetMatWarehouseList') {
     return (
       <div className={style.thead5}>
         <span>倉庫</span>
@@ -66,8 +66,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span> </span>
         {/* <span>按鈕格 留白</span> */}
       </div>
-    )
-  } else if (type === "PickingList") {
+    );
+  } else if (type === 'PickingList') {
     return (
       <div className={style.thead6}>
         <span>領料單號</span>
@@ -77,8 +77,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         {/* <span>按鈕格 留白</span> */}
       </div>
-    )
-  } else if (type === "PickingDetailList") {
+    );
+  } else if (type === 'PickingDetailList') {
     return (
       <div className={style.thead7}>
         <span>序號</span>
@@ -88,8 +88,8 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         {/* <span>按鈕格 留白</span> */}
       </div>
-    )
-  } else if (type === "PickingDetailList2") {
+    );
+  } else if (type === 'PickingDetailList2') {
     return (
       <div className={style.thead8}>
         <span>次序</span>
@@ -100,10 +100,10 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         {/* <span>按鈕格 留白</span> */}
       </div>
-    )
+    );
   }
   //#region 入庫單
-  else if (type === "ProdEntry") {
+  else if (type === 'ProdEntry') {
     return (
       <div className={style.thead9}>
         <span>序</span>
@@ -114,11 +114,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         {/* <span>按鈕格 留白</span> */}
       </div>
-    )
+    );
   }
   //#endregion
   //#region 採購單
-  else if (type === "PurchaseOrder") {
+  else if (type === 'PurchaseOrder') {
     return (
       <div className={style.thead10}>
         <span>序</span>
@@ -129,11 +129,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>廠商名稱</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 採購單明細
-  else if (type === "PurchaseOrderDetail") {
+  else if (type === 'PurchaseOrderDetail') {
     return (
       <div className={style.thead11}>
         <span></span>
@@ -150,11 +150,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 進貨單
-  else if (type === "ProdReceipt") {
+  else if (type === 'ProdReceipt') {
     return (
       <div className={style.thead12}>
         <span>序</span>
@@ -167,11 +167,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>廠商名稱</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 進貨單明細
-  else if (type === "ProdReceiptDetail") {
+  else if (type === 'ProdReceiptDetail') {
     return (
       <div className={style.thead14}>
         <span></span>
@@ -187,11 +187,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 採購單明細2
-  else if (type === "PurchaseOrderDetail2") {
+  else if (type === 'PurchaseOrderDetail2') {
     return (
       <div className={style.thead13}>
         <span></span>
@@ -206,11 +206,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 請購單
-  else if (type === "PurchaseRequisition") {
+  else if (type === 'PurchaseRequisition') {
     return (
       <div className={style.thead15}>
         <span>序</span>
@@ -221,11 +221,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         {/* <span>請購人員</span> */}
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 請購單明細
-  else if (type === "PurchaseRequisitionDetail") {
+  else if (type === 'PurchaseRequisitionDetail') {
     return (
       <div className={style.thead16}>
         <span></span>
@@ -242,11 +242,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 採購單明細2
-  else if (type === "PurchaseRequisitionDetail2") {
+  else if (type === 'PurchaseRequisitionDetail2') {
     return (
       <div className={style.thead21}>
         <span></span>
@@ -262,11 +262,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 詢價單明細
-  else if (type === "Quotereq") {
+  else if (type === 'Quotereq') {
     return (
       <div className={style.thead17}>
         <span>序</span>
@@ -280,11 +280,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>選擇</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 詢價單明細
-  else if (type === "QuotereqDetail") {
+  else if (type === 'QuotereqDetail') {
     return (
       <div className={style.thead18}>
         <span>序</span>
@@ -293,11 +293,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>已詢數</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 物料明細
-  else if (type === "AddPR_GetProduct") {
+  else if (type === 'AddPR_GetProduct') {
     return (
       <div className={style.thead19}>
         <span>料號</span>
@@ -306,11 +306,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>庫存</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 新增請購單明細
-  else if (type === "AddPR_ReqList") {
+  else if (type === 'AddPR_ReqList') {
     return (
       <div className={style.thead20}>
         <span></span>
@@ -324,11 +324,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 物料明細
-  else if (type === "qoDetail_SupplierList") {
+  else if (type === 'qoDetail_SupplierList') {
     return (
       <div className={style.thead22}>
         <span>名稱</span>
@@ -337,7 +337,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>統編</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 詢價單明細
@@ -356,7 +356,7 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
   //     </div>
   //   )
   // }
-  else if (type === "Quotereq2") {
+  else if (type === 'Quotereq2') {
     return (
       <div className={style.thead23}>
         <span>序</span>
@@ -372,11 +372,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>選擇</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 進貨單明細2
-  else if (type === "ProdReceiptDetail2") {
+  else if (type === 'ProdReceiptDetail2') {
     return (
       <div className={style.thead24}>
         <span></span>
@@ -391,11 +391,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 入庫單明細
-  else if (type === "ProdEntryDetail") {
+  else if (type === 'ProdEntryDetail') {
     return (
       <div className={style.thead25}>
         <span></span>
@@ -410,11 +410,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 入庫單明細
-  else if (type === "ProdEntryWhpositionList") {
+  else if (type === 'ProdEntryWhpositionList') {
     return (
       <div className={style.thead26}>
         <span>序</span>
@@ -425,11 +425,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>數量</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 物料明細
-  else if (type === "ProductList") {
+  else if (type === 'ProductList') {
     return (
       <div className={style.thead27}>
         <span>序</span>
@@ -444,11 +444,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>建立日期</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 新增領料單明細
-  else if (type === "AddPR_PickingList") {
+  else if (type === 'AddPR_PickingList') {
     return (
       <div className={style.thead28}>
         <span></span>
@@ -463,11 +463,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 審核明細
-  else if (type === "ReviewList") {
+  else if (type === 'ReviewList') {
     return (
       <div className={style.thead29}>
         <span>序</span>
@@ -478,11 +478,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>人員</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 審核明細
-  else if (type === "ReviewStatusList") {
+  else if (type === 'ReviewStatusList') {
     return (
       <div className={style.thead30}>
         <span>流程</span>
@@ -493,11 +493,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>意見</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 審核明細
-  else if (type === "FlowList") {
+  else if (type === 'FlowList') {
     return (
       <div className={style.thead31}>
         <span></span>
@@ -508,11 +508,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>人員</span> */}
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 審核明細
-  else if (type === "FlowDetailList") {
+  else if (type === 'FlowDetailList') {
     return (
       <div className={style.thead32}>
         <span></span>
@@ -524,11 +524,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
           <span>人員</span> */}
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 新增採購單明細
-  else if (type === "AddPO_ReqList") {
+  else if (type === 'AddPO_ReqList') {
     return (
       <div className={style.thead33}>
         <span></span>
@@ -543,11 +543,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 詢價單
-  else if (type === "Quotereq3") {
+  else if (type === 'Quotereq3') {
     return (
       <div className={style.thead34}>
         <span>序</span>
@@ -558,11 +558,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>廠商名稱</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   // //#region 新增採購單明細
-  else if (type === "AddQOList") {
+  else if (type === 'AddQOList') {
     return (
       <div className={style.thead37}>
         <span></span>
@@ -584,11 +584,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   // //#endregion
   //#region 詢價單明細
-  else if (type === "Quotereq4") {
+  else if (type === 'Quotereq4') {
     return (
       <div className={style.thead35}>
         <span>序</span>
@@ -604,11 +604,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>廠商名稱</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 審核紀錄
-  else if (type === "ReviewHistory") {
+  else if (type === 'ReviewHistory') {
     return (
       <div className={style.thead36}>
         <span>序</span>
@@ -619,11 +619,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>審核意見</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 進貨紀錄
-  else if (type === "ProdReceiptHistory") {
+  else if (type === 'ProdReceiptHistory') {
     return (
       <div className={style.thead40}>
         <span>序</span>
@@ -633,11 +633,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單據備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 物料明細
-  else if (type === "BomList") {
+  else if (type === 'BomList') {
     return (
       <div className={style.thead38}>
         <span></span>
@@ -661,11 +661,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>數量公式</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 新增進貨單用的採購單清單
-  else if (type === "PurchaseOrderForAddProdReceipt") {
+  else if (type === 'PurchaseOrderForAddProdReceipt') {
     return (
       <div className={style.thead39}>
         <span></span>
@@ -679,11 +679,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 新增進貨單明細
-  else if (type === "AddPRe_ReqList") {
+  else if (type === 'AddPRe_ReqList') {
     return (
       <div className={style.thead41}>
         <span></span>
@@ -699,11 +699,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 新增進貨單明細
-  else if (type === "AddPRe_ReqList2") {
+  else if (type === 'AddPRe_ReqList2') {
     return (
       <div className={style.thead42}>
         <span></span>
@@ -714,11 +714,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 審核紀錄
-  else if (type === "ProdEntryHistory") {
+  else if (type === 'ProdEntryHistory') {
     return (
       <div className={style.thead43}>
         <span>序</span>
@@ -728,17 +728,13 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>單據備註</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
 
-
-
-
-
   //新
   //#region 新請購單
-  else if (type === "PRequisition") {
+  else if (type === 'PRequisition') {
     return (
       <div className={style.newthead1}>
         <span>序</span>
@@ -752,11 +748,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         {/* <span>請購人員</span> */}
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 審核紀錄
-  else if (type === "ReviewHistory2") {
+  else if (type === 'ReviewHistory2') {
     return (
       <div className={style.newthead2}>
         <span>序</span>
@@ -767,11 +763,11 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>意見</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
   //#region 採購單
-  else if (type === "POrder") {
+  else if (type === 'POrder') {
     return (
       <div className={style.newthead3}>
         <span>序</span>
@@ -783,12 +779,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>廠商名稱</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
 
   //#region 詢價單
-  else if (type === "QReq") {
+  else if (type === 'QReq') {
     return (
       <div className={style.newthead4}>
         <span>序</span>
@@ -796,15 +792,13 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>狀態</span>
         <span>建立日期</span>
         <span>申請人員</span>
-        <span>
-          {/* 廠商名稱 */}
-        </span>
+        <span>{/* 廠商名稱 */}</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
-  else if (type === "PKing") {
+  else if (type === 'PKing') {
     return (
       <div className={style.newthead5}>
         <span>序</span>
@@ -816,10 +810,10 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span></span>
         {/* <span>按鈕格 留白</span> */}
       </div>
-    )
+    );
   }
   //#region 進貨單
-  else if (type === "PReceipt") {
+  else if (type === 'PReceipt') {
     return (
       <div className={style.newthead6}>
         <span>序</span>
@@ -831,12 +825,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>廠商名稱</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
 
   //#region 入庫單
-  else if (type === "PEntry") {
+  else if (type === 'PEntry') {
     return (
       <div className={style.newthead7}>
         <span></span>
@@ -849,13 +843,12 @@ const Thead01 = ({ type }: TheadProps): JSX.Element | null => {
         <span>已入庫</span>
         <span></span>
       </div>
-    )
+    );
   }
   //#endregion
-
   else {
     return null;
   }
-}
+};
 
 export default Thead01;

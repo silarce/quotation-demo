@@ -1,6 +1,6 @@
 import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Link from 'next/link';
 
 // layer
@@ -16,10 +16,8 @@ import SearchBar, { TsearcbBarProps } from 'components/global/gear/inputAndSel_v
 
 // antd
 import { Collapse } from 'antd';
-const { Panel } = Collapse;
 
 // option
-// import { optionsCreator_doorType } from 'js/utils/options/options';
 import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 import { optionsCreator_doorModel } from 'js/utils/options/productOptions';
 const optionsDoorType = optionsCreator_doorModel({ haveEmpty: true });
@@ -190,8 +188,12 @@ export default function LegacyContractIntegration() {
         <Thead01 />
         <div>
           {/*  */}
-          <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
-            {dataArr?.map((item, index, arr) => {
+          <Collapse
+            expandIcon={() => null}
+            accordion={true}
+            destroyOnHidden={true}
+            onChange={changeActive}
+            items={dataArr?.map((item, index, arr) => {
               const discountRate = (() => {
                 const discountRate = Math.round(parseFloat(item.discountRate) * 100);
 
@@ -206,7 +208,7 @@ export default function LegacyContractIntegration() {
               });
 
               const dateStr = item.createdAt
-                ? moment(convertDate_reduce1911(item.createdAt)).format('yy-MM-DD')
+                ? dayjs(convertDate_reduce1911(item.createdAt)).format('yy-MM-DD')
                 : '無日期';
 
               const quotationContent: TBodyItemContent = {
@@ -231,31 +233,27 @@ export default function LegacyContractIntegration() {
 
               const isActive = activeIndex === index;
 
-              return (
-                <Panel
-                  key={index}
-                  className={scss.panel}
-                  header={
-                    <div
-                      //  ref={arr.length - 3 === index ? viewRef_bottom : undefined}
-                      ref={arr.length - 2 === index ? viewRef_bottom : undefined}
-                    >
-                      <TbodyItem01
-                        quotationContent={quotationContent}
-                        isActive={isActive}
-                        linkProps={{
-                          href,
-                        }}
-                      />
-                    </div>
-                  }
-                >
-                  <AppendList contract={item} />
-                </Panel>
-              );
+              return {
+                key: index,
+                className: scss.panel1,
+                label: (
+                  <div
+                    //  ref={arr.length - 3 === index ? viewRef_bottom : undefined}
+                    ref={arr.length - 2 === index ? viewRef_bottom : undefined}
+                  >
+                    <TbodyItem01
+                      quotationContent={quotationContent}
+                      isActive={isActive}
+                      linkProps={{
+                        href,
+                      }}
+                    />
+                  </div>
+                ),
+                children: <AppendList contract={item} />,
+              };
             })}
-          </Collapse>
-          {/*  */}
+          />
         </div>
       </div>
     </SubLayer>

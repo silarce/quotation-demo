@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 
 import {
@@ -608,7 +608,7 @@ class Class_legacyContract {
         return null;
       }
 
-      const date = moment(legacyContractCopy.quoteDate as string);
+      const date = dayjs(legacyContractCopy.quoteDate as string);
 
       if (date.isValid()) {
         return date.toISOString();
@@ -622,7 +622,7 @@ class Class_legacyContract {
         return '';
       }
 
-      const date = moment(legacyContractCopy.deliveryDate);
+      const date = dayjs(legacyContractCopy.deliveryDate);
 
       if (date.isValid()) {
         return date.toISOString();

@@ -10,7 +10,7 @@ import React, {
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 // antd
 import { Checkbox, Radio, Popover } from 'antd';
@@ -1465,7 +1465,7 @@ const useDefaultState = ({
       allow_EditDeduction_or_deleteInvoice: !notAllow_EditDeduction_or_deleteInvoice,
 
       actualPrice: String(actualPrice || ''),
-      invoiceDate: invoiceDate ? moment(invoiceDate) : null,
+      invoiceDate: invoiceDate ? dayjs(invoiceDate) : null,
       invoiceBook: invoice?.accountantInvoiceBook ?? null,
 
       //
@@ -1833,7 +1833,7 @@ class Class_OtherNode {
 
     const { year, month } = this.invoiceBook;
 
-    return moment()
+    return dayjs()
       .year(Number(year))
       .month(Number(month) - 1);
   }
@@ -1872,7 +1872,7 @@ class Class_OtherNode {
   }
 
   // ------------------------------------------------------------------------------
-  disabledInvoiceDate(currentDate: Moment): boolean {
+  disabledInvoiceDate(currentDate: Dayjs): boolean {
     if (this.isOlderInvoice) {
       return false;
     }
@@ -1885,10 +1885,10 @@ class Class_OtherNode {
 
     const { year, month, latestInvoiceDate } = this.invoiceBook;
 
-    const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
-    const bookDate_next = moment(`${year}-${Number(month) + 1}`, 'YYYY-MM');
+    const bookDate = dayjs(`${year}-${month}`, 'YYYY-MM');
+    const bookDate_next = dayjs(`${year}-${Number(month) + 1}`, 'YYYY-MM');
 
-    const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
+    const latestInvoiceDate_m = dayjs(latestInvoiceDate).endOf('date');
     const begin = latestInvoiceDate_m.subtract(1, 'day');
 
     if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {

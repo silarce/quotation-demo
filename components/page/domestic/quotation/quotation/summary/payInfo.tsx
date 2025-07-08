@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Popover } from 'antd';
@@ -317,7 +317,7 @@ export default function PayInfo({
               props: {
                 className: scss.datePicker,
                 placeholder: '例 : 100-01-01',
-                value: delivery.deliveryDate.value ? moment(delivery.deliveryDate.value) : null,
+                value: delivery.deliveryDate.value ? dayjs(delivery.deliveryDate.value) : null,
                 onChange: (date_m) => {
                   const isoString = date_m?.toISOString() || '';
                   delivery.deliveryDate.onChange?.(isoString);
@@ -378,7 +378,7 @@ export default function PayInfo({
         </div>
       </div>
       <InputModal
-        visible={modalIsShow}
+        open={modalIsShow}
         title="新增付款辦法"
         placeholder="請輸入付款辦法描述"
         onConfirm={(v) => {

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 /**返回ISOString */
 export const convertDate_reduce1911 = (ISOString: string) => {
@@ -6,7 +6,7 @@ export const convertDate_reduce1911 = (ISOString: string) => {
     return ISOString;
   }
 
-  const dateTime = moment(ISOString);
+  const dateTime = dayjs(ISOString);
 
   if (!dateTime.isValid()) {
     return ISOString;
@@ -62,5 +62,5 @@ export const getTaiwanDateStr = (
     format = customFormat;
   }
 
-  return moment(convertDate_reduce1911(ISOString)).format(format);
+  return dayjs(convertDate_reduce1911(ISOString)).format(format);
 };

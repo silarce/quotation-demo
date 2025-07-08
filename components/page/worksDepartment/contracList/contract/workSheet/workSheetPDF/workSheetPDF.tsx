@@ -129,11 +129,11 @@ export default function WorkSheetPDF({
 
   return (
     <Modal
-      visible={isShow}
+      open={isShow}
       footer={null}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       width={'auto'}
       wrapClassName={scss.antdModalWrapper}
       onCancel={onCancel}
@@ -164,7 +164,12 @@ export default function WorkSheetPDF({
             <div key={index}>
               {index !== 0 && <hr className=" border-black" />}
 
-              <div ref={(ele) => (refPdf.current[index] = ele)} className={scss.container}>
+              <div
+                ref={(ele) => {
+                  refPdf.current[index] = ele;
+                }}
+                className={scss.container}
+              >
                 <div>
                   <Title page={index + 1} pageCount={pageCount} />
                   <Info {...control.info} />
@@ -191,7 +196,12 @@ export default function WorkSheetPDF({
             <div key={index}>
               {index !== 0 && <hr className=" border-black" />}
 
-              <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
+              <div
+                ref={(ele) => {
+                  refPdf.current[page - 1] = ele;
+                }}
+                className={scss.container}
+              >
                 <div>
                   <Title page={page} pageCount={pageCount} />
                   <Info {...control.info} />
@@ -211,7 +221,12 @@ export default function WorkSheetPDF({
             <div key={index}>
               {index !== 0 && <hr className=" border-black" />}
 
-              <div ref={(ele) => (refPdf.current[page - 1] = ele)} className={scss.container}>
+              <div
+                ref={(ele) => {
+                  refPdf.current[page - 1] = ele;
+                }}
+                className={scss.container}
+              >
                 <div>
                   <Title page={page} pageCount={pageCount} />
                   <Info {...control.info} />
@@ -221,7 +236,7 @@ export default function WorkSheetPDF({
             </div>
           );
         })}
-        <ClearModal visible={showSelector} width={1000} zIndex={1001} onCancel={() => setShowSelector(false)}>
+        <ClearModal open={showSelector} width={1000} zIndex={1001} onCancel={() => setShowSelector(false)}>
           <div className="p-5">
             {checkedSheetArr.map(({ parentId, parentItemName, itemArr: item }, index) => {
               const { indeterminate, isAllChecked, checkAll, renewItem, options } = createKit(index);

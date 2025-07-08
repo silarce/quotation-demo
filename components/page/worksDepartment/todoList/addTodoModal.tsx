@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Modal } from 'antd';
@@ -123,8 +123,8 @@ export default function AddTodoModal({
   return (
     <Modal
       className={classNames(scss.antdModal)}
-      visible={visible}
-      destroyOnClose={true}
+      open={visible}
+      destroyOnHidden={true}
       footer={null}
       closable={false}
       width={800}
@@ -178,7 +178,7 @@ export default function AddTodoModal({
             {...config}
             datePickerProps={{
               props: {
-                value: state_other.notificationDate ? moment(state_other.notificationDate) : null,
+                value: state_other.notificationDate ? dayjs(state_other.notificationDate) : null,
                 onChange: (date) => changeState_other('notificationDate', date?.toISOString() ?? ''),
               },
             }}
@@ -188,7 +188,7 @@ export default function AddTodoModal({
             {...config}
             datePickerProps={{
               props: {
-                value: state_other.entryDate ? moment(state_other.entryDate) : null,
+                value: state_other.entryDate ? dayjs(state_other.entryDate) : null,
                 onChange: (date) => changeState_other('entryDate', date?.toISOString() ?? ''),
               },
             }}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 
 // layer
@@ -89,7 +89,7 @@ const SelectorGroup = selectModalCreator_multi<['employee_factoryDepartment', 'e
 export default function EditElectronicSuppliesPickup({
   CustomPageHeader,
 }: {
-  CustomPageHeader?: (props: { disabled: boolean }) => JSX.Element;
+  CustomPageHeader?: (props: { disabled: boolean }) => React.ReactNode;
 }) {
   const router = useRouter();
   const query = router.query as Tquery;
@@ -433,7 +433,7 @@ export default function EditElectronicSuppliesPickup({
 
     if (data_pickup) {
       stateInfo = {
-        date: data_pickup.operationDate ? moment(data_pickup.operationDate) : null,
+        date: data_pickup.operationDate ? dayjs(data_pickup.operationDate) : null,
         indexNumber: data_pickup.number || '',
         picker: data_pickup.preparationEmployee || undefined,
         preparer: data_pickup.takeOffEmployee || undefined,
@@ -586,7 +586,7 @@ export default function EditElectronicSuppliesPickup({
           groupArr={groupArr}
           disabled={disabled}
           pdfInfo={{
-            pdfFileName: `送電備品領取單_${contractNumber}_${moment().format('YYYY-MM-DD')}`,
+            pdfFileName: `送電備品領取單_${contractNumber}_${dayjs().format('YYYY-MM-DD')}`,
             contractNumber: contractNumber,
             projectName: projectName,
             date: getTaiwanDateStr(data_pickup?.updatedAt) ?? '',

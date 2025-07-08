@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 import classNames from 'classnames';
 
@@ -71,7 +71,7 @@ export default function IncomeSummons() {
   } = query;
 
   const month_whole = month.padStart(2, '0');
-  const yearMonth_m = moment(`${year}-${month_whole}`);
+  const yearMonth_m = dayjs(`${year}-${month_whole}`);
 
   // -----------------------------------------------------------------------------
 
@@ -93,8 +93,8 @@ export default function IncomeSummons() {
           $eq: isForeign === 'true',
         },
         incomeBillDate: {
-          $gte: moment(`${year}-${month_whole}`).startOf('month').toISOString(),
-          $lte: moment(`${year}-${month_whole}`).endOf('month').toISOString(),
+          $gte: dayjs(`${year}-${month_whole}`).startOf('month').toISOString(),
+          $lte: dayjs(`${year}-${month_whole}`).endOf('month').toISOString(),
         },
       },
     };
@@ -452,7 +452,7 @@ export default function IncomeSummons() {
 // MARK: HOOK
 
 const useYearMonth = () => {
-  const m_today = moment();
+  const m_today = dayjs();
   const thisYear = m_today.year();
   const thisMonth = m_today.month() + 1;
 

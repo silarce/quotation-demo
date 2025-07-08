@@ -179,7 +179,7 @@ export default function ProductList_legacy({
       </DndContext>
 
       <InputModal
-        visible={!!targetProd}
+        open={!!targetProd}
         title="請輸入變更數量"
         tip={`上限 : ${targetProd && targetProd.remainQty}`}
         onConfirm={(v) => {

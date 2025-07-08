@@ -615,7 +615,7 @@ export default function Certificate({
         {/*  */}
         <InputModal
           //
-          visible={showModal}
+          open={showModal}
           title="新增資訊"
           onConfirm={(str) => {
             setState_infoList((prev) => ({ ...prev, [str]: { caption: str, value: '' } }));
@@ -1190,7 +1190,7 @@ const PdfPreview_pre = ({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       footer={null}
       onCancel={closeModal}
       //

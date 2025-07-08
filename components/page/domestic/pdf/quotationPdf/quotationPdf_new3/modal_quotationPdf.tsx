@@ -9,7 +9,8 @@ import Image from 'next/image';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // antd
-import Modal, { ModalProps } from 'antd/lib/modal/Modal';
+import Modal from 'antd/lib/modal/Modal';
+import { ModalProps } from 'antd';
 
 // css
 import scss from './quotationPdf.module.scss';
@@ -178,14 +179,7 @@ export default function Modal_quotationPdf({
   }
 
   return (
-    <Modal
-      visible={visible}
-      onCancel={onCancel}
-      width="fit-content"
-      footer={null}
-      closable={false}
-      destroyOnClose={true}
-    >
+    <Modal open={visible} onCancel={onCancel} width="fit-content" footer={null} closable={false} destroyOnHidden={true}>
       <div className={scss.body}>
         <div>
           <MyButton_v2 onClick={handle_dlPdf} className="mr-5">

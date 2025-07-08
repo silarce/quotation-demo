@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -96,7 +96,7 @@ export default function DispatchList() {
     const dispatch_simpleArr =
       dispatchingArr?.map((item) => {
         return {
-          dispatchDate: moment(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD'),
+          dispatchDate: dayjs(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD'),
           workerNameArr: item.workerEmployee.map((worker) => worker.chName || worker.enName),
           outsourcingNameArr: item.outsourcing.map((worker) => worker.name),
 

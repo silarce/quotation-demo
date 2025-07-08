@@ -217,7 +217,7 @@ export default function IconEdit({
         </Upload>
       </div>
 
-      <Modal visible={previewOpen} title={previewTitle} footer={null} onCancel={closePreview}>
+      <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={closePreview}>
         <img alt="example" style={{ width: '100%' }} src={previewImage} />
       </Modal>
       {/*  */}

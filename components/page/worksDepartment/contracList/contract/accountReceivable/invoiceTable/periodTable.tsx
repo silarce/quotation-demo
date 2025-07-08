@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useContext } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 
 // component
 import PeriodPanel, { Thead, Tbody, Tfoot, CurrencyBox } from './periodPanel';
@@ -105,7 +105,7 @@ type Tstate_period = {
 
   invoiceBook: TaccountantInvoiceBookDto | null;
   invoiceNumber: string;
-  invoiceDate: Moment | null;
+  invoiceDate: Dayjs | null;
 
   //
   nameOfBusinessEntity: string;

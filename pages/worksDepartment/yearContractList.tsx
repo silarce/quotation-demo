@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 
 // global gear
@@ -9,7 +9,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import scss from './yearContractList.module.scss';
 
 export default function YearContractList({ rwd1439 }: { rwd1439: boolean }) {
-  const thisYear = moment().format('YYYY');
+  const thisYear = dayjs().format('YYYY');
   const thisYear_num = Number(thisYear);
   const oldestYear = 2000;
 

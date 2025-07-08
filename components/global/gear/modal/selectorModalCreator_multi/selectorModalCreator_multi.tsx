@@ -266,13 +266,13 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     return (
       <Modal
-        visible={showModal}
+        open={showModal}
         // width={rwd1023 ? '80vw' : modalWidth}
         width={modalWidth}
         className={scss.container}
         closable={false}
         centered={true}
-        destroyOnClose={true}
+        destroyOnHidden={true}
         footer={null}
         onCancel={onCancel}
       >

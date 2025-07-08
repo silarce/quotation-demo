@@ -1,30 +1,58 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document';
+import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs';
+import type { DocumentContext } from 'next/document';
 
-class MyDocument extends Document {
-  render() {
-    return (
-      <Html>
-        <Head>
-          {/* 公司擋住外網，導致無法取得字體 */}
-          {/* 改用本地字體 */}
-          {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin={'crossOrigin'} />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap"
-            rel="stylesheet"
-          />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@100;300;400;500;700;900&display=swap"
-            rel="stylesheet"
-          /> */}
-        </Head>
-        <body>
-          <Main />
-          <NextScript />
-        </body>
-      </Html>
-    );
-  }
-}
+// class MyDocument extends Document {
+//   render() {
+//     return (
+//       <Html>
+//         <Head></Head>
+//         <body>
+//           <Main />
+//           <NextScript />
+//         </body>
+//       </Html>
+//     );
+//   }
+// }
+
+const MyDocument = () => (
+  <Html lang="en">
+    <Head />
+    <body>
+      <Main />
+      <NextScript />
+    </body>
+  </Html>
+);
+
+// region 為了antd做的設置
+MyDocument.getInitialProps = async (ctx: DocumentContext) => {
+  const cache = createCache();
+  const originalRenderPage = ctx.renderPage;
+  ctx.renderPage = () =>
+    originalRenderPage({
+      enhanceApp: (App) => (props) =>
+        (
+          <StyleProvider cache={cache}>
+            <App {...props} />
+          </StyleProvider>
+        ),
+    });
+
+  const initialProps = await Document.getInitialProps(ctx);
+  const style = extractStyle(cache, true);
+
+  return {
+    ...initialProps,
+    styles: (
+      <>
+        {initialProps.styles}
+        <style dangerouslySetInnerHTML={{ __html: style }} />
+      </>
+    ),
+  };
+};
+// endregion
 
 export default MyDocument;

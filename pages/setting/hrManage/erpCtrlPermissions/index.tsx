@@ -104,7 +104,6 @@ export default function ErpCtrlPermissions() {
     optionArr.unshift({ value: '', label: '不拘' });
 
     return optionArr;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [departmentsData]);
 
   // ------------------------------------------------------------------------
@@ -344,7 +343,7 @@ export default function ErpCtrlPermissions() {
         selLimit={1}
       />
       <TwoButtonModal
-        visible={!!selId}
+        open={!!selId}
         text={`請確定要刪除「${selIdNumber}」「${selChName}」?`}
         onConfirm={() => removeEmployee(selId)}
         onCancel={cancelDelete}

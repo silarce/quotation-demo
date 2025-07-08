@@ -9,7 +9,7 @@ import { Modal } from 'antd';
 import style from './twoButtonModal.module.scss';
 
 export default function TwoButtonModal({
-  visible,
+  open,
   setVisible,
   text,
   onConfirm,
@@ -18,7 +18,7 @@ export default function TwoButtonModal({
   cancelText,
 }:
   | {
-      visible: boolean;
+      open: boolean;
       setVisible?: Dispatch<SetStateAction<boolean>>;
       text: string | undefined;
       onConfirm: () => void;
@@ -27,7 +27,7 @@ export default function TwoButtonModal({
       cancelText?: string;
     }
   | {
-      visible: boolean;
+      open: boolean;
       setVisible: Dispatch<SetStateAction<boolean>>;
       text: string;
       onConfirm: () => void;
@@ -46,7 +46,7 @@ export default function TwoButtonModal({
   return (
     <Modal
       className={style.container}
-      visible={visible}
+      open={open}
       maskClosable={true}
       closable={false}
       centered={true}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 
 // gaer
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -28,7 +28,7 @@ const ExportToIncomeBill = ({
   quota: number;
   currency: string;
 }) => {
-  const [state_incomeBillDate, setState_incomeBillDate] = useState<Moment | null>(null);
+  const [state_incomeBillDate, setState_incomeBillDate] = useState<Dayjs | null>(null);
   const [state_splitPayment, setState_splitPayment] = useState<number>(quota);
   const [isForeign, setIsForeign] = useState<boolean>(false);
 

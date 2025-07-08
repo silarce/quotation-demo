@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 
 import classNames from 'classnames';
 import Image from 'next/image';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Drawer, Badge, Spin } from 'antd';
@@ -147,13 +147,13 @@ export default function ReportTable({
       return false;
     }
 
-    const yesterday = moment(reportInEdit.date).subtract(1, 'day');
+    const yesterday = dayjs(reportInEdit.date).subtract(1, 'day');
 
     // dailyReport_calendar是undefined就代表日期選擇器沒有被渲染出來
     // 就代表不是新增日報表，而是編輯已存在日報表
     if (!dailyReport_calendar) {
       // prevDate為該日報表前一筆資料的日期
-      return moment(prevDate).isSame(yesterday);
+      return dayjs(prevDate).isSame(yesterday);
     }
     /**其實在編輯已存在日報表時可以用isYesterdayHaveReport的作法把總表送進來處理
      * 但是prevDate已經做好了，所以就繼續用prevDate來處理
@@ -161,9 +161,9 @@ export default function ReportTable({
 
     /**該日報表日期的前一天 */
     const isYesterdayHaveReport = dailyReport_calendar?.some((report) => {
-      const reportDateM = moment(report.date);
+      const reportDateM = dayjs(report.date);
 
-      return moment(reportDateM).isSame(yesterday, 'day');
+      return dayjs(reportDateM).isSame(yesterday, 'day');
     });
 
     return isYesterdayHaveReport ?? false;
@@ -181,7 +181,7 @@ export default function ReportTable({
       return;
     }
 
-    const now = moment();
+    const now = dayjs();
     setMonthStart(now.clone().subtract(1, 'month').startOf('month').toISOString());
     setMonthEnd(now.clone().add(1, 'month').startOf('month').toISOString());
   }, [itemList]);
@@ -415,7 +415,7 @@ export default function ReportTable({
   return (
     <Drawer
       className={scss.drawer}
-      visible={!!itemList}
+      open={!!itemList}
       // getContainer={false}
       getContainer={rwd1023 ? undefined : false}
       width={'100%'}
@@ -867,8 +867,8 @@ const config: Tconfig = {
     render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
       const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'departureTime';
 
-      const time = moment(class_reportItem.departureTime);
-      const isBeforeAM8 = time.isBefore(moment(time).startOf('day').add(8, 'hours'));
+      const time = dayjs(class_reportItem.departureTime);
+      const isBeforeAM8 = time.isBefore(dayjs(time).startOf('day').add(8, 'hours'));
 
       return (
         <InputSel
@@ -901,8 +901,8 @@ const config: Tconfig = {
     render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
       const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
 
-      const time = moment(class_reportItem.departureWorksiteTime);
-      const isAfter1715 = time.isAfter(moment(time).startOf('day').add(17, 'hours').add(15, 'minutes'));
+      const time = dayjs(class_reportItem.departureWorksiteTime);
+      const isAfter1715 = time.isAfter(dayjs(time).startOf('day').add(17, 'hours').add(15, 'minutes'));
 
       return (
         <InputSel
@@ -1051,7 +1051,7 @@ const DatePicker = ({
       return undefined;
     }
 
-    const inEditDate = moment();
+    const inEditDate = dayjs();
 
     if (!dailyReport?.[0]) {
       if (reportInEdit) {
@@ -1061,7 +1061,7 @@ const DatePicker = ({
       return inEditDate;
     }
 
-    const lastDate = moment(dailyReport?.[0].date);
+    const lastDate = dayjs(dailyReport?.[0].date);
 
     if (lastDate.isSame(inEditDate, 'day')) {
       return undefined;
@@ -1104,7 +1104,7 @@ const DatePicker = ({
               }
 
               // 比當日晚的日期都不能選
-              if (date.isAfter(moment())) {
+              if (date.isAfter(dayjs())) {
                 return true;
               }
 
@@ -1114,7 +1114,7 @@ const DatePicker = ({
               }
 
               const isDisabledDate = dailyReport.some((report) => {
-                const isSame = date.isSame(moment(report.date), 'day');
+                const isSame = date.isSame(dayjs(report.date), 'day');
 
                 return isSame;
               });
@@ -1220,7 +1220,7 @@ const TitlePanel = () => {
     reqApiPatchDailyReports_my,
   } = useContext(DailyReportContext);
   const employeeChName = reportInEdit?.employeeChName;
-  let date = moment(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
+  let date = dayjs(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
 
   if (date === 'Invalid date') {
     date = '請選擇日期';

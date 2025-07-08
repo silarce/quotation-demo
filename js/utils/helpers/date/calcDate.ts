@@ -1,8 +1,8 @@
-import moment, { MomentInput } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
-function getAllMonthByRange({ start, end }: { start: MomentInput; end: MomentInput }): string[] {
-  const startDate = moment(start);
-  const endDate = moment(end);
+function getAllMonthByRange({ start, end }: { start: Dayjs | Date; end: Dayjs | Date }): string[] {
+  const startDate = dayjs(start);
+  const endDate = dayjs(end);
   const currentDate = startDate.clone();
   const dateArr: string[] = [];
 
@@ -18,9 +18,9 @@ type TyearMonthList = {
   [year: number]: number[];
 };
 
-function getAllyearMonthListByRange({ start, end }: { start: MomentInput; end: MomentInput }) {
-  const startDate = moment(start);
-  const endDate = moment(end);
+function getAllyearMonthListByRange({ start, end }: { start: Dayjs | Date; end: Dayjs | Date }) {
+  const startDate = dayjs(start);
+  const endDate = dayjs(end);
 
   const dateObj: TyearMonthList = {};
 

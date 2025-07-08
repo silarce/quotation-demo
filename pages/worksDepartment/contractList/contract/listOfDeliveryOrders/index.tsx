@@ -4,7 +4,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 
 // global gear
@@ -130,8 +130,8 @@ export default function ListOfDeliveryOrders() {
               contractNumber: contract?.content.quotationNumber ?? '',
               projectNumber,
               projectName,
-              requirementsDate: moment(convertDate_reduce1911(requirementsDate)).format('yy-MM-DD'),
-              dispatchDate: moment(convertDate_reduce1911(dispatchDate)).format('yy-MM-DD'),
+              requirementsDate: dayjs(convertDate_reduce1911(requirementsDate)).format('yy-MM-DD'),
+              dispatchDate: dayjs(convertDate_reduce1911(dispatchDate)).format('yy-MM-DD'),
             };
 
             return (

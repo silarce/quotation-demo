@@ -760,7 +760,7 @@ export default function OutboundOrder({
         }}
       />
       <Modal_newDeliveryStatu
-        visible={showBatchAddModal}
+        open={showBatchAddModal}
         onConfirm={batchPost}
         onCancel={() => setShowBatchAddModal(false)}
       />

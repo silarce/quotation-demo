@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -59,12 +59,14 @@ export default function CollectionDetailList() {
       pageSize: 999999,
       filter: {
         insertDate: {
-          $gte: moment()
-            .set({ year: Number(year), month: Number(month) - 1 })
+          $gte: dayjs()
+            .year(Number(year))
+            .month(Number(month) - 1)
             .startOf('month')
             .toISOString(),
-          $lte: moment()
-            .set({ year: Number(year), month: Number(month) - 1 })
+          $lte: dayjs()
+            .year(Number(year))
+            .month(Number(month) - 1)
             .endOf('month')
             .toISOString(),
         },
@@ -98,7 +100,7 @@ export default function CollectionDetailList() {
             // 以後有時間應該要把到期日另外以select處理
             $and: {
               noteMaturityDate: (() => {
-                const data_m = moment(keyword);
+                const data_m = dayjs(keyword);
 
                 if (!keyword || !data_m.isValid()) {
                   return undefined;

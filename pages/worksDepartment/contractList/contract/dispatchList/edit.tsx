@@ -1,7 +1,7 @@
 // 新增派工單
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -181,7 +181,6 @@ export default function EditDispatchList() {
     }
 
     return { todoForDispatch };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todoIdForDispatch]);
 
   // ---------------------------------------------------------
@@ -503,7 +502,7 @@ export default function EditDispatchList() {
         onChange: (e) => changeProfile('idNumber', e.target.value),
       },
       dispatchDate: {
-        value: state_profile.dispatchDate ? moment(state_profile.dispatchDate) : null,
+        value: state_profile.dispatchDate ? dayjs(state_profile.dispatchDate) : null,
         disabled: theDiasbled,
         onChange: (m) => changeProfile('dispatchDate', m?.toISOString() ?? ''),
       },
@@ -964,9 +963,7 @@ export default function EditDispatchList() {
           controll={controll_editDispatch}
           disabled={theDiasbled}
           workerIdArr={workerIdArr}
-          dispatchDate={
-            state_profile.dispatchDate ? moment(state_profile.dispatchDate).format('YYYY-MM-DD') : undefined
-          }
+          dispatchDate={state_profile.dispatchDate ? dayjs(state_profile.dispatchDate).format('YYYY-MM-DD') : undefined}
         />
       </div>
     </SubLayer>

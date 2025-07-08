@@ -1,15 +1,13 @@
 // apiGetQuotationProducts
 
 import { useState, useEffect, useCallback } from 'react';
-import { useInView } from 'react-intersection-observer';
-import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { axi } from './_axiosCreator';
 import { AxiosError } from 'axios';
 
 import { createUseInfinite } from './createUseInfinite';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 import { TgetReviewById, apiGetReviewById } from 'js/api/api_netCore/api_review';
 
@@ -2408,7 +2406,7 @@ const apiGetIncomeBillSerialSettlementForm = async (date: string) => {
 };
 
 export const useGetIncomeBillSerialSettlementForm = (
-  date: Moment | Date | undefined | null,
+  date: Dayjs | Date | undefined | null,
   {
     autoUpdate = true,
   }: {
@@ -2417,7 +2415,7 @@ export const useGetIncomeBillSerialSettlementForm = (
 ) => {
   const [res, setRes] = useState<TincomeBillSerialSettlementFormDto>();
 
-  const dateStr = moment(date).format('YYYY-MM-DD');
+  const dateStr = dayjs(date).format('YYYY-MM-DD');
 
   const update = useCallback(async () => {
     if (!date) {

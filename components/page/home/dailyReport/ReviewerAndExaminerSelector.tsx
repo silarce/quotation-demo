@@ -129,10 +129,10 @@ export default function ReviewerAndExaminerSelector({
   return (
     <Modal
       className={classNames(scss.modal)}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       onCancel={onCancel}
       footer={null}
       width={rwd1023 ? '80vw' : '800px'}

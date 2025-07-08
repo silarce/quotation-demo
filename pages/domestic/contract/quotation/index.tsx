@@ -10,7 +10,7 @@ import { NextRouter } from 'next/router';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // layout
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -125,12 +125,6 @@ type TpanelListList = {
   panel_meeting_edit: TpanelList;
   panel_meeting_add: TpanelList;
 };
-
-// =============================================================
-// =============================================================
-// =============================================================
-
-const { Panel } = Collapse;
 
 // =============================================================
 export default function Quotation() {
@@ -488,7 +482,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
           value: content?.type ?? '',
         },
         scheduledProcurementOrBidDate: {
-          value: content?.estimatedDiscount ? moment(content.estimatedDiscount) : null,
+          value: content?.estimatedDiscount ? dayjs(content.estimatedDiscount) : null,
         },
 
         trackProgress: {
@@ -496,7 +490,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           onClick: () => {
             setInputModalConfig({
-              visible: true,
+              open: true,
               title: '追蹤進度',
               placeholder: '請輸入追蹤進度',
               onConfirm: async (v) => {
@@ -522,7 +516,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
           onClick: () => {
             setInputModalConfig({
-              visible: true,
+              open: true,
               title: '工程進度',
               placeholder: '請輸入工程進度',
               onConfirm: async (v) => {
@@ -694,7 +688,6 @@ function TheQuotation({ router }: { router: NextRouter }) {
     };
 
     return { control_signature };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contract?.content]);
 
   const appendixParams = {
@@ -997,7 +990,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
         )}
 
         <InputModal
-          visible={!!inputModalConfig?.visible}
+          open={!!inputModalConfig?.open}
           onConfirm={inputModalConfig?.onConfirm}
           onCancel={inputModalConfig?.onCancel}
           title={inputModalConfig?.title ?? ''}
@@ -1027,7 +1020,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       <QuotationPdf
         //
-        visible={visible_pdf}
+        open={visible_pdf}
         onCancel={hidePdf}
         pdfData={pdfData}
         fileName={contract?.contractNumber ?? ''}
@@ -1104,7 +1097,7 @@ const OldQuotationProduction = ({
     // changeOthersKeyArr,
     // addOthers,
     // getOthersPostBodyArr,
-    avgDiscount_withQty,
+    // avgDiscount_withQty,
   } = useProductList({
     productArr: rootContent?.products ?? [],
     others: [],
@@ -1115,57 +1108,32 @@ const OldQuotationProduction = ({
   });
 
   const [targetProdKey, setTargetProdKey] = useState<string>('n');
-  const targetProd = productList[targetProdKey];
 
   return (
     <Collapse
       className={`${scss.oldQuotationProduction}`}
-      expandIcon={() => <></>}
+      expandIcon={() => null}
       accordion={false}
-      activeKey={+!isActive} //在這個情境 0會開 其他數字會關 所以要把這邊的isActive反轉
-    >
-      <Panel key={0} header={<OqpHeader isActive={isActive} panelSwitch={panelSwitch} />}>
-        <Table_prod
-          disabled={true}
-          prodList={productList}
-          prodCellConfig={prodCellConfig}
-          prodKeyArr={prodKeyArr}
-          changeProdKeyArr={changeProdKeyArr}
-          addProd={() => {}}
-          setTargetProd={setTargetProdKey}
-          discountRate={undefined}
-        />
-
-        {/* <Table_com
-          disabled={true}
-          comList={targetProd?.comList}
-          comCellConfig={comCellConfig}
-          comKeyArr={comKeyArr}
-          changeComKeyArr={changeComKeyArr}
-          defalutVKeyArr={comVKeyArr}
-        /> */}
-
-        {/* <Table_accessories
-          disabled={true}
-          list={targetProd?.accessoriesList}
-          cellConfig={accessoriesCellConfig}
-          keyArr={accessoriesKeyArr}
-          changeKeyArr={changeAccessoriesKeyArr}
-          defalutVKeyArr={targetProd?.accessoriesVKeyArr}
-          onVKeyChange={(keyArr) => {
-            if (targetProd) {
-              targetProd.accessoriesVKeyArr = keyArr;
-            }
-          }}
-          doorModel={targetProd?.doorType}
-          onSelectorConfirm={(arr) => {
-            if (targetProd) {
-              targetProd.addAcce(arr);
-            }
-          }}
-        /> */}
-      </Panel>
-    </Collapse>
+      activeKey={+!isActive}
+      items={[
+        {
+          key: 0,
+          label: <OqpHeader isActive={isActive} panelSwitch={panelSwitch} />,
+          children: (
+            <Table_prod
+              disabled={true}
+              prodList={productList}
+              prodCellConfig={prodCellConfig}
+              prodKeyArr={prodKeyArr}
+              changeProdKeyArr={changeProdKeyArr}
+              addProd={() => {}}
+              setTargetProd={setTargetProdKey}
+              discountRate={undefined}
+            />
+          ),
+        },
+      ]}
+    />
   );
 };
 
