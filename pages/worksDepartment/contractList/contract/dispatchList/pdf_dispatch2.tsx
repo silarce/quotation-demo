@@ -117,9 +117,15 @@ export default function Pdf_dispatch2({
             <Cell className={classNames(cn4)}>捲門</Cell>
             <Cell className={classNames(cn2)}>遙控器</Cell>
             <Cell_unit>{rollingRemote}</Cell_unit>
-            <Cell className={classNames('col-span-2', cn2)}>{`鑰匙(${rollingKeyNumber})`}</Cell>
+            <Cell className={classNames('col-span-2 gap-1', cn2)}>
+              <span className="flex-shrink-0">鑰匙</span>
+              <span>{rollingKeyNumber}</span>
+            </Cell>
             <Cell_unit>{rollingKey}</Cell_unit>
-            <Cell className={classNames('col-span-3', cn3)}>其他:{rollingOther}</Cell>
+            <Cell className={classNames('col-span-3 gap-1', cn3)}>
+              <span className="flex-shrink-0">其他:</span>
+              <span>{rollingOther}</span>
+            </Cell>
             {/* row5 */}
             <Cell className={classNames(cn4)}>大門</Cell>
             <Cell className={classNames(cn2)}>遙控器</Cell>
@@ -128,10 +134,13 @@ export default function Pdf_dispatch2({
             <Cell_unit>{gateControllerKey}</Cell_unit>
             <Cell className={classNames(cn2)}>馬達鑰匙</Cell>
             <Cell_unit>{gateMotorKey}</Cell_unit>
-            <Cell className={classNames(cn3)}>其他:{gateOther}</Cell>
+            <Cell className={classNames(cn3, 'gap-1')}>
+              <span className="flex-shrink-0">其他:</span>
+              <span>{gateOther}</span>
+            </Cell>
             {/* row6 */}
 
-            <Cell className={classNames('row-span-8 grid justify-center')}>{strToSpan('承辦情形')}</Cell>
+            <Cell className={classNames('row-span-8 grid justify-center pt-3')}>{strToSpan('承辦情形')}</Cell>
             <Cell className={classNames('col-span-8 row-span-8')}>{content}</Cell>
 
             <Cell className={classNames('col-span-2 gap-6', cn2, ch6)}>{strToSpan('派工批價')}</Cell>
@@ -170,7 +179,7 @@ export default function Pdf_dispatch2({
             <Cell className="grid justify-center leading-9">{strToSpan('客戶簽章')}</Cell>
             <Cell></Cell>
           </div>
-          <div className={classNames(scss.signatureBar)}>
+          <div className={classNames(scss.signatureBar, 'mt-1')}>
             <div>{strToSpan('歸檔')}</div>
             <div>{strToSpan('主管')}</div>
             <div>{strToSpan('財會')}</div>
@@ -204,8 +213,8 @@ const strToSpan = (str: string) => {
 const cn1 = classNames('flex justify-between items-center', scss.px12);
 const cn2 = 'flex justify-center items-center';
 const cn3 = 'flex items-center';
-const cn4 = 'text-center leading-8';
+const cn4 = 'flex items-center leading-8 ';
 const cn5 = 'flex justify-center items-center gap-2 leading-8';
-const ch6 = 'py-2';
+const ch6 = 'flex items-center py-2';
 
 export type { Tdata };
