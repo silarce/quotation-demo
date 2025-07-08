@@ -80,9 +80,7 @@ export function createUseInfinite<TapiReq extends Tres>({
 
         if (res) {
           setDataList((list) => {
-            list[`${res.meta.page}`] = res.data;
-
-            return { ...list };
+            return { ...list, [`${res.meta.page}`]: res.data };
           });
           setMeta(res.meta);
           setHasNextPage(res.meta.hasNextPage);
