@@ -872,15 +872,8 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '取消',
-      // onClick: () => router.back(),
       onClick: () => {
         router.back();
-        // router.push({
-        //   pathname: '/worksDepartment/contractList/contract/dispatchList',
-        //   query: {
-        //     contractId,
-        //   },
-        // });
       },
     },
     ...returnPanel,
@@ -894,7 +887,6 @@ export default function EditDispatchList() {
           title: '確定刪除此派工單？',
           content: (() => {
             if (haveTodoList) {
-              // return '此派工單已連結待辦事項，\n該待辦事項將會一起被刪除';
               return (
                 <span>
                   此派工單已連結待辦事項
@@ -918,20 +910,7 @@ export default function EditDispatchList() {
           width: 'fit-content',
           content: (
             <div className="m-5">
-              <Pdf_dispatch data={data_pdf} />
-            </div>
-          ),
-        });
-      },
-    },
-    {
-      type: 'myButton',
-      label: '匯出2',
-      onClick: () => {
-        myAlert.clear({
-          width: 'fit-content',
-          content: (
-            <div>
+              {/* <Pdf_dispatch data={data_pdf} /> */}
               <Pdf_dispatch2 data={data_pdf} />
             </div>
           ),
@@ -948,12 +927,6 @@ export default function EditDispatchList() {
       label: '返回',
       onClick: () => {
         router.back();
-        // router.push({
-        //   pathname: '/worksDepartment/contractList/contract/dispatchList',
-        //   query: {
-        //     contractId,
-        //   },
-        // });
       },
     },
     ...returnPanel,
