@@ -386,11 +386,12 @@ const Row = ({
         </div>
       )}
 
-      {/* {rightPanelArr && <Panel {...rightPanelArr} />} */}
       {rightPanelArr && (
         <div className={scss.rightPanel}>
-          {rightPanelArr.map((rightPanel, index) => {
-            return <Panel key={rightPanel.key || index} {...rightPanel} />;
+          {rightPanelArr.map(({ key: _key, ...rightPanel }, index) => {
+            const key = _key === 'undefined' && undefined;
+
+            return <Panel key={key || index} {...rightPanel} />;
           })}
         </div>
       )}
