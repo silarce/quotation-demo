@@ -10,17 +10,28 @@ import scss from './pdf_dispatch2.module.scss';
 
 // =======================================================================
 
+interface Tdata {
+  idNumber: string; // 派工單號，也就是序號
+  customerName: string; // 其實是工地名稱
+  phoneNumber: string; // 工地電話
+  contactPerson: string; // 接洽人，自動帶工程聯絡單的聯絡人，但必須可以修改
+  address: string; // 工地地址
+  projectNumber: string; // 工程編號
+  // warrantyPeriod: string; // 保固日期
+  content: string; // 承辦情形
+  //
+  rollingOther: React.ReactNode;
+  rollingKeyNumber: React.ReactNode;
+  rollingRemote: React.ReactNode;
+  rollingKey: React.ReactNode;
+  gateOther: React.ReactNode;
+  gateRemote: React.ReactNode;
+  gateControllerKey: React.ReactNode;
+  gateMotorKey: React.ReactNode;
+}
+
 interface Tprops {
-  data: {
-    idNumber: string; // 派工單號，也就是序號
-    customerName: string; // 其實是工地名稱
-    phoneNumber: string; // 工地電話
-    contactPerson: string; // 接洽人，自動帶工程聯絡單的聯絡人，但必須可以修改
-    address: string; // 工地地址
-    projectNumber: string; // 工程編號
-    // warrantyPeriod: string; // 保固日期
-    content: string; // 承辦情形
-  };
+  data: Tdata;
 }
 
 // =======================================================================
@@ -28,7 +39,23 @@ interface Tprops {
 const { width, height } = getA4Rect();
 
 export default function Pdf_dispatch2({
-  data: { idNumber, customerName, phoneNumber, contactPerson, address, projectNumber, content },
+  data: {
+    idNumber,
+    customerName,
+    phoneNumber,
+    contactPerson,
+    address,
+    projectNumber,
+    content,
+    rollingOther,
+    rollingKeyNumber,
+    rollingRemote,
+    rollingKey,
+    gateOther,
+    gateRemote,
+    gateControllerKey,
+    gateMotorKey,
+  },
 }: Tprops) {
   const ref_pdf = useRef<HTMLDivElement>(null);
 
@@ -89,19 +116,19 @@ export default function Pdf_dispatch2({
             <Cell className={classNames('col-span-2 row-span-2 ', cn1)}>{strToSpan('點交內容')}</Cell>
             <Cell className={classNames(cn4)}>捲門</Cell>
             <Cell className={classNames(cn2)}>遙控器</Cell>
-            <Cell_unit></Cell_unit>
-            <Cell className={classNames('col-span-2', cn2)}>{`鑰匙(${'null'})`}</Cell>
-            <Cell_unit></Cell_unit>
-            <Cell className={classNames('col-span-3', cn3)}>其他:</Cell>
+            <Cell_unit>{rollingRemote}</Cell_unit>
+            <Cell className={classNames('col-span-2', cn2)}>{`鑰匙(${rollingKeyNumber})`}</Cell>
+            <Cell_unit>{rollingKey}</Cell_unit>
+            <Cell className={classNames('col-span-3', cn3)}>其他:{rollingOther}</Cell>
             {/* row5 */}
             <Cell className={classNames(cn4)}>大門</Cell>
             <Cell className={classNames(cn2)}>遙控器</Cell>
-            <Cell_unit></Cell_unit>
+            <Cell_unit>{gateRemote}</Cell_unit>
             <Cell className={classNames('col-span-2', cn2)}>控箱鑰匙</Cell>
-            <Cell_unit></Cell_unit>
+            <Cell_unit>{gateControllerKey}</Cell_unit>
             <Cell className={classNames(cn2)}>馬達鑰匙</Cell>
-            <Cell_unit></Cell_unit>
-            <Cell className={classNames(cn3)}>其他:</Cell>
+            <Cell_unit>{gateMotorKey}</Cell_unit>
+            <Cell className={classNames(cn3)}>其他:{gateOther}</Cell>
             {/* row6 */}
 
             <Cell className={classNames('row-span-8 grid justify-center')}>{strToSpan('承辦情形')}</Cell>
@@ -163,9 +190,9 @@ const Cell = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => 
 
 const Cell_unit = ({ className, children = '　', ...props }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <Cell className={classNames(className)} {...props}>
+    <Cell className={classNames(className, 'grid content-between py-1')} {...props}>
       <div className="text-center">{children}</div>
-      <div className={'text-center text-[12px]'}>付</div>
+      <div className={'text-center text-[12px] leading-4'}>付</div>
     </Cell>
   );
 };
@@ -180,3 +207,5 @@ const cn3 = 'flex items-center';
 const cn4 = 'text-center leading-8';
 const cn5 = 'flex justify-center items-center gap-2 leading-8';
 const ch6 = 'py-2';
+
+export type { Tdata };

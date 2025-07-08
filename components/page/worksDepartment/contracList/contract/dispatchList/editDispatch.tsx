@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import moment from 'moment';
 import classNames from 'classnames';
-import _ from 'lodash';
 
 // antd
 import { Radio } from 'antd';

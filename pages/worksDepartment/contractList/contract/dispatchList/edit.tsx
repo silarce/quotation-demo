@@ -14,7 +14,7 @@ import EditDispatch, {
   Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
 import Pdf_dispatch, { Tdata_pdf } from './pdf_dispatch';
-import Pdf_dispatch2 from './pdf_dispatch2';
+import Pdf_dispatch2, { Tdata as Tdata_pdf2 } from './pdf_dispatch2';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -810,7 +810,7 @@ export default function EditDispatchList() {
 
   // MARK:data_pdf
 
-  const data_pdf: Tdata_pdf = useMemo(() => {
+  const data_pdf: Tdata_pdf & Tdata_pdf2 = useMemo(() => {
     const {
       //
       county = '',
@@ -818,12 +818,17 @@ export default function EditDispatchList() {
       address = '',
       warrantyDate,
       tasks = '',
-      // pointContactPerson = '',
-      // pointContactNumber = '',
+
       pointContact,
 
-      projectSiteContactPerson = '',
-      projectSiteContactPersonNumber = '',
+      rollingOther,
+      rollingKeyNumber,
+      rollingRemote,
+      rollingKey,
+      gateOther,
+      gateRemote,
+      gateControllerKey,
+      gateMotorKey,
     } = dispatching ?? {};
 
     const wholeAddress = `${county}${district}${address}`;
@@ -831,19 +836,24 @@ export default function EditDispatchList() {
     const contactPerson = pointContact?.[0]?.name + '\n' + pointContact?.[0]?.phone;
     const contactPerson2 = pointContact?.[1] && pointContact?.[1]?.name + '\n' + pointContact?.[1]?.phone;
 
-    const data_pdf: Tdata_pdf = {
+    const data_pdf: Tdata_pdf & Tdata_pdf2 = {
       idNumber: dispatching?.idNumber ?? '',
-      // customerName: contract?.content.projectName ?? '',
       customerName: (engineeringContact?.projectAbbreviation || contract?.content.projectName) ?? '',
-      // phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
       phoneNumber: contactPerson2 ?? '',
 
-      // contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
       contactPerson,
       address: wholeAddress,
       projectNumber: contract?.contractNumber ?? '',
       warrantyPeriod: (warrantyDate ? getTaiwanDateStr(warrantyDate) : '') || '',
       content: tasks,
+      rollingOther,
+      rollingKeyNumber,
+      rollingRemote,
+      rollingKey,
+      gateOther,
+      gateRemote,
+      gateControllerKey,
+      gateMotorKey,
     };
 
     return data_pdf;
