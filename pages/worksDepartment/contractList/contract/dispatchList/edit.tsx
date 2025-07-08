@@ -104,7 +104,29 @@ export default function EditDispatchList() {
     note: string;
     // pricingMethod: string;
     isCompleted: boolean;
-  }>();
+
+    rollingOther: string;
+    rollingKeyNumber: string;
+    rollingRemote: `${number}` | '';
+    rollingKey: `${number}` | '';
+    gateOther: string;
+    gateRemote: `${number}` | '';
+    gateControllerKey: `${number}` | '';
+    gateMotorKey: `${number}` | '';
+  }>({
+    tasks: '',
+    note: '',
+    isCompleted: false,
+
+    rollingOther: '',
+    rollingKeyNumber: '',
+    rollingRemote: '',
+    rollingKey: '',
+    gateOther: '',
+    gateRemote: '',
+    gateControllerKey: '',
+    gateMotorKey: '',
+  });
 
   const [state_pricingMethod, setState_pricingMethod] = useState<Tstate_pricingMethod>({
     pricingMethod: '',
@@ -161,69 +183,6 @@ export default function EditDispatchList() {
     return { todoForDispatch };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todoIdForDispatch]);
-
-  // ---------------------------------------------------------
-
-  // MARK: controll_editDispatch
-
-  const controll_editDispatch: Tcontroll_editDispatch = {
-    tasks: {
-      value: state_dispatch?.tasks ?? '',
-      onChange: (v: string) => {
-        setState_dispatch((data) => {
-          if (!data) {
-            return data;
-          }
-
-          data.tasks = v;
-
-          return { ...data };
-        });
-      },
-    },
-    note: {
-      value: state_dispatch?.note ?? '',
-      onChange: (v: string) => {
-        setState_dispatch((data) => {
-          if (!data) {
-            return data;
-          }
-
-          data.note = v;
-
-          return { ...data };
-        });
-      },
-    },
-    pricingMethod: {
-      value: state_pricingMethod.pricingMethod,
-      note: state_pricingMethod.note,
-      onChange: (str) => {
-        setState_pricingMethod({
-          pricingMethod: str,
-          note: '',
-        });
-      },
-      onInputChange: (str) => {
-        setState_pricingMethod((state) => ({
-          ...state,
-          note: str,
-        }));
-      },
-    },
-    isCompleted: {
-      value: state_dispatch?.isCompleted ?? false,
-      onChange: (bool) => {
-        setState_dispatch((state) => {
-          if (!state) {
-            return state;
-          }
-
-          return { ...state, isCompleted: bool };
-        });
-      },
-    },
-  };
 
   // ---------------------------------------------------------
 
@@ -289,6 +248,15 @@ export default function EditDispatchList() {
 
       pointContact: state_profile.pointContactArr,
       outsourcingId: state_profile.outsourcing.map((item) => item.id),
+      //
+      rollingOther: state_dispatch.rollingOther,
+      rollingKeyNumber: state_dispatch.rollingKeyNumber,
+      rollingRemote: Number(state_dispatch.rollingRemote),
+      rollingKey: Number(state_dispatch.rollingKey),
+      gateOther: state_dispatch.gateOther,
+      gateRemote: Number(state_dispatch.gateRemote),
+      gateControllerKey: Number(state_dispatch.gateControllerKey),
+      gateMotorKey: Number(state_dispatch.gateMotorKey),
     };
 
     try {
@@ -401,6 +369,15 @@ export default function EditDispatchList() {
       warrantyDate,
       isCompleted,
       outsourcing = [],
+
+      rollingOther,
+      rollingKeyNumber,
+      rollingRemote,
+      rollingKey,
+      gateOther,
+      gateRemote,
+      gateControllerKey,
+      gateMotorKey,
     } = dispatching ?? {};
 
     let {
@@ -478,6 +455,14 @@ export default function EditDispatchList() {
       tasks: tasks ?? todoForDispatch?.content ?? '',
       note: note ?? '',
       isCompleted: !!isCompleted,
+      rollingOther: rollingOther ?? '',
+      rollingKeyNumber: rollingKeyNumber ?? '',
+      rollingRemote: String(rollingRemote ?? '') as `${number}` | '',
+      rollingKey: String(rollingKey ?? '') as `${number}` | '',
+      gateOther: gateOther ?? '',
+      gateRemote: String(gateRemote ?? '') as `${number}` | '',
+      gateControllerKey: String(gateControllerKey ?? '') as `${number}` | '',
+      gateMotorKey: String(gateMotorKey ?? '') as `${number}` | '',
     });
 
     if (pricingMethod) {
@@ -681,6 +666,145 @@ export default function EditDispatchList() {
 
     return control_profile;
   }, [state_profile, theDiasbled, engineeringContact?.contactInfo]);
+
+  // MARK: controll_editDispatch
+  const controll_editDispatch: Tcontroll_editDispatch = {
+    tasks: {
+      value: state_dispatch?.tasks ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          if (!data) {
+            return data;
+          }
+
+          data.tasks = v;
+
+          return { ...data };
+        });
+      },
+    },
+    note: {
+      value: state_dispatch?.note ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          if (!data) {
+            return data;
+          }
+
+          data.note = v;
+
+          return { ...data };
+        });
+      },
+    },
+    pricingMethod: {
+      value: state_pricingMethod.pricingMethod,
+      note: state_pricingMethod.note,
+      onChange: (str) => {
+        setState_pricingMethod({
+          pricingMethod: str,
+          note: '',
+        });
+      },
+      onInputChange: (str) => {
+        setState_pricingMethod((state) => ({
+          ...state,
+          note: str,
+        }));
+      },
+    },
+    isCompleted: {
+      value: state_dispatch?.isCompleted ?? false,
+      onChange: (bool) => {
+        setState_dispatch((state) => {
+          if (!state) {
+            return state;
+          }
+
+          return { ...state, isCompleted: bool };
+        });
+      },
+    },
+
+    rollingOther: {
+      value: state_dispatch?.rollingOther ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          return { ...data, rollingOther: v };
+        });
+      },
+    },
+    rollingKeyNumber: {
+      value: state_dispatch?.rollingKeyNumber ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          return { ...data, rollingKeyNumber: v };
+        });
+      },
+    },
+    rollingRemote: {
+      value: state_dispatch?.rollingRemote ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.rollingRemote = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    rollingKey: {
+      value: state_dispatch?.rollingKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.rollingKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    gateOther: {
+      value: state_dispatch?.gateOther ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateOther = v;
+
+          return { ...data };
+        });
+      },
+    },
+    gateRemote: {
+      value: state_dispatch?.gateRemote ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateRemote = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    gateControllerKey: {
+      value: state_dispatch?.gateControllerKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateControllerKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    gateMotorKey: {
+      value: state_dispatch?.gateMotorKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateMotorKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+
+    //
+  };
 
   // ---------------------------------------------------------
 

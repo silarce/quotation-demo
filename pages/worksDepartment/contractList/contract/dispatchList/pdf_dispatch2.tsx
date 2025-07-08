@@ -180,32 +180,3 @@ const cn3 = 'flex items-center';
 const cn4 = 'text-center leading-8';
 const cn5 = 'flex justify-center items-center gap-2 leading-8';
 const ch6 = 'py-2';
-
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985
-// 接著接api
-// https://dev.azure.com/sanjeou/ERP%E7%B6%AD%E9%81%8B/_backlogs/backlog/ERP%E7%B6%AD%E9%81%8B%20Team/Epics?workitem=985

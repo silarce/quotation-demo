@@ -277,8 +277,6 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
           {control.pointContactArr.map((item, index) => {
             const { name: _name, phone: phoneNumber, remove } = item;
 
-            const name = _name.value ? { label: _name.value, value: _name.value } : null;
-
             return (
               <Fragment key={index}>
                 <IconRemoveCircle className={classNames(scss.iconBtn, disabled && 'invisible')} onClick={remove} />
@@ -309,37 +307,6 @@ export default function Profile({ control, disabled }: { control: Tcontrol; disa
                     }}
                   />
                 </DataEntry>
-                {/* <InputSel
-                  caption="接洽人"
-                  disabled={disabled}
-                  {...config_inputSel}
-                  captionStyle={{ width: 60 }}
-                  selectProps={{
-                    props: {
-                      placeholder: '',
-                      isSearchable: true,
-                      options: control.pointContractPersonOptions,
-                      value: name,
-                      onChange: (option) => {
-                        _name.onChange(option as Toption_pointContactPerson | null);
-                      },
-                    },
-                  }}
-                />
-
-                <InputSel
-                  caption="接洽人電話"
-                  disabled={disabled}
-                  {...config_inputSel}
-                  captionStyle={{ width: 100 }}
-                  inputProps={{
-                    props: {
-                      placeholder: '',
-                      value: phoneNumber.value,
-                      onChange: phoneNumber.onChange,
-                    },
-                  }}
-                /> */}
               </Fragment>
             );
           })}
