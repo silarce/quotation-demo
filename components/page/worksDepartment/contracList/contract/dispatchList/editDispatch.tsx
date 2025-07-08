@@ -27,7 +27,7 @@ type Tcontroll_item_num = {
 };
 
 type TpricingMethodControll = {
-  value: '合約內' | '合約辦理追加' | '贈送' | '修繕計價' | '其他' | '';
+  value: '合約內' | '合約辦理追加' | '贈送' | '修繕計價' | '其他' | '保固內' | '';
   note: string;
   onChange: (v: TpricingMethodControll['value']) => void;
   onInputChange: (v: string) => void;
@@ -153,6 +153,7 @@ export default function EditDispatch({
           <Radio value={'合約內'}>合約內</Radio>
           <Radio value={'合約辦理追加'}>合約辦理追加</Radio>
           <Radio value={'贈送'}>贈送</Radio>
+          <Radio value={'保固內'}>保固內</Radio>
 
           <Radio
             value={`修繕計價`}
@@ -167,11 +168,14 @@ export default function EditDispatch({
               <input
                 id="dispatch-fixFee"
                 disabled={disabled}
-                type="text"
                 autoComplete="off"
                 value={(pricingMethod.value === '修繕計價' && pricingMethod.note) || ''}
                 onChange={(e) => {
-                  pricingMethod.value === '修繕計價' && pricingMethod.onInputChange(e.target.value);
+                  const isPositiveInteger = checkIsPositiveInteger(e.target.value);
+
+                  if (checkAndReport(e, isPositiveInteger)) {
+                    pricingMethod.value === '修繕計價' && pricingMethod.onInputChange(e.target.value);
+                  }
                 }}
                 onClick={() => {
                   pricingMethod.onChange('修繕計價');
