@@ -56,7 +56,7 @@ const dlPdf = async ({
     doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
   }
 
-  const today = dayjs().format('yyyy-MM-DD');
+  const today = dayjs().format('YYYY-MM-DD');
   doc.save(`${fileName}_${today}.pdf`);
   showRootLoading(false);
 };

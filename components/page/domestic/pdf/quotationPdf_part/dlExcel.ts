@@ -186,7 +186,7 @@ const dlExcel = async ({ quotationId, mainProductArr }: { quotationId: string; m
     });
 
     const id = quotationId;
-    const today = dayjs().format('yyyy-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
     link.download = `${id}_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();

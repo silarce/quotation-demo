@@ -355,7 +355,7 @@ export const useApiDailyReports_v2 = (customParams?: Tparams) => {
 }; // useGetAnnotation_v2
 
 // 取得自己指定日期的日報表
-/**date格式為yyyy-MM-DD 例:2022-02-02 */
+/**date格式為YYYY-MM-DD 例:2022-02-02 */
 export const apiDailyReports_my = (date: string) => {
   const api = `/daily-reports/my?date=${date}`;
 
@@ -365,7 +365,7 @@ export const apiDailyReports_my = (date: string) => {
     .catch((err) => Promise.reject(err));
 };
 
-/**date格式為yyyy-MM-DD 例:2022-02-02 */
+/**date格式為YYYY-MM-DD 例:2022-02-02 */
 export const useApiDailyReports_my = (date: string) => {
   const [data, setData] = useState<TdailyReportDto>();
 

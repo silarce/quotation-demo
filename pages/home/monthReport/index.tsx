@@ -49,7 +49,7 @@ export default function MonthReport() {
 
   // -------------------------------------------------------------------------
 
-  const thisYear_tw = dayjs(convertDate_reduce1911(new Date().toISOString())).format('yy');
+  const thisYear_tw = dayjs(convertDate_reduce1911(new Date().toISOString())).format('YYYY').replace(/(^0+)/, '');
   const thisMonth = dayjs(convertDate_reduce1911(new Date().toISOString())).format('M');
 
   const [year_tw, setYear_tw] = useState<string>(thisYear_tw);

@@ -671,7 +671,7 @@ const dlExcel = async ({
       type: 'application/vnd.ms-excel;charset=utf-8;',
     });
 
-    const today = dayjs().format('yyyy-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
     link.download = `${fileName}_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();

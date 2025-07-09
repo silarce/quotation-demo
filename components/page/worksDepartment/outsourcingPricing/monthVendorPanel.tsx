@@ -65,13 +65,13 @@ const MonthVendorPanel = ({
     const tabArr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
       const twDate = dayjs(date).subtract(1911, 'years');
 
-      if (date === dayjs(targetDate).format('yy-MM')) {
+      if (date === dayjs(targetDate).format('YYYY-MM').replace(/(^0+)/, '')) {
         defaultCarouselIndex = index;
         setActiveTab_date(index);
       }
 
       return {
-        label: twDate.format('yy-MM'),
+        label: twDate.format('YYYY-MM').replace(/(^0+)/, ''),
         onClick: ({ ref_slider }) => {
           setActiveTab_date(index);
           ref_slider.current.slickGoTo(index);

@@ -233,9 +233,7 @@ export default function QuotationPdf({
       if (!isValid) {
         return '';
       } else {
-        m_quotationDate.subtract(1911, 'year');
-
-        return m_quotationDate.format('yy年MM月DD日');
+        return getTaiwanDateStr(m_quotationDate, { withUnit: true });
       }
     })();
 
@@ -246,9 +244,7 @@ export default function QuotationPdf({
       if (!isValid) {
         return '';
       } else {
-        // m_tradingDate.subtract(1911, 'year');
-
-        return m_tradingDate.format('yy年MM月DD日');
+        return m_tradingDate.format('YYYY年MM月DD日').replace(/(^0+)/, '');
       }
     })();
 

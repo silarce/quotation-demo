@@ -195,7 +195,6 @@ const DatePicker = ({
   }
 
   // 改變ant-picker-year-btn的格式
-  // locale_copy.lang.yearFormat = 'yy年';
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   locale_copy.lang.yearFormat = (
