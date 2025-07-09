@@ -27,7 +27,6 @@ import icon_add from 'public/image/icon/fc_add2.svg';
 import icon_eye from 'public/image/icon/eyeOpen.svg';
 import icon_export from 'public/image/icon/fc_export.svg';
 
-import moment from 'moment';
 import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from 'js/utils/helpers/hook/useYearMonth';
 import { Tparams } from 'js/api/dtoTypes';
 import { Modal } from 'antd';
@@ -64,7 +63,7 @@ export default function PayrollLedger() {
   // 查詢變數-物料
 
   //普通變數
-  const [selectedOption, setSelectedOption] = useState(moment().format('YYYY-MM')); // 預設為當前年月份
+  // const [selectedOption, setSelectedOption] = useState(moment().format('YYYY-MM')); // 預設為當前年月份
   // const [year, setYear] = useState(moment().format('YYYY-MM')); // 預設為當前年月份
   // const [month, setMonth] = useState(moment().format('MM')); // 預設為當前年月份
   const [currentemp, setCurrentEmp] = useState<string>('');
@@ -166,7 +165,7 @@ export default function PayrollLedger() {
 
   const GetPayrollByDate = async () => {
     //router year傳進來是 ~2024 month 是 1~12
-    console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
+    // console.log(moment().format('YYYY-MM-DD HH:mm:ss'));
 
     try {
       setIsLoading(true);

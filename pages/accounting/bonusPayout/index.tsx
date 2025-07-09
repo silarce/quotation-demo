@@ -32,7 +32,6 @@ import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
 import icon_search2 from 'public/image/icon/search.svg';
 
 //時間
-import moment from 'moment';
 import { Modal, Radio, Space } from 'antd';
 // import { SelectBar, useYearMonth_options, useYearMonth_selectBar_query } from "js/utils/helpers/hook/useYearMonth";
 import { SelectBar_date, useYearMonth_options } from 'js/utils/helpers/hook/useYearMonth';
