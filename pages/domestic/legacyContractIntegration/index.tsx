@@ -1,6 +1,5 @@
 import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/router';
-import dayjs from 'dayjs';
 import Link from 'next/link';
 
 // layer
@@ -233,7 +232,7 @@ export default function LegacyContractIntegration() {
 
               return {
                 key: index,
-                className: scss.panel1,
+                className: scss.panel,
                 label: (
                   <div
                     //  ref={arr.length - 3 === index ? viewRef_bottom : undefined}
