@@ -36,7 +36,8 @@ import { dlPdf } from './dlPdf';
 // api
 import { apiGetAssets } from 'js/api/api_product';
 
-import { useDoorModelList, useShallow } from 'hooks/globalState/useDoorModelList';
+// import { useDoorModelList, useShallow } from 'hooks/globalState/useDoorModelList';
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 // ============================================================================
 
@@ -129,10 +130,8 @@ const excelRowMaxQty = 13; // excel 一頁13列
 // ============================================================================
 // region START
 export default function Modal_quotationPdf({
-  //
-  visible,
+  open,
   onCancel,
-  // data = fakeData,
   pdfData,
   fileName = '未命名',
 }: {
@@ -179,7 +178,7 @@ export default function Modal_quotationPdf({
   }
 
   return (
-    <Modal open={visible} onCancel={onCancel} width="fit-content" footer={null} closable={false} destroyOnHidden={true}>
+    <Modal open={open} onCancel={onCancel} width="fit-content" footer={null} closable={false} destroyOnHidden={true}>
       <div className={scss.body}>
         <div>
           <MyButton_v2 onClick={handle_dlPdf} className="mr-5">
@@ -1184,11 +1183,12 @@ const useModalQuotationPdf = ({
   emptySomeProperty?: boolean; // 清空 customerName contactPerson contactNumber faxNumber
   // noDiscount?: boolean;
 }) => {
+  const { checkIsSpecialDoor } = useGlobal_doorModel();
+
   const [visible, setVisible] = useState(false);
   const [noDiscount, setNoDiscount] = useState(false);
 
   // const [pdfData, setPdfData] = useState<TpdfData>();
-  const checkIsSpecialDoor = useDoorModelList(useShallow((state) => state.checkIsSpecialDoor));
 
   const pdfData = useMemo(() => {
     if (!quotationContent || !visible) {
