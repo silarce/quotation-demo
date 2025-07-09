@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
@@ -206,9 +207,7 @@ const DatePicker = ({
   };
 
   if (disabled && returnSpanWhenDisabled) {
-    const value = transformDate(props.value);
-
-    return <span>{value?.format('yy-MM-DD')}</span>;
+    return <span>{getTaiwanDateStr(props.value)}</span>;
   }
 
   return (
@@ -218,9 +217,7 @@ const DatePicker = ({
       {...suffixIcon}
       locale={locale_copy}
       format={(theDayjs) => {
-        const value = transformDate(theDayjs);
-
-        return value.format('yy-MM-DD');
+        return getTaiwanDateStr(theDayjs);
       }}
       {...props}
     />

@@ -34,6 +34,7 @@ import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 import { optionsCreator_quotationStatus } from 'js/utils/options/options';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ============================================================================
 
@@ -842,7 +843,7 @@ export default function QuotationPdf({
       });
 
       const id = quotationNumber;
-      const today = dayjs().format('yyyy-MM-DD');
+      const today = dayjs().format('YYYY-MM-DD');
       link.download = `${id}_${today}.xlsx`;
       link.href = URL.createObjectURL(blobData);
       link.click();
@@ -857,10 +858,7 @@ export default function QuotationPdf({
   // ----------------------------------------------------------------------------
   // profile
   const profilePram: Tprofile = (() => {
-    // const customerName = customer.name;
-
-    // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
-    const dateString = dayjs(quotationDate).subtract(1911, 'year').format('yy-MM-DD');
+    const dateString = getTaiwanDateStr(quotationDate);
 
     return {
       quotationId: quotationNumber,
@@ -1373,14 +1371,12 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
     };
   });
 
-  // const quotationStatus = quotationStatusLookup[status] ?? '';
-
   const customerName = customer?.name ?? '';
   const agentName = agentEmployee?.chName ?? '';
 
   const allAddress = county + district + address;
 
-  const tradingDate = dayjs(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+  const tradingDate = getTaiwanDateStr(deliveryDate);
 
   const control_basicInfo: Tcontrol_basicInfo = {
     quotationDate,
@@ -1543,7 +1539,7 @@ const legacyContractToBasicInfo = ({
 
   const allAddress = projectCity + projectDistrict + projectAddress;
 
-  const tradingDate = dayjs(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+  const tradingDate = getTaiwanDateStr(deliveryDate);
 
   const control_basicInfo: Tcontrol_basicInfo = {
     quotationDate: '', // 舊合約沒有報價日期

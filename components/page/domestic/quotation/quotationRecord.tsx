@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import dayjs from 'dayjs';
 import _ from 'lodash';
 
 // antd
@@ -9,7 +8,7 @@ import { Collapse } from 'antd';
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // helper
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import style from './quotationRecord.module.scss';
@@ -89,7 +88,7 @@ export default function QuotationRecord({ subContract }: { subContract: Tquotati
 
               const changeInfo = {
                 quotationId: content.quotationNumber,
-                date: dayjs(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
+                date: getTaiwanDateStr(content.quotationDate),
                 priceChange: content.subTotal,
                 remark: content.editNotes,
               };

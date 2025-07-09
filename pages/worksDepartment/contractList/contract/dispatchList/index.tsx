@@ -23,7 +23,7 @@ import { Tparams, useGetEngineeringContact, useGetEngineeringDispatchingList } f
 import { useGetContract_id } from 'js/api/api_quotation';
 
 // helper
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './dispatchList.module.scss';
@@ -96,7 +96,7 @@ export default function DispatchList() {
     const dispatch_simpleArr =
       dispatchingArr?.map((item) => {
         return {
-          dispatchDate: dayjs(convertDate_reduce1911(item.dispatchDate)).format('yy-MM-DD'),
+          dispatchDate: getTaiwanDateStr(item.dispatchDate),
           workerNameArr: item.workerEmployee.map((worker) => worker.chName || worker.enName),
           outsourcingNameArr: item.outsourcing.map((worker) => worker.name),
 

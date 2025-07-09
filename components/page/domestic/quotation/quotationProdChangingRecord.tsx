@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import dayjs from 'dayjs';
+
 import _ from 'lodash';
 
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // antd
 import { Collapse } from 'antd';
@@ -13,15 +13,11 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 // css
 import style from 'components/page/domestic/quotation/quotationProdChangingRecord.module.scss';
 
-// ===================================================================
-// ===================================================================
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import { useProductList } from 'hooks/quotation/useProduct';
 import { TquotationProductDto, TquotationContractDto } from 'js/api/dtoTypes';
 // ===================================================================
-// ===================================================================
 
-// =====================================================
 export default function TheQuotationProdChangingRecord({
   subContract,
 }: {
@@ -71,7 +67,7 @@ export default function TheQuotationProdChangingRecord({
 
             const record = {
               quotationId: content.quotationNumber,
-              date: dayjs(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
+              date: getTaiwanDateStr(content.quotationDate),
               priceChange: `${contentTotal}`,
               remark: content.editNotes,
             };

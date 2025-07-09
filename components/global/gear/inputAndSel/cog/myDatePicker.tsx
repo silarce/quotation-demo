@@ -7,7 +7,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { DatePicker, DatePickerProps } from 'antd';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from '../inputSel.module.scss';
@@ -110,14 +110,10 @@ export default function MyDatePicker({
         placeholder={placeholder ?? '例 : 100-01-01'}
         // format回傳日期的日期會導致input不能用
         format={(theDayjs) => {
-          const twDate = convertDate_reduce1911(theDayjs.toISOString());
-
-          return dayjs(twDate).format('yy-MM-DD');
+          return getTaiwanDateStr(theDayjs);
         }}
-        // format={"yy-MM-DD"}
         disabled={disabled}
-        bordered={false}
-        // showToday={false}
+        variant="borderless"
         autoComplete="off"
         onChange={theOnChange}
         onFocus={theOnFocus}

@@ -394,7 +394,7 @@ const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employee
       type: 'application/vnd.ms-excel;charset=utf-8;',
     });
 
-    const today = dayjs().format('yyyy-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
     link.download = `三久ERP_報表_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();

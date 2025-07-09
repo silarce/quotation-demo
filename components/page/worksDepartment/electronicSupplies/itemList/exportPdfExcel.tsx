@@ -93,7 +93,7 @@ export default function ExportPdfExcel({ itemArr, projectName }: { itemArr: Tite
   // -------------------------------------------------------
 
   const hanlder_dlPdf = () => {
-    const today = dayjs().format('yyyy-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
 
     dlPdf({
       divElementArr: ref_pageArr.current,
@@ -331,7 +331,7 @@ const dlExcel = async ({
       type: 'application/vnd.ms-excel;charset=utf-8;',
     });
 
-    const today = dayjs().format('yyyy-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
     link.download = `送電備品列表_${projectName}_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();

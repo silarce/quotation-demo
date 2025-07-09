@@ -29,7 +29,7 @@ optionsCounty.unshift({ value: '', label: '不拘' });
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './legacyContract.module.scss';
@@ -207,9 +207,7 @@ export default function LegacyContractIntegration() {
                 }
               });
 
-              const dateStr = item.createdAt
-                ? dayjs(convertDate_reduce1911(item.createdAt)).format('yy-MM-DD')
-                : '無日期';
+              const dateStr = item.createdAt ? getTaiwanDateStr(item.createdAt) : '無日期';
 
               const quotationContent: TBodyItemContent = {
                 quotationNumber: item.contractNumber, // 合約編號

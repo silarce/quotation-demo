@@ -1,12 +1,11 @@
 import classNames from 'classnames';
-import dayjs from 'dayjs';
 
 // antd
 import { DatePicker, DatePickerProps } from 'antd';
 import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 // utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from '../inputSel.module.scss';
@@ -49,13 +48,7 @@ export default function MyDatePicker({
       <DatePicker
         locale={locale}
         format={(theDayjs) => {
-          const twDate = convertDate_reduce1911(theDayjs.toISOString());
-
-          const picker = antdProps?.picker;
-
-          const format = picker === 'year' ? 'yy' : picker === 'month' ? 'yy-MM' : 'yy-MM-DD';
-
-          return dayjs(twDate).format(format);
+          return getTaiwanDateStr(theDayjs);
         }}
         autoComplete="off"
         variant="borderless"

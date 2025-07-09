@@ -37,7 +37,7 @@ export default function MonthReportTable({
 
     for (let i = 0; i < daysInMonth; i++) {
       const day = date.day(); // 使用 date() 取得當前的天數
-      const dateStr = date.format('yyyy-MM-DD');
+      const dateStr = date.format('YYYY-MM-DD');
       const dateMoment = date.clone();
       weekDays.push({
         day,

@@ -15,7 +15,7 @@ import PanelBody from './budgetList/tableBody';
 import scss from './budgetList.module.scss';
 
 // utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
@@ -123,7 +123,7 @@ export default function BudgetList({
             const processChain = quotationToReiviewChain(content);
 
             return {
-              date: dayjs(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
+              date: getTaiwanDateStr(quotationDate),
               editNotes,
               discount: averageDiscount ?? '',
               doorQty: String(quantity),

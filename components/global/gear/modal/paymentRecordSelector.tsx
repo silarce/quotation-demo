@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import dayjs from 'dayjs';
 
 // global gear
 import SelectorShell, { TsearcbBarProps } from './selectorShell';
@@ -21,7 +20,7 @@ import {
 } from 'js/api/api_accountant';
 
 // utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // option
 import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/options';
@@ -332,9 +331,7 @@ const RowArr = ({
       {dataArr.map((data, index, arr) => {
         const { paymentType, accountingNumber, price, notes, noteMaturityDate } = data;
 
-        const theNoteMaturityDate = !noteMaturityDate
-          ? ''
-          : dayjs(convertDate_reduce1911(noteMaturityDate)).format('yy-MM-DD');
+        const theNoteMaturityDate = !noteMaturityDate ? '' : getTaiwanDateStr(noteMaturityDate);
 
         const ref = index === dataArr.length - 3 ? viewRef_bottom : undefined;
 
