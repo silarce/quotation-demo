@@ -65,10 +65,13 @@
 
 .clear {
   :global(.ant-modal-content) {
+    padding: unset;
     :global(.ant-modal-body) {
-      padding: unset;
-      :global(.ant-modal-confirm-content) {
-        margin-top: unset;
+      :global(.ant-modal-confirm-paragraph) {
+        max-width: unset;
+        :global(.ant-modal-confirm-content) {
+          margin-top: unset;
+        }
       }
       :global(.ant-modal-confirm-btns) {
         display: none;
