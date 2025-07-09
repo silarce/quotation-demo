@@ -23,9 +23,6 @@ import type { CheckboxGroupProps } from 'antd/lib/checkbox';
 import type { RadioGroupProps } from 'antd/lib/radio';
 import type { DefaultOptionType, BaseOptionType } from 'antd/lib/select';
 
-import locale from 'antd/lib/date-picker/locale/zh_TW';
-const locale_copy = _.cloneDeep(locale);
-
 import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
 
 // ======================================================================
@@ -190,21 +187,6 @@ const DatePicker = ({
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
   disabled && (suffixIcon.suffixIcon = null);
 
-  function transformDate<D extends Dayjs | null | undefined = Dayjs | null | undefined>(date: D) {
-    return twDate && date ? dayjs(date)?.subtract(1911, 'year') : date;
-  }
-
-  // 改變ant-picker-year-btn的格式
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  locale_copy.lang.yearFormat = (
-    date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
-  ) => {
-    const year = transformDate(date)?.year();
-
-    return `${year}年`;
-  };
-
   if (disabled && returnSpanWhenDisabled) {
     return <span>{getTaiwanDateStr(props.value)}</span>;
   }
@@ -214,7 +196,6 @@ const DatePicker = ({
       className={classNames(scss.datepicker, className)}
       disabled={disabled}
       {...suffixIcon}
-      locale={locale_copy}
       format={(theDayjs) => {
         return getTaiwanDateStr(theDayjs);
       }}
@@ -235,7 +216,6 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
       disabled={disabled}
       //
       {...suffixIcon}
-      locale={locale}
       format="HH-mm"
       autoComplete="off"
       {...props}

@@ -12,6 +12,7 @@ import { useMediaQuery } from 'react-responsive';
 
 // antd
 import { ConfigProvider as AntdConfigProvider, unstableSetRender } from 'antd';
+import locale from 'antd/locale/zh_TW';
 
 // conponents
 import Layer from 'components/Layer/Layer';
@@ -32,15 +33,11 @@ import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
-
-dayjs.extend(isBetween);
-dayjs.extend(duration);
-dayjs.extend(utc);
-dayjs.locale('zh-tw');
+import 'dayjs/locale/zh-tw';
 
 // -----------------------------------------------------------------------------------
 
@@ -82,6 +79,33 @@ unstableSetRender((node, container) => {
     root.unmount();
   };
 });
+
+// -----------------------------------------------------------------------------------
+
+dayjs.extend(isBetween);
+dayjs.extend(duration);
+dayjs.extend(utc);
+dayjs.locale('zh-tw');
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+locale.DatePicker.lang.yearFormat = (
+  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
+) => {
+  const year = date.subtract(1911, 'year').year();
+
+  return `${year}年`;
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+locale.DatePicker.lang.cellYearFormat = (
+  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
+) => {
+  const year = date.subtract(1911, 'year').year();
+
+  return `${year}年`;
+};
 
 // -----------------------------------------------------------------------------------
 
@@ -267,7 +291,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // ------------------------------------------------------------------
   return (
-    <AntdConfigProvider button={{ autoInsertSpace: false }}>
+    <AntdConfigProvider button={{ autoInsertSpace: false }} locale={locale}>
       <Head>
         <title>三久ERP</title>
       </Head>

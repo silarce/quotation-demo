@@ -2,7 +2,6 @@ import classNames from 'classnames';
 
 // antd
 import { DatePicker, DatePickerProps } from 'antd';
-import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 // utils
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -46,7 +45,6 @@ export default function MyDatePicker({
   return (
     <div className={classNames(scss.datePickerBox, wrapperClassName)} style={wrapperStyle}>
       <DatePicker
-        locale={locale}
         format={(theDayjs) => {
           return getTaiwanDateStr(theDayjs);
         }}

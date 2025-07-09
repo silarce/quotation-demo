@@ -5,7 +5,6 @@ import dayjs, { Dayjs } from 'dayjs';
 
 // antd
 import { DatePicker, DatePickerProps } from 'antd';
-import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -105,7 +104,6 @@ export default function MyDatePicker({
     <div className={datePickerBoxClassName}>
       <DatePicker
         className={theDatePickerClassName}
-        locale={locale}
         value={theValue}
         placeholder={placeholder ?? '例 : 100-01-01'}
         // format回傳日期的日期會導致input不能用

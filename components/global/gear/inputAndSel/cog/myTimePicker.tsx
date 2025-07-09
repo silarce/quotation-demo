@@ -6,8 +6,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import { TimePicker, TimePickerProps } from 'antd';
 import type { PickerRef } from 'rc-picker';
 
-import locale from 'antd/lib/date-picker/locale/zh_TW';
-
 // css
 import scss from '../inputSel.module.scss';
 
@@ -106,7 +104,6 @@ export default function MyTimePicker({
         ref={ref}
         className={classNames(scss.timePicker, timePickerClassName)}
         popupClassName={classNames(scss.timePickerPopupt)}
-        locale={locale}
         value={theValue}
         placeholder={placeholder ?? 'HH:mm'}
         defaultValue={dayjs('00:00', 'HH-mm')}

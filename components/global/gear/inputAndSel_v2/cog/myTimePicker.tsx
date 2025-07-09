@@ -3,7 +3,6 @@ import classNames from 'classnames';
 import dayjs from 'dayjs';
 // antd
 import { TimePicker, TimePickerProps } from 'antd';
-import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 // css
 import scss from '../inputSel.module.scss';
@@ -18,7 +17,6 @@ export default function MyTimePicker({ wrapperClassName, wrapperStyle, props }: 
   return (
     <div className={classNames(scss.timePickerBox, wrapperClassName)} style={wrapperStyle}>
       <TimePicker
-        locale={locale}
         format="HH-mm"
         defaultValue={dayjs('00:00', 'HH-mm')}
         variant="borderless"
