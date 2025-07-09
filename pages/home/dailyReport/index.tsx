@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/router';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 // layer
 import PageHeader02 from 'components/PageHeader/PageHeader02/PageHeader02';
@@ -13,8 +13,6 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 // component
 import TheCalendar from 'components/page/home/dailyReport/TheCalendar';
 import ReporterList from 'components/page/home/dailyReport/ReporterList';
-// 暫時先留著好了，2023-11-01後還沒用到就砍掉吧
-// import ReviewerAndExaminerSelector from 'components/page/home/dailyReport/ReviewerAndExaminerSelector';
 import ReportTable from 'components/page/home/dailyReport/ReportTable';
 import TabCarousel from 'components/page/home/dailyReport/TabCarousel';
 import { panelListCreator } from 'components/page/home/dailyReport/utils/panelListCreator';
