@@ -2,7 +2,6 @@
 
 .drawer {
   position: absolute;
-  // width: 100%;
   z-index: 2;
   :global(.ant-drawer-mask) {
     display: none;
@@ -10,17 +9,16 @@
   :global(.ant-drawer-content-wrapper) {
     transition-duration: 0s;
   }
-  :global(.ant-drawer-content) {
-    :global(.ant-drawer-body) {
-      padding: 0;
-      @screen laptop {
-        overflow: hidden;
-        display: grid;
-        grid-template-rows: fit-content auto;
-      }
-    }
+}
+
+.drawerBody.drawerBody.drawerBody {
+  padding: 0;
+  @screen laptop {
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: fit-content auto;
   }
-} // wrapper
+}
 
 .datePickerWrapper {
   padding: 18px 35px;
