@@ -329,3 +329,40 @@
     }
   }
 }
+
+.timePicker {
+  padding: 0;
+  border-bottom: solid 1px black;
+  border-radius: 0;
+  height: fit-content;
+
+  &.disabled {
+    border-bottom-color: transparent;
+  }
+
+  &.date_redColor {
+    :global(.ant-picker-input) {
+      > input {
+        color: red !important;
+      }
+    }
+  }
+
+  input {
+    font-weight: 400;
+    font-size: 18px;
+    width: 100%;
+    resize: none;
+    &::placeholder {
+      color: $colorBorder01;
+    }
+  }
+}
+
+.timepickerPopup {
+  :global(.ant-btn) {
+    span {
+      color: white;
+    }
+  }
+}

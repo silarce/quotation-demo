@@ -1,6 +1,5 @@
 import { useState, useContext, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
-
 import classNames from 'classnames';
 import Image from 'next/image';
 import dayjs from 'dayjs';
@@ -8,6 +7,7 @@ import dayjs from 'dayjs';
 // antd
 import { Drawer, Badge, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { TimePicker, TimePickerProps } from 'antd';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -68,11 +68,6 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 // ==================================================
-
-interface TtimeTrigger {
-  rIndex: number;
-  key: string;
-}
 
 // ==================================================
 // 防抖
@@ -270,9 +265,6 @@ export default function ReportTable({
   const theBodyKeyArr = rwd1023 ? headerKeyArr_mobile : bodyKeyArr;
 
   // ------------------------------------------------
-  /**用來觸發目的地、離工地的focus */
-  const [timeTrigger, setTimeTrigger] = useState<TtimeTrigger>({ rIndex: -1, key: '' });
-  // ------------------------------------------------
   // dnd
 
   const sensors = useSensors(useSensor(PointerSensor));
@@ -393,8 +385,7 @@ export default function ReportTable({
                   onMealAddClick: onMealAddClick,
                   onLicensePlateAddClick: onLicensePlateAddClick,
                   onRemoveClick: onRemoveClick,
-                  timeTrigger,
-                  setTimeTrigger,
+
                   index: rIndex,
                   isMine,
                 })}
@@ -595,8 +586,6 @@ type Tconfig = {
       onLicensePlateAddClick: () => void;
       onRemoveClick: (() => void) | undefined;
 
-      timeTrigger: TtimeTrigger;
-      setTimeTrigger: React.Dispatch<React.SetStateAction<TtimeTrigger>>;
       index: number;
 
       isMine: boolean;
@@ -866,26 +855,17 @@ const config: Tconfig = {
       return { header, body };
     },
 
-    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
-      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'departureTime';
-
+    render({ class_reportItem, disabled, index }) {
       const time = dayjs(class_reportItem.departureTime);
       const isBeforeAM8 = time.isBefore(dayjs(time).startOf('day').add(8, 'hours'));
 
       return (
-        <InputSel
+        <MyTimePicker
+          className={classNames(isBeforeAM8 && scss.date_redColor)}
           disabled={disabled}
-          showBaseline="auto"
-          placeholder={'時間'}
-          timePickerProps={{
-            timePickerClassName: classNames(isBeforeAM8 && scss.date_redColor),
-            value: class_reportItem.departureTime ?? '',
-            onChange02: (v) => {
-              const value = v?.toISOString();
-              class_reportItem.departureTime = value;
-              setTimeTrigger({ rIndex: index, key: 'arrivalTime' });
-            },
-            focusTrigger: focusTrigger,
+          value={class_reportItem.departureTime ? dayjs(class_reportItem.departureTime) : null}
+          onChange={(d) => {
+            class_reportItem.departureTime = d.toISOString();
           }}
         />
       );
@@ -900,26 +880,17 @@ const config: Tconfig = {
       return { header, body };
     },
 
-    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
-      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
-
+    render({ class_reportItem, disabled, index }) {
       const time = dayjs(class_reportItem.departureWorksiteTime);
       const isAfter1715 = time.isAfter(dayjs(time).startOf('day').add(17, 'hours').add(15, 'minutes'));
 
       return (
-        <InputSel
+        <MyTimePicker
+          className={classNames(isAfter1715 && scss.date_redColor)}
           disabled={disabled}
-          showBaseline="auto"
-          placeholder={'時間'}
-          timePickerProps={{
-            timePickerClassName: classNames(isAfter1715 && scss.date_redColor),
-            value: class_reportItem.departureWorksiteTime ?? '',
-            onChange02: (v) => {
-              const value = v?.toISOString();
-              class_reportItem.departureWorksiteTime = value;
-              setTimeTrigger({ rIndex: index, key: '' });
-            },
-            focusTrigger: focusTrigger,
+          value={class_reportItem.departureWorksiteTime ? dayjs(class_reportItem.departureWorksiteTime) : null}
+          onChange={(d) => {
+            class_reportItem.departureWorksiteTime = d.toISOString();
           }}
         />
       );
@@ -934,22 +905,13 @@ const config: Tconfig = {
       return { header, body };
     },
 
-    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
-      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
-
+    render({ class_reportItem, disabled, index }) {
       return (
-        <InputSel
+        <MyTimePicker
           disabled={disabled}
-          showBaseline="auto"
-          placeholder={'時間'}
-          timePickerProps={{
-            value: class_reportItem.arrivalTime ?? '',
-            onChange02: (v) => {
-              const value = v?.toISOString();
-              class_reportItem.arrivalTime = value;
-              setTimeTrigger({ rIndex: index, key: 'departureWorksiteTime' });
-            },
-            focusTrigger: focusTrigger,
+          value={class_reportItem.arrivalTime ? dayjs(class_reportItem.arrivalTime) : null}
+          onChange={(d) => {
+            class_reportItem.arrivalTime = d.toISOString();
           }}
         />
       );
@@ -1284,5 +1246,38 @@ const mealsLookup = {
   lunch: '午餐',
   dinner: '晚餐',
 } as const;
+
+const MyTimePicker = ({
+  className,
+  disabled,
+  value,
+  onChange,
+}: {
+  className?: string;
+  disabled: boolean;
+  value: TimePickerProps['value'];
+  onChange: TimePickerProps['onChange'];
+}) => {
+  return (
+    <div className={'flex items-center justify-center'}>
+      <TimePicker
+        className={classNames(scss.timePicker, disabled && scss.disabled, className)}
+        popupClassName={scss.timepickerPopup}
+        placeholder={'HH:mm'}
+        defaultValue={dayjs('00:00', 'HH-mm')}
+        format="HH-mm"
+        disabled={disabled}
+        variant="borderless"
+        showNow={false}
+        autoComplete="off"
+        suffixIcon={null}
+        allowClear={false}
+        inputReadOnly={true}
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  );
+};
 
 export { mealsLookup };
