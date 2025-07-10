@@ -11,7 +11,7 @@ import {
   selectModalCreator_multi,
   TdailyReportItem_my,
 } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
+import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // css
 import scss from './dispatchList.module.scss';
@@ -50,6 +50,7 @@ type Tcontroll = {
   gateRemote: Tcontroll_item_num;
   gateControllerKey: Tcontroll_item_num;
   gateMotorKey: Tcontroll_item_num;
+  ejectionDoorKey: Tcontroll_item_num;
 };
 
 export type { Tcontroll, TpricingMethodControll };
@@ -87,6 +88,7 @@ export default function EditDispatch({
     rollingKey, // '捲門鑰匙數量'
     rollingKeyNumber,
     rollingOther,
+    ejectionDoorKey,
 
     gateRemote, // '大門遙控器數量'
     gateControllerKey, // '大門控制箱鑰匙數量'
@@ -215,8 +217,8 @@ export default function EditDispatch({
       <div>
         <div>
           <p className="text-2xl font-semibold text-main mb-0">捲門</p>
-          <div className="flex gap-2">
-            <InputSel
+          <div className="grid grid-cols-4 gap-10 gap-y-4">
+            <SameInputSel
               caption="遙控器數量"
               disabled={disabled}
               showBaseline="auto"
@@ -233,20 +235,8 @@ export default function EditDispatch({
                 },
               }}
             />
-            <InputSel
-              caption="鑰匙號碼"
-              disabled={disabled}
-              showBaseline="auto"
-              inputProps={{
-                props: {
-                  value: rollingKeyNumber.value,
-                  onChange: (e) => {
-                    rollingKeyNumber.onChange(e.target.value);
-                  },
-                },
-              }}
-            />
-            <InputSel
+
+            <SameInputSel
               caption="鑰匙數量"
               disabled={disabled}
               showBaseline="auto"
@@ -263,7 +253,42 @@ export default function EditDispatch({
                 },
               }}
             />
-            <InputSel
+
+            <SameInputSel
+              caption="彈射門鑰匙數量"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: ejectionDoorKey.value,
+                  onChange: (e) => {
+                    const isPositiveInteger = checkIsPositiveInteger(e.target.value);
+
+                    if (checkAndReport(e, isPositiveInteger)) {
+                      ejectionDoorKey.onChange(e.target.value as `${number}` | '');
+                    }
+                  },
+                },
+              }}
+            />
+
+            <br />
+
+            <SameInputSel
+              caption="鑰匙號碼"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: rollingKeyNumber.value,
+                  onChange: (e) => {
+                    rollingKeyNumber.onChange(e.target.value);
+                  },
+                },
+              }}
+            />
+
+            <SameInputSel
               caption="其他"
               disabled={disabled}
               showBaseline="auto"
@@ -278,10 +303,11 @@ export default function EditDispatch({
             />
           </div>
         </div>
+        <br />
         <div>
           <p className="text-2xl font-semibold text-main mb-0">大門</p>
-          <div className="flex gap-2">
-            <InputSel
+          <div className="grid grid-cols-4 gap-10 gap-y-4">
+            <SameInputSel
               caption="遙控器數量"
               disabled={disabled}
               showBaseline="auto"
@@ -298,7 +324,7 @@ export default function EditDispatch({
                 },
               }}
             />
-            <InputSel
+            <SameInputSel
               caption="控箱鑰匙數量"
               disabled={disabled}
               showBaseline="auto"
@@ -315,7 +341,7 @@ export default function EditDispatch({
                 },
               }}
             />
-            <InputSel
+            <SameInputSel
               caption="馬達鑰匙數量"
               disabled={disabled}
               showBaseline="auto"
@@ -332,7 +358,10 @@ export default function EditDispatch({
                 },
               }}
             />
-            <InputSel
+
+            <br />
+
+            <SameInputSel
               caption="其他"
               disabled={disabled}
               showBaseline="auto"
@@ -412,6 +441,12 @@ export default function EditDispatch({
     </div>
   );
 }
+
+// ============================================================================
+
+const SameInputSel = (props: TinputSelProps) => {
+  return <InputSel captionStyle={{ width: '140px' }} {...props} />;
+};
 
 // ============================================================================
 
