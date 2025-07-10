@@ -116,7 +116,7 @@ export default function Pdf_dispatch2({
             <Cell className={classNames('col-span-3 row-span-2', cn3)}>{customerName}</Cell>
 
             <Cell className={classNames('row-span-2', cn2)}>電話</Cell>
-            <Cell className={classNames('col-span-2 row-span-2', cn3)}>{phoneNumber}</Cell>
+            <Cell className={classNames('col-span-2 row-span-2 text-[22px]', cn3)}>{phoneNumber}</Cell>
 
             <Cell className={classNames('col-span-2', cn5)}>{strToSpan('工程編號')}</Cell>
             <Cell className={classNames(cn3, 'text-[25px]')}>{projectNumber}</Cell>
@@ -162,7 +162,7 @@ export default function Pdf_dispatch2({
             {/* row6 */}
 
             <Cell className={classNames('row-span-8 grid justify-center pt-3')}>{strToSpan('承辦情形')}</Cell>
-            <Cell className={classNames('col-span-8 row-span-8')}>{content}</Cell>
+            <Cell className={classNames('col-span-8 row-span-8 leading-9')}>{content}</Cell>
 
             <Cell className={classNames('col-span-2 gap-6', cn2, ch6)}>{strToSpan('派工批價')}</Cell>
             {/* row7 */}
