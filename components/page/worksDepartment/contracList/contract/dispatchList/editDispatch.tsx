@@ -306,7 +306,7 @@ export default function EditDispatch({
         <br />
         <div>
           <p className="text-2xl font-semibold text-main mb-0">大門</p>
-          <div className="grid grid-cols-4 gap-10">
+          <div className="grid grid-cols-4 gap-10 gap-y-4">
             <SameInputSel
               caption="遙控器數量"
               disabled={disabled}
@@ -358,6 +358,9 @@ export default function EditDispatch({
                 },
               }}
             />
+
+            <br />
+
             <SameInputSel
               caption="其他"
               disabled={disabled}
