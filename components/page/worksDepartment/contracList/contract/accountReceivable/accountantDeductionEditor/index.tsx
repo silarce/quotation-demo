@@ -320,17 +320,16 @@ const editDeduction = ({
   cancelOnSuccess,
   forbidden,
 }: Tprops_modal) => {
-  const modal = myAlert.clear({});
-
-  modal.update({
+  const { destroy } = myAlert.clear({
     content: (
       <EditDeductionPanel
-        //
         accountantId={accountantId}
         incomeBillId={incomeBillId}
         defaultStateArr={defaultStateArr}
         onConfirm={onConfirm}
-        onCancel={modal.destroy}
+        onCancel={() => {
+          destroy();
+        }}
         cancelOnSuccess={cancelOnSuccess}
         forbidden={forbidden}
       />
