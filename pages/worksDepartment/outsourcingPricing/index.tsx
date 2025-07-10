@@ -43,10 +43,6 @@ export default function OutsourcingPricing() {
     month: targetOutsourcingId ? 'showMonthVendorList' : 'showDateList',
   }[showListBy];
 
-  console.log('showListBy', showListBy);
-  console.log('targetIsoDate', targetIsoDate);
-  console.log('showComponent', showComponent);
-
   // ------------------------------------------------------------------------
 
   const params: Tparams = {
