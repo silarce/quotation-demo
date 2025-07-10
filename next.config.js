@@ -15,6 +15,7 @@ dayjs.extend(timezone);
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'export',
   images: {
     unoptimized: true,
     // domains: ["sanjeou-erp-be.caprover.credot-web.com"],
