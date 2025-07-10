@@ -86,8 +86,8 @@ export default function InvoiceManagement(props?: TmyPageProps) {
       sort: 'invoiceDate',
       filter: {
         invoiceDate: {
-          $gte: dayjs(`${year}-${month}`, 'YYYY-MM').startOf('month').toISOString(),
-          $lte: dayjs(`${year}-${month}`, 'YYYY-MM').endOf('month').toISOString(),
+          $gte: dayjs(`${year}-${month}`).startOf('month').toISOString(),
+          $lte: dayjs(`${year}-${month}`).endOf('month').toISOString(),
         },
 
         $or: {
