@@ -2330,7 +2330,7 @@ export const apiPostAccountReceivableAccounts = async (body: TcreateAccountRecei
 };
 
 // 取得所有已開立發票 //w 注意，是已開立發票 invoiceStatus為"已開立" 的發票
-const apiGetAccountReceivableInvoices_all = async (params?: Tparams) => {
+export const apiGetAccountReceivableInvoices_all = async (params?: Tparams) => {
   const api = '/engineering/account-receivable/invoices';
 
   return axi
@@ -2368,6 +2368,11 @@ export const useGetAccountReceivableInvoices_all = ({
     }
   }, [params]);
 
+  const clear = () => {
+    setRes(undefined);
+    setIsFetching(false);
+  };
+
   useEffect(() => {
     autoUpdate && update();
   }, [params]);
@@ -2376,6 +2381,7 @@ export const useGetAccountReceivableInvoices_all = ({
     data: res?.data,
     meta: res?.meta,
     update,
+    clear,
     isFetching,
   };
 };
