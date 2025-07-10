@@ -232,7 +232,7 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
   // MARK: RENDER
 
   return (
-    <Modal {...modalProps} width="fit-content" footer={null} destroyOnClose={true}>
+    <Modal {...modalProps} width="fit-content" footer={null} destroyOnHidden={true}>
       <SquareBtn onClick={handleDownloadPdf}>下載PDF</SquareBtn>
       <br />
       <br />
@@ -266,7 +266,11 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
         {chunkedRowArr_table.map((item, index) => {
           return (
             <div key={index} className={classNames(scss.pageWrapper, 'mb-5')}>
-              <PageEmpty ref={(ref) => (ref_pageArr.current[index] = ref)}>
+              <PageEmpty
+                ref={(ref) => {
+                  ref_pageArr.current[index] = ref;
+                }}
+              >
                 {index === 0 && <Top />}
                 <Table2 rowArr={item} />
                 {index === chunkedRowArr_table.length - 1 && !isBottomOverflow && (
@@ -278,7 +282,11 @@ export default function Pdf_outsourcingPaymentMonthlyTable({
         })}
         {isBottomOverflow && (
           <div className={classNames(scss.pageWrapper, 'mb-5')}>
-            <PageEmpty ref={(ref) => (ref_pageArr.current[chunkedRowArr_table.length] = ref)}>
+            <PageEmpty
+              ref={(ref) => {
+                ref_pageArr.current[chunkedRowArr_table.length] = ref;
+              }}
+            >
               <Bottom />
             </PageEmpty>
           </div>

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, forwardRef, useContext } from 'react';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
@@ -50,7 +50,7 @@ import scss from './summon.module.scss';
 type Tstate_incomeBillSerial = {
   id: string;
   billSerialNumber: string;
-  receiveDate: Moment | null;
+  receiveDate: Dayjs | null;
   contractNumber: string;
   projectName: string;
   contractPayment: string;
@@ -58,7 +58,7 @@ type Tstate_incomeBillSerial = {
   priorPeriodPayment: string;
   importAccountingNumber: string;
   noteNumber: string;
-  noteMaturityDate: Moment | null;
+  noteMaturityDate: Dayjs | null;
   receivablePayment: string;
   deductionPayment: string;
   unpaidPayment: string;
@@ -1707,7 +1707,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
     const defaultState: Tstate_incomeBillSerial = {
       id,
       billSerialNumber: billSerialNumber,
-      receiveDate: receiveDate ? moment(receiveDate) : null,
+      receiveDate: receiveDate ? dayjs(receiveDate) : null,
       contractNumber: contractNumber || '',
       projectName: projectName || '',
       contractPayment: String(contractPayment || ''),
@@ -1715,7 +1715,7 @@ const useDefaultState = (incomeBillSerial: TincomeBillSerialDto) => {
       priorPeriodPayment: String(priorPeriodPayment || ''),
       importAccountingNumber: importAccountingNumber || '',
       noteNumber: noteNumber || '',
-      noteMaturityDate: noteMaturityDate ? moment(noteMaturityDate) : null,
+      noteMaturityDate: noteMaturityDate ? dayjs(noteMaturityDate) : null,
       receivablePayment: String(receivablePayment || ''),
       deductionPayment: String(deductionPayment || ''),
       unpaidPayment: String(unpaidPayment || ''),

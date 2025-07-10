@@ -1,7 +1,15 @@
 import { Key, MouseEvent, useEffect, useState } from 'react';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import iconPlace from 'public/image/icon/place.svg';
-import { IconAddCircle, IconChain, IconCross01, IconDetail, IconSearch, IconTearing, Icon_info } from 'public/image/icon/svgComponent/svgIcons';
+import {
+  IconAddCircle,
+  IconChain,
+  IconCross01,
+  IconDetail,
+  IconSearch,
+  IconTearing,
+  Icon_info,
+} from 'public/image/icon/svgComponent/svgIcons';
 import scss from './tbody01.module.scss';
 import scss2 from './tbody02.module.scss';
 import router from 'next/router';
@@ -16,17 +24,6 @@ import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg';
 import { inspect } from 'util';
 import Thead01 from './thead01';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
-import icon_fc_exclam from 'public/image/icon/fc_exclam.svg';
-import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import icon_fc_arrow_down_red from 'public/image/icon/fc_arrow_down_red.svg';
-import { setting } from '../../wareHouseList/index';
-import moment from 'moment';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import icon_fc_add from 'public/image/icon/fc_add.svg';
-import { first } from 'lodash';
-
-type TBodyItemContent = {};
 
 interface TbodyProps {
   data: any[];
@@ -39,7 +36,6 @@ interface TbodyProps {
   whnamecalled: any;
 }
 
-
 export interface PickingListModel {
   id?: string;
   create_at?: string;
@@ -50,12 +46,25 @@ export interface PickingListModel {
   picked?: string;
 }
 
-export default function Tbody01({ data, error, type, traycalled, traycalledname, traytransfer, url, whnamecalled }: TbodyProps) {
-
-
-
-  async function getTrayByWareHouse(item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
-    handleRowClick(item.id)
+export default function Tbody01({
+  data,
+  error,
+  type,
+  traycalled,
+  traycalledname,
+  traytransfer,
+  url,
+  whnamecalled,
+}: TbodyProps) {
+  async function getTrayByWareHouse(
+    item: any,
+    traycalled: any,
+    traycalledname: any,
+    traytransfer: any,
+    url: any,
+    whnamecalled: any
+  ) {
+    handleRowClick(item.id);
     router.push({
       pathname: `/factoryDepartment/trayList`,
       query: {
@@ -67,15 +76,21 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         traycalledname: traycalledname,
         traytransfer: traytransfer,
         whnamecalled: whnamecalled,
-        firstin: 1
+        firstin: 1,
       },
     });
-
   }
 
   // async function getWHPositionByWareHouseAndTray(whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any, trayid: any) {
-  async function getWHPositionByWareHouseAndTray(item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
-    handleRowClick(item.id)
+  async function getWHPositionByWareHouseAndTray(
+    item: any,
+    traycalled: any,
+    traycalledname: any,
+    traytransfer: any,
+    url: any,
+    whnamecalled: any
+  ) {
+    handleRowClick(item.id);
     router.replace({
       // pathname: `/factoryDepartment/whPositionList`,
       pathname: `/factoryDepartment/trayList`,
@@ -90,14 +105,20 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         url: url,
         whnamecalled: whnamecalled,
         firstin: 0,
-        trayid: item.trayid
+        trayid: item.trayid,
       },
     });
-
   }
 
   // async function editWHPositionById(id: any, whid: any, trayname: any, whname: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
-  async function editWHPositionById(item: any, traycalled: any, traycalledname: any, traytransfer: any, url: any, whnamecalled: any) {
+  async function editWHPositionById(
+    item: any,
+    traycalled: any,
+    traycalledname: any,
+    traytransfer: any,
+    url: any,
+    whnamecalled: any
+  ) {
     router.replace({
       pathname: `/factoryDepartment/editWHPosition`,
       query: {
@@ -109,7 +130,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         traycalled: traycalled,
         traycalledname: traycalledname,
         traytransfer: traytransfer,
-        whnamecalled: whnamecalled
+        whnamecalled: whnamecalled,
       },
     });
   }
@@ -188,9 +209,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
     return newlength + newwidth + newchildlength + (parseInt(newchildwidth) - 2).toString();
   };
 
-
   async function GetPickingListDetailById(item: any) {
-
     // console.log(item);
     router.replace({
       pathname: `/factoryDepartment/getMaterial/pickingList`,
@@ -199,14 +218,13 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         create_at: getTaiwanDateStr(item.create_at),
         create_by: item.create_by,
         lotid: item.lotid,
-        note: item.note
+        note: item.note,
       },
     });
   }
 
   //依據領料單物料取得符合料號與數量的托盤
   async function GetTrayByMaterialNumber(item: any) {
-
     // console.log(item);
     router.replace({
       pathname: `/factoryDepartment/getMaterial/pickingListDetail`,
@@ -219,7 +237,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   //#region 採購單
 
   async function GetPurchaseOrder(item: any) {
-    handleRowClick(item.purchaseorderid)
+    handleRowClick(item.purchaseorderid);
     // alert(getTaiwanDateStr(item.need_date));
     router.push({
       pathname: `/factoryDepartment/purchaseOrderList`,
@@ -239,9 +257,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         note: item.note,
         shippingaddress: item.shippingaddress,
         need_date: item.need_date,
-        quoterequuid:item.quoterequuid
-      }
-    })
+        quoterequuid: item.quoterequuid,
+      },
+    });
   }
 
   async function AddPurchaseOrderDetail(item: any) {
@@ -260,16 +278,15 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         supplierphone: item.supplierphone,
         invoice: item.invoice,
         firstin: 1,
-        purchaseorderdetailuuid: item.id
-      }
-    })
+        purchaseorderdetailuuid: item.id,
+      },
+    });
   }
-
 
   //#endregion
 
   async function GetProdReceipt(item: any) {
-    handleRowClick(item.prodreceiptid)
+    handleRowClick(item.prodreceiptid);
     router.replace({
       pathname: `/factoryDepartment/prodReceiptList`,
       query: {
@@ -291,9 +308,9 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         entrystatus: item.entry_status,
         paystatus: item.pay_status,
         note: item.note,
-        firstin: 1
-      }
-    })
+        firstin: 1,
+      },
+    });
   }
 
   //#region 請購單
@@ -312,8 +329,8 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         need_date: item.need_date,
         note: item.note,
         firstin: 1,
-      }
-    })
+      },
+    });
   }
   //#endregion
 
@@ -340,23 +357,23 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
         prodreceiptcreate_at: getTaiwanDateStr(item.prodreceiptcreate_at),
         prodreceiptcreate_by: item.prodreceiptcreate_by,
         batchid: item.batchid,
-        firstin: 1
-      }
-    })
+        firstin: 1,
+      },
+    });
   }
   //#endregion
 
   //#region 日期格式處理 收
   // 日期格式處理
   function convertToYearMonthDay(datetimetype: string, isoDateString: string | number | Date) {
-    if (datetimetype === "Date") {
+    if (datetimetype === 'Date') {
       // onlyDate
       const date = new Date(isoDateString);
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
 
+      return `${year}-${month}-${day}`;
     } else {
       // datetime
       const date = new Date(isoDateString);
@@ -366,12 +383,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const seconds = String(date.getSeconds()).padStart(2, '0');
+
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
-
   }
   //#endregion
-
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
@@ -379,18 +395,18 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   const handleRowClick = (itemId: string) => {
     setSelectedItemId(itemId);
   };
-  if (type === "WareHouse") {
 
+  if (type === 'WareHouse') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader}>
               <div
                 key={index}
                 className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                onClick={() => getTrayByWareHouse(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
+                onClick={() => getTrayByWareHouse(_item, traycalled, traycalledname, traytransfer, url, whnamecalled)}
               >
                 <span>{_item.whname}</span>
                 <span style={{ color: '#14256a', fontWeight: 'bolder' }}>{_item.traycodetotal}</span>
@@ -405,21 +421,20 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span></span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "WHPosition") {
+  } else if (type === 'WHPosition') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
-            <CellWithBar key={index} className={scss.panelHeader3}  >
+            <CellWithBar key={index} className={scss.panelHeader3}>
               <div
                 key={index}
                 className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                onClick={() => editWHPositionById(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
+                onClick={() => editWHPositionById(_item, traycalled, traycalledname, traytransfer, url, whnamecalled)}
               >
                 {/* <span>{_item.materialnumber}</span> */}
                 <span>
@@ -438,21 +453,22 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span></span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "Tray") {
+  } else if (type === 'Tray') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader2}>
               <div
                 key={index}
                 className={`${scss.row01} ${_item.id === selectedItemId ? scss.selectedRow : ''}`}
-                onClick={() => getWHPositionByWareHouseAndTray(_item, traycalled, traycalledname, traytransfer, url, whnamecalled,)}
+                onClick={() =>
+                  getWHPositionByWareHouseAndTray(_item, traycalled, traycalledname, traytransfer, url, whnamecalled)
+                }
               >
                 <span>{_item.whname}</span>
                 <span>{_item.trayname}</span>
@@ -465,15 +481,14 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled, _item.trayid)} /></span> */}
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "materialList") {
+  } else if (type === 'materialList') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader4}>
               <div className={scss.row01}>
@@ -486,31 +501,38 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span ><IconDetail onClick={() => getWHPositionByWareHouseAndTray(_item.whid, _item.trayname, _item.whname, traycalled, traycalledname, traytransfer, url, whnamecalled)} /></span> */}
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "GetMatWarehouseList") {
+  } else if (type === 'GetMatWarehouseList') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader5}>
               <div className={scss.row01}>
                 <span>{_item.whname}</span>
                 <span>{_item.trayname}</span>
                 {/* <span ><IconDetail onClick={() => {alert("ok")}}/></span> */}
-                <span >
+                <span>
                   {/* {icon_arrowdown} */}
                   <span>
-                    <button onClick={() => { alert("ok") }}>
+                    <button
+                      onClick={() => {
+                        alert('ok');
+                      }}
+                    >
                       <img src={icon_arrowdown.src} alt="Arrow Down" style={{ width: '30px', height: '30px' }} />
                     </button>
                   </span>
                   &nbsp;
                   <span>
-                    <button onClick={() => { alert("ok") }}>
+                    <button
+                      onClick={() => {
+                        alert('ok');
+                      }}
+                    >
                       <img src={icon_arrowup.src} alt="Arrow Down" style={{ width: '30px', height: '30px' }} />
                     </button>
                   </span>
@@ -521,38 +543,46 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 </span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "PickingList") {
+  } else if (type === 'PickingList') {
     // 領料單
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader6}>
               <div className={scss.row01}>
                 <span>{_item.pickinglistid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 <span>{_item.create_by}</span>
-                <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "領料中" ? '#28a745' : '#ea1833' }}>
+                <span
+                  style={{
+                    color: _item.status === '已結案' ? '#14256a' : _item.status === '領料中' ? '#28a745' : '#ea1833',
+                  }}
+                >
                   {_item.status}
                 </span>
-                <span ><IconDetail onClick={() => { GetPickingListDetailById(_item) }} /></span>
+                <span>
+                  <IconDetail
+                    onClick={() => {
+                      GetPickingListDetailById(_item);
+                    }}
+                  />
+                </span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "PickingDetailList") {
+  } else if (type === 'PickingDetailList') {
     // 領料單.領料單明細
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader7}>
               <div className={scss.row01}>
@@ -564,16 +594,15 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span></span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "PickingDetailList2") {
+  } else if (type === 'PickingDetailList2') {
     // 領料明細單.開始領料
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader8}>
               <div className={scss.row01}>
@@ -582,20 +611,25 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.quantity}</span>
                 <span>{_item.unit}</span>
                 <span>{_item.note}</span>
-                <span ><IconDetail onClick={() => { GetTrayByMaterialNumber(_item) }} /></span>
+                <span>
+                  <IconDetail
+                    onClick={() => {
+                      GetTrayByMaterialNumber(_item);
+                    }}
+                  />
+                </span>
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
-  } else if (type === "ProdEntry") {
+  } else if (type === 'ProdEntry') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader9}>
               <div
@@ -606,24 +640,23 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{index + 1}</span>
                 <span>{_item.prodentryid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
-                <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
+                <span style={{ color: `${_item.status === '已結案' ? '#14256a' : '#ea1833'}` }}>{_item.status}</span>
                 {/* <span ><IconDetail onClick={() => { GetProdEntry(_item) }} /></span> */}
                 {/* <span><IconDetail/></span> */}
                 {/* <span ><IconDetail onClick={() => { alert("右測顯示領料明細") }} /></span> */}
                 <span>{_item.suppliername}</span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
   }
   //#region 採購單
-  else if (type === "PurchaseOrder") {
+  else if (type === 'PurchaseOrder') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader10}>
               {/* <div className={scss.row01}
@@ -637,27 +670,29 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.purchaseorderid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 {/* <span style={{ color: `${_item.status === "已結案" ? '#14256a' : '#ea1833'}` }}>{_item.status}</span> */}
-                <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "採購中" ? '#28a745' : '#ea1833' }}>
+                <span
+                  style={{
+                    color: _item.status === '已結案' ? '#14256a' : _item.status === '採購中' ? '#28a745' : '#ea1833',
+                  }}
+                >
                   {_item.status}
                 </span>
                 <span>{_item.suppliername}</span>
                 {/* <span ><IconDetail onClick={() => { GetPurchaseOrder(_item) }} /></span> */}
               </div>
             </CellWithBar>
-          ))
-        )
-        }
-      </div >
+          ))}
+      </div>
     );
   }
   //#endregion
 
   //#region 採購單明細
-  else if (type === "PurchaseOrderDetail") {
+  else if (type === 'PurchaseOrderDetail') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader11}>
               <div className={scss.row01}>
@@ -671,25 +706,28 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.unitprice.toLocaleString()}</span>
                 <span>{_item.totalprice.toLocaleString()}</span>
                 <span>
-                  <button onClick={() => { AddPurchaseOrderDetail(_item) }}>
+                  <button
+                    onClick={() => {
+                      AddPurchaseOrderDetail(_item);
+                    }}
+                  >
                     <img src={icon_fc_arrow_down.src} alt="add" style={{ width: '20px', height: '20px' }} />
                   </button>
                 </span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
   }
   //#endregion
 
   //#region 進貨單
-  else if (type === "ProdReceipt") {
+  else if (type === 'ProdReceipt') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader12}>
               {/* <div className={scss.row01}> */}
@@ -703,24 +741,23 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 {/* <span style={{ color: `${_item.entry_status === "未入庫" ? "#ea1833" : "#14256a"}` }}>{_item.entry_status}</span>
                 <span style={{ color: `${_item.pay_status === "未請付" ? "#ea1833" : "#14256a"}` }}>{_item.pay_status}</span> */}
-                <span style={{ color: `${_item.status === "未結案" ? "#ea1833" : "#14256a"}` }}>{_item.status}</span>
+                <span style={{ color: `${_item.status === '未結案' ? '#ea1833' : '#14256a'}` }}>{_item.status}</span>
                 {/* <span ><IconDetail onClick={() => { GetProdReceipt(_item) }} /></span> */}
                 <span>{_item.suppliername}</span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
   }
   //#endregion
 
   //#region 進貨單明細
-  else if (type === "ProdReceiptDetail") {
+  else if (type === 'ProdReceiptDetail') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader14}>
               <div className={scss.row01}>
@@ -734,30 +771,36 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{_item.totalprice.toLocaleString()}</span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
   }
   //#endregion
 
   //#region 請購單
-  else if (type === "PurchaseRequisition") {
+  else if (type === 'PurchaseRequisition') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader15}>
               <div
                 key={index}
                 className={`${scss.row01} ${_item.purchaserequisitionid === selectedItemId ? scss.selectedRow : ''}`}
-                onClick={() => { GetPurchaseRequisition(_item) }}>
+                onClick={() => {
+                  GetPurchaseRequisition(_item);
+                }}
+              >
                 <span>{index + 1}</span>
                 <span>{_item.purchaserequisitionid}</span>
                 <span>{getTaiwanDateStr(_item.create_at)}</span>
                 {/* <span>{_item.totalprice.toLocaleString()}</span> */}
-                <span style={{ color: _item.status === "已結案" ? '#14256a' : _item.status === "詢價中" ? '#28a745' : '#ea1833' }}>
+                <span
+                  style={{
+                    color: _item.status === '已結案' ? '#14256a' : _item.status === '詢價中' ? '#28a745' : '#ea1833',
+                  }}
+                >
                   {_item.status}
                 </span>
                 <span>{_item.note}</span>
@@ -765,8 +808,7 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 {/* <span ><IconDetail onClick={() => { GetPurchaseRequisition(_item) }} /></span> */}
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
   }
@@ -831,11 +873,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
   // }
   //#endregion
   //#region productList明細
-  else if (type === "ProductList") {
+  else if (type === 'ProductList') {
     return (
       <div>
         {/* {error && <p>Error: {error}</p>} */}
-        {data && (
+        {data &&
           data.map((_item: any, index: number) => (
             <CellWithBar key={index} className={scss.panelHeader21}>
               <div className={scss.row01}>
@@ -848,15 +890,11 @@ export default function Tbody01({ data, error, type, traycalled, traycalledname,
                 <span>{getTaiwanDateStr(_item.update_at)}</span>
               </div>
             </CellWithBar>
-          ))
-        )}
+          ))}
       </div>
     );
   }
   //#endregion
 
-
   return null; // Add default return in case type is not matched
-
-
 }

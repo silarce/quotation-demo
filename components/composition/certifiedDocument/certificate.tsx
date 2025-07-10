@@ -1,9 +1,10 @@
-import { Fragment, useState, useEffect, useCallback, useMemo, useRef, MutableRefObject, forwardRef, memo } from 'react';
+import { Fragment, useState, useEffect, useCallback, useMemo, useRef, RefObject, forwardRef, memo } from 'react';
 import classNames from 'classnames';
 import { NextRouter, useRouter } from 'next/router';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import moment, { Moment } from 'moment';
+
+import dayjs, { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
 import Image, { StaticImageData } from 'next/image';
 
@@ -144,7 +145,7 @@ export default function Certificate({
   const [state_infoList, setState_infoList] = useState<TinfoList>({});
   const [state_itemList, setState_itemList] = useState<TitemList>({});
   const [state_description, setState_description] = useState('');
-  const [state_issuanceDate, setState_issuanceDate] = useState<Moment | null>(null);
+  const [state_issuanceDate, setState_issuanceDate] = useState<Dayjs | null>(null);
 
   const year = state_issuanceDate ? state_issuanceDate.year() - 1911 : '---';
   // const month = state_issuanceDate ? state_issuanceDate.month() + 1 : '---';
@@ -458,7 +459,7 @@ export default function Certificate({
     setState_itemList(list);
 
     if (data_certificate) {
-      const issuanceDate = data_certificate.issuanceDate ? moment(data_certificate.issuanceDate) : null;
+      const issuanceDate = data_certificate.issuanceDate ? dayjs(data_certificate.issuanceDate) : null;
 
       setState_infoList(data_certificate.infoList);
       setState_description(data_certificate.description);
@@ -614,7 +615,7 @@ export default function Certificate({
         {/*  */}
         <InputModal
           //
-          visible={showModal}
+          open={showModal}
           title="新增資訊"
           onConfirm={(str) => {
             setState_infoList((prev) => ({ ...prev, [str]: { caption: str, value: '' } }));
@@ -1005,12 +1006,12 @@ const PdfPreview_pre = ({
   closeModal: () => void;
   //
   // ref_container: MutableRefObject<HTMLDivElement>;
-  ref_title: MutableRefObject<HTMLDivElement>;
-  ref_info: MutableRefObject<HTMLDivElement>;
-  ref_description: MutableRefObject<HTMLDivElement>;
-  ref_footer: MutableRefObject<HTMLDivElement>;
-  ref_table: MutableRefObject<HTMLDivElement>;
-  ref_tableTitle: MutableRefObject<HTMLDivElement>;
+  ref_title: RefObject<HTMLDivElement>;
+  ref_info: RefObject<HTMLDivElement>;
+  ref_description: RefObject<HTMLDivElement>;
+  ref_footer: RefObject<HTMLDivElement>;
+  ref_table: RefObject<HTMLDivElement>;
+  ref_tableTitle: RefObject<HTMLDivElement>;
   state_itemList: TitemList;
   //
   state_docType: React.ReactNode;
@@ -1189,7 +1190,7 @@ const PdfPreview_pre = ({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       footer={null}
       onCancel={closeModal}
       //
@@ -1203,7 +1204,9 @@ const PdfPreview_pre = ({
           return (
             <Fragment key={index}>
               <VirtualContainer
-                ref={(ele) => (refPdf.current[index] = ele)}
+                ref={(ele) => {
+                  refPdf.current[index] = ele;
+                }}
                 state_docType={state_docType}
                 state_infoListArr={state_infoListArr}
                 state_description={state_description}

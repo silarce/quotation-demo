@@ -13,14 +13,11 @@ const Row_pre = (
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
-  const { thead, fullWidth, preStyle, sticky, gap = true } = props;
+  const { thead, fullWidth, preStyle, sticky, gap = true, ...restProps } = props;
 
   const attributes = {
-    ...props,
+    ...restProps,
   };
-
-  delete attributes.thead;
-  delete attributes.fullWidth;
 
   return (
     <div

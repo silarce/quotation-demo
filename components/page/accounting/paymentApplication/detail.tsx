@@ -1,15 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
-import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
 
 // gear
-import Row, { Cell, Tprops_cell } from 'components/global/gear/table/row';
-import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+import Row, { Cell } from 'components/global/gear/table/row';
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import { TablePanel_basic } from 'components/global/gear/table/tablePanel';
-
-import scss from './table_paymentApplication.module.scss';
 
 import type { TstateDetail } from 'pages/accounting/paymentApplication';
 
@@ -300,7 +294,7 @@ const config: Tconfig = {
       const datePickerProps: TinputSelProps['datePickerProps'] = {
         props: {
           value: stateDetail.transaction_date,
-          onChange: (date: Moment | null) => {
+          onChange: (date: Dayjs | null) => {
             setStateDetail((prev) => ({
               ...prev,
               transaction_date: date,

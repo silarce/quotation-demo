@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import _, { reverse, update } from 'lodash';
 import scss from './reviewList.module.scss';
 import Thead01 from '../../factoryDepartment/ui/table/thead01';
@@ -92,12 +92,12 @@ export default function ReviewList() {
   const [options, setOptions] = useState<string[]>([]); // 用來存放唯一的 document_type 選項
 
   // 預設截止日期為今天，起始日期為今天往前推30天
-  const defaultEndDate = moment();
-  const defaultStartDate = moment().subtract(30, 'days');
+  const defaultEndDate = dayjs();
+  const defaultStartDate = dayjs().subtract(30, 'days');
 
   // 使用 Moment 類型作為狀態
-  const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
-  const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
+  const [keywordstartdate, setKeywordstartdate] = useState<Dayjs | null>(defaultStartDate);
+  const [keywordenddate, setKeywordenddate] = useState<Dayjs | null>(defaultEndDate);
 
   // 編輯功能
   const [editstatus, setEditStatus] = useState<boolean>(false);

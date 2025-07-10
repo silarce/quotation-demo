@@ -87,8 +87,6 @@ export default function CustomerSelector({
 
       return;
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
   // ==================================================
@@ -160,7 +158,7 @@ export default function CustomerSelector({
   return (
     <SelectorShell
       label={label ?? ''}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       width={'800'}

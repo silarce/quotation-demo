@@ -7,7 +7,6 @@ import _ from 'lodash';
 
 // antd
 import { Collapse, Drawer } from 'antd';
-const { Panel } = Collapse;
 
 // gear
 import ChangePwPanel from 'components/global/gear/modal/changePwPanel';
@@ -66,7 +65,6 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
   // ------
 
   const [activePanel, setActivePanel] = useState<string[]>([]);
-  const checkIsActive = (key: string) => activePanel.some((theKey) => key === theKey);
 
   return (
     <>
@@ -100,14 +98,17 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
           onChange={(v) => {
             setActivePanel(v as string[]);
           }}
-        >
-          <Panel header={<PanelHeader />} key="0" className={classNames({ [scss.isActive]: checkIsActive('0') })}>
-            <PanelBody />
-          </Panel>
-        </Collapse>
+          items={[
+            {
+              key: '0',
+              label: <PanelHeader />,
+              children: <PanelBody />,
+            },
+          ]}
+        />
       </Drawer>
 
-      <ChangePwPanel visible={isShowChangePw} onCancel={() => setIsShowChangePw(false)} />
+      <ChangePwPanel open={isShowChangePw} onCancel={() => setIsShowChangePw(false)} />
     </>
   );
 };
@@ -125,7 +126,6 @@ const PanelHeader = () => {
 
 const PanelBody = () => {
   const router = useRouter();
-  const { userErpFeature } = useContext(LayerCtx);
 
   const asPath = router.asPath;
   const routerQuery = router.query;
@@ -135,12 +135,9 @@ const PanelBody = () => {
   return (
     <div className={classNames(scss.nav, 'relative')}>
       {linkList?.list.map((item, index) => {
-        const { label, path, list, erpFeature } = item;
+        const { label, path, list } = item;
         const reg = new RegExp(`^${path}`);
         const active = reg.test(asPath) ? scss.active : '';
-
-        // const isPassed = checkErpFeature({ erpFeature, userErpFeature })
-        // if (!isPassed) return null
 
         if (path) {
           return (
@@ -157,31 +154,34 @@ const PanelBody = () => {
               className={scss.nav}
               defaultActiveKey={[linkList.defaultCollapse || '0']}
               ghost
-              onChange={() => {}}
-            >
-              <Panel header={label} key={`${index}`}>
-                <ul>
-                  {list.map((item, index) => {
-                    const { label, path, erpFeature, query } = item;
-                    const reg = new RegExp(`^${path}`);
-                    const isActive = (() => {
-                      const isMatch = _.isMatch(routerQuery, query ?? {});
+              // onChange={() => {}}
+              items={[
+                {
+                  key: `${index}`,
+                  label: label,
+                  children: (
+                    <ul>
+                      {list.map((item, index) => {
+                        const { label, path, query } = item;
+                        const reg = new RegExp(`^${path}`);
+                        const isActive = (() => {
+                          const isMatch = _.isMatch(routerQuery, query ?? {});
 
-                      return reg.test(asPath) && isMatch;
-                    })();
-                    const href = { pathname: path, query };
+                          return reg.test(asPath) && isMatch;
+                        })();
+                        const href = { pathname: path, query };
 
-                    // const isPassed = checkErpFeature({ erpFeature, userErpFeature })
-                    // if (!isPassed) return null
-                    return (
-                      <li className={classNames(scss.li, { [scss.active]: isActive })} key={index}>
-                        <Link href={href}>{label}</Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </Panel>
-            </Collapse>
+                        return (
+                          <li className={classNames(scss.li, { [scss.active]: isActive })} key={index}>
+                            <Link href={href}>{label}</Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ),
+                },
+              ]}
+            />
           );
         }
       })}

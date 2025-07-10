@@ -22,7 +22,7 @@ function Collapse(
 
   return (
     <Antd_Collapse
-      expandIcon={() => <></>}
+      // expandIcon={() => null}
       {...antdProps}
       className={classNames(
         //
@@ -30,17 +30,7 @@ function Collapse(
         noTlrBorder && scss.noTlrBorder,
         props?.className
       )}
-    >
-      {props?.children}
-    </Antd_Collapse>
-  );
-}
-
-function Panel(props: CollapsePanelProps) {
-  return (
-    <Antd_Panel {...props} className={classNames(scss.panel, scss.plus, props.className)}>
-      {props.children}
-    </Antd_Panel>
+    />
   );
 }
 
@@ -83,8 +73,4 @@ const UpDownArrow = (
   );
 };
 
-// ============================================================================
-// 其實可以不用把Panel放進去，但是為求跟原本的antd一樣，決定放進去
-Collapse.Panel = Panel;
-
-export { Collapse, Panel, useActiveKey, UpDownArrow };
+export { Collapse, useActiveKey, UpDownArrow };

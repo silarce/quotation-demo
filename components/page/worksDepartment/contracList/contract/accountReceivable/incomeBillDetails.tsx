@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import Link from 'next/link';
 
@@ -299,8 +299,8 @@ export default function IncomeBillDetails({
             },
           } = incomeBill;
 
-          const year = moment(incomeBillDate).year();
-          const month = moment(incomeBillDate).month() + 1;
+          const year = dayjs(incomeBillDate).year();
+          const month = dayjs(incomeBillDate).month() + 1;
           let hrefToIncomeSummons = `/worksDepartment/incomeSummons?id=${id}&year=${year}&month=${month}`;
 
           isForeign && (hrefToIncomeSummons = hrefToIncomeSummons + '&isForeign=true');

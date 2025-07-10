@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import type { TuseSearchModal, Tstate_filter, Tconfig_filter, Tdto, Tconfig, TmodalData } from '../types';
 
@@ -59,8 +59,8 @@ const useData = (state_filter: Tstate_filter | undefined): TmodalData<TaccountsR
           return undefined;
         } else {
           return {
-            $gte: moment(state_filter.invoiceDate).startOf('day').toISOString(),
-            $lte: moment(state_filter.invoiceDate).endOf('day').toISOString(),
+            $gte: dayjs(state_filter.invoiceDate).startOf('day').toISOString(),
+            $lte: dayjs(state_filter.invoiceDate).endOf('day').toISOString(),
           };
         }
       })(),

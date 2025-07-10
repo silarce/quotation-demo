@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import ExcelJs from 'exceljs';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 import { Tprod, TpdfData } from './modal_quotationPdf';
 
@@ -671,7 +671,7 @@ const dlExcel = async ({
       type: 'application/vnd.ms-excel;charset=utf-8;',
     });
 
-    const today = moment().format('yyyy-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
     link.download = `${fileName}_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();

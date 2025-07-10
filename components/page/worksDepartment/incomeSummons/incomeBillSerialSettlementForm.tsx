@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 import classNames from 'classnames';
@@ -70,7 +70,7 @@ const IncomeBillSerialSettlementForm = ({
       return '';
     }
 
-    const date_m = moment(data.date);
+    const date_m = dayjs(data.date);
     const year = date_m.year() - 1911;
     const month = (date_m.month() + 1).toString().padStart(2, '0');
 

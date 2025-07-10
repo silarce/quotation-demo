@@ -1,28 +1,9 @@
-import moment, { Moment } from 'moment';
-// import _ from 'lodash';
+import { Dayjs } from 'dayjs';
+
 import { TemployeeDto } from 'js/api/dtoTypes';
-// import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
-// type Tstate_electronicItem = {
-//   id?: string;
-//   category: string;
-//   itemName: string;
-//   quantity: number | null;
-//   unit: string | null;
-//   code: string | null;
-
-//   // itemName為'控制箱/盤'時，subItemName為'捲門/水閘門'，其他為null或undefined
-//   subItemName?: null | '捲門/水閘門';
-//   // // 用來辨別item用的，必須為唯一值
-//   // // 目前只有需要編輯category的item會用到
-//   // // idName?: string;
-
-//   // inputCategory?: () => Promise<string>;
-//   categoryParam: string;
-// };
 
 type Tstate_info = {
-  date: Moment | null;
+  date: Dayjs | null;
   indexNumber: string;
   picker: TemployeeDto | undefined;
   preparer: TemployeeDto | undefined;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
 
 // antd
@@ -8,19 +8,14 @@ import { Checkbox, Popover, Button, Switch, Select } from 'antd';
 
 // global gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
-// import OutsourcingSelector, { ToutsourcingDto } from 'components/global/gear/modal/outsourctingSelector';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import MyButton_rounded from 'components/global/gear/button/myButton_rounded';
 
 import { TemployeeDto, ToutsourcingDto, TdeliveryStatusInstallationItem } from 'js/api/dtoTypes';
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
-import { Toption } from 'js/utils/options/options';
 import { optionsCreator_deliveryStatusInstallationItem } from 'js/utils/options/productOptions';
 
 // icon
 import { IconAddCircle, IconEdit, IconDelete01, IconCheck02, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
 
-// import { VerticalLeftOutlined, VerticalRightOutlined } from '@ant-design/icons';
 import * as antdIcon from '@ant-design/icons';
 
 // css
@@ -34,7 +29,6 @@ type Toption_generics<E extends string> = { value: E; label: string };
 type Toption_installationItem = Toption_generics<TdeliveryStatusInstallationItem>;
 
 type TpostDeliveryStatusParams = {
-  // employeeId?: string;
   employeeIdArr?: string[];
   outsourcingId?: string;
   installationDate: string;
@@ -56,8 +50,7 @@ type TrowProps = {
   className?: string;
   isHeadRow?: boolean;
   isProdRow?: boolean;
-  // onCheckClick?: null | (() => void);
-  // isChecked?: boolean;
+
   side?: {
     serialNumber: React.ReactNode;
     projectName: React.ReactNode;
@@ -128,10 +121,6 @@ type Tpanel = {
 
   isLatest?: boolean;
 };
-
-// type Tcontrol = {
-//   rowPropsArr: TrowProps[];
-// };
 
 export type { TrowProps, Tpanel, TpostDeliveryStatusParams };
 
@@ -390,11 +379,12 @@ const Row = ({
         </div>
       )}
 
-      {/* {rightPanelArr && <Panel {...rightPanelArr} />} */}
       {rightPanelArr && (
         <div className={scss.rightPanel}>
-          {rightPanelArr.map((rightPanel, index) => {
-            return <Panel key={rightPanel.key || index} {...rightPanel} />;
+          {rightPanelArr.map(({ key: _key, ...rightPanel }, index) => {
+            const key = _key === 'undefined' && undefined;
+
+            return <Panel key={key || index} {...rightPanel} />;
           })}
         </div>
       )}
@@ -611,7 +601,7 @@ const Panel = ({
           disabled={disabled}
           datePickerProps={{
             props: {
-              value: state.shippingDate ? moment(state.shippingDate) : undefined,
+              value: state.shippingDate ? dayjs(state.shippingDate) : undefined,
               onChange: (v) => {
                 setState((state) => ({
                   ...state,
@@ -712,7 +702,7 @@ const Panel = ({
           disabled={disabled}
           datePickerProps={{
             props: {
-              value: state.installationDate ? moment(state.installationDate) : undefined,
+              value: state.installationDate ? dayjs(state.installationDate) : undefined,
               onChange: (v) => {
                 setState((state) => ({
                   ...state,
@@ -731,28 +721,6 @@ const Panel = ({
           onClick={() => {
             !disabled && setShowModal(true);
           }}
-          // inputProps={{
-          //   props: {
-          //     //
-          //     value: state_employeeArr?.chName ?? state_outsourcing?.name ?? '',
-          //     onChange: () => {},
-          //   },
-          // }}
-          // textareaProps={{
-          //   props: {
-          //     maxRows: 3,
-          //     value: (() => {
-          //       if (state_employeeArr && state_employeeArr.length > 0) {
-          //         return state_employeeArr.map((emp) => emp.chName).join('\n');
-          //       } else if (state_outsourcing) {
-          //         return state_outsourcing.name;
-          //       } else {
-          //         return '';
-          //       }
-          //     })(),
-          //     onChange: () => {},
-          //   },
-          // }}
           suffix={
             <Select
               className={classNames(scss.antd_select, disabled && scss.disabled, scss.plus)}
@@ -771,7 +739,7 @@ const Panel = ({
               open={false}
               removeIcon={null}
               autoFocus={false}
-              bordered={false}
+              variant="borderless"
             />
           }
         />

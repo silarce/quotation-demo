@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import _ from 'lodash';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface Traw {
   deliveryLocation: string;
@@ -14,7 +14,7 @@ interface Traw {
 
 interface Tstate {
   deliveryLocation: string;
-  deliveryDate: Moment | null;
+  deliveryDate: Dayjs | null;
   paymentMethodArr: TpaymentMethod[];
 }
 
@@ -54,7 +54,7 @@ const usePayInfo = ({ disabled, raw }: { disabled: boolean; raw: Traw | undefine
     setState({
       deliveryLocation,
       paymentMethodArr,
-      deliveryDate: deliveryDate ? moment(backupState.deliveryDate) : null,
+      deliveryDate: deliveryDate ? dayjs(backupState.deliveryDate) : null,
     });
   };
 
@@ -81,7 +81,7 @@ const useDefaultState = (raw: Traw | undefined | null) => {
 
     return {
       deliveryLocation: deliveryLocation ?? '',
-      deliveryDate: deliveryDate ? moment(deliveryDate) : null,
+      deliveryDate: deliveryDate ? dayjs(deliveryDate) : null,
       paymentMethodArr: paymentMethodArr,
     };
   }, [raw]);
@@ -105,7 +105,7 @@ const createKit = ({ state, setState }: { state: Tstate; setState: React.Dispatc
     },
     deliveryDate: {
       value: state.deliveryDate,
-      onChange: (v: Moment | null) => {
+      onChange: (v: Dayjs | null) => {
         setState((prev) => ({ ...prev, deliveryDate: v }));
       },
     },

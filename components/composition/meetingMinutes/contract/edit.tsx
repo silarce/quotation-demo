@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useContext, forwardRef, useImperativeHandle } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // ui
 import {
@@ -266,7 +266,7 @@ function MeetingMinuteEdit_component(
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state_meetingMinutes.minuteDate ? null : moment(state_meetingMinutes.minuteDate),
+                value: !state_meetingMinutes.minuteDate ? null : dayjs(state_meetingMinutes.minuteDate),
                 onChange: (m) => {
                   onChange('minuteDate', m?.toISOString() ?? '');
                 },
@@ -358,7 +358,7 @@ function MeetingMinuteEdit_component(
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state_meetingMinutes.entryTime ? null : moment(state_meetingMinutes.entryTime),
+                value: !state_meetingMinutes.entryTime ? null : dayjs(state_meetingMinutes.entryTime),
                 onChange: (m) => {
                   onChange('entryTime', m?.toISOString() ?? '');
                 },
@@ -372,7 +372,7 @@ function MeetingMinuteEdit_component(
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state_meetingMinutes.inspectionTime ? null : moment(state_meetingMinutes.inspectionTime),
+                value: !state_meetingMinutes.inspectionTime ? null : dayjs(state_meetingMinutes.inspectionTime),
                 onChange: (m) => {
                   onChange('inspectionTime', m?.toISOString() ?? '');
                 },
@@ -386,7 +386,7 @@ function MeetingMinuteEdit_component(
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state_meetingMinutes.timeline ? null : moment(state_meetingMinutes.timeline),
+                value: !state_meetingMinutes.timeline ? null : dayjs(state_meetingMinutes.timeline),
                 onChange: (m) => {
                   onChange('timeline', m?.toISOString() ?? '');
                 },
@@ -400,7 +400,7 @@ function MeetingMinuteEdit_component(
             disabled={disabled}
             datePickerProps={{
               props: {
-                value: !state_meetingMinutes.completionTime ? null : moment(state_meetingMinutes.completionTime),
+                value: !state_meetingMinutes.completionTime ? null : dayjs(state_meetingMinutes.completionTime),
                 onChange: (m) => {
                   onChange('completionTime', m?.toISOString() ?? '');
                 },

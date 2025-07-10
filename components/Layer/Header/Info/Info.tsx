@@ -134,7 +134,7 @@ export default function Info() {
         </Dropdown>
       </div>
 
-      <ChangePwPanel visible={showPwModal} onCancel={onCancel} />
+      <ChangePwPanel open={showPwModal} onCancel={onCancel} />
     </div>
   );
 }

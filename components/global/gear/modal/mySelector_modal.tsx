@@ -106,7 +106,7 @@ export default function MySelector_modal<Tdata extends Tdata_ex>({
   return (
     <ModalListSelectorWithSearch
       label={label ?? ''}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       onSearch={() => {}}
