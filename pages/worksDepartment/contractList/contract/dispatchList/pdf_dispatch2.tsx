@@ -28,6 +28,14 @@ interface Tdata {
   gateRemote: React.ReactNode;
   gateControllerKey: React.ReactNode;
   gateMotorKey: React.ReactNode;
+  //
+  合約內: boolean;
+  合約追加: boolean;
+  修繕計價: boolean;
+  贈送: boolean;
+  保固內: boolean;
+  其他: boolean;
+  金額: React.ReactNode;
 }
 
 interface Tprops {
@@ -55,6 +63,13 @@ export default function Pdf_dispatch2({
     gateRemote,
     gateControllerKey,
     gateMotorKey,
+    合約內,
+    合約追加,
+    修繕計價,
+    贈送,
+    保固內,
+    其他,
+    金額,
   },
 }: Tprops) {
   const ref_pdf = useRef<HTMLDivElement>(null);
@@ -145,26 +160,26 @@ export default function Pdf_dispatch2({
 
             <Cell className={classNames('col-span-2 gap-6', cn2, ch6)}>{strToSpan('派工批價')}</Cell>
             {/* row7 */}
-            <Cell></Cell>
+            <Cell className={cn2}>{booleanToV(合約內)}</Cell>
             <Cell className={ch6}>合約內</Cell>
             {/* row8 */}
-            <Cell></Cell>
+            <Cell className={cn2}>{booleanToV(合約追加)}</Cell>
             <Cell className={ch6}>合約追加</Cell>
             {/* row9 */}
-            <Cell></Cell>
+            <Cell className={cn2}>{booleanToV(修繕計價)}</Cell>
             <Cell className={ch6}>修繕計價</Cell>
             {/* row10 */}
-            <Cell></Cell>
+            <Cell className={cn2}>{booleanToV(贈送)}</Cell>
             <Cell className={ch6}>贈送</Cell>
             {/* row11 */}
-            <Cell></Cell>
+            <Cell className={cn2}>{booleanToV(保固內)}</Cell>
             <Cell className={ch6}>保固內</Cell>
             {/* row12 */}
-            <Cell></Cell>
+            <Cell className={cn2}>{booleanToV(其他)}</Cell>
             <Cell className={ch6}>其他</Cell>
             {/* row13 */}
             <Cell className={classNames(cn2, ch6, scss.noXPadding)}>金額</Cell>
-            <Cell></Cell>
+            <Cell className={cn3}>{金額}</Cell>
             {/* row14 */}
             <Cell className="grid grid-rows-2 grid-flow-col justify-center items-center gap-x-4">
               {strToSpan('往返時間')}
@@ -210,11 +225,17 @@ const strToSpan = (str: string) => {
   return str.split('').map((char, index) => <span key={index}>{char}</span>);
 };
 
+// 不用scss是為了可以用tailwind的className覆蓋
+// 不過真的可以可靠的覆蓋嗎?
 const cn1 = classNames('flex justify-between items-center', scss.px12);
 const cn2 = 'flex justify-center items-center';
 const cn3 = 'flex items-center';
 const cn4 = 'flex items-center leading-8 ';
 const cn5 = 'flex justify-center items-center gap-2 leading-8';
 const ch6 = 'flex items-center py-2';
+
+const booleanToV = (bool: boolean | undefined | null) => {
+  return bool ? 'V' : '';
+};
 
 export type { Tdata };
