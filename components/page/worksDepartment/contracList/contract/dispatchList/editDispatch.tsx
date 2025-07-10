@@ -217,7 +217,7 @@ export default function EditDispatch({
       <div>
         <div>
           <p className="text-2xl font-semibold text-main mb-0">捲門</p>
-          <div className="grid grid-cols-4 gap-10">
+          <div className="grid grid-cols-4 gap-10 gap-y-4">
             <SameInputSel
               caption="遙控器數量"
               disabled={disabled}
@@ -235,19 +235,7 @@ export default function EditDispatch({
                 },
               }}
             />
-            <SameInputSel
-              caption="鑰匙號碼"
-              disabled={disabled}
-              showBaseline="auto"
-              inputProps={{
-                props: {
-                  value: rollingKeyNumber.value,
-                  onChange: (e) => {
-                    rollingKeyNumber.onChange(e.target.value);
-                  },
-                },
-              }}
-            />
+
             <SameInputSel
               caption="鑰匙數量"
               disabled={disabled}
@@ -265,6 +253,7 @@ export default function EditDispatch({
                 },
               }}
             />
+
             <SameInputSel
               caption="彈射門鑰匙數量"
               disabled={disabled}
@@ -282,6 +271,23 @@ export default function EditDispatch({
                 },
               }}
             />
+
+            <br />
+
+            <SameInputSel
+              caption="鑰匙號碼"
+              disabled={disabled}
+              showBaseline="auto"
+              inputProps={{
+                props: {
+                  value: rollingKeyNumber.value,
+                  onChange: (e) => {
+                    rollingKeyNumber.onChange(e.target.value);
+                  },
+                },
+              }}
+            />
+
             <SameInputSel
               caption="其他"
               disabled={disabled}
