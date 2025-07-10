@@ -488,7 +488,14 @@ export default function ReportTable({
           </DndContext>
 
           {!disabledOri && (
-            <MyButton label="新增回報" preImg="add" className={scss.newReportBtn} onClick={addDailyReportItem} />
+            <MyButton
+              label="新增回報"
+              preImg="add"
+              className={scss.newReportBtn}
+              onClick={() => {
+                addDailyReportItem();
+              }}
+            />
           )}
         </div>
         <WorkerSelector
@@ -944,7 +951,6 @@ const config: Tconfig = {
   },
   stayLength: {
     createLabel: (rwd1023) => '住宿',
-    suffix: '天',
     wrapperClassName(rwd1023) {
       const header = classNames('w-[100px] row-span-3', rwd1023 && 'h-[43px]');
       const body = classNames(header, '!row-span-1', scss.suffix, rwd1023 && 'h-[43px]', scss.stayLength);
