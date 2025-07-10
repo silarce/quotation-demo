@@ -24,6 +24,7 @@ interface Tdata {
   rollingKeyNumber: React.ReactNode;
   rollingRemote: React.ReactNode;
   rollingKey: React.ReactNode;
+  ejectionDoorKey: React.ReactNode;
   gateOther: React.ReactNode;
   gateRemote: React.ReactNode;
   gateControllerKey: React.ReactNode;
@@ -59,6 +60,7 @@ export default function Pdf_dispatch2({
     rollingKeyNumber,
     rollingRemote,
     rollingKey,
+    ejectionDoorKey,
     gateOther,
     gateRemote,
     gateControllerKey,
@@ -134,10 +136,14 @@ export default function Pdf_dispatch2({
             <Cell_unit>{rollingRemote}</Cell_unit>
             <Cell className={classNames('col-span-2 gap-1', cn2)}>
               <span className="flex-shrink-0">鑰匙</span>
-              <span>{rollingKeyNumber}</span>
+              <span>{`(${rollingKeyNumber})`}</span>
             </Cell>
             <Cell_unit>{rollingKey}</Cell_unit>
-            <Cell className={classNames('col-span-3 gap-1', cn3)}>
+
+            <Cell className={classNames(cn2)}>彈射門鑰匙</Cell>
+            <Cell_unit>{ejectionDoorKey}</Cell_unit>
+
+            <Cell className={classNames('col-span-1 gap-1', cn3)}>
               <span className="flex-shrink-0">其他:</span>
               <span>{rollingOther}</span>
             </Cell>
