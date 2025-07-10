@@ -1,12 +1,4 @@
-import React, {
-  //
-  useState,
-  useEffect,
-  useMemo,
-  forwardRef,
-  useImperativeHandle,
-  useContext,
-} from 'react';
+import React, { useState, useEffect, useMemo, forwardRef, useImperativeHandle, useContext, useCallback } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
@@ -357,12 +349,7 @@ function PeriodPanel_pre(
       return undefined;
     }
 
-    const {
-      alphabeticLetter,
-
-      startNumber,
-      endNumber,
-    } = state_period.invoiceBook;
+    const { alphabeticLetter, startNumber, endNumber } = state_period.invoiceBook;
 
     const startNumber_num = Number(startNumber);
     const endNumber_num = Number(endNumber);
@@ -1946,20 +1933,13 @@ class Class_OtherNode {
       return disabled;
     }
 
-    const { year, month, latestInvoiceDate } = this.invoiceBook;
+    const { year, month } = this.invoiceBook;
 
-    const bookDate = dayjs(`${year}-${month}`, 'YYYY-MM');
-    const bookDate_next = dayjs(`${year}-${Number(month) + 1}`, 'YYYY-MM');
-
-    const latestInvoiceDate_m = dayjs(latestInvoiceDate).endOf('date');
-    const begin = latestInvoiceDate_m.subtract(1, 'day');
+    const bookDate = dayjs(`${year}-${month}`);
+    const bookDate_next = dayjs(`${year}-${Number(month) + 1}`);
 
     if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
-      if (!latestInvoiceDate) {
-        disabled = false;
-      } else {
-        disabled = currentDate.isBefore(begin);
-      }
+      disabled = false;
     }
 
     return disabled;
