@@ -3,12 +3,12 @@ import dayjs, { Dayjs } from 'dayjs';
 function getAllMonthByRange({ start, end }: { start: Dayjs | Date; end: Dayjs | Date }): string[] {
   const startDate = dayjs(start);
   const endDate = dayjs(end);
-  const currentDate = startDate.clone();
+  let currentDate = startDate.clone();
   const dateArr: string[] = [];
 
   while (currentDate <= endDate) {
     dateArr.push(currentDate.format('YYYY-MM'));
-    currentDate.add(1, 'month');
+    currentDate = currentDate.add(1, 'month');
   }
 
   return dateArr;
