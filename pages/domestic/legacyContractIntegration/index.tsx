@@ -234,10 +234,7 @@ export default function LegacyContractIntegration() {
                 key: index,
                 className: scss.panel,
                 label: (
-                  <div
-                    //  ref={arr.length - 3 === index ? viewRef_bottom : undefined}
-                    ref={arr.length - 2 === index ? viewRef_bottom : undefined}
-                  >
+                  <div ref={arr.length - 2 === index ? viewRef_bottom : undefined}>
                     <TbodyItem01
                       quotationContent={quotationContent}
                       isActive={isActive}
