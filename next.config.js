@@ -40,6 +40,8 @@ module.exports = {
     // 使import路徑大小寫敏感
     config.plugins.push(new CaseSensitivePathsPlugin());
 
+
+    // region SVGR
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule) =>
       rule.test?.test?.('.svg'),
@@ -63,6 +65,9 @@ module.exports = {
 
     // Modify the file loader rule to ignore *.svg, since we have it handled now.
     fileLoaderRule.exclude = /\.svg$/i
+    // endregion SVGR
+
+
 
     return config;
   },
