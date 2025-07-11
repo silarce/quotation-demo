@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 
 import scss from './dragableModal.module.scss';
-import crossRed from 'public/image/icon/cross_red.svg';
+import crossRed from 'public/image/icon/cross_red.svg?url';
 
 type Tprops = {
   show: boolean;

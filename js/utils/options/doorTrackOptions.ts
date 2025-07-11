@@ -1,20 +1,20 @@
 import _ from 'lodash';
 
 // typhoonProtection
-import icon_sj302_75_30t from 'public/image/doorTrack/typhoonProtection/SJ302_75_30t.svg';
-import icon_sJ302_90_30t from 'public/image/doorTrack/typhoonProtection/SJ302_90_30t.svg';
-import icon_sJ302_95_30t from 'public/image/doorTrack/typhoonProtection/SJ302_95_30t.svg';
-import icon_sJ302_95_45t from 'public/image/doorTrack/typhoonProtection/SJ302_95_45t.svg';
+import icon_sj302_75_30t from 'public/image/doorTrack/typhoonProtection/SJ302_75_30t.svg?url';
+import icon_sJ302_90_30t from 'public/image/doorTrack/typhoonProtection/SJ302_90_30t.svg?url';
+import icon_sJ302_95_30t from 'public/image/doorTrack/typhoonProtection/SJ302_95_30t.svg?url';
+import icon_sJ302_95_45t from 'public/image/doorTrack/typhoonProtection/SJ302_95_45t.svg?url';
 
 // normal
-import icon_sJ120A_100_25_105_25 from 'public/image/doorTrack/normal/SJ120A_100_25_105_25.svg';
-import icon_sJ302_30 from 'public/image/doorTrack/normal/SJ302_30.svg';
-import icon_sJ303A_100_25_25 from 'public/image/doorTrack/normal/SJ303A_100_25_25.svg';
-import icon_sJ303A_100_65_25 from 'public/image/doorTrack/normal/SJ303A_100_65_25.svg';
-import icon_sJ303S_85 from 'public/image/doorTrack/normal/SJ303S_85.svg';
-import icon_sJ305D_22 from 'public/image/doorTrack/normal/SJ305D_22.svg';
-import icon_sJ312_106_60t from 'public/image/doorTrack/normal/SJ312_106_60t.svg';
-import icon_sJ312_150_90t from 'public/image/doorTrack/normal/SJ312_150_90t.svg';
+import icon_sJ120A_100_25_105_25 from 'public/image/doorTrack/normal/SJ120A_100_25_105_25.svg?url';
+import icon_sJ302_30 from 'public/image/doorTrack/normal/SJ302_30.svg?url';
+import icon_sJ303A_100_25_25 from 'public/image/doorTrack/normal/SJ303A_100_25_25.svg?url';
+import icon_sJ303A_100_65_25 from 'public/image/doorTrack/normal/SJ303A_100_65_25.svg?url';
+import icon_sJ303S_85 from 'public/image/doorTrack/normal/SJ303S_85.svg?url';
+import icon_sJ305D_22 from 'public/image/doorTrack/normal/SJ305D_22.svg?url';
+import icon_sJ312_106_60t from 'public/image/doorTrack/normal/SJ312_106_60t.svg?url';
+import icon_sJ312_150_90t from 'public/image/doorTrack/normal/SJ312_150_90t.svg?url';
 
 // type
 import { Toption } from 'js/utils/options/options';

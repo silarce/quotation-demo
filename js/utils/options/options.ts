@@ -7,14 +7,14 @@ import { customerTypesLookup } from 'config/lookupTable';
 import { generateYearArray } from 'js/tools/date/generateYearArray';
 
 // icon
-import iconDoorRail75 from 'public/image/icon/doorRail/doorRail75.svg';
-import iconDoorRail60 from 'public/image/icon/doorRail/doorRail60.svg';
-import iconDoorRail98 from 'public/image/icon/doorRail/doorRail98.svg';
-import iconDoorRail_sj302_30 from 'public/image/fakeDB/doorRail/normal/SJ302_30.svg';
-import iconDoorRail_sj302_75_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_75_30t.svg';
-import iconDoorRail_sj302_90_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_90_30t.svg';
-import iconDoorRail_sj302_95_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_30t.svg';
-import iconDoorRail_sj302_95_45t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg';
+import iconDoorRail75 from 'public/image/icon/doorRail/doorRail75.svg?url';
+import iconDoorRail60 from 'public/image/icon/doorRail/doorRail60.svg?url';
+import iconDoorRail98 from 'public/image/icon/doorRail/doorRail98.svg?url';
+import iconDoorRail_sj302_30 from 'public/image/fakeDB/doorRail/normal/SJ302_30.svg?url';
+import iconDoorRail_sj302_75_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_75_30t.svg?url';
+import iconDoorRail_sj302_90_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_90_30t.svg?url';
+import iconDoorRail_sj302_95_30t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_30t.svg?url';
+import iconDoorRail_sj302_95_45t from 'public/image/fakeDB/doorRail/antiTyphoon/SJ302_95_45t.svg?url';
 
 import { TinvoiceType, TquotationStatus, Tcurrency } from 'js/api/dtoTypes';
 

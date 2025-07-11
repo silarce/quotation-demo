@@ -78,8 +78,8 @@ import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
-import iconUpload from 'public/image/icon/upload.svg';
-import iconRedLock from 'public/image/icon/redLock.svg';
+import iconUpload from 'public/image/icon/upload.svg?url';
+import iconRedLock from 'public/image/icon/redLock.svg?url';
 
 // css
 import style from './quotation.module.scss';

@@ -5,7 +5,7 @@ import classNames from 'classnames';
 // antd
 import { Collapse as Antd_Collapse, CollapseProps, CollapsePanelProps } from 'antd';
 
-import upDonwArrow from 'public/image/icon/arrow_change_tray.svg';
+import upDonwArrow from 'public/image/icon/arrow_change_tray.svg?url';
 
 import scss from './index.module.scss';
 

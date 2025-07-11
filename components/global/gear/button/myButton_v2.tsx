@@ -6,11 +6,11 @@ import { Button, ButtonProps } from 'antd';
 import Link from 'next/link';
 
 // icon
-import iconAdd from 'public/image/icon/add.svg';
-import iconDelete01 from 'public/image/icon/delete01.svg';
-import iconArrow02_left from 'public/image/icon/arrow02_left.svg';
-import iconArrow02_right from 'public/image/icon/arrow02_right.svg';
-import iconUpload from 'public/image/icon/upload.svg';
+import iconAdd from 'public/image/icon/add.svg?url';
+import iconDelete01 from 'public/image/icon/delete01.svg?url';
+import iconArrow02_left from 'public/image/icon/arrow02_left.svg?url';
+import iconArrow02_right from 'public/image/icon/arrow02_right.svg?url';
+import iconUpload from 'public/image/icon/upload.svg?url';
 
 import scss from './myButton_v2.module.scss';
 

@@ -6,8 +6,8 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import scss from './productList_Table_02.module.scss';
 
 // icon
-import iconCrossRed from 'public/image/icon/cross_red.svg';
-import iconCheckGreen from 'public/image/icon/check_green.svg';
+import iconCrossRed from 'public/image/icon/cross_red.svg?url';
+import iconCheckGreen from 'public/image/icon/check_green.svg?url';
 // fake
 import { TfakeData, partOptions } from 'pages/setting/productList';
 

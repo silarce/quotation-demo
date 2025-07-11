@@ -23,6 +23,7 @@
     "@mui/x-date-pickers": "^6.9.1",
     "@react-pdf-viewer/core": "^3.7.0",
     "@react-pdf-viewer/default-layout": "^3.7.0",
+    "@svgr/webpack": "^8.1.0",
     "@types/react-input-autosize": "^2.2.1",
     "antd": "^5.26.2",
     "axios": "^1.1.0",

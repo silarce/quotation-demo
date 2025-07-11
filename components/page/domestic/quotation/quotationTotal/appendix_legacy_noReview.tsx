@@ -10,7 +10,7 @@ import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals'
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
-import iconAttacth from 'public/image/icon/attach.svg';
+import iconAttacth from 'public/image/icon/attach.svg?url';
 // css
 import styleL from './local.module.scss';
 import scss from './appendix_legacy_noReview.module.scss';

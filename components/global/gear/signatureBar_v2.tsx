@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 
 // icon
-import iconReview from 'public/image/icon/review.svg';
+import iconReview from 'public/image/icon/review.svg?url';
 
 // css
 import scss from './signatureBar_v2.module.scss';

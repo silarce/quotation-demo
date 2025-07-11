@@ -20,9 +20,9 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 //icon
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
-import icon_search from 'public/image/icon/fc_search.svg';
-import icon_tray_out from 'public/image/icon/fc_tray_out.svg';
-import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg';
+import icon_search from 'public/image/icon/fc_search.svg?url';
+import icon_tray_out from 'public/image/icon/fc_tray_out.svg?url';
+import icon_tray_out_gray from 'public/image/icon/fc_tray_out_gray.svg?url';
 //
 import { isWednesday } from 'date-fns';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';

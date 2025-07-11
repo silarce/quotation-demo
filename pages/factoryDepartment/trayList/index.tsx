@@ -13,9 +13,9 @@ import { WhatsAppOutlined } from '@ant-design/icons';
 import EditWHPosition from '../editWHPosition';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import icon_print from 'public/image/icon/fc_printer.svg';
+import icon_print from 'public/image/icon/fc_printer.svg?url';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-import icon_edit from 'public/image/icon/edit.svg';
+import icon_edit from 'public/image/icon/edit.svg?url';
 
 type Tquery = {
   wareHouseId: string | undefined;

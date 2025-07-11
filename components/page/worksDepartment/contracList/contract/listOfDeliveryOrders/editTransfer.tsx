@@ -6,7 +6,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
-import addIcon from 'public/image/icon/add.svg';
+import addIcon from 'public/image/icon/add.svg?url';
 
 // css
 import style from './listOfDeliveryOrders.module.scss';
