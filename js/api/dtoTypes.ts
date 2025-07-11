@@ -3329,6 +3329,26 @@ export type TdispatchingDto = {
     | null;
 
   outsourcing: ToutsourcingDto[];
+  //
+  // '捲門其他'
+  rollingOther?: string | null;
+  // '捲門鑰匙號碼'
+  rollingKeyNumber?: string | null;
+  // '捲門遙控器數量'
+  rollingRemote: number | null;
+  // '捲門鑰匙數量'
+  rollingKey: number | null;
+  // 彈射門鑰匙數量
+  ejectionDoorKey: number | null;
+
+  //  '大門其他'
+  gateOther?: string | null;
+  // '大門遙控器數量'
+  gateRemote: number | null;
+  // '大門控制箱鑰匙數量'
+  gateControllerKey: number | null;
+  // '馬達鑰匙數量'
+  gateMotorKey: number | null;
 };
 
 type TcreateDispatchingDto_pre = Omit<TdispatchingDto, 'contractId' | 'warrantyDate' | 'note'>;
@@ -3355,6 +3375,16 @@ export type TcreateDispatchingDto = Pick<
   // | 'contractId'
   | 'isCompleted'
   | 'pointContact'
+  //
+  | 'gateOther'
+  | 'rollingOther'
+  | 'rollingKeyNumber'
+  | 'gateRemote'
+  | 'gateControllerKey'
+  | 'gateMotorKey'
+  | 'rollingRemote'
+  | 'rollingKey'
+  | 'ejectionDoorKey'
 > & {
   idNumber: string | null;
   contractId: string;

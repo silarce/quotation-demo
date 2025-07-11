@@ -1,0 +1,94 @@
+$borderWidth: 2px;
+
+$c1: 0.7fr;
+$c2: 0.3fr;
+$c3: 0.25fr;
+$c11: 1.2fr;
+
+$c4: 1fr;
+$c6: 0.5fr;
+$c7: 0.5fr;
+$c9: 1fr;
+
+$c5: 0.4fr;
+$c8: 0.4fr;
+$c10: 0.4fr;
+
+.pdf {
+  padding: 50px;
+  padding-top: 100px;
+  div,
+  span {
+    // font-family: "PMingLiU";
+    font-family: "DFKai-SB";
+  }
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 500;
+  margin-bottom: 0;
+  line-height: 60px;
+  // span {
+  //   font-family: "DFKai-SB";
+  // }
+}
+
+.top {
+  display: grid;
+  grid-template-columns: calc($c1 + $c2 + $c3 + $c4 + $c5 + $c6 + $c7 + $c8 + $c9 + $c10) $c11;
+  justify-items: flex-end;
+  line-height: 30px;
+}
+
+.table {
+  display: grid;
+  grid-template-columns:
+    $c1
+    $c2
+    $c3
+    $c4
+    $c5
+    $c6
+    $c7
+    $c8
+    $c9
+    $c10
+    $c11;
+
+  grid-template-rows: 34px 34px 68px repeat(auto-fit, minmax(34px, auto));
+
+  border: solid 0px theme("colors.border02");
+  border-width: $borderWidth 0 0 $borderWidth;
+}
+
+.cell {
+  padding-left: 5px;
+  padding-right: 5px;
+  border-width: 0 $borderWidth $borderWidth 0;
+  border-style: solid;
+  border-color: theme("colors.border02");
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.signatureBar {
+  display: flex;
+  > div {
+    flex: 1 1 auto;
+    display: grid;
+    align-content: space-between;
+  }
+}
+
+.px12 {
+  padding: 0 12px;
+}
+
+.noXPadding {
+  padding-left: 0;
+  padding-right: 0;
+}

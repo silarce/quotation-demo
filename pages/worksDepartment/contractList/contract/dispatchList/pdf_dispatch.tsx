@@ -1,17 +1,14 @@
-import { useState, useRef, Fragment, forwardRef, useEffect, useReducer } from 'react';
+import { useState, useRef, Fragment, forwardRef, useEffect } from 'react';
 import classNames from 'classnames';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-
-// antd
-import { Modal, ModalProps } from 'antd';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // css
-import scss from './modalPdf.module.scss';
+import scss from './pdf_dispatch.module.scss';
 
 // ===============================================================================
 
@@ -36,26 +33,7 @@ let isShowCellNumber = false;
 
 // region START
 
-export default function ModalPdf({
-  //
-  visible,
-  onCancel,
-  data,
-}: ModalProps & { data: Tdata }) {
-  return (
-    <Modal visible={visible} onCancel={onCancel} width={'fit-content'} footer={null} destroyOnClose={true}>
-      <ModalPdf_pre data={data} />
-    </Modal>
-  );
-}
-
-function ModalPdf_pre({
-  //
-
-  data,
-}: {
-  data: Tdata;
-}) {
+export default function Pdf_dispatch({ data }: { data: Tdata }) {
   const ref_pdf = useRef<HTMLDivElement>(null!);
   const ref_contentWrapper = useRef<HTMLDivElement>(null!);
   const ref_content = useRef<HTMLDivElement>(null!);

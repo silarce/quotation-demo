@@ -13,7 +13,8 @@ import Profile, { Tcontrol_profile } from 'components/page/worksDepartment/contr
 import EditDispatch, {
   Tcontroll as Tcontroll_editDispatch,
 } from 'components/page/worksDepartment/contracList/contract/dispatchList/editDispatch';
-import ModalPdf, { Tdata_pdf } from './modalPdf';
+import Pdf_dispatch, { Tdata_pdf } from './pdf_dispatch';
+import Pdf_dispatch2, { Tdata as Tdata_pdf2 } from './pdf_dispatch2';
 
 // gear
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -79,7 +80,7 @@ type Tstate_profile = {
 };
 
 type Tstate_pricingMethod = {
-  pricingMethod: string;
+  pricingMethod: '合約內' | '合約辦理追加' | '贈送' | '修繕計價' | '其他' | '保固內' | '';
   note: string;
 };
 
@@ -95,8 +96,6 @@ export default function EditDispatchList() {
   const [disabled, setDisabled] = useState(true);
   const theDiasbled = !dispatchingId ? false : disabled;
 
-  const [showPdf, setShowPdf] = useState(false);
-
   // ---------------------------------------------------------
   const [state_profile, setState_profile] = useState<Tstate_profile>(emptyState_profile());
 
@@ -105,7 +104,31 @@ export default function EditDispatchList() {
     note: string;
     // pricingMethod: string;
     isCompleted: boolean;
-  }>();
+
+    rollingOther: string;
+    rollingKeyNumber: string;
+    rollingRemote: `${number}` | '';
+    rollingKey: `${number}` | '';
+    gateOther: string;
+    gateRemote: `${number}` | '';
+    gateControllerKey: `${number}` | '';
+    gateMotorKey: `${number}` | '';
+    ejectionDoorKey: `${number}` | '';
+  }>({
+    tasks: '',
+    note: '',
+    isCompleted: false,
+
+    rollingOther: '',
+    rollingKeyNumber: '',
+    rollingRemote: '',
+    rollingKey: '',
+    gateOther: '',
+    gateRemote: '',
+    gateControllerKey: '',
+    gateMotorKey: '',
+    ejectionDoorKey: '',
+  });
 
   const [state_pricingMethod, setState_pricingMethod] = useState<Tstate_pricingMethod>({
     pricingMethod: '',
@@ -165,69 +188,6 @@ export default function EditDispatchList() {
 
   // ---------------------------------------------------------
 
-  // MARK: controll_editDispatch
-
-  const controll_editDispatch: Tcontroll_editDispatch = {
-    tasks: {
-      value: state_dispatch?.tasks ?? '',
-      onChange: (v: string) => {
-        setState_dispatch((data) => {
-          if (!data) {
-            return data;
-          }
-
-          data.tasks = v;
-
-          return { ...data };
-        });
-      },
-    },
-    note: {
-      value: state_dispatch?.note ?? '',
-      onChange: (v: string) => {
-        setState_dispatch((data) => {
-          if (!data) {
-            return data;
-          }
-
-          data.note = v;
-
-          return { ...data };
-        });
-      },
-    },
-    pricingMethod: {
-      value: state_pricingMethod.pricingMethod,
-      note: state_pricingMethod.note,
-      onChange: (str) => {
-        setState_pricingMethod({
-          pricingMethod: str,
-          note: '',
-        });
-      },
-      onInputChange: (str) => {
-        setState_pricingMethod((state) => ({
-          ...state,
-          note: str,
-        }));
-      },
-    },
-    isCompleted: {
-      value: state_dispatch?.isCompleted ?? false,
-      onChange: (bool) => {
-        setState_dispatch((state) => {
-          if (!state) {
-            return state;
-          }
-
-          return { ...state, isCompleted: bool };
-        });
-      },
-    },
-  };
-
-  // ---------------------------------------------------------
-
   // 有些多餘，之後要簡化
   const changeProfile = (key: keyof Omit<Tstate_profile, 'workerEmployee'>, v: string) => {
     setState_profile((state) => ({ ...state, [key]: v }));
@@ -257,9 +217,9 @@ export default function EditDispatchList() {
       return myAlert.info({ title: '請選擇派工日期' });
     }
 
-    if (!workerId[0]) {
-      return myAlert.info({ title: '請選擇工務人員' });
-    }
+    // if (!workerId[0]) {
+    //   return myAlert.info({ title: '請選擇工務人員' });
+    // }
 
     if (!state_pricingMethod.pricingMethod) {
       return myAlert.info({ title: '請選擇派工批價' });
@@ -290,6 +250,16 @@ export default function EditDispatchList() {
 
       pointContact: state_profile.pointContactArr,
       outsourcingId: state_profile.outsourcing.map((item) => item.id),
+      //
+      rollingOther: state_dispatch.rollingOther,
+      rollingKeyNumber: state_dispatch.rollingKeyNumber,
+      rollingRemote: Number(state_dispatch.rollingRemote),
+      rollingKey: Number(state_dispatch.rollingKey),
+      gateOther: state_dispatch.gateOther,
+      gateRemote: Number(state_dispatch.gateRemote),
+      gateControllerKey: Number(state_dispatch.gateControllerKey),
+      gateMotorKey: Number(state_dispatch.gateMotorKey),
+      ejectionDoorKey: Number(state_dispatch.ejectionDoorKey),
     };
 
     try {
@@ -402,6 +372,16 @@ export default function EditDispatchList() {
       warrantyDate,
       isCompleted,
       outsourcing = [],
+
+      rollingOther,
+      rollingKeyNumber,
+      rollingRemote,
+      rollingKey,
+      gateOther,
+      gateRemote,
+      gateControllerKey,
+      gateMotorKey,
+      ejectionDoorKey,
     } = dispatching ?? {};
 
     let {
@@ -479,6 +459,15 @@ export default function EditDispatchList() {
       tasks: tasks ?? todoForDispatch?.content ?? '',
       note: note ?? '',
       isCompleted: !!isCompleted,
+      rollingOther: rollingOther ?? '',
+      rollingKeyNumber: rollingKeyNumber ?? '',
+      rollingRemote: String(rollingRemote ?? '') as `${number}` | '',
+      rollingKey: String(rollingKey ?? '') as `${number}` | '',
+      gateOther: gateOther ?? '',
+      gateRemote: String(gateRemote ?? '') as `${number}` | '',
+      gateControllerKey: String(gateControllerKey ?? '') as `${number}` | '',
+      gateMotorKey: String(gateMotorKey ?? '') as `${number}` | '',
+      ejectionDoorKey: String(ejectionDoorKey ?? '') as `${number}` | '',
     });
 
     if (pricingMethod) {
@@ -683,11 +672,162 @@ export default function EditDispatchList() {
     return control_profile;
   }, [state_profile, theDiasbled, engineeringContact?.contactInfo]);
 
+  // MARK: controll_editDispatch
+  const controll_editDispatch: Tcontroll_editDispatch = {
+    tasks: {
+      value: state_dispatch?.tasks ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          if (!data) {
+            return data;
+          }
+
+          data.tasks = v;
+
+          return { ...data };
+        });
+      },
+    },
+    note: {
+      value: state_dispatch?.note ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          if (!data) {
+            return data;
+          }
+
+          data.note = v;
+
+          return { ...data };
+        });
+      },
+    },
+    pricingMethod: {
+      value: state_pricingMethod.pricingMethod,
+      note: state_pricingMethod.note,
+      onChange: (str) => {
+        if (str !== state_pricingMethod.pricingMethod) {
+          setState_pricingMethod({
+            pricingMethod: str,
+            note: '',
+          });
+        }
+      },
+      onInputChange: (str) => {
+        setState_pricingMethod((state) => ({
+          ...state,
+          note: str,
+        }));
+      },
+    },
+    isCompleted: {
+      value: state_dispatch?.isCompleted ?? false,
+      onChange: (bool) => {
+        setState_dispatch((state) => {
+          if (!state) {
+            return state;
+          }
+
+          return { ...state, isCompleted: bool };
+        });
+      },
+    },
+
+    rollingOther: {
+      value: state_dispatch?.rollingOther ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          return { ...data, rollingOther: v };
+        });
+      },
+    },
+    rollingKeyNumber: {
+      value: state_dispatch?.rollingKeyNumber ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          return { ...data, rollingKeyNumber: v };
+        });
+      },
+    },
+    rollingRemote: {
+      value: state_dispatch?.rollingRemote ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.rollingRemote = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    rollingKey: {
+      value: state_dispatch?.rollingKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.rollingKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    gateOther: {
+      value: state_dispatch?.gateOther ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateOther = v;
+
+          return { ...data };
+        });
+      },
+    },
+    gateRemote: {
+      value: state_dispatch?.gateRemote ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateRemote = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    gateControllerKey: {
+      value: state_dispatch?.gateControllerKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateControllerKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    gateMotorKey: {
+      value: state_dispatch?.gateMotorKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.gateMotorKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+    ejectionDoorKey: {
+      value: state_dispatch?.ejectionDoorKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.ejectionDoorKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
+
+    //
+  };
+
   // ---------------------------------------------------------
 
   // MARK:data_pdf
 
-  const data_pdf: Tdata_pdf = useMemo(() => {
+  const data_pdf: Tdata_pdf & Tdata_pdf2 = useMemo(() => {
     const {
       //
       county = '',
@@ -695,12 +835,18 @@ export default function EditDispatchList() {
       address = '',
       warrantyDate,
       tasks = '',
-      // pointContactPerson = '',
-      // pointContactNumber = '',
+
       pointContact,
 
-      projectSiteContactPerson = '',
-      projectSiteContactPersonNumber = '',
+      rollingOther,
+      rollingKeyNumber,
+      rollingRemote,
+      rollingKey,
+      ejectionDoorKey,
+      gateOther,
+      gateRemote,
+      gateControllerKey,
+      gateMotorKey,
     } = dispatching ?? {};
 
     const wholeAddress = `${county}${district}${address}`;
@@ -708,19 +854,43 @@ export default function EditDispatchList() {
     const contactPerson = pointContact?.[0]?.name + '\n' + pointContact?.[0]?.phone;
     const contactPerson2 = pointContact?.[1] && pointContact?.[1]?.name + '\n' + pointContact?.[1]?.phone;
 
-    const data_pdf: Tdata_pdf = {
+    const data_pdf: Tdata_pdf & Tdata_pdf2 = {
       idNumber: dispatching?.idNumber ?? '',
-      // customerName: contract?.content.projectName ?? '',
       customerName: (engineeringContact?.projectAbbreviation || contract?.content.projectName) ?? '',
-      // phoneNumber: (projectSiteContactPerson || '') + '\n' + (projectSiteContactPersonNumber || ''),
       phoneNumber: contactPerson2 ?? '',
 
-      // contactPerson: (pointContactPerson || '') + '\n' + (pointContactNumber || ''),
       contactPerson,
       address: wholeAddress,
       projectNumber: contract?.contractNumber ?? '',
       warrantyPeriod: (warrantyDate ? getTaiwanDateStr(warrantyDate) : '') || '',
       content: tasks,
+      rollingOther,
+      rollingKeyNumber,
+      rollingRemote,
+      rollingKey,
+      gateOther,
+      gateRemote,
+      gateControllerKey,
+      gateMotorKey,
+      ejectionDoorKey,
+      //
+      合約內: state_pricingMethod.pricingMethod === '合約內',
+      合約追加: state_pricingMethod.pricingMethod === '合約辦理追加',
+      修繕計價: state_pricingMethod.pricingMethod === '修繕計價',
+      贈送: state_pricingMethod.pricingMethod === '贈送',
+      保固內: state_pricingMethod.pricingMethod === '保固內',
+      其他: state_pricingMethod.pricingMethod === '其他',
+      金額: (() => {
+        if (state_pricingMethod.pricingMethod === '修繕計價') {
+          if (state_pricingMethod.note === '') {
+            return state_pricingMethod.note;
+          }
+
+          return Number(state_pricingMethod.note).toLocaleString();
+        }
+
+        return '';
+      })(),
     };
 
     return data_pdf;
@@ -739,15 +909,8 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '取消',
-      // onClick: () => router.back(),
       onClick: () => {
         router.back();
-        // router.push({
-        //   pathname: '/worksDepartment/contractList/contract/dispatchList',
-        //   query: {
-        //     contractId,
-        //   },
-        // });
       },
     },
     ...returnPanel,
@@ -761,7 +924,6 @@ export default function EditDispatchList() {
           title: '確定刪除此派工單？',
           content: (() => {
             if (haveTodoList) {
-              // return '此派工單已連結待辦事項，\n該待辦事項將會一起被刪除';
               return (
                 <span>
                   此派工單已連結待辦事項
@@ -780,7 +942,17 @@ export default function EditDispatchList() {
     {
       type: 'myButton',
       label: '匯出',
-      onClick: () => setShowPdf(true),
+      onClick: () => {
+        myAlert.clear({
+          width: 'fit-content',
+          content: (
+            <div className="m-5">
+              {/* <Pdf_dispatch data={data_pdf} /> */}
+              <Pdf_dispatch2 data={data_pdf} />
+            </div>
+          ),
+        });
+      },
     },
     {
       type: 'myButton',
@@ -792,12 +964,6 @@ export default function EditDispatchList() {
       label: '返回',
       onClick: () => {
         router.back();
-        // router.push({
-        //   pathname: '/worksDepartment/contractList/contract/dispatchList',
-        //   query: {
-        //     contractId,
-        //   },
-        // });
       },
     },
     ...returnPanel,
@@ -840,8 +1006,6 @@ export default function EditDispatchList() {
           }
         />
       </div>
-
-      <ModalPdf visible={showPdf} onCancel={() => setShowPdf(false)} data={data_pdf} />
     </SubLayer>
   );
 }

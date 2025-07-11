@@ -40,6 +40,7 @@ import { Tinvoice_reduce as Tperiod_reduce, Tstate_period } from './periodTable'
 
 // api
 import { TaccountantInvoiceBookDto, useGetAccountantInvoiceBook } from 'js/api/api_accountant';
+import { useGetAccountReceivableInvoices_all } from 'js/api/api_engineering';
 
 // icon
 import { IconEdit, IconCheck02, Icon_info } from 'public/image/icon/svgComponent/svgIcons';
@@ -201,6 +202,27 @@ function PeriodPanel_pre(
 
   // --------------------------------------------------------------------------
 
+  const {
+    data: issuedInvoiceArr,
+    update: update_issuedInvoiceArr,
+    clear: clear_issuedInvoiceArr,
+  } = useGetAccountReceivableInvoices_all(
+    useMemo(() => {
+      return {
+        params: {
+          pageSize: 9999999,
+          sort: 'invoiceNumber',
+          filter: {
+            accountantInvoiceBookId: { $eq: state_period?.invoiceBook?.id },
+          },
+        },
+        autoUpdate: false,
+      };
+    }, [state_period?.invoiceBook?.id])
+  );
+
+  // --------------------------------------------------------------------------
+
   // region FUNCTION
 
   const resetDefault = () => {
@@ -330,6 +352,39 @@ function PeriodPanel_pre(
 
   // region PROPS
 
+  const options_invoiceNumber = useMemo(() => {
+    if (!state_period?.invoiceBook || !issuedInvoiceArr) {
+      return undefined;
+    }
+
+    const {
+      alphabeticLetter,
+
+      startNumber,
+      endNumber,
+    } = state_period.invoiceBook;
+
+    const startNumber_num = Number(startNumber);
+    const endNumber_num = Number(endNumber);
+
+    let options: Toption[] = [];
+
+    for (let i = startNumber_num; i <= endNumber_num; i++) {
+      const value = String(i).padStart(8, '0');
+
+      options.push({
+        value: alphabeticLetter + value,
+        label: alphabeticLetter + value,
+      });
+    }
+
+    options = options.filter((option) => {
+      return !issuedInvoiceArr.some((issuedInvoice) => issuedInvoice.invoiceNumber === option.value);
+    });
+
+    return options;
+  }, [state_period?.invoiceBook, issuedInvoiceArr]);
+
   const { caption, rowArr, totals, other }: Tcenter = useMemo(() => {
     const {
       //
@@ -434,6 +489,14 @@ function PeriodPanel_pre(
   useEffect(() => {
     onPanelStateChange && onPanelStateChange(state_period);
   }, [state_period]);
+
+  useEffect(() => {
+    if (state_period?.invoiceBook?.id) {
+      update_issuedInvoiceArr();
+    } else {
+      clear_issuedInvoiceArr();
+    }
+  }, [state_period?.invoiceBook?.id]);
 
   // ==============================================================================
 
@@ -540,6 +603,7 @@ function PeriodPanel_pre(
         setShowSelector={setShowSelector_invoiceBook}
         setShowSelector_contract={setShowSelector_contract}
         currency={currency}
+        options_invoiceNumber={options_invoiceNumber}
       />
 
       {/* <br />
@@ -574,14 +638,10 @@ function PeriodPanel_pre(
 
       <Selector_invoiceBook
         showModal={showSelector_invoiceBook}
-        onConfirm={([invoiceBookArr]) => {
+        onConfirm={async ([invoiceBookArr]) => {
           const invoiceBook = invoiceBookArr[0] as TaccountantInvoiceBookDto | undefined;
 
-          if (invoiceBook) {
-            other.invoiceBook = invoiceBook;
-          } else {
-            other.invoiceBook = null;
-          }
+          other.invoiceBook = invoiceBook || null;
         }}
         onCancel={() => setShowSelector_invoiceBook(false)}
       />
@@ -706,6 +766,7 @@ const Tfoot = ({
   setShowSelector,
   setShowSelector_contract,
   currency,
+  options_invoiceNumber,
 }: {
   readOnly: boolean;
   node_other: Tcenter['other'];
@@ -715,6 +776,7 @@ const Tfoot = ({
   setShowSelector: React.Dispatch<React.SetStateAction<boolean>>;
   setShowSelector_contract: React.Dispatch<React.SetStateAction<boolean>>;
   currency: string;
+  options_invoiceNumber: Toption[] | undefined;
 }) => {
   const {
     invoiceNumber,
@@ -1073,7 +1135,8 @@ const Tfoot = ({
             const selectProps: TinputSelProps['selectProps'] = {
               props: {
                 value: { label: class_other.invoiceNumber, value: class_other.invoiceNumber },
-                options: class_other.invoiceNumberOptions,
+                // options: class_other.invoiceNumberOptions,
+                options: options_invoiceNumber,
                 onChange: (option) => {
                   const value = option?.value || '';
                   class_other.invoiceNumber = value;
