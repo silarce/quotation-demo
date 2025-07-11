@@ -106,7 +106,7 @@ export default function Pdf_dispatch2({
           <div className={classNames(scss.top)}>
             <span className={classNames('mr-3 translate-y-[5px]')}>序號</span>
             <div className={classNames('pb-[4px] w-full')}>
-              <div className={classNames('border-b-2 border-border02 text-[20px]')}>{idNumber}</div>
+              <div className={classNames('border-b-2 border-border02 text-[20px]')}>{idNumber || '　'}</div>
             </div>
           </div>
 
