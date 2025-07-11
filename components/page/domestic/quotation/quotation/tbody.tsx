@@ -12,9 +12,9 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
-import iconMove from 'public/image/icon/move.svg';
-import iconReset from 'public/image/icon/reset.svg';
-import iconChange from 'public/image/icon/change.svg';
+import iconMove from 'public/image/icon/move.svg?url';
+import iconReset from 'public/image/icon/reset.svg?url';
+import iconChange from 'public/image/icon/change.svg?url';
 // css
 
 import scss from './tbody.module.scss';

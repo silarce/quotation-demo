@@ -1,0 +1,16 @@
+.btn {
+  border: solid 1px theme("colors.border02");
+  border-radius: theme("border.radius.normal");
+  color: theme("colors.text02");
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.normal {
+  padding: 10px 16px;
+  background-color: theme("colors.bgc01");
+}
+
+.large {
+  padding: 16px 32px;
+}

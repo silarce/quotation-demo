@@ -11,7 +11,7 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
 import { IconRemoveCircle, IconAddCircle } from 'public/image/icon/svgComponent/svgIcons';
-import iconEyeOpen from 'public/image/icon/eyeOpen.svg';
+import iconEyeOpen from 'public/image/icon/eyeOpen.svg?url';
 
 // option
 import { optionsCreator_deduction } from 'js/utils/options/options';

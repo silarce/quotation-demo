@@ -5,8 +5,8 @@ import Image from 'next/image';
 import Slider, { CustomArrowProps, ResponsiveObject } from 'react-slick';
 
 // icon
-import iconArrowRight from 'public/image/icon/arrow_right.svg';
-import iconRmove from 'public/image/icon/remove03.svg';
+import iconArrowRight from 'public/image/icon/arrow_right.svg?url';
+import iconRmove from 'public/image/icon/remove03.svg?url';
 
 // css
 import scss from './tabCarousel.module.scss';

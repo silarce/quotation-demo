@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 
 // icon
-import iconMust from 'public/image/icon/asterisk.svg';
+import iconMust from 'public/image/icon/asterisk.svg?url';
 
 import scss from './mustTip_simple.module.scss';
 

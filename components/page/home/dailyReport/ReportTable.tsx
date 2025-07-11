@@ -32,9 +32,9 @@ import { TdailyReportItemDto, TdailyReportWokerDto } from 'js/api/dtoTypes';
 
 // icon
 import { IconAddCircle, IconRemoveCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
-import iconArrow from 'public/image/icon/arrow03_left.svg';
+import iconArrow from 'public/image/icon/arrow03_left.svg?url';
 import { IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
-import iconMove from 'public/image/icon/move.svg';
+import iconMove from 'public/image/icon/move.svg?url';
 
 // other
 import { AppContext } from 'pages/_app';

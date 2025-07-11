@@ -1,6 +1,6 @@
 import { Key, MouseEvent, useEffect, useState } from 'react';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
-import iconPlace from 'public/image/icon/place.svg';
+import iconPlace from 'public/image/icon/place.svg?url';
 import {
   IconAddCircle,
   IconChain,
@@ -18,12 +18,12 @@ import { Transfer, Button, Modal } from 'antd';
 import { IconButton } from '@mui/material';
 import IconContext from '@ant-design/icons/lib/components/Context';
 import { IconMap } from 'antd/lib/result';
-import icon_arrowdown from 'public/image/icon/arrow_down_tray.svg';
-import icon_arrowup from 'public/image/icon/arrow_up_tray.svg';
-import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg';
+import icon_arrowdown from 'public/image/icon/arrow_down_tray.svg?url';
+import icon_arrowup from 'public/image/icon/arrow_up_tray.svg?url';
+import icon_arrowchange from 'public/image/icon/arrow_change_tray.svg?url';
 import { inspect } from 'util';
 import Thead01 from './thead01';
-import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg?url';
 
 interface TbodyProps {
   data: any[];

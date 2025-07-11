@@ -10,7 +10,7 @@ import myAlert from '../../modal/simpleModal/alertModals';
 
 // icon
 import { IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
-// import iconAttacth from 'public/image/icon/attach.svg';
+// import iconAttacth from 'public/image/icon/attach.svg?url';
 
 // import { TfileDto } from 'js/api/dtoTypes';
 

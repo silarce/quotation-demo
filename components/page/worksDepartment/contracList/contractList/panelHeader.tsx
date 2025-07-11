@@ -9,7 +9,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import scss from '../contractList.module.scss';
 
 // icon
-import iconPlace from 'public/image/icon/place.svg';
+import iconPlace from 'public/image/icon/place.svg?url';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 type TtheadInfo = {

@@ -20,7 +20,7 @@ import { setRootLoading, showRootLoading } from 'components/global/gear/loadingC
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // icon
-import iconPassword from 'public/image/icon/password.svg';
+import iconPassword from 'public/image/icon/password.svg?url';
 
 // api
 import {

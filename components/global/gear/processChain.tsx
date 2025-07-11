@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import StatusLabel, { TstatusLabelProps } from './button/statusLabel';
 
 // icon
-import iconLongArrow from 'public/image/icon/longArrow.svg';
+import iconLongArrow from 'public/image/icon/longArrow.svg?url';
 
 // css
 import scss from './processChain.module.scss';

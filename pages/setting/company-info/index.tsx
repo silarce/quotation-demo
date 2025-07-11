@@ -23,7 +23,7 @@ import {
 } from 'js/api/api_company-info';
 
 // icon
-import imgLogo2 from 'public/image/logo/LOGO_2.svg';
+import imgLogo2 from 'public/image/logo/LOGO_2.svg?url';
 
 // css
 import scss from './company-info.module.scss';

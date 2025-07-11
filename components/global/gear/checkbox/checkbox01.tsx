@@ -1,7 +1,7 @@
 // css
 import style from './checkbox.module.scss';
 
-import checkIcon from 'public/image/icon/check.svg';
+import checkIcon from 'public/image/icon/check.svg?url';
 
 export default function Checkbox01({
   stateValue,

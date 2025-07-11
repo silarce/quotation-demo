@@ -6,7 +6,7 @@ import AutosizeInput from 'react-input-autosize';
 
 // icon
 import { IconCross01 } from 'public/image/icon/svgComponent/svgIcons';
-import iconAdd from 'public/image/icon/add.svg';
+import iconAdd from 'public/image/icon/add.svg?url';
 import { RedoOutlined } from '@ant-design/icons';
 
 // css
