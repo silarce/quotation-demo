@@ -157,7 +157,7 @@ export default function SetHoliday() {
             <div className={` flex items-center gap-4 mt-3`}>
               <span className="whitespace-nowrap">日期：</span>
               <RangePicker
-                defaultValue={[moment('2025/07/01', dateFormat), moment('2025/07/24', dateFormat)]}
+                defaultValue={[dayjs('2025/07/01', dateFormat), dayjs('2025/07/24', dateFormat)]}
                 format={dateFormat}
                 className={`${scss.customDatePicker} h-[40px] ml-[24px] w-full`}
                 popupClassName={scss.customDatePicker}
@@ -195,7 +195,7 @@ export default function SetHoliday() {
             <div className={` flex items-center gap-4 mt-3`}>
               <span className="whitespace-nowrap">日期：</span>
               <RangePicker
-                defaultValue={[moment('2025/07/01', dateFormat), moment('2025/07/24', dateFormat)]}
+                defaultValue={[dayjs('2025/07/01', dateFormat), dayjs('2025/07/24', dateFormat)]}
                 format={dateFormat}
                 className={`${scss.customDatePicker} h-[40px] ml-[24px] w-full`}
                 popupClassName={scss.customDatePicker}

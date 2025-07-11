@@ -26,11 +26,11 @@ const LabeledSelect: React.FC<LabeledSelectProps> = ({
 }) => {
   return (
     <div className={classNames('flex flex-col gap-[10px] w-full ', className)}>
-      <span className={`font-normal text-[14px]  ${labelWidth}`}>
+      <span className={`flex font-normal text-[14px]  ${labelWidth}`}>
         {required && <Image src={asterisk} alt="required" width={8} className="ml-[4px] mr-[4px]" />}
         {label}
       </span>
-      <Select {...rest} className={` h-[40px] w-full  `} style={{ width, marginLeft }}/>
+      <Select {...rest} className={` h-[40px] w-full  `} style={{ width, marginLeft }} />
     </div>
   );
 };

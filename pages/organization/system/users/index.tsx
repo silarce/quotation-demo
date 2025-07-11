@@ -23,6 +23,7 @@ import {
 } from 'components/page/organization/system/usres/users_api';
 //scss
 import scss from './users.module.scss';
+import tableScss from 'components/global/myCom/myTable/table.module.scss';
 
 interface DetailItem {
   key: string;
@@ -261,7 +262,7 @@ export default function Users() {
         </div>
         <div className="px-6">
           <Table
-            className={scss.customTable}
+            className={tableScss.customTable}
             columns={columns}
             dataSource={userList}
             rowKey="key"

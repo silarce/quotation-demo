@@ -17,6 +17,7 @@ import { getEmployeeList } from 'components/page/organization/employee/api';
 
 // scss
 import scss from './employee.module.scss';
+import tableScss from 'components/global/myCom/myTable/table.module.scss';
 
 interface EmployeeItem {
   key: string;
@@ -205,7 +206,7 @@ export default function EmployeeData() {
         </div>
         <div className="px-6">
           <Table
-            className={scss.customTable}
+            className={tableScss.customTable}
             columns={columns}
             dataSource={data}
             rowKey="key"

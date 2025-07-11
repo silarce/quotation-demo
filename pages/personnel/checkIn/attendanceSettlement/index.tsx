@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import { Modal, Table } from 'antd';
-import scss from './attendanceSettlement.module.scss';
+import scss from 'components/global/myCom/myTable/table.module.scss';
 
 import Image from 'next/image';
 import editIcon from 'public/image/icon/note.svg';

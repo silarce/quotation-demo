@@ -31,7 +31,7 @@ const LabeledDatePickerV2: React.FC<LabeledDatePickerProps> = ({
 }) => {
   return (
     <div className={classNames('flex flex-col gap-[10px] w-full', className)}>
-      <span className={classNames('font-normal text-[14px]', labelWidth)}>
+      <span className={classNames('flex font-normal text-[14px]', labelWidth)}>
         {required && <Image src={asterisk} alt="required" width={8} className="ml-[4px] mr-[4px]" />}
         {label}
       </span>
@@ -39,7 +39,7 @@ const LabeledDatePickerV2: React.FC<LabeledDatePickerProps> = ({
         {...rest}
         value={value ?? null}
         onChange={onChange}
-        className=" h-[40px] w-full"
+        className=" h-[40px] w-full border border-[#616161]"
         style={{ width, marginLeft }}
       />
     </div>

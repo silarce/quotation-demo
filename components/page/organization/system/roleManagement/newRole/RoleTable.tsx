@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState, useMemo } from 'react';
 
 //scss
-import scss from './table.module.scss';
+import tableScss from 'components/global/myCom/myTable/table.module.scss';
 
 // icons
 import editIcon from 'public/image/icon/note.svg';
@@ -49,21 +49,21 @@ const RoleTable: React.FC<Props> = ({ data = [], onEdit, onDelete }) => {
       dataIndex: 'role_name',
       key: 'role_name',
       align: 'left',
-      width: '240px',
+      width: '7%',
     },
     {
       title: '角色代碼',
       dataIndex: 'role_code',
       key: 'role_code',
       align: 'center',
-      width: '120px',
+      width: '10%',
     },
     {
       title: '角色描述',
       dataIndex: 'description',
       key: 'description',
       align: 'left',
-      width: '696px',
+      width: '74%',
       render: (_, record) => <div className="">{record.description}</div>,
     },
     {
@@ -101,7 +101,7 @@ const RoleTable: React.FC<Props> = ({ data = [], onEdit, onDelete }) => {
     <>
       <div className="flex justify-end ">
         <Input.Search
-          className={scss.customSearchInput}
+          className={tableScss.customSearchInput}
           placeholder="搜尋角色名稱或角色代碼"
           allowClear
           onChange={(e) => setSearchText(e.target.value)}
@@ -110,7 +110,7 @@ const RoleTable: React.FC<Props> = ({ data = [], onEdit, onDelete }) => {
       </div>
 
       <Table
-        className={scss.customTable}
+        className={tableScss.customTable}
         columns={columns}
         dataSource={filteredRoles}
         rowKey="role_id"

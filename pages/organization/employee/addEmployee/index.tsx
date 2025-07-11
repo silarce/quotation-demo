@@ -171,8 +171,8 @@ export default function Organization() {
         </div>
       </div>
       <div className="flex items-center justify-center w-full mb-[20px] mt-[40px]">
-        <span className="font-semibold mr-2 whitespace-nowrap">👤人員基本資料</span>
-        <div className="h-px bg-black flex-1 rounded-[10px]" />
+        <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👤人員基本資料</span>
+        <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
       </div>
       <div className="flex w-full flex-col mt-3">
         <div className="flex w-full gap-[24px]">
@@ -197,7 +197,7 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? moment(formState.birthday_date) : null}
+            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
             onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
           />
           <LabeledSelectV2
@@ -229,8 +229,8 @@ export default function Organization() {
           />
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">📞聯絡與通訊資料</span>
-          <div className="h-px bg-black flex-1 rounded-[10px]" />
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📞聯絡與通訊資料</span>
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="flex w-full gap-[24px]">
           <LabeledInputV2
@@ -324,8 +324,8 @@ export default function Organization() {
           </div>
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">💼職務與任用設定</span>
-          <div className="h-px bg-black flex-1 rounded-[10px]" />
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">💼職務與任用設定</span>
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="flex w-full gap-[24px]">
           <LabeledSelectV2
@@ -356,7 +356,7 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? moment(formState.birthday_date) : null}
+            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
             onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
           />
           <LabeledInputV2
@@ -371,7 +371,7 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? moment(formState.birthday_date) : null}
+            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
             onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
           />
         </div>
@@ -381,7 +381,7 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? moment(formState.birthday_date) : null}
+            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
             onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
           />
           <LabeledDatePickerV2
@@ -389,13 +389,13 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? moment(formState.birthday_date) : null}
+            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
             onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
           />
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">🆔️員工打卡與排班設定</span>
-          <div className="h-px bg-black flex-1 rounded-[10px]" />
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">🆔️員工打卡與排班設定</span>
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="flex w-full gap-[24px]">
           <LabeledInputV2
@@ -431,8 +431,8 @@ export default function Organization() {
           />
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">🛡️勞健保與勞退設定</span>
-          <div className="h-px bg-black flex-1 rounded-[10px]" />
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">🛡️勞健保與勞退設定</span>
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="flex w-full gap-[24px]">
           <LabeledInputV2
@@ -468,9 +468,9 @@ export default function Organization() {
           />
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">👨‍👩‍👧‍👦眷屬資料</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👨‍👩‍👧‍👦眷屬資料</span>
           <AddButton label="新增眷屬" onClick={() => handleAddDependent()} className="h-[40px] mr-3" />
-          <div className="h-px bg-black flex-1 rounded-[10px]" />
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         {dependents.map((dep) => (
           <div key={dep.id} className="flex w-full gap-[24px] relative mb-[16px]">
@@ -486,7 +486,7 @@ export default function Organization() {
               required={true}
               placeholder="請選擇"
               className="w-[100%]"
-              value={formState.birthday_date ? moment(formState.birthday_date) : null}
+              value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
               onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
             />
             <LabeledInputV2
@@ -515,8 +515,8 @@ export default function Organization() {
           </div>
         ))}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">📋投保歷程記錄</span>
-          <div className="h-px bg-black flex-1 rounded-[10px]" />
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋投保歷程記錄</span>
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
           <ExtendButton
             label={isInsure ? '收合' : '展開'}
             className="w-[80px] h-[40px] ml-3"
@@ -535,7 +535,7 @@ export default function Organization() {
                 required={true}
                 placeholder="請選擇"
                 className="w-[100%]"
-                value={formState.birthday_date ? moment(formState.birthday_date) : null}
+                value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
                 onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
               />
               <LabeledInputV2
@@ -563,8 +563,8 @@ export default function Organization() {
           )}
         </div>
         <div className="flex items-center w-full mt-[40px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">📝其他</span>
-          <div className="h-px bg-black flex-1 rounded-[10px]" />
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📝其他</span>
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
 
         <div className="mt-[20px]  flex justify-between">

@@ -17,6 +17,7 @@ import { getCompanyList, deleteCompany } from 'components/page/organization/comp
 
 //scss
 import scss from './company.module.scss';
+import tableScss from 'components/global/myCom/myTable/table.module.scss';
 
 interface DetailItem {
   key: string;
@@ -250,7 +251,7 @@ export default function Companydata() {
         </div>
         <div className="px-6">
           <Table
-            className={scss.customTable}
+            className={tableScss.customTable}
             columns={columns}
             dataSource={companyList}
             rowKey="key"

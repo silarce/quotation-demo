@@ -4,7 +4,7 @@ import Image from 'next/image';
 import editIcon from 'public/image/icon/note.svg';
 import deleteIcon from 'public/image/icon/trash.svg';
 import { DetailItem } from './type';
-import scss from './dempartTable.module.scss';
+import scss from 'components/global/myCom/myTable/table.module.scss';
 
 interface Props {
   data: DetailItem[];

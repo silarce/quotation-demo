@@ -28,14 +28,14 @@ const LabeledInput: React.FC<LabeledInputProps> = ({
   readOnly,
 }) => {
   return (
-    <div className={`flex items-center w-full ${className}`}>
+    <div className={`${scss.customInput} flex items-center w-full ${className}`}>
       <span className={`font-normal whitespace-nowrap ${labelWidth}`}>{label}</span>
 
       <Input
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-[40px] ml-3 border border-[#616161] rounded-md p-3 `}
+        className={`${scss.customInput} h-[40px] ml-3 border border-[#616161] rounded-md p-3 `}
         style={{ width, marginLeft }}
       />
     </div>

@@ -34,7 +34,7 @@ const LabeledInputV2: React.FC<LabeledInputProps> = ({
   return (
     <div className={`flex flex-col gap-[10px] w-full ${className}`}>
       <span className={`flex items-center  font-normal text-[14px]  ${labelWidth}`}>
-        {required && <Image src={asterisk} alt="required" width={8} className='ml-[4px] mr-[4px]'/> }
+        {required && <Image src={asterisk} alt="required" width={8} className="ml-[4px] mr-[4px]" />}
         {label}
       </span>
 

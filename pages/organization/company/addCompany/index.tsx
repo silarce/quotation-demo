@@ -178,7 +178,7 @@ export default function AddCompany() {
             onClick={() => {
               setIsModalOpen(true);
             }}
-            className="w-[80px] h-[40px]"
+            className=" h-[40px]"
           />
           <AddButton label="新增公司" onClick={handleSave} className="h-[40px] " />
 

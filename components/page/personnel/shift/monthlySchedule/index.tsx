@@ -4,7 +4,7 @@ import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 
 //scss
-import scss from './monthlySchedule.module.scss';
+import scss from 'components/global/myCom/myTable/table.module.scss';
 
 import MySelect from 'components/global/myCom/select/mySelect';
 import AddButton from 'components/global/myCom/button/AddButton';

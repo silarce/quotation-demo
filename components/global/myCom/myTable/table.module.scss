@@ -63,6 +63,11 @@
   border-bottom: none !important;
 }
 
+//去除::before的線
+.customTable :global(.ant-table-thead > tr > th::before) {
+  display: none !important;
+}
+
 //搜尋欄
 .customSearchInput :global(.ant-input-affix-wrapper) {
   border: none !important;
@@ -179,14 +184,14 @@
 //checkBox
 
 .checkboxGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  display: flex;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 24px;
 }
 
 .checkboxWrapper {
   display: flex;
-  gap: 8px;
+  // gap: 8px;
   cursor: pointer;
   position: relative;
   user-select: none;
@@ -203,7 +208,7 @@
     background-color: white;
     position: relative;
     transition: all 0.2s;
-    margin-left: 34px;
+    // margin-left: 34px;
   }
   &:hover .customCheckmark {
     border-color: #388e3c;
