@@ -7,6 +7,8 @@ declare module '*.svg' {
 
 declare module '*.svg?url' {
     import type { StaticImport } from 'next/dist/shared/lib/get-img-props';
-  const content:  StaticImport | string;
+    
+    
+  const content:  StaticImport['StaticImageData'];
   export default content
 }
