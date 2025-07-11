@@ -3338,6 +3338,8 @@ export type TdispatchingDto = {
   rollingRemote: number | null;
   // '捲門鑰匙數量'
   rollingKey: number | null;
+  // 彈射門鑰匙數量
+  ejectionDoorKey: number | null;
 
   //  '大門其他'
   gateOther?: string | null;
@@ -3382,6 +3384,7 @@ export type TcreateDispatchingDto = Pick<
   | 'gateMotorKey'
   | 'rollingRemote'
   | 'rollingKey'
+  | 'ejectionDoorKey'
 > & {
   idNumber: string | null;
   contractId: string;
