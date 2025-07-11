@@ -15,7 +15,7 @@ import { display } from 'html2canvas/dist/types/css/property-descriptors/display
 import { setting } from '../wareHouseList/index';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import { AppContext } from 'pages/_app';
-import icon_search from 'public/image/icon/fc_search.svg';
+import icon_search from 'public/image/icon/fc_search.svg?url';
 
 type Tquery = {
   wareHouseId: string | undefined;

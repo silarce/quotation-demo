@@ -4,7 +4,7 @@ import Link, { LinkProps } from 'next/link';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // icon
-import iconPlace from 'public/image/icon/place.svg';
+import iconPlace from 'public/image/icon/place.svg?url';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // css

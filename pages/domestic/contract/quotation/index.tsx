@@ -98,7 +98,7 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 import { cutCurrency, Tcurrency } from 'js/utils/currency/cutCurrency';
 
 // icon
-import iconUpload from 'public/image/icon/upload.svg';
+import iconUpload from 'public/image/icon/upload.svg?url';
 
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 

@@ -1,5 +1,5 @@
 // icon
-import iconAdd from 'public/image/icon/add.svg';
+import iconAdd from 'public/image/icon/add.svg?url';
 
 import style from './_button.module.scss';
 

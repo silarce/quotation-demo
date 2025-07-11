@@ -10,29 +10,29 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 //grid
 import Thead01 from '../ui/table/thead01';
 //icon
-import icon_search from 'public/image/icon/fc_search.svg';
-import icon_clear from 'public/image/icon/fc_clear.svg';
+import icon_search from 'public/image/icon/fc_search.svg?url';
+import icon_clear from 'public/image/icon/fc_clear.svg?url';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import icon_fc_add from 'public/image/icon/fc_add.svg';
+import icon_fc_add from 'public/image/icon/fc_add.svg?url';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import icon_cancel from 'public/image/icon/fc_cancel.svg';
-import icon_fc_check from 'public/image/icon/fc_check.svg';
-import icon_cancel2 from 'public/image/icon/fc_cancel2.svg';
+import icon_cancel from 'public/image/icon/fc_cancel.svg?url';
+import icon_fc_check from 'public/image/icon/fc_check.svg?url';
+import icon_cancel2 from 'public/image/icon/fc_cancel2.svg?url';
 import { AppContext } from 'pages/_app';
-import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
-import icon_edit from 'public/image/icon/fc_edit.svg';
-import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg';
-import icon_add2 from 'public/image/icon/fc_add2.svg';
-import icon_cancel_gray from 'public/image/icon/fc_cancel_gray.svg';
-import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg';
-import icon_save from 'public/image/icon/fc_save.svg';
-import icon_save_gray from 'public/image/icon/fc_save_gray.svg';
-import icon_arrow_down from 'public/image/icon/fc_arrow_down.svg';
-import icon_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
-import icon_delete from 'public/image/icon/fc_delete.svg';
-import icon_add from 'public/image/icon/fc_add2.svg';
-import icon_task_open from 'public/image/icon/fc_task_open.svg';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg?url';
+import icon_edit from 'public/image/icon/fc_edit.svg?url';
+import icon_add2_gray from 'public/image/icon/fc_add2_gray.svg?url';
+import icon_add2 from 'public/image/icon/fc_add2.svg?url';
+import icon_cancel_gray from 'public/image/icon/fc_cancel_gray.svg?url';
+import icon_edit_gray from 'public/image/icon/fc_edit_gray.svg?url';
+import icon_save from 'public/image/icon/fc_save.svg?url';
+import icon_save_gray from 'public/image/icon/fc_save_gray.svg?url';
+import icon_arrow_down from 'public/image/icon/fc_arrow_down.svg?url';
+import icon_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg?url';
+import icon_delete from 'public/image/icon/fc_delete.svg?url';
+import icon_add from 'public/image/icon/fc_add2.svg?url';
+import icon_task_open from 'public/image/icon/fc_task_open.svg?url';
 
 //日期
 import dayjs, { Dayjs } from 'dayjs';

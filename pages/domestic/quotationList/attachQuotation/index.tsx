@@ -54,8 +54,8 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // icon
-import iconUpload from 'public/image/icon/upload.svg';
-import iconRedLock from 'public/image/icon/redLock.svg';
+import iconUpload from 'public/image/icon/upload.svg?url';
+import iconRedLock from 'public/image/icon/redLock.svg?url';
 
 // css
 import style from './quotation.module.scss';

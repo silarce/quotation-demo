@@ -14,8 +14,8 @@ import Select, {
 import { GroupBase } from 'react-select/dist/declarations/src/types.d';
 
 // icon
-import iconArrowRed from 'public/image/icon/arrow_down_red.svg';
-import iconArrowBlack from 'public/image/icon/arrow_down.svg';
+import iconArrowRed from 'public/image/icon/arrow_down_red.svg?url';
+import iconArrowBlack from 'public/image/icon/arrow_down.svg?url';
 // css
 import scss from '../inputSel.module.scss';
 

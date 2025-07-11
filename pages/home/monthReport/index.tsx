@@ -33,7 +33,7 @@ import { holidaysLookup } from 'config/date/holidaysLookup';
 import { myConfig } from 'config/myConfig';
 
 // icon
-import iconDownload from 'public/image/icon/download.svg';
+import iconDownload from 'public/image/icon/download.svg?url';
 
 const holidaysLookupKeyArr = Object.keys(holidaysLookup);
 

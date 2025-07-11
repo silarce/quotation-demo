@@ -10,25 +10,25 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 //grid
 // import Thead01 from "../../factoryDepartment/ui/table/thead01";
 //icon
-import icon_search from 'public/image/icon/fc_search.svg';
-import icon_clear from 'public/image/icon/fc_clear.svg';
+import icon_search from 'public/image/icon/fc_search.svg?url';
+import icon_clear from 'public/image/icon/fc_clear.svg?url';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import icon_fc_add from 'public/image/icon/fc_add.svg';
+import icon_fc_add from 'public/image/icon/fc_add.svg?url';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import icon_cancel from 'public/image/icon/fc_cancel.svg';
-import icon_fc_check from 'public/image/icon/fc_check.svg';
-import icon_cancel2 from 'public/image/icon/fc_cancel2.svg';
+import icon_cancel from 'public/image/icon/fc_cancel.svg?url';
+import icon_fc_check from 'public/image/icon/fc_check.svg?url';
+import icon_cancel2 from 'public/image/icon/fc_cancel2.svg?url';
 import { AppContext } from 'pages/_app';
-import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
-import icon_edit from 'public/image/icon/fc_edit.svg';
-import icon_delete from 'public/image/icon/fc_delete.svg';
-import icon_add from 'public/image/icon/fc_add2.svg';
-import icon_eye from 'public/image/icon/eyeOpen.svg';
-import icon_eye_gray from 'public/image/icon/eyeProhibit.svg';
-import icon_cir_add from 'public/image/icon/addCircle.svg';
-import icon_cir_remove from 'public/image/icon/removeCircle.svg';
-import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg?url';
+import icon_edit from 'public/image/icon/fc_edit.svg?url';
+import icon_delete from 'public/image/icon/fc_delete.svg?url';
+import icon_add from 'public/image/icon/fc_add2.svg?url';
+import icon_eye from 'public/image/icon/eyeOpen.svg?url';
+import icon_eye_gray from 'public/image/icon/eyeProhibit.svg?url';
+import icon_cir_add from 'public/image/icon/addCircle.svg?url';
+import icon_cir_remove from 'public/image/icon/removeCircle.svg?url';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg?url';
 
 //時間
 import { Modal, Radio, Space } from 'antd';

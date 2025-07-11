@@ -12,14 +12,14 @@ import { Collapse, Drawer } from 'antd';
 import ChangePwPanel from 'components/global/gear/modal/changePwPanel';
 
 // img
-import iconMember from 'public/image/icon/member.svg';
+import iconMember from 'public/image/icon/member.svg?url';
 import logo from 'public/image/logo/logo_header_mobile.png';
 
 // icon
-import iconMenu from 'public/image/icon/menu02.svg';
-import iconLogout from 'public/image/icon/logout.svg';
-import iconCross from 'public/image/icon/cross_hover.svg';
-import iconHome from 'public/image/icon/home.svg';
+import iconMenu from 'public/image/icon/menu02.svg?url';
+import iconLogout from 'public/image/icon/logout.svg?url';
+import iconCross from 'public/image/icon/cross_hover.svg?url';
+import iconHome from 'public/image/icon/home.svg?url';
 
 // css
 import scss from './header_mobile.module.scss';

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import scss from './logo.module.scss';
 
 // logo
-import logo from 'public/image/logo/logo01.svg';
+import logo from 'public/image/logo/logo01.svg?url';
 
 export default function Logo() {
   return (

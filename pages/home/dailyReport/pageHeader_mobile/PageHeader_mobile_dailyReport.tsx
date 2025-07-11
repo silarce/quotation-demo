@@ -8,9 +8,9 @@ import MyButton from 'components/global/gear/button/myButton';
 import scss from './pageHeader_mobile_dailyReport.module.scss';
 
 // icon
-import iconSearch from 'public/image/icon/search.svg';
-import iconSearch_hover from 'public/image/icon/search_hover.svg';
-import iconArrow from 'public/image/icon/arrow03_left.svg';
+import iconSearch from 'public/image/icon/search.svg?url';
+import iconSearch_hover from 'public/image/icon/search_hover.svg?url';
+import iconArrow from 'public/image/icon/arrow03_left.svg?url';
 
 // ====================================================================
 export default function PageHeader_mobile_dailyReport({

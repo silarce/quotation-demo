@@ -19,7 +19,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 //icon
-import icon_search from 'public/image/icon/fc_search.svg';
+import icon_search from 'public/image/icon/fc_search.svg?url';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 export interface WHPositionModel {

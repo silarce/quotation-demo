@@ -6,17 +6,17 @@ import { setting } from '../wareHouseList/index';
 import CellWithBar from "components/global/gear/cell/cellWithBar";
 import { AppContext } from 'pages/_app';
 //icon
-import icon_add from 'public/image/icon/fc_add2.svg';
-import icon_fc_check from 'public/image/icon/fc_check.svg';
-import icon_cancel2 from 'public/image/icon/fc_cancel2.svg';
-import icon_cancel3 from 'public/image/icon/fc_cancel3.svg';
-import icon_edit from 'public/image/icon/fc_edit.svg';
-import icon_delete from 'public/image/icon/fc_delete.svg';
-import icon_eye from 'public/image/icon/eyeOpen.svg';
-import icon_eye_gray from 'public/image/icon/eyeProhibit.svg';
-import icon_cir_add from 'public/image/icon/addCircle.svg';
-import icon_cir_remove from 'public/image/icon/removeCircle.svg';
-import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_add from 'public/image/icon/fc_add2.svg?url';
+import icon_fc_check from 'public/image/icon/fc_check.svg?url';
+import icon_cancel2 from 'public/image/icon/fc_cancel2.svg?url';
+import icon_cancel3 from 'public/image/icon/fc_cancel3.svg?url';
+import icon_edit from 'public/image/icon/fc_edit.svg?url';
+import icon_delete from 'public/image/icon/fc_delete.svg?url';
+import icon_eye from 'public/image/icon/eyeOpen.svg?url';
+import icon_eye_gray from 'public/image/icon/eyeProhibit.svg?url';
+import icon_cir_add from 'public/image/icon/addCircle.svg?url';
+import icon_cir_remove from 'public/image/icon/removeCircle.svg?url';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg?url';
 import myAlert from "components/global/gear/modal/simpleModal/alertModals";
 
 export default function PoMapping() {

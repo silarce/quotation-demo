@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import Image from 'next/image';
 
 // icon
-import iconCheck from 'public/image/icon/check.svg';
+import iconCheck from 'public/image/icon/check.svg?url';
 
 // css
 import scss from './_button.module.scss';

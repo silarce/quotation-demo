@@ -11,8 +11,8 @@ import { EventWrapperProps, Calendar, momentLocalizer } from 'react-big-calendar
 import MyButton from 'components/global/gear/button/myButton';
 
 // icon
-import iconCircle from 'public/image/icon/circle.svg';
-import icongreenDot from 'public/image/icon/greenDot.svg';
+import iconCircle from 'public/image/icon/circle.svg?url';
+import icongreenDot from 'public/image/icon/greenDot.svg?url';
 
 // tool
 import { month_chToNumber } from 'js/tools/date/conversionTable';

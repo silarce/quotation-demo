@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 // icon
 import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
-import iconPassword from 'public/image/icon/password.svg';
+import iconPassword from 'public/image/icon/password.svg?url';
 // css
 import scss from './table.module.scss';
 // type
