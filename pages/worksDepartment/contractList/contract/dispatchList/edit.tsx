@@ -113,6 +113,7 @@ export default function EditDispatchList() {
     gateRemote: `${number}` | '';
     gateControllerKey: `${number}` | '';
     gateMotorKey: `${number}` | '';
+    ejectionDoorKey: `${number}` | '';
   }>({
     tasks: '',
     note: '',
@@ -126,6 +127,7 @@ export default function EditDispatchList() {
     gateRemote: '',
     gateControllerKey: '',
     gateMotorKey: '',
+    ejectionDoorKey: '',
   });
 
   const [state_pricingMethod, setState_pricingMethod] = useState<Tstate_pricingMethod>({
@@ -256,6 +258,7 @@ export default function EditDispatchList() {
       gateRemote: Number(state_dispatch.gateRemote),
       gateControllerKey: Number(state_dispatch.gateControllerKey),
       gateMotorKey: Number(state_dispatch.gateMotorKey),
+      ejectionDoorKey: Number(state_dispatch.ejectionDoorKey),
     };
 
     try {
@@ -377,6 +380,7 @@ export default function EditDispatchList() {
       gateRemote,
       gateControllerKey,
       gateMotorKey,
+      ejectionDoorKey,
     } = dispatching ?? {};
 
     let {
@@ -462,6 +466,7 @@ export default function EditDispatchList() {
       gateRemote: String(gateRemote ?? '') as `${number}` | '',
       gateControllerKey: String(gateControllerKey ?? '') as `${number}` | '',
       gateMotorKey: String(gateMotorKey ?? '') as `${number}` | '',
+      ejectionDoorKey: String(ejectionDoorKey ?? '') as `${number}` | '',
     });
 
     if (pricingMethod) {
@@ -803,6 +808,16 @@ export default function EditDispatchList() {
         });
       },
     },
+    ejectionDoorKey: {
+      value: state_dispatch?.ejectionDoorKey ?? '',
+      onChange: (v: string) => {
+        setState_dispatch((data) => {
+          data.ejectionDoorKey = v as `${number}` | '';
+
+          return { ...data };
+        });
+      },
+    },
 
     //
   };
@@ -826,6 +841,7 @@ export default function EditDispatchList() {
       rollingKeyNumber,
       rollingRemote,
       rollingKey,
+      ejectionDoorKey,
       gateOther,
       gateRemote,
       gateControllerKey,
@@ -855,6 +871,7 @@ export default function EditDispatchList() {
       gateRemote,
       gateControllerKey,
       gateMotorKey,
+      ejectionDoorKey,
       //
       合約內: state_pricingMethod.pricingMethod === '合約內',
       合約追加: state_pricingMethod.pricingMethod === '合約辦理追加',
