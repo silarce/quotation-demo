@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // gaer
 import SelectBar, { TselectBarProps } from 'components/global/gear/select/selectBar/selectBar';
@@ -28,7 +28,7 @@ const useYearMonth_options = ({
   emptyYearOption?: boolean;
   emptyMonthOption?: boolean;
 } = {}) => {
-  const m_now = moment();
+  const m_now = dayjs();
   const thisYear = m_now.year();
   const thisMonth = m_now.month() + 1;
 

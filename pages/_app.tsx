@@ -1,5 +1,7 @@
 import { useState, useEffect, createContext, useCallback } from 'react';
 import type { ReactElement, ReactNode } from 'react';
+import { createRoot } from 'react-dom/client';
+
 import _ from 'lodash';
 
 import Head from 'next/head';
@@ -9,7 +11,8 @@ import type { NextPage } from 'next';
 import { useMediaQuery } from 'react-responsive';
 
 // antd
-import { ConfigProvider as AntdConfigProvider } from 'antd';
+import { ConfigProvider as AntdConfigProvider, unstableSetRender } from 'antd';
+import locale from 'antd/locale/zh_TW';
 
 // conponents
 import Layer from 'components/Layer/Layer';
@@ -30,6 +33,12 @@ import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
+import dayjs, { Dayjs } from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import duration from 'dayjs/plugin/duration';
+import utc from 'dayjs/plugin/utc';
+import 'dayjs/locale/zh-tw';
+
 // -----------------------------------------------------------------------------------
 
 import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
@@ -39,28 +48,72 @@ import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
 // -----------------------------------------------------------------------------------
 // 全域 css
 import '../styles/globals.scss';
-import 'antd/dist/antd.css';
 import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用的
 import 'slick-carousel/slick/slick.css'; // react-slick
 import 'slick-carousel/slick/slick-theme.css'; // react-slick
+import 'antd/dist/reset.css';
 // -----------------------------------------------------------------------------------
 // i18n
 import 'hooks/i18n';
 
-// 全域moment語系轉換
-import 'moment/locale/zh-tw';
-// moment擴充套件
-import moment_tz from 'moment-timezone';
 // -----------------------------------------------------------------------------------
 
-// 時區設為台北時間
-moment_tz.tz.setDefault('Asia/Taipei');
+// React 19 兼容
+// https://ant.design/docs/react/v5-for-19-cn
+
+// @ant-design/v5-patch-for-react-19不能用
+// 編譯時發生錯誤 (0 , _antd.unstableSetRender) is not a function
+// 所以採用在入口執行unstableSetRender的方案
+// @ant-design/v5-patch-for-react-19 v1.0.3其實是在做同樣的事
+unstableSetRender((node, container) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  container._reactRoot ||= createRoot(container);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const root = container._reactRoot;
+  root.render(node);
+
+  return async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    root.unmount();
+  };
+});
+
+// -----------------------------------------------------------------------------------
+
+dayjs.extend(isBetween);
+dayjs.extend(duration);
+dayjs.extend(utc);
+dayjs.locale('zh-tw');
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+locale.DatePicker.lang.yearFormat = (
+  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
+) => {
+  const year = date.subtract(1911, 'year').year();
+
+  return `${year}年`;
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+locale.DatePicker.lang.cellYearFormat = (
+  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
+) => {
+  const year = date.subtract(1911, 'year').year();
+
+  return `${year}年`;
+};
+
+// -----------------------------------------------------------------------------------
 
 const AppContext = createContext<TappContext>(null!);
 
 // =============================================================================
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
@@ -238,7 +291,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // ------------------------------------------------------------------
   return (
-    <AntdConfigProvider autoInsertSpaceInButton={false}>
+    <AntdConfigProvider button={{ autoInsertSpace: false }} locale={locale}>
       <Head>
         <title>三久ERP</title>
       </Head>

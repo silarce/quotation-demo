@@ -46,8 +46,8 @@ export default function Pop_form({
       title={<PopContent control={control} setIsShow={setIsShow} confirmText={confirmText} />}
       trigger="click"
       color={theme.colors_bgc02}
-      destroyTooltipOnHide={true}
-      visible={show}
+      destroyOnHidden={true}
+      open={show}
       placement={placement}
     >
       {children}

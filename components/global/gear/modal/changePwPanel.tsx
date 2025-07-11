@@ -17,7 +17,7 @@ type TpwPostBody = {
   newPassword: string;
 };
 
-export default function ChangePwPanel({ visible, onCancel }: { visible: boolean; onCancel: () => void }) {
+export default function ChangePwPanel({ open: visible, onCancel }: { open: boolean; onCancel: () => void }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [oldPw, setOldPw] = useState('');
@@ -103,7 +103,7 @@ export default function ChangePwPanel({ visible, onCancel }: { visible: boolean;
       maskClosable={true}
       footer={null}
       onCancel={theOnCancel}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       afterClose={theOnCancel}
     >
       <div className={scss.header}>

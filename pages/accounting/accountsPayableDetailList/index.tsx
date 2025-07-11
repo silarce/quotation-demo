@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Spin } from 'antd';
@@ -65,8 +65,8 @@ export default function AccountsPayableDetailList() {
   const [disabled, setDisabled] = useState(true);
 
   const isFuture = (() => {
-    const date = moment(`${year}-${month}`);
-    const now = moment();
+    const date = dayjs(`${year}-${month}`);
+    const now = dayjs();
 
     return date.isAfter(now);
   })();
@@ -123,7 +123,7 @@ export default function AccountsPayableDetailList() {
   // MARK: API
 
   const reqPostAddAccountPayableStatistics = async () => {
-    const date = moment(`${year}-${month}`).format('YYYY-MM-DD');
+    const date = dayjs(`${year}-${month}`).format('YYYY-MM-DD');
     const note = '';
     const account_payable_uuids = Object.keys(checkedRaw);
 

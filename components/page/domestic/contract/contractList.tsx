@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 import _ from 'lodash';
 
@@ -19,8 +19,6 @@ import { useGetContract_id_noItems_2 } from 'js/api/api_quotation';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 export type { Tcontract };
-
-const { Panel } = Collapse;
 
 export default function ContractList({
   //
@@ -65,7 +63,7 @@ export default function ContractList({
 
     const obj: TsubContract = {
       contractNumber: subContract.contractNumber ?? '---',
-      createdAt: moment(subContract.content.createdAt).format('YYYY-MM-DD'),
+      createdAt: dayjs(subContract.content.createdAt).format('YYYY-MM-DD'),
       projectName: subContract.content.projectName,
       verifyForm: (
         <span
@@ -99,27 +97,21 @@ export default function ContractList({
     <div className={classNames(style.container, className)}>
       <ContractListTop />
       <Collapse
-        //
-        expandIcon={() => <></>}
+        className={style.panel}
+        expandIcon={() => null}
         accordion={true}
-        destroyInactivePanel={true}
+        destroyOnHidden={true}
         onChange={changeActive}
-      >
-        {contractList.map((contract, index) => {
+        items={contractList.map((contract, index) => {
           const isActive = activeIndex === index;
 
-          return (
-            <Panel
-              key={index}
-              //
-              className={style.panel}
-              header={<ListHeader01 contract={contract} isActive={isActive} />}
-            >
-              <ListBody01 memoList={memoArr} />
-            </Panel>
-          );
+          return {
+            key: index,
+            label: <ListHeader01 contract={contract} isActive={isActive} />,
+            children: <ListBody01 memoList={memoArr} />,
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }

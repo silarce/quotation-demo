@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import _ from 'lodash';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // ui
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -183,7 +183,7 @@ export default function SearchBar({
                   const props = datePickerProps.props;
 
                   const preValue = props?.value || field.value;
-                  const value = preValue ? moment(preValue) : null;
+                  const value = preValue ? dayjs(preValue) : null;
 
                   ispC.datePickerProps = {
                     ...datePickerProps,

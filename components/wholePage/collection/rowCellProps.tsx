@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js';
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 import type { Toption } from 'js/utils/options/options';
 
 import {
@@ -38,7 +38,7 @@ type TrowCellProps = {
     //
     disabled: boolean;
     bankAccountOptionArr: Toption[];
-    limitedDate: Moment | undefined;
+    limitedDate: Dayjs | undefined;
     // value: string | Moment | null | boolean;
     state_accountant: Tstate_accountant;
     setState_accountant: React.Dispatch<React.SetStateAction<Tstate_accountant>>;

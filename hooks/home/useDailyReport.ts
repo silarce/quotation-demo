@@ -281,20 +281,6 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       prevDate: undefined,
     };
 
-    // obj.itemList.firEmpty = new Class_reportItem({
-    //   reRender,
-    //   delSelf: () => {
-    //     setReportItemKeyArr((arr) => {
-    //       const index = arr.indexOf('firEmpty');
-    //       arr.splice(index, 1);
-
-    //       return [...arr];
-    //     });
-
-    //     delete obj?.itemList?.firEmpty;
-    //     reRender();
-    //   },
-    // });
     obj.itemList = {
       firEmpty: new Class_reportItem({
         reRender,
@@ -412,7 +398,6 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
     //
   }; // reNew_report
 
-  //
   const addReportItem = () => {
     const newItemid = nanoid();
 
@@ -421,27 +406,42 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
         return report;
       }
 
-      report.itemList[newItemid] = new Class_reportItem({
+      const newItem = new Class_reportItem({
         reRender,
         delSelf: () => {
           setReportItemKeyArr((arr) => {
-            const index = arr.indexOf(newItemid);
-            arr.splice(index, 1);
+            const copy = [...arr];
 
-            return [...arr];
+            const index = copy.indexOf(newItemid);
+            copy.splice(index, 1);
+
+            return copy;
           });
 
-          delete report?.itemList[newItemid];
+          setReport((prev) => {
+            if (!prev) {
+              return prev;
+            }
+
+            const { [newItemid]: _, ...newItemList } = prev.itemList;
+
+            return { ...prev, itemList: newItemList };
+          });
+
           reRender();
         },
       });
-      setReportItemKeyArr((arr) => {
-        arr.push(newItemid);
 
-        return [...arr];
-      });
+      const itemList = {
+        ...report.itemList,
+        [newItemid]: newItem,
+      };
 
-      return { ...report };
+      return { ...report, itemList };
+    });
+
+    setReportItemKeyArr((arr) => {
+      return [...arr, newItemid];
     });
   };
 
@@ -509,7 +509,6 @@ const useReport = ({ userInfo }: { userInfo: TuserDto }) => {
       return false;
     }
 
-    // return report.isReviewedByOther || !report.isEdit ? false : true;
     return !report.isEdit ? false : true;
   })();
 

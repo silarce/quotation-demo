@@ -363,7 +363,7 @@ export type TdailyReportDto = {
   id: string;
   createdAt: string; // date
   updatedAt: string; //date
-  date: string; // yyyy-MM-DD
+  date: string; // YYYY-MM-DD
   employee: TemployeeDto;
   reviewStatus: TdailyReportReviewStatusDto[];
   isReviewCompleted: boolean;

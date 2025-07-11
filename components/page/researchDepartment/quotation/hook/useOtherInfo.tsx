@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 
 // ====================================================================
 
 interface Tstate_otherInfo {
   deliveryLocation: string; // 交貨地點
-  deliveryDate: Moment | null; // 交貨日期
+  deliveryDate: Dayjs | null; // 交貨日期
   paymentMethods: {
     milestone: string;
     totalPaymentRatio: `${number}` | ''; // 0~100 浮點數

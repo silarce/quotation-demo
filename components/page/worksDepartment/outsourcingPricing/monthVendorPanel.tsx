@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
@@ -43,8 +43,8 @@ const MonthVendorPanel = ({
     pageSize: 99999,
     filter: {
       date: {
-        $gte: moment(targetDate).startOf('month').toISOString(),
-        $lte: moment(targetDate).endOf('month').toISOString(),
+        $gte: dayjs(targetDate).startOf('month').toISOString(),
+        $lte: dayjs(targetDate).endOf('month').toISOString(),
       },
     },
   };
@@ -56,26 +56,26 @@ const MonthVendorPanel = ({
   const { tabArr, defaultCarouselIndex } = useMemo(() => {
     //
     const dateArr = getAllMonthByRange({
-      start: 2022,
-      end: undefined,
+      start: new Date('2022/01/01'),
+      end: new Date(),
     }).reverse();
 
     let defaultCarouselIndex = -1;
 
     const tabArr: Tcontrol_tabCarousel['tabArr'] = dateArr.map((date, index) => {
-      const twDate = moment(date).subtract(1911, 'years');
+      const twDate = dayjs(date).subtract(1911, 'years');
 
-      if (date === moment(targetDate).format('yy-MM')) {
+      if (date === dayjs(targetDate).format('YYYY-MM').replace(/(^0+)/, '')) {
         defaultCarouselIndex = index;
         setActiveTab_date(index);
       }
 
       return {
-        label: twDate.format('yy-MM'),
+        label: twDate.format('YYYY-MM').replace(/(^0+)/, ''),
         onClick: ({ ref_slider }) => {
           setActiveTab_date(index);
           ref_slider.current.slickGoTo(index);
-          const theDate = moment(date);
+          const theDate = dayjs(date);
           onDateTabClick(theDate.toISOString());
         },
       };
