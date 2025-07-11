@@ -1,0 +1,120 @@
+.customTable :global(.ant-table th),
+.customTable :global(.ant-table td) {
+  box-sizing: border-box;
+}
+.customTable :global(.ant-table) {
+  // height: 304px !important;
+  min-height: 96px !important;
+  // max-height: 304px !important;
+  overflow: auto !important; // 讓表格可以滾動
+}
+.customTable :global(.ant-table-thead > tr > .ant-table-cell) {
+  color: black !important;
+}
+
+.customTable :global(.ant-table-thead > tr > th) {
+  background: #edf1f7 !important;
+  border-bottom: 1px solid #616161 !important;
+  // border-right: 1px solid #616161 !important;
+  height: 48px !important;
+  padding: 0px 16px !important;
+}
+
+//去除垂直的線
+.customTable :global(.ant-table-thead > tr > th:last-child) {
+  border-right: none !important;
+}
+
+.customTable :global(.ant-table-container) {
+  border: 1px solid #616161 !important;
+  border-radius: 6px !important;
+  border-start-start-radius: 6px !important;
+  border-start-end-radius: 6px !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.customTable :global(.ant-table-header) {
+  border-radius: 6px !important;
+  border-top-right-radius: 6px !important;
+  overflow: hidden;
+}
+
+.customTable :global(.ant-table-thead > tr > th:first-child) {
+  border-top-left-radius: 6px !important;
+  overflow: hidden;
+}
+
+.customTable :global(.ant-table-thead > tr > th:last-child) {
+  border-top-right-radius: 6px !important;
+  overflow: hidden;
+}
+
+.customTable :global(.ant-table-tbody > tr > td) {
+  border-bottom: 1px solid #616161;
+}
+.customTable :global(.ant-table-tbody > tr > td) {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.customTable :global(.ant-table-tbody > tr) {
+  line-height: 23px !important;
+}
+
+//去除垂直的線
+.customTable :global(.ant-table-content > table > tbody > tr > td) {
+  border-inline-end: none !important;
+}
+.customTable :global(.ant-table-content > table > tbody > tr > td:first-child) {
+  border-left: none !important;
+}
+.customTable :global(.ant-table-content > table > tbody > tr > td:last-child) {
+  border-right: none !important;
+}
+.customTable :global(.ant-table-tbody > tr:last-child > td) {
+  border-bottom: none !important;
+}
+
+//Table的checkBox
+.checkboxWrapperTable {
+  display: flex;
+  gap: 8px;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  justify-content: center;
+
+  input[type='checkbox'] {
+    display: none;
+  }
+
+  .customCheckmarkTable {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d9d9d9;
+    border-radius: 4px;
+    background-color: white;
+    position: relative;
+    transition: all 0.2s;
+  }
+  &:hover .customCheckmarkTable {
+    border-color: #388e3c;
+  }
+
+  input[type='checkbox']:checked + .customCheckmarkTable {
+    background-color: #2acc7e;
+    border-color: #388e3c;
+  }
+
+  input[type='checkbox']:checked + .customCheckmarkTable::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+}

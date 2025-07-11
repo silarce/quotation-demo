@@ -1,0 +1,13 @@
+.inputPassword {
+  display: flex;
+  align-items: center;
+
+  //調整文字向上偏移的狀況
+  > p {
+    margin-top: 14px;
+  }
+}
+.formBlock{
+  display: flex;
+  width: fit-content;
+}

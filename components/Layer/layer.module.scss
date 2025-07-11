@@ -17,8 +17,8 @@
 }
 .main {
   height: 100%;
-  padding: 20px 15px 15px 15px;
-  overflow: hidden;
+  padding: 32px;
+  overflow: scroll;
   @screen laptop {
     padding: 0px 5px;
   }

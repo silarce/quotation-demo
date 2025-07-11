@@ -1,0 +1,219 @@
+import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
+import Input from 'components/global/myCom/Input/Input';
+import AddButton from 'components/global/myCom/button/AddButton';
+import { useEffect, useState } from 'react';
+import SearchButton from 'components/global/myCom/button/searchButton';
+import ClearButton from 'components/global/myCom/button/clearButton';
+import type { ColumnsType } from 'antd/es/table';
+import Image from 'next/image';
+import editIcon from 'public/image/icon/note.svg';
+import deleteIcon from 'public/image/icon/trash.svg';
+import { Table } from 'antd';
+import { useRouter } from 'next/router';
+import MySelect from 'components/global/myCom/select/mySelect';
+
+// api
+import { getEmployeeList } from 'components/page/organization/employee/api';
+
+// scss
+import scss from './employee.module.scss';
+
+interface EmployeeItem {
+  key: string;
+  emp_code: string;
+  department: string;
+  job_title: string;
+  emp_ch_name: string;
+  shift: string;
+  duty_type: string;
+  onboard_date: string;
+  seniority: number;
+}
+
+export default function EmployeeData() {
+  const [input, setInput] = useState('');
+  const [checkedEmployees, setCheckedEmployees] = useState<string[]>([]);
+  const [employeeList, setEmployeeList] = useState<EmployeeItem[]>([]);
+  const router = useRouter();
+
+  const fetchEmployeeList = async () => {
+    try {
+      const res = await getEmployeeList({ fe_search: input.trim() });
+
+      if (res.length === 0) {
+        return;
+      }
+
+      const formattedData: EmployeeItem[] = res.map((item: any) => ({
+        key: item.emp_id,
+        emp_code: item.emp_code,
+        department: item.department,
+        emp_ch_name: item.emp_ch_name,
+      }));
+
+      setEmployeeList(formattedData);
+    } catch (err) {
+      console.error('取得員工資料失敗', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployeeList(); // 初次載入
+  }, []);
+
+  const handleCheck = (emp_code: string) => {
+    setCheckedEmployees((prev) =>
+      prev.includes(emp_code) ? prev.filter((code) => code !== emp_code) : [...prev, emp_code]
+    );
+  };
+
+  const handleSelectAll = () => {
+    const allCodes = employeeList.map((item) => item.emp_code);
+    setCheckedEmployees(checkedEmployees.length === allCodes.length ? [] : allCodes);
+  };
+
+  const mapPageHeaderTop: MapPageHeader = {
+    title: [
+      {
+        name: '員工資料維護',
+      },
+    ],
+  };
+
+  const columns: ColumnsType<EmployeeItem> = [
+    {
+      title: '員工編號',
+      dataIndex: 'emp_code',
+      key: 'emp_code',
+      width: '8%',
+    },
+    {
+      title: '部門',
+      dataIndex: 'department',
+      key: 'department',
+      width: '8%',
+    },
+    {
+      title: '職稱',
+      dataIndex: 'job_title',
+      key: 'job_title',
+      width: '8%',
+    },
+    {
+      title: '姓名',
+      dataIndex: 'emp_ch_name',
+      key: 'emp_ch_name',
+      width: '8%',
+    },
+    {
+      title: '班別',
+      dataIndex: 'shift',
+      key: 'shift',
+      width: '8%',
+    },
+    {
+      title: '編制',
+      dataIndex: 'duty_type',
+      key: 'duty_type',
+      width: '8%',
+    },
+    {
+      title: '到職日',
+      dataIndex: 'onboard_date',
+      key: 'onboard_date',
+      width: '8%',
+    },
+    {
+      title: '年資/年',
+      dataIndex: 'seniority',
+      key: 'seniority',
+      width: '8%',
+      align: 'center',
+    },
+    {
+      title: '',
+      dataIndex: '',
+      key: '',
+      width: '28%',
+      align: 'center',
+    },
+    {
+      title: '操作',
+      key: 'action',
+      align: 'center',
+      width: '8%',
+      render: (_, record) => (
+        <div className="flex justify-center gap-5">
+          <Image
+            src={editIcon}
+            alt="edit"
+            onClick={() => router.push(`/setting/organization/employeeData?emp_id=${record.key}`)}
+            style={{ cursor: 'pointer', width: '20px', height: '20px' }}
+          />
+          <Image
+            src={deleteIcon}
+            alt="delete"
+            onClick={() => console.log('delete')}
+            style={{ cursor: 'pointer' }}
+            width={16}
+            height={16}
+          />
+        </div>
+      ),
+    },
+  ];
+
+  const data: EmployeeItem[] = [
+    {
+      key: '1',
+      emp_code: '11456',
+      department: '生產部',
+      job_title: '技術員',
+      emp_ch_name: '林建宏',
+      shift: '早班',
+      duty_type: '內勤',
+      onboard_date: '2024/02/04',
+      seniority: 1,
+    },
+    {
+      key: '2',
+      emp_code: '11457',
+      department: '品保部',
+      job_title: '品管員',
+      emp_ch_name: '陳怡君',
+      shift: '早班',
+      duty_type: '外勤',
+      onboard_date: '2023/02/04',
+      seniority: 2,
+    },
+  ];
+
+  return (
+    <>
+      <PageHeader {...mapPageHeaderTop} />
+      <div className="border-[1px] border-[#616161] rounded-lg py-8">
+        <div className="px-6  pb-6 flex justify-between">
+          <div className="flex gap-4 h-[40px]">
+            <Input marginLeft="0px" value={input} onChange={setInput} placeholder="請輸入員工代碼/姓名" width="176px" />
+            <MySelect className="w-full" marginLeft="0px" placeholder="選擇部門" />
+            <SearchButton onClick={fetchEmployeeList} />
+          </div>
+          <div className="flex gap-6 h-[40px]">
+            {checkedEmployees.length > 0 && <ClearButton label="全部刪除" onClick={() => console.log('Clear!')} />}
+            <AddButton label="新增員工" onClick={() => router.push('/organization/employee/addEmployee')} />
+          </div>
+        </div>
+        <div className="px-6">
+          <Table
+            className={scss.customTable}
+            columns={columns}
+            dataSource={data}
+            rowKey="key"
+            bordered
+            style={{ minWidth: '50%' }}
+          />
+        </div>
+      </div>
+    </>
+  );
+}

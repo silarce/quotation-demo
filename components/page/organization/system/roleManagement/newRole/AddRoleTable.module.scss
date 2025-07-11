@@ -1,0 +1,108 @@
+.formBlock {
+  :global(.ant-input-outlined) {
+    border-color: #616161 !important;
+  }
+}
+
+.redButtonNew {
+  color: #EA1833;
+  border: 1px solid #EA1833;
+  background-color: #F5F5F5;
+  font-size: 16px;
+  line-height: 19px;
+  padding: 10px 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem; // 8px
+  font-weight: 500;
+  margin-left: 0.75rem; // 12px
+
+  svg {
+    color: #EA1833 !important;
+  }
+  // hover 狀態
+  &:hover {
+    background-color: #d12c30;
+    color: #ffffff;
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #cc142b;
+    color: #ffff;
+  }
+}
+
+.greenButtonNew {
+  color: #1B9C5E;
+  border: 1px solid #1B9C5E;
+  background-color: #F5F5F5;
+  font-size: 16px;
+  line-height: 19px;
+  padding: 10px 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem; // 8px
+  font-weight: 500;
+  margin-left: 0.75rem; // 12px
+
+  svg {
+    color: #1B9C5E !important;
+  }
+
+  // hover 狀態
+  &:hover {
+    background-color: #388e3c;
+    color: #ffffff;
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #2e7d32;
+    color: #ffff;
+  }
+}
+
+.blueButtonNew {
+  color: #14256a;
+  border: 1px solid #14256a;
+  background-color: #F5F5F5;
+  font-size: 16px;
+  line-height: 19px;
+  padding: 10px 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.5rem; // 8px
+  font-weight: 500;
+  margin-left: 0.75rem; // 12px
+
+  svg {
+    color: #14256a !important;
+  }
+  // hover 狀態
+  &:hover {
+    background-color: #14256a;
+    color: #ffffff;
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #0f1b52;
+    color: #ffff;
+  }
+}

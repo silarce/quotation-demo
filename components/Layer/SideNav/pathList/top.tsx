@@ -34,6 +34,8 @@ const accounting = sidePathList['/accounting'].path;
 const factoryDepartment = sidePathList['/factoryDepartment'].path;
 const documentManagementPath = sidePathList['/documentManagement'].path;
 const researchDepartmentPath = sidePathList['/researchDepartment'].path;
+const personnelPath = sidePathList['/personnel'].path;
+const organizationPath = sidePathList['/organization'].path;
 
 export const topPathList: TtopPathListConfig[] = [
   {
@@ -146,5 +148,25 @@ export const topPathList: TtopPathListConfig[] = [
       pathname: researchDepartmentPath + '/workSheet',
     },
     erpFeature: devPass,
+  },
+  {
+    icon: icon_home,
+    label: '人事管理',
+    path: personnelPath,
+    href: {
+      pathname: '/personnel/shift',
+      query: { isMine: 'true' },
+    },
+    erpFeature: 'allPass',
+  },
+  {
+    icon: icon_home,
+    label: '組織管理',
+    path: organizationPath,
+    href: {
+      pathname: '/organization/company',
+      query: { isMine: 'true' },
+    },
+    erpFeature: 'allPass',
   },
 ];

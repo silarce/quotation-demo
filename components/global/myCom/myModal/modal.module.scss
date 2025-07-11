@@ -1,0 +1,70 @@
+//Modal
+.customModal {
+  :global {
+    .ant-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+      gap: 8px;
+    }
+    .cancelbutton {
+      width: 60px;
+      height: 40px;
+      background-color: #f5f5f5;
+      border-radius: 6px;
+      border: 1px solid #616161;
+      display: flex;
+      justify-content: center;
+    }
+
+    .ant-modal-content {
+      border-radius: 6px;
+    }
+  }
+}
+
+.redButtonNew {
+  height: 40px;
+  border: 1px solid #ea1833;
+  background-color: #f5f5f5;
+  font-size: 16px;
+  line-height: 19px;
+  padding: 0px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px; // 8px
+  font-weight: 500;
+  margin-left: 0.75rem; // 12px
+
+  span {
+    color: #ea1833 !important;
+  }
+
+  svg {
+    color: #ea1833 !important;
+  }
+  // hover 狀態
+  &:hover {
+    background-color: #d12c30 !important;
+    span {
+      color: #ffffff !important;
+    }
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #cc142b;
+    span {
+      color: #ffffff !important;
+    }
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+}

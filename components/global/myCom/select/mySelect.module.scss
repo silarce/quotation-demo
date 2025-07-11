@@ -1,0 +1,20 @@
+.customSelect {
+  .ant-select-selector {
+    border: 1px solid #616161 !important;
+    border-radius: 6px !important;
+    padding: 0 11px !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    height: 40px !important;
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-select-selection-placeholder {
+    color: #bfbfbf;
+  }
+
+  .ant-select-arrow {
+    color: #616161;
+  }
+}

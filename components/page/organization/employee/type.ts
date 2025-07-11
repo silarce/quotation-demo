@@ -1,0 +1,32 @@
+export interface CreateEmployeePayload {
+  emp_code: string;
+  id_no: string;
+  emp_ch_name: string;
+  emp_en_name: string;
+  email: string;
+  birthday_date: string;
+  gender_pcode: string;
+  marital_pcode: string;
+  education_pcode: string;
+  phone1: string;
+  phone2: string;
+  residence_county_pcode: string;
+  residence_district_pcode: string;
+  residence_address: string;
+  mailing_county_pcode: string;
+  mailing_district_pcode: string;
+  mailing_address: string;
+  seniority: string;
+  start_date: string;
+  leave_date: string;
+  retire_date: string;
+  severance_date: string;
+  military_service_type_pcode: string;
+  emergency_contact_phone: string;
+  emergency_contact_relationship: string;
+  phone_number: string;
+  department: string;
+  job_grade_id: string;
+  hire_date: string;
+  is_enable: boolean;
+}

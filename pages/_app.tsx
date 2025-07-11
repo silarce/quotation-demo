@@ -52,6 +52,10 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'; // 行事曆 UI用�
 import 'slick-carousel/slick/slick.css'; // react-slick
 import 'slick-carousel/slick/slick-theme.css'; // react-slick
 import 'antd/dist/reset.css';
+
+//新增的
+import '../styles/tailwind.css';
+import '../styles/antd.scss';
 // -----------------------------------------------------------------------------------
 // i18n
 import 'hooks/i18n';
