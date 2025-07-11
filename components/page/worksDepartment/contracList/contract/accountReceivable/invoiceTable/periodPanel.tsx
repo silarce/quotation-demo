@@ -349,7 +349,9 @@ function PeriodPanel_pre(
       return undefined;
     }
 
+
     const { alphabeticLetter, startNumber, endNumber } = state_period.invoiceBook;
+
 
     const startNumber_num = Number(startNumber);
     const endNumber_num = Number(endNumber);
