@@ -32,6 +32,7 @@ import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalCo
 import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+import { useGlobal_environment } from 'hooks/globalState/useGlobal_enviroment';
 
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -165,6 +166,8 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     setErpFeature: setErpFeature_global,
   } = useGlobal_userInfo();
 
+  const { isInIframe } = useGlobal_environment();
+
   // ----------------------------------------------------------------------------
 
   let userGrade = 0;
@@ -259,7 +262,9 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   let getLayout = Component.getLayout;
 
-  if (!getLayout) {
+  if (isInIframe) {
+    getLayout = (page) => page;
+  } else if (!getLayout) {
     if (!userInfo || !userErpFeature) {
       getLayout = (page) => page;
     } else {
