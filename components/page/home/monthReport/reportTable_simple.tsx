@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import TextareaAutosize from 'react-textarea-autosize';
 
 // layer
@@ -105,7 +105,7 @@ export default function ReportTable_simple({ reportId }: { reportId: string }) {
                   if (value === null) {
                     value = '00-00';
                   } else {
-                    value = moment(value as string).format('HH:mm');
+                    value = dayjs(value as string).format('HH:mm');
                   }
                 }
 

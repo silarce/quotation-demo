@@ -14,7 +14,7 @@
 // 報價單
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -1051,7 +1051,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(createdAt).toISOString(),
+        isoString: dayjs(createdAt).toISOString(),
       };
     });
   }, [quotationData, theContent]);
@@ -1924,7 +1924,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       {theContent && (
         <QuotationPdf
-          visible={pdfModalVisible}
+          open={pdfModalVisible}
           onCancel={hidePdf}
           pdfData={pdfData}
           fileName={`報價單-${theContent?.quotationNumber}`}

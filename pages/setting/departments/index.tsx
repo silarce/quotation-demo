@@ -241,7 +241,7 @@ export default function Department() {
         <LoadingCover01 isLoading={isLoading} />
       </div>
       <InputModal
-        visible={showAdd}
+        open={showAdd}
         setVisible={setShowAdd}
         title={'請輸入新增部門'}
         placeholder={'新部門'}

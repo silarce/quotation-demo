@@ -55,7 +55,7 @@ export default function SearchDrawer({
   };
 
   return (
-    <Drawer className={scss.searchDrawer} visible={visible} getContainer={false} width={'100%'} closable={false}>
+    <Drawer className={scss.searchDrawer} open={visible} getContainer={false} width={'100%'} closable={false}>
       <Image className={scss.iconClose} onClick={onCancel} src={iconCross} alt="close" />
       <InputSel
         className={scss.sel}

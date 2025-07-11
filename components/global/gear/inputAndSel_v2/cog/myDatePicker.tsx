@@ -1,13 +1,10 @@
 import classNames from 'classnames';
-import moment from 'moment';
 
 // antd
 import { DatePicker, DatePickerProps } from 'antd';
-import 'moment/locale/zh-tw';
-import locale from 'antd/lib/date-picker/locale/zh_TW';
 
 // utils
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from '../inputSel.module.scss';
@@ -48,22 +45,13 @@ export default function MyDatePicker({
   return (
     <div className={classNames(scss.datePickerBox, wrapperClassName)} style={wrapperStyle}>
       <DatePicker
-        locale={locale}
-        format={(theMoment) => {
-          const twDate = convertDate_reduce1911(theMoment.toISOString());
-
-          const picker = antdProps?.picker;
-
-          const format = picker === 'year' ? 'yy' : picker === 'month' ? 'yy-MM' : 'yy-MM-DD';
-
-          return moment(twDate).format(format);
+        format={(theDayjs) => {
+          return getTaiwanDateStr(theDayjs);
         }}
         autoComplete="off"
-        bordered={false}
+        variant="borderless"
         inputReadOnly={true}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore // 明明就有showToday，但是ts表示沒有
-        showToday={false}
+        showNow={false}
         //
         {...antdProps}
         //

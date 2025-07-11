@@ -1,3 +1,5 @@
+import { Dayjs } from 'dayjs';
+
 // global gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import InputSelBar_address from 'components/global/gear/inputAndSel/inputSelBar_address/inputSelBar_address';
@@ -112,8 +114,8 @@ export default function EditEmployeeItem01({ classEmployee }: { classEmployee: C
             captionWidth={'60px'}
             datePickerProps={{
               value: classEmployee.birthday,
-              onChange02: (moment: moment.Moment | null) => {
-                classEmployee.birthday = moment?.toISOString() ?? '';
+              onChange02: (dayjs) => {
+                classEmployee.birthday = dayjs?.toISOString() ?? '';
               },
             }}
           />

@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import ExcelJs, { TableProperties } from 'exceljs';
 import _ from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -455,7 +455,7 @@ const unformat = (str: string) => {
 // region dlExcel
 
 const dlExcel = async ({
-  excelName = moment().format('YYYY-MM-DD HH:mm:ss'),
+  excelName = dayjs().format('YYYY-MM-DD HH:mm:ss'),
   title,
   formatedList,
   quotetypeArr,

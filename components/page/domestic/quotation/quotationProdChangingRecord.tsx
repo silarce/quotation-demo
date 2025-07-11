@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import moment from 'moment';
+
 import _ from 'lodash';
 
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // antd
 import { Collapse } from 'antd';
@@ -13,17 +13,11 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 // css
 import style from 'components/page/domestic/quotation/quotationProdChangingRecord.module.scss';
 
-// ===================================================================
-// ===================================================================
 import Table_prod from 'components/page/domestic/contract/table/table_prod';
 import { useProductList } from 'hooks/quotation/useProduct';
 import { TquotationProductDto, TquotationContractDto } from 'js/api/dtoTypes';
 // ===================================================================
-// ===================================================================
 
-const { Panel } = Collapse;
-
-// =====================================================
 export default function TheQuotationProdChangingRecord({
   subContract,
 }: {
@@ -60,53 +54,54 @@ export default function TheQuotationProdChangingRecord({
       </div>
       {/*  */}
       <Collapse
-        expandIcon={() => <></>}
+        expandIcon={() => null}
         accordion={true}
-        destroyInactivePanel={true}
+        destroyOnHidden={true}
         className={style.collapse}
         onChange={changeActive}
-      >
-        {subContract?.map((item, index) => {
-          const content = item.content;
+        items={subContract
+          ?.map((item, index) => {
+            const content = item.content;
 
-          const contentTotal = content?.subTotal ?? 0;
+            const contentTotal = content?.subTotal ?? 0;
 
-          const record = {
-            quotationId: content.quotationNumber,
-            date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
-            priceChange: `${contentTotal}`,
-            remark: content.editNotes,
-          };
+            const record = {
+              quotationId: content.quotationNumber,
+              date: getTaiwanDateStr(content.quotationDate),
+              priceChange: `${contentTotal}`,
+              remark: content.editNotes,
+            };
 
-          const isActive = activeIndex === index;
+            const isActive = activeIndex === index;
 
-          const contentProdArr = _.cloneDeep(content.products);
+            const contentProdArr = _.cloneDeep(content.products);
 
-          contentProdArr.forEach((prod, index) => {
-            if (!rootProdList[prod.rootProductId]) {
-              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
-            } else {
-              const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
-              const copy = _.cloneDeep(prod);
-              copy.quantity = rootQty - copy.quantity;
-              rootProdList[prod.rootProductId] = _.cloneDeep(prod);
-              // 替換掉原本的
-              contentProdArr[index] = copy;
+            contentProdArr.forEach((prod, index) => {
+              if (!rootProdList[prod.rootProductId]) {
+                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+              } else {
+                const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
+                const copy = _.cloneDeep(prod);
+                copy.quantity = rootQty - copy.quantity;
+                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+                // 替換掉原本的
+                contentProdArr[index] = copy;
+              }
+            });
+
+            // 上面的演算法必須執行，所以 return null放在下面
+            if (index === 0) {
+              return null;
             }
-          });
 
-          // 上面的演算法必須執行，所以 return null放在下面
-          if (index === 0) {
-            return null;
-          }
-
-          return (
-            <Panel key={index} header={<PanelHeader record={record} isActive={isActive} />}>
-              <ProdRow prodArr={contentProdArr} quotationDiscount={Number(content.discount || '100')} />
-            </Panel>
-          );
-        })}
-      </Collapse>
+            return {
+              key: index,
+              label: <PanelHeader record={record} isActive={isActive} />,
+              children: <ProdRow prodArr={contentProdArr} quotationDiscount={Number(content.discount || '100')} />,
+            };
+          })
+          .filter((item) => !!item)}
+      />
     </div>
   );
 }
@@ -119,7 +114,6 @@ type TchangeListItem = {
   date: string; // 日期
   priceChange: number | string; // 追加追減價格
   remark: string; // 備註
-  // product: TrecordProduct[];
 };
 
 const PanelHeader = ({ record, isActive }: { record: TchangeListItem; isActive: boolean }) => {

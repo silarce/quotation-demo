@@ -354,7 +354,7 @@ export default function QuotationAdditions({
 
       {/*  */}
       <InputModal
-        visible={!!targetAddi}
+        open={!!targetAddi}
         title="請輸入變更數量"
         tip={`上限 : ${targetAddi && targetAddi.remainQty}`}
         onConfirm={(v) => {

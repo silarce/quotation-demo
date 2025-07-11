@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 
 import type { TquotationDto } from 'js/api/dtoTypes';
@@ -21,7 +21,7 @@ const useHistory = ({ quotationData }: { quotationData: TquotationDto | undefine
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(createdAt).toISOString(),
+        isoString: dayjs(createdAt).toISOString(),
       };
     });
   }, [quotationData]);

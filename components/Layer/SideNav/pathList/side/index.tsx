@@ -1,13 +1,15 @@
-import { TsidePathList } from "../type";
-import Home from './home'
-import Setting from './setting'
-import Domestic from './domestic'
-import SalesDepartmentForeign from './salesDepartmentForeign'
-import WorksDepartment from './worksDepartment'
-import Accounting from './accounting'
-import FactoryDepartment from './factoryDepartment'
-import DocumentManagement from './documentManagement'
-import ResearchDepartment from './researchDepartment'
+import { TsidePathList } from '../type';
+import Home from './home';
+import Setting from './setting';
+import Domestic from './domestic';
+import SalesDepartmentForeign from './salesDepartmentForeign';
+import WorksDepartment from './worksDepartment';
+import Accounting from './accounting';
+import FactoryDepartment from './factoryDepartment';
+import DocumentManagement from './documentManagement';
+import ResearchDepartment from './researchDepartment';
+import Personnel from './personnel';
+import Organization from './organization';
 
 // 首頁　　　　　　　home
 // 公司設定　　　　　setting
@@ -36,13 +38,15 @@ import ResearchDepartment from './researchDepartment'
 // const devPass: TtopPathListConfig["erpFeature"] = (allPass) as TtopPathListConfig["erpFeature"]
 
 export const sidePathList: TsidePathList = {
-    '/home': Home(),
-    '/setting': Setting(),
-    '/domestic': Domestic(),
-    '/salesDepartmentForeign': SalesDepartmentForeign(),
-    '/worksDepartment': WorksDepartment(),
-    '/accounting': Accounting(),
-    '/factoryDepartment': FactoryDepartment(),
-    '/documentManagement': DocumentManagement(),
-    '/researchDepartment': ResearchDepartment(),
+  '/home': Home(),
+  '/setting': Setting(),
+  '/domestic': Domestic(),
+  '/salesDepartmentForeign': SalesDepartmentForeign(),
+  '/worksDepartment': WorksDepartment(),
+  '/accounting': Accounting(),
+  '/factoryDepartment': FactoryDepartment(),
+  '/documentManagement': DocumentManagement(),
+  '/researchDepartment': ResearchDepartment(),
+  '/personnel': Personnel(),
+  '/organization': Organization(),
 };

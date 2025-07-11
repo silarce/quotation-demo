@@ -13,16 +13,12 @@
     :global(.ant-collapse-content-box) {
       padding: 0;
     }
-
-    // :global(.){
-    // }
   }
 }
 // =====================================================
 .panelHeader {
   position: relative;
   display: grid;
-  // grid-template-columns: auto 300px 230px 130px;
   grid-template-columns: auto 300px 230px 130px;
   padding: 5px 0px;
   width: 100%;

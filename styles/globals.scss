@@ -12,7 +12,7 @@
   @tailwind base;
 }
 
-// @tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -43,6 +43,7 @@ body {
 
   // font-family: Microsoft JhengHei;
   height: 100%;
+  font-size: 14px;
 }
 
 #__next {

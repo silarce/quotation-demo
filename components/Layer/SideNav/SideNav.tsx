@@ -6,7 +6,6 @@ import _ from 'lodash';
 
 // antd
 import { Collapse } from 'antd';
-const { Panel } = Collapse;
 
 // css
 import style from './side.module.scss';
@@ -69,51 +68,56 @@ export default function SideNav() {
                 className={style.collapse}
                 defaultActiveKey={[linkList.defaultCollapse || '0']}
                 ghost
-              >
-                <Panel header={label} key={`${index}`}>
-                  <ul>
-                    {list.map((item, index) => {
-                      const {
-                        //
-                        label,
-                        path,
-                        erpFeature,
-                        query,
-                        otherPermissions,
-                        exception,
-                        activeChecker,
-                      } = item;
+                items={[
+                  {
+                    key: `${index}`,
+                    label: label,
+                    children: (
+                      <ul>
+                        {list.map((item, index) => {
+                          const {
+                            //
+                            label,
+                            path,
+                            erpFeature,
+                            query,
+                            otherPermissions,
+                            exception,
+                            activeChecker,
+                          } = item;
 
-                      let isActive = pathname.startsWith(path);
+                          let isActive = pathname.startsWith(path);
 
-                      if (activeChecker) {
-                        isActive = activeChecker({ router });
-                      } else if (query) {
-                        isActive = _.isMatch(routerQuery, query ?? {});
-                      }
+                          if (activeChecker) {
+                            isActive = activeChecker({ router });
+                          } else if (query) {
+                            isActive = _.isMatch(routerQuery, query ?? {});
+                          }
 
-                      const href = { pathname: path, query };
+                          const href = { pathname: path, query };
 
-                      let isPassed = false;
-                      isPassed = checkErpFeature({ erpFeature, userErpFeature });
+                          let isPassed = false;
+                          isPassed = checkErpFeature({ erpFeature, userErpFeature });
 
-                      if (isPassed && otherPermissions) {
-                        isPassed = checkOtherPermissions({ userInfo, otherPermissions, exception });
-                      }
+                          if (isPassed && otherPermissions) {
+                            isPassed = checkOtherPermissions({ userInfo, otherPermissions, exception });
+                          }
 
-                      if (!isPassed) {
-                        return null;
-                      }
+                          if (!isPassed) {
+                            return null;
+                          }
 
-                      return (
-                        <li className={classNames({ [style.active]: isActive })} key={index}>
-                          <Link href={href}>{label}</Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </Panel>
-              </Collapse>
+                          return (
+                            <li className={classNames({ [style.active]: isActive })} key={index}>
+                              <Link href={href}>{label}</Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ),
+                  },
+                ]}
+              />
             );
           }
         })}

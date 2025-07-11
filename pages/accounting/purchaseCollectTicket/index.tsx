@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, memo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Spin } from 'antd';
@@ -85,9 +85,9 @@ export default function PurchaseCollectTicket({ userInfo, isAdmin }: { userInfo:
   const [isFetching, setIsFetching] = useState(false);
   // ------------------------------------------------------------
 
-  const ref_selectTicketUnmount = useRef<() => void>();
-  const ref_selectInvoiceUnmount = useRef<() => void>();
-  const ref_selectDetailUnmount = useRef<() => void>();
+  const ref_selectTicketUnmount = useRef<() => void>(undefined);
+  const ref_selectInvoiceUnmount = useRef<() => void>(undefined);
+  const ref_selectDetailUnmount = useRef<() => void>(undefined);
 
   useEffect(() => {
     return () => {
@@ -531,7 +531,7 @@ const useDefaultState = (
           identifyId: detail.id,
           item: detail.item || '',
           prodreceipt_number: detail.prodreceipt_number || '',
-          transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
+          transaction_date: detail.transaction_date ? dayjs(detail.transaction_date) : null,
           quantity: `${detail.quantity || ''}`,
           unit: detail.unit || '',
           unit_price: `${detail.unit_price || ''}`,

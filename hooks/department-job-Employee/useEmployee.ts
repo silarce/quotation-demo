@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import moment from 'moment';
-import 'moment-timezone';
+import dayjs from 'dayjs';
 
 import _ from 'lodash';
 
@@ -208,20 +207,20 @@ class Class_employee {
   }
 
   get seniority() {
-    const mStartDate = moment(this.startDate); //到職日
+    const mStartDate = dayjs(this.startDate); //到職日
 
     if (!this.startDate) {
       return '請輸入到職日';
     }
 
     if (this.leaveDate || this.severanceDate) {
-      const mEndDate = moment(this.leaveDate || this.severanceDate);
+      const mEndDate = dayjs(this.leaveDate || this.severanceDate);
 
       if (mStartDate.isAfter(mEndDate)) {
         return '離職日或資遣日早於到職日';
       }
 
-      const duration = moment.duration(mEndDate.diff(mStartDate));
+      const duration = dayjs.duration(mEndDate.diff(mStartDate));
 
       return `${duration.years()}年${duration.months()}月${duration.days()}天`;
     } else {

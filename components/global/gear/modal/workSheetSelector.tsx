@@ -163,7 +163,7 @@ export default function WorkSheetSelector({
   return (
     <ModalListSelectorWithSearch
       label={label ?? ''}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       onSearch={onSearch}

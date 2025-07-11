@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import { nanoid } from 'nanoid';
 
 // layer
@@ -53,7 +53,7 @@ type Tquery = {
 
 type Tstate_profile = {
   projectNumber: string;
-  projectDate: Moment | null;
+  projectDate: Dayjs | null;
   projectName: string;
   county: string;
   district: string;
@@ -621,7 +621,7 @@ const useDetail_default = ({
 
     const defaultState_profile: Tstate_profile = {
       projectNumber: projectNumber ?? '',
-      projectDate: projectDate ? moment(projectDate) : null,
+      projectDate: projectDate ? dayjs(projectDate) : null,
       projectName: projectName ?? '',
       county: projectCounty ?? '',
       district: projectDistrict ?? '',
@@ -821,7 +821,7 @@ const useDefault_profile = ({ paymentDetail }: { paymentDetail: ToutsourcingPaym
 
     const defaultState_profile: Tstate_profile = {
       projectNumber: projectNumber ?? '',
-      projectDate: projectDate ? moment(projectDate) : null,
+      projectDate: projectDate ? dayjs(projectDate) : null,
       projectName: projectName ?? '',
       county: projectCounty ?? '',
       district: projectDistrict ?? '',

@@ -1,66 +1,50 @@
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 /**返回ISOString */
-export const convertDate_reduce1911 = (ISOString: string) => {
-  if (!ISOString) {
-    return ISOString;
-  }
-
-  const dateTime = moment(ISOString);
+export const convertDate_reduce1911 = (date: string | Date | Dayjs) => {
+  let dateTime = dayjs(date);
 
   if (!dateTime.isValid()) {
-    return ISOString;
+    return 'invalid date';
   }
 
-  dateTime.subtract(1911, 'year');
+  dateTime = dateTime.subtract(1911, 'year');
 
   return dateTime.toISOString();
-
-  // const dateTime = new Date(ISOString);
-  // const year = dateTime.getFullYear();
-  // const chYear = year - 1911;
-  // dateTime.setFullYear(chYear);
-
-  // return dateTime.toISOString();
 };
 
 /**返回ISOString */
-export const convertDate_add1911 = (ISOString: string) => {
-  if (!ISOString) {
-    return ISOString;
+export const convertDate_add1911 = (date: string | Date | Dayjs) => {
+  let dateTime = dayjs(date);
+
+  if (!dateTime.isValid()) {
+    return 'invalid date';
   }
 
-  const dateTime = new Date(ISOString);
-  const twYear = dateTime.getFullYear();
-  const year = twYear + 1911;
-  dateTime.setFullYear(year);
+  dateTime = dateTime.add(1911, 'year');
 
   return dateTime.toISOString();
 };
 
 export const getTaiwanDateStr = (
-  ISOString: string | null | undefined,
+  date: string | Date | Dayjs | undefined | null,
   {
     withUnit,
-    customFormat,
   }: {
     withUnit?: boolean;
-    customFormat?: string;
   } = {}
 ) => {
-  if (!ISOString) {
-    return null;
+  const d = dayjs(date || undefined);
+
+  if (!d.isValid()) {
+    return 'invalid date';
   }
 
-  let format = 'yy-MM-DD';
+  let format = 'YYYY-MM-DD';
 
   if (withUnit) {
-    format = 'yy年MM月DD日';
+    format = 'YYYY年MM月DD日';
   }
 
-  if (customFormat) {
-    format = customFormat;
-  }
-
-  return moment(convertDate_reduce1911(ISOString)).format(format);
+  return dayjs(convertDate_reduce1911(d)).format(format).replace(/(^0+)/, '');
 };

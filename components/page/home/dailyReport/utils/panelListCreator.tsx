@@ -63,7 +63,7 @@ const panelListCreator = ({
   userInfo: TuserDto;
   dailyReport_calendar: TdailyReportDto[] | undefined;
   //
-  customSearchBar: JSX.Element;
+  customSearchBar: React.ReactNode;
   saveTempReport: () => void;
   getTempReport: () => void;
 }) => {

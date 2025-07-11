@@ -3,7 +3,7 @@
   overflow: auto;
 }
 
-.panel {
+.panel.panel {
   :global(.ant-collapse-header) {
     display: block !important;
     padding: 0 !important;

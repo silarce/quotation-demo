@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, memo, useContext } from 'react';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
+
 import { useRouter, NextRouter } from 'next/router';
 import Decimal from 'decimal.js';
 
@@ -62,16 +63,16 @@ type Tquery = {
 
 type Tstate_info = {
   // docStyle: string; //文件種類
-  applicationDate: Moment | null; // 申請日期
+  applicationDate: Dayjs | null; // 申請日期
   projectNumber: string; // 工程編號
   projectName: string; //  工程名稱
   contractor: string; // 承包商
   valuation: string; // 本期計價
   payment: string; // 本期請款
   retainage: string; // 保留款
-  paymentDate: Moment | null; // 請款日
-  disbursementDate: Moment | null; // 放款日
-  warrantyDate: Moment | null; // 保固日
+  paymentDate: Dayjs | null; // 請款日
+  disbursementDate: Dayjs | null; // 放款日
+  warrantyDate: Dayjs | null; // 保固日
 };
 
 type Tstate_itemList = {
@@ -95,7 +96,7 @@ type TeditInfo = (
 
 type TeditDate = (
   key: 'applicationDate' | 'paymentDate' | 'disbursementDate' | 'warrantyDate',
-  value: Moment | null
+  value: Dayjs | null
 ) => void;
 
 // =========================================================================
@@ -730,18 +731,18 @@ export default function Edit({
 
       setState_info({
         // docStyle: data_certifiedDocument.docStyle,
-        applicationDate: data_certifiedDocument.applicationDate ? moment(data_certifiedDocument.applicationDate) : null,
+        applicationDate: data_certifiedDocument.applicationDate ? dayjs(data_certifiedDocument.applicationDate) : null,
         projectNumber: data_certifiedDocument.projectNumber ?? '',
         projectName: data_certifiedDocument.projectName ?? '',
         contractor: data_certifiedDocument.contractor ?? '',
         valuation: String(data_certifiedDocument.valuation),
         payment: String(data_certifiedDocument.payment),
         retainage: String(data_certifiedDocument.retainage),
-        paymentDate: data_certifiedDocument.paymentDate ? moment(data_certifiedDocument.paymentDate) : null,
+        paymentDate: data_certifiedDocument.paymentDate ? dayjs(data_certifiedDocument.paymentDate) : null,
         disbursementDate: data_certifiedDocument.disbursementDate
-          ? moment(data_certifiedDocument.disbursementDate)
+          ? dayjs(data_certifiedDocument.disbursementDate)
           : null,
-        warrantyDate: data_certifiedDocument.warrantyDate ? moment(data_certifiedDocument.warrantyDate) : null,
+        warrantyDate: data_certifiedDocument.warrantyDate ? dayjs(data_certifiedDocument.warrantyDate) : null,
       });
 
       setState_itemList(list);

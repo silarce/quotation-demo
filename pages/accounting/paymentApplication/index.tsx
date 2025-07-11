@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import { nanoid } from 'nanoid';
@@ -69,7 +69,7 @@ interface Tstate {
   actualpaid: `${number}` | ''; // 實付金額
   total: `${number}` | ''; // 總金額
 
-  applicant_date: Moment | null; // 申請日期
+  applicant_date: Dayjs | null; // 申請日期
 
   beneficiary: TcustomerDto | undefined; // 廠商
   agent: TemployeeDto | undefined; // 經辦人
@@ -84,14 +84,14 @@ interface TstateDetail {
   identifier: string; // 識別碼
   //
   source_number: string | ''; // 立帳來源單號
-  transaction_date: Moment | null; // 交易日期
+  transaction_date: Dayjs | null; // 交易日期
   accountsPayableInvoicePrice: `${number}` | ''; // accountPayable.invoice_price // 應付帳款 // 不送後端
   payable_amount: `${number}` | ''; // account_payable.invoice_price  // 本次沖銷
   invoice_number: string | ''; // 發票號碼
   unappliedBalance: `${number}` | '' | null; // account_payable.balance // 未沖餘額 // 不送後端
   note: string | ''; // 備註 // 摘要說明
   //
-  payment_date: Moment | null; // 付款日期 // 無欄位
+  payment_date: Dayjs | null; // 付款日期 // 無欄位
   //
   checked: boolean;
   //
@@ -632,7 +632,7 @@ const usePaymentOrder = (
       actualpaid: `${raw_paymentOrder.actualpaid ?? ''}`,
       total: `${raw_paymentOrder.total ?? ''}`,
 
-      applicant_date: raw_paymentOrder.applicant_date ? moment(raw_paymentOrder.applicant_date) : null,
+      applicant_date: raw_paymentOrder.applicant_date ? dayjs(raw_paymentOrder.applicant_date) : null,
       beneficiary: raw_paymentOrder.beneficiary,
       agent: raw_paymentOrder.agent_employee,
       detailArr,
@@ -702,7 +702,7 @@ const usePaymentOrder = (
       const agent = userInfo.employee;
       !agent && myAlert.warning({ title: 'userInfo.employee為undefined', content: '將無法新增資料' });
       theDefaultState.agent = agent;
-      theDefaultState.applicant_date = moment();
+      theDefaultState.applicant_date = dayjs();
     }
 
     setState(theDefaultState);
@@ -745,14 +745,14 @@ const createStateDetail = (detail: TpaymentOrderDetail_Dto): TstateDetail => {
     identifier: detail.id || `identifier-${nanoid()}`,
     //
     source_number: detail.source_number || '',
-    transaction_date: detail.transaction_date ? moment(detail.transaction_date) : null,
+    transaction_date: detail.transaction_date ? dayjs(detail.transaction_date) : null,
     accountsPayableInvoicePrice: '',
     payable_amount: `${detail.payable_amount || ''}`,
     invoice_number: detail.invoice_number || '',
     unappliedBalance: null,
     note: detail.note || '',
     //
-    payment_date: detail.payment_date ? moment(detail.payment_date) : null,
+    payment_date: detail.payment_date ? dayjs(detail.payment_date) : null,
     //
     checked: true,
   };
@@ -767,7 +767,7 @@ const createStateDetail_byAccountPayable = (accountPayable: Taccount_payable_Dto
     identifier: `identifier-${nanoid()}`,
     //
     source_number: accountPayable.source_number || '',
-    transaction_date: accountPayable.transaction_date ? moment(accountPayable.transaction_date) : null,
+    transaction_date: accountPayable.transaction_date ? dayjs(accountPayable.transaction_date) : null,
     accountsPayableInvoicePrice: `${accountPayable.invoice_price ?? ''}`,
     payable_amount: `${accountPayable.invoice_price ?? ''}`,
     invoice_number: accountPayable.invoice_number || '',

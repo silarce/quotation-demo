@@ -9,6 +9,7 @@ export type { TuserDto };
 // 登入
 export const apiLogin = (body: { account: string; password: string }) => {
   const api = '/auth/login';
+  // const api = 'http://mspc1140427:8039/api/v2/login';
 
   return axi
     .post(api, body)
@@ -21,6 +22,7 @@ export const apiLogin = (body: { account: string; password: string }) => {
 // 登出
 export const apiLogout = () => {
   const api = '/auth/logout';
+  // const api = 'http://mspc1140427:8039/api/v2/logout';
 
   return axi
     .get(api)

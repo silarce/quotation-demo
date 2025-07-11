@@ -142,10 +142,6 @@ export default function EditEmployeeItem02({
               const stateValue = classEmployee[key];
               const { label } = config02[key];
 
-              const onChange02 = (moment: moment.Moment | null) => {
-                classEmployee[key] = moment?.toISOString() ?? '';
-              };
-
               const isMust = key === 'startDate' ? true : false;
 
               return (
@@ -157,7 +153,9 @@ export default function EditEmployeeItem02({
                   presetStyle="s01"
                   datePickerProps={{
                     value: stateValue,
-                    onChange02: onChange02,
+                    onChange02: (dayjs) => {
+                      classEmployee[key] = dayjs?.toISOString() ?? '';
+                    },
                   }}
                   isMust={isMust}
                   mustTipClassName={scss.mustTip}

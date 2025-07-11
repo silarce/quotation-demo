@@ -48,7 +48,7 @@ export default function LicensePlateSelector({
     <ModalListSelectorWithSearch
       className={scss.antdModal}
       label={'選擇車牌'}
-      visible={visible}
+      open={visible}
       onConfirm={() => onConfirm(sel)}
       onCancel={onCancel}
       onSearch={onSearch}

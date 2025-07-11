@@ -45,7 +45,7 @@ interface Tpanel_inpusearch {
 
 // 客製化元件
 interface Tpanel_custom {
-  custom: JSX.Element;
+  custom: React.ReactNode;
   type?: undefined;
   label?: undefined;
   onClick?: undefined;
@@ -96,7 +96,7 @@ export default function PanelList({ panelList }: { panelList: TpanelList }) {
         }
 
         // 通常的按鈕bar
-        const { label, type, onClick, placeholder, className, img, defaultValue } = item;
+        const { label, type, onClick, placeholder, className, img } = item;
 
         return (
           <Fragment key={index}>
@@ -109,12 +109,7 @@ export default function PanelList({ panelList }: { panelList: TpanelList }) {
             ) : type === 'exportButton' ? (
               <ExportButton label={label} onClick={onClick} className={classNames(scss.btn, className)} />
             ) : type === 'inputSearch' ? (
-              <InputSearch
-                placeholder={placeholder}
-                onClick={onClick}
-                className={classNames(scss.btn, className)}
-                defaultValue={defaultValue}
-              />
+              <InputSearch placeholder={placeholder} onClick={onClick} className={classNames(scss.btn, className)} />
             ) : null}
           </Fragment>
         );

@@ -53,11 +53,11 @@ export default function GridPanel({
   return (
     <Modal
       className={scss.container}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       width={620}
-      // destroyOnClose={true}
+      // destroyOnHidden={true}
       onCancel={onCancel}
       footer={<TwoBtnFooter {...{ onConfirm: theOnConfirm, onCancel }} />}
     >

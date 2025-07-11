@@ -110,7 +110,7 @@ function PdfTable_ref<PROPS>(props: Tprops_pdfTable<PROPS>, ref: React.Forwarded
   const ref_bottom = useRef<HTMLDivElement>(null);
   const ref_page = useRef<(null | HTMLDivElement)[]>([]);
 
-  const ref_thead = useRef<HTMLElement>(null);
+  const ref_thead = useRef<HTMLElement>(null!);
   const ref_centerRowArr = useRef<(null | HTMLElement)[]>([]);
 
   const [isReady, setIsReady] = useState<boolean>(false);

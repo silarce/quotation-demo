@@ -1,4 +1,4 @@
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 
 import {
   TpurchaseCollectTicket_Dto,
@@ -46,7 +46,7 @@ interface Tstate_detail {
   //
   item: string;
   prodreceipt_number: string | number;
-  transaction_date: Moment | null;
+  transaction_date: Dayjs | null;
   quantity: `${number}` | '';
   unit: string;
   unit_price: `${number}` | '';

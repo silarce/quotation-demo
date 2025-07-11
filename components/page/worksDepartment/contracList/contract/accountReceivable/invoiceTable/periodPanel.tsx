@@ -1,16 +1,8 @@
-import React, {
-  //
-  useState,
-  useEffect,
-  useMemo,
-  forwardRef,
-  useImperativeHandle,
-  useContext,
-} from 'react';
+import React, { useState, useEffect, useMemo, forwardRef, useImperativeHandle, useContext, useCallback } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 // antd
 import { Checkbox, Radio, Popover } from 'antd';
@@ -357,12 +349,9 @@ function PeriodPanel_pre(
       return undefined;
     }
 
-    const {
-      alphabeticLetter,
 
-      startNumber,
-      endNumber,
-    } = state_period.invoiceBook;
+    const { alphabeticLetter, startNumber, endNumber } = state_period.invoiceBook;
+
 
     const startNumber_num = Number(startNumber);
     const endNumber_num = Number(endNumber);
@@ -1528,7 +1517,7 @@ const useDefaultState = ({
       allow_EditDeduction_or_deleteInvoice: !notAllow_EditDeduction_or_deleteInvoice,
 
       actualPrice: String(actualPrice || ''),
-      invoiceDate: invoiceDate ? moment(invoiceDate) : null,
+      invoiceDate: invoiceDate ? dayjs(invoiceDate) : null,
       invoiceBook: invoice?.accountantInvoiceBook ?? null,
 
       //
@@ -1896,7 +1885,7 @@ class Class_OtherNode {
 
     const { year, month } = this.invoiceBook;
 
-    return moment()
+    return dayjs()
       .year(Number(year))
       .month(Number(month) - 1);
   }
@@ -1935,7 +1924,7 @@ class Class_OtherNode {
   }
 
   // ------------------------------------------------------------------------------
-  disabledInvoiceDate(currentDate: Moment): boolean {
+  disabledInvoiceDate(currentDate: Dayjs): boolean {
     if (this.isOlderInvoice) {
       return false;
     }
@@ -1946,20 +1935,13 @@ class Class_OtherNode {
       return disabled;
     }
 
-    const { year, month, latestInvoiceDate } = this.invoiceBook;
+    const { year, month } = this.invoiceBook;
 
-    const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
-    const bookDate_next = moment(`${year}-${Number(month) + 1}`, 'YYYY-MM');
-
-    const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
-    const begin = latestInvoiceDate_m.subtract(1, 'day');
+    const bookDate = dayjs(`${year}-${month}`);
+    const bookDate_next = dayjs(`${year}-${Number(month) + 1}`);
 
     if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
-      if (!latestInvoiceDate) {
-        disabled = false;
-      } else {
-        disabled = currentDate.isBefore(begin);
-      }
+      disabled = false;
     }
 
     return disabled;

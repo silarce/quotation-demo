@@ -2,19 +2,12 @@ import { useState } from 'react';
 
 // antd
 import { Collapse, Checkbox } from 'antd';
-const { Panel } = Collapse;
 
 // css
 import scss from './filterPanel.module.scss';
 
 // type
-import type {
-  TcheckOption,
-  // TprodClassOptions,
-  // TdoorTypeOptions,
-  // TpartOptions,
-  TfilterCtrl,
-} from 'pages/setting/productList';
+import type { TcheckOption, TfilterCtrl } from 'pages/setting/productList';
 
 // =============================================================================
 export default function FilterPanel({
@@ -23,9 +16,6 @@ export default function FilterPanel({
   partOptions,
   filterCtrl,
 }: {
-  // prodClassOptions: TprodClassOptions;
-  // doorTypeOptions: TdoorTypeOptions;
-  // partOptions: TpartOptions;
   prodClassOptions: TcheckOption[];
   doorTypeOptions: TcheckOption[];
   partOptions: TcheckOption[];
@@ -49,88 +39,92 @@ export default function FilterPanel({
   // --------------------------------------------------------------------------
   return (
     <div className={scss.filterPanel}>
-      <Collapse activeKey={+isOpen} ghost>
-        <Panel
-          className={scss.panel}
-          key={1}
-          header={<PanelHeader switchPanel={switchPanel} isOpen={isOpen} />}
-          showArrow={false}
-        >
-          <div className={scss.panelBody}>
-            <div className={scss.item}>
-              <p className={scss.caption}>類別</p>
-              <div className={scss.checkContainer}>
-                {prodClassOptions.map((option, index) => {
-                  const { label, value } = option;
-                  const checked = checkedProdClass.find((item) => item === value);
+      <Collapse
+        expandIcon={() => null}
+        activeKey={+isOpen}
+        ghost
+        items={[
+          {
+            key: 1,
+            label: <PanelHeader switchPanel={switchPanel} isOpen={isOpen} />,
+            children: (
+              <div className={scss.panelBody}>
+                <div className={scss.item}>
+                  <p className={scss.caption}>類別</p>
+                  <div className={scss.checkContainer}>
+                    {prodClassOptions.map((option, index) => {
+                      const { label, value } = option;
+                      const checked = checkedProdClass.find((item) => item === value);
 
-                  return (
-                    <Checkbox
-                      className={scss.checkBox}
-                      key={index}
-                      checked={!!checked}
-                      onChange={() => checkProdClass(value)}
-                    >
-                      {label}
-                    </Checkbox>
-                  );
-                })}
+                      return (
+                        <Checkbox
+                          className={scss.checkBox}
+                          key={index}
+                          checked={!!checked}
+                          onChange={() => checkProdClass(value)}
+                        >
+                          {label}
+                        </Checkbox>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className={scss.item}>
+                  <p className={scss.caption}>門型</p>
+                  <div className={scss.checkContainer}>
+                    {doorTypeOptions.map((option, index) => {
+                      const { label, value } = option;
+                      const checked = checkedDoorType.find((item) => item === value);
+
+                      return (
+                        <Checkbox
+                          className={scss.checkBox}
+                          key={index}
+                          checked={!!checked}
+                          onChange={() => checkDoorType(value)}
+                        >
+                          {label}
+                        </Checkbox>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className={scss.item}>
+                  <p className={scss.caption}>顯示條件</p>
+                  <div className={scss.checkContainer02}>
+                    {partOptions.map((option, index) => {
+                      const { label, value } = option;
+                      const checked = checkedPart.find((item) => item === value);
+
+                      return (
+                        <Checkbox
+                          className={scss.checkBox}
+                          key={index}
+                          checked={!!checked}
+                          onChange={() => checkPark(value)}
+                        >
+                          {label}
+                        </Checkbox>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className={scss.sideBtnBox}>
+                  <button onClick={filterConfirm}>
+                    <span>篩選</span>
+                  </button>
+                  <button onClick={filterClear}>
+                    <span>清除</span>
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div className={scss.item}>
-              <p className={scss.caption}>門型</p>
-              <div className={scss.checkContainer}>
-                {doorTypeOptions.map((option, index) => {
-                  const { label, value } = option;
-                  const checked = checkedDoorType.find((item) => item === value);
-
-                  return (
-                    <Checkbox
-                      className={scss.checkBox}
-                      key={index}
-                      checked={!!checked}
-                      onChange={() => checkDoorType(value)}
-                    >
-                      {label}
-                    </Checkbox>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className={scss.item}>
-              <p className={scss.caption}>顯示條件</p>
-              <div className={scss.checkContainer02}>
-                {partOptions.map((option, index) => {
-                  const { label, value } = option;
-                  const checked = checkedPart.find((item) => item === value);
-
-                  return (
-                    <Checkbox
-                      className={scss.checkBox}
-                      key={index}
-                      checked={!!checked}
-                      onChange={() => checkPark(value)}
-                    >
-                      {label}
-                    </Checkbox>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className={scss.sideBtnBox}>
-              <button onClick={filterConfirm}>
-                <span>篩選</span>
-              </button>
-              <button onClick={filterClear}>
-                <span>清除</span>
-              </button>
-            </div>
-          </div>
-        </Panel>
-      </Collapse>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }

@@ -15,7 +15,7 @@ import scss from './modalListSelectorWithSearch.module.scss';
 export default function ModalListSelectorWithSearch({
   children,
   label,
-  visible,
+  open: visible,
   onConfirm,
   onCancel,
   onSearch,
@@ -27,7 +27,7 @@ export default function ModalListSelectorWithSearch({
 }: {
   children: ReactNode;
   label: string;
-  visible: boolean;
+  open: boolean;
   // onClick會寫在children裡面
   onConfirm: () => void;
   onCancel: () => void;
@@ -43,10 +43,10 @@ export default function ModalListSelectorWithSearch({
   return (
     <Modal
       className={classNames(scss.modal, className)}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       onCancel={onCancel}
       footer={null}
       width={width}

@@ -1,27 +1,16 @@
 import React, { useState, useEffect, useMemo, Fragment, forwardRef, useRef } from 'react';
-import moment from 'moment';
 import _ from 'lodash';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import Decimal from 'decimal.js';
 
 import classNames from 'classnames';
 import Image from 'next/image';
 
-// component
-// import Header from './header';
-// import Profile, { Tprofile as Ttop } from './profile';
-// import Table, { TtableProdList, TtableProdListItem } from './table';
-// import Table_quoteTypeSum, { TquoteTypeSumList } from './table_quoteTypeSum';
-// import Total, { TmemoArr, Tsettlement } from './total';
-// import Other from './other';
-
 // global gear
-import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // antd
-import Modal, { ModalProps } from 'antd/lib/modal/Modal';
+import Modal from 'antd/lib/modal/Modal';
+import { ModalProps } from 'antd';
 
 // css
 import scss from './quotationPdf.module.scss';
@@ -30,12 +19,9 @@ import scss from './quotationPdf.module.scss';
 
 import { TquotationContentDto, TquotationContentOtherDto, TquotationProductDto } from 'js/api/dtoTypes';
 //
-import { Class_product, Class_other } from 'hooks/quotation/useProduct';
-import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 // config options
-import { optionsCreator_quotationStatus } from 'js/utils/options/options';
-import { doorTrackLookup } from 'js/utils/options/doorTrackOptions';
+
 import { findGuideRailUnicode } from 'config/product/lookup';
 import { companyInfo } from 'config/companyInfo';
 import { lookup_quoteType_doorModelName } from 'js/utils/options/productOptions';
@@ -50,7 +36,8 @@ import { dlPdf } from './dlPdf';
 // api
 import { apiGetAssets } from 'js/api/api_product';
 
-import { useDoorModelList, useShallow } from 'hooks/globalState/useDoorModelList';
+// import { useDoorModelList, useShallow } from 'hooks/globalState/useDoorModelList';
+import { useGlobal_doorModel } from 'hooks/globalState/useGlobal_doorModel';
 
 // ============================================================================
 
@@ -143,10 +130,8 @@ const excelRowMaxQty = 13; // excel 一頁13列
 // ============================================================================
 // region START
 export default function Modal_quotationPdf({
-  //
-  visible,
+  open,
   onCancel,
-  // data = fakeData,
   pdfData,
   fileName = '未命名',
 }: {
@@ -193,14 +178,7 @@ export default function Modal_quotationPdf({
   }
 
   return (
-    <Modal
-      visible={visible}
-      onCancel={onCancel}
-      width="fit-content"
-      footer={null}
-      closable={false}
-      destroyOnClose={true}
-    >
+    <Modal open={open} onCancel={onCancel} width="fit-content" footer={null} closable={false} destroyOnHidden={true}>
       <div className={scss.body}>
         <div>
           <MyButton_v2 onClick={handle_dlPdf} className="mr-5">
@@ -1205,11 +1183,12 @@ const useModalQuotationPdf = ({
   emptySomeProperty?: boolean; // 清空 customerName contactPerson contactNumber faxNumber
   // noDiscount?: boolean;
 }) => {
+  const { checkIsSpecialDoor } = useGlobal_doorModel();
+
   const [visible, setVisible] = useState(false);
   const [noDiscount, setNoDiscount] = useState(false);
 
   // const [pdfData, setPdfData] = useState<TpdfData>();
-  const checkIsSpecialDoor = useDoorModelList(useShallow((state) => state.checkIsSpecialDoor));
 
   const pdfData = useMemo(() => {
     if (!quotationContent || !visible) {
