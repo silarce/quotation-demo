@@ -5,9 +5,9 @@ import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 import ImportAttendance from './importingAttendance/index';
 import AttendanceSettlement from './attendanceSettlement/index';
 import CardApplication from './cardApplication';
-import MonthlySchedule from 'components/page/personnel/shift/monthlySchedule';
+import AbnormalAttendance from './abnormalAttendance';
 
-type TabKey = 'ImportAttendance' | 'AttendanceSettlement' | 'CardApplication' | 'monthlySchedule';
+type TabKey = 'ImportAttendance' | 'AttendanceSettlement' | 'CardApplication' | 'AbnormalAttendance';
 
 export default function RoleManagementIndex() {
   const router = useRouter();
@@ -17,7 +17,7 @@ export default function RoleManagementIndex() {
   useEffect(() => {
     const tab = router.query.tab as TabKey;
 
-    if (tab && ['ImportAttendance', 'AttendanceSettlement', 'CardApplication', 'monthlySchedule'].includes(tab)) {
+    if (tab && ['ImportAttendance', 'AttendanceSettlement', 'CardApplication', 'AbnormalAttendance'].includes(tab)) {
       setActiveTab(tab);
     }
   }, [router.query.tab]);
@@ -57,8 +57,8 @@ export default function RoleManagementIndex() {
       },
       {
         name: '考勤異常查詢',
-        onClick: () => handleTabChange('monthlySchedule'),
-        className: activeTab === 'monthlySchedule' ? activeClass : inactiveClass,
+        onClick: () => handleTabChange('AbnormalAttendance'),
+        className: activeTab === 'AbnormalAttendance' ? activeClass : inactiveClass,
       },
     ],
   };
@@ -70,7 +70,7 @@ export default function RoleManagementIndex() {
         {activeTab === 'ImportAttendance' && <ImportAttendance />}
         {activeTab === 'AttendanceSettlement' && <AttendanceSettlement />}
         {activeTab === 'CardApplication' && <CardApplication />}
-        {activeTab === 'monthlySchedule' && <MonthlySchedule />}
+        {activeTab === 'AbnormalAttendance' && <AbnormalAttendance />}
       </div>
     </div>
   );
