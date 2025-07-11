@@ -6,7 +6,7 @@ import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 import scss from './approve.module.scss';
-import Btn_fong from 'components/global/gear/button/btn_fong';
+import Btn_fong from 'components/global/gear/button/btn_fong_old';
 import DataEntry, { Input, DataEntry_fong } from 'components/global/gear/dataEntry';
 
 // ===========================================================================
