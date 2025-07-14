@@ -42,6 +42,8 @@ module.exports = {
 
 
     // region SVGR
+    // https://react-svgr.com/docs/next/
+
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule) =>
       rule.test?.test?.('.svg'),
@@ -59,7 +61,12 @@ module.exports = {
         test: /\.svg$/i,
         issuer: fileLoaderRule.issuer,
         resourceQuery: { not: [...fileLoaderRule.resourceQuery.not, /url/] }, // exclude if *.svg?url
-        use: ['@svgr/webpack'],
+        use: [{
+          loader: '@svgr/webpack',
+          options: {
+            icon: true,
+          }
+        }],
       },
     )
 
