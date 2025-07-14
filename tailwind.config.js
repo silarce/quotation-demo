@@ -1,4 +1,4 @@
-import { blue,green,orange } from '@ant-design/colors';
+import { blue, green, orange } from '@ant-design/colors';
 
 
 module.exports = {
@@ -23,9 +23,39 @@ module.exports = {
         danger: "#ea1833",
         success: "#08f366",
         pass: "#008000",
-        ok:green[0],
-        warning:orange[1],
-        antdBlue:{
+        ok: green[0],
+        warning: orange[1],
+        // 
+        brown01: '#B45309',
+        brown02: '#92400E',
+        brown03: '#78350F',
+
+        green01: '#1B9C5E',
+        green02: '#159151',
+        green03: '#117944',
+
+        blue01: '#14256A', // main
+        blue02: '#1A3084',
+        blue03: '#101E4A',
+        blue04: '#EDF1F7',
+
+        gray01: '#4B5563',
+        gray02: '#374151',
+        gray03: '#111827',
+        gray04: '#F5F5F5', // bgc01
+        gray05: '#616161', // border02
+        gray06: '#9D9D9D',
+
+        red01: '#EA1833', // danger active
+        red02: '#C5152B',
+        red03: '#A11223',
+
+        black01: '#212121', // text02
+        white01: '#FFFFFF',
+
+
+        // 
+        antdBlue: {
           // DEFAULT: blue.primary, // 沒有DEFAULT的效果以後再研究
           primary: blue.primary,
           // '1': blue[0],
@@ -43,14 +73,14 @@ module.exports = {
       width: {
         table: "1100px"
       },
-      border:{
-        radius:{
+      border: {
+        radius: {
           normal: "8px",
         }
       },
-      boxShadow:{
-        "01":"0px 3px 3px 0px #61616133",
-        "02":"0px 4px 4px 0px #00000040"
+      boxShadow: {
+        "01": "0px 3px 3px 0px #61616133",
+        "02": "0px 4px 4px 0px #00000040"
       }
     },
     screens: {

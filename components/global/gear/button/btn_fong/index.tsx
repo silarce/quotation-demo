@@ -1,18 +1,8 @@
+import dynamic from 'next/dynamic';
+
 import classNames from 'classnames';
 
 import scss from './index.module.scss';
-
-import Icon_add from 'public/image/icon/fong/add.svg';
-import Icon_arrowDown from 'public/image/icon/fong/arrowDown.svg';
-import Icon_arrowUp from 'public/image/icon/fong/arrowUp.svg';
-import Icon_cross from 'public/image/icon/fong/cross.svg';
-import Icon_import from 'public/image/icon/fong/import.svg';
-import Icon_query from 'public/image/icon/fong/query.svg';
-import Icon_save from 'public/image/icon/fong/save.svg';
-import Icon_saveAs from 'public/image/icon/fong/saveAs.svg';
-import Icon_tempIcon from 'public/image/icon/fong/tempIcon.svg';
-import Icon_trash from 'public/image/icon/fong/trash.svg';
-import Icon_send from 'public/image/icon/fong/send.svg';
 
 // ================================================================================
 
@@ -66,7 +56,8 @@ type TthemeName =
   | 'saveAs'
   | 'tempIcon'
   | 'trash'
-  | 'send';
+  | 'send'
+  | 'brown';
 
 type Tprops_btn = {
   theme?: TthemeName;
@@ -78,8 +69,9 @@ type Tprops_btn = {
 
 interface Ttheme {
   className?: string;
-  Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>> | null; // SVG component or null
-  IconAfter?: React.ComponentType<React.SVGProps<SVGSVGElement>> | null; // SVG component or null
+  // Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>; // SVG component or null
+  Icon?: React.ComponentType<React.SVGProps<SVGElement>>;
+  IconAfter?: React.ComponentType<React.SVGProps<SVGElement>>; // SVG component or null
 }
 
 // ================================================================================
@@ -87,49 +79,46 @@ interface Ttheme {
 const lookup_theme: Record<TthemeName, Ttheme> = {
   basic: {},
   save: {
-    className: scss.save,
-    Icon: Icon_save,
+    className: scss.blue_I,
+    Icon: dynamic(() => import('public/image/icon/fong/save.svg')),
   },
   add: {
-    className: scss.add,
-    Icon: Icon_add,
+    className: scss.green_I,
+    Icon: dynamic(() => import('public/image/icon/fong/add.svg')),
   },
   arrowDown: {
-    className: scss.arrowDown,
-    IconAfter: Icon_arrowDown,
+    IconAfter: dynamic(() => import('public/image/icon/fong/arrowDown.svg')),
   },
   arrowUp: {
-    className: scss.arrowUp,
-    IconAfter: Icon_arrowUp,
+    IconAfter: dynamic(() => import('public/image/icon/fong/arrowUp.svg')),
   },
   cross: {
-    className: scss.cross,
-    Icon: Icon_cross,
+    className: scss.green_II,
+    Icon: dynamic(() => import('public/image/icon/fong/cross.svg')),
   },
   import: {
-    className: scss.import,
-    Icon: Icon_import,
+    Icon: dynamic(() => import('public/image/icon/fong/import.svg')),
   },
   query: {
-    className: scss.query,
-    Icon: Icon_query,
+    Icon: dynamic(() => import('public/image/icon/fong/query.svg')),
   },
 
   saveAs: {
-    className: scss.saveAs,
-    Icon: Icon_saveAs,
+    Icon: dynamic(() => import('public/image/icon/fong/saveAs.svg')),
   },
   tempIcon: {
-    className: scss.tempIcon,
-    Icon: Icon_tempIcon,
+    Icon: dynamic(() => import('public/image/icon/fong/tempIcon.svg')),
   },
   trash: {
-    className: scss.trash,
-    Icon: Icon_trash,
+    className: scss.red_I,
+    Icon: dynamic(() => import('public/image/icon/fong/trash.svg')),
   },
   send: {
-    className: scss.send,
-    Icon: Icon_send,
+    className: scss.blue_I,
+    Icon: dynamic(() => import('public/image/icon/fong/send.svg')),
+  },
+  brown: {
+    className: scss.brown,
   },
 };
 

@@ -1,4 +1,6 @@
 .btn {
+  @extend .basic;
+
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -7,10 +9,8 @@
   min-height: 40px;
   padding: 0 16px;
   font-size: 14px;
-  color: theme("colors.main");
-  border: solid 1px theme("colors.main");
+
   border-radius: 6px;
-  background-color: theme("colors.bgc01");
   > .iconContainer {
     color: inherit;
     margin-right: 6px;
@@ -24,62 +24,82 @@
   }
 }
 
-.save {
+.basic {
+  color: theme("colors.gray01");
+  border: solid 1px theme("colors.gray01");
+  background-color: theme("colors.gray04");
+
   &:hover {
-    background-color: theme("colors.main");
-    color: theme("colors.white");
+    color: theme("colors.gray02");
+    border: solid 1px theme("colors.gray02");
   }
   &:active {
-    background-color: theme("colors.main");
-    color: theme("colors.white");
+    color: theme("colors.gray03");
+    border: solid 1px theme("colors.gray03");
   }
 }
 
-.send {
+.blue_I {
   &:hover {
-    background-color: theme("colors.main");
-    color: theme("colors.white");
+    background-color: theme("colors.blue02");
+    border-color: theme("colors.blue02");
+    color: theme("colors.white01");
   }
   &:active {
-    background-color: theme("colors.main");
-    color: theme("colors.white");
+    background-color: theme("colors.blue01");
+    border-color: theme("colors.blue01");
+    color: theme("colors.white01");
   }
 }
 
-.add {
-  color: #1b9c5e;
-  border-color: #1b9c5e;
+.green_I {
+  color: theme("colors.green01");
+  border-color: theme("colors.green01");
   &:hover {
-    background-color: #159151;
-    border-color: #159151;
-    color: theme("colors.white");
+    background-color: theme("colors.green02");
+    border-color: theme("colors.green02");
+    color: theme("colors.white01");
   }
   &:active {
-    background-color: #117944;
-    background-color: #117944;
-    color: theme("colors.white");
+    background-color: theme("colors.green03");
+    background-color: theme("colors.green03");
+    color: theme("colors.white01");
   }
 }
 
-.trash {
-  color: #ea1833;
-  border-color: #ea1833;
-  &:hover {
-    background-color: #ea1833;
-    color: theme("colors.white");
-  }
+.green_II {
+  color: theme("colors.green01");
+  border-color: theme("colors.green01");
   &:active {
-    background-color: #a11223;
-    border-color: #a11223;
-    color: theme("colors.white");
+    border-color: theme("colors.green03");
+    color: theme("colors.green03");
   }
 }
 
-.cross {
-  color: #1b9c5e;
-  border-color: #1b9c5e;
+.red_I {
+  color: theme("colors.red01");
+  border-color: theme("colors.red01");
+  &:hover {
+    background-color: theme("colors.red02");
+    border-color: theme("colors.red02");
+    color: theme("colors.white01");
+  }
   &:active {
-    border-color: #117944;
-    color: #117944;
+    background-color: theme("colors.red03");
+    border-color: theme("colors.red03");
+    color: theme("colors.white01");
+  }
+}
+
+.brown {
+  color: theme("colors.brown01");
+  border-color: theme("colors.brown01");
+  &:hover {
+    color: theme("colors.brown02");
+    border-color: theme("colors.brown02");
+  }
+  &:active {
+    color: theme("colors.brown03");
+    border-color: theme("colors.brown03");
   }
 }
