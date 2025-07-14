@@ -2,6 +2,8 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  width: fit-content;
+  // min-width: 84px;
   min-height: 40px;
   padding: 0 16px;
   font-size: 14px;
@@ -14,6 +16,10 @@
     margin-right: 6px;
     svg {
       font-size: 16px;
+    }
+    &.after {
+      margin-right: unset;
+      margin-left: 6px;
     }
   }
 }
@@ -42,12 +48,38 @@
 
 .add {
   color: #1b9c5e;
+  border-color: #1b9c5e;
   &:hover {
     background-color: #159151;
+    border-color: #159151;
     color: theme("colors.white");
   }
   &:active {
     background-color: #117944;
+    background-color: #117944;
     color: theme("colors.white");
+  }
+}
+
+.trash {
+  color: #ea1833;
+  border-color: #ea1833;
+  &:hover {
+    background-color: #ea1833;
+    color: theme("colors.white");
+  }
+  &:active {
+    background-color: #a11223;
+    border-color: #a11223;
+    color: theme("colors.white");
+  }
+}
+
+.cross {
+  color: #1b9c5e;
+  border-color: #1b9c5e;
+  &:active {
+    border-color: #117944;
+    color: #117944;
   }
 }
