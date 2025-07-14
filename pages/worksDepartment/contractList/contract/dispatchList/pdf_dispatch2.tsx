@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { dlPdf, getA4Rect, getIso216Rect } from 'js/utils/dlPdf';
+import { dlPdf, getIso216Rect } from 'js/utils/dlPdf';
 
 import scss from './pdf_dispatch2.module.scss';
 
@@ -80,8 +80,8 @@ export default function Pdf_dispatch2({
   const handelExportPdf = () => {
     dlPdf({
       divElementArr: [ref_pdf.current],
-      fileName: `派工單_${customerName}_${idNumber}`,
-      ISO216: 'a4',
+      fileName: `派工單_${customerName}_${projectNumber}`,
+      ISO216: 'b5',
       horizontal: false,
     });
   };
