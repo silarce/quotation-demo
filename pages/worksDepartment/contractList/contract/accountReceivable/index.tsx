@@ -300,7 +300,7 @@ export default function AccountReceivable({
       // 已在源頭onChange設為00:00:00
       // invoiceDate: invoiceDate ? invoiceDate.toISOString() : null,
       // invoiceDate: invoiceDate ? invoiceDate.toISOString(true) : null,
-      invoiceDate: invoiceDate ? invoiceDate.format('YYYY-MM') : null,
+      invoiceDate: invoiceDate ? invoiceDate.format('YYYY-MM-DD') : null,
       invoiceNumber: invoiceNumber || null,
       actualPrice: actualPrice ? Number(actualPrice) : null,
       accountantInvoiceBookId: accountantInvoiceBook?.id || null,
