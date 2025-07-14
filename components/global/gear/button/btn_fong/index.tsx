@@ -26,9 +26,10 @@ function Btn_fong({
   icon,
   iconAfter,
   themeColor: customThemeColor,
+  //
   ...props
 }: Tprops_btn) {
-  const { themeColor } = theme && lookup_theme[theme];
+  const { themeColor } = lookup_theme[theme];
 
   const Icon = typeof icon === 'string' ? lookup_icon[icon] : icon || lookup_theme[theme].Icon;
   const IconAfter = typeof iconAfter === 'string' ? lookup_icon[iconAfter] : iconAfter || lookup_theme[theme].IconAfter;
