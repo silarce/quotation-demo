@@ -7,6 +7,22 @@ import Decimal from 'decimal.js';
 
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
+// ==================================================================================================
+
+// ==================================================================================================
+// ISO 216 標準紙張尺寸
+// https://zh.wikipedia.org/zh-tw/ISO_216
+const ISO216Sizes = {
+  a3: { short: 297, long: 420 },
+  a4: { short: 210, long: 297 },
+  a5: { short: 148, long: 210 },
+
+  b4: { short: 250, long: 353 },
+  b5: { short: 176, long: 250 },
+} as const;
+
+// ==================================================================================================
+
 const dlPdf = async ({
   divElementArr,
   fileName,
@@ -71,6 +87,9 @@ const calcHeight_a4 = (width: number, { round = true }: { round?: boolean } = {}
   // return Math.round(width / (210 / 297));
 };
 
+/**
+ * @deprecated 棄用，改用getIso216Rect
+ */
 const getA4Rect = ({ scale = 2, horizontal = false }: { scale?: number; horizontal?: boolean } = {}) => {
   let width;
   let height;
@@ -89,4 +108,19 @@ const getA4Rect = ({ scale = 2, horizontal = false }: { scale?: number; horizont
   };
 };
 
-export { dlPdf, calcHeight_a4, getA4Rect };
+const getIso216Rect = (
+  ISO216: keyof typeof ISO216Sizes,
+  { scale = 6, horizontal = false }: { scale?: number; horizontal?: boolean } = {}
+) => {
+  const size = ISO216Sizes[ISO216];
+
+  const width = horizontal ? size.long : size.short;
+  const height = horizontal ? size.short : size.long;
+
+  return {
+    width: new Decimal(width).mul(scale).toNumber(),
+    height: new Decimal(height).mul(scale).toNumber(),
+  };
+};
+
+export { dlPdf, calcHeight_a4, getA4Rect, getIso216Rect };

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
-import { dlPdf, getA4Rect } from 'js/utils/dlPdf';
+import { dlPdf, getIso216Rect } from 'js/utils/dlPdf';
 
 import scss from './pdf_dispatch2.module.scss';
 
@@ -45,7 +45,8 @@ interface Tprops {
 
 // =======================================================================
 
-const { width, height } = getA4Rect();
+// const { width, height } = getA4Rect();
+const { width, height } = getIso216Rect('b5', { scale: 7 });
 
 export default function Pdf_dispatch2({
   data: {
@@ -79,8 +80,8 @@ export default function Pdf_dispatch2({
   const handelExportPdf = () => {
     dlPdf({
       divElementArr: [ref_pdf.current],
-      fileName: `派工單_${customerName}_${idNumber}`,
-      ISO216: 'a4',
+      fileName: `派工單_${customerName}_${projectNumber}`,
+      ISO216: 'b5',
       horizontal: false,
     });
   };
@@ -162,7 +163,7 @@ export default function Pdf_dispatch2({
             {/* row6 */}
 
             <Cell className={classNames('row-span-8 grid justify-center pt-3')}>{strToSpan('承辦情形')}</Cell>
-            <Cell className={classNames('col-span-8 row-span-8 leading-9')}>{content}</Cell>
+            <Cell className={classNames('col-span-8 row-span-8', scss.content)}>{content}</Cell>
 
             <Cell className={classNames('col-span-2 gap-6', cn2, ch6)}>{strToSpan('派工批價')}</Cell>
             {/* row7 */}
@@ -192,7 +193,7 @@ export default function Pdf_dispatch2({
             </Cell>
             <Cell className={classNames('col-span-8 flex items-center justify-between')}>
               <div>
-                <div>　　月　　日　　時　　　分</div>
+                <div className="mb-5">　　月　　日　　時　　　分</div>
                 <div>　　月　　日　　時　　　分</div>
               </div>
               <div className="mr-2">{'(共計　　時　　分)'}</div>
