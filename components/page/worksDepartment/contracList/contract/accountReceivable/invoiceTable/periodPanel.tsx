@@ -1117,7 +1117,7 @@ const Tfoot = ({
                 date_m && (date_m = date_m.startOf('day'));
                 class_other.invoiceDate = date_m;
               },
-              disabledDate: (date_m) => class_other.disabledInvoiceDate(date_m),
+              // disabledDate: (date_m) => class_other.disabledInvoiceDate(date_m),
             },
           }}
         />
@@ -1854,7 +1854,7 @@ class Class_OtherNode {
     this.setState_period((period) => ({
       ...period,
       invoiceBook,
-      invoiceDate: null,
+      // invoiceDate: null,
       invoiceNumber: '',
       isOriginalCustomer: isEmpty === true ? true : period.isOriginalCustomer,
     }));
