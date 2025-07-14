@@ -87,6 +87,9 @@ const calcHeight_a4 = (width: number, { round = true }: { round?: boolean } = {}
   // return Math.round(width / (210 / 297));
 };
 
+/**
+ * @deprecated 棄用，改用getIso216Rect
+ */
 const getA4Rect = ({ scale = 2, horizontal = false }: { scale?: number; horizontal?: boolean } = {}) => {
   let width;
   let height;
