@@ -1117,7 +1117,7 @@ const Tfoot = ({
                 date_m && (date_m = date_m.startOf('day'));
                 class_other.invoiceDate = date_m;
               },
-              // disabledDate: (date_m) => class_other.disabledInvoiceDate(date_m),
+              disabledDate: (date_m) => class_other.disabledInvoiceDate(date_m),
             },
           }}
         />
@@ -1854,7 +1854,7 @@ class Class_OtherNode {
     this.setState_period((period) => ({
       ...period,
       invoiceBook,
-      // invoiceDate: null,
+      invoiceDate: null,
       invoiceNumber: '',
       isOriginalCustomer: isEmpty === true ? true : period.isOriginalCustomer,
     }));
@@ -1936,33 +1936,49 @@ class Class_OtherNode {
 
   // ------------------------------------------------------------------------------
   disabledInvoiceDate(currentDate: Moment): boolean {
+    // return tue 是不可選
+    // return false 是可選
+
     if (this.isOlderInvoice) {
       return false;
     }
 
-    let disabled = true;
+    // const disabled = true;
 
     if (!this.invoiceBook) {
-      return disabled;
+      // return disabled;
+      return true;
     }
 
-    const { year, month, latestInvoiceDate } = this.invoiceBook;
+    const {
+      year,
+      month,
+      //  latestInvoiceDate
+    } = this.invoiceBook;
 
     const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
     const bookDate_next = moment(`${year}-${Number(month) + 1}`, 'YYYY-MM');
 
-    const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
-    const begin = latestInvoiceDate_m.subtract(1, 'day');
+    // const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
+    // const begin = latestInvoiceDate_m.subtract(1, 'day');
+    const begin = bookDate;
+    const end = bookDate_next.endOf('month');
 
-    if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
-      if (!latestInvoiceDate) {
-        disabled = false;
-      } else {
-        disabled = currentDate.isBefore(begin);
-      }
+    // if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
+    //   if (!latestInvoiceDate) {
+    //     disabled = false;
+    //   } else {
+    //     disabled = currentDate.isBefore(begin);
+    //   }
+    // }
+
+    if (currentDate.isAfter(begin) && currentDate.isBefore(end)) {
+      return false;
+    } else {
+      return true;
     }
 
-    return disabled;
+    // return disabled;
   }
 } // Class_OtherNode
 
