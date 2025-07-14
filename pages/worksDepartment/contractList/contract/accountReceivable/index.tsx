@@ -298,7 +298,9 @@ export default function AccountReceivable({
       // w 後端會檢查invoiceDate是否比該發票本的latestInvoiceDate更晚
       // w 更晚的話會404，所以統一設為00:00:00
       // 已在源頭onChange設為00:00:00
-      invoiceDate: invoiceDate ? invoiceDate.toISOString() : null,
+      // invoiceDate: invoiceDate ? invoiceDate.toISOString() : null,
+      // invoiceDate: invoiceDate ? invoiceDate.toISOString(true) : null,
+      invoiceDate: invoiceDate ? invoiceDate.format('YYYY-MM') : null,
       invoiceNumber: invoiceNumber || null,
       actualPrice: actualPrice ? Number(actualPrice) : null,
       accountantInvoiceBookId: accountantInvoiceBook?.id || null,
