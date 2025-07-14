@@ -61,15 +61,14 @@ type TthemeName =
 
 type Tprops_btn = {
   theme?: TthemeName;
-  props_icon?: React.SVGProps<SVGSVGElement>; // SVG component or null
-  props_iconAfter?: React.SVGProps<SVGSVGElement>; // SVG component or null
-  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>> | null; // SVG component or null
-  iconAfter?: React.ComponentType<React.SVGProps<SVGSVGElement>> | null; // SVG component or null
+  props_icon?: React.SVGProps<SVGElement>;
+  props_iconAfter?: React.SVGProps<SVGElement>;
+  icon?: React.ComponentType<React.SVGProps<SVGElement>> | null;
+  iconAfter?: React.ComponentType<React.SVGProps<SVGElement>> | null;
 } & React.HTMLAttributes<HTMLButtonElement>;
 
 interface Ttheme {
   className?: string;
-  // Icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>; // SVG component or null
   Icon?: React.ComponentType<React.SVGProps<SVGElement>>;
   IconAfter?: React.ComponentType<React.SVGProps<SVGElement>>; // SVG component or null
 }
