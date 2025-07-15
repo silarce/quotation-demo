@@ -103,6 +103,18 @@
   }
 }
 
+.dateRangePicker.dateRangePicker.dateRangePicker {
+  display: flex;
+  padding: unset;
+  margin: unset;
+  border: none;
+
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
+}
+
 .checkbox {
   display: flex;
   font-size: inherit;

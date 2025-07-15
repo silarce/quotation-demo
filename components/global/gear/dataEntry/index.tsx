@@ -1,8 +1,7 @@
 import { useRef } from 'react';
 
 import classNames from 'classnames';
-import _ from 'lodash';
-import dayjs, { Dayjs } from 'dayjs';
+
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
@@ -19,6 +18,8 @@ import {
   Select as AntdSelect,
   SelectProps as AntdSelectProps,
 } from 'antd';
+import type { RangePickerProps } from 'antd/es/date-picker';
+
 import type { CheckboxGroupProps } from 'antd/lib/checkbox';
 import type { RadioGroupProps } from 'antd/lib/radio';
 import type { DefaultOptionType, BaseOptionType } from 'antd/lib/select';
@@ -230,6 +231,10 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
       {...props}
     />
   );
+};
+
+const DateRangePicker = ({ className, ...props }: RangePickerProps) => {
+  return <AntdDatePicker.RangePicker className={classNames(scss.dateRangePicker, className)} {...props} />;
 };
 
 // MARK:Checkbox
@@ -574,6 +579,7 @@ export {
   Select,
   Select_rs,
   InputSelect,
+  DateRangePicker,
 };
 
 export type {
