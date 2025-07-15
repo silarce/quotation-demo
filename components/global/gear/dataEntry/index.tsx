@@ -241,8 +241,8 @@ const CheckboxGroup = ({ className, ...props }: CheckboxGroupProps) => {
 };
 
 // MARK:Radio
-const Radio = (props: RadioProps) => {
-  return <AntdRadio {...props} />;
+const Radio = ({ className, ...props }: RadioProps) => {
+  return <AntdRadio className={classNames(scss.radio, className)} {...props} />;
 };
 
 // MARK:RadioGroup
