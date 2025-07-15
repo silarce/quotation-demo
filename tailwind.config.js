@@ -76,6 +76,7 @@ module.exports = {
       border: {
         radius: {
           normal: "8px",
+          n2: "4px"
         }
       },
       boxShadow: {
