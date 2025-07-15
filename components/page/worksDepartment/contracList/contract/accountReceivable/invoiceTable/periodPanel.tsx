@@ -1943,7 +1943,7 @@ class Class_OtherNode {
 
     // const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
     // const begin = latestInvoiceDate_m.subtract(1, 'day');
-    const begin = bookDate;
+    const begin = bookDate.startOf('month');
     const end = bookDate_next.endOf('month');
 
     // if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
@@ -1954,7 +1954,8 @@ class Class_OtherNode {
     //   }
     // }
 
-    if (currentDate.isAfter(begin) && currentDate.isBefore(end)) {
+    // if (currentDate.isAfter(begin) && currentDate.isBefore(end)) {
+    if (currentDate.isBetween(begin, end, 'month', '[]')) {
       return false;
     } else {
       return true;
