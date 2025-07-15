@@ -25,6 +25,8 @@ import type { DefaultOptionType, BaseOptionType } from 'antd/lib/select';
 
 import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
 
+import Icon_asterisk from 'public/image/icon/fong/asterisk.svg';
+
 // ======================================================================
 
 import scss from './index.module.scss';
@@ -39,6 +41,7 @@ type TdataEntryProps = {
   captionWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   showBorder?: boolean;
+
   childrenWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   prefix?: React.ReactNode;
@@ -51,8 +54,6 @@ type TdataEntryProps = {
   fontSize?: 12 | 14 | 16 | 18 | 20 | 22;
   //
   //
-
-  theme?: 'normal' | 'fong';
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'>;
 
 type TdataEntrycontainerProps = React.ComponentProps<typeof DataEntryContainer>;
@@ -79,7 +80,7 @@ const DataEntryContainer = ({
   captionWrapperProps: { className: className_caption, ...captionWrapperProps } = {},
 
   showBorder = true,
-  childrenWrapperProps: { className: className_childrenWrapper, ...childrenWrapperProps } = {},
+  childrenWrapperProps: { className: childrenWrapperClassName, ...childrenWrapperProps } = {},
 
   prefix,
   prefixWrapperProps: { className: className_prefix, ...prefixWrapperProps } = {},
@@ -92,27 +93,25 @@ const DataEntryContainer = ({
   className,
   children,
   //
-  theme = 'normal',
 
-  // fontSize = 18,
-  fontSize = theme === 'fong' ? 14 : 18,
+  fontSize = 18,
+
   ...props_container
 }: TdataEntryProps) => {
   const className_fontSize = `f${fontSize}`;
 
   return (
-    <div className={classNames(scss.container, className, theme === 'fong' && ['items-center'])} {...props_container}>
+    <div className={classNames(scss.container, className)} {...props_container}>
       {caption !== undefined && (
         <div
           className={classNames(
-            'w-[100px]  font-medium',
+            'w-[100px] font-medium',
             `mr-${captionMr}`,
+            'text-main',
             scss.captionWrapper,
             className_fontSize,
             captionClassName,
-            className_caption,
-            theme === 'normal' && ['text-main'],
-            theme === 'fong' && ['text-text02']
+            className_caption
           )}
           style={captionStyle}
           {...captionWrapperProps}
@@ -129,12 +128,9 @@ const DataEntryContainer = ({
         className={classNames(
           scss.childrenWrapper,
           className_fontSize,
-          className_childrenWrapper,
+          childrenWrapperClassName,
           showBorder && scss.showBorder,
-          'border-b border-transparent',
-          //
-          theme === 'normal' && [showBorder && scss.showBorder],
-          theme === 'fong' && [showBorder && scss.showBorder2, 'border-[1px] p-[12px] rounded-lg']
+          'border-b border-transparent'
         )}
         {...childrenWrapperProps}
       >
@@ -450,9 +446,83 @@ function findOption<Option extends { value: unknown; label: React.ReactNode }>({
 
 // =============================================================================
 
+// MAKR:DataEntry_fong
 // 目前搭配Input運作正常
 // 其他表單元件等到確實要用時再說
-const DataEntry_fong = (props: Omit<TdataEntryProps, 'theme'>) => <DataEntryContainer {...props} theme="fong" />;
+// const DataEntry_fong = (props: Omit<TdataEntryProps, 'theme'>) => <DataEntryContainer {...props} theme="fong" />;
+
+const DataEntry_fong = ({
+  caption,
+  captionClassName,
+  captionStyle,
+
+  captionWrapperProps: { className: className_caption, ...captionWrapperProps } = {},
+
+  showBorder = true,
+  childrenWrapperProps: { className: childrenWrapperClassName, ...childrenWrapperProps } = {},
+
+  prefix,
+  prefixWrapperProps: { className: className_prefix, ...prefixWrapperProps } = {},
+
+  suffix,
+  suffixWrapperProps: { className: className_suffix, ...suffixWrapperProps } = {},
+
+  isMust,
+  //
+  className,
+  children,
+  //
+
+  fontSize = 14,
+  ...props_container
+}: Omit<TdataEntryProps, 'captionMr'>) => {
+  const className_fontSize = `f${fontSize}`;
+
+  return (
+    <div className={classNames(scss.container_fong, className, 'items-center')} {...props_container}>
+      {caption !== undefined && (
+        <div
+          className={classNames(
+            scss.captionWrapper,
+            className_fontSize,
+            captionClassName,
+            className_caption,
+            isMust && scss.must,
+            'font-medium text-text02 mb-[10px]'
+          )}
+          style={captionStyle}
+          {...captionWrapperProps}
+        >
+          {isMust && <Icon_asterisk className={scss.asterisk} />}
+          {caption}
+        </div>
+      )}
+      {prefix && (
+        <div className={classNames('mr-1', className_fontSize, className_prefix)} {...prefixWrapperProps}>
+          {prefix}
+        </div>
+      )}
+      <div
+        className={classNames(
+          scss.childrenWrapper,
+          className_fontSize,
+          childrenWrapperClassName,
+          showBorder && scss.showBorder,
+          'border-[1px] border-transparent p-[12px] rounded-lg'
+        )}
+        {...childrenWrapperProps}
+      >
+        {children}
+      </div>
+      {suffix && (
+        <div className={classNames('ml-1', className_fontSize, className_suffix)} {...suffixWrapperProps}>
+          {suffix}
+        </div>
+      )}
+      {/*  */}
+    </div>
+  );
+};
 
 // =============================================================================
 
