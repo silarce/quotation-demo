@@ -195,23 +195,20 @@ function PeriodPanel_pre(
   // --------------------------------------------------------------------------
 
   const {
+    // 已開立發票
     data: issuedInvoiceArr,
     update: update_issuedInvoiceArr,
     clear: clear_issuedInvoiceArr,
-  } = useGetAccountReceivableInvoices_all(
-    useMemo(() => {
-      return {
-        params: {
-          pageSize: 9999999,
-          sort: 'invoiceNumber',
-          filter: {
-            accountantInvoiceBookId: { $eq: state_period?.invoiceBook?.id },
-          },
-        },
-        autoUpdate: false,
-      };
-    }, [state_period?.invoiceBook?.id])
-  );
+  } = useGetAccountReceivableInvoices_all({
+    params: {
+      pageSize: 9999999,
+      sort: 'invoiceNumber',
+      filter: {
+        accountantInvoiceBookId: { $eq: state_period?.invoiceBook?.id },
+      },
+    },
+    autoUpdate: false,
+  });
 
   // --------------------------------------------------------------------------
 
@@ -478,12 +475,12 @@ function PeriodPanel_pre(
   }, [state_period]);
 
   useEffect(() => {
-    if (state_period?.invoiceBook?.id) {
+    if (!disabled && state_period?.invoiceBook?.id) {
       update_issuedInvoiceArr();
     } else {
       clear_issuedInvoiceArr();
     }
-  }, [state_period?.invoiceBook?.id]);
+  }, [state_period?.invoiceBook?.id, disabled]);
 
   // ==============================================================================
 
