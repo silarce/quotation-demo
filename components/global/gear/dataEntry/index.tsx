@@ -206,6 +206,7 @@ const DatePicker = ({
       format={(theDayjs) => {
         return getTaiwanDateStr(theDayjs);
       }}
+      placeholder="- -"
       {...props}
     />
   );
@@ -225,6 +226,7 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
       {...suffixIcon}
       format="HH-mm"
       autoComplete="off"
+      placeholder="- -"
       {...props}
     />
   );
@@ -237,7 +239,7 @@ const Checkbox = ({ className, ...props }: CheckboxProps) => {
 
 // MARK:CheckboxGroup
 const CheckboxGroup = ({ className, ...props }: CheckboxGroupProps) => {
-  return <AntdCheckbox.Group className={classNames(scss.checkbox, className)} {...props} />;
+  return <AntdCheckbox.Group className={classNames(scss.checkBoxGroup, scss.checkbox, className)} {...props} />;
 };
 
 // MARK:Radio
@@ -272,6 +274,7 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
       allowClear={true}
       suffixIcon={hideSuffixIconWhenDisabled && disabled ? null : suffixIcon}
       className={classNames(scss.antdSelect, className)}
+      placeholder="- -"
       {...props}
     />
   );
@@ -509,7 +512,7 @@ const DataEntry_fong = ({
         </div>
       )}
       {prefix && (
-        <div className={classNames('mr-1', className_fontSize, className_prefix)} {...prefixWrapperProps}>
+        <div className={classNames('mr-[6px]', className_fontSize, className_prefix)} {...prefixWrapperProps}>
           {prefix}
         </div>
       )}
@@ -519,6 +522,8 @@ const DataEntry_fong = ({
           className_fontSize,
           childrenWrapperClassName,
           showBorder && scss.showBorder,
+          !showBorder && scss.notShowBorder,
+
           'border-[1px] border-transparent p-[12px] rounded-lg'
         )}
         {...childrenWrapperProps}
@@ -526,7 +531,7 @@ const DataEntry_fong = ({
         {children}
       </div>
       {suffix && (
-        <div className={classNames('ml-1', className_fontSize, className_suffix)} {...suffixWrapperProps}>
+        <div className={classNames('ml-[6px]', className_fontSize, className_suffix)} {...suffixWrapperProps}>
           {suffix}
         </div>
       )}
