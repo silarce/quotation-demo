@@ -349,9 +349,7 @@ function PeriodPanel_pre(
       return undefined;
     }
 
-
     const { alphabeticLetter, startNumber, endNumber } = state_period.invoiceBook;
-
 
     const startNumber_num = Number(startNumber);
     const endNumber_num = Number(endNumber);
@@ -1925,26 +1923,44 @@ class Class_OtherNode {
 
   // ------------------------------------------------------------------------------
   disabledInvoiceDate(currentDate: Dayjs): boolean {
+    // return tue 是不可選
+    // return false 是可選
+
     if (this.isOlderInvoice) {
       return false;
     }
 
-    let disabled = true;
+    // const disabled = true;
 
     if (!this.invoiceBook) {
-      return disabled;
+      // return disabled;
+      return true;
     }
 
     const { year, month } = this.invoiceBook;
-
     const bookDate = dayjs(`${year}-${month}`);
     const bookDate_next = dayjs(`${year}-${Number(month) + 1}`);
 
-    if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
-      disabled = false;
+    // const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
+    // const begin = latestInvoiceDate_m.subtract(1, 'day');
+    const begin = bookDate;
+    const end = bookDate_next.endOf('month');
+
+    // if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
+    //   if (!latestInvoiceDate) {
+    //     disabled = false;
+    //   } else {
+    //     disabled = currentDate.isBefore(begin);
+    //   }
+    // }
+
+    if (currentDate.isAfter(begin) && currentDate.isBefore(end)) {
+      return false;
+    } else {
+      return true;
     }
 
-    return disabled;
+    // return disabled;
   }
 } // Class_OtherNode
 
