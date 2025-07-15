@@ -153,22 +153,30 @@ const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputEleme
     <input
       // 避免使用者滾動page時意外編輯了input的值
       onWheel={(e) => e.currentTarget.blur()}
+      placeholder="- -"
       {...props}
-      className={classNames('w-full', className)}
+      className={classNames('w-full placeholder:text-gray06', className)}
     />
   );
 };
 
 // MARK:Textarea
 const Textarea = ({ className, ...props }: TextareaAutosizeProps) => {
-  return <TextareaAutosize className={classNames(scss.textarea, className)} autoComplete="off" {...props} />;
+  return (
+    <TextareaAutosize
+      className={classNames(scss.textarea, 'placeholder:text-gray06', className)}
+      autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
 };
 
 // MARK:DatePicker
 const DatePicker = ({
   // value: _value,
   // defaultValue: _defaultValue,
-  twDate = true,
+  // twDate = true,
   // onChange,
   className,
   disabled,
@@ -176,6 +184,9 @@ const DatePicker = ({
   ...props
 }: DatePickerProps & {
   //
+  /**
+   * @deprecated twDate已沒有作用
+   */
   twDate?: boolean;
   returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
 }) => {
