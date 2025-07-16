@@ -68,12 +68,20 @@
 // =====================================
 
 // textarea
-.textarea {
+.textarea_autoHeight {
   line-height: inherit;
   width: 100%;
   &:disabled {
     cursor: auto;
   }
+}
+.textarea {
+  // border:solid 1px black;
+  line-height: inherit;
+  width: 100%;
+  // &:disabled {
+  //   cursor: auto;
+  // }
 }
 
 .datepicker.datepicker.datepicker {

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import classNames from 'classnames';
 
@@ -165,6 +165,17 @@ const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputEleme
 const Textarea_autoHeight = ({ className, ...props }: TextareaAutosizeProps) => {
   return (
     <TextareaAutosize
+      className={classNames(scss.textarea_autoHeight, 'placeholder:text-gray06', className)}
+      autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
+};
+
+const Textarea = ({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+  return (
+    <textarea
       className={classNames(scss.textarea, 'placeholder:text-gray06', className)}
       autoComplete="off"
       placeholder="- -"
@@ -590,6 +601,7 @@ export {
   Select_rs,
   InputSelect,
   DateRangePicker,
+  Textarea,
 };
 
 export type {
