@@ -1206,7 +1206,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         />
 
         <QuotationPdf
-          visible={pdfModalVisible}
+          open={pdfModalVisible}
           pdfData={pdfData}
           onCancel={hidePdf}
           fileName={content?.quotationNumber ?? ''}

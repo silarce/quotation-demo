@@ -1,7 +1,7 @@
 import { useState, useRef, Fragment, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Modal } from 'antd';
@@ -266,13 +266,13 @@ export function selectModalCreator_multi<TkeyArr extends (keyof TtypeLookup)[]>(
 
     return (
       <Modal
-        visible={showModal}
+        open={showModal}
         // width={rwd1023 ? '80vw' : modalWidth}
         width={modalWidth}
         className={scss.container}
         closable={false}
         centered={true}
-        destroyOnClose={true}
+        destroyOnHidden={true}
         footer={null}
         onCancel={onCancel}
       >
@@ -1353,7 +1353,7 @@ const props_invoiceBook: TselectorProps<TaccountantInvoiceBookDto> = {
   ],
   filter: ([dateStr]) => {
     const { year, month } = (() => {
-      const date_m = moment(dateStr);
+      const date_m = dayjs(dateStr);
 
       if (!date_m.isValid()) {
         return {

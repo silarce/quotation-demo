@@ -16,7 +16,7 @@ import MyButton from 'components/global/gear/button/myButton';
 import EmployeeSelector from 'components/global/gear/modal/employeeSelector';
 
 // icon
-import iconAdd from 'public/image/icon/add.svg';
+import iconAdd from 'public/image/icon/add.svg?url';
 import { IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // css

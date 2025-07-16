@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 import { useRouter } from 'next/router';
 
@@ -39,10 +39,6 @@ type TsortedTodoList = {
     toDispatch: (index: number) => void;
   };
 };
-
-// =======================================================================
-
-const Panel = Collapse.Panel;
 
 // =======================================================================
 
@@ -174,17 +170,15 @@ export default function Table_todoList({
 
   return (
     <div>
-      <Collapse className={scss.antdCollapse} destroyInactivePanel={true}>
-        {Object.values(sortedTodoList).map((item, index) => {
+      <Collapse
+        className={scss.antdCollapse}
+        destroyOnHidden={true}
+        items={Object.values(sortedTodoList).map((item, index) => {
           const { engineeringContact, todoArr, reqPatch, reqDelete, toDispatch } = item;
 
           const contact = engineeringContact?.contactInfo?.[0];
           const contactPerson = contact?.contactPerson ?? '';
 
-          // !!! 因為worksheet結構改變，這段程式碼已不能使用
-          // const latestRecord = engineeringContact?.contract?.worksheet?.latestRecord;
-          // const itemArr = latestRecord?.contractProductItems;
-          // const qty = itemArr?.length ?? 0;
           const qty = '';
 
           const onAddclick = engineeringContact?.id
@@ -193,36 +187,32 @@ export default function Table_todoList({
               }
             : undefined;
 
-          return (
-            <Panel
-              className={classNames(scss.antdPanel, scss.plus)}
-              key={engineeringContact?.id ?? index}
-              header={
-                <PanelHeader
-                  projectNumber={engineeringContact?.projectNumber ?? ''}
-                  contactPerson={contactPerson}
-                  qty={qty}
-                  projectName={engineeringContact?.projectName ?? ''}
-                  onAddclick={onAddclick}
+          return {
+            key: engineeringContact?.id ?? index,
+            className: classNames(scss.antdPanel, scss.plus),
+            label: (
+              <PanelHeader
+                projectNumber={engineeringContact?.projectNumber ?? ''}
+                contactPerson={contactPerson}
+                qty={qty}
+                projectName={engineeringContact?.projectName ?? ''}
+                onAddclick={onAddclick}
+              />
+            ),
+            children: todoArr.map((todo, index) => {
+              return (
+                <PanelBody
+                  key={todo.id}
+                  todo={todo}
+                  onOkClick={reqPatch}
+                  onDeleteClick={() => reqDelete(index)}
+                  onDispatchClick={() => toDispatch(index)}
                 />
-              }
-            >
-              {todoArr.map((todo, index) => {
-                return (
-                  <PanelBody
-                    //
-                    key={todo.id}
-                    todo={todo}
-                    onOkClick={reqPatch}
-                    onDeleteClick={() => reqDelete(index)}
-                    onDispatchClick={() => toDispatch(index)}
-                  />
-                );
-              })}
-            </Panel>
-          );
+              );
+            }),
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }
@@ -416,7 +406,7 @@ const PanelBody = ({
             caption="通知日期"
             datePickerProps={{
               props: {
-                value: state_todo.notificationDate ? moment(state_todo.notificationDate) : null,
+                value: state_todo.notificationDate ? dayjs(state_todo.notificationDate) : null,
                 onChange: (date) => changeState_todo('notificationDate', date?.toISOString() ?? ''),
               },
             }}
@@ -429,7 +419,7 @@ const PanelBody = ({
             caption="預計進場日期"
             datePickerProps={{
               props: {
-                value: state_todo.entryDate ? moment(state_todo.entryDate) : null,
+                value: state_todo.entryDate ? dayjs(state_todo.entryDate) : null,
                 onChange: (date) => changeState_todo('entryDate', date?.toISOString() ?? ''),
               },
             }}

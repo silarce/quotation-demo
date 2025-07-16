@@ -1,10 +1,10 @@
 import classNames from 'classnames';
 
 // icon
-import iconAdd from 'public/image/icon/add.svg';
-import iconDelete01 from 'public/image/icon/delete01.svg';
-import iconArrow02_left from 'public/image/icon/arrow02_left.svg';
-import iconArrow02_right from 'public/image/icon/arrow02_right.svg';
+import iconAdd from 'public/image/icon/add.svg?url';
+import iconDelete01 from 'public/image/icon/delete01.svg?url';
+import iconArrow02_left from 'public/image/icon/arrow02_left.svg?url';
+import iconArrow02_right from 'public/image/icon/arrow02_right.svg?url';
 
 import style from './_button.module.scss';
 

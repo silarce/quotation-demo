@@ -4,7 +4,7 @@ import { Popconfirm } from 'antd';
 
 // icon
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
-import iconAttacth from 'public/image/icon/attach.svg';
+import iconAttacth from 'public/image/icon/attach.svg?url';
 
 import scss from './QuotationAttachment.module.scss';
 

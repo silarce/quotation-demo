@@ -11,9 +11,9 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import Input_pw from 'components/global/gear/inputAndSel/Input_pw';
 
 // logo
-import logo from 'public/image/logo/logoWithYear.svg';
-import erpLogo from 'public/image/logo/erpLogo.svg';
-import imgArc from 'public/image/blueArc.svg';
+import logo from 'public/image/logo/logoWithYear.svg?url';
+import erpLogo from 'public/image/logo/erpLogo.svg?url';
+import imgArc from 'public/image/blueArc.svg?url';
 // img
 import Imgbanner from 'public/image/loginBanner.png';
 import Imgbanner_mobile from 'public/image/loginBanner_mobile.png';

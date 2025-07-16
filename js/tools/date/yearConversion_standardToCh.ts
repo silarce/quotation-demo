@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 export const yearConversion_standardToCh = (dateStringOri: string, noLeading = false) => {
   if (!dateStringOri) {
     return '';

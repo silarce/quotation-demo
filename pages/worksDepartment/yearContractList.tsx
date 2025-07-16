@@ -1,5 +1,6 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
+import Link from 'next/link';
 
 // global gear
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -9,7 +10,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import scss from './yearContractList.module.scss';
 
 export default function YearContractList({ rwd1439 }: { rwd1439: boolean }) {
-  const thisYear = moment().format('YYYY');
+  const thisYear = dayjs().format('YYYY');
   const thisYear_num = Number(thisYear);
   const oldestYear = 2000;
 
@@ -81,9 +82,9 @@ export default function YearContractList({ rwd1439 }: { rwd1439: boolean }) {
                     const href = `/worksDepartment/yearContractList/contractList_year?year=${year}`;
 
                     return (
-                      <div key={index} style={config.otherYear.style}>
-                        <MyButton_v2 label="合約列表" href={href} />
-                      </div>
+                      <Link key={index} style={config.otherYear.style} href={href}>
+                        <MyButton_v2 label="合約列表" className={scss.btn} />
+                      </Link>
                     );
                   })}
                 </div>

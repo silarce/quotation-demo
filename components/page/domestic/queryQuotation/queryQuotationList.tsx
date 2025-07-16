@@ -23,8 +23,6 @@ type Tcontrol = {
 export type { Tcontrol as Tcontrol_queryQuotationList };
 
 // =======================================================================
-const { Panel } = Collapse;
-// =======================================================================
 
 export default function QueryQuotationList({
   //
@@ -46,20 +44,23 @@ export default function QueryQuotationList({
     <div className={style.container}>
       <Thead popFormList={popFormList} />
 
-      <Collapse expandIcon={() => <></>} accordion={true} destroyInactivePanel={true} onChange={changeActive}>
-        {control.panelArr.map((item, index) => {
+      <Collapse
+        className={style.panel}
+        expandIcon={() => null}
+        accordion={true}
+        destroyOnHidden={true}
+        onChange={changeActive}
+        items={control.panelArr.map((item, index) => {
           const { header, body } = item;
           const isActive = activeIndex === index;
 
-          // ===========================
-
-          return (
-            <Panel key={index} className={style.panel} header={<PanelHeader control={header} isActive={isActive} />}>
-              <PanelBody control={body} />
-            </Panel>
-          );
+          return {
+            key: `${index}`,
+            label: <PanelHeader control={header} isActive={isActive} />,
+            children: <PanelBody control={body} />,
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }

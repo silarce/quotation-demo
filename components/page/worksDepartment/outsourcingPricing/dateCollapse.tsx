@@ -2,8 +2,6 @@ import classNames from 'classnames';
 
 import { Collapse } from 'antd';
 
-const { Panel } = Collapse;
-
 import scss from './dateCollapse.module.scss';
 
 // ====================================================================
@@ -37,10 +35,13 @@ export default function DateCollapse({
 }) {
   return (
     <div className={classNames(scss.container, className)}>
-      <Collapse defaultActiveKey={['0']}>
-        {control.panelArr.map((panel, pIndex) => {
-          return (
-            <Panel key={pIndex} header={panel.label}>
+      <Collapse
+        defaultActiveKey={['0']}
+        items={control.panelArr.map((panel, pIndex) => {
+          return {
+            key: pIndex,
+            label: panel.label,
+            children: (
               <div className={scss.panel}>
                 {panel.cardArr.map((card, cIndex) => {
                   const { label, onClick, forbidden, disabled } = card;
@@ -50,10 +51,10 @@ export default function DateCollapse({
                   );
                 })}
               </div>
-            </Panel>
-          );
+            ),
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }

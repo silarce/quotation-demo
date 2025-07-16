@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 
 import type { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -96,7 +96,7 @@ const createInputSel = ({
       inputSelProps.datePickerProps = {
         props: {
           name: key,
-          value: state?.[key] ? moment(state[key]) : null,
+          value: state?.[key] ? dayjs(state[key]) : null,
           onChange: (date) => {
             const isoStr = date?.toISOString() || '';
 

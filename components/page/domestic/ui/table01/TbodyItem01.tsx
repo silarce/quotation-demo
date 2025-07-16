@@ -1,11 +1,10 @@
-import { MouseEvent } from 'react';
 import Link, { LinkProps } from 'next/link';
 
 // global gear
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 // icon
-import iconPlace from 'public/image/icon/place.svg';
+import iconPlace from 'public/image/icon/place.svg?url';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 
 // css
@@ -57,10 +56,6 @@ export default function TbodyItem01({
     viewRef_bottom,
     isAttachQuotation,
   } = quotationContent;
-
-  // const date = moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD');
-
-  // const approvalsStatus = '待審核 '; // 之後api會再補這個狀態資料
 
   return (
     <CellWithBar className={scss.panelHeader} isActive={isActive}>

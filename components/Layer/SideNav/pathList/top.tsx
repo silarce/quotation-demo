@@ -1,10 +1,10 @@
-import icon_home from 'public/image/icon/home.svg';
-import icon_setting from 'public/image/icon/setting.svg';
-import icon_domestic from 'public/image/icon/domestic.svg';
-import icon_foreign from 'public/image/icon/foreign.svg';
-import icon_project from 'public/image/icon/project.svg';
-import icon_warehouse from 'public/image/icon/warehouse.svg';
-import icon_shareform from 'public/image/icon/sharedform.svg';
+import icon_home from 'public/image/icon/home.svg?url';
+import icon_setting from 'public/image/icon/setting.svg?url';
+import icon_domestic from 'public/image/icon/domestic.svg?url';
+import icon_foreign from 'public/image/icon/foreign.svg?url';
+import icon_project from 'public/image/icon/project.svg?url';
+import icon_warehouse from 'public/image/icon/warehouse.svg?url';
+import icon_shareform from 'public/image/icon/sharedform.svg?url';
 
 import { erpFeaturesLookup, TtopPathListConfig, devPass } from './type';
 

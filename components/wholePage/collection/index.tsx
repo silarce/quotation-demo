@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 import classNames from 'classnames';
@@ -75,7 +75,7 @@ type Tquery = {
 };
 
 type Tstate_accountant = {
-  insertDate: Moment | null;
+  insertDate: Dayjs | null;
   importAccountingNumber: string;
   noteNumber: string;
   accountingNumber: string;
@@ -86,9 +86,9 @@ type Tstate_accountant = {
   isImported: boolean;
   accountsReceivableDeduction: TupdateAccountReceivableDeductionDto[];
 
-  noteMaturityDate: Moment | null;
-  receiptCollectionDate: Moment | null;
-  receiptEstimatedDate: Moment | null;
+  noteMaturityDate: Dayjs | null;
+  receiptCollectionDate: Dayjs | null;
+  receiptEstimatedDate: Dayjs | null;
 
   currency: Tcurrency; // 幣別
   // 匯率 不與幣別連動 // 手動輸入 在cre_emptyStateAccountant預設為1
@@ -179,10 +179,9 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
     isFetching,
   } = useGetAccountant({
     params: useMemo(() => {
-      const m_date = moment({
-        year: Number(year),
-        month: Number(month) - 1,
-      });
+      const m_date = dayjs()
+        .year(Number(year))
+        .month(Number(month) - 1);
 
       const params: Tparams = {
         populate: ['incomeBill.accountsReceivableDeduction', 'vendorCustomer'],
@@ -211,7 +210,7 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       (data) => {
         // 之前更新insertDate的時候時分秒沒有歸零，使的排序出問題，因此在這裡歸零
         const { insertDate, createdAt } = data;
-        const insertDate_format = moment(insertDate).format('YYYY-MM-DD');
+        const insertDate_format = dayjs(insertDate).format('YYYY-MM-DD');
 
         return [insertDate_format, createdAt];
       },
@@ -241,15 +240,15 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
 
     const body: TcreateAccountantDto = {
       ...preBody,
-      insertDate: preBody.insertDate.toISOString(true),
+      insertDate: preBody.insertDate.utc().toISOString(),
       paymentType,
       price: Number(preBody.price),
       fee: 0,
-      noteMaturityDate: preBody.noteMaturityDate?.toISOString(true),
-      receiptCollectionDate: preBody.receiptCollectionDate?.toISOString(true) ?? null,
+      noteMaturityDate: preBody.noteMaturityDate?.utc().toISOString(),
+      receiptCollectionDate: preBody.receiptCollectionDate?.utc().toISOString() ?? null,
       // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
-      receiptEstimatedDate: preBody.receiptEstimatedDate?.toISOString(true) ?? null,
-      receiptCashedDate: preBody.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptEstimatedDate: preBody.receiptEstimatedDate?.utc().toISOString() ?? null,
+      receiptCashedDate: preBody.receiptEstimatedDate?.utc().toISOString() ?? null,
       currency: preBody.currency,
       exchangeRate: preBody.exchangeRate ? (preBody.exchangeRate as `${number}`) : '0',
       currencyValue: preBody.currencyValue ? (preBody.currencyValue as `${number}`) : '0',
@@ -286,12 +285,12 @@ export default function Collection({ isWorksDepartment = false }: { isWorksDepar
       paymentType,
       price: Number(state_accountant.price),
       // fee: 0,
-      noteMaturityDate: state_accountant.noteMaturityDate?.toISOString(true),
+      noteMaturityDate: state_accountant.noteMaturityDate?.utc().toISOString(),
 
-      receiptCollectionDate: state_accountant.receiptCollectionDate?.toISOString(true) ?? null,
+      receiptCollectionDate: state_accountant.receiptCollectionDate?.utc().toISOString() ?? null,
       // 在這個階段，receiptEstimatedDate與receiptCashedDate同步
-      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
-      receiptCashedDate: state_accountant.receiptEstimatedDate?.toISOString(true) ?? null,
+      receiptEstimatedDate: state_accountant.receiptEstimatedDate?.utc().toISOString() ?? null,
+      receiptCashedDate: state_accountant.receiptEstimatedDate?.utc().toISOString() ?? null,
       currency: state_accountant.currency,
       exchangeRate: state_accountant.exchangeRate ? (state_accountant.exchangeRate as `${number}`) : '0',
       currencyValue: state_accountant.currencyValue ? (state_accountant.currencyValue as `${number}`) : '0',
@@ -630,7 +629,7 @@ const useTagList = () => {
 
 // -------------------------------------------------------------------------------
 const useYearMonth = () => {
-  const m_today = moment();
+  const m_today = dayjs();
   const thisYear = m_today.year();
   const thisMonth = m_today.month() + 1;
 

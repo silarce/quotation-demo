@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import _ from 'lodash';
 
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import ExcelJs from 'exceljs';
 
 // layer
@@ -33,7 +33,7 @@ import { holidaysLookup } from 'config/date/holidaysLookup';
 import { myConfig } from 'config/myConfig';
 
 // icon
-import iconDownload from 'public/image/icon/download.svg';
+import iconDownload from 'public/image/icon/download.svg?url';
 
 const holidaysLookupKeyArr = Object.keys(holidaysLookup);
 
@@ -49,8 +49,8 @@ export default function MonthReport() {
 
   // -------------------------------------------------------------------------
 
-  const thisYear_tw = moment(convertDate_reduce1911(new Date().toISOString())).format('yy');
-  const thisMonth = moment(convertDate_reduce1911(new Date().toISOString())).format('M');
+  const thisYear_tw = dayjs(convertDate_reduce1911(new Date().toISOString())).format('YYYY').replace(/(^0+)/, '');
+  const thisMonth = dayjs(convertDate_reduce1911(new Date().toISOString())).format('M');
 
   const [year_tw, setYear_tw] = useState<string>(thisYear_tw);
   const [month, setMonth] = useState<string>(thisMonth);
@@ -60,7 +60,7 @@ export default function MonthReport() {
       const year_i18n = parseInt(year_tw) + 1911;
 
       // 因為時區誤差，所以設15號
-      return moment(`${year_i18n}-${month}-15`).toISOString();
+      return dayjs(`${year_i18n}-${month}-15`).toISOString();
     })();
 
     return isoDate;
@@ -394,7 +394,7 @@ const exportExcel = async (dataArr: TaccountingReportDto[] | undefined, employee
       type: 'application/vnd.ms-excel;charset=utf-8;',
     });
 
-    const today = moment().format('yyyy-MM-DD');
+    const today = dayjs().format('YYYY-MM-DD');
     link.download = `三久ERP_報表_${today}.xlsx`;
     link.href = URL.createObjectURL(blobData);
     link.click();

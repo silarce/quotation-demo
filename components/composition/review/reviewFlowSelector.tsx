@@ -10,7 +10,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { TreviewFlow, useGetFlow } from 'js/api/api_netCore/api_review';
 
-import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg';
+import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg?url';
 
 import scss from './reviewFlowSelector.module.scss';
 

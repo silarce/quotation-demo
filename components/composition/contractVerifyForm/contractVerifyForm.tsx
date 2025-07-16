@@ -143,10 +143,10 @@ function ContractVerifyForm({
   return (
     <Modal
       className={scss.modal}
-      visible={showModal}
+      open={showModal}
       closable={false}
       centered={true}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       footer={null}
       // width="1000px"
       width="fit-content"
@@ -190,7 +190,7 @@ function ReviewForm({
 
   // ----------------------------------------------------------------------------
 
-  const ref_head = useRef<HTMLDivElement>(null);
+  const ref_head = useRef<HTMLDivElement>(null!);
 
   // w item從index 1開始加入，所以index 0是undefined
   const ref_itemArr = useRef<HTMLDivElement[]>([]);
@@ -877,7 +877,11 @@ function ReviewForm({
         {/*  */}
 
         {/* // MARK: 1 */}
-        <Item ref={(ele) => (ref_itemArr.current[1] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[1] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>1</div>
           <div>
             <span>註明請款日</span>
@@ -978,7 +982,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 2 */}
-        <Item ref={(ele) => (ref_itemArr.current[2] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[2] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>2</div>
           <div className={scss.item2}>
             <div>
@@ -1034,7 +1042,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 3 */}
-        <Item ref={(ele) => (ref_itemArr.current[3] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[3] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>3</div>
           <div>
             <div className={scss.paymentTenor}>
@@ -1080,7 +1092,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 4 */}
-        <Item ref={(ele) => (ref_itemArr.current[4] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[4] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>4</div>
           <div>
             <RadioContainer
@@ -1109,7 +1125,11 @@ function ReviewForm({
         </Item>
 
         {/* //MARK: 5 */}
-        <Item ref={(ele) => (ref_itemArr.current[5] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[5] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>5</div>
           <div>
             <RadioContainer
@@ -1137,7 +1157,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 6 */}
-        <Item ref={(ele) => (ref_itemArr.current[6] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[6] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>6</div>
           <div>
             <InputBox
@@ -1175,7 +1199,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 7 */}
-        <Item ref={(ele) => (ref_itemArr.current[7] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[7] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>7</div>
           <div>
             <RadioContainer
@@ -1203,7 +1231,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 8 */}
-        <Item ref={(ele) => (ref_itemArr.current[8] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[8] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>8</div>
           <div>
             <div>
@@ -1256,7 +1288,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 9 */}
-        <Item ref={(ele) => (ref_itemArr.current[9] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[9] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>9</div>
           <div>
             <div>
@@ -1309,7 +1345,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 10 */}
-        <Item ref={(ele) => (ref_itemArr.current[10] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[10] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>10</div>
           <div>
             <div>
@@ -1361,7 +1401,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 11 */}
-        <Item ref={(ele) => (ref_itemArr.current[11] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[11] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>11</div>
           <div>
             <div>
@@ -1391,7 +1435,11 @@ function ReviewForm({
         </Item>
 
         {/* // MARK: 12 */}
-        <Item ref={(ele) => (ref_itemArr.current[12] = ele!)}>
+        <Item
+          ref={(ele) => {
+            ref_itemArr.current[12] = ele!;
+          }}
+        >
           <div className={scss.numIndex}>12</div>
           <div>
             <span>扣款項目及其比例、金額（例如保險費、清潔費...等）：</span>
@@ -1799,7 +1847,9 @@ const PDFBody_pre = (
           <Body
             //
             style={style_body}
-            ref={(ele) => (ref_pdf.current[index] = ele!)}
+            ref={(ele) => {
+              ref_pdf.current[index] = ele!;
+            }}
             key={index}
             className={scss.pdfBody}
           >

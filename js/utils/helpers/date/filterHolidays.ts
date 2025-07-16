@@ -1,4 +1,4 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // 目前在這邊使用 /demo/downloadHolidays
 
@@ -34,14 +34,14 @@ const filterHolidays = (calendar: Tcalendar[]) => {
 
   calendar.forEach((c) => {
     if (c.是否放假 === '2') {
-      const month = moment(c.西元日期).month() + 1;
+      const month = dayjs(c.西元日期).month() + 1;
 
       if (!calendar_group[month]) {
         calendar_group[month] = {};
       }
 
-      const iso = moment(c.西元日期).toISOString();
-      const dateDay = moment(c.西元日期).date().toString();
+      const iso = dayjs(c.西元日期).toISOString();
+      const dateDay = dayjs(c.西元日期).date().toString();
 
       calendar_group[month][dateDay] = {
         ...c,

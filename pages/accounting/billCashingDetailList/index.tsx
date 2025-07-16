@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import classNames from 'classnames';
 
 // layer
@@ -80,12 +80,14 @@ export default function BillCashingDetailList() {
   const params: Tparams = useMemo(() => {
     const [insertDateGte, insertDateLte] = year
       ? [
-          moment()
-            .set({ year: Number(year), month: Number(month || 1) - 1 })
+          dayjs()
+            .year(Number(year))
+            .month(Number(month || 1) - 1)
             .startOf('month')
             .toISOString(),
-          moment()
-            .set({ year: Number(year), month: Number(month || 12) - 1 })
+          dayjs()
+            .year(Number(year))
+            .month(Number(month || 12) - 1)
             .endOf('month')
             .toISOString(),
         ]
@@ -348,7 +350,7 @@ const Accountant = ({
   const router = useRouter();
 
   const [isFetching, setIsFetching] = useState(false);
-  const [state_receiptCashedDate, setState_receiptCashedDate] = useState<Moment | null>(null);
+  const [state_receiptCashedDate, setState_receiptCashedDate] = useState<Dayjs | null>(null);
 
   const {
     receiptStatus,
@@ -368,7 +370,7 @@ const Accountant = ({
 
   // -------------------------------------------------------------
 
-  const handle_onReceiptCashedDateChange = async (m: Moment | null) => {
+  const handle_onReceiptCashedDateChange = async (m: Dayjs | null) => {
     const oldDate = state_receiptCashedDate;
 
     setIsFetching(true);
@@ -376,7 +378,7 @@ const Accountant = ({
     await reqPatchReceiptCashedDate(data_accountant.id, m?.toISOString() || null)
       .then((res) => {
         if ('receiptCashedDate' in res) {
-          setState_receiptCashedDate(res.receiptCashedDate ? moment(res.receiptCashedDate) : null);
+          setState_receiptCashedDate(res.receiptCashedDate ? dayjs(res.receiptCashedDate) : null);
         } else {
           throw new Error('回應沒有receiptCashedDate');
         }
@@ -415,7 +417,7 @@ const Accountant = ({
   };
 
   useEffect(() => {
-    const state = receiptCashedDate ? moment(receiptCashedDate) : null;
+    const state = receiptCashedDate ? dayjs(receiptCashedDate) : null;
     setState_receiptCashedDate(state);
   }, [data_accountant]);
 

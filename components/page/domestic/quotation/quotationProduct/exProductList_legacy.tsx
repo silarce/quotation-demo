@@ -28,7 +28,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 
 // icon
-import iconMove from 'public/image/icon/move.svg';
+import iconMove from 'public/image/icon/move.svg?url';
 import { IconCopy, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
 
 // css

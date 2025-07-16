@@ -1,7 +1,7 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import _, { reverse, update } from 'lodash';
 import scss from './reviewList.module.scss';
 import Thead01 from '../../factoryDepartment/ui/table/thead01';
@@ -21,20 +21,20 @@ import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 // 圖示
-import icon_edit from 'public/image/icon/fc_edit.svg';
-import icon_save from 'public/image/icon/fc_save.svg';
-import icon_cancel from 'public/image/icon/fc_cancel.svg';
-import icon_delete from 'public/image/icon/fc_delete.svg';
-import icon_autoadd from 'public/image/icon/fc_add.svg';
-import icon_search from 'public/image/icon/fc_search.svg';
-import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg';
-import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg';
-import icon_print from 'public/image/icon/fc_printer.svg';
-import icon_export from 'public/image/icon/fc_export.svg';
-import icon_clear from 'public/image/icon/fc_clear.svg';
-import icon_add2 from 'public/image/icon/fc_add2.svg';
-import icon_task_approved from 'public/image/icon/fc_approved.svg';
-import icon_task_rejected from 'public/image/icon/fc_rejected.svg';
+import icon_edit from 'public/image/icon/fc_edit.svg?url';
+import icon_save from 'public/image/icon/fc_save.svg?url';
+import icon_cancel from 'public/image/icon/fc_cancel.svg?url';
+import icon_delete from 'public/image/icon/fc_delete.svg?url';
+import icon_autoadd from 'public/image/icon/fc_add.svg?url';
+import icon_search from 'public/image/icon/fc_search.svg?url';
+import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg?url';
+import icon_fc_arrow_down_gray from 'public/image/icon/fc_arrow_down_gray.svg?url';
+import icon_print from 'public/image/icon/fc_printer.svg?url';
+import icon_export from 'public/image/icon/fc_export.svg?url';
+import icon_clear from 'public/image/icon/fc_clear.svg?url';
+import icon_add2 from 'public/image/icon/fc_add2.svg?url';
+import icon_task_approved from 'public/image/icon/fc_approved.svg?url';
+import icon_task_rejected from 'public/image/icon/fc_rejected.svg?url';
 import { Modal } from 'antd';
 
 import Quotation from 'pages/domestic/quotationList/quotation';
@@ -92,12 +92,12 @@ export default function ReviewList() {
   const [options, setOptions] = useState<string[]>([]); // 用來存放唯一的 document_type 選項
 
   // 預設截止日期為今天，起始日期為今天往前推30天
-  const defaultEndDate = moment();
-  const defaultStartDate = moment().subtract(30, 'days');
+  const defaultEndDate = dayjs();
+  const defaultStartDate = dayjs().subtract(30, 'days');
 
   // 使用 Moment 類型作為狀態
-  const [keywordstartdate, setKeywordstartdate] = useState<Moment | null>(defaultStartDate);
-  const [keywordenddate, setKeywordenddate] = useState<Moment | null>(defaultEndDate);
+  const [keywordstartdate, setKeywordstartdate] = useState<Dayjs | null>(defaultStartDate);
+  const [keywordenddate, setKeywordenddate] = useState<Dayjs | null>(defaultEndDate);
 
   // 編輯功能
   const [editstatus, setEditStatus] = useState<boolean>(false);

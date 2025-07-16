@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import Router from 'next/router';
 
@@ -100,7 +100,7 @@ function useBackup<T = unknown>(
       return;
     }
 
-    const timeNow = moment();
+    const timeNow = dayjs();
 
     const meta: TbackupMetaItem = {
       identity,
@@ -187,10 +187,10 @@ const useClearBackup = () => {
     if (!backupMeta || Object.keys(backupMeta).length === 0) {
       clear();
     } else {
-      const timeNow = moment();
+      const timeNow = dayjs();
 
       const arr = Object.entries(backupMeta).map(([key, item]) => {
-        let clearAt = moment(item.clearAt);
+        let clearAt = dayjs(item.clearAt);
         !clearAt.isValid && (clearAt = timeNow.clone().add(30, 'days'));
 
         const shouldClear = timeNow.isAfter(clearAt);

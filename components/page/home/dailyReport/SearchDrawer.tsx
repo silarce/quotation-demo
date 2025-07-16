@@ -11,8 +11,8 @@ import InputSel from 'components/global/gear/inputAndSel/inputSel';
 import scss from './searchDrawer.module.scss';
 
 // icon
-import iconCross from 'public/image/icon/cross_thin.svg';
-import iconSearch from 'public/image/icon/search.svg';
+import iconCross from 'public/image/icon/cross_thin.svg?url';
+import iconSearch from 'public/image/icon/search.svg?url';
 
 // ============================================================================
 // type
@@ -55,7 +55,7 @@ export default function SearchDrawer({
   };
 
   return (
-    <Drawer className={scss.searchDrawer} visible={visible} getContainer={false} width={'100%'} closable={false}>
+    <Drawer className={scss.searchDrawer} open={visible} getContainer={false} width={'100%'} closable={false}>
       <Image className={scss.iconClose} onClick={onCancel} src={iconCross} alt="close" />
       <InputSel
         className={scss.sel}

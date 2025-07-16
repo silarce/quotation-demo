@@ -1,4 +1,4 @@
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -11,7 +11,7 @@ import scss from './profile.module.scss';
 
 interface Tprofile {
   projectNumber: string;
-  projectDate: Moment | null;
+  projectDate: Dayjs | null;
   projectName: string;
   county: string;
   district: string;

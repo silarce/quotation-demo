@@ -30,8 +30,8 @@ const DateList = ({ className, onCardClick }: { className?: string; onCardClick:
   // 另外預期每個月都會有資料，在正式環境應該是不會有點下去沒資料的情況
   const control_dateCollapse: Tcontrol_dateCollapse = useMemo(() => {
     const yearMonthList = getAllyearMonthListByRange({
-      start: oldestDate,
-      end: new Date().toISOString(),
+      start: new Date(oldestDate),
+      end: new Date(),
     });
 
     let panelArr: Tcontrol_dateCollapse['panelArr'] = Object.entries(yearMonthList).map(([year, monthArr]) => {

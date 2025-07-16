@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { nanoid } from 'nanoid';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
 import { useRouter } from 'next/router';
 import _ from 'lodash';
@@ -56,7 +56,7 @@ interface Tstate_applyPayment {
   readonly id?: string;
   readonly serial_number: string | undefined; // 單號
   readonly status: string | undefined;
-  payment_date: Moment | null; // 支出日期
+  payment_date: Dayjs | null; // 支出日期
   total_price: number | undefined; // 合計
   applicant_department: string | undefined | null; //  申請單位(支出部門)
   description: string | undefined; // 備註說明
@@ -464,7 +464,7 @@ const useApplyPayment = (applyPaymnet: TapplyPayment_Dto | undefined, disabled: 
       id: applyPaymnet.id,
       serial_number: applyPaymnet.serial_number,
       status: applyPaymnet.status,
-      payment_date: moment(applyPaymnet.payment_date),
+      payment_date: dayjs(applyPaymnet.payment_date),
       total_price: applyPaymnet.total_price,
       applicant_department: applyPaymnet.applicant_department,
       description: applyPaymnet.description,

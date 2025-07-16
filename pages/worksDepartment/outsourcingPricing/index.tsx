@@ -99,12 +99,15 @@ export default function OutsourcingPricing() {
           />
         )}
 
-        <DateList
-          className={classNames('m-auto mb-5 mt-[40px]', showComponent !== 'showDateList' && 'hidden')}
-          onCardClick={(dateStr) => {
-            setTargetIsoDate(new Date(dateStr).toISOString());
-          }}
-        />
+        {showComponent === 'showDateList' && (
+          <DateList
+            className={classNames('m-auto mb-5 mt-[40px]')}
+            onCardClick={(dateStr) => {
+              setTargetIsoDate(new Date(dateStr).toISOString());
+              setTargetOutsourcingId('true');
+            }}
+          />
+        )}
 
         {showComponent === 'showVendorMonthList' && (
           <VendorMonthPanel

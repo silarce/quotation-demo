@@ -22,6 +22,7 @@
     "baseUrl": "",
   },
   "include": [
+    "svgr.d.ts",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx", "js/utils/downloadPdf.js", "components/page/worksDepartment/contracList/contract/workSheet/productForm",

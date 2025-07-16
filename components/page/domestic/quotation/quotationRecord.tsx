@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import moment from 'moment';
 import _ from 'lodash';
 
 // antd
 import { Collapse } from 'antd';
-const { Panel } = Collapse;
 
 // global gear
 import { RotatingArrow01 } from 'public/image/icon/iconComponent/rotatingArrow';
 
 // helper
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import style from './quotationRecord.module.scss';
@@ -68,86 +66,74 @@ export default function QuotationRecord({ subContract }: { subContract: Tquotati
       <div className={style.recordList}>
         <Collapse
           className={`${style.collapse} ${style.recordContainer}`}
-          expandIcon={() => <></>}
+          expandIcon={() => null}
           accordion={false}
           activeKey={activePanel}
-        >
-          {subContract?.map((item, index) => {
-            const content = item.content;
+          items={subContract
+            ?.map((item, index) => {
+              const content = item.content;
 
-            const activeIndex = activePanel.findIndex((item) => item === index);
-            const isActive = activeIndex === -1 ? false : true;
+              const activeIndex = activePanel.findIndex((item) => item === index);
+              const isActive = activeIndex === -1 ? false : true;
 
-            const panelSwitch = () => {
-              if (activeIndex === -1) {
-                activePanel.push(index);
-                setActivePanel([...activePanel]);
-              } else {
-                activePanel.splice(activeIndex, 1);
-                setActivePanel([...activePanel]);
+              const panelSwitch = () => {
+                if (activeIndex === -1) {
+                  activePanel.push(index);
+                  setActivePanel([...activePanel]);
+                } else {
+                  activePanel.splice(activeIndex, 1);
+                  setActivePanel([...activePanel]);
+                }
+              };
+
+              const changeInfo = {
+                quotationId: content.quotationNumber,
+                date: getTaiwanDateStr(content.quotationDate),
+                priceChange: content.subTotal,
+                remark: content.editNotes,
+              };
+
+              const contentProdArr = _.cloneDeep(content.products);
+
+              contentProdArr.forEach((prod, index) => {
+                if (!rootProdList[prod.rootProductId]) {
+                  rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+                } else {
+                  const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
+                  const copy = _.cloneDeep(prod);
+                  copy.quantity = rootQty - copy.quantity;
+                  rootProdList[prod.rootProductId] = _.cloneDeep(prod);
+                  // 替換掉原本的
+                  contentProdArr[index] = copy;
+                }
+              });
+
+              // 上面的演算法必須執行，所以 return null放在下面
+              if (index === 0) {
+                return null;
               }
-            };
 
-            const changeInfo = {
-              quotationId: content.quotationNumber,
-              date: moment(convertDate_reduce1911(content.quotationDate)).format('yy-MM-DD'),
-              priceChange: content.subTotal,
-              remark: content.editNotes,
-            };
-
-            const contentProdArr = _.cloneDeep(content.products);
-
-            contentProdArr.forEach((prod, index) => {
-              if (!rootProdList[prod.rootProductId]) {
-                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
-              } else {
-                const rootQty = rootProdList[prod.rootProductId]?.quantity ?? 0;
-                const copy = _.cloneDeep(prod);
-                copy.quantity = rootQty - copy.quantity;
-                rootProdList[prod.rootProductId] = _.cloneDeep(prod);
-                // 替換掉原本的
-                contentProdArr[index] = copy;
-              }
-            });
-
-            // 上面的演算法必須執行，所以 return null放在下面
-            if (index === 0) {
-              return null;
-            }
-
-            return (
-              <Panel
-                key={index}
-                header={<RecordInfo changeInfo={changeInfo} panelSwitch={panelSwitch} isActive={isActive} />}
-                extra={
+              return {
+                key: index,
+                label: <RecordInfo changeInfo={changeInfo} panelSwitch={panelSwitch} isActive={isActive} />,
+                children: (
+                  <div className={style.prodContainer}>
+                    <ProdRow prodArr={contentProdArr} quotationDiscount={Number(content.discount || '100')} />
+                  </div>
+                ),
+                extra: (
                   <button className={style.panelButton} onClick={panelSwitch}>
                     <span>展開</span>
                     <RotatingArrow01 deg={0} defaultDeg={-180} isActive={isActive} />
                   </button>
-                }
-              >
-                <div className={style.prodContainer}>
-                  {/* <Thead />
-                  <Tbody product={product} /> */}
-                  <ProdRow
-                    //
-                    prodArr={contentProdArr}
-                    quotationDiscount={Number(content.discount || '100')}
-                  />
-                </div>
-              </Panel>
-            );
-          })}
-        </Collapse>
+                ),
+              };
+            })
+            .filter((item) => !!item)}
+        />
       </div>
-
-      {/* {!prodChangingRecord && (
-        <div className={style.noRecord}>
-          <span>無追加/追減項目紀錄</span>
-        </div>
-      )} */}
     </div>
-  ); // return
+  );
 
   // ======================================================
   interface TchangeListItem {

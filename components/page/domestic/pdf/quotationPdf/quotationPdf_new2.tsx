@@ -1,5 +1,5 @@
 import React, { useState, useRef, Fragment } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -34,6 +34,7 @@ import { Class_product, Class_other } from 'hooks/quotation/useProduct';
 import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 
 import { optionsCreator_quotationStatus } from 'js/utils/options/options';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ============================================================================
 
@@ -226,28 +227,24 @@ export default function QuotationPdf({
     const total_num = Number(total.replaceAll(',', ''));
 
     const quotationDate_tw = (() => {
-      const m_quotationDate = moment(quotationDate);
+      const m_quotationDate = dayjs(quotationDate);
       const isValid = m_quotationDate.isValid();
 
       if (!isValid) {
         return '';
       } else {
-        m_quotationDate.subtract(1911, 'year');
-
-        return m_quotationDate.format('yy年MM月DD日');
+        return getTaiwanDateStr(m_quotationDate, { withUnit: true });
       }
     })();
 
     const tradingDate_tw = (() => {
-      const m_tradingDate = moment(tradingDate);
+      const m_tradingDate = dayjs(tradingDate);
       const isValid = m_tradingDate.isValid();
 
       if (!isValid) {
         return '';
       } else {
-        // m_tradingDate.subtract(1911, 'year');
-
-        return m_tradingDate.format('yy年MM月DD日');
+        return m_tradingDate.format('YYYY年MM月DD日').replace(/(^0+)/, '');
       }
     })();
 
@@ -842,7 +839,7 @@ export default function QuotationPdf({
       });
 
       const id = quotationNumber;
-      const today = moment().format('yyyy-MM-DD');
+      const today = dayjs().format('YYYY-MM-DD');
       link.download = `${id}_${today}.xlsx`;
       link.href = URL.createObjectURL(blobData);
       link.click();
@@ -857,10 +854,7 @@ export default function QuotationPdf({
   // ----------------------------------------------------------------------------
   // profile
   const profilePram: Tprofile = (() => {
-    // const customerName = customer.name;
-
-    // const dateString = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
-    const dateString = moment(quotationDate).subtract(1911, 'year').format('yy-MM-DD');
+    const dateString = getTaiwanDateStr(quotationDate);
 
     return {
       quotationId: quotationNumber,
@@ -920,13 +914,13 @@ export default function QuotationPdf({
     <Modal
       className={scss.quotationPdf}
       // wrapClassName={style.modal}
-      visible={isVisable}
+      open={isVisable}
       onCancel={onCancel}
       footer={null}
       closable={false}
       centered={true}
       width={'fit-content'}
-      destroyOnClose={true}
+      destroyOnHidden={true}
     >
       <div className={scss.panel}>
         <div className={scss.left}>
@@ -1093,7 +1087,12 @@ const PdfTypeA = ({
         return (
           <Fragment key={index}>
             {index !== 0 && <hr className={scss.hr} />}
-            <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[index] = ele)}>
+            <div
+              className={`${scss.pdf} ${scss.spaceBetween}`}
+              ref={(ele) => {
+                refPdf.current[index] = ele;
+              }}
+            >
               <div>
                 <Header />
                 <Profile profileData={profilePram} index={index + 1} pageCount={pageCount} />
@@ -1116,7 +1115,12 @@ const PdfTypeA = ({
       })}
       {chunkedList.length === 0 && (
         <Fragment>
-          <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+          <div
+            className={`${scss.pdf} ${scss.spaceBetween}`}
+            ref={(ele) => {
+              refPdf.current[0] = ele;
+            }}
+          >
             <div>
               <Header />
               <Profile profileData={profilePram} index={1} pageCount={pageCount} />
@@ -1189,7 +1193,12 @@ const PdfTypeB = ({
   return (
     <>
       {/* 第一頁 */}
-      <div className={`${scss.pdf} ${scss.spaceBetween}`} ref={(ele) => (refPdf.current[0] = ele)}>
+      <div
+        className={`${scss.pdf} ${scss.spaceBetween}`}
+        ref={(ele) => {
+          refPdf.current[0] = ele;
+        }}
+      >
         <div>
           <Header />
           <Profile profileData={profilePram} index={1} pageCount={pageCount} />
@@ -1211,7 +1220,12 @@ const PdfTypeB = ({
         return (
           <Fragment key={index}>
             <hr className={scss.hr} />
-            <div className={scss.pdf} ref={(ele) => (refPdf.current[index + 1] = ele)}>
+            <div
+              className={scss.pdf}
+              ref={(ele) => {
+                refPdf.current[index + 1] = ele;
+              }}
+            >
               <Header />
               <Profile profileData={profilePram} index={index + 2} pageCount={pageCount} />
               <Table productList={chunk} />
@@ -1353,14 +1367,12 @@ const quotationContentToBasicInfo = (quotationContent: TquotationContentDto | un
     };
   });
 
-  // const quotationStatus = quotationStatusLookup[status] ?? '';
-
   const customerName = customer?.name ?? '';
   const agentName = agentEmployee?.chName ?? '';
 
   const allAddress = county + district + address;
 
-  const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+  const tradingDate = getTaiwanDateStr(deliveryDate);
 
   const control_basicInfo: Tcontrol_basicInfo = {
     quotationDate,
@@ -1523,7 +1535,7 @@ const legacyContractToBasicInfo = ({
 
   const allAddress = projectCity + projectDistrict + projectAddress;
 
-  const tradingDate = moment(deliveryDate).subtract(1911, 'year').format('yy-MM-DD');
+  const tradingDate = getTaiwanDateStr(deliveryDate);
 
   const control_basicInfo: Tcontrol_basicInfo = {
     quotationDate: '', // 舊合約沒有報價日期

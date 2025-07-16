@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import Image from 'next/image';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
-
-import _ from 'lodash';
 
 // 行事曆元件
 import BigCalendar from 'react-big-calendar';
@@ -13,8 +11,8 @@ import { EventWrapperProps, Calendar, momentLocalizer } from 'react-big-calendar
 import MyButton from 'components/global/gear/button/myButton';
 
 // icon
-import iconCircle from 'public/image/icon/circle.svg';
-import icongreenDot from 'public/image/icon/greenDot.svg';
+import iconCircle from 'public/image/icon/circle.svg?url';
+import icongreenDot from 'public/image/icon/greenDot.svg?url';
 
 // tool
 import { month_chToNumber } from 'js/tools/date/conversionTable';
@@ -28,7 +26,7 @@ import { TuserDto, Tparams } from 'js/api/dtoTypes';
 import { TdailyReportDto } from 'js/api/api_dailyReport';
 import { Ttab } from 'pages/home/dailyReport';
 
-const localizer = momentLocalizer(moment);
+const localizer = momentLocalizer(dayjs);
 
 // ===========================================================================
 
@@ -154,21 +152,21 @@ const ToolBar = ({
   // 'PREV' | 'NEXT' | 'TODAY' | 'DATE'
   const nextMonth = async () => {
     onNavigate('NEXT');
-    const nextMonth = moment(date).add(1, 'months');
+    const nextMonth = dayjs(date).add(1, 'months');
     const dynamicFilter = filterCre_nextAndPrevMonth(nextMonth);
     update_calendar(dynamicFilter);
   };
 
   const prevMonth = async () => {
     onNavigate('PREV');
-    const prevMonth = moment(date).subtract(1, 'months');
+    const prevMonth = dayjs(date).subtract(1, 'months');
     const dynamicFilter = filterCre_nextAndPrevMonth(prevMonth);
     update_calendar(dynamicFilter);
   };
 
   const toToday = async () => {
     onNavigate('TODAY');
-    const dynamicFilter = filterCre_nextAndPrevMonth(moment());
+    const dynamicFilter = filterCre_nextAndPrevMonth(dayjs());
     update_calendar(dynamicFilter);
   };
 
@@ -263,7 +261,7 @@ const Header = (HeaderProps: BigCalendar.HeaderProps) => {
 const DateHeader = (DateHeaderProps: BigCalendar.DateHeaderProps) => {
   const { label, date } = DateHeaderProps;
   const showDate = parseInt(label);
-  const isCurrentMonth = moment(date).isSame(new Date(), 'month');
+  const isCurrentMonth = dayjs(date).isSame(new Date(), 'month');
 
   return (
     <div className={classNames('my-[10px] mx-2', scss.dateHeader)}>
@@ -279,10 +277,10 @@ const DateHeader = (DateHeaderProps: BigCalendar.DateHeaderProps) => {
 };
 
 // ======================================================================
-const DateCellWrapper = (props: { range: Date[]; value: Date; children: JSX.Element }) => {
+const DateCellWrapper = (props: { range: Date[]; value: Date; children: React.ReactNode }) => {
   const { children, range, value } = props;
 
-  const isToday = moment(value).isSame(new Date(), 'date');
+  const isToday = dayjs(value).isSame(new Date(), 'date');
 
   // children的className為 rbc-day-bg rbc-off-range-bg，留作備註
   // rbc-day-bg rbc-off-range-bg

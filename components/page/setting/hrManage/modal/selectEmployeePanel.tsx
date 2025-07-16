@@ -60,11 +60,11 @@ export default function SelectEmployeePanel({
   return (
     <Modal
       className={style.container}
-      visible={visible}
+      open={visible}
       closable={false}
       centered={true}
       width={800}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       onCancel={onCancel}
       footer={<TwoBtnFooter {...{ onConfirm: theOnConfirm, onCancel }} />}
     >

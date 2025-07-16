@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-import { axi_netCore, axi_monkey } from '../_axiosCreator';
+import { axi_monkey } from '../_axiosCreator';
 
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 
 import type { TengineerContactExport } from './_schemas';
 
@@ -79,11 +79,9 @@ const useApiEngineerContactExport = (
       setData(data);
       await updateAllAttachment();
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error('API Error:', error.message);
-      } else {
-        console.error('未知錯誤:', error);
-      }
+      const err = error as AxiosError;
+
+      console.error('API Error:', err.message);
 
       setData(null);
     } finally {

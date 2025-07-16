@@ -1,0 +1,17 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+
+  padding: 0 24px;
+  border-radius: theme("border.radius.n2");
+  border: solid 1px theme("colors.gray05");
+
+  font-size: 14px;
+  &:hover {
+    border: solid 1px theme("colors.blue01");
+  }
+  &:active {
+    box-shadow: 0px -2px 0px 0px theme("colors.blue01") inset;
+  }
+}

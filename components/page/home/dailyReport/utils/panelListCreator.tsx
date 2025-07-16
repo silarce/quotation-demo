@@ -11,8 +11,8 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { ThookEmptyReport } from 'hooks/home/useDailyReport';
 
 // icon
-import iconFourCube from 'public/image/icon/fourCube.svg';
-import iconMenu from 'public/image/icon/menu.svg';
+import iconFourCube from 'public/image/icon/fourCube.svg?url';
+import iconMenu from 'public/image/icon/menu.svg?url';
 
 // type
 import { TdailyReportDto } from 'js/api/api_dailyReport';
@@ -63,7 +63,7 @@ const panelListCreator = ({
   userInfo: TuserDto;
   dailyReport_calendar: TdailyReportDto[] | undefined;
   //
-  customSearchBar: JSX.Element;
+  customSearchBar: React.ReactNode;
   saveTempReport: () => void;
   getTempReport: () => void;
 }) => {

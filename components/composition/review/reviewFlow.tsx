@@ -11,7 +11,7 @@ import {
   // apiGetReviewBack,
 } from 'js/api/api_netCore/api_review';
 
-import icon_review from 'public/image/icon/review.svg';
+import icon_review from 'public/image/icon/review.svg?url';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';

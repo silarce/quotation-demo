@@ -23,7 +23,7 @@
 // 報價單
 import React, { useState, useReducer, useEffect, useContext, useMemo, memo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -78,8 +78,8 @@ import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
-import iconUpload from 'public/image/icon/upload.svg';
-import iconRedLock from 'public/image/icon/redLock.svg';
+import iconUpload from 'public/image/icon/upload.svg?url';
+import iconRedLock from 'public/image/icon/redLock.svg?url';
 
 // css
 import style from './quotation.module.scss';
@@ -173,7 +173,7 @@ type Tprofile = {
   requiredDoorType: string;
   requiredDoorQuantity: string;
   estimatedDiscount: string; // number
-  scheduledProcurementOrBidDate: Moment | null;
+  scheduledProcurementOrBidDate: Dayjs | null;
   type: string;
 };
 
@@ -1901,7 +1901,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(createdAt).toISOString(),
+        isoString: dayjs(createdAt).toISOString(),
       };
     });
   }, [quotationData]);
@@ -2234,7 +2234,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       requiredDoorQuantity: String(latestContent?.requiredDoorQuantity ?? ''),
       estimatedDiscount: latestContent?.estimatedDiscount ?? '',
       scheduledProcurementOrBidDate: latestContent?.scheduledProcurementOrBidDate
-        ? moment(latestContent.scheduledProcurementOrBidDate)
+        ? dayjs(latestContent.scheduledProcurementOrBidDate)
         : null,
       type: latestContent?.type ?? '',
     });
@@ -2644,7 +2644,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       {latestContent && (
         <QuotationPdf
-          visible={pdfModalVisible}
+          open={pdfModalVisible}
           pdfData={pdfData}
           onCancel={hidePdf}
           fileName={latestContent.quotationNumber}

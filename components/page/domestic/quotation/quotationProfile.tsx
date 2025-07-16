@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 // glogal gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
@@ -60,7 +60,7 @@ type Tstate_profile = {
   requiredDoorType: string;
   requiredDoorQuantity: string;
   estimatedDiscount: string;
-  scheduledProcurementOrBidDate: Moment | null;
+  scheduledProcurementOrBidDate: Dayjs | null;
   type: string;
 };
 
@@ -72,8 +72,8 @@ type TcontrolItem = {
 };
 
 type TcontrolItem_date = {
-  value: Moment | null;
-  onChange?: (m: Moment | null) => void;
+  value: Dayjs | null;
+  onChange?: (m: Dayjs | null) => void;
   onClick?: () => void;
   disabled?: boolean;
 };
@@ -736,7 +736,7 @@ const useProfile = ({
 
   const control_profile = useMemo(() => {
     const quotationDate = quotationContent?.quotationDate
-      ? moment(quotationContent.quotationDate).format('YYYY-MM-DD')
+      ? dayjs(quotationContent.quotationDate).format('YYYY-MM-DD')
       : '';
 
     const control_profile: Tcontrol = {
@@ -909,7 +909,7 @@ const useProfile = ({
         requiredDoorQuantity: String(originContent?.requiredDoorQuantity ?? ''),
         estimatedDiscount: originContent?.estimatedDiscount ?? '',
         scheduledProcurementOrBidDate: originContent?.scheduledProcurementOrBidDate
-          ? moment(originContent?.scheduledProcurementOrBidDate)
+          ? dayjs(originContent?.scheduledProcurementOrBidDate)
           : null,
         type: originContent?.type ?? '',
       });
@@ -939,7 +939,7 @@ const useProfile = ({
       requiredDoorQuantity: String(originContent?.requiredDoorQuantity ?? ''),
       estimatedDiscount: originContent?.estimatedDiscount ?? '',
       scheduledProcurementOrBidDate: originContent?.scheduledProcurementOrBidDate
-        ? moment(originContent?.scheduledProcurementOrBidDate)
+        ? dayjs(originContent?.scheduledProcurementOrBidDate)
         : null,
       type: originContent?.type ?? '',
     });

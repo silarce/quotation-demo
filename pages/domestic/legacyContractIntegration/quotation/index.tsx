@@ -61,7 +61,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 // import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
 // icon
-import iconUpload from 'public/image/icon/upload.svg';
+import iconUpload from 'public/image/icon/upload.svg?url';
 
 // css
 import style from './quotation.module.scss';

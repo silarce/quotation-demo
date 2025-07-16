@@ -1,7 +1,6 @@
 @use "styles/theme01" as *;
 
 .container {
-  // padding: 4px;
   :global(.ant-collapse) {
     border: none;
   }
@@ -17,9 +16,6 @@
   :global(.ant-collapse-content-box) {
     padding: 0;
   }
-
-  // :global(.){
-  // }
 }
 
 // ===============================================================
