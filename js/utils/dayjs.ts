@@ -1,15 +1,6 @@
-import { DatePickerProps } from 'antd';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
-// export const toMinguoYear = (date: Dayjs | null | string) => {
-//   if (typeof date === 'string') {
-//     date = dayjs(date);
-//   }
-
-//   return date && date.isValid() ? `${date.year() - 1911}-${date.format('MM-DD')}` : '';
-// };
-
-export const fromMinguoYear = (rocDateStr: string): Moment | null => {
+export const fromMinguoYear = (rocDateStr: string): Dayjs | null => {
   if (!rocDateStr) {
     return null;
   }
@@ -22,17 +13,17 @@ export const fromMinguoYear = (rocDateStr: string): Moment | null => {
 
   const year = parseInt(rocYear, 10) + 1911;
 
-  const parsed = moment(`${year}-${month}-${day}`);
+  const parsed = dayjs(`${year}-${month}-${day}`);
 
   return parsed.isValid() ? parsed : null;
 };
 
-export const toMinguoYear = (date: Moment | string | null | undefined): string => {
+export const toMinguoYear = (date: Dayjs | string | null | undefined): string => {
   if (!date) {
     return '';
   }
 
-  const d = typeof date === 'string' ? moment(date) : date;
+  const d = typeof date === 'string' ? dayjs(date) : date;
 
   if (!d.isValid()) {
     return '';
@@ -48,7 +39,7 @@ export const toMinguoYear = (date: Moment | string | null | undefined): string =
 export const toADYear = (rocString: string) => {
   const [rocYear, month, day] = rocString.split('-');
 
-  return moment(`${parseInt(rocYear, 10) + 1911}-${month}-${day}`).format('YYYY-MM-DD');
+  return dayjs(`${parseInt(rocYear, 10) + 1911}-${month}-${day}`).format('YYYY-MM-DD');
 };
 
 // const getYearMonth = (date: Moment) => date.year() * 12 + date.month();
@@ -73,9 +64,9 @@ export const toADYear = (rocString: string) => {
 //   return false;
 // };
 
-export const getOneMonthAgo = (): [Moment, Moment] => {
-  const oneMonthAge = moment().add(-1, 'month').startOf('day');
-  const today = moment().startOf('day');
+export const getOneMonthAgo = (): [Dayjs, Dayjs] => {
+  const oneMonthAge = dayjs().add(-1, 'month').startOf('day');
+  const today = dayjs().startOf('day');
 
   return [oneMonthAge, today];
 };
