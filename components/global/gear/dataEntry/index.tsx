@@ -1,8 +1,7 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import classNames from 'classnames';
-import _ from 'lodash';
-import dayjs, { Dayjs } from 'dayjs';
+
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
@@ -19,11 +18,15 @@ import {
   Select as AntdSelect,
   SelectProps as AntdSelectProps,
 } from 'antd';
+import type { RangePickerProps } from 'antd/es/date-picker';
+
 import type { CheckboxGroupProps } from 'antd/lib/checkbox';
 import type { RadioGroupProps } from 'antd/lib/radio';
 import type { DefaultOptionType, BaseOptionType } from 'antd/lib/select';
 
 import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
+
+import Icon_asterisk from 'public/image/icon/fong/asterisk.svg';
 
 // ======================================================================
 
@@ -39,6 +42,7 @@ type TdataEntryProps = {
   captionWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   showBorder?: boolean;
+
   childrenWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   prefix?: React.ReactNode;
@@ -51,13 +55,11 @@ type TdataEntryProps = {
   fontSize?: 12 | 14 | 16 | 18 | 20 | 22;
   //
   //
-
-  theme?: 'normal' | 'fong';
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'>;
 
 type TdataEntrycontainerProps = React.ComponentProps<typeof DataEntryContainer>;
 type TinputProps = React.ComponentProps<typeof Input>;
-type TtextareaProps = React.ComponentProps<typeof Textarea>;
+type TtextareaProps = React.ComponentProps<typeof Textarea_autoHeight>;
 type TdatePickerProps = React.ComponentProps<typeof DatePicker>;
 type TtimePickerProps = React.ComponentProps<typeof TimePicker>;
 type TcheckboxProps = React.ComponentProps<typeof Checkbox>;
@@ -79,7 +81,7 @@ const DataEntryContainer = ({
   captionWrapperProps: { className: className_caption, ...captionWrapperProps } = {},
 
   showBorder = true,
-  childrenWrapperProps: { className: className_childrenWrapper, ...childrenWrapperProps } = {},
+  childrenWrapperProps: { className: childrenWrapperClassName, ...childrenWrapperProps } = {},
 
   prefix,
   prefixWrapperProps: { className: className_prefix, ...prefixWrapperProps } = {},
@@ -92,27 +94,25 @@ const DataEntryContainer = ({
   className,
   children,
   //
-  theme = 'normal',
 
-  // fontSize = 18,
-  fontSize = theme === 'fong' ? 14 : 18,
+  fontSize = 18,
+
   ...props_container
 }: TdataEntryProps) => {
   const className_fontSize = `f${fontSize}`;
 
   return (
-    <div className={classNames(scss.container, className, theme === 'fong' && ['items-center'])} {...props_container}>
+    <div className={classNames(scss.container, className)} {...props_container}>
       {caption !== undefined && (
         <div
           className={classNames(
-            'w-[100px]  font-medium',
+            'w-[100px] font-medium',
             `mr-${captionMr}`,
+            'text-main',
             scss.captionWrapper,
             className_fontSize,
             captionClassName,
-            className_caption,
-            theme === 'normal' && ['text-main'],
-            theme === 'fong' && ['text-text02']
+            className_caption
           )}
           style={captionStyle}
           {...captionWrapperProps}
@@ -129,12 +129,9 @@ const DataEntryContainer = ({
         className={classNames(
           scss.childrenWrapper,
           className_fontSize,
-          className_childrenWrapper,
+          childrenWrapperClassName,
           showBorder && scss.showBorder,
-          'border-b border-transparent',
-          //
-          theme === 'normal' && [showBorder && scss.showBorder],
-          theme === 'fong' && [showBorder && scss.showBorder2, 'border-[1px] p-[12px] rounded-lg']
+          'border-b border-transparent'
         )}
         {...childrenWrapperProps}
       >
@@ -157,22 +154,41 @@ const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputEleme
     <input
       // 避免使用者滾動page時意外編輯了input的值
       onWheel={(e) => e.currentTarget.blur()}
+      placeholder="- -"
       {...props}
-      className={classNames('w-full', className)}
+      className={classNames('w-full placeholder:text-gray06', className)}
     />
   );
 };
 
 // MARK:Textarea
-const Textarea = ({ className, ...props }: TextareaAutosizeProps) => {
-  return <TextareaAutosize className={classNames(scss.textarea, className)} autoComplete="off" {...props} />;
+const Textarea_autoHeight = ({ className, ...props }: TextareaAutosizeProps) => {
+  return (
+    <TextareaAutosize
+      className={classNames(scss.textarea_autoHeight, 'placeholder:text-gray06', className)}
+      autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
+};
+
+const Textarea = ({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+  return (
+    <textarea
+      className={classNames(scss.textarea, 'placeholder:text-gray06', className)}
+      autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
 };
 
 // MARK:DatePicker
 const DatePicker = ({
   // value: _value,
   // defaultValue: _defaultValue,
-  twDate = true,
+  // twDate = true,
   // onChange,
   className,
   disabled,
@@ -180,6 +196,9 @@ const DatePicker = ({
   ...props
 }: DatePickerProps & {
   //
+  /**
+   * @deprecated twDate已沒有作用
+   */
   twDate?: boolean;
   returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
 }) => {
@@ -199,6 +218,7 @@ const DatePicker = ({
       format={(theDayjs) => {
         return getTaiwanDateStr(theDayjs);
       }}
+      placeholder="- -"
       {...props}
     />
   );
@@ -218,6 +238,21 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
       {...suffixIcon}
       format="HH-mm"
       autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
+};
+
+const DateRangePicker = ({ className, disabled, ...props }: RangePickerProps) => {
+  const suffixIcon: { suffixIcon?: React.ReactNode } = {};
+  disabled && (suffixIcon.suffixIcon = null);
+
+  return (
+    <AntdDatePicker.RangePicker
+      className={classNames(scss.dateRangePicker, className)}
+      disabled={disabled}
+      {...suffixIcon}
       {...props}
     />
   );
@@ -230,12 +265,12 @@ const Checkbox = ({ className, ...props }: CheckboxProps) => {
 
 // MARK:CheckboxGroup
 const CheckboxGroup = ({ className, ...props }: CheckboxGroupProps) => {
-  return <AntdCheckbox.Group className={classNames(scss.checkbox, className)} {...props} />;
+  return <AntdCheckbox.Group className={classNames(scss.checkBoxGroup, scss.checkbox, className)} {...props} />;
 };
 
 // MARK:Radio
-const Radio = (props: RadioProps) => {
-  return <AntdRadio {...props} />;
+const Radio = ({ className, ...props }: RadioProps) => {
+  return <AntdRadio className={classNames(scss.radio, className)} {...props} />;
 };
 
 // MARK:RadioGroup
@@ -265,6 +300,7 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
       allowClear={true}
       suffixIcon={hideSuffixIconWhenDisabled && disabled ? null : suffixIcon}
       className={classNames(scss.antdSelect, className)}
+      placeholder="- -"
       {...props}
     />
   );
@@ -450,14 +486,90 @@ function findOption<Option extends { value: unknown; label: React.ReactNode }>({
 
 // =============================================================================
 
+// MAKR:DataEntry_fong
 // 目前搭配Input運作正常
 // 其他表單元件等到確實要用時再說
-const DataEntry_fong = (props: Omit<TdataEntryProps, 'theme'>) => <DataEntryContainer {...props} theme="fong" />;
+// const DataEntry_fong = (props: Omit<TdataEntryProps, 'theme'>) => <DataEntryContainer {...props} theme="fong" />;
+
+const DataEntry_fong = ({
+  caption,
+  captionClassName,
+  captionStyle,
+
+  captionWrapperProps: { className: className_caption, ...captionWrapperProps } = {},
+
+  showBorder = true,
+  childrenWrapperProps: { className: childrenWrapperClassName, ...childrenWrapperProps } = {},
+
+  prefix,
+  prefixWrapperProps: { className: className_prefix, ...prefixWrapperProps } = {},
+
+  suffix,
+  suffixWrapperProps: { className: className_suffix, ...suffixWrapperProps } = {},
+
+  isMust,
+  //
+  className,
+  children,
+  //
+
+  fontSize = 14,
+  ...props_container
+}: Omit<TdataEntryProps, 'captionMr'>) => {
+  const className_fontSize = `f${fontSize}`;
+
+  return (
+    <div className={classNames(scss.container_fong, className, 'items-center')} {...props_container}>
+      {caption !== undefined && (
+        <div
+          className={classNames(
+            scss.captionWrapper,
+            className_fontSize,
+            captionClassName,
+            className_caption,
+            isMust && scss.must,
+            'font-medium text-text02 mb-[10px]'
+          )}
+          style={captionStyle}
+          {...captionWrapperProps}
+        >
+          {isMust && <Icon_asterisk className={scss.asterisk} />}
+          {caption}
+        </div>
+      )}
+      {prefix && (
+        <div className={classNames('mr-[6px]', className_fontSize, className_prefix)} {...prefixWrapperProps}>
+          {prefix}
+        </div>
+      )}
+      <div
+        className={classNames(
+          scss.childrenWrapper,
+          className_fontSize,
+          childrenWrapperClassName,
+          showBorder && scss.showBorder,
+          !showBorder && scss.notShowBorder,
+
+          'border-[1px] border-transparent p-[12px] rounded-lg'
+        )}
+        {...childrenWrapperProps}
+      >
+        {children}
+      </div>
+      {suffix && (
+        <div className={classNames('ml-[6px]', className_fontSize, className_suffix)} {...suffixWrapperProps}>
+          {suffix}
+        </div>
+      )}
+      {/*  */}
+    </div>
+  );
+};
 
 // =============================================================================
 
 DataEntryContainer.Input = Input;
-DataEntryContainer.Textarea = Textarea;
+DataEntryContainer.Textarea_autoHeight = Textarea_autoHeight;
 DataEntryContainer.DatePicker = DatePicker;
 DataEntryContainer.TimePicker = TimePicker;
 DataEntryContainer.Checkbox = Checkbox;
@@ -478,7 +590,7 @@ export default DataEntry;
 export { DataEntryContainer, DataEntry_fong };
 export {
   Input,
-  Textarea,
+  Textarea_autoHeight,
   DatePicker,
   TimePicker,
   Checkbox,
@@ -488,6 +600,8 @@ export {
   Select,
   Select_rs,
   InputSelect,
+  DateRangePicker,
+  Textarea,
 };
 
 export type {

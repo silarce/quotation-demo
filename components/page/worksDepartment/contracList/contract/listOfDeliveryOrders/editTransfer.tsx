@@ -193,7 +193,7 @@ const config: {
     Render: ({ value, onChange, disabled }) => {
       return (
         <DataEntry>
-          <DataEntry.Textarea disabled={disabled} value={value} onChange={(e) => onChange(e.target.value)} />
+          <DataEntry.Textarea_autoHeight disabled={disabled} value={value} onChange={(e) => onChange(e.target.value)} />
         </DataEntry>
       );
     },

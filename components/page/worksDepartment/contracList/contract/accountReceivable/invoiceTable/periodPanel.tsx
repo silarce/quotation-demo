@@ -195,23 +195,20 @@ function PeriodPanel_pre(
   // --------------------------------------------------------------------------
 
   const {
+    // 已開立發票
     data: issuedInvoiceArr,
     update: update_issuedInvoiceArr,
     clear: clear_issuedInvoiceArr,
-  } = useGetAccountReceivableInvoices_all(
-    useMemo(() => {
-      return {
-        params: {
-          pageSize: 9999999,
-          sort: 'invoiceNumber',
-          filter: {
-            accountantInvoiceBookId: { $eq: state_period?.invoiceBook?.id },
-          },
-        },
-        autoUpdate: false,
-      };
-    }, [state_period?.invoiceBook?.id])
-  );
+  } = useGetAccountReceivableInvoices_all({
+    params: {
+      pageSize: 9999999,
+      sort: 'invoiceNumber',
+      filter: {
+        accountantInvoiceBookId: { $eq: state_period?.invoiceBook?.id },
+      },
+    },
+    autoUpdate: false,
+  });
 
   // --------------------------------------------------------------------------
 
@@ -349,9 +346,7 @@ function PeriodPanel_pre(
       return undefined;
     }
 
-
     const { alphabeticLetter, startNumber, endNumber } = state_period.invoiceBook;
-
 
     const startNumber_num = Number(startNumber);
     const endNumber_num = Number(endNumber);
@@ -480,12 +475,12 @@ function PeriodPanel_pre(
   }, [state_period]);
 
   useEffect(() => {
-    if (state_period?.invoiceBook?.id) {
+    if (!disabled && state_period?.invoiceBook?.id) {
       update_issuedInvoiceArr();
     } else {
       clear_issuedInvoiceArr();
     }
-  }, [state_period?.invoiceBook?.id]);
+  }, [state_period?.invoiceBook?.id, disabled]);
 
   // ==============================================================================
 
@@ -1925,26 +1920,45 @@ class Class_OtherNode {
 
   // ------------------------------------------------------------------------------
   disabledInvoiceDate(currentDate: Dayjs): boolean {
+    // return tue 是不可選
+    // return false 是可選
+
     if (this.isOlderInvoice) {
       return false;
     }
 
-    let disabled = true;
+    // const disabled = true;
 
     if (!this.invoiceBook) {
-      return disabled;
+      // return disabled;
+      return true;
     }
 
     const { year, month } = this.invoiceBook;
-
     const bookDate = dayjs(`${year}-${month}`);
     const bookDate_next = dayjs(`${year}-${Number(month) + 1}`);
 
-    if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
-      disabled = false;
+    // const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
+    // const begin = latestInvoiceDate_m.subtract(1, 'day');
+    const begin = bookDate.startOf('month');
+    const end = bookDate_next.endOf('month');
+
+    // if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
+    //   if (!latestInvoiceDate) {
+    //     disabled = false;
+    //   } else {
+    //     disabled = currentDate.isBefore(begin);
+    //   }
+    // }
+
+    // if (currentDate.isAfter(begin) && currentDate.isBefore(end)) {
+    if (currentDate.isBetween(begin, end, 'month', '[]')) {
+      return false;
+    } else {
+      return true;
     }
 
-    return disabled;
+    // return disabled;
   }
 } // Class_OtherNode
 
