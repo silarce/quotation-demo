@@ -175,25 +175,13 @@
 }
 
 .radioGroup.radioGroup.radioGroup {
-  // height: calc(1em + 2px);
-  // height: 1em;
-  // height: 1.143em;
-
   font-size: inherit;
   line-height: inherit;
   * {
     line-height: inherit;
   }
   > :global(.ant-radio-wrapper) {
-    font-size: inherit;
-    align-items: center;
     margin-right: 20px;
-    &::after {
-      line-height: inherit !important;
-    }
-    // > :global(.ant-radio) {
-    //   transform: translateY(-2px);
-    // }
     :global(.ant-radio-checked) {
       :global(.ant-radio-inner) {
         background-color: theme("colors.green01");
@@ -416,4 +404,3 @@
     color: theme("colors.gray06");
   }
 }
-
