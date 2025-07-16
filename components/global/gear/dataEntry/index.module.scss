@@ -50,17 +50,15 @@
     }
   }
   .childrenWrapper {
-    &.showBorder {
-      border-color: theme("colors.border02");
-    }
-  }
-
-  .childrenWrapper {
-    &.notShowBorder {
+    padding: 12px;
+    border: solid 1px theme("colors.border02");
+    border-radius: theme("border.radius.02");
+    &.disabled {
       color: #666666;
       background-color: #fafafa;
-      border-color: #e0e0e0;
-      border-width: 0 0 1px 0;
+
+      border-color: transparent;
+      border-bottom-color: #e0e0e0;
     }
   }
 }
@@ -76,12 +74,8 @@
   }
 }
 .textarea {
-  // border:solid 1px black;
   line-height: inherit;
   width: 100%;
-  // &:disabled {
-  //   cursor: auto;
-  // }
 }
 
 .datepicker.datepicker.datepicker {
@@ -181,7 +175,9 @@
 }
 
 .radioGroup.radioGroup.radioGroup {
-  height: calc(1rem + 2px);
+  // height: calc(1em + 2px);
+  // height: 1em;
+  // height: 1.143em;
 
   font-size: inherit;
   line-height: inherit;
@@ -225,7 +221,7 @@
     font-size: inherit;
     :global(.ant-select-selection-wrap) {
       &::after {
-        line-height: unset;
+        line-height: inherit;
       }
     }
     :global(.ant-select-selection-placeholder),
@@ -234,7 +230,7 @@
       font-size: inherit;
     }
     &::after {
-      line-height: unset;
+      line-height: inherit;
     }
   }
 
@@ -279,9 +275,9 @@
   padding: 0;
   [class$="indicatorContainer"] {
     padding: 0;
-    >svg{
-      width:1rem;
-      height:1rem;
+    > svg {
+      width: 1rem;
+      height: 1rem;
     }
   }
 }
@@ -420,3 +416,4 @@
     color: theme("colors.gray06");
   }
 }
+
