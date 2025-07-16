@@ -59,7 +59,7 @@ type TdataEntryProps = {
 
 type TdataEntrycontainerProps = React.ComponentProps<typeof DataEntryContainer>;
 type TinputProps = React.ComponentProps<typeof Input>;
-type TtextareaProps = React.ComponentProps<typeof Textarea>;
+type TtextareaProps = React.ComponentProps<typeof Textarea_autoHeight>;
 type TdatePickerProps = React.ComponentProps<typeof DatePicker>;
 type TtimePickerProps = React.ComponentProps<typeof TimePicker>;
 type TcheckboxProps = React.ComponentProps<typeof Checkbox>;
@@ -162,7 +162,7 @@ const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputEleme
 };
 
 // MARK:Textarea
-const Textarea = ({ className, ...props }: TextareaAutosizeProps) => {
+const Textarea_autoHeight = ({ className, ...props }: TextareaAutosizeProps) => {
   return (
     <TextareaAutosize
       className={classNames(scss.textarea, 'placeholder:text-gray06', className)}
@@ -558,7 +558,7 @@ const DataEntry_fong = ({
 // =============================================================================
 
 DataEntryContainer.Input = Input;
-DataEntryContainer.Textarea = Textarea;
+DataEntryContainer.Textarea_autoHeight = Textarea_autoHeight;
 DataEntryContainer.DatePicker = DatePicker;
 DataEntryContainer.TimePicker = TimePicker;
 DataEntryContainer.Checkbox = Checkbox;
@@ -579,7 +579,7 @@ export default DataEntry;
 export { DataEntryContainer, DataEntry_fong };
 export {
   Input,
-  Textarea,
+  Textarea_autoHeight,
   DatePicker,
   TimePicker,
   Checkbox,

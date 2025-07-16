@@ -194,5 +194,5 @@ const Select: typeof DataEntry.Select = ({ className, ...props }) => {
 };
 
 const Textarea = ({ className, ...props }: TtextareaProps) => {
-  return <DataEntry.Textarea {...props} className={classNames('resize-none', scss.textarea, className)} />;
+  return <DataEntry.Textarea_autoHeight {...props} className={classNames('resize-none', scss.textarea, className)} />;
 };
