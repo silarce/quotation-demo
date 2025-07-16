@@ -57,6 +57,11 @@ type TdataEntryProps = {
   //
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'>;
 
+type TdataEntryFongProps = Omit<TdataEntryProps, 'captionMr' | 'showBorder'> & {
+  disabled?: boolean;
+  syncDisabled?: boolean;
+};
+
 type TdataEntrycontainerProps = React.ComponentProps<typeof DataEntryContainer>;
 type TinputProps = React.ComponentProps<typeof Input>;
 type TtextareaProps = React.ComponentProps<typeof Textarea_autoHeight>;
@@ -151,6 +156,7 @@ const DataEntryContainer = ({
 // MARK:DataEntry_fong
 const DataEntry_fong = ({
   disabled,
+  // 目前只支援disabled、isDisabled、readOnly
   syncDisabled = true,
 
   className,
@@ -172,41 +178,13 @@ const DataEntry_fong = ({
   suffixWrapperProps: { className: className_suffix, ...suffixWrapperProps } = {},
 
   ...props_container
-}: Omit<TdataEntryProps, 'captionMr'> & { disabled?: boolean; syncDisabled?: boolean }) => {
+}: TdataEntryFongProps) => {
   const className_fontSize = `f${fontSize}`;
 
   // --------------------------------------------------------------------------------
 
   const processedChildren =
-    syncDisabled === false || disabled === undefined
-      ? children
-      : React.Children.map(children, (child) => {
-          if (!React.isValidElement(child)) {
-            return child;
-          }
-
-          if (!child.props) {
-            return child;
-          }
-
-          const props = { ...child.props } as {
-            disabled?: boolean;
-            isDisabled?: boolean;
-            readOnly?: boolean;
-          };
-
-          if (props.disabled !== undefined || props.isDisabled !== undefined || props.readOnly !== undefined) {
-            return child;
-          }
-
-          props.readOnly = disabled;
-          props.disabled = disabled;
-          props.isDisabled = disabled;
-
-          return React.cloneElement(child, {
-            ...props,
-          });
-        });
+    syncDisabled === false || disabled === undefined ? children : doProcessedChildren(children, disabled);
 
   // --------------------------------------------------------------------------------
 
@@ -358,6 +336,7 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
   );
 };
 
+// MARK: DateRangePicker
 const DateRangePicker = ({ className, disabled, ...props }: RangePickerProps) => {
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
   disabled && (suffixIcon.suffixIcon = null);
@@ -504,12 +483,6 @@ function InputSelect<
 
   return (
     <div {...divPros} className={classNames(scss.inputSelect, className)}>
-      {/* //// 這邊用label包起來是為了避免觸發Container的Label */}
-      {/* ////label必須在input之前，這樣不用設z-index就可以使input蓋過select */}
-      {/* ////不設index才能避免InputSelect垂直排列時menu因為z-index造成的跑版*/}
-      {/* 過陣子沒問題就把註解的lable刪掉，css裡的 inputSelect>label也刪掉 */}
-      {/* <label> */}
-
       {!disabled && (
         <ReactSelect
           className={scss.select}
@@ -598,7 +571,38 @@ function findOption<Option extends { value: unknown; label: React.ReactNode }>({
   //
 }
 
-// =============================================================================
+/**
+ * 遍歷children，將所有child的props.disabled、props.isDisabled、props.readOnly設為disabled
+ */
+const doProcessedChildren = (children: React.ReactNode, disabled: boolean = false) => {
+  return React.Children.map(children, (child) => {
+    if (!React.isValidElement(child)) {
+      return child;
+    }
+
+    if (!child.props) {
+      return child;
+    }
+
+    const props = { ...child.props } as {
+      disabled?: boolean;
+      isDisabled?: boolean;
+      readOnly?: boolean;
+    };
+
+    if (props.disabled !== undefined || props.isDisabled !== undefined || props.readOnly !== undefined) {
+      return child;
+    }
+
+    props.readOnly = disabled;
+    props.disabled = disabled;
+    props.isDisabled = disabled;
+
+    return React.cloneElement(child, {
+      ...props,
+    });
+  });
+};
 
 // =============================================================================
 
