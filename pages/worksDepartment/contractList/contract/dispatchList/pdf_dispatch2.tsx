@@ -120,7 +120,7 @@ export default function Pdf_dispatch2({
             <Cell className={classNames('col-span-2 row-span-2 text-[22px]', cn3)}>{phoneNumber}</Cell>
 
             <Cell className={classNames('col-span-2', cn5)}>{strToSpan('工程編號')}</Cell>
-            <Cell className={classNames(cn3, 'text-[25px]')}>{projectNumber}</Cell>
+            <Cell className={classNames(cn3)}>{projectNumber}</Cell>
 
             {/* row2 */}
             <Cell className={classNames('col-span-2', cn5)}>{strToSpan('保固期限')}</Cell>
@@ -193,7 +193,7 @@ export default function Pdf_dispatch2({
             </Cell>
             <Cell className={classNames('col-span-8 flex items-center justify-between')}>
               <div>
-                <div className="mb-5">　　月　　日　　時　　　分</div>
+                <div className="mb-10">　　月　　日　　時　　　分</div>
                 <div>　　月　　日　　時　　　分</div>
               </div>
               <div className="mr-2">{'(共計　　時　　分)'}</div>
