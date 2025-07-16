@@ -1,8 +1,8 @@
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
-import editIcon from 'public/image/icon/note.svg';
-import deleteIcon from 'public/image/icon/trash.svg';
+import editIcon from 'public/image/icon/note.svg?url';
+import deleteIcon from 'public/image/icon/trash.svg?url';
 import { DetailItem } from './type';
 import scss from 'components/global/myCom/myTable/table.module.scss';
 

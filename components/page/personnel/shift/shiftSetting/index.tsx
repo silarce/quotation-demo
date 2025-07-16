@@ -4,27 +4,16 @@ import { Modal, Switch, Table } from 'antd';
 import scss from 'components/global/myCom/myTable/table.module.scss';
 
 import Image from 'next/image';
-import editIcon from 'public/image/icon/note.svg';
-import deleteIcon from 'public/image/icon/trash.svg';
+import editIcon from 'public/image/icon/note.svg?url';
+import deleteIcon from 'public/image/icon/trash.svg?url';
 import MyInput from 'components/global/myCom/Input/Input';
-import CustomTimePicker from './CustomTimePicker';
+import CustomTimePicker from 'components/global/myCom/date/CustomTimePicker';
 import AddButton from 'components/global/myCom/button/AddButton';
 
 //button
 import CancelButton from 'components/global/myCom/button/cancelButton';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
-import 'dayjs/locale/zh-tw';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-import updateLocale from 'dayjs/plugin/updateLocale';
-
-dayjs.extend(localizedFormat);
-dayjs.extend(updateLocale);
-dayjs.locale('zh-tw');
-dayjs.updateLocale('zh-tw', {
-  meridiem: (hour: number) => (hour < 12 ? '上午' : '下午'),
-});
 
 interface ShiftItem {
   key: string;

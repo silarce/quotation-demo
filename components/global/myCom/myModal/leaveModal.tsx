@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'antd';
 import { IconTrash } from 'public/image/icon/svgComponent/svgIcons';
-import warning from 'public/image/icon/warning3.svg';
+import warning from 'public/image/icon/warning3.svg?url';
 import scss from './modal.module.scss';
 import Image from 'next/image';
 

@@ -13,8 +13,8 @@ import MySelect from 'components/global/myCom/select/mySelect';
 import type { ColumnsType } from 'antd/es/table';
 
 //button
-import editIcon from 'public/image/icon/note.svg';
-import deleteIcon from 'public/image/icon/trash.svg';
+import editIcon from 'public/image/icon/note.svg?url';
+import deleteIcon from 'public/image/icon/trash.svg?url';
 import AddButton from 'components/global/myCom/button/AddButton';
 import CancelButton from 'components/global/myCom/button/cancelButton';
 

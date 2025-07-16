@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react';
 import SearchButton from 'components/global/myCom/button/searchButton';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
-import editIcon from 'public/image/icon/note.svg';
+import editIcon from 'public/image/icon/note.svg?url';
 import { useRouter } from 'next/router';
 import { Table, Modal, Switch } from 'antd';
 import CancelButton from 'components/global/myCom/button/cancelButton';
 import ClearButton from 'components/global/myCom/button/clearButton';
 import CustomSelect from 'components/page/organization/system/usres/CustomSelect';
-import vector from 'public/image/icon/Vector.svg';
+import vector from 'public/image/icon/Vector.svg?url';
 import { IconLink } from 'public/image/icon/svgComponent/svgIcons';
-import yellowLink from 'public/image/icon/link_yellow.svg';
+import yellowLink from 'public/image/icon/link_yellow.svg?url';
 
 //api
 import {
@@ -341,7 +341,7 @@ export default function Users() {
           </svg>
         </div>
         {showAdvanced && (
-          <div className="flex gap-4 mt-3">
+          <div className="flex gap-4 mt-3 h-[40px]">
             <ClearButton
               label="刪除"
               onClick={() => {
@@ -397,7 +397,7 @@ export default function Users() {
             }}
           >
             <IconLink />
-            <p>綁定帳號</p>
+            <span>綁定帳號</span>
           </button>
         </div>
       </Modal>

@@ -35,7 +35,7 @@ export default function CustomTimeInputWithOk({ onChange }: { onChange?: (val: s
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
 
-  const [displayValue, setDisplayValue] = useState('上午 01:00');
+  const [displayValue, setDisplayValue] = useState('- - : - -');
   const [tempAmPm, setTempAmPm] = useState('上午');
   const [tempHour, setTempHour] = useState('01');
   const [tempMinute, setTempMinute] = useState('00');

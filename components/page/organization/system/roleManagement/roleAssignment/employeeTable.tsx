@@ -7,8 +7,8 @@ import { Modal, message } from 'antd';
 import axios from 'axios';
 import DeleteModal from 'components/global/myCom/myModal/deleteModal';
 //icon
-import editIcon from 'public/image/icon/note.svg';
-import deleteIcon from 'public/image/icon/trash.svg';
+import editIcon from 'public/image/icon/note.svg?url';
+import deleteIcon from 'public/image/icon/trash.svg?url';
 import { IconSave } from 'public/image/icon/svgComponent/svgIcons';
 
 //scss

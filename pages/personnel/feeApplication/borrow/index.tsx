@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import { Modal, Table } from 'antd';
-import tablescss from 'components/global/myCom/myTable/table.module.scss';
+import scss from 'components/global/myCom/myTable/table.module.scss';
 import { LogoUploader } from 'components/global/myCom/uploader/Uploader';
 import Image from 'next/image';
 import editIcon from 'public/image/icon/note.svg?url';
@@ -9,40 +9,39 @@ import deleteIcon from 'public/image/icon/trash.svg?url';
 import MyInput from 'components/global/myCom/Input/Input';
 import MySelect from 'components/global/myCom/select/mySelect';
 import LeaveDateTimePicker from 'components/page/personnel/checkIn/cardApplication/LeaveDateTimePicker';
+import CustomDateTimePickerV2 from 'components/global/myCom/date/CustomTimePickerV2';
 import { Dayjs } from 'dayjs';
 
 //button
 import CancelButton from 'components/global/myCom/button/cancelButton';
+import AddButton from 'components/global/myCom/button/AddButton';
 import SearchButton from 'components/global/myCom/button/searchButton';
 
-interface AbnormalItem {
+interface AdvanceApplicationItem {
   key: string;
-  empId: string;
-  department: string;
-  name: string;
-  abnormalDate: string;
-  clockIn: string;
-  clockOut: string;
-  abnormalType: string;
+  applyDate: string;
+  purpose: string;
+  amount: number;
+  repayDate: string;
+  remark: string;
   status: string;
 }
 
-export default function AbnornalAttendance() {
+export default function Borrow() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [input, setInput] = useState('');
   const [previewLogoUrl, setPreviewLogoUrl] = useState<string | undefined>(undefined);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [start, setStart] = useState<Dayjs | null>(null);
+  const [end, setEnd] = useState<Dayjs | null>(null);
 
-  const columns: ColumnsType<AbnormalItem> = [
-    { title: '員工編號', dataIndex: 'empId', key: 'empId', align: 'left', width: '10%' },
-    { title: '部門', dataIndex: 'department', key: 'department', align: 'left', width: '10%' },
-    { title: '姓名', dataIndex: 'name', key: 'name', align: 'left', width: '10%' },
-    { title: '異常日期', dataIndex: 'abnormalDate', key: 'abnormalDate', align: 'left', width: '15%' },
-    { title: '上班打卡', dataIndex: 'clockIn', key: 'clockIn', align: 'center', width: '10%' },
-    { title: '下班打卡', dataIndex: 'clockOut', key: 'clockOut', align: 'center', width: '10%' },
-    { title: '異常類型', dataIndex: 'abnormalType', key: 'abnormalType', align: 'left', width: '10%' },
-    { title: '目前狀態', dataIndex: 'status', key: 'status', align: 'center', width: '10%' },
+  const columns: ColumnsType<AdvanceApplicationItem> = [
+    { title: '申請日期', dataIndex: 'applyDate', key: 'applyDate', align: 'left', width: '12%' },
+    { title: '用途', dataIndex: 'purpose', key: 'purpose', align: 'left', width: '18%' },
+    { title: '借支金額', dataIndex: 'amount', key: 'amount', align: 'left', width: '12%' },
+    { title: '還款日期', dataIndex: 'repayDate', key: 'repayDate', align: 'left', width: '15%' },
+    { title: '備註', dataIndex: 'remark', key: 'remark', align: 'left', width: '20%' },
+    { title: '狀態', dataIndex: 'status', key: 'status', align: 'center', width: '10%' },
     {
       title: '操作',
       key: 'actions',
@@ -57,28 +56,24 @@ export default function AbnornalAttendance() {
     },
   ];
 
-  const data: AbnormalItem[] = [
+  const data: AdvanceApplicationItem[] = [
     {
       key: '1',
-      empId: 'A001',
-      department: '資訊部',
-      name: '丘子鈞',
-      abnormalDate: '2025/06/17',
-      clockIn: '09:15',
-      clockOut: '18:00',
-      abnormalType: '遲到',
-      status: '待補卡',
+      applyDate: '2025/06/11',
+      purpose: '出差前交通費',
+      amount: 3000,
+      repayDate: '2025/06/30',
+      remark: '高鐵與計程車預支',
+      status: '審核中',
     },
     {
       key: '2',
-      empId: 'A002',
-      department: '會計部',
-      name: '呂元棠',
-      abnormalDate: '2025/06/18',
-      clockIn: '-',
-      clockOut: '-',
-      abnormalType: '缺勤',
-      status: '補卡審核中',
+      applyDate: '2025/06/01',
+      purpose: '活動前場租借',
+      amount: 5000,
+      repayDate: '2025/07/05',
+      remark: '社內發表活動預支場地費',
+      status: '審核完畢',
     },
   ];
 
@@ -95,8 +90,9 @@ export default function AbnornalAttendance() {
             />
             <SearchButton onClick={() => console.log('Search')} />
           </div>
+          <AddButton label="新增借支單" onClick={() => setIsModalOpen(true)} className="h-[40px]" />
         </div>
-        <Table columns={columns} dataSource={data} pagination={false} className={tablescss.customTable} />
+        <Table columns={columns} dataSource={data} pagination={false} className={scss.customTable} />
       </div>
       <Modal
         title=""
@@ -106,13 +102,13 @@ export default function AbnornalAttendance() {
         maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
         open={isModalOpen}
         footer={null}
-        className={tablescss.customModal}
+        className={scss.customModal}
       >
         <div className="py-1">
-          <span className="font-bold text-[16px]">補卡申請單</span>
+          <span className="font-bold text-[16px]">借支申請單</span>
           <div>
             <MyInput
-              label="部門："
+              label="申請用途："
               onChange={setInput}
               labelWidth="w-[34%]"
               className="mt-3"
@@ -120,35 +116,16 @@ export default function AbnornalAttendance() {
               placeholder="- -"
             />
             <MyInput
-              label="員工姓名："
+              label="借支金額："
               onChange={setInput}
               labelWidth="w-[34%]"
               className="mt-3"
               marginLeft="8px"
               placeholder="- -"
-            />
-            <MySelect
-              label="補卡類型："
-              labelWidth="w-[32%]"
-              className="mt-3"
-              placeholder="請選擇"
-              options={[
-                { label: '病假', value: '病假' },
-                { label: '事假', value: '事假' },
-              ]}
             />
             <div className="flex items-center mt-3">
-              <p className="whitespace-nowrap w-[36%]">補卡時段：</p>
-              <LeaveDateTimePicker value={start} onChange={setStart} />
+              <CustomDateTimePickerV2 value={start} onChange={setStart} label="還款日期：" labelWidth="w-[24.6%]" />
             </div>
-            <MyInput
-              label="備註："
-              onChange={setInput}
-              labelWidth="w-[34%]"
-              className="mt-3"
-              marginLeft="8px"
-              placeholder="填寫說明"
-            />
             <MySelect
               label="選擇流程："
               labelWidth="w-[32%]"
@@ -159,6 +136,15 @@ export default function AbnornalAttendance() {
                 { label: '事假', value: '事假' },
               ]}
             />
+            <MyInput
+              label="備註："
+              onChange={setInput}
+              labelWidth="w-[34%]"
+              className="mt-3"
+              marginLeft="8px"
+              placeholder="填寫說明"
+            />
+
             <div className="gap-4 items-center mt-3">
               <LogoUploader
                 defaultPreviewUrl={previewLogoUrl}

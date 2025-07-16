@@ -4,8 +4,8 @@ import { Modal, Table } from 'antd';
 import scss from 'components/global/myCom/myTable/table.module.scss';
 
 import Image from 'next/image';
-import editIcon from 'public/image/icon/note.svg';
-import deleteIcon from 'public/image/icon/trash.svg';
+import editIcon from 'public/image/icon/note.svg?url';
+import deleteIcon from 'public/image/icon/trash.svg?url';
 import MyInput from 'components/global/myCom/Input/Input';
 import MySelect from 'components/global/myCom/select/mySelect';
 

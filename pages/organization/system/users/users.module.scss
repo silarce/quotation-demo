@@ -1,0 +1,44 @@
+.blueButtonNew {
+  border: 1px solid #14256a;
+  background-color: #f5f5f5;
+  font-size: 16px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  font-weight: 500;
+  span {
+    color: #14256a;
+  }
+
+  svg {
+    color: #14256a !important;
+  }
+  // hover 狀態
+  &:hover {
+    background-color: #14256a;
+
+    color: #ffffff !important;
+
+    span {
+      color: #ffffff !important;
+    }
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #0f1b52;
+
+    svg {
+      color: #ffffff !important;
+    }
+    span {
+      color: #ffff;
+    }
+  }
+}

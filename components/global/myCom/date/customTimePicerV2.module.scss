@@ -1,0 +1,8 @@
+.customTimePicker {
+  :global {
+    .ant-picker-input input::placeholder {
+      color: #909090;
+      opacity: 1;
+    }
+  }
+}

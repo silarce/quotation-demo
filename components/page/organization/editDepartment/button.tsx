@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { RcFile } from 'antd/es/upload';
 
 import Image from 'next/image';
-import UploadImage from 'public/image/icon/UploadImage.svg';
+import UploadImage from 'public/image/icon/UploadImage.svg?url';
 
 export const LogoUploader2 = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);

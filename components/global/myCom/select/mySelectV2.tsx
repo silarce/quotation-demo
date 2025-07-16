@@ -3,7 +3,7 @@ import { Select } from 'antd';
 import type { SelectProps } from 'antd';
 import classNames from 'classnames';
 import styles from './mySelect.module.scss';
-import asterisk from 'public/image/icon/asterisk.svg';
+import asterisk from 'public/image/icon/asterisk.svg?url';
 import Image from 'next/image';
 
 interface LabeledSelectProps extends SelectProps<string> {

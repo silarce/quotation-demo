@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from 'antd';
 import scss from './input.module.scss';
 import classNames from 'classnames';
-import asterisk from 'public/image/icon/asterisk.svg';
+import asterisk from 'public/image/icon/asterisk.svg?url';
 import Image from 'next/image';
 
 interface LabeledInputProps {

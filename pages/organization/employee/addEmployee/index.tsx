@@ -1,9 +1,8 @@
 import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Switch } from 'antd';
 import dayjs from 'dayjs';
-import moment from 'moment';
 import debounce from 'lodash/debounce';
 import { v4 as uuidv4 } from 'uuid';
 import { useFormReducer } from 'components/page/organization/employee/addEmployee/formReducer';

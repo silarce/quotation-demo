@@ -8,8 +8,8 @@ import { useState, useMemo } from 'react';
 import tableScss from 'components/global/myCom/myTable/table.module.scss';
 
 // icons
-import editIcon from 'public/image/icon/note.svg';
-import deleteIcon from 'public/image/icon/trash.svg';
+import editIcon from 'public/image/icon/note.svg?url';
+import deleteIcon from 'public/image/icon/trash.svg?url';
 
 //Modal
 import DeleteModal from 'components/global/myCom/myModal/deleteModal';
