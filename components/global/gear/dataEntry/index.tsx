@@ -233,8 +233,18 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
   );
 };
 
-const DateRangePicker = ({ className, ...props }: RangePickerProps) => {
-  return <AntdDatePicker.RangePicker className={classNames(scss.dateRangePicker, className)} {...props} />;
+const DateRangePicker = ({ className, disabled, ...props }: RangePickerProps) => {
+  const suffixIcon: { suffixIcon?: React.ReactNode } = {};
+  disabled && (suffixIcon.suffixIcon = null);
+
+  return (
+    <AntdDatePicker.RangePicker
+      className={classNames(scss.dateRangePicker, className)}
+      disabled={disabled}
+      {...suffixIcon}
+      {...props}
+    />
+  );
 };
 
 // MARK:Checkbox
