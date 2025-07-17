@@ -17,7 +17,7 @@
 }
 .main {
   height: 100%;
-  padding: 32px;
+  padding: theme("padding.layoutY") theme("padding.layoutX");
   overflow: scroll;
   @screen laptop {
     padding: 0px 5px;

@@ -306,11 +306,11 @@ const DatePicker = ({
     <AntdDatePicker
       className={classNames(scss.datepicker, className)}
       disabled={disabled}
-      {...suffixIcon}
       format={(theDayjs) => {
         return getTaiwanDateStr(theDayjs);
       }}
       placeholder="- -"
+      {...suffixIcon}
       {...props}
     />
   );
@@ -345,6 +345,10 @@ const DateRangePicker = ({ className, disabled, ...props }: RangePickerProps) =>
     <AntdDatePicker.RangePicker
       className={classNames(scss.dateRangePicker, className)}
       disabled={disabled}
+      format={(theDayjs) => {
+        return getTaiwanDateStr(theDayjs);
+      }}
+      placeholder={['- -', '- -']}
       {...suffixIcon}
       {...props}
     />

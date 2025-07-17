@@ -7,23 +7,19 @@
   .pageHeaderTitle {
     @apply flex flex-col justify-center px-6 py-0 h-[40px] border border-[#14256A] bg-[#E9ECF5] text-[#14256A] border-b-2  text-[14px]  mr-[8px] rounded-[6px];
   }
-  /* button */
-  .blueButton {
-    @apply text-[#14256a] border-[#c1c1c1] bg-[#f5f5f5] hover:bg-[#ecf1ff] text-[16px] leading-[19px] py-[10px] px-[22px] flex justify-center border m-auto font-medium ml-3;
+  .pageTop {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: theme("colors.white01");
+    &::before {
+      content: "";
+      position: absolute;
+      top: calc(theme("padding.layoutY") * -1);
+      left: 0;
+      width: 100%;
+      height: theme("padding.layoutY");
+      background-color: theme("colors.white01");
+    }
   }
-  .redButton {
-    @apply text-[#ea1833] border-[#ea1833] bg-[#f5f5f5] hover:bg-[#ffeeee] text-[16px] leading-[19px] py-[10px] px-[22px] flex justify-center border m-auto font-medium  ml-3;
-  }
-  .greenButton {
-    @apply text-[#009100] border-[#009100] bg-[#f5f5f5] hover:bg-[#F0FFF0] text-[16px] leading-[19px] py-[10px] px-[22px] flex justify-center border m-auto font-medium  ml-3;
-  }
-  /* .blueButtonNew {
-    @apply text-[#14256A] border-[#14256A] bg-[#E9ECF5] hover:bg-[#14256A] hover:text-[#FFFFFF] active:bg-[#0F1B52] active:text-[#FFFF] text-[16px] leading-[19px] py-[10px] px-[22px] flex justify-center border rounded-lg  font-medium  ml-3;
-  }
-   .redButtonNew {
-    @apply text-[#D12C30] border-[#D12C30] bg-[#FFFF] hover:bg-[#D12C30] hover:text-[#FFFFFF] active:bg-[#CC142B] active:text-[#FFFF] text-[16px] leading-[19px] py-[10px] px-[22px] flex justify-center border rounded-lg  font-medium  ml-3;
-  }
-  .greenButtonNew {
-    @apply text-[#388E3C] border-[#388E3C] bg-[#FFFF] hover:bg-[#388E3C] hover:text-[#FFFFFF] active:bg-[#2E7D32] active:text-[#FFFF] text-[16px] leading-[19px] py-[10px] px-[22px] flex justify-center border rounded-lg  font-medium  ml-3;
-  } */
 }
