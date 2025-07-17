@@ -82,6 +82,10 @@ module.exports = {
       boxShadow: {
         "01": "0px 3px 3px 0px #61616133",
         "02": "0px 4px 4px 0px #00000040"
+      },
+      padding: {
+        layoutY: "32px",
+        layoutX: "24px"
       }
     },
     screens: {
