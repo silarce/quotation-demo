@@ -266,6 +266,9 @@ const useQuotationProduct = ({
     return _.cloneDeep(defaultState_iterativeProdDict);
   }, [defaultState_iterativeProdDict, disabled]);
 
+  // 自動取得資料
+  const [state_allowProdAutoChange, setState_allowProdAutoChange] = useState<boolean>(true);
+
   // 總折數
   const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(defaultQuotationDiscount);
 
@@ -435,6 +438,7 @@ const useQuotationProduct = ({
     state_prodDict,
     activeProdKey,
     setActiveProdKey,
+    allowProdAutoChange: state_allowProdAutoChange,
   });
 
   const {
@@ -457,6 +461,7 @@ const useQuotationProduct = ({
     state_prodDict: state_iterativeProdDict,
     activeProdKey: activeProdKey_iterative,
     setActiveProdKey: setActiveProdKey_iterative,
+    allowProdAutoChange: state_allowProdAutoChange,
   });
 
   const copy_prodToProd: Tinstance_useQuotationProduct['copyProd'] = ({ prodKey }) => {
@@ -627,6 +632,10 @@ const useQuotationProduct = ({
     // props.cellKeyArr && setCellKeyArr(props.cellKeyArr);
     // props.cellKeyArr_component && setCellKeyArr_component(props.cellKeyArr_component);
     // props.cellKeyArr_accessory && setCellKeyArr_accessory(props.cellKeyArr_accessory);
+  };
+
+  const changeAllowProdAutoChange = (v: boolean) => {
+    setState_allowProdAutoChange(v);
   };
 
   // -----------------------------------------------------------------------
@@ -801,6 +810,9 @@ const useQuotationProduct = ({
     checkIsIterativeProdValid,
     exportState,
     restoreState,
+    //
+    changeAllowProdAutoChange,
+    state_allowProdAutoChange,
   };
 };
 
