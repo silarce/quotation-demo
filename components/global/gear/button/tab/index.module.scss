@@ -4,14 +4,19 @@
   min-height: 40px;
 
   padding: 0 24px;
-  border-radius: theme("border.radius.n2");
+  border-radius: theme("border.radius.02");
   border: solid 1px theme("colors.gray05");
 
   font-size: 14px;
+  &.active {
+    background-color: #e9ecf5;
+    box-shadow: 0px -2px 0px 0px theme("colors.blue01") inset;
+  }
   &:hover {
     border: solid 1px theme("colors.blue01");
   }
   &:active {
+    background-color: #e9ecf5;
     box-shadow: 0px -2px 0px 0px theme("colors.blue01") inset;
   }
 }
