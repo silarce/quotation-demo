@@ -11,15 +11,15 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    background-color: theme("colors.white01");
+    background-color: theme('colors.white01');
     &::before {
-      content: "";
+      content: '';
       position: absolute;
-      top: calc(theme("padding.layoutY") * -1);
+      top: calc(theme('padding.layoutY') * -1);
       left: 0;
       width: 100%;
-      height: theme("padding.layoutY");
-      background-color: theme("colors.white01");
+      height: theme('padding.layoutY');
+      background-color: theme('colors.white01');
     }
   }
 }

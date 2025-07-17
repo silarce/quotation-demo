@@ -9,21 +9,18 @@ import MonthlySchedule from 'components/page/personnel/shift/monthlySchedule';
 
 type TabKey = 'shiftSetting' | 'addStaff' | 'setHoliday' | 'monthlySchedule';
 
+interface Tquery {
+  tab?: TabKey;
+}
+
 export default function RoleManagementIndex() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabKey>('shiftSetting');
 
-  // 初始化根據 query 設定 tab
-  useEffect(() => {
-    const tab = router.query.tab as TabKey;
+  const query = router.query as Tquery;
 
-    if (tab && ['shiftSetting', 'addStaff', 'setHoliday', 'monthlySchedule'].includes(tab)) {
-      setActiveTab(tab);
-    }
-  }, [router.query.tab]);
+  const activeTab = query.tab || 'shiftSetting';
 
   const handleTabChange = (tabKey: TabKey) => {
-    setActiveTab(tabKey);
     router.push(
       {
         pathname: router.pathname,
