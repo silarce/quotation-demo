@@ -221,6 +221,7 @@ const useQuotationProduct = ({
   iterativeContractProductArr,
   disabled,
   onProdAllTotalChange: _onProdAllTotalChange,
+  raw_autoRefresh,
 }: {
   raw_quotationProductArr: TprodSource[] | undefined;
   iterativeContractProductArr: TprodSource[] | undefined;
@@ -229,6 +230,7 @@ const useQuotationProduct = ({
   raw_quotationDiscount: TquotationContentDto['discount'] | undefined;
   disabled: boolean;
   onProdAllTotalChange: (alltotal: number) => void;
+  raw_autoRefresh: boolean;
 }) => {
   const raw_productArr = raw_quotationProductArr;
   const defaultQuotationDiscount = (raw_quotationDiscount ? raw_quotationDiscount : '100') as `${number}`;
@@ -267,7 +269,7 @@ const useQuotationProduct = ({
   }, [defaultState_iterativeProdDict, disabled]);
 
   // 自動取得資料
-  const [state_allowProdAutoChange, setState_allowProdAutoChange] = useState<boolean>(true);
+  const [state_allowProdAutoChange, setState_allowProdAutoChange] = useState<boolean>(raw_autoRefresh);
 
   // 總折數
   const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(defaultQuotationDiscount);
@@ -685,6 +687,10 @@ const useQuotationProduct = ({
   useEffect(() => {
     _onProdAllTotalChange(theProductTotal);
   }, [theProductTotal]);
+
+  useEffect(() => {
+    setState_allowProdAutoChange(raw_autoRefresh);
+  }, [raw_autoRefresh, disabled]);
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------

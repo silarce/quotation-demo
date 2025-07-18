@@ -301,6 +301,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         otherPriceAllTotal: instance_useQuotationOther.calcAllOtherTotalPrice(),
       });
     },
+    raw_autoRefresh: content?.autoRefresh ?? true,
   });
 
   const {
@@ -477,6 +478,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     instatnce_getQuotationId3,
     status: state_status,
     calcProductBody,
+    allowProdAutoChange: state_allowProdAutoChange,
   });
 
   // MARK:更新報價單
