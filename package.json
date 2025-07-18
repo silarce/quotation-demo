@@ -7,6 +7,7 @@
     "build": "next build",
     "build:static": "next build",
     "start": "next start",
+    "startServe": "serve out",
     "lint": "next lint --quiet",
     "check": "tsc --noEmit"
   },
