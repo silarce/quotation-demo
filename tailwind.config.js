@@ -38,6 +38,7 @@ module.exports = {
         blue02: '#1A3084',
         blue03: '#101E4A',
         blue04: '#EDF1F7',
+        blue05: '#E9ECF5',
 
         gray01: '#4B5563',
         gray02: '#374151',
@@ -45,14 +46,19 @@ module.exports = {
         gray04: '#F5F5F5', // bgc01
         gray05: '#616161', // border02
         gray06: '#9D9D9D',
+        gray07: '#FAFAFA',
+        gray08: '#666666',
 
         red01: '#EA1833', // danger active
         red02: '#C5152B',
         red03: '#A11223',
 
+        yellow01:"#FBC02D",
+        yellow02:"#F9A825",
+        yellow03:"#F57F17",
+
         black01: '#212121', // text02
         white01: '#FFFFFF',
-
 
         // 
         antdBlue: {

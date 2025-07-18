@@ -1,6 +1,6 @@
 @use "styles/theme01" as *;
 
-.btn {
+.btn.btn {
   padding: 10px 44px;
   background-color: $bgc01;
   border-color: $colorBorder01;
@@ -8,6 +8,15 @@
   > span {
     color: $colorMain;
     font-weight: 500;
+  }
+  &:hover {
+    background-color: $bgc01;
+    // border-color: unset;
+    // border-color: $colorBorder01;
+  }
+  &:active {
+    background-color: $bgc01;
+    // border-color: $colorBorder01;
   }
 }
 // =======================================================================

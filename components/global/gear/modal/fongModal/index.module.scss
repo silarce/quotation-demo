@@ -1,0 +1,39 @@
+.clean {
+  :global(.ant-modal-content) {
+    padding: unset;
+    border-radius: theme("border.radius.normal");
+    background-color: theme("colors.white01");
+    box-shadow:
+      0px 4px 4px 0px #21212166,
+      0px 4px 4px 0px #00000040;
+
+    :global(.ant-modal-body) {
+      :global(.ant-modal-confirm-paragraph) {
+        max-width: unset;
+      }
+    }
+  }
+}
+
+.template_confirm {
+  padding: 24px;
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .content {
+    margin-bottom: 24px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .panel {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+}

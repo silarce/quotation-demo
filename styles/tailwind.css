@@ -15,7 +15,8 @@
     &::before {
       content: "";
       position: absolute;
-      top: calc(theme("padding.layoutY") * -1);
+      /* top: calc(theme("padding.layoutY") * -1); */
+      bottom: 100%;
       left: 0;
       width: 100%;
       height: theme("padding.layoutY");
