@@ -1,6 +1,4 @@
 .btn {
-  @extend .basic;
-
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -11,6 +9,11 @@
   font-size: 14px;
 
   border-radius: 6px;
+
+  color: theme("colors.gray01");
+  border: solid 1px theme("colors.gray01");
+  background-color: theme("colors.gray04");
+
   > .iconContainer {
     color: inherit;
     margin-right: 6px;
@@ -25,10 +28,6 @@
 }
 
 .basic {
-  color: theme("colors.gray01");
-  border: solid 1px theme("colors.gray01");
-  background-color: theme("colors.gray04");
-
   &:hover {
     color: theme("colors.gray02");
     border: solid 1px theme("colors.gray02");
@@ -109,6 +108,11 @@
     color: theme("colors.brown03");
     border-color: theme("colors.brown03");
   }
+}
+
+.yellow_I {
+  color: theme("colors.yellow02");
+  border-color: theme("colors.yellow02");
 }
 
 .warning_I {

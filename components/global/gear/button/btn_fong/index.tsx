@@ -58,7 +58,7 @@ function Btn_fong({
 
 // ================================================================================
 
-type Tcolors = 'blue_I' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I';
+type Tcolors = 'basic' | 'blue_I' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I' | 'yellow_I';
 
 type TthemeName =
   | 'basic'
@@ -74,7 +74,8 @@ type TthemeName =
   | 'trash'
   | 'send'
   | 'brown'
-  | 'warning';
+  | 'warning'
+  | 'warning_2';
 
 type Tprops_btn = {
   theme?: TthemeName;
@@ -111,7 +112,9 @@ const lookup_icon = {
 } as const;
 
 const lookup_theme: Record<TthemeName, Ttheme> = {
-  basic: {},
+  basic: {
+    themeColor: 'basic',
+  },
   save: {
     themeColor: 'blue_I',
     Icon: Icon_save,
@@ -158,7 +161,13 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
     themeColor: 'warning_I',
     Icon: Icon_warning,
   },
+  warning_2: {
+    themeColor: 'yellow_I',
+    Icon: Icon_warning,
+  },
 };
 
 const Btn = Btn_fong;
+
 export default Btn;
+export type { Tprops_btn };
