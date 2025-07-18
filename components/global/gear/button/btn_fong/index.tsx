@@ -13,6 +13,7 @@ import Icon_saveAs from 'public/image/icon/fong/saveAs.svg';
 import Icon_tempIcon from 'public/image/icon/fong/tempIcon.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_send from 'public/image/icon/fong/send.svg';
+import Icon_warning from 'public/image/icon/fong/warning.svg';
 
 // ================================================================================
 
@@ -57,7 +58,7 @@ function Btn_fong({
 
 // ================================================================================
 
-type Tcolors = 'blue_I' | 'green_I' | 'green_II' | 'red_I' | 'brown_I';
+type Tcolors = 'blue_I' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I';
 
 type TthemeName =
   | 'basic'
@@ -72,7 +73,8 @@ type TthemeName =
   | 'tempIcon'
   | 'trash'
   | 'send'
-  | 'brown';
+  | 'brown'
+  | 'warning';
 
 type Tprops_btn = {
   theme?: TthemeName;
@@ -85,6 +87,7 @@ type Tprops_btn = {
 
 interface Ttheme {
   themeColor?: Tcolors;
+  className?: string;
   Icon?: React.ComponentType<React.SVGProps<SVGElement>>;
   IconAfter?: React.ComponentType<React.SVGProps<SVGElement>>;
 }
@@ -150,6 +153,10 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
   },
   brown: {
     themeColor: 'brown_I',
+  },
+  warning: {
+    themeColor: 'warning_I',
+    Icon: Icon_warning,
   },
 };
 

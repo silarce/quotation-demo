@@ -40,6 +40,7 @@
 }
 
 .blue_I {
+  background-color: theme("colors.white01");
   &:hover {
     background-color: theme("colors.blue02");
     border-color: theme("colors.blue02");
@@ -53,6 +54,7 @@
 }
 
 .green_I {
+  background-color: theme("colors.white01");
   color: theme("colors.green01");
   border-color: theme("colors.green01");
   &:hover {
@@ -70,6 +72,10 @@
 .green_II {
   color: theme("colors.green01");
   border-color: theme("colors.green01");
+  &:hover {
+    border-color: theme("colors.green02");
+    color: theme("colors.green02");
+  }
   &:active {
     border-color: theme("colors.green03");
     color: theme("colors.green03");
@@ -77,6 +83,7 @@
 }
 
 .red_I {
+  background-color: theme("colors.white01");
   color: theme("colors.red01");
   border-color: theme("colors.red01");
   &:hover {
@@ -101,5 +108,35 @@
   &:active {
     color: theme("colors.brown03");
     border-color: theme("colors.brown03");
+  }
+}
+
+.warning_I {
+  border: solid 1px theme("colors.yellow01");
+  color: theme("colors.yellow01");
+  background-color: theme("colors.white01");
+  &:hover {
+    background-color: theme("colors.yellow02");
+    border-color: theme("colors.yellow02");
+    color: theme("colors.white01");
+    .iconContainer {
+      > svg {
+        > rect {
+          fill: theme("colors.yellow02");
+        }
+      }
+    }
+  }
+  &:active {
+    background-color: theme("colors.yellow03");
+    border-color: theme("colors.yellow03");
+    color: theme("colors.white01");
+    .iconContainer {
+      > svg {
+        > rect {
+          fill: theme("colors.yellow03");
+        }
+      }
+    }
   }
 }
