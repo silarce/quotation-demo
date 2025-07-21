@@ -4,6 +4,9 @@ import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
 import Tab from 'components/global/gear/button/tab';
+import { modal_empty } from 'components/global/gear/modal/fongModal';
+
+import Selector_searchSomething from 'components/page/accounting/accountsReceivableInquiry/selector_searchSomething';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
@@ -21,7 +24,18 @@ export default function SalesInformation() {
         </div>
         <div className="flex gap-3">
           <Btn onClick={router.back}>返回</Btn>
-          <Btn theme="query">查詢資料</Btn>
+          <Btn
+            theme="query"
+            onClick={() => {
+              modal_empty({
+                width: 1200,
+                customWidth: 'fit-content',
+                content: <Selector_searchSomething />,
+              });
+            }}
+          >
+            查詢資料
+          </Btn>
           <Btn theme="save" form="aa">
             儲存
           </Btn>
