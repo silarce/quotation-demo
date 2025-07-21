@@ -9,7 +9,7 @@ import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 
 export default function SalesInformation() {
-  const { query } = useRouter();
+  const router = useRouter();
 
   return (
     <div>
@@ -20,7 +20,7 @@ export default function SalesInformation() {
           <Tab>應收帳款</Tab>
         </div>
         <div className="flex gap-3">
-          <Btn>返回</Btn>
+          <Btn onClick={router.back}>返回</Btn>
           <Btn theme="query">查詢資料</Btn>
           <Btn theme="save" form="aa">
             儲存
