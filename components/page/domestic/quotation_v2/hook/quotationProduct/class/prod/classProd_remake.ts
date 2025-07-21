@@ -789,12 +789,16 @@ class ClassProd {
       });
 
       await this.updateAvailableComponents();
+
       await this.updateComponent();
       await this.updateBom();
     } catch (error) {
       dealErr(error);
     } finally {
       this.state.isFetching = true;
+      Object.values(this.classAcceoooryDict).forEach((class_accessory) => {
+        class_accessory.renewQuantity();
+      });
       this.renewProdAllPrice_updateQuotationTotalPrice();
       this.render();
     }
