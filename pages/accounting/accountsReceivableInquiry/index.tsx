@@ -1,3 +1,6 @@
+import Router from 'next/router';
+import Link from 'next/link';
+
 import classNames from 'classnames';
 
 import scss from './index.module.scss';
@@ -30,7 +33,9 @@ export default function AccountsReceivableInquiry() {
           <Btn theme="query">搜索資料</Btn>
         </div>
         <div>
-          <Btn theme="add">新增資料</Btn>
+          <Link href={Router.pathname + '/salesInformation'}>
+            <Btn theme="add">新增資料</Btn>
+          </Link>
         </div>
       </div>
 
@@ -74,12 +79,12 @@ const columns: TableProps<Tdata>['columns'] = [
   {
     title: '客戶姓名',
     dataIndex: 'customerName',
-    // width: 150,
+    width: 250,
   },
   {
     title: '案場名稱',
     dataIndex: 'projectName',
-    // width: 150,
+    width: 250,
   },
   {
     title: '合約金額',
@@ -115,10 +120,21 @@ const columns: TableProps<Tdata>['columns'] = [
     title: '操作',
     key: 'action',
     width: 80,
-    render() {
+    render(record) {
+      // const href = {
+      //   pathname: Router.pathname + '/salesInformation',
+      //   query: {
+      //     id: record.id,
+      //   },
+      // };
+
+      const href = Router.pathname + '/salesInformation';
+
       return (
         <div className="flex justify-center">
-          <Icon_note className="text-blue01" />
+          <Link href={href}>
+            <Icon_note className="text-blue01" />
+          </Link>
         </div>
       );
     },
@@ -132,10 +148,10 @@ const fakeData: Tdata[] = Array.from({ length: 100 }, (_, index) => {
     customerName: `客戶${index + 1}`,
     projectName: `案場${index + 1}`,
     contractPrice: 999999999999,
-    tax: 99999,
-    totalPrice: 99999,
-    amountOfPaymentRequested: 99999,
-    deduction: 99999,
+    tax: 999999999999,
+    totalPrice: 999999999999,
+    amountOfPaymentRequested: 999999999999,
+    deduction: 999999999999,
     status: index % 2 === 0 ? '待處理' : '已完成',
   };
 
