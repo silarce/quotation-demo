@@ -11,7 +11,6 @@ export default function Table_antd<T>({ className, pagination, ...props }: Table
       rowKey={'id'}
       sticky={true}
       pagination={{
-        pageSize: 10,
         position: ['bottomCenter'],
         hideOnSinglePage: true,
         showTotal: (total, range) => {
