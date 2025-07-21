@@ -23,4 +23,7 @@
       background-color: theme("colors.white01");
     }
   }
+  .gap-fong {
+    gap: 20px 24px;
+  }
 }
