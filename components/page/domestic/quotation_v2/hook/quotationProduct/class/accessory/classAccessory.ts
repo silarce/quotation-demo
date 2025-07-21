@@ -86,6 +86,32 @@ class Class_accessory implements Interface_ClassAccessory {
     this.render();
   }
 
+  renewQuantity() {
+    if (!this.classProd) {
+      return;
+    }
+
+    const referenceSpec = this.state.referenceSpec;
+
+    if (!(referenceSpec === 'fullWidth' || referenceSpec === 'area')) {
+      return;
+    }
+
+    const newQuantity = calcQuantity({
+      classProd: this.classProd,
+      referenceSpec: referenceSpec,
+    });
+
+    if (`${newQuantity}` === this.state.quantity) {
+      return;
+    }
+
+    this.state.quantity = `${newQuantity}`;
+    this.renewAcceAllPrice();
+    // this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
+    this.render();
+  }
+
   // -----------------------------------------------------------------------
   get name() {
     return this.state.name;
@@ -157,10 +183,11 @@ function createAcce({ classProd, doorAccesssory }: { classProd: ClassProd; doorA
     }
   }
 
-  if (referenceSpec === 'fullWidth') {
-    quantity = new Decimal(classProd.data.fullWidth || 0).toDecimalPlaces(2).toNumber();
-  } else if (referenceSpec === 'area') {
-    quantity = new Decimal(classProd.data.area || 0).toDecimalPlaces(2).toNumber();
+  if (referenceSpec === 'fullWidth' || referenceSpec === 'area') {
+    quantity = calcQuantity({
+      classProd: classProd,
+      referenceSpec: referenceSpec,
+    });
   }
 
   const { unitPrice, totalPrice, dualPrice } = calcAllPrice({
@@ -185,6 +212,16 @@ function createAcce({ classProd, doorAccesssory }: { classProd: ClassProd; doorA
 
   return state_accessory;
 }
+
+const calcQuantity = ({ classProd, referenceSpec }: { classProd: ClassProd; referenceSpec: 'fullWidth' | 'area' }) => {
+  if (referenceSpec === 'fullWidth') {
+    return new Decimal(classProd.data.fullWidth || 0).toDecimalPlaces(2).toNumber();
+  } else if (referenceSpec === 'area') {
+    return new Decimal(classProd.data.area || 0).toDecimalPlaces(2).toNumber();
+  }
+
+  return NaN;
+};
 
 // ==========================================================================
 export type { Interface_ClassAccessory };
