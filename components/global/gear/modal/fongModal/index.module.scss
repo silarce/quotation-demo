@@ -15,6 +15,43 @@
   }
 }
 
+.empty {
+  @extend .clean;
+  &.w500 {
+    :global(.ant-modal-confirm-content) {
+      padding: 26.5px 24px 24px 24px;
+    }
+  }
+  &.w700 {
+    :global(.ant-modal-confirm-content) {
+      padding: 26.5px 24px 24px 24px;
+    }
+  }
+  &.w1200 {
+    :global(.ant-modal-confirm-content) {
+      padding: 24px 24px 24px 24px;
+    }
+  }
+}
+
+.confirm {
+  &.w500 {
+    > .title {
+      margin-bottom: 26.5px;
+    }
+  }
+  &.w700 {
+    > .title {
+      margin-bottom: 26.5px;
+    }
+  }
+  &.w1200 {
+    > .title {
+      margin-bottom: 24px;
+    }
+  }
+}
+
 .template_confirm {
   padding: 24px;
   .header {
