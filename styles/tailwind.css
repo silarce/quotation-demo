@@ -10,9 +10,9 @@
   .pageTop {
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 4;
     background-color: theme("colors.white01");
-    margin-bottom: 24px;
+    padding-bottom: 24px;
     &::before {
       content: "";
       position: absolute;
