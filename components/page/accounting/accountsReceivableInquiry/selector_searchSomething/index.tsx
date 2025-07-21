@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 
+import Icon_query from 'public/image/icon/fong/query.svg';
+
+import scss from './index.module.scss';
+
 export default function Selector_searchSomething({
   onConfirm,
   onCancel,
@@ -21,16 +25,28 @@ export default function Selector_searchSomething({
     <div className="w-full">
       <div className="grid grid-cols-4 gap-fong">
         <DataEntry_fong caption="合約編號">
-          <Input value={contractNumber} onChange={(e) => setContractNumber(e.target.value)} />
+          <div className={scss.container}>
+            <Input value={contractNumber} onChange={(e) => setContractNumber(e.target.value)} />
+            <Icon_query />
+          </div>
         </DataEntry_fong>
         <DataEntry_fong caption="客戶名稱">
-          <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+          <div className={scss.container}>
+            <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+            <Icon_query />
+          </div>
         </DataEntry_fong>
         <DataEntry_fong caption="報價編號">
-          <Input value={quotationNumber} onChange={(e) => setQuotationNumber(e.target.value)} />
+          <div className={scss.container}>
+            <Input value={quotationNumber} onChange={(e) => setQuotationNumber(e.target.value)} />
+            <Icon_query />
+          </div>
         </DataEntry_fong>
         <DataEntry_fong caption="案場名稱">
-          <Input value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+          <div className={scss.container}>
+            <Input value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+            <Icon_query />
+          </div>
         </DataEntry_fong>
       </div>
       <div className="mt-5">
