@@ -7,10 +7,19 @@ import Btn from 'components/global/gear/button/btn_fong';
 import Tab from 'components/global/gear/button/tab';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
+import Selector_addNewOffsetAmount from 'components/page/accounting/accountsReceivableInquiry/selector_addNewOffsetAmount/indext';
+
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 
 export default function AccountsReceivable() {
+  const handle_addNewOffsetAmount = () => {
+    modal_empty({
+      content: <Selector_addNewOffsetAmount />,
+      width: 1200,
+    });
+  };
+
   return (
     <div>
       <div className="pageTop">
@@ -61,7 +70,9 @@ export default function AccountsReceivable() {
         <div className="mt-6">
           <div className="flex gap-3 items-center">
             <div className="text-xl font-semibold">沖銷明細</div>
-            <Btn theme="cross">新增沖銷金額</Btn>
+            <Btn theme="cross" onClick={handle_addNewOffsetAmount}>
+              新增沖銷金額
+            </Btn>
             <Btn theme="cross">新增請款資料</Btn>
           </div>
           <div></div>
