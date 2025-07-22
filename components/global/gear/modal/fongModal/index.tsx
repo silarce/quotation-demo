@@ -3,14 +3,13 @@ import classNames from 'classnames';
 import Btn, { Tprops_btn } from '../../button/btn_fong';
 
 import { Modal, ModalFuncProps } from 'antd';
+import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_warning from 'public/image/icon/fong/warning.svg';
 
 import scss from './index.module.scss';
 
 // ============================================================================
-
-type Twidth = 500 | 700 | 1200;
 
 type Tprops_empty = Omit<ModalFuncProps, 'width'> & {
   width?: 500 | 700 | 1200;
@@ -47,20 +46,16 @@ const modal_confirm = ({
   content: theContent,
   width = 500,
   content_footer,
-  props_footer: { className: className_footer, ...props_footer } = {},
+  props_footer,
   ...props
 }: Tprops_empty & {
   content_footer?: React.ReactNode;
   props_footer?: React.HTMLAttributes<HTMLDivElement>;
 } = {}) => {
   const content = (
-    <div className={classNames(scss.confirm, scss[`w${width}`])}>
-      <div className={scss.title}>{title}</div>
-      <div>{theContent}</div>
-      <div className={classNames('mt-6 flex gap-[6px] justify-end', className_footer)} {...props_footer}>
-        {content_footer}
-      </div>
-    </div>
+    <Container_confirm title={title} props_footer={props_footer} footerRight={content_footer}>
+      {theContent}
+    </Container_confirm>
   );
 
   return modal_empty({ content, width, ...props });
