@@ -1,0 +1,20 @@
+.confirm {
+  > .title {
+    &.s01 {
+      margin-bottom: 26.5px;
+    }
+    &.s02 {
+      margin-bottom: 24px;
+    }
+  }
+  > .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 24px;
+    > div {
+      display: flex;
+      gap: 16px;
+    }
+  }
+}
