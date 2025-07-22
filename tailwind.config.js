@@ -53,9 +53,9 @@ module.exports = {
         red02: '#C5152B',
         red03: '#A11223',
 
-        yellow01:"#FBC02D",
-        yellow02:"#F9A825",
-        yellow03:"#F57F17",
+        yellow01: "#FBC02D",
+        yellow02: "#F9A825",
+        yellow03: "#F57F17",
 
         black01: '#212121', // text02
         white01: '#FFFFFF',
@@ -84,6 +84,10 @@ module.exports = {
           normal: "8px",
           "02": "4px"
         }
+      },
+      borderRadius: {
+        "01": "8px",
+        "02": "4px"
       },
       boxShadow: {
         "01": "0px 3px 3px 0px #61616133",
