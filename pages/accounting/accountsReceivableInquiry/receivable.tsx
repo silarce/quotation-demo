@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
@@ -13,23 +13,16 @@ import Icon_trash from 'public/image/icon/fong/trash.svg';
 export default function AccountsReceivable() {
   return (
     <div>
-      <div className="pageTop flex justify-between">
-        <div className="flex gap-4">
-          <Link href="salesInformation">
-            <Tab>銷貨資料</Tab>
-          </Link>
-          <Tab active={true}>應收帳款</Tab>
-        </div>
-
-        <div className="flex gap-3">
-          <Btn>返回</Btn>
+      <div className="pageTop">
+        <div className="w-fit flex gap-3 ml-auto mr-0">
+          <Btn onClick={Router.back}>返回</Btn>
           <Btn theme="add">新增資料</Btn>
           <Btn theme="save">儲存</Btn>
         </div>
       </div>
 
       <div className="border border-gray05 rounded-01 py-8 px-6">
-        <div className="text-xl font-semibold mb-6">應收帳款</div>
+        <div className="text-xl font-semibold mb-6">應收請款</div>
 
         <div className="grid grid-cols-4 gap-fong ">
           <DataEntry_fong caption="請款單號" isMust={true}>

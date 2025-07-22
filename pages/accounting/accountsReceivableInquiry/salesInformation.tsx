@@ -19,13 +19,8 @@ export default function SalesInformation() {
   return (
     <div>
       {/*  */}
-      <div className="pageTop flex justify-between">
-        <div className="flex gap-4">
-          <Tab active={true}>銷貨資料</Tab>
-          <Link href="accountsReceivable">
-            <Tab>應收帳款</Tab>
-          </Link>
-        </div>
+      <div className="pageTop flex justify-between items-center">
+        <div className="text-xl font-semibold">應收款</div>
         <div className="flex gap-3">
           <Btn onClick={router.back}>返回</Btn>
           <Btn
@@ -105,7 +100,9 @@ export default function SalesInformation() {
         <div className="mt-10">
           <div className="mb-6">
             <span className="text-xl font-semibold mr-3">請款狀況</span>
-            <Btn theme="cross">新增資料</Btn>
+            <Link href="receivable">
+              <Btn theme="cross">新增資料</Btn>
+            </Link>
           </div>
           <Table_antd columns={columns02} dataSource={fakeData02} pagination={false} />
         </div>
@@ -218,12 +215,7 @@ const columns02: TableProps<TfakeData02>['columns'] = [
     width: 90,
     align: 'center',
     render: (_, record) => {
-      return (
-        <div className="flex gap-2">
-          <Icon_note className="w-[16px] h-[16px] text-blue01" />
-          <Icon_trash className="w-[16px] h-[16px] text-red01" />
-        </div>
-      );
+      return <Icon_trash className="inline w-[16px] h-[16px] text-red01" />;
     },
   },
 ];
