@@ -1,4 +1,6 @@
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
@@ -20,7 +22,9 @@ export default function SalesInformation() {
       <div className="pageTop flex justify-between">
         <div className="flex gap-4">
           <Tab active={true}>銷貨資料</Tab>
-          <Tab>應收帳款</Tab>
+          <Link href="accountsReceivable">
+            <Tab>應收帳款</Tab>
+          </Link>
         </div>
         <div className="flex gap-3">
           <Btn onClick={router.back}>返回</Btn>
@@ -42,66 +46,69 @@ export default function SalesInformation() {
         </div>
       </div>
       {/*  */}
-      <div className="grid grid-cols-4 gap-fong">
-        <DataEntry_fong caption="合約編號" isMust={true} className="col-span-2">
-          <Input required />
-        </DataEntry_fong>
-        <DataEntry_fong caption="案場名稱" isMust={true} className="col-span-2">
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="客戶編號" isMust={true} className="col-span-2">
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="客戶名稱" isMust={true} className="col-span-2">
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="統一編號" isMust={true} className="col-span-2">
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="稅別" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="外幣" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="銷售金額" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="銷售稅金" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="追加減金額" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="追加減金額稅金" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="已收金額" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="扣款折讓" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="已請款總額" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-        <DataEntry_fong caption="銷售總額" isMust={true}>
-          <Input />
-        </DataEntry_fong>
-      </div>
-      {/*  */}
-      <div className="mt-10">
-        <div className="mb-6">
-          <span className="text-xl font-semibold">銷貨明細</span>
+
+      <div className="border border-gray05 rounded-01 py-8 px-6">
+        <div className="grid grid-cols-4 gap-fong ">
+          <DataEntry_fong caption="合約編號" isMust={true} className="col-span-2">
+            <Input required />
+          </DataEntry_fong>
+          <DataEntry_fong caption="案場名稱" isMust={true} className="col-span-2">
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="客戶編號" isMust={true} className="col-span-2">
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="客戶名稱" isMust={true} className="col-span-2">
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="統一編號" isMust={true} className="col-span-2">
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="稅別" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="外幣" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="銷售金額" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="銷售稅金" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="追加減金額" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="追加減金額稅金" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="已收金額" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="扣款折讓" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="已請款總額" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="銷售總額" isMust={true}>
+            <Input />
+          </DataEntry_fong>
         </div>
-        <Table_antd columns={columns01} dataSource={fakeData01} pagination={false} />
-      </div>
-      <div className="mt-10">
-        <div className="mb-6">
-          <span className="text-xl font-semibold mr-3">請款狀況</span>
-          <Btn theme="cross">新增資料</Btn>
+        {/*  */}
+        <div className="mt-10">
+          <div className="mb-6">
+            <span className="text-xl font-semibold">銷貨明細</span>
+          </div>
+          <Table_antd columns={columns01} dataSource={fakeData01} pagination={false} />
         </div>
-        <Table_antd columns={columns02} dataSource={fakeData02} pagination={false} />
+        <div className="mt-10">
+          <div className="mb-6">
+            <span className="text-xl font-semibold mr-3">請款狀況</span>
+            <Btn theme="cross">新增資料</Btn>
+          </div>
+          <Table_antd columns={columns02} dataSource={fakeData02} pagination={false} />
+        </div>
       </div>
     </div>
   );
