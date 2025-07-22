@@ -1,16 +1,21 @@
+import { useState } from 'react';
+import dayjs, { Dayjs } from 'dayjs';
+
 import Link from 'next/link';
 import Router, { useRouter } from 'next/router';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
-import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
+import { DataEntry_fong, Input, DatePicker, Select } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
 import Tab from 'components/global/gear/button/tab';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
 import Selector_addNewOffsetAmount from 'components/page/accounting/accountsReceivableInquiry/selector_addNewOffsetAmount/indext';
+import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
+import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 export default function AccountsReceivable() {
   const handle_addNewOffsetAmount = () => {
@@ -20,12 +25,30 @@ export default function AccountsReceivable() {
     });
   };
 
+  const handle_addData = () => {
+    modal_empty({
+      content: <AddData />,
+      width: 500,
+      customWidth: 350,
+    });
+  };
+
+  const handle_addDeduction = () => {
+    modal_empty({
+      content: <AddDeduction />,
+      width: 500,
+      customWidth: 350,
+    });
+  };
+
   return (
     <div>
       <div className="pageTop">
         <div className="w-fit flex gap-3 ml-auto mr-0">
           <Btn onClick={Router.back}>返回</Btn>
-          <Btn theme="add">新增資料</Btn>
+          <Btn theme="add" onClick={handle_addData}>
+            新增資料
+          </Btn>
           <Btn theme="save">儲存</Btn>
         </div>
       </div>
@@ -73,7 +96,9 @@ export default function AccountsReceivable() {
             <Btn theme="cross" onClick={handle_addNewOffsetAmount}>
               新增沖銷金額
             </Btn>
-            <Btn theme="cross">新增請款資料</Btn>
+            <Btn theme="cross" onClick={handle_addDeduction}>
+              新增沖銷扣款
+            </Btn>
           </div>
           <div></div>
         </div>
@@ -91,6 +116,122 @@ export default function AccountsReceivable() {
     </div>
   );
 }
+
+// ============================================================================
+
+const AddData = () => {
+  const [date, setDate] = useState<Dayjs | null>(null);
+  const [amount, setAmount] = useState<string>('');
+  const [incomeCategory, setIncomeCategory] = useState<string>('');
+  const [remarks, setRemarks] = useState<string>('');
+
+  const handle_submit = () => {
+    console.log(date);
+    console.log(amount);
+    console.log(incomeCategory);
+    console.log(remarks);
+  };
+
+  return (
+    <Container_confirm
+      title="新增資料"
+      footerRight={
+        <>
+          <Btn>取消</Btn>
+          <Btn theme="save" onClick={handle_submit}>
+            儲存
+          </Btn>
+        </>
+      }
+    >
+      <div className="grid gap-fong">
+        <DataEntry_fong caption="日期" isMust={true}>
+          <DatePicker value={date} onChange={(value) => setDate(value)} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="金額" isMust={true}>
+          <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="收入類別" isMust={true}>
+          <Select
+            options={[
+              { label: '類別一', value: 'category1' },
+              { label: '類別二', value: 'category2' },
+              { label: '類別三', value: 'category3' },
+            ]}
+            value={incomeCategory}
+            onChange={(value) => setIncomeCategory(value)}
+          />
+        </DataEntry_fong>
+        <DataEntry_fong caption="備註" isMust={true}>
+          <Input value={remarks} onChange={(e) => setRemarks(e.target.value)} />
+        </DataEntry_fong>
+      </div>
+    </Container_confirm>
+  );
+};
+
+const AddDeduction = () => {
+  const [date, setDate] = useState<Dayjs | null>(null);
+  const [amount, setAmount] = useState<string>('');
+  const [incomeCategory, setIncomeCategory] = useState<string>('');
+  const [remarks, setRemarks] = useState<string>('');
+  const [isDomestic, setIsDomestic] = useState<boolean>(true);
+
+  const handle_submit = () => {
+    console.log(date);
+    console.log(amount);
+    console.log(incomeCategory);
+    console.log(remarks);
+    console.log(isDomestic);
+  };
+
+  return (
+    <Container_confirm
+      title="新增沖銷扣款"
+      footerRight={
+        <>
+          <Btn>取消</Btn>
+          <Btn theme="save" onClick={handle_submit}>
+            儲存
+          </Btn>
+        </>
+      }
+    >
+      <div className="grid gap-fong">
+        <DataEntry_fong caption="日期" isMust={true}>
+          <DatePicker value={date} onChange={(value) => setDate(value)} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="金額" isMust={true}>
+          <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="類型" isMust={true}>
+          <Select
+            options={[
+              { label: '類別一', value: 'category1' },
+              { label: '類別二', value: 'category2' },
+              { label: '類別三', value: 'category3' },
+            ]}
+            value={incomeCategory}
+            onChange={(value) => setIncomeCategory(value)}
+          />
+        </DataEntry_fong>
+        <DataEntry_fong caption="國內/國外" isMust={true}>
+          <Select
+            options={[
+              { label: '國內', value: true },
+              { label: '國外', value: false },
+            ]}
+            value={isDomestic}
+            onChange={(value) => setIsDomestic(value as boolean)}
+          />
+        </DataEntry_fong>
+        <DataEntry_fong caption="備註" isMust={true}>
+          <Input value={remarks} onChange={(e) => setRemarks(e.target.value)} />
+        </DataEntry_fong>
+      </div>
+    </Container_confirm>
+  );
+};
 
 // ============================================================================
 
