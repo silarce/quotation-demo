@@ -3,17 +3,28 @@ import DataEntry, { DataEntry_fong, Input } from 'components/global/gear/dataEnt
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
+import Selector_searchSomething from 'components/page/accounting/accountsReceivableInquiry/selector_searchSomething';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 
 export default function SalesOrder() {
+  const handle_importContract = () => {
+    modal_empty({
+      width: 1200,
+      customWidth: 'fit-content',
+      content: <Selector_searchSomething />,
+    });
+  };
+
   return (
     <div>
       <div className="pageTop flex justify-between items-center">
         <div className="text-xl font-semibold">銷貨單</div>
         <div className="flex gap-3">
-          <Btn theme="import">合約匯入</Btn>
+          <Btn theme="import" onClick={handle_importContract}>
+            合約匯入
+          </Btn>
           <Btn theme="trash">清空</Btn>
           <Btn theme="save">儲存</Btn>
         </div>
