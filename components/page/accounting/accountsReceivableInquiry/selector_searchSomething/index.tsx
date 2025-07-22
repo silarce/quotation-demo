@@ -1,7 +1,11 @@
 import { useState } from 'react';
+import classNames from 'classnames';
 
 import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
+import Btn from 'components/global/gear/button/btn_fong';
+
+import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_query from 'public/image/icon/fong/query.svg';
 
@@ -22,7 +26,21 @@ export default function Selector_searchSomething({
   const [data, setData] = useState<TfakeData>();
 
   return (
-    <div className="w-full">
+    <Container_confirm
+      title="查詢資料"
+      footerLeft={
+        <div>
+          <div>合約總金額</div>
+          <div className=" mt-[21.5px] ml-3">$99999</div>
+        </div>
+      }
+      footerRight={
+        <>
+          <Btn>取消</Btn>
+          <Btn theme="save">儲存</Btn>
+        </>
+      }
+    >
       <div className="grid grid-cols-4 gap-fong">
         <DataEntry_fong caption="合約編號">
           <div className={scss.container}>
@@ -53,22 +71,25 @@ export default function Selector_searchSomething({
         <Table_antd
           columns={columns}
           dataSource={fakeData}
+          rowHoverable={false}
           style={{
-            width: '1344px',
+            width: '1360px',
           }}
-          // scroll={{
-          //   x: '1330px',
-          // }}
-          onRow={(record) => {
-            return {
-              onClick: () => {
-                setData(record);
-              },
-            };
+          scroll={{
+            // x: '1330px',
+            y: 450,
           }}
+          rowClassName={(record) => {
+            return classNames(scss.row, record.id === data?.id && scss.active);
+          }}
+          onRow={(record) => ({
+            onClick: () => {
+              setData(record);
+            },
+          })}
         />
       </div>
-    </div>
+    </Container_confirm>
   );
 }
 
@@ -102,11 +123,13 @@ const columns: TableProps<TfakeData>['columns'] = [
     title: '案場名稱',
     dataIndex: 'projectName',
     width: 250,
+    className: 'whitespace-pre-wrap',
   },
   {
     title: '客戶名稱',
     dataIndex: 'customerName',
     width: 250,
+    className: 'whitespace-pre-wrap',
   },
   {
     title: '合約金額',
@@ -127,119 +150,32 @@ const columns: TableProps<TfakeData>['columns'] = [
     title: '追加減',
     dataIndex: 'attachment',
     width: 150,
+    className: 'whitespace-pre-wrap ',
   },
 ];
 
 // ===========================================================================
-const fakeData: TfakeData[] = [
-  {
-    id: '1',
-    quotationNumber: 'Q12345',
-    contractNumber: 'C67890',
-    projectName: 'Project Alpha',
-    customerName: 'Customer A',
-    pirce: 1000,
-    tax: 50,
-    currency: 'USD',
-    attachment: 'file1.pdf',
-  },
-  {
-    id: '2',
-    quotationNumber: 'Q54321',
-    contractNumber: 'C09876',
-    projectName: 'Project Beta',
-    customerName: 'Customer B',
-    pirce: 2000,
-    tax: 100,
-    currency: 'EUR',
-    attachment: 'file2.pdf',
-  },
-  {
-    id: '3',
-    quotationNumber: 'Q11223',
-    contractNumber: 'C44556',
-    projectName: 'Project Gamma',
-    customerName: 'Customer C',
-    pirce: 1500,
-    tax: 75,
-    currency: 'GBP',
-    attachment: 'file3.pdf',
-  },
-  {
-    id: '4',
-    quotationNumber: 'Q33445',
-    contractNumber: 'C66778',
-    projectName: 'Project Delta',
-    customerName: 'Customer D',
-    pirce: 2500,
-    tax: 125,
-    currency: 'JPY',
-    attachment: 'file4.pdf',
-  },
-  {
-    id: '5',
-    quotationNumber: 'Q55667',
-    contractNumber: 'C88990',
-    projectName: 'Project Epsilon',
-    customerName: 'Customer E',
-    pirce: 3000,
-    tax: 150,
-    currency: 'AUD',
-    attachment: 'file5.pdf',
-  },
-  {
-    id: '6',
-    quotationNumber: 'Q77889',
-    contractNumber: 'C00112',
-    projectName: 'Project Zeta',
-    customerName: 'Customer F',
-    pirce: 1800,
-    tax: 90,
-    currency: 'CAD',
-    attachment: 'file6.pdf',
-  },
-  {
-    id: '7',
-    quotationNumber: 'Q99001',
-    contractNumber: 'C22334',
-    projectName: 'Project Eta',
-    customerName: 'Customer G',
-    pirce: 2200,
-    tax: 110,
-    currency: 'CHF',
-    attachment: 'file7.pdf',
-  },
-  {
-    id: '8',
-    quotationNumber: 'Q11222',
-    contractNumber: 'C44567',
-    projectName: 'Project Theta',
-    customerName: 'Customer H',
-    pirce: 2700,
-    tax: 135,
-    currency: 'NZD',
-    attachment: 'file8.pdf',
-  },
-  {
-    id: '9',
-    quotationNumber: 'Q33456',
-    contractNumber: 'C78901',
-    projectName: 'Project Iota',
-    customerName: 'Customer I',
-    pirce: 3200,
-    tax: 160,
-    currency: 'SEK',
-    attachment: 'file9.pdf',
-  },
-  {
-    id: '10',
-    quotationNumber: 'Q55678',
-    contractNumber: 'C12345',
-    projectName: 'Project Kappa',
-    customerName: 'Customer J',
-    pirce: 4000,
-    tax: 200,
-    currency: 'NOK',
-    attachment: 'file10.pdf',
-  },
-];
+const createFakeData = (count: number): TfakeData[] => {
+  const data: TfakeData[] = [];
+  const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'SEK', 'NOK'];
+
+  for (let i = 1; i <= count; i++) {
+    const price = Math.floor(Math.random() * 5000) + 1000;
+    data.push({
+      id: `${i}`,
+      quotationNumber: `Q${String(10000 + i).padStart(5, '0')}`,
+      contractNumber: `C${String(50000 + i).padStart(5, '0')}`,
+      projectName: `專案 ${String.fromCharCode(65 + ((i - 1) % 26))}-${Math.floor((i - 1) / 26) + 1}`, // 專案 A-1, B-1...
+      customerName: `客戶 ${String.fromCharCode(65 + ((i - 1) % 26))}`, // 客戶 A, B...
+      pirce: price,
+      tax: Math.round(price * 0.05),
+      currency: currencies[(i - 1) % currencies.length],
+      attachment: `追加50000\n追減30000\n變更10000`,
+    });
+  }
+
+  return data;
+};
+
+// 使用函式建立 20 筆假資料
+const fakeData: TfakeData[] = createFakeData(20);

@@ -8,3 +8,10 @@
     color: #90909090;
   }
 }
+
+.row {
+  cursor: pointer;
+  &.active {
+    background-color: theme("colors.blue05");
+  }
+}
