@@ -1,0 +1,166 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+import Table_antd, { TableProps } from 'components/global/myAntd/table';
+import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
+import Btn from 'components/global/gear/button/btn_fong';
+import Tab from 'components/global/gear/button/tab';
+import { modal_empty } from 'components/global/gear/modal/fongModal';
+
+import Icon_note from 'public/image/icon/fong/note.svg';
+import Icon_trash from 'public/image/icon/fong/trash.svg';
+
+export default function AccountsReceivable() {
+  return (
+    <div>
+      <div className="pageTop flex justify-between">
+        <div className="flex gap-4">
+          <Link href="salesInformation">
+            <Tab>銷貨資料</Tab>
+          </Link>
+          <Tab active={true}>應收帳款</Tab>
+        </div>
+
+        <div className="flex gap-3">
+          <Btn>返回</Btn>
+          <Btn theme="add">新增資料</Btn>
+          <Btn theme="save">儲存</Btn>
+        </div>
+      </div>
+
+      <div className="border border-gray05 rounded-01 py-8 px-6">
+        <div className="text-xl font-semibold mb-6">應收帳款</div>
+
+        <div className="grid grid-cols-4 gap-fong ">
+          <DataEntry_fong caption="請款單號" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="請款類型" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="期別" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="請款金額" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="發票本" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="發票日期" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="發票號碼" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="發票買受人" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="保留款" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+          <DataEntry_fong caption="%" isMust={true}>
+            <Input />
+          </DataEntry_fong>
+        </div>
+
+        {/*  */}
+        <div className="mt-6">
+          <div className="flex gap-3 items-center">
+            <div className="text-xl font-semibold">沖銷明細</div>
+            <Btn theme="cross">新增沖銷金額</Btn>
+            <Btn theme="cross">新增請款資料</Btn>
+          </div>
+          <div></div>
+        </div>
+        <Table_antd
+          className="mt-4"
+          dataSource={fakeData}
+          columns={columns}
+          scroll={{
+            y: 400,
+          }}
+        />
+
+        {/*  */}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+
+const columns: TableProps<TfakeData>['columns'] = [
+  {
+    title: '序號',
+    dataIndex: 'serialNumber',
+    align: 'center',
+    width: 80,
+  },
+  {
+    title: '代號',
+    dataIndex: 'idNumber',
+    width: 120,
+  },
+  {
+    title: '名稱',
+    dataIndex: 'name',
+    width: 150,
+  },
+  {
+    title: '會科',
+    dataIndex: 'accountingSubjects',
+    width: 150,
+  },
+  {
+    title: '金額',
+    dataIndex: 'price',
+    width: 150,
+    align: 'right',
+    render: (value) => '$' + value.toLocaleString(),
+  },
+  {},
+  {
+    title: '操作',
+    key: 'action',
+    width: 90,
+    align: 'center',
+    render: () => (
+      <div className="flex gap-2">
+        <Icon_note className="w-[16px] h-[16px] text-blue01" />
+        <Icon_trash className="w-[16px] h-[16px] text-red01" />
+      </div>
+    ),
+  },
+];
+
+// ============================================================================
+
+interface TfakeData {
+  id: string;
+  serialNumber: string;
+  idNumber: string;
+  name: string;
+  accountingSubjects: string;
+  price: number;
+}
+
+const createFakeData = (count: number): TfakeData[] => {
+  const data: TfakeData[] = [];
+
+  for (let i = 1; i <= count; i++) {
+    data.push({
+      id: `${i}`,
+      serialNumber: `${i}`,
+      idNumber: `ID${String(1000 + i).padStart(4, '0')}`,
+      name: `項目名稱 ${i}`,
+      accountingSubjects: `會計科目 ${String.fromCharCode(65 + ((i - 1) % 26))}`,
+      price: Math.floor(Math.random() * 100000) + 5000,
+    });
+  }
+
+  return data;
+};
+
+// 使用範例：建立 10 筆假資料
+const fakeData: TfakeData[] = createFakeData(10);
