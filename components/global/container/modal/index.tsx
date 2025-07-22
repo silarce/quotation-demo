@@ -18,12 +18,15 @@ function Container_confirm({
 }) {
   return (
     <div className={classNames(scss.confirm)}>
-      <div className={classNames(scss.title, scss[`s${theme}`])}>{title}</div>
+      {title && <div className={classNames(scss.title, scss[`s${theme}`])}>{title}</div>}
       <div>{children}</div>
-      <div className={classNames(scss.footer, className_footer)} {...props_footer}>
-        <div>{footerLeft}</div>
-        <div>{footerRight}</div>
-      </div>
+
+      {(footerLeft || footerRight) && (
+        <div className={classNames(scss.footer, className_footer)} {...props_footer}>
+          <div>{footerLeft}</div>
+          <div>{footerRight}</div>
+        </div>
+      )}
     </div>
   );
 }
