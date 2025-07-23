@@ -21,21 +21,7 @@
 }
 
 .confirm {
-  &.w500 {
-    > .title {
-      margin-bottom: 26.5px;
-    }
-  }
-  &.w700 {
-    > .title {
-      margin-bottom: 26.5px;
-    }
-  }
-  &.w1200 {
-    > .title {
-      margin-bottom: 24px;
-    }
-  }
+  margin-bottom: 26.5px;
 }
 
 .template_confirm {
