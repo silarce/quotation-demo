@@ -13,7 +13,6 @@ import scss from './index.module.scss';
 
 type Tprops_empty = Omit<ModalFuncProps, 'width'> & {
   width?: 500 | 700 | 1200;
-  customWidth?: React.CSSProperties['width'];
 };
 
 // ============================================================================
@@ -29,10 +28,9 @@ const Modal_clean = ({ className, ...props }: ModalFuncProps) => {
   });
 };
 
-const modal_empty = ({ className, width = 500, customWidth, ...props }: Tprops_empty) => {
+const modal_empty = ({ className, width = 500, ...props }: ModalFuncProps) => {
   return Modal.info({
     className: classNames(scss.empty, scss[`w${width}`], className),
-    width: customWidth || width,
     icon: null,
     maskClosable: true,
     centered: true,

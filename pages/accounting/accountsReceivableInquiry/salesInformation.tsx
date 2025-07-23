@@ -27,8 +27,7 @@ export default function SalesInformation() {
             theme="query"
             onClick={() => {
               modal_empty({
-                width: 1200,
-                customWidth: 'fit-content',
+                width: 'fit-content',
                 content: <Selector_searchSomething />,
               });
             }}

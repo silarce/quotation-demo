@@ -28,16 +28,14 @@ export default function AccountsReceivable() {
   const handle_addData = () => {
     modal_empty({
       content: <AddData />,
-      width: 500,
-      customWidth: 350,
+      width: 350,
     });
   };
 
   const handle_addDeduction = () => {
     modal_empty({
       content: <AddDeduction />,
-      width: 500,
-      customWidth: 350,
+      width: 350,
     });
   };
 
