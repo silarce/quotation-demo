@@ -184,7 +184,12 @@ const columns: TableProps<TaccountsReceivablesList_Dto>['columns'] = [
     key: 'action',
     width: 80,
     render(_, record) {
-      const href = Router.pathname + '/salesInformation';
+      const href = {
+        pathname: Router.pathname + '/salesInformation',
+        query: {
+          id: record.id,
+        },
+      };
 
       return (
         <div className="flex justify-center">
