@@ -28,7 +28,7 @@ import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
 
 import Icon_asterisk from 'public/image/icon/fong/asterisk.svg';
 
-import { Form } from 'antd';
+import { Form as AntdForm } from 'antd';
 
 // ======================================================================
 
@@ -553,8 +553,14 @@ const MustTip = () => {
   return <div className={scss.mustTip}>*</div>;
 };
 
-const FormItem = ({ className, ...props }: Parameters<typeof Form.Item>[0]) => (
-  <Form.Item className={classNames(scss.formItem, className)} {...props} />
+const Form = (props: Parameters<typeof AntdForm>[0]) => {
+  return <AntdForm component={false} {...props} />;
+};
+
+Form.useForm = AntdForm.useForm;
+
+const FormItem = ({ className, ...props }: Parameters<typeof AntdForm.Item>[0]) => (
+  <AntdForm.Item className={classNames(scss.formItem, className)} {...props} />
 );
 
 // =============================================================================
