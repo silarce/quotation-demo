@@ -506,33 +506,39 @@ interface TaccountsReceivablesList_Dto {
   // 客戶傳真
   companyFax: string;
   // 銷售金額(合約金額)
-  salesAmount: number;
+  salesAmount: number | null;
   // 稅金
-  taxes: number;
+  taxes: number | null;
   // 幣別
   salesCurrency: string;
   // 匯率
-  exchangeRate: number;
+  exchangeRate: number | null;
   // 總請款金額
-  requestAmount: number;
+  requestAmount: number | null;
   // 外幣金額
-  foreignCurrencyAmount: number;
+  foreignCurrencyAmount: number | null;
   // 請款未收款金額
-  uncollectedPayment: number;
+  uncollectedPayment: number | null;
   // 總金額
-  totalAmount: number;
+  totalAmount: number | null;
   // 建立時間 UTC
-  createdAt: string;
+  createdAt: string | null;
   // 修改時間 UTC
-  updatedAt: string;
+  updatedAt: string | null;
   // 建立人員
-  createdBy: string;
+  createdBy: string | null;
   // 修改人員
-  updatedBy: string;
+  updatedBy: string | null;
   // 狀態
-  status: string;
+  status: string | null;
   // 已請款金額
-  prAmount: number;
+  prAmount: number | null;
+  //扣款金額
+  deduction: number | null;
+  //合約編號
+  quotationContractNumber: string | null;
+  //案場名稱
+  projectName: string | null;
 }
 
 // endregion accountsReceivable
