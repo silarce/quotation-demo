@@ -17,7 +17,9 @@
 
 .empty {
   @extend .clean;
-  padding: 24px 24px 24px 24px;
+  :global(.ant-modal-confirm-content) {
+    padding: 24px 24px 24px 24px;
+  }
 }
 
 .confirm {
