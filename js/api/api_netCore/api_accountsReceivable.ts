@@ -4,17 +4,23 @@ import { axi_monkey } from '../_axiosCreator';
 
 import type { AxiosError } from 'axios';
 
-import type { TaccountsReceivablesList_Dto } from './_schemas';
+import type { TapiParams, Tmeta, TpageResponse, TaccountsReceivablesList_Dto } from './_schemas';
 
-const apiGetAccountsReceivablesList = async () => {
-  const api = '/api/AccountsReceivable/GetAccountsReceivablesList';
+const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
+  // const api = '/api/AccountsReceivable/GetAccountsReceivablesList';
+  // return axi_monkey.get<TaccountsReceivablesList_Dto[]>(api).then(({ data }) => data);
 
-  return axi_monkey.get<TaccountsReceivablesList_Dto[]>(api).then(({ data }) => data);
+  const api = '/api/AccountsReceivable/GetAccountsReceivablesListPaged';
+
+  return axi_monkey.get<TpageResponse<TaccountsReceivablesList_Dto>>(api, { params }).then(({ data }) => data);
 };
 
-const useApiGetAccountsReceivablesList = ({ autoUpdate = true }: { autoUpdate?: boolean } = {}) => {
+const useApiGetAccountsReceivablesList = (
+  params: TapiParams & { filter?: string } = {},
+  { autoUpdate = true }: { autoUpdate?: boolean } = {}
+) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [data, setData] = useState<TaccountsReceivablesList_Dto[] | null>();
+  const [res, setRes] = useState<TpageResponse<TaccountsReceivablesList_Dto> | null>();
 
   const update = async () => {
     if (isFetching) {
@@ -23,25 +29,26 @@ const useApiGetAccountsReceivablesList = ({ autoUpdate = true }: { autoUpdate?: 
 
     setIsFetching(true);
 
-    const res = await apiGetAccountsReceivablesList().catch((err: AxiosError) => {
+    const res = await apiGetAccountsReceivablesList(params).catch((err: AxiosError) => {
       console.error('useApiGetAccountsReceivablesList error:', err);
 
-      setData(null);
+      setRes(null);
 
       return null;
     });
 
-    setData(res);
+    setRes(res);
     setIsFetching(false);
   };
 
   useEffect(() => {
     autoUpdate && update();
-  }, []);
+  }, [params]);
 
   return {
     isFetching,
-    data,
+    data: res?.items,
+    meta: res?.meta,
     update,
   };
 };
