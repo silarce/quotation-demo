@@ -28,6 +28,8 @@ import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
 
 import Icon_asterisk from 'public/image/icon/fong/asterisk.svg';
 
+import { Form } from 'antd';
+
 // ======================================================================
 
 import scss from './index.module.scss';
@@ -551,6 +553,10 @@ const MustTip = () => {
   return <div className={scss.mustTip}>*</div>;
 };
 
+const FormItem = ({ className, ...props }: Parameters<typeof Form.Item>[0]) => (
+  <Form.Item className={classNames(scss.formItem, className)} {...props} />
+);
+
 // =============================================================================
 
 function findOption<Option extends { value: unknown; label: React.ReactNode }>({
@@ -645,6 +651,8 @@ export {
   DateRangePicker,
   Textarea,
 };
+
+export { Form, FormItem };
 
 export type {
   TdataEntrycontainerProps,
