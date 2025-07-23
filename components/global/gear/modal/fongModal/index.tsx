@@ -28,9 +28,9 @@ const Modal_clean = ({ className, ...props }: ModalFuncProps) => {
   });
 };
 
-const modal_empty = ({ className, width = 500, ...props }: ModalFuncProps) => {
+const modal_empty = ({ className, ...props }: ModalFuncProps) => {
   return Modal.info({
-    className: classNames(scss.empty, scss[`w${width}`], className),
+    className: classNames(scss.empty, className),
     icon: null,
     maskClosable: true,
     centered: true,
