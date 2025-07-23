@@ -58,7 +58,7 @@ function Btn_fong({
 
 // ================================================================================
 
-type Tcolors = 'basic' | 'blue_I' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I' | 'yellow_I';
+type Tcolors = 'basic' | 'blue_I' | 'blue_II' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I' | 'yellow_I';
 
 type TthemeName =
   | 'basic'
