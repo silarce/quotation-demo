@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Popover, TextField, ClickAwayListener, Button } from '@mui/material';
 import classNames from 'classnames';
 
@@ -32,7 +32,8 @@ const PickerColumn = ({
 );
 
 export default function CustomTimeInputWithOk({ onChange }: { onChange?: (val: string) => void }) {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  // const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const ref_anchorEl = useRef<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
 
   const [displayValue, setDisplayValue] = useState('- - : - -');
@@ -41,7 +42,7 @@ export default function CustomTimeInputWithOk({ onChange }: { onChange?: (val: s
   const [tempMinute, setTempMinute] = useState('00');
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+    // setAnchorEl(event.currentTarget);
     setOpen(true);
   };
 
@@ -57,6 +58,9 @@ export default function CustomTimeInputWithOk({ onChange }: { onChange?: (val: s
   return (
     <>
       <TextField
+        ref={(ele) => {
+          ref_anchorEl.current = ele;
+        }}
         value={displayValue}
         fullWidth
         onClick={handleOpen}
@@ -84,7 +88,7 @@ export default function CustomTimeInputWithOk({ onChange }: { onChange?: (val: s
 
       <Popover
         open={open}
-        anchorEl={anchorEl}
+        anchorEl={ref_anchorEl.current}
         onClose={handleClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >

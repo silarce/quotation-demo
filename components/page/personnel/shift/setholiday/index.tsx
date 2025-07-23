@@ -1,58 +1,22 @@
 import { useState } from 'react';
-import { Table, DatePicker, Modal } from 'antd';
+import { DatePicker, Modal } from 'antd';
 
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import moment from 'moment';
-import Image from 'next/image';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker as DateMui } from '@mui/x-date-pickers/DatePicker';
 import MyInput from 'components/global/myCom/Input/Input';
 import MySelect from 'components/global/myCom/select/mySelect';
-import type { ColumnsType } from 'antd/es/table';
+import YearCalendar from './YearCalendar';
 
 //button
-import editIcon from 'public/image/icon/note.svg?url';
-import deleteIcon from 'public/image/icon/trash.svg?url';
 import AddButton from 'components/global/myCom/button/AddButton';
 import CancelButton from 'components/global/myCom/button/cancelButton';
+import Btn from 'components/global/gear/button/btn_fong';
 
 //scss
 import scss from './setHoliday.module.scss';
-
-type HolidayItem = {
-  key: string;
-  date: string;
-  weekday: string;
-  description: string;
-  type: string;
-};
-
-type HolidayData = {
-  holidays: HolidayItem[];
-  makeUp: HolidayItem[];
-};
-
-const fakeData: Record<string, HolidayData> = {
-  '2025-06': {
-    holidays: [
-      { key: '1', date: '06/01', weekday: '六', description: '端午節', type: '國定假日' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-    ],
-    makeUp: [
-      { key: '1', date: '06/05', weekday: '三', description: '端午節補班', type: '國定補班' },
-      { key: '2', date: '06/10', weekday: '一', description: '中秋節補班', type: '公司補班' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-      { key: '2', date: '06/24', weekday: '一', description: '勞動節補假', type: '公司假日' },
-    ],
-  },
-};
 
 const { RangePicker } = DatePicker;
 const dateFormat = 'YYYY/MM/DD';
@@ -63,83 +27,80 @@ export default function SetHoliday() {
   const [openYearPicker, setOpenYearPicker] = useState(false);
   const [input, setInput] = useState('');
   const [isAddMakeUpOpen, setIsAddMakeUpOpen] = useState(false);
+  const [isYearView, setIsYearView] = useState(true); // true = 年檢視, false = 月檢視
 
   const changeMonth = (amount: number) => {
     setCurrentDate(currentDate.add(amount, 'month'));
   };
 
   const key = currentDate.format('YYYY-MM');
-  const holidays = fakeData[key]?.holidays || [];
-  const makeUps = fakeData[key]?.makeUp || [];
   console.log(key);
 
-  const columns: ColumnsType<HolidayItem> = [
-    { title: '日期', dataIndex: 'date', key: 'date', align: 'center', width: '10%' },
-    { title: '星期', dataIndex: 'weekday', key: 'weekday', align: 'center', width: '10%' },
-    { title: '說明', dataIndex: 'description', key: 'description', width: '32.5%' },
-    { title: '類型', dataIndex: 'type', key: 'type', width: '32.5%' },
-    {
-      title: '操作',
-      key: 'action',
-      align: 'center',
-      width: '15%',
-      render: () => (
-        <>
-          <div className="flex justify-center gap-5">
-            <Image src={editIcon} alt="edit" style={{ cursor: 'pointer', width: '20px', height: '20px' }} />
-            <Image src={deleteIcon} alt="delete" style={{ cursor: 'pointer' }} width={16} height={16} />
-          </div>
-        </>
-      ),
-    },
-  ];
+  const renderYearCalendar = () => {
+    const year = currentDate.year(); //使用狀態中的 currentDate 控制年份
+
+    return (
+      <div className="grid grid-cols-3 gap-6">
+        {Array.from({ length: 12 }, (_, monthIndex) => (
+          <YearCalendar key={monthIndex} year={year} monthIndex={monthIndex} />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div className="border border-gray-500 rounded-md px-6 py-6 ">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-[28px] ">
-            <div className="flex items-center gap-2 text-xl font-bold">
-              <div className="flex items-center gap-1">
-                <button
-                  className="flex items-center text-black font-bold hover:opacity-70"
-                  onClick={() => setOpenYearPicker(true)}
-                >
-                  {currentDate.year()}年<span className="text-gray-400 text-sm ml-1">ICON</span>
-                </button>
-                <span>{currentDate.format('MM')}月</span>
+        <div className=" items-center justify-between mb-6">
+          <div className="flex justify-between items-center mb-[40px]">
+            <div className="flex items-center gap-[28px] ">
+              <div className="flex items-center gap-2 text-xl font-bold">
+                <div className="flex items-center gap-1">
+                  <button
+                    className="flex items-center text-black font-bold hover:opacity-70"
+                    onClick={() => setOpenYearPicker(true)}
+                  >
+                    {currentDate.year()}年<span className="text-gray-400 text-sm ml-1">ICON</span>
+                  </button>
+                  {!isYearView && <span>{currentDate.format('MM')}月</span>}
+                </div>
               </div>
+              {!isYearView && (
+                <div className="flex gap-[40px]">
+                  <button onClick={() => changeMonth(-1)}>
+                    <LeftOutlined />
+                  </button>
+                  <button onClick={() => changeMonth(1)}>
+                    <RightOutlined />
+                  </button>
+                </div>
+              )}
+
+              <DateMui
+                open={openYearPicker}
+                onClose={() => setOpenYearPicker(false)}
+                views={['year', 'month']} // 這裡支援年份 + 月份
+                value={currentDate}
+                onChange={(date) => {
+                  if (date) {
+                    setCurrentDate(date);
+                    setOpenYearPicker(false);
+                  }
+                }}
+                slotProps={{
+                  textField: { style: { display: 'none' } },
+                }}
+              />
             </div>
-            <div className="flex gap-[40px]">
-              <button onClick={() => changeMonth(-1)}>
-                <LeftOutlined />
-              </button>
-              <button onClick={() => changeMonth(1)}>
-                <RightOutlined />
-              </button>
+            <div className=" flex gap-4 h-[40px]">
+              <Btn onClick={() => setIsYearView(false)}>月檢視</Btn>
+              <Btn onClick={() => setIsYearView(true)}>年檢視</Btn>
+              <Btn>設定例行休假日</Btn>
+              <Btn>新增節假日</Btn>
             </div>
-            <DateMui
-              open={openYearPicker}
-              onClose={() => setOpenYearPicker(false)}
-              views={['year', 'month']} // 這裡支援年份 + 月份
-              value={currentDate}
-              onChange={(date) => {
-                if (date) {
-                  setCurrentDate(date);
-                  setOpenYearPicker(false);
-                }
-              }}
-              slotProps={{
-                textField: { style: { display: 'none' } },
-              }}
-            />
           </div>
-          <div className=" flex gap-4 h-[40px]">
-            <AddButton label="檢視月曆" onClick={() => console.log('Add')} />
-            <AddButton label="新增假日" onClick={() => setAddHolidayModal(true)} />
-            <AddButton label="新增補班" onClick={() => setIsAddMakeUpOpen(true)} />
-          </div>
+          {isYearView && renderYearCalendar()}
         </div>
         <Modal
           open={isAddMakeUpOpen}
@@ -217,38 +178,6 @@ export default function SetHoliday() {
             </div>
           </div>
         </Modal>
-
-        <div className="flex gap-6 ">
-          {/* 國定假日 */}
-          <div className="border border-[#616161] rounded-md p-4 w-[50%]  overflow-y-auto">
-            <p className="font-bold mb-6">國定假日</p>
-            <Table
-              columns={columns}
-              dataSource={holidays}
-              pagination={false}
-              size="small"
-              bordered
-              className={scss.customTable}
-            />
-          </div>
-
-          {/* 補班日 */}
-          <div className="border border-[#616161] rounded-md px-4 py-6 w-[50%]">
-            <p className="font-bold px-3 ">補班日</p>
-            <div className={`mt-6 overflow-y-auto  ${scss.customScrollbar}`}>
-              <div className="px-2">
-                <Table
-                  columns={columns}
-                  dataSource={makeUps}
-                  pagination={false}
-                  size="small"
-                  bordered
-                  className={scss.customTable}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </LocalizationProvider>
   );

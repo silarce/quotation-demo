@@ -32,7 +32,7 @@ export default function SidePathPersonnel() {
           erpFeature: 'allPass',
           list: [
             {
-              label: '使用這維護',
+              label: '使用者維護',
               path: path + '/system/users',
               erpFeature: 'allPass',
             },
