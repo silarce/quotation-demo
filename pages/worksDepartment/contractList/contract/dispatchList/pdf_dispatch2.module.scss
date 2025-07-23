@@ -60,7 +60,10 @@ $c10: 0.4fr;
     $c10
     $c11;
 
-  grid-template-rows: 34px 34px 68px repeat(auto-fit, minmax(34px, auto));
+  grid-template-rows: 40px 40px 68px repeat(auto-fit, minmax(40px, auto));
+  > *:nth-last-child(1) {
+    min-height: 180px;
+  }
 
   border: solid 0px theme("colors.border02");
   border-width: $borderWidth 0 0 $borderWidth;

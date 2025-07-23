@@ -1,31 +1,27 @@
 import { blue, green, orange } from '@ant-design/colors';
 
-
 module.exports = {
-  content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
-        main: "#14256a",
-        sub: "#404040",
-        text: "#404040",
-        text02: "#212121",
-        active: "#ea1833",
-        border: "#c1c1c1",
-        border02: "#616161",
-        bgc01: "#f5f5f5",
-        bgc02: "#fcfcfc",
-        hoverBgc: "#ecf1ff",
-        chosenBgc: "#ffeeee",
-        danger: "#ea1833",
-        success: "#08f366",
-        pass: "#008000",
+        main: '#14256a',
+        sub: '#404040',
+        text: '#404040',
+        text02: '#212121',
+        active: '#ea1833',
+        border: '#c1c1c1',
+        border02: '#616161',
+        bgc01: '#f5f5f5',
+        bgc02: '#fcfcfc',
+        hoverBgc: '#ecf1ff',
+        chosenBgc: '#ffeeee',
+        danger: '#ea1833',
+        success: '#08f366',
+        pass: '#008000',
         ok: green[0],
         warning: orange[1],
-        // 
+        //
         brown01: '#B45309',
         brown02: '#92400E',
         brown03: '#78350F',
@@ -53,14 +49,14 @@ module.exports = {
         red02: '#C5152B',
         red03: '#A11223',
 
-        yellow01:"#FBC02D",
-        yellow02:"#F9A825",
-        yellow03:"#F57F17",
+        yellow01: '#FBC02D',
+        yellow02: '#F9A825',
+        yellow03: '#F57F17',
 
         black01: '#212121', // text02
         white01: '#FFFFFF',
 
-        // 
+        //
         antdBlue: {
           // DEFAULT: blue.primary, // 沒有DEFAULT的效果以後再研究
           primary: blue.primary,
@@ -77,30 +73,34 @@ module.exports = {
         },
       },
       width: {
-        table: "1100px"
+        table: '1100px',
       },
       border: {
         radius: {
-          normal: "8px",
-          "02": "4px"
-        }
+          normal: '8px',
+          '02': '4px',
+        },
+      },
+      borderRadius: {
+        '01': '8px',
+        '02': '4px',
       },
       boxShadow: {
-        "01": "0px 3px 3px 0px #61616133",
-        "02": "0px 4px 4px 0px #00000040"
+        '01': '0px 3px 3px 0px #61616133',
+        '02': '0px 4px 4px 0px #00000040',
       },
       padding: {
-        layoutY: "32px",
-        layoutX: "24px"
-      }
+        layoutY: '32px',
+        layoutX: '24px',
+      },
     },
     screens: {
       // xxl: { max: "1535px" },
       // => @media (max-width: 1535px) { ... }
       // xl: { max: "1279px" },
-      notebook: { max: "1440px" },
+      notebook: { max: '1440px' },
       // => @media (max-width: 1279px) { ... }
-      laptop: { max: "1023px" },
+      laptop: { max: '1023px' },
       // => @media (max-width: 1023px) { ... }
       // md: { max: "767px" },
       // => @media (max-width: 767px) { ... }
@@ -109,4 +109,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};

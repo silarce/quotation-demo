@@ -18,7 +18,7 @@ export default function RoleManagementIndex() {
 
   const query = router.query as Tquery;
 
-  const activeTab = query.tab || 'shiftSetting';
+  const activeTab = query.tab || 'ImportAttendance';
 
   const handleTabChange = (tabKey: TabKey) => {
     router.push(

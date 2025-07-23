@@ -113,7 +113,7 @@ export default function EmployeeData() {
       width: '8%',
     },
     {
-      title: '編制',
+      title: '勤務',
       dataIndex: 'duty_type',
       key: 'duty_type',
       width: '8%',

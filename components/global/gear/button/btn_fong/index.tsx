@@ -84,7 +84,7 @@ type Tprops_btn = {
   icon?: React.ComponentType<React.SVGProps<SVGElement>> | null | TiconName;
   iconAfter?: React.ComponentType<React.SVGProps<SVGElement>> | null | TiconName;
   themeColor?: Tcolors;
-} & React.HTMLAttributes<HTMLButtonElement>;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 interface Ttheme {
   themeColor?: Tcolors;

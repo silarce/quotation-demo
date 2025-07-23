@@ -3,15 +3,24 @@ import classNames from 'classnames';
 import Btn, { Tprops_btn } from '../../button/btn_fong';
 
 import { Modal, ModalFuncProps } from 'antd';
+import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_warning from 'public/image/icon/fong/warning.svg';
 
 import scss from './index.module.scss';
 
+// ============================================================================
+
+type Tprops_empty = Omit<ModalFuncProps, 'width'> & {
+  width?: 500 | 700 | 1200;
+  customWidth?: React.CSSProperties['width'];
+};
+
+// ============================================================================
+
 const Modal_clean = ({ className, ...props }: ModalFuncProps) => {
   return Modal.info({
     className: classNames(scss.clean, className),
-    width: 'unset',
     icon: null,
     maskClosable: true,
     centered: true,
@@ -19,6 +28,40 @@ const Modal_clean = ({ className, ...props }: ModalFuncProps) => {
     ...props,
   });
 };
+
+const modal_empty = ({ className, width = 500, customWidth, ...props }: Tprops_empty) => {
+  return Modal.info({
+    className: classNames(scss.empty, scss[`w${width}`], className),
+    width: customWidth || width,
+    icon: null,
+    maskClosable: true,
+    centered: true,
+    footer: null,
+    ...props,
+  });
+};
+
+const modal_confirm = ({
+  title,
+  content: theContent,
+  width = 500,
+  content_footer,
+  props_footer,
+  ...props
+}: Tprops_empty & {
+  content_footer?: React.ReactNode;
+  props_footer?: React.HTMLAttributes<HTMLDivElement>;
+} = {}) => {
+  const content = (
+    <Container_confirm title={title} props_footer={props_footer} footerRight={content_footer}>
+      {theContent}
+    </Container_confirm>
+  );
+
+  return modal_empty({ content, width, ...props });
+};
+
+// ==========================================================================
 
 const Template_confirm = ({
   icon,
@@ -133,4 +176,11 @@ const modal_leave = ({
   return instance;
 };
 
-export { Modal_clean, modal_delete, modal_leave };
+export {
+  //
+  Modal_clean,
+  modal_empty,
+  modal_confirm,
+  modal_delete,
+  modal_leave,
+};

@@ -3,10 +3,10 @@ import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 
 import SalaryMaintain from './salaryMaintain/index';
 import BonusMaintain from './bonusMaintain/index';
-// import SetHoliday from 'components/page/personnel/shift/setholiday';
-// import MonthlySchedule from 'components/page/personnel/shift/monthlySchedule';
+import AnnualBonus from './annualBonus/index';
+import SalarySettlement from './SalarySettlement/index';
 
-type TabKey = 'SalaryMaintain' | 'BonusMaintain' | 'setHoliday' | 'monthlySchedule';
+type TabKey = 'SalaryMaintain' | 'BonusMaintain' | 'AnnualBonus' | 'SalarySettlement';
 
 interface Tquery {
   tab?: TabKey;
@@ -47,14 +47,14 @@ export default function Salary() {
         className: activeTab === 'BonusMaintain' ? activeClass : inactiveClass,
       },
       {
-        name: '假日設定',
-        onClick: () => handleTabChange('setHoliday'),
-        className: activeTab === 'setHoliday' ? activeClass : inactiveClass,
+        name: '年終獎金維護',
+        onClick: () => handleTabChange('AnnualBonus'),
+        className: activeTab === 'AnnualBonus' ? activeClass : inactiveClass,
       },
       {
-        name: '每月班表',
-        onClick: () => handleTabChange('monthlySchedule'),
-        className: activeTab === 'monthlySchedule' ? activeClass : inactiveClass,
+        name: '結算薪資作業',
+        onClick: () => handleTabChange('SalarySettlement'),
+        className: activeTab === 'SalarySettlement' ? activeClass : inactiveClass,
       },
     ],
   };
@@ -65,8 +65,8 @@ export default function Salary() {
       <div className="mt-4">
         {activeTab === 'SalaryMaintain' && <SalaryMaintain />}
         {activeTab === 'BonusMaintain' && <BonusMaintain />}
-        {/* {activeTab === 'setHoliday' && <SetHoliday />} */}
-        {/* {activeTab === 'monthlySchedule' && <MonthlySchedule />} */}
+        {activeTab === 'AnnualBonus' && <AnnualBonus />}
+        {activeTab === 'SalarySettlement' && <SalarySettlement />}
       </div>
     </div>
   );

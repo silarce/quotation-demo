@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  > svg {
+    width: 12px;
+    height: 12px;
+    color: #90909090;
+  }
+}
+
+.row {
+  cursor: pointer;
+  &.active {
+    background-color: theme("colors.blue05");
+  }
+}

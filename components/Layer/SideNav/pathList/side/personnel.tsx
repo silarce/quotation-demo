@@ -22,6 +22,16 @@ export default function SidePathPersonnel() {
           path: path + '/checkIn',
           erpFeature: devPass,
         },
+        {
+          label: '費用管理',
+          path: path + '/feeApplication',
+          erpFeature: devPass,
+        },
+        {
+          label: '薪資結算',
+          path: path + '/salary',
+          erpFeature: devPass,
+        },
       ],
     };
   })();

@@ -37,7 +37,36 @@ const researchDepartmentPath = sidePathList['/researchDepartment'].path;
 const personnelPath = sidePathList['/personnel'].path;
 const organizationPath = sidePathList['/organization'].path;
 
-export const topPathList: TtopPathListConfig[] = [
+const topPathList_notProd: TtopPathListConfig[] = (() => {
+  if (process.env.NEXT_PUBLLIC_NODE_ENV === 'prod') {
+    return [];
+  }
+
+  return [
+    {
+      icon: icon_home,
+      label: '人事管理',
+      path: personnelPath,
+      href: {
+        pathname: '/personnel/shift',
+        query: { isMine: 'true' },
+      },
+      erpFeature: 'allPass',
+    },
+    {
+      icon: icon_home,
+      label: '組織管理',
+      path: organizationPath,
+      href: {
+        pathname: '/organization/company',
+        query: { isMine: 'true' },
+      },
+      erpFeature: 'allPass',
+    },
+  ];
+})();
+
+const topPathList: TtopPathListConfig[] = [
   {
     icon: icon_home,
     label: '首頁',
@@ -149,24 +178,7 @@ export const topPathList: TtopPathListConfig[] = [
     },
     erpFeature: devPass,
   },
-  {
-    icon: icon_home,
-    label: '人事管理',
-    path: personnelPath,
-    href: {
-      pathname: '/personnel/shift',
-      query: { isMine: 'true' },
-    },
-    erpFeature: 'allPass',
-  },
-  {
-    icon: icon_home,
-    label: '組織管理',
-    path: organizationPath,
-    href: {
-      pathname: '/organization/company',
-      query: { isMine: 'true' },
-    },
-    erpFeature: 'allPass',
-  },
+  ...topPathList_notProd,
 ];
+
+export { topPathList };

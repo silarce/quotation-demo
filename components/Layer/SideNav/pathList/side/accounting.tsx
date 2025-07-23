@@ -47,6 +47,11 @@ export default function SidePathAccountingDepartment() {
               path: path + '/accountsReceivableInquiry',
               erpFeature: 'allPass',
             },
+            {
+              label: '銷貨單',
+              path: path + '/salesOrder',
+              erpFeature: 'allPass',
+            },
           ],
         },
         {
