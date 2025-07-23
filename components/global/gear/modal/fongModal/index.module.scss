@@ -17,21 +17,7 @@
 
 .empty {
   @extend .clean;
-  &.w500 {
-    :global(.ant-modal-confirm-content) {
-      padding: 26.5px 24px 24px 24px;
-    }
-  }
-  &.w700 {
-    :global(.ant-modal-confirm-content) {
-      padding: 26.5px 24px 24px 24px;
-    }
-  }
-  &.w1200 {
-    :global(.ant-modal-confirm-content) {
-      padding: 24px 24px 24px 24px;
-    }
-  }
+  padding: 24px 24px 24px 24px;
 }
 
 .confirm {

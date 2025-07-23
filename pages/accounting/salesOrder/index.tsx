@@ -25,8 +25,7 @@ export default function SalesOrder() {
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {
     modal_empty({
-      width: 1200,
-      customWidth: 'fit-content',
+      width: 'fit-content',
       content: <Selector_searchSomething />,
     });
   };
