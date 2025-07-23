@@ -10,15 +10,16 @@ export default function Table_antd<T>({ className, pagination, ...props }: Table
       className={classNames(scss.table, className)}
       rowKey={'id'}
       sticky={true}
-      pagination={{
-        pageSize: 10,
-        position: ['bottomCenter'],
-        hideOnSinglePage: true,
-        showTotal: (total, range) => {
-          return `總計 ${total} 項`;
-        },
-        ...pagination,
-      }}
+      pagination={
+        pagination !== false && {
+          position: ['bottomCenter'],
+          hideOnSinglePage: true,
+          showTotal: (total, range) => {
+            return `總計 ${total} 項`;
+          },
+          ...pagination,
+        }
+      }
       {...props}
     />
   );
