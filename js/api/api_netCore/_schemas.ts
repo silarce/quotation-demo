@@ -6,6 +6,25 @@ type Treview_status = '未審核' | '已審核' | '審核中';
 type Treview_status__stages = '核准' | '提出' | '簽核中' | '';
 type Tdocument_status = '審核中' | '駁回' | '核准' | '抽單';
 
+interface Tmeta {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  itemCount: number;
+  page: number;
+  pageCount: number;
+  pageSize: number;
+}
+
+interface TpageResponse<T> {
+  items: T[];
+  meta: Tmeta;
+}
+
+interface TapiParams {
+  page?: number;
+  pageSize?: number;
+}
+
 // ==============================================================================
 
 interface TnetCoreApiBody {
@@ -589,4 +608,14 @@ export type {
   TaccountsReceivablesList_Dto,
 };
 
-export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
+export type {
+  TapiParams,
+  TpageResponse,
+  Tmeta,
+  //
+  Tinvoice_type,
+  Ttax_type,
+  Tdocument_status,
+  Treview_status,
+  Treview_status__stages,
+};
