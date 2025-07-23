@@ -487,6 +487,58 @@ interface TengineerContactExport {
 
 // ==============================================================================
 
+// region accountsReceivable
+
+interface TaccountsReceivablesList_Dto {
+  id: string;
+  //  應收帳款編號
+  accountsReceivableNumber: string;
+  // 來源單據類別
+  sourceType: string;
+  // 來源ID
+  sourceId: string;
+  // 客戶編號
+  customerNumber: string;
+  // 客戶名稱
+  customerName: string;
+  // 客戶電話
+  companyPhone: string;
+  // 客戶傳真
+  companyFax: string;
+  // 銷售金額(合約金額)
+  salesAmount: number;
+  // 稅金
+  taxes: number;
+  // 幣別
+  salesCurrency: string;
+  // 匯率
+  exchangeRate: number;
+  // 總請款金額
+  requestAmount: number;
+  // 外幣金額
+  foreignCurrencyAmount: number;
+  // 請款未收款金額
+  uncollectedPayment: number;
+  // 總金額
+  totalAmount: number;
+  // 建立時間 UTC
+  createdAt: string;
+  // 修改時間 UTC
+  updatedAt: string;
+  // 建立人員
+  createdBy: string;
+  // 修改人員
+  updatedBy: string;
+  // 狀態
+  status: string;
+  // 已請款金額
+  prAmount: number;
+}
+
+// endregion accountsReceivable
+
+// ==============================================================================
+
 export type {
   //
   TnetCoreApiBody,
@@ -527,6 +579,8 @@ export type {
   Tprodreceiptdetail_Dto,
   //
   TengineerContactExport,
+  //
+  TaccountsReceivablesList_Dto,
 };
 
 export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
