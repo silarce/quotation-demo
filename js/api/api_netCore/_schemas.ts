@@ -561,40 +561,43 @@ interface TaccountsReceivablesList_Dto {
 }
 
 interface TquotationListViewModel_Dto {
-  id: string;
-  status: string;
-  reviewManagerEmployeeId: string | null;
-  managerReviewedAt: string | null;
-  quotationNumber: string;
-  version: number;
-  customerId: string | null;
-  projectName: string;
-  county: string;
-  district: string;
-  address: string;
-  contactPerson: string;
-  contactNumber: string;
-  quantity: number | null;
-  editNotes: string;
-  discount: number | null;
-  subTotal: number | null;
-  salesTax: number | null;
-  total: number | null;
-  deliveryLocation: string;
-  paymentMethods: string;
-  supervisorEmployeeId: string | null;
-  agentEmployeeId: string | null;
-  reviewSalesEmployeeId: string | null;
-  productsOrder: string;
-  tuneTotal: number | null;
-  averageDiscount: number | null;
-  estimatedDiscount: number | null;
-  type: string;
-  currency: string;
-  foreignTotal: number | null;
-  exchangeRate: number | null;
-  contractId: string | null;
-  contractStatus: string;
+  id: string; // 報價單id(quotation_content.id)
+  status: string; // 報價單狀態
+  reviewManagerEmployeeId: string | null; // 審核經理人員id
+  managerReviewedAt: string | null; // 審核經理人員審核時間
+  quotationNumber: string; // 報價單編號
+  version: number; // 報價單版本
+  customerId: string | null; // 客戶id
+  projectName: string; // 案場名稱
+  county: string; // 縣市
+  district: string; // 區域(鄉鎮市區)
+  address: string; // 地址
+  contactPerson: string; // 聯絡人
+  contactNumber: string; // 聯絡人電話
+  quantity: number | null; // 摚數
+  editNotes: string; // 編輯備註
+  discount: number | null; // 折扣
+  subTotal: number | null; // 小計
+  salesTax: number | null; // 銷售稅
+  total: number | null; // 總金額
+  deliveryLocation: string; // 交貨地點
+  paymentMethods: string; // 付款方式
+  supervisorEmployeeId: string | null; // 主管人員id
+  agentEmployeeId: string | null; // 承辦人員id
+  reviewSalesEmployeeId: string | null; // 審核業務人員id
+  productsOrder: string; // 產品順序
+  tuneTotal: number | null; // 調整總金額
+  averageDiscount: number | null; // 平均折扣
+  estimatedDiscount: number | null; // 預估折扣
+  type: string; // 報價單類型
+  currency: string; // 幣別
+  foreignTotal: number | null; // 外幣總金額
+  exchangeRate: number | null; // 匯率
+  contractId: string | null; // 合約id
+  contractStatus: string; // 合約狀態
+  contractNumber: string | null; // 合約編號
+  customerName: string | null; // 客戶名稱
+  additionalAmount: string | null; // 追加減金額
 }
 
 // endregion accountsReceivable
