@@ -11,19 +11,16 @@ import scss from './index.module.scss';
 
 // ============================================================================
 
-type Tprops_empty = Omit<ModalFuncProps, 'width'> & {
-  width?: 500 | 700 | 1200;
-};
-
 // ============================================================================
 
-const Modal_clean = ({ className, ...props }: ModalFuncProps) => {
+const modal_clean = ({ className, ...props }: ModalFuncProps) => {
   return Modal.info({
     className: classNames(scss.clean, className),
     icon: null,
     maskClosable: true,
     centered: true,
     footer: null,
+    width: 'fit-content',
     ...props,
   });
 };
@@ -35,6 +32,7 @@ const modal_empty = ({ className, ...props }: ModalFuncProps) => {
     maskClosable: true,
     centered: true,
     footer: null,
+    width: 'fit-content',
     ...props,
   });
 };
@@ -42,11 +40,10 @@ const modal_empty = ({ className, ...props }: ModalFuncProps) => {
 const modal_confirm = ({
   title,
   content: theContent,
-  width = 500,
   content_footer,
   props_footer,
   ...props
-}: Tprops_empty & {
+}: ModalFuncProps & {
   content_footer?: React.ReactNode;
   props_footer?: React.HTMLAttributes<HTMLDivElement>;
 } = {}) => {
@@ -56,7 +53,7 @@ const modal_confirm = ({
     </Container_confirm>
   );
 
-  return modal_empty({ content, width, ...props });
+  return modal_empty({ content, ...props });
 };
 
 // ==========================================================================
@@ -95,7 +92,7 @@ const modal_delete = ({
   closeOnCancel?: boolean;
   closeOnConfirm?: boolean;
 } = {}) => {
-  const instance = Modal_clean({
+  const instance = modal_clean({
     content: (
       <Template_confirm
         icon={<Icon_warning className="text-red01" />}
@@ -140,7 +137,7 @@ const modal_leave = ({
   closeOnCancel?: boolean;
   closeOnConfirm?: boolean;
 } = {}) => {
-  const instance = Modal_clean({
+  const instance = modal_clean({
     content: (
       <Template_confirm
         icon={<Icon_warning className="text-yellow01" />}
@@ -174,11 +171,4 @@ const modal_leave = ({
   return instance;
 };
 
-export {
-  //
-  Modal_clean,
-  modal_empty,
-  modal_confirm,
-  modal_delete,
-  modal_leave,
-};
+export { modal_clean, modal_empty, modal_confirm, modal_delete, modal_leave };
