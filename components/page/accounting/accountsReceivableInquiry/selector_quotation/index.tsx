@@ -1,37 +1,98 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 
 import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
-import Table_antd, { TableProps } from 'components/global/myAntd/table';
+import Table_antd, { TableProps, metaToPageProps } from 'components/global/myAntd/table';
 import Btn from 'components/global/gear/button/btn_fong';
 
 import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_query from 'public/image/icon/fong/query.svg';
 
+import { useApiGetQuotationList, TquotationListViewModel_Dto } from 'js/api/api_netCore/api_accountsReceivable';
+
+import { useDebounce } from 'hooks/useDebounce';
+
 import scss from './index.module.scss';
 
-export default function Selector_searchSomething({
-  onConfirm,
-  onCancel,
-}: {
-  onConfirm?: (data: TfakeData) => void;
+// ==========================================================================
+
+interface Tprops {
+  onConfirm?: (customer: TquotationListViewModel_Dto[]) => void;
   onCancel?: () => void;
-}) {
+  limit?: number;
+}
+
+// ==========================================================================
+export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: Tprops) {
+  const [page, setPage] = useState(1);
+
   const [contractNumber, setContractNumber] = useState('');
   const [customerName, setCustomerName] = useState('');
   const [quotationNumber, setQuotationNumber] = useState('');
   const [projectName, setProjectName] = useState('');
 
-  const [data, setData] = useState<TfakeData>();
+  const { debouncedState: params_search } = useDebounce(
+    useMemo(() => {
+      return {
+        contractNumber,
+        customerName,
+        quotationNumber,
+        projectName,
+      };
+    }, [contractNumber, customerName, quotationNumber, projectName]),
+    200
+  );
 
+  const params = useMemo(() => {
+    return {
+      page,
+      ...params_search,
+    };
+  }, [page, params_search]);
+
+  const { data: raw, meta } = useApiGetQuotationList(params);
+
+  const [selected, setSelected] = useState<TquotationListViewModel_Dto[]>([]);
+
+  // ------------------------------------------------------------------
+  const onRowClick = (record: TquotationListViewModel_Dto) => {
+    if (limit === 1) {
+      setSelected([record]);
+    }
+
+    const isExist = selected?.some((item) => item.id === record.id);
+
+    if (isExist) {
+      setSelected(selected.filter((item) => item.id !== record.id));
+    } else if (selected.length < limit) {
+      setSelected([...selected, record]);
+    }
+  };
+
+  const handle_confirm = () => {
+    // onConfirm && onConfirm();
+  };
+
+  const handle_cancel = () => {
+    onCancel && onCancel();
+  };
+
+  // ------------------------------------------------------------------
+
+  const pagination = meta && metaToPageProps(meta);
+
+  // ------------------------------------------------------------------
+
+  // ------------------------------------------------------------------
+  // MARK: RENDER
   return (
     <Container_confirm
       title="查詢資料"
       footerLeft={
         <div>
           <div>合約總金額</div>
-          <div className=" mt-[21.5px] ml-3">$99999</div>
+          <div className=" mt-[21.5px] ml-3">$??????</div>
         </div>
       }
       footerRight={
@@ -70,21 +131,26 @@ export default function Selector_searchSomething({
       <div className="mt-5">
         <Table_antd
           columns={columns}
-          dataSource={fakeData}
+          dataSource={raw}
           rowHoverable={false}
+          pagination={{
+            ...pagination,
+            onChange(page) {
+              setPage(page);
+            },
+          }}
           style={{
             width: '1360px',
           }}
           scroll={{
-            // x: '1330px',
-            y: 450,
+            y: 400,
           }}
-          rowClassName={(record) => {
-            return classNames(scss.row, record.id === data?.id && scss.active);
-          }}
+          rowClassName={(record) =>
+            classNames(' cursor-pointer', selected?.some((item) => item.id === record.id) && 'bg-blue05')
+          }
           onRow={(record) => ({
             onClick: () => {
-              setData(record);
+              onRowClick(record);
             },
           })}
         />
@@ -108,7 +174,7 @@ interface TfakeData {
 
 // ===========================================================================
 
-const columns: TableProps<TfakeData>['columns'] = [
+const columns: TableProps<TquotationListViewModel_Dto>['columns'] = [
   {
     title: '報價編號',
     dataIndex: 'quotationNumber',
@@ -133,18 +199,22 @@ const columns: TableProps<TfakeData>['columns'] = [
   },
   {
     title: '合約金額',
-    dataIndex: 'pirce',
+    dataIndex: 'total',
     width: 150,
+    align: 'right',
+    render: (value) => '$' + value.toLocaleString(),
   },
   {
     title: '稅金',
-    dataIndex: 'tax',
+    dataIndex: 'salesTax',
     width: 150,
+    align: 'right',
+    render: (value) => '$' + value.toLocaleString(),
   },
   {
     title: '幣別',
     dataIndex: 'currency',
-    width: 80,
+    width: 110,
   },
   {
     title: '追加減',
@@ -153,29 +223,3 @@ const columns: TableProps<TfakeData>['columns'] = [
     className: 'whitespace-pre-wrap ',
   },
 ];
-
-// ===========================================================================
-const createFakeData = (count: number): TfakeData[] => {
-  const data: TfakeData[] = [];
-  const currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'SEK', 'NOK'];
-
-  for (let i = 1; i <= count; i++) {
-    const price = Math.floor(Math.random() * 5000) + 1000;
-    data.push({
-      id: `${i}`,
-      quotationNumber: `Q${String(10000 + i).padStart(5, '0')}`,
-      contractNumber: `C${String(50000 + i).padStart(5, '0')}`,
-      projectName: `專案 ${String.fromCharCode(65 + ((i - 1) % 26))}-${Math.floor((i - 1) / 26) + 1}`, // 專案 A-1, B-1...
-      customerName: `客戶 ${String.fromCharCode(65 + ((i - 1) % 26))}`, // 客戶 A, B...
-      pirce: price,
-      tax: Math.round(price * 0.05),
-      currency: currencies[(i - 1) % currencies.length],
-      attachment: `追加50000\n追減30000\n變更10000`,
-    });
-  }
-
-  return data;
-};
-
-// 使用函式建立 20 筆假資料
-const fakeData: TfakeData[] = createFakeData(20);

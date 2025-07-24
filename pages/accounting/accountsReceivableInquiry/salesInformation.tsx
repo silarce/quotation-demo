@@ -8,7 +8,7 @@ import Btn from 'components/global/gear/button/btn_fong';
 import Tab from 'components/global/gear/button/tab';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
-import Selector_searchSomething from 'components/page/accounting/accountsReceivableInquiry/selector_searchSomething';
+import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
@@ -27,7 +27,7 @@ export default function SalesInformation() {
             onClick={() => {
               modal_empty({
                 width: 'fit-content',
-                content: <Selector_searchSomething />,
+                content: <Selector_quotation limit={2} />,
               });
             }}
           >

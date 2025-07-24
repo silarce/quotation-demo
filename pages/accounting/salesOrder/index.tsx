@@ -6,7 +6,7 @@ import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'comp
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
-import Selector_searchSomething from 'components/page/accounting/accountsReceivableInquiry/selector_searchSomething';
+import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
@@ -26,7 +26,7 @@ export default function SalesOrder() {
   const handle_importContract = () => {
     modal_empty({
       width: 'fit-content',
-      content: <Selector_searchSomething />,
+      content: <Selector_quotation />,
     });
   };
 
