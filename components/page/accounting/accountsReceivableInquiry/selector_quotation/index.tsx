@@ -71,7 +71,7 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
   };
 
   const handle_confirm = () => {
-    // onConfirm && onConfirm();
+    onConfirm && onConfirm(selected);
   };
 
   const handle_cancel = () => {
@@ -81,8 +81,6 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
   // ------------------------------------------------------------------
 
   const pagination = meta && metaToPageProps(meta);
-
-  // ------------------------------------------------------------------
 
   // ------------------------------------------------------------------
   // MARK: RENDER
@@ -97,8 +95,10 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
       }
       footerRight={
         <>
-          <Btn>取消</Btn>
-          <Btn theme="save">儲存</Btn>
+          <Btn onClick={handle_cancel}>取消</Btn>
+          <Btn theme="save" onClick={handle_confirm}>
+            儲存
+          </Btn>
         </>
       }
     >
