@@ -269,7 +269,7 @@ const columns: TableProps<TfakeData>['columns'] = [
     width: 80,
     align: 'center',
     render: () => (
-      <div className="flex gap-[10px] justify-center">
+      <div className="flex gap-[16px] justify-center">
         <Icon_note className="w-[16px] h-[16px] text-blue01" />
         <Icon_trash className="w-[16px] h-[16px] text-red01" />
       </div>

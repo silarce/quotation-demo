@@ -278,7 +278,7 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
 
         if (state?.id === record.id) {
           node = (
-            <div className="flex gap-[10px] justify-center">
+            <div className="flex gap-[16px] justify-center">
               <Icon_cancel
                 className="w-[16px] h-[16px] text-red01 cursor-pointer"
                 onClick={() => {
@@ -290,7 +290,7 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
           );
         } else {
           node = (
-            <div className="flex gap-[10px] justify-center">
+            <div className="flex gap-[16px] justify-center">
               <Icon_note
                 className="w-[16px] h-[16px] text-blue01 cursor-pointer"
                 onClick={() => {
