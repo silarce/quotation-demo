@@ -560,6 +560,43 @@ interface TaccountsReceivablesList_Dto {
   projectName: string | null;
 }
 
+interface TquotationListViewModel_Dto {
+  id: string;
+  status: string;
+  reviewManagerEmployeeId: string | null;
+  managerReviewedAt: string | null;
+  quotationNumber: string;
+  version: number;
+  customerId: string | null;
+  projectName: string;
+  county: string;
+  district: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  quantity: number | null;
+  editNotes: string;
+  discount: number | null;
+  subTotal: number | null;
+  salesTax: number | null;
+  total: number | null;
+  deliveryLocation: string;
+  paymentMethods: string;
+  supervisorEmployeeId: string | null;
+  agentEmployeeId: string | null;
+  reviewSalesEmployeeId: string | null;
+  productsOrder: string;
+  tuneTotal: number | null;
+  averageDiscount: number | null;
+  estimatedDiscount: number | null;
+  type: string;
+  currency: string;
+  foreignTotal: number | null;
+  exchangeRate: number | null;
+  contractId: string | null;
+  contractStatus: string;
+}
+
 // endregion accountsReceivable
 
 // ==============================================================================
@@ -606,6 +643,7 @@ export type {
   TengineerContactExport,
   //
   TaccountsReceivablesList_Dto,
+  TquotationListViewModel_Dto,
 };
 
 export type {

@@ -4,7 +4,13 @@ import { axi_monkey } from '../_axiosCreator';
 
 import type { AxiosError } from 'axios';
 
-import type { TapiParams, Tmeta, TpageResponse, TaccountsReceivablesList_Dto } from './_schemas';
+import type {
+  TapiParams,
+  Tmeta,
+  TpageResponse,
+  TaccountsReceivablesList_Dto,
+  TquotationListViewModel_Dto,
+} from './_schemas';
 
 const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
   // const api = '/api/AccountsReceivable/GetAccountsReceivablesList';
@@ -53,5 +59,57 @@ const useApiGetAccountsReceivablesList = (
   };
 };
 
-export type { TaccountsReceivablesList_Dto };
-export { useApiGetAccountsReceivablesList };
+const apiGetQuotationList = async (
+  params?: TapiParams & {
+    contractNumber?: string;
+    customerName?: string;
+    quotationNumber?: string;
+    projectName?: string;
+  }
+) => {
+  const api = '/api/AccountsReceivable/GetQuotationList';
+
+  return axi_monkey.get<TpageResponse<TquotationListViewModel_Dto>>(api, { params }).then(({ data }) => data);
+};
+
+const useApiGetQuotationList = (
+  params?: Parameters<typeof apiGetQuotationList>[0],
+  { autoUpdate = true }: { autoUpdate?: boolean } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TpageResponse<TquotationListViewModel_Dto> | null>();
+
+  const update = async () => {
+    if (isFetching) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    const res = await apiGetQuotationList(params).catch((err: AxiosError) => {
+      console.error('useApiGetQuotationList error:', err);
+
+      setRes(null);
+
+      return null;
+    });
+
+    setRes(res);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [params]);
+
+  return {
+    isFetching,
+    data: res?.items,
+    meta: res?.meta,
+    update,
+  };
+};
+
+// ========================================================================
+export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto };
+export { useApiGetAccountsReceivablesList, useApiGetQuotationList };
