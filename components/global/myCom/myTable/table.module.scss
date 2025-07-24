@@ -4,49 +4,49 @@
 }
 .customTable :global(.ant-table) {
   // height: 304px !important;
-  min-height: 96px !important;
+  min-height: 96px ;
   // max-height: 304px !important;
-  overflow: auto !important; // 讓表格可以滾動
-  border-radius: 6px 6px 0px 0px !important;
+  overflow: auto ; // 讓表格可以滾動
+  border-radius: 6px 6px 0px 0px ;
 }
 .customTable :global(.ant-table-thead > tr > .ant-table-cell) {
-  color: black !important;
+  color: black ;
 }
 
 .customTable :global(.ant-table-thead > tr > th) {
-  background: #edf1f7 !important;
-  border-bottom: 1px solid #616161 !important;
-  height: 48px !important;
-  padding: 0px 16px !important;
+  background: #edf1f7 ;
+  border-bottom: 1px solid #616161 ;
+  height: 48px ;
+  padding: 0px 16px ;
 }
 //去除垂直的線
 .customTable :global(.ant-table-thead > tr > th:last-child) {
-  border-right: none !important;
-  border-start-end-radius: 6px !important;
+  border-right: none ;
+  border-start-end-radius: 6px ;
 }
 .customTable :global(.ant-table-thead > tr > th:first-child) {
-  border-start-start-radius: 6px !important;
+  border-start-start-radius: 6px ;
 }
 
 .customTable :global(.ant-table-container) {
   border: 1px solid #616161 !important;
   overflow: hidden;
   position: relative;
-  border-start-start-radius: 6px !important;
-  border-start-end-radius: 6px !important;
-  border-end-start-radius: 6px !important;
-  border-end-end-radius: 6px !important;
+  border-start-start-radius: 6px ;
+  border-start-end-radius: 6px ;
+  border-end-start-radius: 6px;
+  border-end-end-radius: 6px ;
 }
 
 .customTable :global(.ant-table-tbody > tr > td) {
-  border-bottom: 1px solid #616161;
+  border-bottom: 1px solid #616161 ;
 }
 .customTable :global(.ant-table-tbody > tr > td) {
   padding-top: 8px;
   padding-bottom: 8px;
 }
 .customTable :global(.ant-table-tbody > tr) {
-  line-height: 23px !important;
+  line-height: 23px ;
 }
 
 //去除垂直的線
@@ -65,19 +65,19 @@
 
 //去除::before的線
 .customTable :global(.ant-table-thead > tr > th::before) {
-  display: none !important;
+  display: none ;
 }
 
 //搜尋欄
 .customSearchInput :global(.ant-input-affix-wrapper) {
-  border: none !important;
-  border-radius: 8px !important;
-  box-shadow: none !important;
-  width: 250px !important;
+  border: none ;
+  border-radius: 8px ;
+  box-shadow: none ;
+  width: 250px ;
 }
 
 .customSearchInput :global(.ant-input-search-button .anticon-search) {
-  color: #616161 !important; // 你想要的顏色
+  color: #616161 ; // 你想要的顏色
   font-size: 24px;
 }
 
@@ -86,26 +86,26 @@
 // }
 
 .customSearchInput :global(.ant-input-search-button) {
-  border-top: none !important;
-  border-right: none !important;
-  border-bottom: none !important;
-  border-left: 1px solid #616161 !important;
-  // color: #1d4ed8 !important;
-  height: 38px !important;
+  border-top: none ;
+  border-right: none ;
+  border-bottom: none ;
+  border-left: 1px solid #616161 ;
+  // color: #1d4ed8 ;
+  height: 38px ;
 }
 .customSearchInput :global(.ant-input-group) {
-  border-radius: 8px !important;
-  border: 1px solid #616161 !important;
-  color: #1d4ed8 !important;
-  height: 40px !important;
+  border-radius: 8px ;
+  border: 1px solid #616161 ;
+  color: #1d4ed8 ;
+  height: 40px ;
 }
 .customSearchInput :global(.ant-input) {
   height: 30px; // 與 affix wrapper 高度一致
   line-height: 40px; // 讓文字垂直置中
   padding: 0 11px; // 保持左右間距
   display: flex;
-  align-items: center; // 保險起見加這個
-  font-size: 14px !important;
+  align-items: center;
+  font-size: 14px ;
 }
 
 //Modal

@@ -9,21 +9,17 @@ import Bonus from './bonus/index';
 
 type TabKey = 'TravelAllowance' | 'PettyCash' | 'Borrow' | 'Bonus';
 
+interface Tquery {
+  tab?: TabKey;
+}
+
 export default function FeeApplication() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabKey>('TravelAllowance');
+  const query = router.query as Tquery;
 
-  // 初始化根據 query 設定 tab
-  useEffect(() => {
-    const tab = router.query.tab as TabKey;
-
-    if (tab && ['TravelAllowance', 'Borrow', 'CardApplication', 'Bonus'].includes(tab)) {
-      setActiveTab(tab);
-    }
-  }, [router.query.tab]);
+  const activeTab = query.tab || 'TravelAllowance';
 
   const handleTabChange = (tabKey: TabKey) => {
-    setActiveTab(tabKey);
     router.push(
       {
         pathname: router.pathname,
