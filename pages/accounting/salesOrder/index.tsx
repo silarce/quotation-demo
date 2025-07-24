@@ -272,13 +272,13 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
       key: 'panel',
       title: '操作',
       align: 'center',
-      width: 90,
+      width: 100,
       render: (_, record) => {
         let node: React.ReactNode = null;
 
         if (state?.id === record.id) {
           node = (
-            <div className="flex gap-2">
+            <div className="flex gap-[10px] justify-center">
               <Icon_cancel
                 className="w-[16px] h-[16px] text-red01 cursor-pointer"
                 onClick={() => {
@@ -290,7 +290,7 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
           );
         } else {
           node = (
-            <div className="flex gap-2">
+            <div className="flex gap-[10px] justify-center">
               <Icon_note
                 className="w-[16px] h-[16px] text-blue01 cursor-pointer"
                 onClick={() => {

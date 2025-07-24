@@ -266,10 +266,10 @@ const columns: TableProps<TfakeData>['columns'] = [
   {
     title: '操作',
     key: 'action',
-    width: 90,
+    width: 80,
     align: 'center',
     render: () => (
-      <div className="flex gap-2">
+      <div className="flex gap-[10px] justify-center">
         <Icon_note className="w-[16px] h-[16px] text-blue01" />
         <Icon_trash className="w-[16px] h-[16px] text-red01" />
       </div>
