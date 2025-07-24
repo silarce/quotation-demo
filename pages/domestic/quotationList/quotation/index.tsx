@@ -724,6 +724,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       isLost: state_profile.isLost,
       //
       designUnitId: designUnit?.id ?? null,
+
+      autoRefresh: true,
     };
 
     if (!body.customerId) {

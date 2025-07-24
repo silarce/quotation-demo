@@ -26,6 +26,8 @@ import {
 import { InputSel_prod } from './hook/quotationProduct/ui/InputSel_prod';
 import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import DataEntry from 'components/global/gear/dataEntry';
+import Tip from 'components/global/myAntd/popover/tip';
 
 // css
 import scss from './QuotationProdTable.module.scss';
@@ -58,6 +60,9 @@ interface Tprops {
   showQuotationDiscount?: TtableProps['showQuotationDiscount'];
   // isIterativeProd?: TtableProps['isIterativeProd'];
   prodTotal?: TtableProps['prodTotal'];
+
+  changeAllowProdAutoChange?: (v: boolean) => void;
+  state_allowProdAutoChange?: boolean;
 }
 
 interface TtableProps {
@@ -67,6 +72,8 @@ interface TtableProps {
   showQuotationDiscount?: boolean;
   // isIterativeProd?: boolean;
   prodTotal?: React.ReactNode;
+  changeAllowProdAutoChange?: Tprops['changeAllowProdAutoChange'];
+  state_allowProdAutoChange?: Tprops['state_allowProdAutoChange'];
 }
 
 interface Tcontext {
@@ -91,6 +98,9 @@ export default function QuotationProdTable(tableProps: Tprops) {
     showQuotationDiscount = true,
     // isIterativeProd,
     prodTotal,
+
+    changeAllowProdAutoChange,
+    state_allowProdAutoChange,
   } = tableProps;
 
   const instance_useQuotationProductInstance = tableProps.instance_useQuotationProductInstance;
@@ -108,6 +118,8 @@ export default function QuotationProdTable(tableProps: Tprops) {
           showQuotationDiscount={showQuotationDiscount}
           // isIterativeProd={isIterativeProd}
           prodTotal={prodTotal}
+          changeAllowProdAutoChange={changeAllowProdAutoChange}
+          state_allowProdAutoChange={state_allowProdAutoChange}
         />
         <br />
 
@@ -176,6 +188,9 @@ const Table_prod = ({
   showQuotationDiscount,
   // isIterativeProd,
   prodTotal,
+  //
+  changeAllowProdAutoChange,
+  state_allowProdAutoChange,
 }: TtableProps) => {
   // const { isIterativeProdExist } = useContext(Context);
 
@@ -273,6 +288,23 @@ const Table_prod = ({
         {/* <SquareBtn className="ml-2" sharp="mini">
           編輯欄位排序
         </SquareBtn> */}
+
+        <div className={'ml-auto'}>
+          {changeAllowProdAutoChange && (
+            <div className="flex gap-0">
+              <DataEntry.Checkbox
+                disabled={disabled}
+                checked={state_allowProdAutoChange}
+                onChange={(e) => {
+                  changeAllowProdAutoChange(e.target.checked);
+                }}
+              >
+                自動計算
+              </DataEntry.Checkbox>
+              <Tip content="編輯L、W、h、boxB時仍會自動計算。" />
+            </div>
+          )}
+        </div>
       </div>
       {/*  */}
       <div className={classNames(scss.prodTable, className)}>

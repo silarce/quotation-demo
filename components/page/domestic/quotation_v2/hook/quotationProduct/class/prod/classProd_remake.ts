@@ -82,6 +82,8 @@ interface Tprops_constructor {
   nodeConfig: TnodeConfig;
   quotationDiscount: number | `${number}`;
   onPordTotalChange: () => void;
+
+  allowProdAutoChange: boolean;
 }
 
 // ================================================================================
@@ -166,9 +168,19 @@ class ClassProd {
 
   onPordTotalChange;
 
+  allowProdAutoChange: boolean;
+
   // ---------------------------------------------------------------------------
   // MARK:constructor
-  constructor({ stateProd, setStateProd, nodeConfig, quotationDiscount, onPordTotalChange }: Tprops_constructor) {
+  constructor({
+    //
+    stateProd,
+    setStateProd,
+    nodeConfig,
+    quotationDiscount,
+    onPordTotalChange,
+    allowProdAutoChange,
+  }: Tprops_constructor) {
     this.state = stateProd;
     this.quotationDiscount = quotationDiscount;
 
@@ -177,6 +189,8 @@ class ClassProd {
     this.nodeConfig = customizeNodeConfig({ nodeConfig });
 
     this.onPordTotalChange = onPordTotalChange;
+
+    this.allowProdAutoChange = allowProdAutoChange;
   } // constructor
   // ---------------------------------------------------------------------------
 
@@ -1561,7 +1575,7 @@ class ClassProd {
 
     this.data.materialName = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;
@@ -1590,7 +1604,7 @@ class ClassProd {
 
     this.data.materialSurface = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;
@@ -1616,7 +1630,7 @@ class ClassProd {
 
     this.data.horsepower = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;
@@ -1670,7 +1684,7 @@ class ClassProd {
   set guideRail(value) {
     this.data.guideRail = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;
@@ -1706,7 +1720,7 @@ class ClassProd {
 
     this.data.guideRailThickness = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;
@@ -1765,7 +1779,7 @@ class ClassProd {
   set headBoxThickness(value) {
     this.data.headBoxThickness = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;
@@ -1822,7 +1836,7 @@ class ClassProd {
   set bottomBarAngleIron(value) {
     this.data.bottomBarAngleIron = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;
@@ -1860,7 +1874,7 @@ class ClassProd {
   set bottomBarPlate(value) {
     this.data.bottomBarPlate = value;
 
-    if (this.isSpecial) {
+    if (this.isSpecial || !this.allowProdAutoChange) {
       this.render();
 
       return;

@@ -221,6 +221,7 @@ const useQuotationProduct = ({
   iterativeContractProductArr,
   disabled,
   onProdAllTotalChange: _onProdAllTotalChange,
+  raw_autoRefresh,
 }: {
   raw_quotationProductArr: TprodSource[] | undefined;
   iterativeContractProductArr: TprodSource[] | undefined;
@@ -229,6 +230,7 @@ const useQuotationProduct = ({
   raw_quotationDiscount: TquotationContentDto['discount'] | undefined;
   disabled: boolean;
   onProdAllTotalChange: (alltotal: number) => void;
+  raw_autoRefresh: boolean;
 }) => {
   const raw_productArr = raw_quotationProductArr;
   const defaultQuotationDiscount = (raw_quotationDiscount ? raw_quotationDiscount : '100') as `${number}`;
@@ -265,6 +267,9 @@ const useQuotationProduct = ({
   const defaultState_iterative_copy = useMemo(() => {
     return _.cloneDeep(defaultState_iterativeProdDict);
   }, [defaultState_iterativeProdDict, disabled]);
+
+  // 自動取得資料
+  const [state_allowProdAutoChange, setState_allowProdAutoChange] = useState<boolean>(raw_autoRefresh);
 
   // 總折數
   const [state_quotationDiscount, setState_quotationDiscount] = useState<`${number}` | ''>(defaultQuotationDiscount);
@@ -435,6 +440,7 @@ const useQuotationProduct = ({
     state_prodDict,
     activeProdKey,
     setActiveProdKey,
+    allowProdAutoChange: state_allowProdAutoChange,
   });
 
   const {
@@ -457,6 +463,7 @@ const useQuotationProduct = ({
     state_prodDict: state_iterativeProdDict,
     activeProdKey: activeProdKey_iterative,
     setActiveProdKey: setActiveProdKey_iterative,
+    allowProdAutoChange: state_allowProdAutoChange,
   });
 
   const copy_prodToProd: Tinstance_useQuotationProduct['copyProd'] = ({ prodKey }) => {
@@ -629,6 +636,10 @@ const useQuotationProduct = ({
     // props.cellKeyArr_accessory && setCellKeyArr_accessory(props.cellKeyArr_accessory);
   };
 
+  const changeAllowProdAutoChange = (v: boolean) => {
+    setState_allowProdAutoChange(v);
+  };
+
   // -----------------------------------------------------------------------
   // region useEffect
 
@@ -676,6 +687,10 @@ const useQuotationProduct = ({
   useEffect(() => {
     _onProdAllTotalChange(theProductTotal);
   }, [theProductTotal]);
+
+  useEffect(() => {
+    setState_allowProdAutoChange(raw_autoRefresh);
+  }, [raw_autoRefresh, disabled]);
 
   // -----------------------------------------------------------------------------
   // -----------------------------------------------------------------------------
@@ -801,6 +816,9 @@ const useQuotationProduct = ({
     checkIsIterativeProdValid,
     exportState,
     restoreState,
+    //
+    changeAllowProdAutoChange,
+    state_allowProdAutoChange,
   };
 };
 

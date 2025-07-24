@@ -50,6 +50,7 @@ const kit_req = ({
   instatnce_getQuotationId3,
   status,
   calcProductBody,
+  allowProdAutoChange,
 }: {
   userId: string | undefined;
   quotationId: string | undefined;
@@ -71,6 +72,7 @@ const kit_req = ({
   instatnce_getQuotationId3: Tinstance_getQuotationId3;
   status: TquotationContentDto['status'];
   calcProductBody: TcalcProductBody;
+  allowProdAutoChange: boolean;
 }) => {
   const { reqPost, reqPatch, reqCopyQuotation } = instatnce_getQuotationId3;
 
@@ -128,6 +130,8 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
+
+      allowProdAutoChange,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -191,6 +195,8 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
+
+      allowProdAutoChange,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -266,6 +272,8 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
+
+      allowProdAutoChange,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -353,6 +361,8 @@ const kit_req = ({
       annoArr,
       quotationRangeArr,
       status,
+
+      allowProdAutoChange,
     });
 
     const attachmentArr: FormData[] = createAttachmentArr(await createFileArr());
@@ -415,6 +425,7 @@ const createBody = ({
   annoArr,
   quotationRangeArr,
   status,
+  allowProdAutoChange,
 }: {
   quotationDiscount: `${number}`;
   avgDiscount: number;
@@ -434,6 +445,8 @@ const createBody = ({
   annoArr: string[];
   quotationRangeArr: string[];
   status: TquotationContentDto['status'];
+
+  allowProdAutoChange: boolean;
 }) => {
   const { formatToBody_other } = instance_useQuotationOther;
 
@@ -515,6 +528,7 @@ const createBody = ({
     others: formatToBody_other(),
     isLost,
     designUnitId: designUnit?.id || null,
+    autoRefresh: allowProdAutoChange,
   };
 
   return body;
