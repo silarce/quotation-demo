@@ -19,9 +19,8 @@ export default function SalesInformation() {
   return (
     <div>
       {/*  */}
-      <div className="pageTop flex justify-between items-center">
-        <div className="text-xl font-semibold">應收款</div>
-        <div className="flex gap-3">
+      <div className="pageTop ">
+        <div className="flex gap-3 w-fit ml-auto mr-0">
           <Btn onClick={router.back}>返回</Btn>
           <Btn
             theme="query"
@@ -42,6 +41,7 @@ export default function SalesInformation() {
       {/*  */}
 
       <div className="border border-gray05 rounded-01 py-8 px-6">
+        <div className="text-xl font-semibold mb-6">應收款</div>
         <div className="grid grid-cols-4 gap-fong ">
           <DataEntry_fong caption="合約編號" isMust={true} className="col-span-2">
             <Input required />
