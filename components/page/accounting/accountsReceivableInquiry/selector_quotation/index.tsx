@@ -160,19 +160,6 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
 }
 
 // ===========================================================================
-interface TfakeData {
-  id: string;
-  quotationNumber: string;
-  contractNumber: string;
-  projectName: string;
-  customerName: string;
-  pirce: number;
-  tax: number;
-  currency: string;
-  attachment: string;
-}
-
-// ===========================================================================
 
 const columns: TableProps<TquotationListViewModel_Dto>['columns'] = [
   {
@@ -223,3 +210,5 @@ const columns: TableProps<TquotationListViewModel_Dto>['columns'] = [
     className: 'whitespace-pre-wrap ',
   },
 ];
+
+export type { TquotationListViewModel_Dto };

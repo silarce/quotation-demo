@@ -1,41 +1,155 @@
+import { useState, useEffect, useMemo } from 'react';
+
 import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
-import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
+import { DataEntry_fong } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
-import Tab from 'components/global/gear/button/tab';
+
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
-import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
+import Selector_quotation, {
+  TquotationListViewModel_Dto,
+} from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 
-import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
+
+// ============================================================================
+
+type Tstate = {
+  id?: string;
+  contractNumber: string; // 合約編號
+  projectName: string; // 案場名稱
+  customerNumber: string; // 客戶編號
+  customerName: string; // 客戶名稱
+  customerTaxId: string; // 統一編號
+  taxType: string; // 稅別
+  currency: string; // 外幣
+  total: number | null; // 銷售金額
+  salesTax: number | null; // 銷售稅金
+
+  attachmentTotal: '沒有property' | number | null; // 追加減金額
+  attachmentTax: '沒有property' | number | null; // 追加減金額稅金
+
+  receivedAmount: '沒有property' | number | null; // 已收金額
+  discountAmount: '沒有property' | number | null; // 扣款折讓
+
+  totalAmount: '沒有property' | number | null; // 已請款總額
+  salesTotal: '沒有property' | number | null; // 銷售總額
+};
+
+// ============================================================================
+
+// MARK: START
 
 export default function SalesInformation() {
   const router = useRouter();
+  const { id } = router.query;
+  const isNew = !id;
 
+  const [state, setState] = useState<Tstate>();
+
+  const onSelectQuotation = (data: TquotationListViewModel_Dto | undefined) => {
+    if (!data) {
+      return;
+    }
+
+    const {
+      // status,
+      // reviewManagerEmployeeId,
+      // managerReviewedAt,
+      // quotationNumber,
+      // version,
+      // customerId,
+      projectName,
+      // county,
+      // district,
+      // address,
+      // contactPerson,
+      // contactNumber,
+      // quantity,
+      // editNotes,
+      // discount,
+      // subTotal,
+      salesTax,
+      total,
+      // deliveryLocation,
+      // paymentMethods,
+      // supervisorEmployeeId,
+      // agentEmployeeId,
+      // reviewSalesEmployeeId,
+      // productsOrder,
+      // tuneTotal,
+      // averageDiscount,
+      // estimatedDiscount,
+      // type,
+      currency,
+      // foreignTotal,
+      // exchangeRate,
+      // contractId,
+      // ontractStatus,
+    } = data;
+
+    const newState: Tstate = {
+      ...state,
+      contractNumber: '沒有property',
+      projectName,
+      customerNumber: '沒有property',
+      customerName: '沒有property',
+      customerTaxId: '沒有property',
+      taxType: '沒有property',
+      currency,
+      total,
+      salesTax,
+      attachmentTotal: '沒有property',
+      attachmentTax: '沒有property',
+      receivedAmount: '沒有property',
+      discountAmount: '沒有property',
+      totalAmount: '沒有property',
+      salesTotal: '沒有property',
+    };
+
+    setState(newState);
+  };
+
+  // MARK: RENDER
   return (
     <div>
       {/*  */}
       <div className="pageTop ">
         <div className="flex gap-3 w-fit ml-auto mr-0">
           <Btn onClick={router.back}>返回</Btn>
-          <Btn
-            theme="query"
-            onClick={() => {
-              modal_empty({
-                width: 'fit-content',
-                content: <Selector_quotation limit={2} />,
-              });
-            }}
-          >
-            查詢資料
-          </Btn>
-          <Btn theme="save" form="aa">
-            儲存
-          </Btn>
+
+          {isNew && (
+            <>
+              <Btn
+                theme="query"
+                onClick={() => {
+                  const { destroy } = modal_empty({
+                    width: 'fit-content',
+                    content: (
+                      <Selector_quotation
+                        onConfirm={([data]) => {
+                          onSelectQuotation(data);
+                          destroy();
+                        }}
+                        onCancel={() => {
+                          destroy();
+                        }}
+                      />
+                    ),
+                  });
+                }}
+              >
+                查詢資料
+              </Btn>
+              <Btn theme="save" form="aa">
+                儲存
+              </Btn>
+            </>
+          )}
         </div>
       </div>
       {/*  */}
@@ -44,50 +158,35 @@ export default function SalesInformation() {
         <div className="text-xl font-semibold mb-6">應收款</div>
         <div className="grid grid-cols-4 gap-fong ">
           <DataEntry_fong caption="合約編號" isMust={true} className="col-span-2">
-            <Input required />
+            {state?.contractNumber}
           </DataEntry_fong>
-          <DataEntry_fong caption="案場名稱" isMust={true} className="col-span-2">
-            <Input />
+          <DataEntry_fong caption="案場名稱" className="col-span-2">
+            {state?.projectName}
           </DataEntry_fong>
-          <DataEntry_fong caption="客戶編號" isMust={true} className="col-span-2">
-            <Input />
+          <DataEntry_fong caption="客戶編號" className="col-span-2">
+            {state?.customerNumber}
           </DataEntry_fong>
-          <DataEntry_fong caption="客戶名稱" isMust={true} className="col-span-2">
-            <Input />
+          <DataEntry_fong caption="客戶名稱" className="col-span-2">
+            {state?.customerName}
           </DataEntry_fong>
-          <DataEntry_fong caption="統一編號" isMust={true} className="col-span-2">
-            <Input />
+          <DataEntry_fong caption="統一編號" className="col-span-2">
+            {state?.customerTaxId}
           </DataEntry_fong>
-          <DataEntry_fong caption="稅別" isMust={true}>
-            <Input />
+          <DataEntry_fong caption="稅別">{state?.taxType}</DataEntry_fong>
+          <DataEntry_fong caption="外幣">{state?.currency}</DataEntry_fong>
+          <DataEntry_fong caption="銷售金額">
+            {<span className="text-right"></span>}
+            {/* {<span className="text-right">{toLocaleString(state?.total)}</span>} */}
           </DataEntry_fong>
-          <DataEntry_fong caption="外幣" isMust={true}>
-            <Input />
+          <DataEntry_fong caption="銷售稅金">
+            {<span className="text-right">{toLocaleString(state?.salesTax)}</span>}
           </DataEntry_fong>
-          <DataEntry_fong caption="銷售金額" isMust={true}>
-            <Input />
-          </DataEntry_fong>
-          <DataEntry_fong caption="銷售稅金" isMust={true}>
-            <Input />
-          </DataEntry_fong>
-          <DataEntry_fong caption="追加減金額" isMust={true}>
-            <Input />
-          </DataEntry_fong>
-          <DataEntry_fong caption="追加減金額稅金" isMust={true}>
-            <Input />
-          </DataEntry_fong>
-          <DataEntry_fong caption="已收金額" isMust={true}>
-            <Input />
-          </DataEntry_fong>
-          <DataEntry_fong caption="扣款折讓" isMust={true}>
-            <Input />
-          </DataEntry_fong>
-          <DataEntry_fong caption="已請款總額" isMust={true}>
-            <Input />
-          </DataEntry_fong>
-          <DataEntry_fong caption="銷售總額" isMust={true}>
-            <Input />
-          </DataEntry_fong>
+          <DataEntry_fong caption="追加減金額">{state?.attachmentTotal}</DataEntry_fong>
+          <DataEntry_fong caption="追加減金額稅金">{state?.attachmentTax}</DataEntry_fong>
+          <DataEntry_fong caption="已收金額">{state?.receivedAmount}</DataEntry_fong>
+          <DataEntry_fong caption="扣款折讓">{state?.discountAmount}</DataEntry_fong>
+          <DataEntry_fong caption="已請款總額">{state?.totalAmount}</DataEntry_fong>
+          <DataEntry_fong caption="銷售總額">{state?.salesTotal}</DataEntry_fong>
         </div>
         {/*  */}
         <div className="mt-10">
@@ -109,6 +208,18 @@ export default function SalesInformation() {
     </div>
   );
 }
+
+// MARK: END
+
+// ==========================================================================
+
+const toLocaleString = (value: number | null | undefined) => {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  return '$' + value.toLocaleString();
+};
 
 // ==========================================================================
 
