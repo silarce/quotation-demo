@@ -58,7 +58,7 @@ function Btn_fong({
 
 // ================================================================================
 
-type Tcolors = 'basic' | 'blue_I' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I' | 'yellow_I';
+type Tcolors = 'basic' | 'blue_I' | 'blue_II' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I' | 'yellow_I';
 
 type TthemeName =
   | 'basic'
@@ -134,12 +134,13 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
     Icon: Icon_cross,
   },
   import: {
+    themeColor: 'blue_II',
     Icon: Icon_import,
   },
   query: {
+    themeColor: 'blue_II',
     Icon: Icon_query,
   },
-
   saveAs: {
     Icon: Icon_saveAs,
   },

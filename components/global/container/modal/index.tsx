@@ -7,18 +7,16 @@ function Container_confirm({
   footerRight,
   children,
   props_footer: { className: className_footer, ...props_footer } = {},
-  theme = '01',
 }: {
   title?: React.ReactNode;
   footerLeft?: React.ReactNode;
   footerRight?: React.ReactNode;
   children: React.ReactNode;
   props_footer?: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
-  theme?: '01' | '02';
 }) {
   return (
     <div className={classNames(scss.confirm)}>
-      {title && <div className={classNames(scss.title, scss[`s${theme}`])}>{title}</div>}
+      {title && <div className={classNames(scss.title)}>{title}</div>}
       <div>{children}</div>
 
       {(footerLeft || footerRight) && (
