@@ -39,6 +39,8 @@
 }
 
 .blue_I {
+  border-color: theme("colors.blue01");
+  color: theme("colors.blue01");
   background-color: theme("colors.white01");
   &:hover {
     background-color: theme("colors.blue02");
@@ -46,9 +48,22 @@
     color: theme("colors.white01");
   }
   &:active {
-    background-color: theme("colors.blue01");
-    border-color: theme("colors.blue01");
+    background-color: theme("colors.blue03");
+    border-color: theme("colors.blue03");
     color: theme("colors.white01");
+  }
+}
+
+.blue_II {
+  border-color: theme("colors.blue01");
+  color: theme("colors.blue01");
+  &:hover {
+    border-color: theme("colors.blue02");
+    color: theme("colors.blue02");
+  }
+  &:active {
+    border-color: theme("colors.blue03");
+    color: theme("colors.blue03");
   }
 }
 
