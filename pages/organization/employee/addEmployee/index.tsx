@@ -413,7 +413,7 @@ export default function Organization() {
             options={selectOptionsMap.gender_pcode || []}
           />
           <LabeledSelectV2
-            label="編制"
+            label="勤務"
             required={true}
             placeholder="請選擇"
             value={formState.gender_pcode}

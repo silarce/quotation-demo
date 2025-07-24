@@ -12,7 +12,7 @@ const EditButton: React.FC<EditButtonProps> = ({ onClick, label, className = '' 
   return (
     <button className={`${scss.blueButtonNew} ${className} gap-2`} onClick={onClick}>
       <IconButtonNote />
-      {label}
+      <span>{label}</span>
     </button>
   );
 };

@@ -14,13 +14,13 @@
     background-color: theme("colors.white01");
     padding-bottom: 24px;
     &::before {
-      content: "";
+      content: '';
       position: absolute;
       bottom: 100%;
       left: 0;
       width: 100%;
-      height: theme("padding.layoutY");
-      background-color: theme("colors.white01");
+      height: theme('padding.layoutY');
+      background-color: theme('colors.white01');
     }
   }
   .gap-fong {

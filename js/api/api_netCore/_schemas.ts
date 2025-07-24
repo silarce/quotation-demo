@@ -6,6 +6,25 @@ type Treview_status = '未審核' | '已審核' | '審核中';
 type Treview_status__stages = '核准' | '提出' | '簽核中' | '';
 type Tdocument_status = '審核中' | '駁回' | '核准' | '抽單';
 
+interface Tmeta {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  itemCount: number;
+  page: number;
+  pageCount: number;
+  pageSize: number;
+}
+
+interface TpageResponse<T> {
+  items: T[];
+  meta: Tmeta;
+}
+
+interface TapiParams {
+  page?: number;
+  pageSize?: number;
+}
+
 // ==============================================================================
 
 interface TnetCoreApiBody {
@@ -487,6 +506,64 @@ interface TengineerContactExport {
 
 // ==============================================================================
 
+// region accountsReceivable
+
+interface TaccountsReceivablesList_Dto {
+  id: string;
+  //  應收帳款編號
+  accountsReceivableNumber: string;
+  // 來源單據類別
+  sourceType: string;
+  // 來源ID
+  sourceId: string;
+  // 客戶編號
+  customerNumber: string;
+  // 客戶名稱
+  customerName: string;
+  // 客戶電話
+  companyPhone: string;
+  // 客戶傳真
+  companyFax: string;
+  // 銷售金額(合約金額)
+  salesAmount: number | null;
+  // 稅金
+  taxes: number | null;
+  // 幣別
+  salesCurrency: string;
+  // 匯率
+  exchangeRate: number | null;
+  // 總請款金額
+  requestAmount: number | null;
+  // 外幣金額
+  foreignCurrencyAmount: number | null;
+  // 請款未收款金額
+  uncollectedPayment: number | null;
+  // 總金額
+  totalAmount: number | null;
+  // 建立時間 UTC
+  createdAt: string | null;
+  // 修改時間 UTC
+  updatedAt: string | null;
+  // 建立人員
+  createdBy: string | null;
+  // 修改人員
+  updatedBy: string | null;
+  // 狀態
+  status: string | null;
+  // 已請款金額
+  prAmount: number | null;
+  //扣款金額
+  deduction: number | null;
+  //合約編號
+  quotationContractNumber: string | null;
+  //案場名稱
+  projectName: string | null;
+}
+
+// endregion accountsReceivable
+
+// ==============================================================================
+
 export type {
   //
   TnetCoreApiBody,
@@ -527,6 +604,18 @@ export type {
   Tprodreceiptdetail_Dto,
   //
   TengineerContactExport,
+  //
+  TaccountsReceivablesList_Dto,
 };
 
-export type { Tinvoice_type, Ttax_type, Tdocument_status, Treview_status, Treview_status__stages };
+export type {
+  TapiParams,
+  TpageResponse,
+  Tmeta,
+  //
+  Tinvoice_type,
+  Ttax_type,
+  Tdocument_status,
+  Treview_status,
+  Treview_status__stages,
+};
