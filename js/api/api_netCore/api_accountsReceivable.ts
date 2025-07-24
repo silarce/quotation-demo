@@ -110,6 +110,18 @@ const useApiGetQuotationList = (
   };
 };
 
+const apiQuotationToAccountsReceivables = async (quotationId: string) => {
+  const api = '/api/AccountsReceivable/QuotationToAccountsReceivables';
+  const params = {
+    frombody: quotationId,
+  };
+
+  return axi_monkey.get<TaccountsReceivablesList_Dto>(api, { params }).then(({ data }) => data);
+};
+
 // ========================================================================
 export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto };
+
+export { apiQuotationToAccountsReceivables };
+
 export { useApiGetAccountsReceivablesList, useApiGetQuotationList };
