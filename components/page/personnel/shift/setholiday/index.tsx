@@ -1,51 +1,142 @@
 import { useState } from 'react';
-import { DatePicker, Modal } from 'antd';
-
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker as DateMui } from '@mui/x-date-pickers/DatePicker';
-import MyInput from 'components/global/myCom/Input/Input';
-import MySelect from 'components/global/myCom/select/mySelect';
 import YearCalendar from './YearCalendar';
+import MonthCalendar from './MonthCalendar';
+
+//
+import { modal_empty } from 'components/global/gear/modal/fongModal';
+import { Container_confirm } from 'components/global/container/modal';
+
+//svg
+import calender from 'public/image/icon/fong/calendar.svg';
+import setting from 'public/image/icon/fong/setting.svg';
+
+//
+import {
+  //
+  DataEntry_fong,
+  DatePicker,
+  Checkbox,
+  DateRangePicker,
+  Select,
+  CheckboxGroup,
+  Input,
+} from 'components/global/gear/dataEntry';
 
 //button
-import AddButton from 'components/global/myCom/button/AddButton';
-import CancelButton from 'components/global/myCom/button/cancelButton';
 import Btn from 'components/global/gear/button/btn_fong';
 
 //scss
 import scss from './setHoliday.module.scss';
 
-const { RangePicker } = DatePicker;
-const dateFormat = 'YYYY/MM/DD';
-
 export default function SetHoliday() {
-  const [addHoliday, setAddHolidayModal] = useState(false);
-  const [currentDate, setCurrentDate] = useState(dayjs('2025-06-01'));
-  const [openYearPicker, setOpenYearPicker] = useState(false);
+  const [currentDate, setCurrentDate] = useState(dayjs());
   const [input, setInput] = useState('');
-  const [isAddMakeUpOpen, setIsAddMakeUpOpen] = useState(false);
-  const [isYearView, setIsYearView] = useState(true); // true = 年檢視, false = 月檢視
-
-  const changeMonth = (amount: number) => {
-    setCurrentDate(currentDate.add(amount, 'month'));
-  };
-
-  const key = currentDate.format('YYYY-MM');
-  console.log(key);
+  const [isYearView, setIsYearView] = useState(false); // true = 年檢視, false = 月檢視
 
   const renderYearCalendar = () => {
     const year = currentDate.year(); //使用狀態中的 currentDate 控制年份
 
     return (
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 gap-x-6 gap-y-11">
         {Array.from({ length: 12 }, (_, monthIndex) => (
           <YearCalendar key={monthIndex} year={year} monthIndex={monthIndex} />
         ))}
       </div>
     );
+  };
+
+  const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+
+  const handle_addRoutine = () => {
+    modal_empty({
+      width: 500,
+      content: (
+        <div>
+          <Container_confirm
+            title="設定例行休假日"
+            footerRight={
+              <>
+                <Btn>取消</Btn>
+                <Btn theme="save">儲存</Btn>
+              </>
+            }
+          >
+            <DataEntry_fong caption={`日期區間`}>
+              <DateRangePicker disabled={false} />
+            </DataEntry_fong>
+            <div className="mt-5">
+              <span>選擇例行休假日</span>
+              {/* <div className="flex w-full mt-3">
+                {weekdays.map((day, idx) => (
+                  <Checkbox key={idx} className="flex-1 flex flex-col items-center gap-3">
+                    {day}
+                  </Checkbox>
+                ))}
+              </div> */}
+              <DataEntry_fong caption={``}>
+                <CheckboxGroup
+                  className={scss.evenCheckboxGroup}
+                  options={[
+                    { label: '日', value: '1' },
+                    { label: '一', value: '2' },
+                    { label: '二', value: '3' },
+                    { label: '三', value: '3' },
+                    { label: '四', value: '3' },
+                    { label: '五', value: '3' },
+                    { label: '六', value: '3' },
+                  ]}
+                />
+              </DataEntry_fong>
+            </div>
+          </Container_confirm>
+        </div>
+      ),
+    });
+  };
+
+  const handle_addHoliday = () => {
+    modal_empty({
+      width: 500,
+      content: (
+        <div>
+          <Container_confirm
+            title="設定例行休假日"
+            footerRight={
+              <>
+                <Btn>取消</Btn>
+                <Btn theme="save">儲存</Btn>
+              </>
+            }
+          >
+            <div className="flex flex-col gap-5">
+              <DataEntry_fong caption={`假日名稱`} isMust={true}>
+                <Select disabled={false} />
+              </DataEntry_fong>
+              <DataEntry_fong caption={`假日日期`} isMust={true}>
+                <DateRangePicker disabled={false} />
+              </DataEntry_fong>
+              <DataEntry_fong caption={`類型`} isMust={true}>
+                <CheckboxGroup
+                  className={scss.evenCheckboxGroup}
+                  options={[
+                    { label: '國定假日', value: '1' },
+                    { label: '補班日', value: '2' },
+                    { label: '上班日', value: '3' },
+                    { label: '例假', value: '4' },
+                  ]}
+                />
+              </DataEntry_fong>
+              <DataEntry_fong caption={`備註`}>
+                <Input disabled={false} />
+              </DataEntry_fong>
+            </div>
+          </Container_confirm>
+        </div>
+      ),
+    });
   };
 
   return (
@@ -57,127 +148,48 @@ export default function SetHoliday() {
             <div className="flex items-center gap-[28px] ">
               <div className="flex items-center gap-2 text-xl font-bold">
                 <div className="flex items-center gap-1">
-                  <button
-                    className="flex items-center text-black font-bold hover:opacity-70"
-                    onClick={() => setOpenYearPicker(true)}
-                  >
-                    {currentDate.year()}年<span className="text-gray-400 text-sm ml-1">ICON</span>
-                  </button>
-                  {!isYearView && <span>{currentDate.format('MM')}月</span>}
+                  <DataEntry_fong>
+                    <DatePicker
+                      picker="month"
+                      format={(date) => date.format('YYYY / MM ')}
+                      value={currentDate}
+                      onChange={(date) => {
+                        if (date) {
+                          setCurrentDate(date);
+                        }
+                      }}
+                    />
+                  </DataEntry_fong>
                 </div>
               </div>
-              {!isYearView && (
-                <div className="flex gap-[40px]">
-                  <button onClick={() => changeMonth(-1)}>
-                    <LeftOutlined />
-                  </button>
-                  <button onClick={() => changeMonth(1)}>
-                    <RightOutlined />
-                  </button>
-                </div>
-              )}
-
-              <DateMui
-                open={openYearPicker}
-                onClose={() => setOpenYearPicker(false)}
-                views={['year', 'month']} // 這裡支援年份 + 月份
-                value={currentDate}
-                onChange={(date) => {
-                  if (date) {
-                    setCurrentDate(date);
-                    setOpenYearPicker(false);
-                  }
-                }}
-                slotProps={{
-                  textField: { style: { display: 'none' } },
-                }}
-              />
             </div>
             <div className=" flex gap-4 h-[40px]">
-              <Btn onClick={() => setIsYearView(false)}>月檢視</Btn>
-              <Btn onClick={() => setIsYearView(true)}>年檢視</Btn>
-              <Btn>設定例行休假日</Btn>
-              <Btn>新增節假日</Btn>
+              <Btn onClick={() => setIsYearView((prev) => !prev)} themeColor="blue_II" icon={calender}>
+                月/年檢視
+              </Btn>
+              <Btn themeColor="blue_II" icon={setting} onClick={handle_addRoutine}>
+                設定例行休假日
+              </Btn>
+              <Btn theme="add" onClick={handle_addHoliday}>
+                新增節假日
+              </Btn>
             </div>
           </div>
           {isYearView && renderYearCalendar()}
+          {!isYearView && (
+            <MonthCalendar
+              year={currentDate.year()}
+              monthIndex={currentDate.month()}
+              holidays={[
+                {
+                  start: '2025-07-14',
+                  end: '2025-07-15',
+                  label: '情人節',
+                },
+              ]}
+            />
+          )}
         </div>
-        <Modal
-          open={isAddMakeUpOpen}
-          title=""
-          closable={false}
-          centered
-          maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          footer={null}
-        >
-          <div>
-            <p className="font-bold text-[16px]">新增補班</p>
-          </div>
-          <div>
-            <MyInput label="假日名稱：" onChange={setInput} className="whitespace-nowrap mt-3" />
-            <div className={` flex items-center gap-4 mt-3`}>
-              <span className="whitespace-nowrap">日期：</span>
-              <RangePicker
-                defaultValue={[dayjs('2025/07/01', dateFormat), dayjs('2025/07/24', dateFormat)]}
-                format={dateFormat}
-                className={`${scss.customDatePicker} h-[40px] ml-[24px] w-full`}
-                popupClassName={scss.customDatePicker}
-                placeholder={['- -', '- -']}
-              />
-            </div>
-            <MySelect
-              label="假日類型："
-              className="mt-3 whitespace-nowrap"
-              placeholder="請選擇類型"
-              options={[
-                { label: '國定補班', value: '國定補班' },
-                { label: '公司補班', value: '公司補班' },
-              ]}
-            />
-            <div className="flex h-[40px] gap-4 justify-end mt-3">
-              <CancelButton label="取消" onClick={() => setIsAddMakeUpOpen(false)} />
-              <CancelButton label="新增假日" onClick={() => setIsAddMakeUpOpen(false)} />
-            </div>
-          </div>
-        </Modal>
-        <Modal
-          open={addHoliday}
-          title=""
-          closable={false}
-          centered
-          maskStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          footer={null}
-        >
-          <div>
-            <p className="font-bold text-[16px]">新增假日</p>
-          </div>
-          <div>
-            <MyInput label="假日名稱：" onChange={setInput} className="whitespace-nowrap mt-3" />
-            <div className={` flex items-center gap-4 mt-3`}>
-              <span className="whitespace-nowrap">日期：</span>
-              <RangePicker
-                defaultValue={[dayjs('2025/07/01', dateFormat), dayjs('2025/07/24', dateFormat)]}
-                format={dateFormat}
-                className={`${scss.customDatePicker} h-[40px] ml-[24px] w-full`}
-                popupClassName={scss.customDatePicker}
-                placeholder={['- -', '- -']}
-              />
-            </div>
-            <MySelect
-              label="假日類型："
-              className="mt-3 whitespace-nowrap"
-              placeholder="請選擇類型"
-              options={[
-                { label: '國定補班', value: '國定補班' },
-                { label: '公司補班', value: '公司補班' },
-              ]}
-            />
-            <div className="flex h-[40px] gap-4 justify-end mt-3">
-              <CancelButton label="取消" onClick={() => setAddHolidayModal(false)} />
-              <CancelButton label="新增假日" onClick={() => setAddHolidayModal(false)} />
-            </div>
-          </div>
-        </Modal>
       </div>
     </LocalizationProvider>
   );

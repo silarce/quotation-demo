@@ -23,7 +23,7 @@ const LabeledSelect: React.FC<LabeledSelectProps> = ({
   return (
     <div className={classNames('flex items-center ', className)}>
       <span className={`font-normal  ${labelWidth}`}>{label}</span>
-      <Select {...rest} className={` ml-3 h-[40px] w-full  `} style={{ width, marginLeft }} />
+      <Select {...rest} className={` ml-3 h-[40px] w-full  ${styles.customSelect}`} style={{ width, marginLeft }} />
     </div>
   );
 };

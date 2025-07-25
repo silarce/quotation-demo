@@ -10,9 +10,9 @@
 
   border-radius: 6px;
 
-  color: theme("colors.gray01");
-  border: solid 1px theme("colors.gray01");
-  background-color: theme("colors.gray04");
+  color: theme('colors.gray01');
+  border: solid 1px theme('colors.gray01');
+  background-color: theme('colors.gray04');
 
   > .iconContainer {
     color: inherit;
@@ -29,12 +29,12 @@
 
 .basic {
   &:hover {
-    color: theme("colors.gray02");
-    border: solid 1px theme("colors.gray02");
+    color: theme('colors.gray02');
+    border: solid 1px theme('colors.gray02');
   }
   &:active {
-    color: theme("colors.gray03");
-    border: solid 1px theme("colors.gray03");
+    color: theme('colors.gray03');
+    border: solid 1px theme('colors.gray03');
   }
 }
 
@@ -43,9 +43,8 @@
   color: theme("colors.blue01");
   background-color: theme("colors.white01");
   &:hover {
-    background-color: theme("colors.blue02");
-    border-color: theme("colors.blue02");
-    color: theme("colors.white01");
+    border-color: theme('colors.blue02');
+    color: theme('colors.blue02');
   }
   &:active {
     background-color: theme("colors.blue03");
@@ -68,92 +67,92 @@
 }
 
 .green_I {
-  background-color: theme("colors.white01");
-  color: theme("colors.green01");
-  border-color: theme("colors.green01");
+  background-color: theme('colors.white01');
+  color: theme('colors.green01');
+  border-color: theme('colors.green01');
   &:hover {
-    background-color: theme("colors.green02");
-    border-color: theme("colors.green02");
-    color: theme("colors.white01");
+    background-color: theme('colors.green02');
+    border-color: theme('colors.green02');
+    color: theme('colors.white01');
   }
   &:active {
-    background-color: theme("colors.green03");
-    background-color: theme("colors.green03");
-    color: theme("colors.white01");
+    background-color: theme('colors.green03');
+    background-color: theme('colors.green03');
+    color: theme('colors.white01');
   }
 }
 
 .green_II {
-  color: theme("colors.green01");
-  border-color: theme("colors.green01");
+  color: theme('colors.green01');
+  border-color: theme('colors.green01');
   &:hover {
-    border-color: theme("colors.green02");
-    color: theme("colors.green02");
+    border-color: theme('colors.green02');
+    color: theme('colors.green02');
   }
   &:active {
-    border-color: theme("colors.green03");
-    color: theme("colors.green03");
+    border-color: theme('colors.green03');
+    color: theme('colors.green03');
   }
 }
 
 .red_I {
-  background-color: theme("colors.white01");
-  color: theme("colors.red01");
-  border-color: theme("colors.red01");
+  background-color: theme('colors.white01');
+  color: theme('colors.red01');
+  border-color: theme('colors.red01');
   &:hover {
-    background-color: theme("colors.red02");
-    border-color: theme("colors.red02");
-    color: theme("colors.white01");
+    background-color: theme('colors.red02');
+    border-color: theme('colors.red02');
+    color: theme('colors.white01');
   }
   &:active {
-    background-color: theme("colors.red03");
-    border-color: theme("colors.red03");
-    color: theme("colors.white01");
+    background-color: theme('colors.red03');
+    border-color: theme('colors.red03');
+    color: theme('colors.white01');
   }
 }
 
 .brown_I {
-  color: theme("colors.brown01");
-  border-color: theme("colors.brown01");
+  color: theme('colors.brown01');
+  border-color: theme('colors.brown01');
   &:hover {
-    color: theme("colors.brown02");
-    border-color: theme("colors.brown02");
+    color: theme('colors.brown02');
+    border-color: theme('colors.brown02');
   }
   &:active {
-    color: theme("colors.brown03");
-    border-color: theme("colors.brown03");
+    color: theme('colors.brown03');
+    border-color: theme('colors.brown03');
   }
 }
 
 .yellow_I {
-  color: theme("colors.yellow02");
-  border-color: theme("colors.yellow02");
+  color: theme('colors.yellow02');
+  border-color: theme('colors.yellow02');
 }
 
 .warning_I {
-  border: solid 1px theme("colors.yellow01");
-  color: theme("colors.yellow01");
-  background-color: theme("colors.white01");
+  border: solid 1px theme('colors.yellow01');
+  color: theme('colors.yellow01');
+  background-color: theme('colors.white01');
   &:hover {
-    background-color: theme("colors.yellow02");
-    border-color: theme("colors.yellow02");
-    color: theme("colors.white01");
+    background-color: theme('colors.yellow02');
+    border-color: theme('colors.yellow02');
+    color: theme('colors.white01');
     .iconContainer {
       > svg {
         > rect {
-          fill: theme("colors.yellow02");
+          fill: theme('colors.yellow02');
         }
       }
     }
   }
   &:active {
-    background-color: theme("colors.yellow03");
-    border-color: theme("colors.yellow03");
-    color: theme("colors.white01");
+    background-color: theme('colors.yellow03');
+    border-color: theme('colors.yellow03');
+    color: theme('colors.white01');
     .iconContainer {
       > svg {
         > rect {
-          fill: theme("colors.yellow03");
+          fill: theme('colors.yellow03');
         }
       }
     }

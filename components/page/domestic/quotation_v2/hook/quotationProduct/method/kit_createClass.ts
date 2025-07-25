@@ -54,6 +54,7 @@ const kit_createClass = ({
   state_prodDict,
   activeProdKey,
   setActiveProdKey,
+  allowProdAutoChange,
 }: {
   setState_prodDict: React.Dispatch<React.SetStateAction<TstateProdDict>>;
   nodeConfig_prime: TnodeConfig;
@@ -63,6 +64,7 @@ const kit_createClass = ({
   state_prodDict: TstateProdDict;
   activeProdKey: string | undefined;
   setActiveProdKey: React.Dispatch<React.SetStateAction<string | undefined>>;
+  allowProdAutoChange: boolean;
 }) => {
   // MARK:createSetProd
   const createSetProd = (key: string): TsetProd => {
@@ -160,6 +162,7 @@ const kit_createClass = ({
       nodeConfig: nodeConfig_prime,
       quotationDiscount: quotationDiscount || 0,
       onPordTotalChange: onProdAllTotalChange,
+      allowProdAutoChange,
     });
 
     return classProd;

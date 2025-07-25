@@ -778,6 +778,8 @@ function TheQuotation({ router }: { router: NextRouter }) {
       //
       isLost: state_profile.isLost ?? false,
       averageDiscount: avgDiscount_withQty,
+
+      autoRefresh: true,
     };
 
     if (!body.customerId) {

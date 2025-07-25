@@ -30,7 +30,12 @@ const LabeledSelect: React.FC<LabeledSelectProps> = ({
         {required && <Image src={asterisk} alt="required" width={8} className="ml-[4px] mr-[4px]" />}
         {label}
       </span>
-      <Select {...rest} className={` h-[40px] w-full  `} style={{ width, marginLeft }} />
+      <Select
+        {...rest}
+        rootClassName={styles.customSelect}
+        className={` h-[40px] w-full ${styles.customSelect}`}
+        style={{ width, marginLeft }}
+      />
     </div>
   );
 };
