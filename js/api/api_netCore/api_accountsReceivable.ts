@@ -129,7 +129,7 @@ const apiQuotationToAccountsReceivables = async (quotationId: string) => {
 };
 
 const apiGetAccountsReceivables = async (accountsReceivableId: string) => {
-  const api = '/api/AccountsReceivable/GetAccountsReceivables';
+  const api = '/api/AccountsReceivable/GetAccountsReceivablesEditMode';
 
   const params = { id: accountsReceivableId };
 

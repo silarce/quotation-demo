@@ -1,5 +1,9 @@
 import { TemployeeDto } from '../dtoTypes';
 
+type Guid = string;
+type DateTime = string; // UTC
+type decimal = number;
+
 type Tinvoice_type = '二聯式' | '三聯式';
 type Ttax_type = '應稅' | '零稅' | '免稅';
 type Treview_status = '未審核' | '已審核' | '審核中';
@@ -509,55 +513,32 @@ interface TengineerContactExport {
 // region accountsReceivable
 
 interface TaccountsReceivablesList_Dto {
-  id: string;
-  //  應收帳款編號
-  accountsReceivableNumber: string;
-  // 來源單據類別
-  sourceType: string;
-  // 來源ID
-  sourceId: string;
-  // 客戶編號
-  customerNumber: string;
-  // 客戶名稱
-  customerName: string;
-  // 客戶電話
-  companyPhone: string;
-  // 客戶傳真
-  companyFax: string;
-  // 銷售金額(合約金額)
-  salesAmount: number | null;
-  // 稅金
-  taxes: number | null;
-  // 幣別
-  salesCurrency: string;
-  // 匯率
-  exchangeRate: number | null;
-  // 總請款金額
-  requestAmount: number | null;
-  // 外幣金額
-  foreignCurrencyAmount: number | null;
-  // 請款未收款金額
-  uncollectedPayment: number | null;
-  // 總金額
-  totalAmount: number | null;
-  // 建立時間 UTC
-  createdAt: string | null;
-  // 修改時間 UTC
-  updatedAt: string | null;
-  // 建立人員
-  createdBy: string | null;
-  // 修改人員
-  updatedBy: string | null;
-  // 狀態
-  status: string | null;
-  // 已請款金額
-  prAmount: number | null;
-  //扣款金額
-  deduction: number | null;
-  //合約編號
-  quotationContractNumber: string | null;
-  //案場名稱
-  projectName: string | null;
+  id: Guid; //應收帳款id
+  accountsReceivableNumber: string; //應收帳款編號
+  sourceType: string; //來源類型
+  sourceId: Guid | null; //來源id
+  customerNumber: string; //客戶編號
+  customerName: string; //客戶名稱
+  companyPhone: string; //公司電話
+  companyFax: string; //公司傳真
+  salesAmount: decimal | null; // 銷售金額
+  taxes: decimal | null; //稅金
+  salesCurrency: string; //幣別
+  exchangeRate: decimal | null; //匯率
+  requestAmount: decimal | null; //請款金額
+  foreignCurrencyAmount: decimal | null; //外幣金額
+  uncollectedPayment: decimal | null; //未收款項
+  totalAmount: decimal | null; //總金額
+  createdAt: DateTime | null; //建立時間
+  updatedAt: DateTime | null; //更新時間
+  createdBy: string | null; //建立人
+  updatedBy: string | null; //更新人
+  status: string | null; //狀態
+  prAmount: decimal | null; //已請款金額
+  deduction: decimal | null; //扣款金額
+  quotationContractNumber: string | null; //合約編號
+  projectName: string | null; //案場名稱
+  salesOrderNumber: string | null; //銷售訂單編號
 }
 
 interface TquotationListViewModel_Dto {
@@ -600,33 +581,52 @@ interface TquotationListViewModel_Dto {
   additionalAmount: string | null; // 追加減金額
 }
 
+interface TsalesOrderItemData_Dto {
+  id: string; //銷貨明細id
+  itemNumber: string; //項目編號
+  salesOrderNumber: string; //銷售訂單編號
+  productId: string; //產品id
+  discount: number | null; //折扣
+  productName: string; //產品名稱
+  productNumber: string; //產品編號
+  unitPrice: number | null; //單價
+  quantity: number | null; //數量
+  amount: number | null; //金額
+  taxes: number | null; //稅金
+  attachedToProductId: string | null; //附加產品id
+  dualPrice: number; //牌價
+}
+
+interface TpaymentRequest_Dto {
+  Id: Guid | null;
+  PaymentRequestNumber: string | null;
+  SourceFormType: string;
+  SourceFormId: Guid;
+  CustomerNumber: string;
+  CustomerName: string;
+  CreatedAt: DateTime | null;
+  CreatedBy: string;
+  UpdatedAt: DateTime | null;
+  UpdatedBy: string;
+  InvoiceNumber: string | null;
+  InvoiceAmount: decimal | null;
+  PaymentAmount: decimal | null;
+  AccountsReceivableId: Guid | null;
+  Type: string;
+  Period: string;
+  PaymentCurrency: string;
+  ForeignCurrencyAmount: decimal | null;
+}
+
 /**
  * 這個api回應的東西
  *
  * /api/AccountsReceivable/GetAccountsReceivables
  */
 interface TaccountsReceivable {
-  id: string;
-  accountsReceivableNumber: string | null;
-  sourceType: string | null;
-  sourceId: string | null;
-  customerNumber: string | null;
-  customerName: string | null;
-  companyPhone: string | null;
-  companyFax: string | null;
-  salesAmount: number | null;
-  taxes: number | null;
-  salesCurrency: string | null;
-  exchangeRate: number | null;
-  requestAmount: number | null;
-  foreignCurrencyAmount: number | null;
-  uncollectedPayment: number | null;
-  totalAmount: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-  status: number | null;
+  accountsReceivablesList: TaccountsReceivablesList_Dto;
+  paymentRequests: TpaymentRequest_Dto[];
+  salesOrderItem: TsalesOrderItemData_Dto;
 }
 
 // endregion accountsReceivable
