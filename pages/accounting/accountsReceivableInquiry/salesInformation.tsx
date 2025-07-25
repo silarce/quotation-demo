@@ -1,6 +1,3 @@
-import { useState, useEffect, useMemo } from 'react';
-
-import classNames from 'classnames';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -17,34 +14,16 @@ import Selector_quotation, {
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 
 // api
-import {
-  apiQuotationToAccountsReceivables,
-  getAccountsReceivableFromQuotation,
-} from 'js/api/api_netCore/api_accountsReceivable';
+import { TaccountsReceivable, useGetAccountsReceivables } from 'js/api/api_netCore/api_accountsReceivable';
 
 // ============================================================================
 
-type Tstate = {
+interface Tquery {
   id?: string;
-  contractNumber: string | null; // 合約編號
-  projectName: string | null; // 案場名稱
-  customerNumber: string; // 客戶編號
-  customerName: string; // 客戶名稱
-  customerTaxId: string; // 統一編號
-  taxType: string; // 稅別
-  currency: string; // 外幣
-  total: number | null; // 銷售金額
-  salesTax: number | null; // 銷售稅金
+}
 
-  attachmentTotal: '沒有property' | number | null; // 追加減金額
-  attachmentTax: '沒有property' | number | null; // 追加減金額稅金
-
-  receivedAmount: '沒有property' | number | null; // 已收金額
-  discountAmount: '沒有property' | number | null; // 扣款折讓
-
-  prAmount: '沒有property' | number | null; // 已請款總額
-  totalAmount: number | null; // 銷售總額
-};
+type TsalseOrderItem = TaccountsReceivable['salesOrderItem'][0];
+type TpaymentRequest = TaccountsReceivable['paymentRequests'][0];
 
 // ============================================================================
 
@@ -52,87 +31,52 @@ type Tstate = {
 
 export default function SalesInformation() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = router.query as Tquery;
   const isNew = !id;
 
-  const [state, setState] = useState<Tstate>();
+  const { data, isFetching } = useGetAccountsReceivables(id);
+
+  const { accountsReceivablesList, paymentRequests, salesOrderItem } = data ?? {};
+
+  const {
+    accountsReceivableNumber,
+    sourceType,
+    sourceId,
+    customerNumber,
+    customerName,
+    companyPhone,
+    companyFax,
+    salesAmount,
+    taxes,
+    salesCurrency,
+    exchangeRate,
+    requestAmount,
+    foreignCurrencyAmount,
+    uncollectedPayment,
+    totalAmount,
+    createdAt,
+    updatedAt,
+    createdBy,
+    updatedBy,
+    status,
+    prAmount,
+    deduction,
+    quotationContractNumber,
+    projectName,
+    salesOrderNumber,
+  } = accountsReceivablesList ?? {};
 
   const onSelectQuotation = async (data: TquotationListViewModel_Dto | undefined) => {
     if (!data) {
       return;
     }
 
-    const quotationInfo = await getAccountsReceivableFromQuotation(data.quotationNumber);
-
-    if (!quotationInfo) {
-      return;
-    }
-
-    const { accountsReceivablesList, paymentRequests, salesOrderItem } = quotationInfo;
-
-    const {
-      accountsReceivableNumber,
-      sourceType,
-      sourceId,
-      customerNumber,
-      customerName,
-      companyPhone,
-      companyFax,
-      salesAmount,
-      taxes,
-      salesCurrency,
-      exchangeRate,
-      requestAmount,
-      foreignCurrencyAmount,
-      uncollectedPayment,
-      totalAmount,
-      createdAt,
-      updatedAt,
-      createdBy,
-      updatedBy,
-      status,
-      prAmount,
-      deduction,
-      quotationContractNumber,
-      projectName,
-      salesOrderNumber,
-    } = accountsReceivablesList;
-
-    const {
-      itemNumber,
-      // salesOrderNumber,
-      productId,
-      discount,
-      productName,
-      productNumber,
-      unitPrice,
-      quantity,
-      amount,
-      // taxes,
-      attachedToProductId,
-      dualPrice,
-    } = salesOrderItem;
-
-    const newState: Tstate = {
-      ...state,
-      contractNumber: accountsReceivablesList.quotationContractNumber, // 合約編號
-      projectName: accountsReceivablesList.projectName, // 案場名稱
-      customerNumber: accountsReceivablesList.customerNumber, // 客戶編號
-      customerName: accountsReceivablesList.customerName, // 客戶名稱
-      customerTaxId: '沒有property', // 統一編號
-      taxType: '沒有property', // 稅別
-      currency: accountsReceivablesList.salesCurrency, // 外幣
-      total: accountsReceivablesList.salesAmount, // 銷售金額
-      salesTax: accountsReceivablesList.taxes, // 銷售稅金
-      attachmentTotal: '沒有property', // 追加減金額
-      attachmentTax: '沒有property', // 追加減金額稅金
-      receivedAmount: '沒有property', // 已收金額
-      discountAmount: salesOrderItem.discount, // 扣款折讓
-      prAmount: accountsReceivablesList.prAmount, // 已請款總額
-      totalAmount: accountsReceivablesList.totalAmount ?? 0, // 銷售總額
-    };
-
-    setState(newState);
+    router.replace({
+      query: {
+        ...router.query,
+        id: data.quotationNumber,
+      },
+    });
   };
 
   const handle_search = () => {
@@ -162,9 +106,8 @@ export default function SalesInformation() {
           {isNew && (
             <>
               <Btn theme="query" onClick={handle_search}>
-                查詢資料
+                新增應收款
               </Btn>
-              <Btn theme="save">儲存</Btn>
             </>
           )}
         </div>
@@ -175,42 +118,41 @@ export default function SalesInformation() {
         <div className="text-xl font-semibold mb-6">應收款</div>
         <div className="grid grid-cols-4 gap-fong ">
           <DataEntry_fong caption="合約編號" isMust={true} className="col-span-2">
-            {state?.contractNumber}
+            {quotationContractNumber}
           </DataEntry_fong>
           <DataEntry_fong caption="案場名稱" className="col-span-2">
-            {state?.projectName}
+            {projectName}
           </DataEntry_fong>
           <DataEntry_fong caption="客戶編號" className="col-span-2">
-            {state?.customerNumber}
+            {customerNumber}
           </DataEntry_fong>
           <DataEntry_fong caption="客戶名稱" className="col-span-2">
-            {state?.customerName}
+            {customerName}
           </DataEntry_fong>
           <DataEntry_fong caption="統一編號" className="col-span-2">
-            {state?.customerTaxId}
+            {'customerTaxId'}
           </DataEntry_fong>
-          <DataEntry_fong caption="稅別">{state?.taxType}</DataEntry_fong>
-          <DataEntry_fong caption="外幣">{state?.currency}</DataEntry_fong>
+          <DataEntry_fong caption="稅別">{'taxType'}</DataEntry_fong>
+          <DataEntry_fong caption="外幣">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
           <DataEntry_fong caption="銷售金額">
-            {<span className="text-right"></span>}
-            {<span className="text-right">{toLocaleString(state?.total)}</span>}
+            {<span className="text-right">{toLocaleString(salesAmount)}</span>}
           </DataEntry_fong>
           <DataEntry_fong caption="銷售稅金">
-            {<span className="text-right">{toLocaleString(state?.salesTax)}</span>}
+            {<span className="text-right">{toLocaleString(taxes)}</span>}
           </DataEntry_fong>
-          <DataEntry_fong caption="追加減金額">{state?.attachmentTotal}</DataEntry_fong>
-          <DataEntry_fong caption="追加減金額稅金">{state?.attachmentTax}</DataEntry_fong>
-          <DataEntry_fong caption="已收金額">{state?.receivedAmount}</DataEntry_fong>
-          <DataEntry_fong caption="扣款折讓">{state?.discountAmount}</DataEntry_fong>
-          <DataEntry_fong caption="已請款總額">{state?.prAmount}</DataEntry_fong>
-          <DataEntry_fong caption="銷售總額">{state?.totalAmount}</DataEntry_fong>
+          <DataEntry_fong caption="追加減金額">{'attachmentTotal'}</DataEntry_fong>
+          <DataEntry_fong caption="追加減金額稅金">{'attachmentTax'}</DataEntry_fong>
+          <DataEntry_fong caption="已收金額">{'receivedAmount'}</DataEntry_fong>
+          <DataEntry_fong caption="扣款折讓">{'discountAmount'}</DataEntry_fong>
+          <DataEntry_fong caption="已請款總額">{prAmount}</DataEntry_fong>
+          <DataEntry_fong caption="銷售總額">{totalAmount}</DataEntry_fong>
         </div>
         {/*  */}
         <div className="mt-10">
           <div className="mb-6">
             <span className="text-xl font-semibold">銷貨明細</span>
           </div>
-          <Table_antd columns={columns01} dataSource={fakeData01} pagination={false} />
+          <Table_antd columns={columns_salseOrderItem} dataSource={salesOrderItem} pagination={false} />
         </div>
         <div className="mt-10">
           <div className="mb-6">
@@ -219,7 +161,7 @@ export default function SalesInformation() {
               <Btn theme="cross">新增資料</Btn>
             </Link>
           </div>
-          <Table_antd columns={columns02} dataSource={fakeData02} pagination={false} />
+          <Table_antd columns={columns_paymentRequests} dataSource={paymentRequests} pagination={false} />
         </div>
       </div>
     </div>
@@ -240,68 +182,53 @@ const toLocaleString = (value: number | null | undefined) => {
 
 // ==========================================================================
 
-interface TfakeData01 {
-  id: string;
-  serialNumber: string;
-  idNumber: string;
-  name: string;
-  qty: number;
-  price: number;
-  totalPrice: number;
-}
-interface TfakeData02 {
-  id: string;
-  idNumber: string;
-  period: string;
-  type: string;
-  requestAmount: number;
-  amountReceived: number;
-  discount: number;
-}
-const columns01: TableProps<TfakeData01>['columns'] = [
+const columns_salseOrderItem: TableProps<TsalseOrderItem>['columns'] = [
   {
     title: '序號',
     dataIndex: 'serialNumber',
     width: 80,
     align: 'center',
+    render: (_, __, index) => {
+      return index + 1;
+    },
   },
   {
     title: '產品代號',
-    dataIndex: 'idNumber',
+    dataIndex: 'productNumber',
     width: 120,
   },
   {
     title: '產品名稱',
-    dataIndex: 'name',
+    dataIndex: 'productName',
     width: 150,
   },
   {
     title: '數量',
     align: 'right',
-    dataIndex: 'qty',
+    dataIndex: 'quantity',
     width: 150,
   },
   {
     title: '單價',
-    dataIndex: 'price',
+    dataIndex: 'unitPrice',
     align: 'right',
     width: 150,
-    render: (value) => '$' + value.toLocaleString(),
+    render: (value: number | null) => toLocaleString(value),
   },
   {
     title: '金額',
-    dataIndex: 'totalPrice',
+    dataIndex: 'amount',
     align: 'right',
     width: 150,
-    render: (value) => '$' + value.toLocaleString(),
+    render: (value: number | null) => toLocaleString(value),
   },
   {},
 ];
 
-const columns02: TableProps<TfakeData02>['columns'] = [
+const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
   {
     title: '請款單號',
-    dataIndex: 'idNumber',
+    dataIndex: 'paymentRequestNumber',
     width: 150,
   },
   {
@@ -316,24 +243,24 @@ const columns02: TableProps<TfakeData02>['columns'] = [
   },
   {
     title: '請款金額',
-    dataIndex: 'requestAmount',
+    dataIndex: 'paymentAmount',
     align: 'right',
     width: 150,
-    render: (value) => '$' + value.toLocaleString(),
+    render: (value: number | null) => toLocaleString(value),
   },
   {
     title: '實收金額',
     dataIndex: 'amountReceived',
     align: 'right',
     width: 150,
-    render: (value) => '$' + value.toLocaleString(),
+    render: (value: number | null) => toLocaleString(value),
   },
   {
     title: '折讓',
     dataIndex: 'discount',
     align: 'right',
     width: 150,
-    render: (value) => '$' + value.toLocaleString(),
+    render: (value: number | null) => toLocaleString(value),
   },
   {},
   {
@@ -346,23 +273,3 @@ const columns02: TableProps<TfakeData02>['columns'] = [
     },
   },
 ];
-
-const fakeData01: TfakeData01[] = Array.from({ length: 11 }, (_, index) => ({
-  id: `id-${index}`,
-  serialNumber: `${index + 1}`,
-  idNumber: `SD${index + 1000}`,
-  name: 'SJ-302',
-  qty: Math.floor(Math.random() * 10) + 1,
-  price: 99999,
-  totalPrice: 99999,
-}));
-
-const fakeData02: TfakeData02[] = Array.from({ length: 10 }, (_, index) => ({
-  id: `id-${index}`,
-  idNumber: `INV${index + 2000}`,
-  period: `2023/06`,
-  type: '代收支付',
-  requestAmount: 99999,
-  amountReceived: 99999,
-  discount: 99999,
-}));
