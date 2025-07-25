@@ -26,8 +26,8 @@ import {
 
 type Tstate = {
   id?: string;
-  contractNumber: string; // 合約編號
-  projectName: string; // 案場名稱
+  contractNumber: string | null; // 合約編號
+  projectName: string | null; // 案場名稱
   customerNumber: string; // 客戶編號
   customerName: string; // 客戶名稱
   customerTaxId: string; // 統一編號
@@ -62,6 +62,14 @@ export default function SalesInformation() {
       return;
     }
 
+    const quotationInfo = await getAccountsReceivableFromQuotation(data.quotationNumber);
+
+    if (!quotationInfo) {
+      return;
+    }
+
+    const { accountsReceivablesList, paymentRequests, salesOrderItem } = quotationInfo;
+
     const {
       accountsReceivableNumber,
       sourceType,
@@ -78,71 +86,53 @@ export default function SalesInformation() {
       foreignCurrencyAmount,
       uncollectedPayment,
       totalAmount,
-
       createdAt,
       updatedAt,
       createdBy,
       updatedBy,
       status,
-    } = (await getAccountsReceivableFromQuotation(data.quotationNumber)) ?? {};
+      prAmount,
+      deduction,
+      quotationContractNumber,
+      projectName,
+      salesOrderNumber,
+    } = accountsReceivablesList;
 
-    // const {
-    //   // status,
-    //   // reviewManagerEmployeeId,
-    //   // managerReviewedAt,
-    //   // quotationNumber,
-    //   // version,
-    //   // customerId,
-    //   projectName,
-    //   // county,
-    //   // district,
-    //   // address,
-    //   // contactPerson,
-    //   // contactNumber,
-    //   // quantity,
-    //   // editNotes,
-    //   // discount,
-    //   // subTotal,
-    //   salesTax,
-    //   total,
-    //   // deliveryLocation,
-    //   // paymentMethods,
-    //   // supervisorEmployeeId,
-    //   // agentEmployeeId,
-    //   // reviewSalesEmployeeId,
-    //   // productsOrder,
-    //   // tuneTotal,
-    //   // averageDiscount,
-    //   // estimatedDiscount,
-    //   // type,
-    //   currency,
-    //   // foreignTotal,
-    //   // exchangeRate,
-    //   // contractId,
-    //   // ontractStatus,
-    // } = data;
+    const {
+      itemNumber,
+      // salesOrderNumber,
+      productId,
+      discount,
+      productName,
+      productNumber,
+      unitPrice,
+      quantity,
+      amount,
+      // taxes,
+      attachedToProductId,
+      dualPrice,
+    } = salesOrderItem;
 
     const newState: Tstate = {
       ...state,
-      contractNumber: '沒有property',
-      projectName: '沒有property',
-      customerNumber: customerNumber ?? '',
-      customerName: customerName ?? '',
-      customerTaxId: '沒有property',
-      taxType: '沒有property',
-      currency: salesCurrency ?? '',
-      total: salesAmount ?? 0,
-      salesTax: taxes ?? 0,
-      attachmentTotal: '沒有property',
-      attachmentTax: '沒有property',
-      receivedAmount: '沒有property',
-      discountAmount: '沒有property',
-      // prAmount: 'prAmount' ?? '',
-      prAmount: '沒有property',
-      totalAmount: totalAmount ?? 0,
+      contractNumber: accountsReceivablesList.quotationContractNumber, // 合約編號
+      projectName: accountsReceivablesList.projectName, // 案場名稱
+      customerNumber: accountsReceivablesList.customerNumber, // 客戶編號
+      customerName: accountsReceivablesList.customerName, // 客戶名稱
+      customerTaxId: '沒有property', // 統一編號
+      taxType: '沒有property', // 稅別
+      currency: accountsReceivablesList.salesCurrency, // 外幣
+      total: accountsReceivablesList.salesAmount, // 銷售金額
+      salesTax: accountsReceivablesList.taxes, // 銷售稅金
+      attachmentTotal: '沒有property', // 追加減金額
+      attachmentTax: '沒有property', // 追加減金額稅金
+      receivedAmount: '沒有property', // 已收金額
+      discountAmount: salesOrderItem.discount, // 扣款折讓
+      prAmount: accountsReceivablesList.prAmount, // 已請款總額
+      totalAmount: accountsReceivablesList.totalAmount ?? 0, // 銷售總額
     };
 
-    // setState(newState);
+    setState(newState);
   };
 
   const handle_search = () => {
