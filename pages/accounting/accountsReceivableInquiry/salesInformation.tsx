@@ -16,6 +16,12 @@ import Selector_quotation, {
 
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 
+// api
+import {
+  apiQuotationToAccountsReceivables,
+  getAccountsReceivableFromQuotation,
+} from 'js/api/api_netCore/api_accountsReceivable';
+
 // ============================================================================
 
 type Tstate = {
@@ -51,10 +57,12 @@ export default function SalesInformation() {
 
   const [state, setState] = useState<Tstate>();
 
-  const onSelectQuotation = (data: TquotationListViewModel_Dto | undefined) => {
+  const onSelectQuotation = async (data: TquotationListViewModel_Dto | undefined) => {
     if (!data) {
       return;
     }
+
+    await getAccountsReceivableFromQuotation(data.id);
 
     const {
       // status,
@@ -114,6 +122,22 @@ export default function SalesInformation() {
     setState(newState);
   };
 
+  const handle_search = () => {
+    const { destroy } = modal_empty({
+      content: (
+        <Selector_quotation
+          onConfirm={([data]) => {
+            onSelectQuotation(data);
+            destroy();
+          }}
+          onCancel={() => {
+            destroy();
+          }}
+        />
+      ),
+    });
+  };
+
   // MARK: RENDER
   return (
     <div>
@@ -124,30 +148,10 @@ export default function SalesInformation() {
 
           {isNew && (
             <>
-              <Btn
-                theme="query"
-                onClick={() => {
-                  const { destroy } = modal_empty({
-                    width: 'fit-content',
-                    content: (
-                      <Selector_quotation
-                        onConfirm={([data]) => {
-                          onSelectQuotation(data);
-                          destroy();
-                        }}
-                        onCancel={() => {
-                          destroy();
-                        }}
-                      />
-                    ),
-                  });
-                }}
-              >
+              <Btn theme="query" onClick={handle_search}>
                 查詢資料
               </Btn>
-              <Btn theme="save" form="aa">
-                儲存
-              </Btn>
+              <Btn theme="save">儲存</Btn>
             </>
           )}
         </div>
