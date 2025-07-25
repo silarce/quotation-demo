@@ -11,6 +11,7 @@ import type {
   TpageResponse,
   TaccountsReceivablesList_Dto,
   TquotationListViewModel_Dto,
+  TaccountsReceivable,
 } from './_schemas';
 
 const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
@@ -118,27 +119,21 @@ const useApiGetQuotationList = (
 const apiQuotationToAccountsReceivables = async (quotationId: string) => {
   const api = '/api/AccountsReceivable/QuotationToAccountsReceivables';
 
-  const body = quotationId;
-
-  // return axi_monkey
-  //   .post<string>(api, quotationId, {
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //   })
-  //   .then(({ data }) => data);
-
-  return axi_monkey.post<string>(api, { body }).then(({ data }) => data);
+  return axi_monkey
+    .post<string>(api, quotationId, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(({ data }) => data);
 };
 
 const apiGetAccountsReceivables = async (accountsReceivableId: string) => {
   const api = '/api/AccountsReceivable/GetAccountsReceivables';
 
-  const body = accountsReceivableId;
+  const params = { id: accountsReceivableId };
 
-  return axi_monkey.get<unknown>(api, {
-    data: body,
-  });
+  return axi_monkey.get<TaccountsReceivable>(api, { params }).then(({ data }) => data);
 };
 
 // ========================================================================
@@ -155,6 +150,8 @@ const getAccountsReceivableFromQuotation = async (quotationId: string) => {
       title: '錯誤',
       content: `無法從報價單 ${quotationId} 取得應收帳款資料。`,
     });
+
+    return null;
   }
 };
 

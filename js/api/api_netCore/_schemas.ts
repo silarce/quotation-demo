@@ -600,6 +600,35 @@ interface TquotationListViewModel_Dto {
   additionalAmount: string | null; // 追加減金額
 }
 
+/**
+ * 這個api回應的東西
+ *
+ * /api/AccountsReceivable/GetAccountsReceivables
+ */
+interface TaccountsReceivable {
+  id: string;
+  accountsReceivableNumber: string | null;
+  sourceType: string | null;
+  sourceId: string | null;
+  customerNumber: string | null;
+  customerName: string | null;
+  companyPhone: string | null;
+  companyFax: string | null;
+  salesAmount: number | null;
+  taxes: number | null;
+  salesCurrency: string | null;
+  exchangeRate: number | null;
+  requestAmount: number | null;
+  foreignCurrencyAmount: number | null;
+  uncollectedPayment: number | null;
+  totalAmount: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  status: number | null;
+}
+
 // endregion accountsReceivable
 
 // ==============================================================================
@@ -647,6 +676,7 @@ export type {
   //
   TaccountsReceivablesList_Dto,
   TquotationListViewModel_Dto,
+  TaccountsReceivable,
 };
 
 export type {
