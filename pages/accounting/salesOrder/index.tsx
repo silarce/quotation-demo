@@ -6,7 +6,7 @@ import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'comp
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
-import Selector_searchSomething from 'components/page/accounting/accountsReceivableInquiry/selector_searchSomething';
+import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
@@ -26,7 +26,7 @@ export default function SalesOrder() {
   const handle_importContract = () => {
     modal_empty({
       width: 'fit-content',
-      content: <Selector_searchSomething />,
+      content: <Selector_quotation />,
     });
   };
 
@@ -272,13 +272,13 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
       key: 'panel',
       title: '操作',
       align: 'center',
-      width: 90,
+      width: 100,
       render: (_, record) => {
         let node: React.ReactNode = null;
 
         if (state?.id === record.id) {
           node = (
-            <div className="flex gap-2">
+            <div className="flex gap-[16px] justify-center">
               <Icon_cancel
                 className="w-[16px] h-[16px] text-red01 cursor-pointer"
                 onClick={() => {
@@ -290,7 +290,7 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
           );
         } else {
           node = (
-            <div className="flex gap-2">
+            <div className="flex gap-[16px] justify-center">
               <Icon_note
                 className="w-[16px] h-[16px] text-blue01 cursor-pointer"
                 onClick={() => {

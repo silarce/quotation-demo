@@ -30,6 +30,7 @@
   display: flex;
   flex-wrap: wrap;
   line-height: 1.143rem;
+
   .captionWrapper {
     display: flex;
     align-items: center;
@@ -53,6 +54,8 @@
     padding: 12px;
     border: solid 1px theme("colors.border02");
     border-radius: theme("border.radius.02");
+    min-height: calc(1.143rem + 24px + 2px); // line-height + 上下 padding + border
+
     &.disabled {
       color: #666666;
       background-color: #fafafa;

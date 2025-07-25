@@ -10,6 +10,8 @@ import { erpFeaturesLookup, TtopPathListConfig, devPass } from './type';
 
 import { sidePathList } from './side';
 
+const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
+
 const {
   BasicDataCreation,
   HRAuthoritySetup,
@@ -157,7 +159,7 @@ const topPathList: TtopPathListConfig[] = [
       pathname: '/personnel/shift',
       query: { isMine: 'true' },
     },
-    erpFeature: 'allPass',
+    erpFeature: isInProd ? [] : 'allPass',
   },
   {
     icon: icon_home,
@@ -167,7 +169,7 @@ const topPathList: TtopPathListConfig[] = [
       pathname: '/organization/company',
       query: { isMine: 'true' },
     },
-    erpFeature: 'allPass',
+    erpFeature: isInProd ? [] : 'allPass',
   },
 ];
 

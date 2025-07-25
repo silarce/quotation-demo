@@ -178,13 +178,37 @@ const columns: TableProps<TaccountsReceivablesList_Dto>['columns'] = [
     title: '狀態',
     dataIndex: 'status',
     width: 100,
+    align: 'center',
+    render: (text: string | null) => {
+      if (!text) {
+        return null;
+      }
+
+      const lookup: Record<string, string> = {
+        未請款: 'state-gray',
+        草稿: 'state-gray',
+        請款中: 'state-blue',
+        審核中: 'state-blue',
+        已完成: 'state-green',
+        已請款: 'state-green',
+        駁回: 'state-red',
+      };
+
+      return <span className={classNames(lookup[text] || 'state-gray')}>{text}</span>;
+    },
   },
   {
     title: '操作',
     key: 'action',
     width: 80,
+    align: 'center',
     render(_, record) {
-      const href = Router.pathname + '/salesInformation';
+      const href = {
+        pathname: Router.pathname + '/salesInformation',
+        query: {
+          id: record.id,
+        },
+      };
 
       return (
         <div className="flex justify-center">

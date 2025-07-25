@@ -185,8 +185,12 @@ const DataEntry_fong = ({
 
   // --------------------------------------------------------------------------------
 
-  const processedChildren =
+  let processedChildren =
     syncDisabled === false || disabled === undefined ? children : doProcessedChildren(children, disabled);
+
+  if (processedChildren === undefined || processedChildren === '') {
+    processedChildren = '　';
+  }
 
   // --------------------------------------------------------------------------------
 
