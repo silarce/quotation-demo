@@ -225,9 +225,25 @@ const columns: TableProps<TquotationListViewModel_Dto>['columns'] = [
   },
   {
     title: '追加減',
-    dataIndex: 'attachment',
+    dataIndex: 'additionalAmount',
     width: 150,
-    className: 'whitespace-pre-wrap ',
+    className: 'whitespace-pre-wrap',
+    align: 'right',
+    render: (value: string | null) => {
+      if (!value) {
+        return '';
+      }
+      // value長的像這樣 "[100, -125, 300, 245]"
+
+      const v = value
+        .replace('[', '')
+        .replace(']', '')
+        .split(',')
+        .map((item) => '$' + Number(item.trim()).toLocaleString())
+        .join('\n');
+
+      return v;
+    },
   },
 ];
 
