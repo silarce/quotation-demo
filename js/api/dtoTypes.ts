@@ -1983,6 +1983,8 @@ export type TquotationContentDto = {
   exchangeRate: `${number}` | null;
   foreignTotal: `${number}` | null;
   currency: Tcurrency;
+
+  autoRefresh: boolean | null; // 是否自動計算主產品來自後端的資料
 };
 
 export type TquotationDto = {
@@ -2380,6 +2382,7 @@ export type TcreateQuotationContentDto = {
   exchangeRate: string | null;
   foreignTotal: string | null;
   currency: Tcurrency;
+  autoRefresh: boolean;
 };
 
 /**合約 */
