@@ -31,15 +31,15 @@
     @apply w-fit font-medium px-2 py-1 rounded-full;
   }
   .state-blue {
-    @apply global-state bg-state01 text-state02 w-fit font-medium px-2 py-1 rounded-full;
+    @apply global-state bg-state01 text-state02;
   }
   .state-green {
-    @apply global-state bg-state03 text-green01 w-fit font-medium px-2 py-1 rounded-full;
+    @apply global-state bg-state03 text-green01;
   }
   .state-gray {
-    @apply global-state bg-gray04 text-gray01 w-fit font-medium px-2 py-1 rounded-full;
+    @apply global-state bg-gray04 text-gray01;
   }
   .state-red {
-    @apply global-state bg-state04 text-red01 w-fit font-medium px-2 py-1 rounded-full;
+    @apply global-state bg-state04 text-red01;
   }
 }
