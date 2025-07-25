@@ -42,8 +42,8 @@ type Tstate = {
   receivedAmount: '沒有property' | number | null; // 已收金額
   discountAmount: '沒有property' | number | null; // 扣款折讓
 
-  totalAmount: '沒有property' | number | null; // 已請款總額
-  salesTotal: '沒有property' | number | null; // 銷售總額
+  prAmount: '沒有property' | number | null; // 已請款總額
+  totalAmount: number | null; // 銷售總額
 };
 
 // ============================================================================
@@ -86,60 +86,61 @@ export default function SalesInformation() {
       status,
     } = (await getAccountsReceivableFromQuotation(data.quotationNumber)) ?? {};
 
-    const {
-      // status,
-      // reviewManagerEmployeeId,
-      // managerReviewedAt,
-      // quotationNumber,
-      // version,
-      // customerId,
-      projectName,
-      // county,
-      // district,
-      // address,
-      // contactPerson,
-      // contactNumber,
-      // quantity,
-      // editNotes,
-      // discount,
-      // subTotal,
-      salesTax,
-      total,
-      // deliveryLocation,
-      // paymentMethods,
-      // supervisorEmployeeId,
-      // agentEmployeeId,
-      // reviewSalesEmployeeId,
-      // productsOrder,
-      // tuneTotal,
-      // averageDiscount,
-      // estimatedDiscount,
-      // type,
-      currency,
-      // foreignTotal,
-      // exchangeRate,
-      // contractId,
-      // ontractStatus,
-    } = data;
+    // const {
+    //   // status,
+    //   // reviewManagerEmployeeId,
+    //   // managerReviewedAt,
+    //   // quotationNumber,
+    //   // version,
+    //   // customerId,
+    //   projectName,
+    //   // county,
+    //   // district,
+    //   // address,
+    //   // contactPerson,
+    //   // contactNumber,
+    //   // quantity,
+    //   // editNotes,
+    //   // discount,
+    //   // subTotal,
+    //   salesTax,
+    //   total,
+    //   // deliveryLocation,
+    //   // paymentMethods,
+    //   // supervisorEmployeeId,
+    //   // agentEmployeeId,
+    //   // reviewSalesEmployeeId,
+    //   // productsOrder,
+    //   // tuneTotal,
+    //   // averageDiscount,
+    //   // estimatedDiscount,
+    //   // type,
+    //   currency,
+    //   // foreignTotal,
+    //   // exchangeRate,
+    //   // contractId,
+    //   // ontractStatus,
+    // } = data;
 
-    // const newState: Tstate = {
-    //   ...state,
-    //   contractNumber: '沒有property',
-    //   projectName: '沒有property',
-    //   customerNumber: 'customerNumber' ?? '',
-    //   customerName: 'customerName' ?? '',
-    //   customerTaxId: '沒有property',
-    //   taxType: '沒有property',
-    //   currency: 'salesCurrency' ?? '',
-    //   total: 'salesAmount' ?? 0,
-    //   salesTax: 'taxes' ?? 0,
-    //   attachmentTotal: '沒有property',
-    //   attachmentTax: '沒有property',
-    //   receivedAmount: '沒有property',
-    //   discountAmount: '沒有property',
-    //   totalAmount: '沒有property',
-    //   salesTotal: 'totalAmount' ?? '',
-    // };
+    const newState: Tstate = {
+      ...state,
+      contractNumber: '沒有property',
+      projectName: '沒有property',
+      customerNumber: customerNumber ?? '',
+      customerName: customerName ?? '',
+      customerTaxId: '沒有property',
+      taxType: '沒有property',
+      currency: salesCurrency ?? '',
+      total: salesAmount ?? 0,
+      salesTax: taxes ?? 0,
+      attachmentTotal: '沒有property',
+      attachmentTax: '沒有property',
+      receivedAmount: '沒有property',
+      discountAmount: '沒有property',
+      // prAmount: 'prAmount' ?? '',
+      prAmount: '沒有property',
+      totalAmount: totalAmount ?? 0,
+    };
 
     // setState(newState);
   };
@@ -211,8 +212,8 @@ export default function SalesInformation() {
           <DataEntry_fong caption="追加減金額稅金">{state?.attachmentTax}</DataEntry_fong>
           <DataEntry_fong caption="已收金額">{state?.receivedAmount}</DataEntry_fong>
           <DataEntry_fong caption="扣款折讓">{state?.discountAmount}</DataEntry_fong>
-          <DataEntry_fong caption="已請款總額">{state?.totalAmount}</DataEntry_fong>
-          <DataEntry_fong caption="銷售總額">{state?.salesTotal}</DataEntry_fong>
+          <DataEntry_fong caption="已請款總額">{state?.prAmount}</DataEntry_fong>
+          <DataEntry_fong caption="銷售總額">{state?.totalAmount}</DataEntry_fong>
         </div>
         {/*  */}
         <div className="mt-10">
