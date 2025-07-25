@@ -146,8 +146,9 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
           </div>
         </DataEntry_fong>
       </div>
-      <div className="mt-5">
+      <div className="mt-5 ">
         <Table_antd
+          className={scss.table}
           columns={columns}
           dataSource={raw}
           rowHoverable={false}
@@ -158,7 +159,8 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
             },
           }}
           style={{
-            width: '1360px',
+            // width: '1360px',
+            width: '1400px',
           }}
           scroll={{
             y: 400,
