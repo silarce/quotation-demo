@@ -14,16 +14,32 @@
     background-color: theme("colors.white01");
     padding-bottom: 24px;
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       bottom: 100%;
       left: 0;
       width: 100%;
-      height: theme('padding.layoutY');
-      background-color: theme('colors.white01');
+      height: theme("padding.layoutY");
+      background-color: theme("colors.white01");
     }
   }
   .gap-fong {
     gap: 20px 24px;
+  }
+
+  .global-state {
+    @apply w-fit font-medium px-2 py-1 rounded-full;
+  }
+  .state-blue {
+    @apply global-state bg-state01 text-state02 w-fit font-medium px-2 py-1 rounded-full;
+  }
+  .state-green {
+    @apply global-state bg-state03 text-green01 w-fit font-medium px-2 py-1 rounded-full;
+  }
+  .state-gray {
+    @apply global-state bg-gray04 text-gray01 w-fit font-medium px-2 py-1 rounded-full;
+  }
+  .state-red {
+    @apply global-state bg-state04 text-red01 w-fit font-medium px-2 py-1 rounded-full;
   }
 }
