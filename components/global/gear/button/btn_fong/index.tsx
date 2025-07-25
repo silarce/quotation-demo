@@ -134,12 +134,13 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
     Icon: Icon_cross,
   },
   import: {
+    themeColor: 'blue_II',
     Icon: Icon_import,
   },
   query: {
+    themeColor: 'blue_II',
     Icon: Icon_query,
   },
-
   saveAs: {
     Icon: Icon_saveAs,
   },

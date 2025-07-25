@@ -17,6 +17,7 @@ export default function Table_antd<T>({ className, pagination, ...props }: Table
           showTotal: (total, range) => {
             return `總計 ${total} 項`;
           },
+          showSizeChanger: false,
           ...pagination,
         }
       }

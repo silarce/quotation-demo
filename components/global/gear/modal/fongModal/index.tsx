@@ -8,35 +8,32 @@ import { Container_confirm } from 'components/global/container/modal';
 import Icon_warning from 'public/image/icon/fong/warning.svg';
 
 import scss from './index.module.scss';
+import React from 'react';
 
 // ============================================================================
 
-type Tprops_empty = Omit<ModalFuncProps, 'width'> & {
-  width?: 500 | 700 | 1200;
-  customWidth?: React.CSSProperties['width'];
-};
-
 // ============================================================================
 
-const Modal_clean = ({ className, ...props }: ModalFuncProps) => {
+const modal_clean = ({ className, ...props }: ModalFuncProps) => {
   return Modal.info({
     className: classNames(scss.clean, className),
     icon: null,
     maskClosable: true,
     centered: true,
     footer: null,
+    width: 'fit-content',
     ...props,
   });
 };
 
-const modal_empty = ({ className, width = 500, customWidth, ...props }: Tprops_empty) => {
+const modal_empty = ({ className, ...props }: ModalFuncProps) => {
   return Modal.info({
-    className: classNames(scss.empty, scss[`w${width}`], className),
-    width: customWidth || width,
+    className: classNames(scss.empty, className),
     icon: null,
     maskClosable: true,
     centered: true,
     footer: null,
+    width: 'fit-content',
     ...props,
   });
 };
@@ -44,11 +41,10 @@ const modal_empty = ({ className, width = 500, customWidth, ...props }: Tprops_e
 const modal_confirm = ({
   title,
   content: theContent,
-  width = 500,
   content_footer,
   props_footer,
   ...props
-}: Tprops_empty & {
+}: ModalFuncProps & {
   content_footer?: React.ReactNode;
   props_footer?: React.HTMLAttributes<HTMLDivElement>;
 } = {}) => {
@@ -58,7 +54,7 @@ const modal_confirm = ({
     </Container_confirm>
   );
 
-  return modal_empty({ content, width, ...props });
+  return modal_empty({ content, ...props });
 };
 
 // ==========================================================================
@@ -87,22 +83,30 @@ const Template_confirm = ({
 };
 
 const modal_delete = ({
+  title = "確認刪除嗎？'",
+  content = '此操作將永久刪除，且無法復原。',
   onCancel,
   onConfirm,
   closeOnCancel = true,
   closeOnConfirm = true,
+  cancelText = '取消',
+  confirmText = '確認刪除',
 }: {
+  title?: React.ReactNode;
+  content?: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
   closeOnCancel?: boolean;
   closeOnConfirm?: boolean;
+  cancelText?: React.ReactNode;
+  confirmText?: React.ReactNode;
 } = {}) => {
-  const instance = Modal_clean({
+  const instance = modal_clean({
     content: (
       <Template_confirm
         icon={<Icon_warning className="text-red01" />}
-        title="確認刪除嗎？'"
-        content="此操作將永久刪除，且無法復原。"
+        title={title}
+        content={content}
         panel={
           <>
             <Btn
@@ -111,7 +115,7 @@ const modal_delete = ({
                 closeOnCancel && instance.destroy();
               }}
             >
-              取消
+              {cancelText}
             </Btn>
             <Btn
               onClick={() => {
@@ -120,7 +124,7 @@ const modal_delete = ({
               }}
               theme="trash"
             >
-              確認刪除
+              {confirmText}
             </Btn>
           </>
         }
@@ -132,22 +136,30 @@ const modal_delete = ({
 };
 
 const modal_leave = ({
+  title = '確認離開嗎？',
+  content = '尚有資料未儲存,確定離開嗎。',
   onCancel,
   onConfirm,
   closeOnCancel = true,
   closeOnConfirm = true,
+  cancelText = '取消',
+  confirmText = '確認離開',
 }: {
+  title?: React.ReactNode;
+  content?: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
   closeOnCancel?: boolean;
   closeOnConfirm?: boolean;
+  cancelText?: React.ReactNode;
+  confirmText?: React.ReactNode;
 } = {}) => {
-  const instance = Modal_clean({
+  const instance = modal_clean({
     content: (
       <Template_confirm
         icon={<Icon_warning className="text-yellow01" />}
-        title="確認離開嗎？"
-        content="尚有資料未儲存,確定離開嗎。"
+        title={title}
+        content={content}
         panel={
           <>
             <Btn
@@ -156,7 +168,7 @@ const modal_leave = ({
                 closeOnCancel && instance.destroy();
               }}
             >
-              取消
+              {cancelText}
             </Btn>
             <Btn
               theme="warning_2"
@@ -165,7 +177,7 @@ const modal_leave = ({
                 closeOnConfirm && instance.destroy();
               }}
             >
-              確認離開
+              {confirmText}
             </Btn>
           </>
         }
@@ -176,11 +188,4 @@ const modal_leave = ({
   return instance;
 };
 
-export {
-  //
-  Modal_clean,
-  modal_empty,
-  modal_confirm,
-  modal_delete,
-  modal_leave,
-};
+export { modal_clean, modal_empty, modal_confirm, modal_delete, modal_leave };
