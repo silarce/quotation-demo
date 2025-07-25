@@ -56,6 +56,14 @@ module.exports = {
         black01: '#212121', // text02
         white01: '#FFFFFF',
 
+        state01: "#DBEAFE",
+        state02: "#2563EB",
+        state03: "#D1FAE5",
+        state04: "#FEE2E2",
+
+
+
+
         //
         antdBlue: {
           // DEFAULT: blue.primary, // 沒有DEFAULT的效果以後再研究
