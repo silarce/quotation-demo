@@ -311,7 +311,7 @@ const DatePicker = ({
       format={(theDayjs) => {
         return getTaiwanDateStr(theDayjs);
       }}
-      placeholder="- -"
+      placeholder="請選擇"
       {...suffixIcon}
       {...props}
     />
