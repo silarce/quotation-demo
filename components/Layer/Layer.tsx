@@ -1,4 +1,5 @@
-import React, { createContext } from 'react';
+import React, { useRef, useEffect, createContext, useLayoutEffect } from 'react';
+import { useRouter } from 'next/router';
 
 import style from './layer.module.scss';
 
@@ -30,6 +31,14 @@ export default function Layer({
   userInfo: TuserDto;
   userErpFeature: TerpFeatureDto[];
 }) {
+  const { pathname } = useRouter();
+
+  const ref_main = useRef<HTMLDivElement>(null!);
+
+  useEffect(() => {
+    ref_main.current.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <div className={style.container}>
       <LayerCtx.Provider value={{ reqLogout, userInfo, userErpFeature }}>
@@ -38,7 +47,9 @@ export default function Layer({
         <div className={style.wrapper}>
           <SideNav />
           {/* main */}
-          <div className={style.main}>{children}</div>
+          <div ref={ref_main} className={style.main}>
+            {children}
+          </div>
         </div>
       </LayerCtx.Provider>
     </div>
