@@ -58,9 +58,11 @@ export default function Organization() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEnable, setIsEnable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
-  const [isInsure, setIsInsure] = useState(false);
+  const [labor, setLabor] = useState(false);
+  const [health, setHealth] = useState(false);
   const [dependents, setDependents] = useState<Dependent[]>([]);
-  const [insuranceHistories, setInsuranceHistories] = useState<InsuranceHistory[]>([]);
+  const [laborInsurance, setLaborInsurance] = useState<InsuranceHistory[]>([]);
+  const [healthInsurance, setHealthInsurance] = useState<InsuranceHistory[]>([]);
 
   const updateField = useMemo(
     () =>
@@ -164,9 +166,9 @@ export default function Organization() {
   };
   //=============================
 
-  //新增投保歷程
-  const handleAddInsuranceHistory = () => {
-    setInsuranceHistories((prev) => [
+  //新增勞保歷程
+  const handleAddLaborInsurance = () => {
+    setLaborInsurance((prev) => [
       ...prev,
       {
         id: uuidv4(),
@@ -179,12 +181,36 @@ export default function Organization() {
     ]);
   };
 
-  const updateInsuranceField = (id: string, key: keyof InsuranceHistory, value: string) => {
-    setInsuranceHistories((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
+  const updateLaborInsuranceField = (id: string, key: keyof InsuranceHistory, value: string) => {
+    setLaborInsurance((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
   };
 
-  const handleRemoveInsurance = (id: string) => {
-    setInsuranceHistories((prev) => prev.filter((item) => item.id !== id));
+  const handleRemoveLaborInsurance = (id: string) => {
+    setLaborInsurance((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  //新增健保歷程
+
+  const handleAddHealthInsurance = () => {
+    setHealthInsurance((prev) => [
+      ...prev,
+      {
+        id: uuidv4(),
+        changeDate: '',
+        laborLevel: '',
+        healthLevel: '',
+        reason: '',
+        effectiveDate: '',
+      },
+    ]);
+  };
+
+  const updateHealthInsuranceField = (id: string, key: keyof InsuranceHistory, value: string) => {
+    setHealthInsurance((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
+  };
+
+  const handleRemoveHealthInsurance = (id: string) => {
+    setHealthInsurance((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
@@ -458,76 +484,6 @@ export default function Organization() {
           />
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋投保歷程記錄</span>
-          <AddButton label="歷程記錄" onClick={() => handleAddInsuranceHistory()} className="h-[40px] mr-3" />
-          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
-          <ExtendButton
-            label={isInsure ? '收合' : '展開'}
-            className="w-[80px] h-[40px] ml-3"
-            onClick={() => setIsInsure((prev) => !prev)}
-          />
-        </div>
-        <div className={`transition-all duration-300  ${isInsure ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          {insuranceHistories.map((history) => (
-            <div key={history.id} className="grid grid-cols-12 gap-[24px] relative mb-[16px]">
-              <div className="col-span-3">
-                <LabeledInputV2
-                  label="勞保投保級距"
-                  value={history.laborLevel}
-                  onChange={(val) => updateInsuranceField(history.id, 'laborLevel', val)}
-                  placeholder="- -"
-                  required
-                />
-              </div>
-              <div className="col-span-3">
-                <LabeledInputV2
-                  label="健保投保級距"
-                  value={history.healthLevel}
-                  onChange={(val) => updateInsuranceField(history.id, 'healthLevel', val)}
-                  placeholder="- -"
-                  required
-                />
-              </div>
-              <div className="col-span-2">
-                <LabeledDatePickerV2
-                  label="異動日期"
-                  required
-                  placeholder="請選擇"
-                  className="w-full"
-                  value={history.changeDate ? dayjs(history.changeDate) : null}
-                  onChange={(date, dateString) => updateInsuranceField(history.id, 'changeDate', dateString as string)}
-                />
-              </div>
-              <div className="col-span-2">
-                <LabeledInputV2
-                  label="異動原因"
-                  value={history.reason}
-                  onChange={(val) => updateInsuranceField(history.id, 'reason', val)}
-                  placeholder="- -"
-                  required
-                />
-              </div>
-              <div className="col-span-2">
-                <LabeledInputV2
-                  label="生效日"
-                  value={history.effectiveDate}
-                  onChange={(val) => updateInsuranceField(history.id, 'effectiveDate', val)}
-                  placeholder="- -"
-                  required
-                />
-              </div>
-              <div className="absolute right-0 top-[-1.5px]">
-                <ClearButton
-                  label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
-                  className="h-[24px]"
-                  iconPosition="right"
-                  onClick={() => handleRemoveInsurance(history.id)}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
           <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">🆔️員工打卡與排班設定</span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
@@ -563,6 +519,116 @@ export default function Organization() {
             onChange={(val) => updateField('gender_pcode', val)}
             options={selectOptionsMap.gender_pcode || []}
           />
+        </div>
+        <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋勞保歷程記錄</span>
+          <AddButton label="歷程記錄" onClick={handleAddLaborInsurance} className="h-[40px] mr-3" />
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
+          <ExtendButton
+            label={labor ? '收合' : '展開'}
+            className="w-[80px] h-[40px] ml-3"
+            onClick={() => setLabor((prev) => !prev)}
+          />
+        </div>
+        <div className={`transition-all duration-300  ${labor ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          {laborInsurance.map((history) => (
+            <div key={history.id} className="grid grid-cols-4 gap-[24px] relative mb-[16px]">
+              <LabeledInputV2
+                label="勞保投保級距"
+                value={history.laborLevel}
+                onChange={(val) => updateLaborInsuranceField(history.id, 'laborLevel', val)}
+                placeholder="- -"
+                required
+              />
+              <LabeledDatePickerV2
+                label="異動日期"
+                required
+                placeholder="請選擇"
+                className="w-full"
+                value={history.changeDate ? dayjs(history.changeDate) : null}
+                onChange={(date, dateString) =>
+                  updateLaborInsuranceField(history.id, 'changeDate', dateString as string)
+                }
+              />
+              <LabeledInputV2
+                label="異動原因"
+                value={history.reason}
+                onChange={(val) => updateLaborInsuranceField(history.id, 'reason', val)}
+                placeholder="- -"
+                required
+              />
+              <LabeledInputV2
+                label="生效日"
+                value={history.effectiveDate}
+                onChange={(val) => updateLaborInsuranceField(history.id, 'effectiveDate', val)}
+                placeholder="- -"
+                required
+              />
+              <div className="absolute right-0 top-[-1.5px]">
+                <ClearButton
+                  label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
+                  className="h-[24px]"
+                  iconPosition="right"
+                  onClick={() => handleRemoveLaborInsurance(history.id)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋健保歷程記錄</span>
+          <AddButton label="歷程記錄" onClick={() => handleAddHealthInsurance()} className="h-[40px] mr-3" />
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
+          <ExtendButton
+            label={health ? '收合' : '展開'}
+            className="w-[80px] h-[40px] ml-3"
+            onClick={() => setHealth((prev) => !prev)}
+          />
+        </div>
+        <div className={`transition-all duration-300  ${health ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          {healthInsurance.map((history) => (
+            <div key={history.id} className="grid grid-cols-4 gap-[24px] relative mb-[16px]">
+              <LabeledInputV2
+                label="健保投保級距"
+                value={history.laborLevel}
+                onChange={(val) => updateHealthInsuranceField(history.id, 'laborLevel', val)}
+                placeholder="- -"
+                required
+              />
+              <LabeledDatePickerV2
+                label="異動日期"
+                required
+                placeholder="請選擇"
+                className="w-full"
+                value={history.changeDate ? dayjs(history.changeDate) : null}
+                onChange={(date, dateString) =>
+                  updateHealthInsuranceField(history.id, 'changeDate', dateString as string)
+                }
+              />
+              <LabeledInputV2
+                label="異動原因"
+                value={history.reason}
+                onChange={(val) => updateHealthInsuranceField(history.id, 'reason', val)}
+                placeholder="- -"
+                required
+              />
+              <LabeledInputV2
+                label="生效日"
+                value={history.effectiveDate}
+                onChange={(val) => updateHealthInsuranceField(history.id, 'effectiveDate', val)}
+                placeholder="- -"
+                required
+              />
+              <div className="absolute right-0 top-[-1.5px]">
+                <ClearButton
+                  label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
+                  className="h-[24px]"
+                  iconPosition="right"
+                  onClick={() => handleRemoveHealthInsurance(history.id)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
           <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👨‍👩‍👧‍👦眷屬資料</span>
