@@ -32,13 +32,13 @@ export default function TwoButtonModal_free({
   return (
     <Modal
       className={scss.container}
-      visible={visible}
+      open={visible}
       maskClosable={true}
       closable={false}
       centered={true}
       width={400}
       onCancel={onCancel}
-      destroyOnClose={true}
+      destroyOnHidden={true}
       footer={
         <TwoBtnFooter
           {...{

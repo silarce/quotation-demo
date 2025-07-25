@@ -1,8 +1,8 @@
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
-import iconReset from 'public/image/icon/reset.svg';
-// import iconChange from 'public/image/icon/change.svg';
-import iconCopy2 from 'public/image/icon/copy2.svg';
+import iconReset from 'public/image/icon/reset.svg?url';
+// import iconChange from 'public/image/icon/change.svg?url';
+import iconCopy2 from 'public/image/icon/copy2.svg?url';
 
 import Image from 'next/image';
 

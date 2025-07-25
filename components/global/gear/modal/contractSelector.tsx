@@ -18,7 +18,7 @@ import { Tparams, TquotationContractDto, useContract_infinite } from 'js/api/api
 import { AppContext } from 'pages/_app';
 
 // icon
-import iconPlace from 'public/image/icon/place.svg';
+import iconPlace from 'public/image/icon/place.svg?url';
 
 export type { TquotationContractDto };
 
@@ -96,8 +96,6 @@ export default function ContractSelector({
 
       return;
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showModal]);
 
   // ==================================================
@@ -171,7 +169,7 @@ export default function ContractSelector({
   return (
     <SelectorShell
       label={label ?? ''}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       // onSearch={onSearch}

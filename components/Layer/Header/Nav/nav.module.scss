@@ -1,17 +1,12 @@
 @use "styles/theme01" as *;
 .container {
-  // display: grid;
-  // grid-template-columns: repeat(5, auto);
   display: flex;
-  justify-content: center;
-  grid-gap: 40px;
-  height: fit-content;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+  padding-left: 27px;
   margin: auto;
   margin-bottom: 0;
-  margin-left: 77px;
-  > * {
-    margin: auto;
-  }
 }
 
 .link {

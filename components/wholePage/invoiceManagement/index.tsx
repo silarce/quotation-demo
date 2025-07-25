@@ -1,8 +1,8 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 // import { nanoid } from 'nanoid';
 import classNames from 'classnames';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -86,8 +86,8 @@ export default function InvoiceManagement(props?: TmyPageProps) {
       sort: 'invoiceDate',
       filter: {
         invoiceDate: {
-          $gte: moment(`${year}-${month}`, 'YYYY-MM').startOf('month').toISOString(),
-          $lte: moment(`${year}-${month}`, 'YYYY-MM').endOf('month').toISOString(),
+          $gte: dayjs(`${year}-${month}`).startOf('month').toISOString(),
+          $lte: dayjs(`${year}-${month}`).endOf('month').toISOString(),
         },
 
         $or: {

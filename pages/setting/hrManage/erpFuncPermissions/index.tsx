@@ -305,14 +305,14 @@ export default function ErpFuncPermissions() {
       />
 
       <TwoButtonModal
-        visible={!!erpData_del && !!departmentData_del}
+        open={!!erpData_del && !!departmentData_del}
         text={`請確認是否從${erpData_del?.name}移除${departmentData_del?.name}`}
         onConfirm={confirmDelete}
         onCancel={() => cancelDelete()}
       />
 
       <TwoButtonModal
-        visible={!!erpData_del && !!employee_del}
+        open={!!erpData_del && !!employee_del}
         text={`請確認是否從${erpData_del?.name}移除${employee_del?.chName}`}
         onConfirm={confirmDelete_emp}
         onCancel={() => cancelDelete_emp()}

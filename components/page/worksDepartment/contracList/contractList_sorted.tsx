@@ -1,14 +1,9 @@
-import {
-  useState,
-  useEffect,
-  //  MouseEvent
-} from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 
 import { useRouter } from 'next/router';
 
 // components
-// import Thead from './contractList/thead';
 import PanelHeader, { TtheadInfo } from './contractList/panelHeader';
 import PanelBody, { Tdetail } from './contractList/panelBody';
 
@@ -20,8 +15,6 @@ import { useGetContract_id, TquotationContractDto } from 'js/api/api_quotation';
 
 // css
 import scss from './contractList_sorted.module.scss';
-
-const { Panel } = Collapse;
 
 // ========================
 
@@ -122,31 +115,24 @@ export default function ContractList_sorted({ control }: { control: Tcontrol }) 
   // ------------------------------------------------------------------
   return (
     <div className={scss.container}>
-      {/* <Thead /> */}
       <Collapse
-        //
-        expandIcon={() => <></>}
-        // accordion={true}
-        destroyInactivePanel={true}
-      >
-        {arr.map((item, index) => {
+        expandIcon={() => null}
+        destroyOnHidden={true}
+        items={arr.map((item, index) => {
           const { label, contractArr } = item;
 
-          return (
-            <Panel
-              key={index}
-              className={classNames(scss.panel, scss.locationPanel, scss.plus)}
-              header={
-                <div className={scss.sortTitle}>
-                  <span>{label}</span>
-                </div>
-              }
-            >
-              <List key={label} contractArr={contractArr} createContractDetailArr={createContractDetailArr} />
-            </Panel>
-          );
+          return {
+            key: index,
+            className: classNames(scss.panel, scss.locationPanel, scss.plus),
+            label: (
+              <div className={scss.sortTitle}>
+                <span>{label}</span>
+              </div>
+            ),
+            children: <List key={label} contractArr={contractArr} createContractDetailArr={createContractDetailArr} />,
+          };
         })}
-      </Collapse>
+      />
     </div>
   );
 }
@@ -167,22 +153,12 @@ const List = ({
   return (
     <Collapse
       //
-      expandIcon={() => <></>}
-      // accordion={false}
-      destroyInactivePanel={true}
+      expandIcon={() => null}
+      destroyOnHidden={true}
       activeKey={targetContractId}
-    >
-      {contractArr.map((item) => {
+      items={contractArr.map((item) => {
         const { contractId } = item;
         const isActive = contractId === targetContractId;
-
-        // const openQuotation = (e: MouseEvent) => {
-        //   e.stopPropagation();
-        //   router.push({
-        //     pathname: '/worksDepartment/contractList/contract/workContactDoc',
-        //     query: { contractId, version: 1 },
-        //   });
-        // };
 
         const detailLinkProps: Parameters<typeof PanelHeader>[0]['detailLinkProps'] = {
           onClick(e) {
@@ -196,36 +172,31 @@ const List = ({
 
         const detailArr = createContractDetailArr(contractId);
 
-        return (
-          <Panel
-            key={contractId}
-            className={scss.panel}
-            header={
-              <PanelHeader
+        return {
+          key: contractId,
+          className: scss.panel,
+          label: (
+            <PanelHeader
+              contract={item}
+              isActive={isActive}
+              detailLinkProps={detailLinkProps}
+              onClick={() => {
                 //
-                contract={item}
-                isActive={isActive}
-                // onIconDetailClick={openQuotation}
-                detailLinkProps={detailLinkProps}
-                onClick={() => {
-                  //
-                  if (isActive) {
-                    router.replace({
-                      query: { ...query, targetContractId: undefined },
-                    });
-                  } else {
-                    router.replace({
-                      query: { ...query, targetContractId: contractId },
-                    });
-                  }
-                }}
-              />
-            }
-          >
-            <PanelBody contractDetailArr={detailArr} />
-          </Panel>
-        );
+                if (isActive) {
+                  router.replace({
+                    query: { ...query, targetContractId: undefined },
+                  });
+                } else {
+                  router.replace({
+                    query: { ...query, targetContractId: contractId },
+                  });
+                }
+              }}
+            />
+          ),
+          children: <PanelBody contractDetailArr={detailArr} />,
+        };
       })}
-    </Collapse>
+    />
   );
 };

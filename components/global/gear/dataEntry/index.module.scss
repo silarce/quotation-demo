@@ -1,11 +1,6 @@
 .container {
   position: relative;
   display: flex;
-  // border: solid 1px black;
-  // background-color: pink;
-  // gap: 0px;
-  // align-items: flex-end;
-  // box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 }
 
 .captionWrapper {
@@ -28,20 +23,69 @@
   &.showBorder {
     border-color: black;
   }
-  &.showBorder2 {
-    border-color: theme("colors.border02");
+}
+
+.container_fong {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  line-height: 1.143rem;
+
+  .captionWrapper {
+    display: flex;
+    align-items: center;
+
+    position: relative;
+
+    width: 100%;
+    border: none;
+    font-weight: 500;
+    white-space: pre-wrap;
+
+    .asterisk {
+      font-size: 8px;
+      color: theme("colors.red01");
+      font-weight: 600;
+      margin: 6px;
+      align-self: flex-start;
+    }
+  }
+  .childrenWrapper {
+    padding: 12px;
+    border: solid 1px theme("colors.border02");
+    border-radius: theme("border.radius.02");
+    min-height: calc(1.143rem + 24px + 2px); // line-height + 上下 padding + border
+
+    &.disabled {
+      color: #666666;
+      background-color: #fafafa;
+
+      border-color: transparent;
+      border-bottom-color: #e0e0e0;
+    }
   }
 }
 
+// =====================================
+
 // textarea
-.textarea {
+.textarea_autoHeight {
+  line-height: inherit;
   width: 100%;
   &:disabled {
     cursor: auto;
   }
 }
+.textarea {
+  line-height: inherit;
+  width: 100%;
+}
 
-.datepicker {
+.datepicker.datepicker.datepicker {
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
   &:global(.ant-picker) {
     font-size: inherit;
     padding: 0;
@@ -54,34 +98,98 @@
     }
   }
 }
-.timepicker {
+.timepicker.timepicker.timepicker {
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
   &:global(.ant-picker) {
     padding: 0;
     border: 0;
   }
 }
 
-.checkbox {
+.dateRangePicker.dateRangePicker.dateRangePicker {
+  display: flex;
+  padding: unset;
+  margin: unset;
+  border: none;
+  background-color: unset;
+
+  &:hover {
+    background-color: unset;
+  }
+
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
+}
+
+.checkbox.checkbox.checkbox {
   display: flex;
   font-size: inherit;
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
 
-  > :global(.ant-checkbox-wrapper) {
-    position: relative;
-    align-items: center;
-    font-size: inherit;
-    > :global(.ant-checkbox) {
-      transform: translateY(-2px);
+  position: relative;
+  align-items: center;
+  font-size: inherit;
+  :global(.ant-checkbox-checked) {
+    :global(.ant-checkbox-inner) {
+      background-color: theme("colors.green01");
+      border-color: theme("colors.green01");
     }
   }
 }
 
-.radioGroup {
-  font-size: inherit;
-  > :global(.ant-radio-wrapper) {
-    font-size: inherit;
+.checkBoxGroup {
+  gap: 20px;
+  > :global(.ant-checkbox-wrapper) {
+    position: relative;
     align-items: center;
-    > :global(.ant-radio) {
-      transform: translateY(-2px);
+    font-size: inherit;
+    :global(.ant-checkbox-checked) {
+      :global(.ant-checkbox-inner) {
+        background-color: theme("colors.green01");
+        border-color: theme("colors.green01");
+      }
+    }
+  }
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
+
+  :global(.ant-radio-checked) {
+    :global(.ant-radio-inner) {
+      background-color: theme("colors.green01");
+      border-color: theme("colors.green01");
+    }
+  }
+}
+
+.radioGroup.radioGroup.radioGroup {
+  font-size: inherit;
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
+  > :global(.ant-radio-wrapper) {
+    margin-right: 20px;
+    :global(.ant-radio-checked) {
+      :global(.ant-radio-inner) {
+        background-color: theme("colors.green01");
+        border-color: theme("colors.green01");
+      }
     }
   }
 }
@@ -89,6 +197,11 @@
 .antdSelect.antdSelect.antdSelect.antdSelect {
   display: flex;
   font-size: inherit;
+  height: unset;
+  line-height: inherit;
+  * {
+    line-height: inherit;
+  }
 
   :global(.ant-select-selector) {
     background-color: transparent;
@@ -96,12 +209,19 @@
     border: unset;
     height: unset;
     box-shadow: unset;
+    font-size: inherit;
+    :global(.ant-select-selection-wrap) {
+      &::after {
+        line-height: inherit;
+      }
+    }
     :global(.ant-select-selection-placeholder),
     :global(.ant-select-selection-item) {
-      line-height: unset;
+      // line-height: unset;
+      font-size: inherit;
     }
     &::after {
-      line-height: unset;
+      line-height: inherit;
     }
   }
 
@@ -146,6 +266,10 @@
   padding: 0;
   [class$="indicatorContainer"] {
     padding: 0;
+    > svg {
+      width: 1rem;
+      height: 1rem;
+    }
   }
 }
 
@@ -173,7 +297,7 @@
 .input.plus {
   @extend .input_base;
 }
-.indicatorsContainer.plus {
+.indicatorsContainer.indicatorsContainer {
   @extend .indicatorsContainer_base;
 }
 .indicatorSeparator.plus {
@@ -189,6 +313,7 @@
 .inputSelect {
   display: inline-block;
   position: relative;
+  width: 100%;
   > input {
     position: relative;
     width: calc(100% - 20px);
@@ -269,8 +394,32 @@
   font-size: 25px;
 }
 
+.formItem {
+  all: unset;
+  :global(.ant-row) {
+    all: unset;
+    :global(.ant-col) {
+      all: unset;
+      :global(.ant-form-item-control-input) {
+        all: unset;
+        :global(.ant-form-item-control-input-content) {
+          all: unset;
+        }
+      }
+    }
+  }
+}
+
 // ==================================================
 .none,
 .none.plus {
   display: none;
+}
+
+// ===================================================
+
+.input {
+  &::placeholder {
+    color: theme("colors.gray06");
+  }
 }

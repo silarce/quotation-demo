@@ -1,16 +1,160 @@
 .btn {
-  border: solid 1px theme("colors.border02");
-  border-radius: theme("border.radius.normal");
-  color: theme("colors.text02");
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  // min-width: 84px;
+  min-height: 40px;
+  padding: 0 16px;
   font-size: 14px;
-  font-weight: 400;
+
+  border-radius: 6px;
+
+  color: theme('colors.gray01');
+  border: solid 1px theme('colors.gray01');
+  background-color: theme('colors.gray04');
+
+  > .iconContainer {
+    color: inherit;
+    margin-right: 6px;
+    svg {
+      font-size: 16px;
+    }
+    &.after {
+      margin-right: unset;
+      margin-left: 6px;
+    }
+  }
 }
 
-.normal {
-  padding: 10px 16px;
-  background-color: theme("colors.bgc01");
+.basic {
+  &:hover {
+    color: theme('colors.gray02');
+    border: solid 1px theme('colors.gray02');
+  }
+  &:active {
+    color: theme('colors.gray03');
+    border: solid 1px theme('colors.gray03');
+  }
 }
 
-.large {
-  padding: 16px 32px;
+.blue_I {
+  border-color: theme("colors.blue01");
+  color: theme("colors.blue01");
+  background-color: theme("colors.white01");
+  &:hover {
+    border-color: theme('colors.blue02');
+    color: theme('colors.blue02');
+  }
+  &:active {
+    background-color: theme("colors.blue03");
+    border-color: theme("colors.blue03");
+    color: theme("colors.white01");
+  }
+}
+
+.blue_II {
+  border-color: theme("colors.blue01");
+  color: theme("colors.blue01");
+  &:hover {
+    border-color: theme("colors.blue02");
+    color: theme("colors.blue02");
+  }
+  &:active {
+    border-color: theme("colors.blue03");
+    color: theme("colors.blue03");
+  }
+}
+
+.green_I {
+  background-color: theme('colors.white01');
+  color: theme('colors.green01');
+  border-color: theme('colors.green01');
+  &:hover {
+    background-color: theme('colors.green02');
+    border-color: theme('colors.green02');
+    color: theme('colors.white01');
+  }
+  &:active {
+    background-color: theme('colors.green03');
+    background-color: theme('colors.green03');
+    color: theme('colors.white01');
+  }
+}
+
+.green_II {
+  color: theme('colors.green01');
+  border-color: theme('colors.green01');
+  &:hover {
+    border-color: theme('colors.green02');
+    color: theme('colors.green02');
+  }
+  &:active {
+    border-color: theme('colors.green03');
+    color: theme('colors.green03');
+  }
+}
+
+.red_I {
+  background-color: theme('colors.white01');
+  color: theme('colors.red01');
+  border-color: theme('colors.red01');
+  &:hover {
+    background-color: theme('colors.red02');
+    border-color: theme('colors.red02');
+    color: theme('colors.white01');
+  }
+  &:active {
+    background-color: theme('colors.red03');
+    border-color: theme('colors.red03');
+    color: theme('colors.white01');
+  }
+}
+
+.brown_I {
+  color: theme('colors.brown01');
+  border-color: theme('colors.brown01');
+  &:hover {
+    color: theme('colors.brown02');
+    border-color: theme('colors.brown02');
+  }
+  &:active {
+    color: theme('colors.brown03');
+    border-color: theme('colors.brown03');
+  }
+}
+
+.yellow_I {
+  color: theme('colors.yellow02');
+  border-color: theme('colors.yellow02');
+}
+
+.warning_I {
+  border: solid 1px theme('colors.yellow01');
+  color: theme('colors.yellow01');
+  background-color: theme('colors.white01');
+  &:hover {
+    background-color: theme('colors.yellow02');
+    border-color: theme('colors.yellow02');
+    color: theme('colors.white01');
+    .iconContainer {
+      > svg {
+        > rect {
+          fill: theme('colors.yellow02');
+        }
+      }
+    }
+  }
+  &:active {
+    background-color: theme('colors.yellow03');
+    border-color: theme('colors.yellow03');
+    color: theme('colors.white01');
+    .iconContainer {
+      > svg {
+        > rect {
+          fill: theme('colors.yellow03');
+        }
+      }
+    }
+  }
 }

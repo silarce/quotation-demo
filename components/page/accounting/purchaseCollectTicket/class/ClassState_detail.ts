@@ -1,4 +1,4 @@
-import { Moment } from 'moment';
+import { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
 
 import { Tstate_detail, Interface_classState, Interface_classState_detail } from '../type';
@@ -53,7 +53,7 @@ class ClassState_detail implements Interface_classState_detail {
   get transaction_date() {
     return this.state_datail.transaction_date;
   }
-  set transaction_date(date: Moment | null) {
+  set transaction_date(date: Dayjs | null) {
     // this.countUpdate();
     this.setState_detail({
       ...this.state_datail,

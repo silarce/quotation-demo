@@ -1,0 +1,205 @@
+//button
+.redButtonNew {
+  color: #ea1833;
+  border: 1px solid #ea1833;
+  background-color: #f5f5f5;
+  font-size: 16px;
+  display: flex;
+  padding: 0px 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px; // 8px
+  font-weight: 500;
+
+  svg {
+    color: #ea1833 !important;
+  }
+  // hover 狀態
+  &:hover {
+    background-color: #d12c30;
+    color: #ffffff;
+    span {
+      color: #ffffff;
+    }
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #cc142b;
+    color: #ffff;
+    span {
+      color: #ffffff;
+    }
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+}
+
+.greenButtonNew {
+  color: #1b9c5e;
+  border: 1px solid #1b9c5e;
+  background-color: #f5f5f5;
+  font-size: 16px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  font-weight: 500;
+
+  svg {
+    color: #1b9c5e !important;
+  }
+
+  // hover 狀態
+  &:hover {
+    background-color: #388e3c;
+    color: #ffffff;
+    span {
+      color: #ffffff;
+    }
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #2e7d32;
+    color: #ffffff;
+    span {
+      color: #ffffff;
+    }
+    svg {
+      color: #ffffff !important;
+    }
+  }
+}
+
+.blueButtonNew {
+  border: 1px solid #14256a;
+  background-color: #f5f5f5;
+  font-size: 16px;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  font-weight: 500;
+  span {
+    color: #14256a;
+  }
+
+  svg {
+    color: #14256a !important;
+  }
+  // hover 狀態
+  &:hover {
+    background-color: #14256a;
+
+    color: #ffffff !important;
+
+    span {
+      color: #ffffff !important;
+    }
+
+    svg {
+      color: #ffffff !important;
+    }
+  }
+
+  // active 狀態
+  &:active {
+    background-color: #0f1b52;
+
+    svg {
+      color: #ffffff !important;
+    }
+    span {
+      color: #ffff;
+    }
+  }
+}
+
+.backButton {
+  border: 1px solid #14256a;
+  background-color: #f5f5f5;
+  font-size: 16px;
+  display: flex;
+  padding: 0px 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  font-weight: 500;
+  span {
+    color: #14256a;
+  }
+  svg {
+    color: #14256a;
+  }
+  // hover 狀態
+  &:hover {
+    border: 1px solid #1a3084;
+    span {
+      color: #1a3084;
+    }
+    svg {
+      color: #1a3084;
+    }
+  }
+  // active 狀態
+  &:active {
+    border: 1px solid #0F1A4A;
+    svg {
+      color: #0F1A4A !important;
+    }
+    span {
+      color: #0F1A4A;
+    }
+  }
+}
+
+.extendButton {
+  border: 1px solid #616161;
+  background-color: #f5f5f5;
+  font-size: 16px;
+  display: flex;
+  padding: 0px 16px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  font-weight: 500;
+  span {
+    color: #616161;
+  }
+  svg {
+    color: #616161;
+  }
+  // hover 狀態
+  &:hover {
+    border: 1px solid #424242;
+    span {
+      color: #424242;
+    }
+    svg {
+      color: #424242;
+    }
+  }
+  // active 狀態
+  &:active {
+    border: 1px solid #212121;
+    svg {
+      color: #212121 ;
+    }
+    span {
+      color: #212121;
+    }
+  }
+}

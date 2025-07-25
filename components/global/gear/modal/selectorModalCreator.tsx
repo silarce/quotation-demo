@@ -194,7 +194,7 @@ export function selectModalCreator<Tdata extends Tobject>({
     return (
       <SelectorShell
         label={label ?? ''}
-        visible={showModal}
+        open={showModal}
         onConfirm={theOnConfirm}
         onCancel={theOnCancel}
         width={rwd1023 ? '80vw' : modalWidth}

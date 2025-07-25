@@ -1,9 +1,9 @@
 // import Modal, { ModalProps } from 'antd/lib/modal/Modal';
 import Modal, { ModalProps } from 'components/global/myAntd/modal';
 
-export default function PdfTemplate_accountReceivable({ visible }: ModalProps) {
+export default function PdfTemplate_accountReceivable({ open }: ModalProps) {
   return (
-    <Modal visible={visible}>
+    <Modal open={open}>
       <Template />
     </Modal>
   );

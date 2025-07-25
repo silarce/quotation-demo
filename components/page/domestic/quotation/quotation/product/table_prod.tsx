@@ -251,7 +251,7 @@ export default function Table_prod({
 
       {/*  */}
       <InputModal
-        visible={!!showInputModal}
+        open={!!showInputModal}
         title="請輸入變更數量"
         tip={`上限 : ${targetProd && targetProd.remainQty}`}
         onConfirm={(v) => {

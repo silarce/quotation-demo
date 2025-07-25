@@ -6,11 +6,11 @@ import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import { Switch } from 'antd';
 
 // img
-import iconMember from 'public/image/icon/member.svg';
-import iconGear from 'public/image/icon/gear.svg';
+import iconMember from 'public/image/icon/member.svg?url';
+import iconGear from 'public/image/icon/gear.svg?url';
 
 // icon
-import logout from 'public/image/icon/logout.svg';
+import logout from 'public/image/icon/logout.svg?url';
 
 // css
 import scss from './info.module.scss';
@@ -134,7 +134,7 @@ export default function Info() {
         </Dropdown>
       </div>
 
-      <ChangePwPanel visible={showPwModal} onCancel={onCancel} />
+      <ChangePwPanel open={showPwModal} onCancel={onCancel} />
     </div>
   );
 }

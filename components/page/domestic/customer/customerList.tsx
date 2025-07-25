@@ -6,7 +6,6 @@ import PanelBody from './customerList/panelBody';
 
 // antd
 import { Collapse } from 'antd';
-const { Panel } = Collapse;
 
 // golbal gear
 import TwoButtonModal from 'components/global/gear/modal/simpleModal/twoButtonModal';
@@ -89,25 +88,25 @@ export default function CustomerList({
   // ========================================================
   return (
     <div className={style.customerList}>
-      <Collapse expandIcon={() => <></>} accordion={true} onChange={changeActive}>
-        {customersList.map((data, index) => {
+      <Collapse
+        className={style.panel}
+        expandIcon={() => null}
+        accordion={true}
+        onChange={changeActive}
+        items={customersList.map((data, index) => {
           const isActive = activeIndex === `${index}`;
 
-          return (
-            <Panel
-              className={style.panel}
-              key={index}
-              header={<PanelHeader customersData={data} isActive={isActive} openDelPanel={openDelPanel} />}
-            >
-              <PanelBody customersData={data} />
-            </Panel>
-          );
+          return {
+            key: `${index}`,
+            label: <PanelHeader customersData={data} isActive={isActive} openDelPanel={openDelPanel} />,
+            children: <PanelBody customersData={data} />,
+          };
         })}
-      </Collapse>
+      />
 
       <TwoButtonModal
         {...{
-          visible: !!selInfo.id,
+          open: !!selInfo.id,
           text: `請確定要刪除「${selInfo.customerNumber}」「${selInfo.name}」?`,
           onConfirm: deleteEmployee,
           onCancel: closeDelPanel,

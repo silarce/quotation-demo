@@ -270,7 +270,7 @@ export default function WorkerSelector({
     <SelectorShell
       label={label ?? ''}
       className={scss.container}
-      visible={showModal}
+      open={showModal}
       onConfirm={theOnConfirm}
       onCancel={theOnCancel}
       width={rwd1023 ? '80vw' : '800px'}

@@ -4,7 +4,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 
 // global gear
@@ -17,15 +17,11 @@ import PageHeader02, { TpanelList } from 'components/PageHeader/PageHeader02/Pag
 import Nav_worksDepartment from 'components/page/worksDepartment/nav_worksDepartment';
 
 // api
-import {
-  Tparams,
-  //
-  useGetEngineeringExchanges,
-} from 'js/api/api_engineering';
+import { Tparams, useGetEngineeringExchanges } from 'js/api/api_engineering';
 import { useGetContract_id } from 'js/api/api_quotation';
 
 // helper
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // css
 import scss from './listOfDeliveryOrders.module.scss';
@@ -130,8 +126,8 @@ export default function ListOfDeliveryOrders() {
               contractNumber: contract?.content.quotationNumber ?? '',
               projectNumber,
               projectName,
-              requirementsDate: moment(convertDate_reduce1911(requirementsDate)).format('yy-MM-DD'),
-              dispatchDate: moment(convertDate_reduce1911(dispatchDate)).format('yy-MM-DD'),
+              requirementsDate: getTaiwanDateStr(requirementsDate),
+              dispatchDate: getTaiwanDateStr(dispatchDate),
             };
 
             return (

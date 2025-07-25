@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
-import _ from 'lodash';
+import { Dayjs } from 'dayjs';
 
 // antd
 import { Popover } from 'antd';
@@ -78,8 +76,8 @@ interface Tform_info {
   };
   // 交貨日期
   deliveryDate: {
-    value: Moment | null;
-    onChange?: (value: Moment | null) => void;
+    value: Dayjs | null;
+    onChange?: (value: Dayjs | null) => void;
   };
   //付款辦法
   paymentMethodArr: TpaymentMethod[];

@@ -134,10 +134,6 @@ export default function IncomeBillSorting({
   readonly?: boolean;
   currency: string;
 }) {
-  // console.log('incomeBillList_noInvoice', incomeBillList_noInvoice);
-  // console.log('periodArr', periodArr);
-  // console.log('-------------------------------');
-
   // 幣別一樣時才需要計算amountNotCollected
   // 因為算一算其實不會怎麼樣，所以簡單處理，隱藏就好
   const showAmountNotCollected = currency === currency_tw;
@@ -146,8 +142,6 @@ export default function IncomeBillSorting({
 
   const [stateList, setStateList] = useState<TstateList>({});
   const [activeIncomeBill, setActiveIncomeBill] = useState<TincomeBill>();
-
-  console.log(stateList);
 
   // -----------------------------------------------------------------------------
 

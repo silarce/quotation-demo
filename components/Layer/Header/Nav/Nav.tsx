@@ -71,7 +71,7 @@ export default function Nav() {
 
         if (isDocumentManagement) {
           return (
-            <Link className={`${scss.link} ${active} relative`} href={theHref} key={index}>
+            <Link className={`${scss.link} ${active} flex items-center relative`} href={theHref} key={index}>
               <Image src={icon} alt={label + subLabel} />
               <span>{label}</span>
 
@@ -85,7 +85,7 @@ export default function Nav() {
         }
 
         return (
-          <Link className={`${scss.link} ${active}`} href={theHref} key={index}>
+          <Link className={`${scss.link} ${active} flex items-center`} href={theHref} key={index}>
             <Image src={icon} alt={label + subLabel} />
             <span>{label}</span>
             {subLabel && <span>{subLabel}</span>}

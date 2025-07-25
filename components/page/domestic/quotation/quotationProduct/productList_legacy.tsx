@@ -12,9 +12,9 @@ import InputModal from 'components/global/gear/modal/simpleModal/inputModal_v2';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
-import iconMove from 'public/image/icon/move.svg';
-import iconReset from 'public/image/icon/reset.svg';
-import iconChange from 'public/image/icon/change.svg';
+import iconMove from 'public/image/icon/move.svg?url';
+import iconReset from 'public/image/icon/reset.svg?url';
+import iconChange from 'public/image/icon/change.svg?url';
 
 // css
 import scss from './productList.module.scss';
@@ -179,7 +179,7 @@ export default function ProductList_legacy({
       </DndContext>
 
       <InputModal
-        visible={!!targetProd}
+        open={!!targetProd}
         title="請輸入變更數量"
         tip={`上限 : ${targetProd && targetProd.remainQty}`}
         onConfirm={(v) => {

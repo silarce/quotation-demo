@@ -827,7 +827,7 @@ const QuotationRow_dealClass = ({
           }}
           renderProps_copy={(cellCopy) => {
             return (
-              <Popover content="已複製" visible={copyedTip}>
+              <Popover content="已複製" open={copyedTip}>
                 {cellCopy}
               </Popover>
             );

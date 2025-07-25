@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import moment from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import _ from 'lodash';
 
 // layer
@@ -25,7 +25,7 @@ import {
 
 // utils
 import { quotationStatusLookup } from 'config/lookupTable';
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
 import { Toption, optionsCreator_county } from 'js/utils/options/countryAndDistrict';
@@ -96,10 +96,10 @@ export default function Budget() {
 
   const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
 
-  const dateStart_moment = dateStart ? moment(dateStart) : undefined;
-  dateStart_moment && (dateStart_moment.add(1911, 'year') as moment.Moment);
-  const dateEnd_moment = dateEnd ? moment(dateEnd) : undefined;
-  dateEnd_moment && (dateEnd_moment.add(1911, 'year') as moment.Moment);
+  const dateStart_moment = dateStart ? dayjs(dateStart) : undefined;
+  dateStart_moment && (dateStart_moment.add(1911, 'year') as Dayjs);
+  const dateEnd_moment = dateEnd ? dayjs(dateEnd) : undefined;
+  dateEnd_moment && (dateEnd_moment.add(1911, 'year') as Dayjs);
 
   // ----------------------------------------------------------------------
 
@@ -229,7 +229,7 @@ export default function Budget() {
         const header: Tcontrol_queryQuotationList['panelArr'][number]['header'] = {
           quotationNumber: latestContent.contract?.contractNumber ?? latestContent.quotationNumber,
           status: <Status status={quotationStatusLookup[latestContent.status]} isLost={latestContent.isLost} />,
-          quoteDate: moment(convertDate_reduce1911(latestContent.quotationDate)).format('yy-MM-DD'),
+          quoteDate: getTaiwanDateStr(latestContent.quotationDate),
           county: latestContent.county,
           projectName: latestContent.projectName,
           customerName: latestCustomer?.name ?? '',
@@ -303,7 +303,7 @@ export default function Budget() {
 
           return {
             status: <Status status={quotationStatusLookup[status]} isLost={content.isLost} />,
-            quoteDate: moment(convertDate_reduce1911(quotationDate)).format('yy-MM-DD'),
+            quoteDate: getTaiwanDateStr(quotationDate),
             county: county,
             projectName: projectName,
             customerName: customer?.name ?? '',
@@ -436,10 +436,10 @@ const usePopFormListCreator = () => {
   } = query;
 
   const popFormList = useMemo(() => {
-    const dateStart_moment = dateStart ? moment(dateStart) : undefined;
-    dateStart_moment && (dateStart_moment.add(1911, 'year') as moment.Moment);
-    const dateEnd_moment = dateEnd ? moment(dateEnd) : undefined;
-    dateEnd_moment && (dateEnd_moment.add(1911, 'year') as moment.Moment);
+    const dateStart_moment = dateStart ? dayjs(dateStart) : undefined;
+    dateStart_moment && (dateStart_moment.add(1911, 'year') as Dayjs);
+    const dateEnd_moment = dateEnd ? dayjs(dateEnd) : undefined;
+    dateEnd_moment && (dateEnd_moment.add(1911, 'year') as Dayjs);
 
     const popFormList: Thead_popFormList = {
       quotationNumber: {

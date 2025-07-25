@@ -11,7 +11,7 @@ import LoadingCover01 from 'components/global/gear/loadingCover/loadingCover01';
 
 // icon
 import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
-import iconMove from 'public/image/icon/move.svg';
+import iconMove from 'public/image/icon/move.svg?url';
 
 // css
 

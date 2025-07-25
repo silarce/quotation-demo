@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 import classNames from 'classnames';
 
 // antd
@@ -12,7 +12,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 //
-import { Toption, optionsCreator_deliveryStatusInstallationItem } from 'js/utils/options/productOptions';
+import { optionsCreator_deliveryStatusInstallationItem } from 'js/utils/options/productOptions';
 
 // type
 import { TemployeeDto, ToutsourcingDto, TdeliveryStatusInstallationItem } from 'js/api/dtoTypes';
@@ -27,8 +27,8 @@ type Toption_generics<E extends string> = { value: E; label: string };
 type Toption_installationItem = Toption_generics<TdeliveryStatusInstallationItem>;
 
 type Tstate = {
-  installationDate: Moment | null;
-  shippingDate: Moment | null;
+  installationDate: Dayjs | null;
+  shippingDate: Dayjs | null;
   itemName: string;
   notes: string;
 };
@@ -138,7 +138,7 @@ export default function Modal_newDeliveryStatu({
   // -----------------------------------------------------------------------------
 
   return (
-    <Modal visible={visible} onCancel={onCancel} footer={null} destroyOnClose={true} width={800}>
+    <Modal open={visible} onCancel={onCancel} footer={null} destroyOnHidden={true} width={800}>
       <div className={scss.body}>
         <p className={scss.caption}>批次新增管理單</p>
 
@@ -191,7 +191,7 @@ export default function Modal_newDeliveryStatu({
             {...config}
             datePickerProps={{
               props: {
-                value: state.shippingDate ? moment(state.shippingDate) : undefined,
+                value: state.shippingDate ? dayjs(state.shippingDate) : undefined,
                 onChange: (v) => {
                   setState((state) => ({
                     ...state,
@@ -208,7 +208,7 @@ export default function Modal_newDeliveryStatu({
             {...config}
             datePickerProps={{
               props: {
-                value: state.installationDate ? moment(state.installationDate) : undefined,
+                value: state.installationDate ? dayjs(state.installationDate) : undefined,
                 onChange: (v) => {
                   setState((state) => ({
                     ...state,

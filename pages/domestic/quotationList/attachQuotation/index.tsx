@@ -14,7 +14,7 @@
 // 報價單
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { useRouter, NextRouter } from 'next/router';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import classNames from 'classnames';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
@@ -54,8 +54,8 @@ import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 
 // icon
-import iconUpload from 'public/image/icon/upload.svg';
-import iconRedLock from 'public/image/icon/redLock.svg';
+import iconUpload from 'public/image/icon/upload.svg?url';
+import iconRedLock from 'public/image/icon/redLock.svg?url';
 
 // css
 import style from './quotation.module.scss';
@@ -1053,7 +1053,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
       return {
         state_from: quotationStatusLookup[preStatus] ?? '建立',
         state_to: quotationStatusLookup[status] ?? '',
-        isoString: moment(createdAt).toISOString(),
+        isoString: dayjs(createdAt).toISOString(),
       };
     });
   }, [quotationData, theContent]);
@@ -1926,7 +1926,7 @@ function TheQuotation({ router }: { router: NextRouter }) {
 
       {theContent && (
         <QuotationPdf
-          visible={pdfModalVisible}
+          open={pdfModalVisible}
           onCancel={hidePdf}
           pdfData={pdfData}
           fileName={`報價單-${theContent?.quotationNumber}`}

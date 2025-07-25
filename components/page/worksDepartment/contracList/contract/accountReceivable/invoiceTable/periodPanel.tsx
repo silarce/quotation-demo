@@ -1,16 +1,8 @@
-import React, {
-  //
-  useState,
-  useEffect,
-  useMemo,
-  forwardRef,
-  useImperativeHandle,
-  useContext,
-} from 'react';
+import React, { useState, useEffect, useMemo, forwardRef, useImperativeHandle, useContext, useCallback } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import Decimal from 'decimal.js';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 // antd
 import { Checkbox, Radio, Popover } from 'antd';
@@ -203,23 +195,20 @@ function PeriodPanel_pre(
   // --------------------------------------------------------------------------
 
   const {
+    // 已開立發票
     data: issuedInvoiceArr,
     update: update_issuedInvoiceArr,
     clear: clear_issuedInvoiceArr,
-  } = useGetAccountReceivableInvoices_all(
-    useMemo(() => {
-      return {
-        params: {
-          pageSize: 9999999,
-          sort: 'invoiceNumber',
-          filter: {
-            accountantInvoiceBookId: { $eq: state_period?.invoiceBook?.id },
-          },
-        },
-        autoUpdate: false,
-      };
-    }, [state_period?.invoiceBook?.id])
-  );
+  } = useGetAccountReceivableInvoices_all({
+    params: {
+      pageSize: 9999999,
+      sort: 'invoiceNumber',
+      filter: {
+        accountantInvoiceBookId: { $eq: state_period?.invoiceBook?.id },
+      },
+    },
+    autoUpdate: false,
+  });
 
   // --------------------------------------------------------------------------
 
@@ -357,12 +346,7 @@ function PeriodPanel_pre(
       return undefined;
     }
 
-    const {
-      alphabeticLetter,
-
-      startNumber,
-      endNumber,
-    } = state_period.invoiceBook;
+    const { alphabeticLetter, startNumber, endNumber } = state_period.invoiceBook;
 
     const startNumber_num = Number(startNumber);
     const endNumber_num = Number(endNumber);
@@ -491,12 +475,12 @@ function PeriodPanel_pre(
   }, [state_period]);
 
   useEffect(() => {
-    if (state_period?.invoiceBook?.id) {
+    if (!disabled && state_period?.invoiceBook?.id) {
       update_issuedInvoiceArr();
     } else {
       clear_issuedInvoiceArr();
     }
-  }, [state_period?.invoiceBook?.id]);
+  }, [state_period?.invoiceBook?.id, disabled]);
 
   // ==============================================================================
 
@@ -1528,7 +1512,7 @@ const useDefaultState = ({
       allow_EditDeduction_or_deleteInvoice: !notAllow_EditDeduction_or_deleteInvoice,
 
       actualPrice: String(actualPrice || ''),
-      invoiceDate: invoiceDate ? moment(invoiceDate) : null,
+      invoiceDate: invoiceDate ? dayjs(invoiceDate) : null,
       invoiceBook: invoice?.accountantInvoiceBook ?? null,
 
       //
@@ -1896,7 +1880,7 @@ class Class_OtherNode {
 
     const { year, month } = this.invoiceBook;
 
-    return moment()
+    return dayjs()
       .year(Number(year))
       .month(Number(month) - 1);
   }
@@ -1935,7 +1919,7 @@ class Class_OtherNode {
   }
 
   // ------------------------------------------------------------------------------
-  disabledInvoiceDate(currentDate: Moment): boolean {
+  disabledInvoiceDate(currentDate: Dayjs): boolean {
     // return tue 是不可選
     // return false 是可選
 
@@ -1950,18 +1934,13 @@ class Class_OtherNode {
       return true;
     }
 
-    const {
-      year,
-      month,
-      //  latestInvoiceDate
-    } = this.invoiceBook;
-
-    const bookDate = moment(`${year}-${month}`, 'YYYY-MM');
-    const bookDate_next = moment(`${year}-${Number(month) + 1}`, 'YYYY-MM');
+    const { year, month } = this.invoiceBook;
+    const bookDate = dayjs(`${year}-${month}`);
+    const bookDate_next = dayjs(`${year}-${Number(month) + 1}`);
 
     // const latestInvoiceDate_m = moment(latestInvoiceDate).endOf('date');
     // const begin = latestInvoiceDate_m.subtract(1, 'day');
-    const begin = bookDate;
+    const begin = bookDate.startOf('month');
     const end = bookDate_next.endOf('month');
 
     // if (currentDate.isSame(bookDate, 'month') || currentDate.isSame(bookDate_next, 'month')) {
@@ -1972,7 +1951,8 @@ class Class_OtherNode {
     //   }
     // }
 
-    if (currentDate.isAfter(begin) && currentDate.isBefore(end)) {
+    // if (currentDate.isAfter(begin) && currentDate.isBefore(end)) {
+    if (currentDate.isBetween(begin, end, 'month', '[]')) {
       return false;
     } else {
       return true;

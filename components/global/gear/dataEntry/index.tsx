@@ -1,8 +1,8 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 
 import classNames from 'classnames';
-import _ from 'lodash';
-import { Moment } from 'moment';
+
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 import TextareaAutosize, { TextareaAutosizeProps } from 'react-textarea-autosize';
 
@@ -18,16 +18,17 @@ import {
   Select as AntdSelect,
   SelectProps as AntdSelectProps,
 } from 'antd';
+import type { RangePickerProps } from 'antd/es/date-picker';
+
 import type { CheckboxGroupProps } from 'antd/lib/checkbox';
 import type { RadioGroupProps } from 'antd/lib/radio';
 import type { DefaultOptionType, BaseOptionType } from 'antd/lib/select';
 
-import 'moment/locale/zh-tw';
-import locale from 'antd/lib/date-picker/locale/zh_TW';
-const locale_copy = _.cloneDeep(locale);
-import moment from 'moment';
-
 import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
+
+import Icon_asterisk from 'public/image/icon/fong/asterisk.svg';
+
+import { Form as AntdForm } from 'antd';
 
 // ======================================================================
 
@@ -43,6 +44,7 @@ type TdataEntryProps = {
   captionWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   showBorder?: boolean;
+
   childrenWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
 
   prefix?: React.ReactNode;
@@ -55,13 +57,16 @@ type TdataEntryProps = {
   fontSize?: 12 | 14 | 16 | 18 | 20 | 22;
   //
   //
-
-  theme?: 'normal' | 'fong';
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'prefix'>;
+
+type TdataEntryFongProps = Omit<TdataEntryProps, 'captionMr' | 'showBorder'> & {
+  disabled?: boolean;
+  syncDisabled?: boolean;
+};
 
 type TdataEntrycontainerProps = React.ComponentProps<typeof DataEntryContainer>;
 type TinputProps = React.ComponentProps<typeof Input>;
-type TtextareaProps = React.ComponentProps<typeof Textarea>;
+type TtextareaProps = React.ComponentProps<typeof Textarea_autoHeight>;
 type TdatePickerProps = React.ComponentProps<typeof DatePicker>;
 type TtimePickerProps = React.ComponentProps<typeof TimePicker>;
 type TcheckboxProps = React.ComponentProps<typeof Checkbox>;
@@ -82,8 +87,8 @@ const DataEntryContainer = ({
   captionMr = 0,
   captionWrapperProps: { className: className_caption, ...captionWrapperProps } = {},
 
-  showBorder = true,
-  childrenWrapperProps: { className: className_childrenWrapper, ...childrenWrapperProps } = {},
+  showBorder: showBorder = true,
+  childrenWrapperProps: { className: childrenWrapperClassName, ...childrenWrapperProps } = {},
 
   prefix,
   prefixWrapperProps: { className: className_prefix, ...prefixWrapperProps } = {},
@@ -96,27 +101,25 @@ const DataEntryContainer = ({
   className,
   children,
   //
-  theme = 'normal',
 
-  // fontSize = 18,
-  fontSize = theme === 'fong' ? 14 : 18,
+  fontSize = 18,
+
   ...props_container
 }: TdataEntryProps) => {
   const className_fontSize = `f${fontSize}`;
 
   return (
-    <div className={classNames(scss.container, className, theme === 'fong' && ['items-center'])} {...props_container}>
+    <div className={classNames(scss.container, className)} {...props_container}>
       {caption !== undefined && (
         <div
           className={classNames(
-            'w-[100px]  font-medium',
+            'w-[100px] font-medium',
             `mr-${captionMr}`,
+            'text-main',
             scss.captionWrapper,
             className_fontSize,
             captionClassName,
-            className_caption,
-            theme === 'normal' && ['text-main'],
-            theme === 'fong' && ['text-text02']
+            className_caption
           )}
           style={captionStyle}
           {...captionWrapperProps}
@@ -133,12 +136,9 @@ const DataEntryContainer = ({
         className={classNames(
           scss.childrenWrapper,
           className_fontSize,
-          className_childrenWrapper,
+          childrenWrapperClassName,
           showBorder && scss.showBorder,
-          'border-b border-transparent',
-          //
-          theme === 'normal' && [showBorder && scss.showBorder],
-          theme === 'fong' && [showBorder && scss.showBorder2, 'border-[1px] p-[12px] rounded-lg']
+          'border-b border-transparent'
         )}
         {...childrenWrapperProps}
       >
@@ -155,28 +155,138 @@ const DataEntryContainer = ({
   );
 };
 
+// MARK:DataEntry_fong
+const DataEntry_fong = ({
+  disabled,
+  // 目前只支援disabled、isDisabled、readOnly
+  syncDisabled = true,
+
+  className,
+  children,
+  isMust,
+  fontSize = 14,
+
+  caption,
+  captionClassName,
+  captionStyle,
+  captionWrapperProps: { className: className_caption, ...captionWrapperProps } = {},
+
+  childrenWrapperProps: { className: childrenWrapperClassName, ...childrenWrapperProps } = {},
+
+  prefix,
+  prefixWrapperProps: { className: className_prefix, ...prefixWrapperProps } = {},
+
+  suffix,
+  suffixWrapperProps: { className: className_suffix, ...suffixWrapperProps } = {},
+
+  ...props_container
+}: TdataEntryFongProps) => {
+  const className_fontSize = `f${fontSize}`;
+
+  // --------------------------------------------------------------------------------
+
+  let processedChildren =
+    syncDisabled === false || disabled === undefined ? children : doProcessedChildren(children, disabled);
+
+  if (processedChildren === undefined || processedChildren === '') {
+    processedChildren = '　';
+  }
+
+  // --------------------------------------------------------------------------------
+
+  return (
+    <div className={classNames(scss.container_fong, className, 'items-center')} {...props_container}>
+      {caption !== undefined && (
+        <div
+          className={classNames(
+            scss.captionWrapper,
+            className_fontSize,
+            captionClassName,
+            className_caption,
+            isMust && scss.must,
+            'font-medium text-text02 mb-[10px]'
+          )}
+          style={captionStyle}
+          {...captionWrapperProps}
+        >
+          {isMust && <Icon_asterisk className={scss.asterisk} />}
+          {caption}
+        </div>
+      )}
+      {prefix && (
+        <div className={classNames('mr-[6px]', className_fontSize, className_prefix)} {...prefixWrapperProps}>
+          {prefix}
+        </div>
+      )}
+      <div
+        className={classNames(
+          scss.childrenWrapper,
+          className_fontSize,
+          childrenWrapperClassName,
+          disabled && scss.disabled,
+          'p-[12px] rounded-lg'
+        )}
+        {...childrenWrapperProps}
+      >
+        {processedChildren}
+      </div>
+      {suffix && (
+        <div className={classNames('ml-[6px]', className_fontSize, className_suffix)} {...suffixWrapperProps}>
+          {suffix}
+        </div>
+      )}
+      {/*  */}
+    </div>
+  );
+};
+
+// =============================================================================
+// =============================================================================
+// =============================================================================
+// =============================================================================
+// =============================================================================
+
 // MARK:Input
 const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => {
   return (
     <input
       // 避免使用者滾動page時意外編輯了input的值
       onWheel={(e) => e.currentTarget.blur()}
+      placeholder="- -"
       {...props}
-      className={classNames('w-full', className)}
+      className={classNames('w-full placeholder:text-gray06', className)}
     />
   );
 };
 
 // MARK:Textarea
-const Textarea = ({ className, ...props }: TextareaAutosizeProps) => {
-  return <TextareaAutosize className={classNames(scss.textarea, className)} autoComplete="off" {...props} />;
+const Textarea_autoHeight = ({ className, ...props }: TextareaAutosizeProps) => {
+  return (
+    <TextareaAutosize
+      className={classNames(scss.textarea_autoHeight, 'placeholder:text-gray06', className)}
+      autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
+};
+
+const Textarea = ({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+  return (
+    <textarea
+      className={classNames(scss.textarea, 'placeholder:text-gray06', className)}
+      autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
 };
 
 // MARK:DatePicker
 const DatePicker = ({
   // value: _value,
   // defaultValue: _defaultValue,
-  twDate = true,
+  // twDate = true,
   // onChange,
   className,
   disabled,
@@ -184,6 +294,9 @@ const DatePicker = ({
   ...props
 }: DatePickerProps & {
   //
+  /**
+   * @deprecated twDate已沒有作用
+   */
   twDate?: boolean;
   returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
 }) => {
@@ -191,39 +304,19 @@ const DatePicker = ({
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
   disabled && (suffixIcon.suffixIcon = null);
 
-  function transformDate<D = Moment | null | undefined>(date: D) {
-    return twDate && date ? moment(date)?.subtract(1911, 'year') : date;
-  }
-
-  // 改變ant-picker-year-btn的格式
-  // locale_copy.lang.yearFormat = 'yy年';
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  locale_copy.lang.yearFormat = (
-    date: Moment // yearFormat的型別是string，但實際上也可以是callback函式
-  ) => {
-    const year = transformDate(date)?.year();
-
-    return `${year}年`;
-  };
-
   if (disabled && returnSpanWhenDisabled) {
-    const value = transformDate(props.value);
-
-    return <span>{value?.format('yy-MM-DD')}</span>;
+    return <span>{props.value ? getTaiwanDateStr(props.value) : props.placeholder || '- -'}</span>;
   }
 
   return (
     <AntdDatePicker
       className={classNames(scss.datepicker, className)}
       disabled={disabled}
-      {...suffixIcon}
-      locale={locale_copy}
-      format={(theMoment) => {
-        const value = transformDate(theMoment);
-
-        return value.format('yy-MM-DD');
+      format={(theDayjs) => {
+        return getTaiwanDateStr(theDayjs);
       }}
+      placeholder="請選擇"
+      {...suffixIcon}
       {...props}
     />
   );
@@ -241,9 +334,28 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
       disabled={disabled}
       //
       {...suffixIcon}
-      locale={locale}
       format="HH-mm"
       autoComplete="off"
+      placeholder="- -"
+      {...props}
+    />
+  );
+};
+
+// MARK: DateRangePicker
+const DateRangePicker = ({ className, disabled, ...props }: RangePickerProps) => {
+  const suffixIcon: { suffixIcon?: React.ReactNode } = {};
+  disabled && (suffixIcon.suffixIcon = null);
+
+  return (
+    <AntdDatePicker.RangePicker
+      className={classNames(scss.dateRangePicker, className)}
+      disabled={disabled}
+      format={(theDayjs) => {
+        return getTaiwanDateStr(theDayjs);
+      }}
+      placeholder={['- -', '- -']}
+      {...suffixIcon}
       {...props}
     />
   );
@@ -256,12 +368,12 @@ const Checkbox = ({ className, ...props }: CheckboxProps) => {
 
 // MARK:CheckboxGroup
 const CheckboxGroup = ({ className, ...props }: CheckboxGroupProps) => {
-  return <AntdCheckbox.Group className={classNames(scss.checkbox, className)} {...props} />;
+  return <AntdCheckbox.Group className={classNames(scss.checkBoxGroup, scss.checkbox, className)} {...props} />;
 };
 
 // MARK:Radio
-const Radio = (props: RadioProps) => {
-  return <AntdRadio {...props} />;
+const Radio = ({ className, ...props }: RadioProps) => {
+  return <AntdRadio className={classNames(scss.radio, className)} {...props} />;
 };
 
 // MARK:RadioGroup
@@ -282,7 +394,7 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
   returnSpanWhenDisabled?: false | React.HTMLAttributes<HTMLSpanElement>;
 }) {
   if (disabled && returnSpanWhenDisabled) {
-    return <span>{props.value?.toString()}</span>;
+    return <span className={scss.foo}>{props.value?.toString() || props.placeholder || '- -'}</span>;
   }
 
   return (
@@ -291,6 +403,7 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
       allowClear={true}
       suffixIcon={hideSuffixIconWhenDisabled && disabled ? null : suffixIcon}
       className={classNames(scss.antdSelect, className)}
+      placeholder="- -"
       {...props}
     />
   );
@@ -380,12 +493,6 @@ function InputSelect<
 
   return (
     <div {...divPros} className={classNames(scss.inputSelect, className)}>
-      {/* //// 這邊用label包起來是為了避免觸發Container的Label */}
-      {/* ////label必須在input之前，這樣不用設z-index就可以使input蓋過select */}
-      {/* ////不設index才能避免InputSelect垂直排列時menu因為z-index造成的跑版*/}
-      {/* 過陣子沒問題就把註解的lable刪掉，css裡的 inputSelect>label也刪掉 */}
-      {/* <label> */}
-
       {!disabled && (
         <ReactSelect
           className={scss.select}
@@ -450,6 +557,16 @@ const MustTip = () => {
   return <div className={scss.mustTip}>*</div>;
 };
 
+const Form = (props: Parameters<typeof AntdForm>[0]) => {
+  return <AntdForm component={false} {...props} />;
+};
+
+Form.useForm = AntdForm.useForm;
+
+const FormItem = ({ className, ...props }: Parameters<typeof AntdForm.Item>[0]) => (
+  <AntdForm.Item className={classNames(scss.formItem, className)} {...props} />
+);
+
 // =============================================================================
 
 function findOption<Option extends { value: unknown; label: React.ReactNode }>({
@@ -474,16 +591,43 @@ function findOption<Option extends { value: unknown; label: React.ReactNode }>({
   //
 }
 
-// =============================================================================
+/**
+ * 遍歷children，將所有child的props.disabled、props.isDisabled、props.readOnly設為disabled
+ */
+const doProcessedChildren = (children: React.ReactNode, disabled: boolean = false) => {
+  return React.Children.map(children, (child) => {
+    if (!React.isValidElement(child)) {
+      return child;
+    }
 
-// 目前搭配Input運作正常
-// 其他表單元件等到確實要用時再說
-const DataEntry_fong = (props: Omit<TdataEntryProps, 'theme'>) => <DataEntryContainer {...props} theme="fong" />;
+    if (!child.props) {
+      return child;
+    }
+
+    const props = { ...child.props } as {
+      disabled?: boolean;
+      isDisabled?: boolean;
+      readOnly?: boolean;
+    };
+
+    if (props.disabled !== undefined || props.isDisabled !== undefined || props.readOnly !== undefined) {
+      return child;
+    }
+
+    props.readOnly = disabled;
+    props.disabled = disabled;
+    props.isDisabled = disabled;
+
+    return React.cloneElement(child, {
+      ...props,
+    });
+  });
+};
 
 // =============================================================================
 
 DataEntryContainer.Input = Input;
-DataEntryContainer.Textarea = Textarea;
+DataEntryContainer.Textarea_autoHeight = Textarea_autoHeight;
 DataEntryContainer.DatePicker = DatePicker;
 DataEntryContainer.TimePicker = TimePicker;
 DataEntryContainer.Checkbox = Checkbox;
@@ -504,7 +648,7 @@ export default DataEntry;
 export { DataEntryContainer, DataEntry_fong };
 export {
   Input,
-  Textarea,
+  Textarea_autoHeight,
   DatePicker,
   TimePicker,
   Checkbox,
@@ -514,7 +658,11 @@ export {
   Select,
   Select_rs,
   InputSelect,
+  DateRangePicker,
+  Textarea,
 };
+
+export { Form, FormItem };
 
 export type {
   TdataEntrycontainerProps,
@@ -530,109 +678,3 @@ export type {
   Tselect_rsProps,
   TinputSelectProps,
 };
-
-// type Toption_ex = { value: string; label: string; foo: string };
-
-// const options_ex: Toption_ex[] = [
-//   { value: 'aaa', label: 'aaa', foo: 'foo' },
-//   { value: 'bbb', label: 'bbb', foo: 'foo' },
-//   { value: 'ccc', label: 'ccc', foo: 'foo' },
-//   { value: 'ddd', label: 'ddd', foo: 'foo' },
-//   { value: 'eee', label: 'eee', foo: 'foo' },
-//   { value: 'fff', label: 'fff', foo: 'foo' },
-//   { value: 'ggg', label: 'ggg', foo: 'foo' },
-//   { value: 'hhh', label: 'hhh', foo: 'foo' },
-//   { value: 'iii', label: 'iii', foo: 'foo' },
-//   { value: 'jjj', label: 'jjj', foo: 'foo' },
-//   { value: 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', label: 'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk', foo: 'foo' },
-// ];
-
-// function Example() {
-//   return (
-//     <div className="w-[300px]">
-//       <Container caption="Caption">
-//         <Input />
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         <Select<string>
-//           //
-//           options={options_ex}
-//           onChange={(value, option) => {}}
-//           // disabled={true}
-//         />
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         <Textarea />
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         <DatePicker
-//         //
-//         // disabled={true}
-//         />
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         <Checkbox>TEST</Checkbox>
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         {/* 標準用法 */}
-//         <CheckboxGroup
-//           options={options_ex}
-//           onChange={(e) => {
-//             console.log(e);
-//           }}
-//         />
-//         {/* CheckboxGroup也可以像下面這樣用，就可以自由排版 */}
-//         {/* <CheckboxGroup
-//           onChange={(e) => {
-//             console.log(e);
-//           }}
-//         >
-//           <Checkbox value="a">a</Checkbox>
-//           <Checkbox value="b">b</Checkbox>
-//           <Checkbox value="c">c</Checkbox>
-//         </CheckboxGroup> */}
-//       </Container>
-//       <br />
-//       <Container caption="一二三四五六七" captionClassName="text-red-500" captionMr={5}>
-//         <RadioGroup>
-//           <Radio value="a">a</Radio>
-//           <Radio value="b">b</Radio>
-//           <Radio value="c">c</Radio>
-//         </RadioGroup>
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         <TimePicker
-//           //
-//           disabled={true}
-//         />
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         <Select_rs
-//           options={options_ex}
-//           //
-//           // isDisabled={true}
-//         />
-//       </Container>
-//       <br />
-//       <Container caption="MEOW">
-//         <InputSelect
-//           //
-//           options={options_ex}
-//           selectProps={{
-//             onChange(newValue, actionMeta) {
-//               console.log(newValue?.value);
-//             },
-//           }}
-//           // disabled={true}
-//         />
-//       </Container>
-//     </div>
-//   );
-// }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
@@ -21,7 +21,7 @@ type Tprops = {
 export default function WarrantyDate({ accountReceivable, reqPatchAccountReceivable, className }: Tprops) {
   const [disabled, setDisabled] = useState(true);
 
-  const [state_warrantyDate, setState_warrantyDate] = useState<Moment | null>(null);
+  const [state_warrantyDate, setState_warrantyDate] = useState<Dayjs | null>(null);
   const [state_warrantyPeriod, setState_warrantyPeriod] = useState<`${number}` | ''>('');
 
   const onConfirm = async () => {
@@ -42,7 +42,7 @@ export default function WarrantyDate({ accountReceivable, reqPatchAccountReceiva
   };
 
   useEffect(() => {
-    const warrantyDate = accountReceivable.warrantyDate ? moment(accountReceivable.warrantyDate) : null;
+    const warrantyDate = accountReceivable.warrantyDate ? dayjs(accountReceivable.warrantyDate) : null;
     const warrantyPeriod = accountReceivable.warrantyPeriod || '';
     setState_warrantyDate(warrantyDate);
     setState_warrantyPeriod(warrantyPeriod);

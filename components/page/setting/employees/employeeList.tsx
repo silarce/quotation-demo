@@ -140,7 +140,7 @@ export default function EmployeeList({
       </div>
       <TwoButtonModal
         {...{
-          visible: !!selInfo.id,
+          open: !!selInfo.id,
           text: `請確定要刪除「${selInfo.idNumber}」「${selInfo.chName}」?`,
           onConfirm: deleteEmployee,
           onCancel: closeDelPanel,

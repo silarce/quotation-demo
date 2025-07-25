@@ -11,8 +11,8 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 
 // icon
 // import { IconDelete01, IconCopy } from 'public/image/icon/svgComponent/svgIcons';
-// import iconReset from 'public/image/icon/reset.svg';
-// import iconChange from 'public/image/icon/change.svg';
+// import iconReset from 'public/image/icon/reset.svg?url';
+// import iconChange from 'public/image/icon/change.svg?url';
 
 import inputLocaleStringSwitcher from 'js/utils/helpers/inputLocaleStringSwitcher';
 

@@ -163,7 +163,9 @@ export default function Pdf_dispatch2({
             {/* row6 */}
 
             <Cell className={classNames('row-span-8 grid justify-center pt-3')}>{strToSpan('承辦情形')}</Cell>
+
             <Cell className={classNames('col-span-8 row-span-8', scss.content)}>{content}</Cell>
+
 
             <Cell className={classNames('col-span-2 gap-6', cn2, ch6)}>{strToSpan('派工批價')}</Cell>
             {/* row7 */}

@@ -1,13 +1,13 @@
 import { useState, useContext, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
-
 import classNames from 'classnames';
 import Image from 'next/image';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // antd
 import { Drawer, Badge, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { TimePicker, TimePickerProps } from 'antd';
 
 // gear
 import InputSel from 'components/global/gear/inputAndSel/inputSel';
@@ -32,9 +32,9 @@ import { TdailyReportItemDto, TdailyReportWokerDto } from 'js/api/dtoTypes';
 
 // icon
 import { IconAddCircle, IconRemoveCircle, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
-import iconArrow from 'public/image/icon/arrow03_left.svg';
+import iconArrow from 'public/image/icon/arrow03_left.svg?url';
 import { IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
-import iconMove from 'public/image/icon/move.svg';
+import iconMove from 'public/image/icon/move.svg?url';
 
 // other
 import { AppContext } from 'pages/_app';
@@ -68,11 +68,6 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 // ==================================================
-
-interface TtimeTrigger {
-  rIndex: number;
-  key: string;
-}
 
 // ==================================================
 // 防抖
@@ -147,13 +142,13 @@ export default function ReportTable({
       return false;
     }
 
-    const yesterday = moment(reportInEdit.date).subtract(1, 'day');
+    const yesterday = dayjs(reportInEdit.date).subtract(1, 'day');
 
     // dailyReport_calendar是undefined就代表日期選擇器沒有被渲染出來
     // 就代表不是新增日報表，而是編輯已存在日報表
     if (!dailyReport_calendar) {
       // prevDate為該日報表前一筆資料的日期
-      return moment(prevDate).isSame(yesterday);
+      return dayjs(prevDate).isSame(yesterday);
     }
     /**其實在編輯已存在日報表時可以用isYesterdayHaveReport的作法把總表送進來處理
      * 但是prevDate已經做好了，所以就繼續用prevDate來處理
@@ -161,9 +156,9 @@ export default function ReportTable({
 
     /**該日報表日期的前一天 */
     const isYesterdayHaveReport = dailyReport_calendar?.some((report) => {
-      const reportDateM = moment(report.date);
+      const reportDateM = dayjs(report.date);
 
-      return moment(reportDateM).isSame(yesterday, 'day');
+      return dayjs(reportDateM).isSame(yesterday, 'day');
     });
 
     return isYesterdayHaveReport ?? false;
@@ -181,7 +176,7 @@ export default function ReportTable({
       return;
     }
 
-    const now = moment();
+    const now = dayjs();
     setMonthStart(now.clone().subtract(1, 'month').startOf('month').toISOString());
     setMonthEnd(now.clone().add(1, 'month').startOf('month').toISOString());
   }, [itemList]);
@@ -269,9 +264,6 @@ export default function ReportTable({
   const theHeaderKeyArr = rwd1023 ? headerKeyArr_mobile : headerKeyArr;
   const theBodyKeyArr = rwd1023 ? headerKeyArr_mobile : bodyKeyArr;
 
-  // ------------------------------------------------
-  /**用來觸發目的地、離工地的focus */
-  const [timeTrigger, setTimeTrigger] = useState<TtimeTrigger>({ rIndex: -1, key: '' });
   // ------------------------------------------------
   // dnd
 
@@ -393,8 +385,7 @@ export default function ReportTable({
                   onMealAddClick: onMealAddClick,
                   onLicensePlateAddClick: onLicensePlateAddClick,
                   onRemoveClick: onRemoveClick,
-                  timeTrigger,
-                  setTimeTrigger,
+
                   index: rIndex,
                   isMine,
                 })}
@@ -414,9 +405,11 @@ export default function ReportTable({
 
   return (
     <Drawer
-      className={scss.drawer}
-      visible={!!itemList}
-      // getContainer={false}
+      open={!!itemList}
+      rootClassName={scss.drawer}
+      classNames={{
+        body: scss.drawerBody,
+      }}
       getContainer={rwd1023 ? undefined : false}
       width={'100%'}
       closable={false}
@@ -495,7 +488,14 @@ export default function ReportTable({
           </DndContext>
 
           {!disabledOri && (
-            <MyButton label="新增回報" preImg="add" className={scss.newReportBtn} onClick={addDailyReportItem} />
+            <MyButton
+              label="新增回報"
+              preImg="add"
+              className={scss.newReportBtn}
+              onClick={() => {
+                addDailyReportItem();
+              }}
+            />
           )}
         </div>
         <WorkerSelector
@@ -593,8 +593,6 @@ type Tconfig = {
       onLicensePlateAddClick: () => void;
       onRemoveClick: (() => void) | undefined;
 
-      timeTrigger: TtimeTrigger;
-      setTimeTrigger: React.Dispatch<React.SetStateAction<TtimeTrigger>>;
       index: number;
 
       isMine: boolean;
@@ -864,26 +862,17 @@ const config: Tconfig = {
       return { header, body };
     },
 
-    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
-      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'departureTime';
-
-      const time = moment(class_reportItem.departureTime);
-      const isBeforeAM8 = time.isBefore(moment(time).startOf('day').add(8, 'hours'));
+    render({ class_reportItem, disabled, index }) {
+      const time = dayjs(class_reportItem.departureTime);
+      const isBeforeAM8 = time.isBefore(dayjs(time).startOf('day').add(8, 'hours'));
 
       return (
-        <InputSel
+        <MyTimePicker
+          className={classNames(isBeforeAM8 && scss.date_redColor)}
           disabled={disabled}
-          showBaseline="auto"
-          placeholder={'時間'}
-          timePickerProps={{
-            timePickerClassName: classNames(isBeforeAM8 && scss.date_redColor),
-            value: class_reportItem.departureTime ?? '',
-            onChange02: (v) => {
-              const value = v?.toISOString();
-              class_reportItem.departureTime = value;
-              setTimeTrigger({ rIndex: index, key: 'arrivalTime' });
-            },
-            focusTrigger: focusTrigger,
+          value={class_reportItem.departureTime ? dayjs(class_reportItem.departureTime) : null}
+          onChange={(d) => {
+            class_reportItem.departureTime = d.toISOString();
           }}
         />
       );
@@ -898,26 +887,17 @@ const config: Tconfig = {
       return { header, body };
     },
 
-    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
-      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
-
-      const time = moment(class_reportItem.departureWorksiteTime);
-      const isAfter1715 = time.isAfter(moment(time).startOf('day').add(17, 'hours').add(15, 'minutes'));
+    render({ class_reportItem, disabled, index }) {
+      const time = dayjs(class_reportItem.departureWorksiteTime);
+      const isAfter1715 = time.isAfter(dayjs(time).startOf('day').add(17, 'hours').add(15, 'minutes'));
 
       return (
-        <InputSel
+        <MyTimePicker
+          className={classNames(isAfter1715 && scss.date_redColor)}
           disabled={disabled}
-          showBaseline="auto"
-          placeholder={'時間'}
-          timePickerProps={{
-            timePickerClassName: classNames(isAfter1715 && scss.date_redColor),
-            value: class_reportItem.departureWorksiteTime ?? '',
-            onChange02: (v) => {
-              const value = v?.toISOString();
-              class_reportItem.departureWorksiteTime = value;
-              setTimeTrigger({ rIndex: index, key: '' });
-            },
-            focusTrigger: focusTrigger,
+          value={class_reportItem.departureWorksiteTime ? dayjs(class_reportItem.departureWorksiteTime) : null}
+          onChange={(d) => {
+            class_reportItem.departureWorksiteTime = d.toISOString();
           }}
         />
       );
@@ -932,22 +912,13 @@ const config: Tconfig = {
       return { header, body };
     },
 
-    render({ class_reportItem, disabled, index, timeTrigger, setTimeTrigger }) {
-      const focusTrigger = timeTrigger.rIndex === index && timeTrigger.key === 'arrivalTime';
-
+    render({ class_reportItem, disabled, index }) {
       return (
-        <InputSel
+        <MyTimePicker
           disabled={disabled}
-          showBaseline="auto"
-          placeholder={'時間'}
-          timePickerProps={{
-            value: class_reportItem.arrivalTime ?? '',
-            onChange02: (v) => {
-              const value = v?.toISOString();
-              class_reportItem.arrivalTime = value;
-              setTimeTrigger({ rIndex: index, key: 'departureWorksiteTime' });
-            },
-            focusTrigger: focusTrigger,
+          value={class_reportItem.arrivalTime ? dayjs(class_reportItem.arrivalTime) : null}
+          onChange={(d) => {
+            class_reportItem.arrivalTime = d.toISOString();
           }}
         />
       );
@@ -980,7 +951,6 @@ const config: Tconfig = {
   },
   stayLength: {
     createLabel: (rwd1023) => '住宿',
-    suffix: '天',
     wrapperClassName(rwd1023) {
       const header = classNames('w-[100px] row-span-3', rwd1023 && 'h-[43px]');
       const body = classNames(header, '!row-span-1', scss.suffix, rwd1023 && 'h-[43px]', scss.stayLength);
@@ -1051,7 +1021,7 @@ const DatePicker = ({
       return undefined;
     }
 
-    const inEditDate = moment();
+    const inEditDate = dayjs();
 
     if (!dailyReport?.[0]) {
       if (reportInEdit) {
@@ -1061,7 +1031,7 @@ const DatePicker = ({
       return inEditDate;
     }
 
-    const lastDate = moment(dailyReport?.[0].date);
+    const lastDate = dayjs(dailyReport?.[0].date);
 
     if (lastDate.isSame(inEditDate, 'day')) {
       return undefined;
@@ -1104,7 +1074,7 @@ const DatePicker = ({
               }
 
               // 比當日晚的日期都不能選
-              if (date.isAfter(moment())) {
+              if (date.isAfter(dayjs())) {
                 return true;
               }
 
@@ -1114,7 +1084,7 @@ const DatePicker = ({
               }
 
               const isDisabledDate = dailyReport.some((report) => {
-                const isSame = date.isSame(moment(report.date), 'day');
+                const isSame = date.isSame(dayjs(report.date), 'day');
 
                 return isSame;
               });
@@ -1220,7 +1190,7 @@ const TitlePanel = () => {
     reqApiPatchDailyReports_my,
   } = useContext(DailyReportContext);
   const employeeChName = reportInEdit?.employeeChName;
-  let date = moment(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
+  let date = dayjs(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
 
   if (date === 'Invalid date') {
     date = '請選擇日期';
@@ -1282,5 +1252,38 @@ const mealsLookup = {
   lunch: '午餐',
   dinner: '晚餐',
 } as const;
+
+const MyTimePicker = ({
+  className,
+  disabled,
+  value,
+  onChange,
+}: {
+  className?: string;
+  disabled: boolean;
+  value: TimePickerProps['value'];
+  onChange: TimePickerProps['onChange'];
+}) => {
+  return (
+    <div className={'flex items-center justify-center'}>
+      <TimePicker
+        className={classNames(scss.timePicker, disabled && scss.disabled, className)}
+        popupClassName={scss.timepickerPopup}
+        placeholder={'HH:mm'}
+        defaultValue={dayjs('00:00', 'HH-mm')}
+        format="HH-mm"
+        disabled={disabled}
+        variant="borderless"
+        showNow={false}
+        autoComplete="off"
+        suffixIcon={null}
+        allowClear={false}
+        inputReadOnly={true}
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  );
+};
 
 export { mealsLookup };

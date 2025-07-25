@@ -1,4 +1,5 @@
-import AntdModal, { ModalProps } from 'antd/lib/modal/Modal';
+import AntdModal from 'antd/lib/modal/Modal';
+import { ModalProps } from 'antd';
 import classNames from 'classnames';
 
 import scss from './index.module.scss';

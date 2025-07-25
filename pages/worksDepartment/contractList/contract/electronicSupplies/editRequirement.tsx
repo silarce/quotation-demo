@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -390,7 +390,7 @@ export default function EditRequirementRecord() {
 
     if (data_requirementRecord) {
       stateInfo = {
-        date: data_requirementRecord.operationDate ? moment(data_requirementRecord.operationDate) : null,
+        date: data_requirementRecord.operationDate ? dayjs(data_requirementRecord.operationDate) : null,
         indexNumber: data_requirementRecord.number ?? '',
         picker: undefined,
         preparer: data_requirementRecord.storageManagementPersonnelEmployee || undefined,
@@ -399,7 +399,7 @@ export default function EditRequirementRecord() {
         doorQty: String(data_requirementRecord.quantity || '') as Tstate_info['doorQty'],
       };
     } else {
-      stateInfo.date = moment();
+      stateInfo.date = dayjs();
     }
 
     replaceState_electronicSuppliesRequirment(stateArr);
@@ -540,7 +540,7 @@ export default function EditRequirementRecord() {
           disabled={disabled}
           //
           pdfInfo={{
-            pdfFileName: `送電備品需求單_${contractNumber}_${moment().format('YYYY-MM-DD')}`,
+            pdfFileName: `送電備品需求單_${contractNumber}_${dayjs().format('YYYY-MM-DD')}`,
             contractNumber: contractNumber,
             projectName: projectName,
             date: getTaiwanDateStr(data_requirementRecord?.updatedAt) ?? '',

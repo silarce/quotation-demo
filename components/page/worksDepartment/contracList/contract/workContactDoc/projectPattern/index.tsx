@@ -33,9 +33,6 @@ import {
 import { Toption } from 'js/utils/options/options';
 
 // =======================================================================
-const { Panel } = Collapse;
-
-// =======================================================================
 
 type TpatternType = Exclude<TengineeringContactAttachmentType, 'signature'>;
 
@@ -478,103 +475,83 @@ export default function ProjectPattern({
       </div>
       <Collapse
         className={scss.antdCollapse}
-        // defaultActiveKey={['detail']}
-      >
-        {/* 簽認圖 */}
-        {shouldHasPattern.shouldHasDetail && (
-          <Panel header="簽認圖" key="detail" className={scss.panel}>
-            <Pattern
-              engineeringContactId={engineeringContactId}
-              patternType={'detail'}
-              props={props_detail}
-              onSubmiSuccess={onSubmitSuccess}
-              onDeleteSuccess={onDeleteSuccess}
-              // isDetailSubmit={!!controlList.isDetailSubmit}
-              // isReviewer={controlList.isReviewer_detail}
-              // statusArr={controlList.detail}
-              // confirmReqSubmitPattern={confirmReqSubmitPattern}
-              // reqReviewPattern={reqReviewPattern}
-              // setReviewConfirm={setReviewConfirm}
-            />
-          </Panel>
-        )}
-
-        {/* 平面圖 */}
-        {shouldHasPattern.shouldHasFloor && (
-          <Panel header="平面圖" key="floor" className={scss.panel}>
-            <Pattern
-              engineeringContactId={engineeringContactId}
-              patternType={'floor'}
-              props={props_floor}
-              onSubmiSuccess={onSubmitSuccess}
-              onDeleteSuccess={onDeleteSuccess}
-              // isDetailSubmit={!!controlList.isFloorSubmit}
-              // isReviewer={controlList.isReviewer_floor}
-              // statusArr={controlList.floor}
-              // confirmReqSubmitPattern={confirmReqSubmitPattern}
-              // reqReviewPattern={reqReviewPattern}
-              // setReviewConfirm={setReviewConfirm}
-            />
-          </Panel>
-        )}
-
-        {/* 設計圖 */}
-        {shouldHasPattern.shouldHasDesign && (
-          <Panel header="設計圖" key="design" className={scss.panel}>
-            <Pattern
-              engineeringContactId={engineeringContactId}
-              patternType={'design'}
-              props={props_design}
-              onSubmiSuccess={onSubmitSuccess}
-              onDeleteSuccess={onDeleteSuccess}
-              // isDetailSubmit={!!controlList.isDesignSubmit}
-              // isReviewer={controlList.isReviewer_design}
-              // statusArr={controlList.design}
-              // confirmReqSubmitPattern={confirmReqSubmitPattern}
-              // reqReviewPattern={reqReviewPattern}
-              // setReviewConfirm={setReviewConfirm}
-            />
-          </Panel>
-        )}
-
-        {/* 施工圖 */}
-        {shouldHasPattern.shouldHasConstruction && (
-          <Panel header="施工圖" key="construction" className={scss.panel}>
-            <Pattern
-              engineeringContactId={engineeringContactId}
-              patternType={'construction'}
-              props={props_construction}
-              onSubmiSuccess={onSubmitSuccess}
-              onDeleteSuccess={onDeleteSuccess}
-              // isDetailSubmit={!!controlList.isConstructionSubmit}
-              // isReviewer={controlList.isReviewer_construction}
-              // statusArr={controlList.construction}
-              // confirmReqSubmitPattern={confirmReqSubmitPattern}
-              // reqReviewPattern={reqReviewPattern}
-              // setReviewConfirm={setReviewConfirm}
-            />
-          </Panel>
-        )}
-
-        {/* 色卡 */}
-        {shouldHasPattern.shouldHasColor && (
-          <Panel header="色卡" key="color" className={scss.panel}>
-            <Pattern
-              engineeringContactId={engineeringContactId}
-              patternType={'color'}
-              props={props_color}
-              onSubmiSuccess={onSubmitSuccess}
-              onDeleteSuccess={onDeleteSuccess}
-              // isDetailSubmit={!!controlList.isColorSubmit}
-              // isReviewer={controlList.isReviewer_color}
-              // statusArr={controlList.color}
-              // confirmReqSubmitPattern={confirmReqSubmitPattern}
-              // reqReviewPattern={reqReviewPattern}
-              // setReviewConfirm={setReviewConfirm}
-            />
-          </Panel>
-        )}
-      </Collapse>
+        items={[
+          //  簽認圖
+          shouldHasPattern.shouldHasDetail && {
+            key: 'detail',
+            label: '簽認圖',
+            className: scss.panel,
+            children: (
+              <Pattern
+                engineeringContactId={engineeringContactId}
+                patternType={'detail'}
+                props={props_detail}
+                onSubmiSuccess={onSubmitSuccess}
+                onDeleteSuccess={onDeleteSuccess}
+              />
+            ),
+          },
+          // 平面圖
+          shouldHasPattern.shouldHasFloor && {
+            key: 'floor',
+            label: '平面圖',
+            className: scss.panel,
+            children: (
+              <Pattern
+                engineeringContactId={engineeringContactId}
+                patternType={'floor'}
+                props={props_floor}
+                onSubmiSuccess={onSubmitSuccess}
+                onDeleteSuccess={onDeleteSuccess}
+              />
+            ),
+          },
+          // 設計圖
+          shouldHasPattern.shouldHasDesign && {
+            key: 'design',
+            label: '設計圖',
+            className: scss.panel,
+            children: (
+              <Pattern
+                engineeringContactId={engineeringContactId}
+                patternType={'design'}
+                props={props_design}
+                onSubmiSuccess={onSubmitSuccess}
+                onDeleteSuccess={onDeleteSuccess}
+              />
+            ),
+          },
+          // 施工圖
+          shouldHasPattern.shouldHasConstruction && {
+            key: 'construction',
+            label: '施工圖',
+            className: scss.panel,
+            children: (
+              <Pattern
+                engineeringContactId={engineeringContactId}
+                patternType={'construction'}
+                props={props_construction}
+                onSubmiSuccess={onSubmitSuccess}
+                onDeleteSuccess={onDeleteSuccess}
+              />
+            ),
+          },
+          shouldHasPattern.shouldHasColor && {
+            key: 'color',
+            label: '色卡',
+            className: scss.panel,
+            children: (
+              <Pattern
+                engineeringContactId={engineeringContactId}
+                patternType={'color'}
+                props={props_color}
+                onSubmiSuccess={onSubmitSuccess}
+                onDeleteSuccess={onDeleteSuccess}
+              />
+            ),
+          },
+        ].filter((item) => !!item)}
+      />
 
       <MultButtonModal
         visible={!!reviewConfirm}

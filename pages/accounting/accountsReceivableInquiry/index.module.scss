@@ -1,0 +1,24 @@
+.form {
+  .input {
+    width: 254px;
+  }
+  .datePicker {
+    width: 145px;
+  }
+}
+
+.formItem {
+  all: unset;
+  :global(.ant-row) {
+    all: unset;
+    :global(.ant-col) {
+      all: unset;
+      :global(.ant-form-item-control-input) {
+        all: unset;
+        :global(.ant-form-item-control-input-content) {
+          all: unset;
+        }
+      }
+    }
+  }
+}

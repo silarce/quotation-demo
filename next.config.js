@@ -2,24 +2,29 @@
 // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
 CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
-// const moment = require('moment');
-const moment = require('moment-timezone');
 
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 
-// =====================================================
-const path = require('path');
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 // =====================================================
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'export',
   images: {
     unoptimized: true,
     // domains: ["sanjeou-erp-be.caprover.credot-web.com"],
   },
   env: {
-    DEPLOY_TIME: moment().tz("Asia/Taipei").format("YYYY-MM-DD HH:mm:ss"), // 設置部屬時間為環境變數
+    DEPLOY_TIME: dayjs().tz("Asia/Taipei").format("YYYY-MM-DD HH:mm:ss"), // 設置部屬時間為環境變數
   },
+
+
 };
 
 module.exports = {
@@ -35,7 +40,84 @@ module.exports = {
     // 使import路徑大小寫敏感
     config.plugins.push(new CaseSensitivePathsPlugin());
 
+
+    // region SVGR
+    // https://react-svgr.com/docs/next/
+
+    // Grab the existing rule that handles SVG imports
+    const fileLoaderRule = config.module.rules.find((rule) =>
+      rule.test?.test?.('.svg'),
+    )
+
+    config.module.rules.push(
+      // Reapply the existing rule, but only for svg imports ending in ?url
+      {
+        ...fileLoaderRule,
+        test: /\.svg$/i,
+        resourceQuery: /url/, // *.svg?url
+      },
+      // Convert all other *.svg imports to React components
+      {
+        test: /\.svg$/i,
+        issuer: fileLoaderRule.issuer,
+        resourceQuery: { not: [...fileLoaderRule.resourceQuery.not, /url/] }, // exclude if *.svg?url
+        use: [{
+          loader: '@svgr/webpack',
+          options: {
+            icon: true,
+          }
+        }],
+      },
+    )
+
+    // Modify the file loader rule to ignore *.svg, since we have it handled now.
+    fileLoaderRule.exclude = /\.svg$/i
+    // endregion SVGR
+
+
+
     return config;
   },
-  
+  // 設置transpilePackages使轉譯正常
+  // https://juejin.cn/post/7441094982978207784
+  // https://github.com/vercel/next.js/issues/58817
+  transpilePackages: [
+    // antd & deps
+    '@ant-design',
+    '@rc-component',
+    'antd',
+    'rc-cascader',
+    'rc-checkbox',
+    'rc-collapse',
+    'rc-dialog',
+    'rc-drawer',
+    'rc-dropdown',
+    'rc-field-form',
+    'rc-image',
+    'rc-input',
+    'rc-input-number',
+    'rc-mentions',
+    'rc-menu',
+    'rc-motion',
+    'rc-notification',
+    'rc-pagination',
+    'rc-picker',
+    'rc-progress',
+    'rc-rate',
+    'rc-resize-observer',
+    'rc-segmented',
+    'rc-select',
+    'rc-slider',
+    'rc-steps',
+    'rc-switch',
+    'rc-table',
+    'rc-tabs',
+    'rc-textarea',
+    'rc-tooltip',
+    'rc-tree',
+    'rc-tree-select',
+    'rc-upload',
+    'rc-util',
+  ]
+
 };

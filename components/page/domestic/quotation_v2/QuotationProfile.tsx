@@ -1,15 +1,10 @@
-import { useState, useMemo, useEffect } from 'react';
 import classNames from 'classnames';
-import moment, { Moment } from 'moment';
 
 // glogal gear
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
 import AddressBar, { TaddressProps } from 'components/global/gear/inputAndSel_v2/addressBar/addressBar';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
-
-// import CustomerSelector from 'components/global/gear/modal/customerSelector';
 
 // icon
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
@@ -27,10 +22,8 @@ import { optionsCreator_quotationType } from 'js/utils/options/options';
 import { IconEdit } from 'public/image/icon/svgComponent/svgIcons';
 
 // ====================================================
-import { TquotationContentDto, TcustomerDto } from 'js/api/dtoTypes';
-import { TcustomerDto_TC } from 'js/api/api_customer';
+import { TcustomerDto } from 'js/api/dtoTypes';
 
-// import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
 // =======================================================================

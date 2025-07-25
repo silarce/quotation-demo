@@ -3,8 +3,8 @@ import classNames from 'classnames';
 import Image from 'next/image';
 
 // icon
-import iconEyeOpen from 'public/image/icon/eyeOpen.svg';
-import iconEyeProhibit from 'public/image/icon/eyeProhibit.svg';
+import iconEyeOpen from 'public/image/icon/eyeOpen.svg?url';
+import iconEyeProhibit from 'public/image/icon/eyeProhibit.svg?url';
 
 // css
 import scss from './Input_pw.module.scss';

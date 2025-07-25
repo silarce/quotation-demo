@@ -19,8 +19,8 @@ import {
 
 // icon
 import { IconEdit, IconCopy, IconDelete01 } from 'public/image/icon/svgComponent/svgIcons';
-import iconCheck from 'public/image/icon/check02.svg';
-import iconCross from 'public/image/icon/cross_thin.svg';
+import iconCheck from 'public/image/icon/check02.svg?url';
+import iconCross from 'public/image/icon/cross_thin.svg?url';
 
 // type
 import {

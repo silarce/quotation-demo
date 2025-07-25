@@ -20,7 +20,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 
 // icon
-import iconGrayAddCircle from 'public/image/icon/grayAddCircle.svg';
+import iconGrayAddCircle from 'public/image/icon/grayAddCircle.svg?url';
 import { IconRemove02 } from 'public/image/icon/svgComponent/svgIcons';
 
 // api
