@@ -116,6 +116,7 @@ const useApiGetQuotationList = (
 //
 //
 
+// 經由報價單新增應收款
 const apiQuotationToAccountsReceivables = async (quotationId: string) => {
   const api = '/api/AccountsReceivable/QuotationToAccountsReceivables';
 
@@ -125,9 +126,19 @@ const apiQuotationToAccountsReceivables = async (quotationId: string) => {
         'Content-Type': 'application/json',
       },
     })
-    .then(({ data }) => data);
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '新增應收款失敗',
+        content: err.message,
+      });
+
+      return '';
+    });
 };
 
+// 取得應收款
 const apiGetAccountsReceivables = async (accountsReceivableId: string) => {
   const api = '/api/AccountsReceivable/GetAccountsReceivablesEditMode';
 
@@ -136,30 +147,58 @@ const apiGetAccountsReceivables = async (accountsReceivableId: string) => {
   return axi_monkey.get<TaccountsReceivable>(api, { params }).then(({ data }) => data);
 };
 
-// ========================================================================
+const useGetAccountsReceivables = (
+  accountsReceivableId: string | undefined,
+  {
+    isAutoUpdate = true,
+  }: {
+    isAutoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TaccountsReceivable | null>();
 
-const getAccountsReceivableFromQuotation = async (quotationId: string) => {
-  try {
-    const accountsReceivableId = await apiQuotationToAccountsReceivables(quotationId);
+  const update = async () => {
+    if (isFetching || !accountsReceivableId) {
+      return;
+    }
 
-    return await apiGetAccountsReceivables(accountsReceivableId);
-  } catch (error) {
-    const err = error as AxiosError;
-    console.error('getAccountsReceivableFromQuotation error:', err);
-    myAlert.err({
-      title: '錯誤',
-      content: `無法從報價單 ${quotationId} 取得應收帳款資料。`,
-    });
+    setIsFetching(true);
 
-    return null;
-  }
+    const res = await apiGetAccountsReceivables(accountsReceivableId)
+      .then((res) => {
+        setRes(res);
+
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.notify.error({ message: '無法取得應收款資料', description: err.message });
+        setRes(null);
+
+        return null;
+      });
+
+    setIsFetching(false);
+
+    return res;
+  };
+
+  useEffect(() => {
+    isAutoUpdate && update();
+  }, [accountsReceivableId]);
+
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
 };
 
 // ========================================================================
-export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto };
+
+// ========================================================================
+export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto, TaccountsReceivable };
 
 export { apiQuotationToAccountsReceivables };
 
-export { useApiGetAccountsReceivablesList, useApiGetQuotationList };
-
-export { getAccountsReceivableFromQuotation };
+export { useApiGetAccountsReceivablesList, useApiGetQuotationList, useGetAccountsReceivables };
