@@ -598,24 +598,30 @@ interface TsalesOrderItemData_Dto {
 }
 
 interface TpaymentRequest_Dto {
-  Id: Guid | null;
-  PaymentRequestNumber: string | null;
-  SourceFormType: string;
-  SourceFormId: Guid;
-  CustomerNumber: string;
-  CustomerName: string;
-  CreatedAt: DateTime | null;
-  CreatedBy: string;
-  UpdatedAt: DateTime | null;
-  UpdatedBy: string;
-  InvoiceNumber: string | null;
-  InvoiceAmount: decimal | null;
-  PaymentAmount: decimal | null;
-  AccountsReceivableId: Guid | null;
-  Type: string;
-  Period: string;
-  PaymentCurrency: string;
-  ForeignCurrencyAmount: decimal | null;
+  id: Guid | null;
+  createdAt: DateTime | null;
+  createdBy: string;
+  updatedAt: DateTime | null;
+  updatedBy: string;
+
+  sourceFormType: string;
+  sourceFormId: Guid;
+
+  accountsReceivableId: Guid | null;
+  paymentRequestNumber: string | null;
+
+  customerNumber: string;
+  customerName: string;
+
+  type: string;
+  period: string;
+
+  invoiceNumber: string | null;
+  invoiceAmount: decimal | null;
+
+  paymentAmount: decimal | null;
+  paymentCurrency: string;
+  foreignCurrencyAmount: decimal | null;
 }
 
 /**
@@ -626,7 +632,7 @@ interface TpaymentRequest_Dto {
 interface TaccountsReceivable {
   accountsReceivablesList: TaccountsReceivablesList_Dto;
   paymentRequests: TpaymentRequest_Dto[];
-  salesOrderItem: TsalesOrderItemData_Dto;
+  salesOrderItem: TsalesOrderItemData_Dto[];
 }
 
 // endregion accountsReceivable
