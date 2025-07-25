@@ -89,6 +89,7 @@ export default function EmployeeData() {
       dataIndex: 'emp_code',
       key: 'emp_code',
       width: '6%',
+      align: 'right',
     },
     {
       title: '部門',
@@ -119,7 +120,6 @@ export default function EmployeeData() {
       dataIndex: 'work_location',
       key: 'work_location',
       width: '6%',
-      align: 'center',
     },
     {
       title: '班別',
@@ -144,13 +144,14 @@ export default function EmployeeData() {
       dataIndex: 'onboard_date',
       key: 'onboard_date',
       width: '1%',
+      align: 'right',
     },
     {
       title: '年資/年',
       dataIndex: 'seniority',
       key: 'seniority',
-      align: 'center',
       width: '5%',
+      align: 'right',
     },
     {
       title: '', // 空白欄位標題留空
