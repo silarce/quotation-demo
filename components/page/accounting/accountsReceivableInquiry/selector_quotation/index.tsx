@@ -87,12 +87,6 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
   return (
     <Container_confirm
       title="查詢資料"
-      footerLeft={
-        <div>
-          <div>合約總金額</div>
-          <div className=" mt-[21.5px] ml-3">$??????</div>
-        </div>
-      }
       footerRight={
         <>
           <Btn onClick={handle_cancel}>取消</Btn>
@@ -105,25 +99,49 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
       <div className="grid grid-cols-4 gap-fong">
         <DataEntry_fong caption="合約編號">
           <div className={scss.container}>
-            <Input value={contractNumber} onChange={(e) => setContractNumber(e.target.value)} />
+            <Input
+              value={contractNumber}
+              onChange={(e) => {
+                setPage(1);
+                setContractNumber(e.target.value);
+              }}
+            />
             <Icon_query />
           </div>
         </DataEntry_fong>
         <DataEntry_fong caption="客戶名稱">
           <div className={scss.container}>
-            <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+            <Input
+              value={customerName}
+              onChange={(e) => {
+                setPage(1);
+                setCustomerName(e.target.value);
+              }}
+            />
             <Icon_query />
           </div>
         </DataEntry_fong>
         <DataEntry_fong caption="報價編號">
           <div className={scss.container}>
-            <Input value={quotationNumber} onChange={(e) => setQuotationNumber(e.target.value)} />
+            <Input
+              value={quotationNumber}
+              onChange={(e) => {
+                setPage(1);
+                setQuotationNumber(e.target.value);
+              }}
+            />
             <Icon_query />
           </div>
         </DataEntry_fong>
         <DataEntry_fong caption="案場名稱">
           <div className={scss.container}>
-            <Input value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+            <Input
+              value={projectName}
+              onChange={(e) => {
+                setPage(1);
+                setProjectName(e.target.value);
+              }}
+            />
             <Icon_query />
           </div>
         </DataEntry_fong>
