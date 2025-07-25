@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { axi_monkey } from '../_axiosCreator';
 
 import type { AxiosError } from 'axios';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import type {
   TapiParams,
@@ -110,13 +111,51 @@ const useApiGetQuotationList = (
   };
 };
 
+//
+//
+//
+
 const apiQuotationToAccountsReceivables = async (quotationId: string) => {
   const api = '/api/AccountsReceivable/QuotationToAccountsReceivables';
-  const params = {
-    frombody: quotationId,
-  };
 
-  return axi_monkey.get<TaccountsReceivablesList_Dto>(api, { params }).then(({ data }) => data);
+  const body = quotationId;
+
+  // return axi_monkey
+  //   .post<string>(api, quotationId, {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //   })
+  //   .then(({ data }) => data);
+
+  return axi_monkey.post<string>(api, { body }).then(({ data }) => data);
+};
+
+const apiGetAccountsReceivables = async (accountsReceivableId: string) => {
+  const api = '/api/AccountsReceivable/GetAccountsReceivables';
+
+  const body = accountsReceivableId;
+
+  return axi_monkey.get<unknown>(api, {
+    data: body,
+  });
+};
+
+// ========================================================================
+
+const getAccountsReceivableFromQuotation = async (quotationId: string) => {
+  try {
+    const accountsReceivableId = await apiQuotationToAccountsReceivables(quotationId);
+
+    return await apiGetAccountsReceivables(accountsReceivableId);
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error('getAccountsReceivableFromQuotation error:', err);
+    myAlert.err({
+      title: '錯誤',
+      content: `無法從報價單 ${quotationId} 取得應收帳款資料。`,
+    });
+  }
 };
 
 // ========================================================================
@@ -125,3 +164,5 @@ export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto };
 export { apiQuotationToAccountsReceivables };
 
 export { useApiGetAccountsReceivablesList, useApiGetQuotationList };
+
+export { getAccountsReceivableFromQuotation };
