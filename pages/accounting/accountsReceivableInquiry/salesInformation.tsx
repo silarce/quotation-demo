@@ -62,64 +62,86 @@ export default function SalesInformation() {
       return;
     }
 
-    await getAccountsReceivableFromQuotation(data.id);
-
     const {
-      // status,
-      // reviewManagerEmployeeId,
-      // managerReviewedAt,
-      // quotationNumber,
-      // version,
-      // customerId,
-      projectName,
-      // county,
-      // district,
-      // address,
-      // contactPerson,
-      // contactNumber,
-      // quantity,
-      // editNotes,
-      // discount,
-      // subTotal,
-      salesTax,
-      total,
-      // deliveryLocation,
-      // paymentMethods,
-      // supervisorEmployeeId,
-      // agentEmployeeId,
-      // reviewSalesEmployeeId,
-      // productsOrder,
-      // tuneTotal,
-      // averageDiscount,
-      // estimatedDiscount,
-      // type,
-      currency,
-      // foreignTotal,
-      // exchangeRate,
-      // contractId,
-      // ontractStatus,
-    } = data;
+      accountsReceivableNumber,
+      sourceType,
+      sourceId,
+      customerNumber,
+      customerName,
+      companyPhone,
+      companyFax,
+      salesAmount,
+      taxes,
+      salesCurrency,
+      exchangeRate,
+      requestAmount,
+      foreignCurrencyAmount,
+      uncollectedPayment,
+      totalAmount,
 
-    const newState: Tstate = {
-      ...state,
-      contractNumber: '沒有property',
-      projectName,
-      customerNumber: '沒有property',
-      customerName: '沒有property',
-      customerTaxId: '沒有property',
-      taxType: '沒有property',
-      currency,
-      total,
-      salesTax,
-      attachmentTotal: '沒有property',
-      attachmentTax: '沒有property',
-      receivedAmount: '沒有property',
-      discountAmount: '沒有property',
-      totalAmount: '沒有property',
-      salesTotal: '沒有property',
-    };
+      createdAt,
+      updatedAt,
+      createdBy,
+      updatedBy,
+      status,
+    } = (await getAccountsReceivableFromQuotation(data.quotationNumber)) ?? {};
 
-    setState(newState);
+    // const {
+    //   // status,
+    //   // reviewManagerEmployeeId,
+    //   // managerReviewedAt,
+    //   // quotationNumber,
+    //   // version,
+    //   // customerId,
+    //   projectName,
+    //   // county,
+    //   // district,
+    //   // address,
+    //   // contactPerson,
+    //   // contactNumber,
+    //   // quantity,
+    //   // editNotes,
+    //   // discount,
+    //   // subTotal,
+    //   salesTax,
+    //   total,
+    //   // deliveryLocation,
+    //   // paymentMethods,
+    //   // supervisorEmployeeId,
+    //   // agentEmployeeId,
+    //   // reviewSalesEmployeeId,
+    //   // productsOrder,
+    //   // tuneTotal,
+    //   // averageDiscount,
+    //   // estimatedDiscount,
+    //   // type,
+    //   currency,
+    //   // foreignTotal,
+    //   // exchangeRate,
+    //   // contractId,
+    //   // ontractStatus,
+    // } = data;
+
+    // const newState: Tstate = {
+    //   ...state,
+    //   contractNumber: '沒有property',
+    //   projectName: '沒有property',
+    //   customerNumber: 'customerNumber' ?? '',
+    //   customerName: 'customerName' ?? '',
+    //   customerTaxId: '沒有property',
+    //   taxType: '沒有property',
+    //   currency: 'salesCurrency' ?? '',
+    //   total: 'salesAmount' ?? 0,
+    //   salesTax: 'taxes' ?? 0,
+    //   attachmentTotal: '沒有property',
+    //   attachmentTax: '沒有property',
+    //   receivedAmount: '沒有property',
+    //   discountAmount: '沒有property',
+    //   totalAmount: 'totalAmount' ?? '',
+    //   salesTotal: '沒有property',
+    // };
+
+    // setState(newState);
   };
 
   const handle_search = () => {
@@ -180,7 +202,7 @@ export default function SalesInformation() {
           <DataEntry_fong caption="外幣">{state?.currency}</DataEntry_fong>
           <DataEntry_fong caption="銷售金額">
             {<span className="text-right"></span>}
-            {/* {<span className="text-right">{toLocaleString(state?.total)}</span>} */}
+            {<span className="text-right">{toLocaleString(state?.total)}</span>}
           </DataEntry_fong>
           <DataEntry_fong caption="銷售稅金">
             {<span className="text-right">{toLocaleString(state?.salesTax)}</span>}
