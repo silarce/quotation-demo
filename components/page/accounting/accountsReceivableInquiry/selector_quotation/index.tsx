@@ -20,11 +20,12 @@ import scss from './index.module.scss';
 interface Tprops {
   onConfirm?: (customer: TquotationListViewModel_Dto[]) => void;
   onCancel?: () => void;
+  confirmText?: React.ReactNode;
   limit?: number;
 }
 
 // ==========================================================================
-export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: Tprops) {
+export default function Selector_quotation({ onConfirm, onCancel, confirmText = '確認', limit = 1 }: Tprops) {
   const [page, setPage] = useState(1);
 
   const [contractNumber, setContractNumber] = useState('');
@@ -91,7 +92,7 @@ export default function Selector_quotation({ onConfirm, onCancel, limit = 1 }: T
         <>
           <Btn onClick={handle_cancel}>取消</Btn>
           <Btn theme="save" onClick={handle_confirm}>
-            儲存
+            {confirmText}
           </Btn>
         </>
       }
