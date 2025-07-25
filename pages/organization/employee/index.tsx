@@ -18,15 +18,17 @@ import { getEmployeeList } from 'components/page/organization/employee/api';
 // scss
 import scss from './employee.module.scss';
 import tableScss from 'components/global/myCom/myTable/table.module.scss';
-
 interface EmployeeItem {
   key: string;
   emp_code: string;
   department: string;
   job_title: string;
   emp_ch_name: string;
+  nationality: string;
+  work_location: string;
   shift: string;
   duty_type: string;
+  salary_type: string;
   onboard_date: string;
   seniority: number;
 }
@@ -86,57 +88,76 @@ export default function EmployeeData() {
       title: '員工編號',
       dataIndex: 'emp_code',
       key: 'emp_code',
-      width: '8%',
+      width: '6%',
     },
     {
       title: '部門',
       dataIndex: 'department',
       key: 'department',
-      width: '8%',
+      width: '5%',
     },
     {
       title: '職稱',
       dataIndex: 'job_title',
       key: 'job_title',
-      width: '8%',
+      width: '5%',
     },
     {
       title: '姓名',
       dataIndex: 'emp_ch_name',
       key: 'emp_ch_name',
-      width: '8%',
+      width: '5%',
+    },
+    {
+      title: '國籍',
+      dataIndex: 'nationality',
+      key: 'nationality',
+      width: '4%',
+    },
+    {
+      title: '工作所在地',
+      dataIndex: 'work_location',
+      key: 'work_location',
+      width: '6%',
+      align: 'center',
     },
     {
       title: '班別',
       dataIndex: 'shift',
       key: 'shift',
-      width: '8%',
+      width: '4%',
     },
     {
       title: '勤務',
       dataIndex: 'duty_type',
       key: 'duty_type',
-      width: '8%',
+      width: '4%',
+    },
+    {
+      title: '薪資類別',
+      dataIndex: 'salary_type',
+      key: 'salary_type',
+      width: '5%',
     },
     {
       title: '到職日',
       dataIndex: 'onboard_date',
       key: 'onboard_date',
-      width: '8%',
+      width: '1%',
     },
     {
       title: '年資/年',
       dataIndex: 'seniority',
       key: 'seniority',
-      width: '8%',
       align: 'center',
+      width: '5%',
     },
     {
-      title: '',
-      dataIndex: '',
-      key: '',
-      width: '28%',
-      align: 'center',
+      title: '', // 空白欄位標題留空
+      dataIndex: 'spacer',
+      key: 'spacer',
+      width: '25%', // 可視情況加大空間
+      render: () => '',
     },
     {
       title: '操作',
@@ -167,25 +188,45 @@ export default function EmployeeData() {
   const data: EmployeeItem[] = [
     {
       key: '1',
-      emp_code: '11456',
+      emp_code: '11457',
       department: '生產部',
       job_title: '技術員',
       emp_ch_name: '林建宏',
+      nationality: '本國',
+      work_location: '台北',
       shift: '早班',
       duty_type: '內勤',
+      salary_type: '薪資資資',
       onboard_date: '2024/02/04',
       seniority: 1,
     },
     {
       key: '2',
-      emp_code: '11457',
+      emp_code: '11437',
       department: '品保部',
       job_title: '品管員',
       emp_ch_name: '陳怡君',
+      nationality: '外國',
+      work_location: '台中',
       shift: '早班',
       duty_type: '外勤',
+      salary_type: '直接人工',
       onboard_date: '2023/02/04',
       seniority: 2,
+    },
+    {
+      key: '3',
+      emp_code: '11224',
+      department: '廠務部',
+      job_title: '技術員',
+      emp_ch_name: '陳世齊',
+      nationality: '本國',
+      work_location: '台中',
+      shift: '早班',
+      duty_type: '內勤',
+      salary_type: '間接人工',
+      onboard_date: '2022/02/04',
+      seniority: 3,
     },
   ];
 

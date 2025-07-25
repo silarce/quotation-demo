@@ -342,4 +342,14 @@
   }
 }
 
+.evenCheckboxGroup {
+  display: flex;
+  gap: 8px;
 
+  :global(.ant-checkbox-group-item) {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

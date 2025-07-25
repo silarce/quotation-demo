@@ -34,6 +34,16 @@ interface Dependent {
   birthday: string;
   idNumber: string;
   isForeign: string;
+  relation: string;
+}
+
+interface InsuranceHistory {
+  id: string;
+  changeDate: string;
+  laborLevel: string;
+  healthLevel: string;
+  reason: string;
+  effectiveDate: string;
 }
 
 export default function Organization() {
@@ -50,6 +60,7 @@ export default function Organization() {
   const [isDeleted, setIsDeleted] = useState(false);
   const [isInsure, setIsInsure] = useState(false);
   const [dependents, setDependents] = useState<Dependent[]>([]);
+  const [insuranceHistories, setInsuranceHistories] = useState<InsuranceHistory[]>([]);
 
   const updateField = useMemo(
     () =>
@@ -139,6 +150,7 @@ export default function Organization() {
         birthday: '',
         idNumber: '',
         isForeign: '',
+        relation: '',
       },
     ]);
   };
@@ -152,6 +164,29 @@ export default function Organization() {
   };
   //=============================
 
+  //新增投保歷程
+  const handleAddInsuranceHistory = () => {
+    setInsuranceHistories((prev) => [
+      ...prev,
+      {
+        id: uuidv4(),
+        changeDate: '',
+        laborLevel: '',
+        healthLevel: '',
+        reason: '',
+        effectiveDate: '',
+      },
+    ]);
+  };
+
+  const updateInsuranceField = (id: string, key: keyof InsuranceHistory, value: string) => {
+    setInsuranceHistories((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
+  };
+
+  const handleRemoveInsurance = (id: string) => {
+    setInsuranceHistories((prev) => prev.filter((item) => item.id !== id));
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -160,7 +195,7 @@ export default function Organization() {
           <BackButton
             label="返回"
             onClick={() => {
-              setIsModalOpen(true);
+              router.push(`/organization/employee`);
             }}
             className=" h-[40px]"
           />
@@ -174,7 +209,7 @@ export default function Organization() {
         <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
       </div>
       <div className="flex w-full flex-col mt-3">
-        <div className="flex w-full gap-[24px]">
+        <div className="grid grid-cols-6 gap-[24px]">
           <LabeledInputV2
             label="員工姓名"
             value={formState.emp_id}
@@ -226,12 +261,21 @@ export default function Organization() {
             onChange={(val) => updateField('military_service_type_pcode', val)}
             options={selectOptionsMap.military_service_type_pcode || []}
           />
+          <LabeledSelectV2
+            label="國籍"
+            required={true}
+            placeholder="請選擇"
+            className="w-[100%]"
+            value={formState.gender_pcode}
+            onChange={(val) => updateField('gender_pcode', val)}
+            options={selectOptionsMap.gender_pcode || []}
+          />
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
           <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📞聯絡與通訊資料</span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
-        <div className="flex w-full gap-[24px]">
+        <div className="grid grid-cols-6 gap-[24px]">
           <LabeledInputV2
             label="電子郵件"
             value={formState.emp_id}
@@ -278,55 +322,56 @@ export default function Organization() {
           />
         </div>
 
-        <div className="flex w-full mt-[20px] gap-[24px]">
-          <div className="w-[50%] flex gap-[24px]">
-            <div className="w-[20%]">
-              <LabeledSelectV2
-                label="戶籍城市"
-                required={true}
-                placeholder="請選擇"
-                value={formState.residence_county_pcode}
-                onChange={(val) => updateField('residence_county_pcode', val)}
-                options={selectOptionsMap.residence_county_pcode || []}
-              />
-            </div>
-            <div className="w-[80%]">
-              <LabeledInputV2
-                label="緊急連絡人電話"
-                value={formState.emp_id}
-                onChange={(val) => updateField('emp_id', val)}
-                placeholder="- -"
-                required={true}
-              />
-            </div>
+        <div className="grid grid-cols-6 mt-[20px] gap-[24px]">
+          <LabeledSelectV2
+            label="戶籍城市"
+            required={true}
+            placeholder="請選擇"
+            value={formState.residence_county_pcode}
+            onChange={(val) => updateField('residence_county_pcode', val)}
+            options={selectOptionsMap.residence_county_pcode || []}
+          />
+          <div className="col-span-2">
+            <LabeledInputV2
+              label="戶籍地址"
+              value={formState.emp_id}
+              onChange={(val) => updateField('emp_id', val)}
+              placeholder="- -"
+              required={true}
+            />
           </div>
-          <div className="w-[50%] flex gap-[24px]">
-            <div className="w-[20%]">
-              <LabeledSelectV2
-                label="通訊城市"
-                required={true}
-                placeholder="請選擇"
-                value={formState.mailing_county_pcode}
-                onChange={(val) => updateField('mailing_county_pcode', val)}
-                options={selectOptionsMap.mailing_county_pcode || []}
-              />
-            </div>
-            <div className="w-[80%]">
-              <LabeledInputV2
-                label="通訊地址"
-                value={formState.emp_id}
-                onChange={(val) => updateField('emp_id', val)}
-                placeholder="- -"
-                required={true}
-              />
-            </div>
+
+          <LabeledSelectV2
+            label="通訊城市"
+            required={true}
+            placeholder="請選擇"
+            value={formState.mailing_county_pcode}
+            onChange={(val) => updateField('mailing_county_pcode', val)}
+            options={selectOptionsMap.mailing_county_pcode || []}
+          />
+          <div className="col-span-2">
+            <LabeledInputV2
+              label="通訊地址"
+              value={formState.emp_id}
+              onChange={(val) => updateField('emp_id', val)}
+              placeholder="- -"
+              required={true}
+            />
           </div>
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
           <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">💼職務與任用設定</span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
-        <div className="flex w-full gap-[24px]">
+        <div className="grid grid-cols-6 gap-[24px]">
+          <LabeledSelectV2
+            label="工作地點"
+            required={true}
+            placeholder="請選擇"
+            value={formState.job_grade_id}
+            onChange={(val) => updateField('job_grade_id', val)}
+            options={selectOptionsMap.job_grade_id || []}
+          />
           <LabeledSelectV2
             label="職稱"
             required={true}
@@ -351,7 +396,7 @@ export default function Organization() {
             required={true}
           />
           <LabeledDatePickerV2
-            label="到職日"
+            label="薪資帳別"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
@@ -366,15 +411,21 @@ export default function Organization() {
             required={true}
           />
           <LabeledDatePickerV2
-            label="離職日"
+            label="到職日"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
             value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
             onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
           />
-        </div>
-        <div className="flex w-[32.2%] mt-[20px] gap-[24px]">
+          <LabeledDatePickerV2
+            label="離職日"
+            required={true}
+            placeholder="請選擇"
+            className=""
+            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
+            onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
+          />
           <LabeledDatePickerV2
             label="資遣日"
             required={true}
@@ -391,6 +442,90 @@ export default function Organization() {
             value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
             onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
           />
+          <LabeledInputV2
+            label="勞退百分比"
+            value={formState.emp_id}
+            onChange={(val) => updateField('emp_id', val)}
+            placeholder="- -"
+            required={true}
+          />
+          <LabeledInputV2
+            label="員工本薪"
+            value={formState.emp_id}
+            onChange={(val) => updateField('emp_id', val)}
+            placeholder="- -"
+            required={true}
+          />
+        </div>
+        <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋投保歷程記錄</span>
+          <AddButton label="歷程記錄" onClick={() => handleAddInsuranceHistory()} className="h-[40px] mr-3" />
+          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
+          <ExtendButton
+            label={isInsure ? '收合' : '展開'}
+            className="w-[80px] h-[40px] ml-3"
+            onClick={() => setIsInsure((prev) => !prev)}
+          />
+        </div>
+        <div className={`transition-all duration-300  ${isInsure ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+          {insuranceHistories.map((history) => (
+            <div key={history.id} className="grid grid-cols-12 gap-[24px] relative mb-[16px]">
+              <div className="col-span-3">
+                <LabeledInputV2
+                  label="勞保投保級距"
+                  value={history.laborLevel}
+                  onChange={(val) => updateInsuranceField(history.id, 'laborLevel', val)}
+                  placeholder="- -"
+                  required
+                />
+              </div>
+              <div className="col-span-3">
+                <LabeledInputV2
+                  label="健保投保級距"
+                  value={history.healthLevel}
+                  onChange={(val) => updateInsuranceField(history.id, 'healthLevel', val)}
+                  placeholder="- -"
+                  required
+                />
+              </div>
+              <div className="col-span-2">
+                <LabeledDatePickerV2
+                  label="異動日期"
+                  required
+                  placeholder="請選擇"
+                  className="w-full"
+                  value={history.changeDate ? dayjs(history.changeDate) : null}
+                  onChange={(date, dateString) => updateInsuranceField(history.id, 'changeDate', dateString as string)}
+                />
+              </div>
+              <div className="col-span-2">
+                <LabeledInputV2
+                  label="異動原因"
+                  value={history.reason}
+                  onChange={(val) => updateInsuranceField(history.id, 'reason', val)}
+                  placeholder="- -"
+                  required
+                />
+              </div>
+              <div className="col-span-2">
+                <LabeledInputV2
+                  label="生效日"
+                  value={history.effectiveDate}
+                  onChange={(val) => updateInsuranceField(history.id, 'effectiveDate', val)}
+                  placeholder="- -"
+                  required
+                />
+              </div>
+              <div className="absolute right-0 top-[-1.5px]">
+                <ClearButton
+                  label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
+                  className="h-[24px]"
+                  iconPosition="right"
+                  onClick={() => handleRemoveInsurance(history.id)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
           <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">🆔️員工打卡與排班設定</span>
@@ -430,79 +565,60 @@ export default function Organization() {
           />
         </div>
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">🛡️勞健保與勞退設定</span>
-          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
-        </div>
-        <div className="flex w-full gap-[24px]">
-          <LabeledInputV2
-            label="員工本薪"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
-            placeholder="- -"
-            required={true}
-          />
-          <LabeledSelectV2
-            label="勞保投保級距"
-            required={true}
-            placeholder="請選擇"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
-          />
-          <LabeledSelectV2
-            label="健保投保級距"
-            required={true}
-            placeholder="請選擇"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
-          />
-          <LabeledSelectV2
-            label="勞退自提百分比 "
-            required={true}
-            placeholder="請選擇"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
-          />
-        </div>
-        <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
           <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👨‍👩‍👧‍👦眷屬資料</span>
           <AddButton label="新增眷屬" onClick={() => handleAddDependent()} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         {dependents.map((dep) => (
-          <div key={dep.id} className="flex w-full gap-[24px] relative mb-[16px]">
-            <LabeledInputV2
-              label="眷屬姓名"
-              value={dep.name}
-              onChange={(val) => updateDependentField(dep.id, 'name', val)}
-              placeholder="- -"
-              required
-            />
-            <LabeledDatePickerV2
-              label="眷屬生日"
-              required={true}
-              placeholder="請選擇"
-              className="w-[100%]"
-              value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-              onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
-            />
-            <LabeledInputV2
-              label="眷屬身分證"
-              value={dep.name}
-              onChange={(val) => updateDependentField(dep.id, 'name', val)}
-              placeholder="- -"
-              required
-            />
-            <LabeledSelectV2
-              label="眷屬是否國外"
-              required
-              placeholder="請選擇"
-              value={dep.isForeign}
-              onChange={(val) => updateDependentField(dep.id, 'isForeign', val)}
-              options={selectOptionsMap.isForeign || []}
-            />
+          <div key={dep.id} className="grid grid-cols-12 gap-[24px] relative mb-[16px]">
+            <div className="col-span-3">
+              <LabeledInputV2
+                label="員工眷屬姓名"
+                value={dep.name}
+                onChange={(val) => updateDependentField(dep.id, 'name', val)}
+                placeholder="- -"
+                required
+              />
+            </div>
+            <div className="col-span-3">
+              <LabeledDatePickerV2
+                label="員工眷屬生日"
+                required
+                placeholder="請選擇"
+                className="w-full"
+                value={dep.birthday ? dayjs(dep.birthday) : null}
+                onChange={(date, dateString) => updateDependentField(dep.id, 'birthday', dateString as string)}
+              />
+            </div>
+            <div className="col-span-2">
+              <LabeledSelectV2
+                label="員工眷屬關係"
+                required
+                placeholder="請選擇"
+                value={dep.relation || ''}
+                onChange={(val) => updateDependentField(dep.id, 'relation', val)}
+                options={selectOptionsMap.emergency_contact_relationship || []}
+              />
+            </div>
+            <div className="col-span-2">
+              <LabeledInputV2
+                label="眷屬身分證"
+                value={dep.idNumber}
+                onChange={(val) => updateDependentField(dep.id, 'idNumber', val)}
+                placeholder="- -"
+                required
+              />
+            </div>
+            <div className="col-span-2">
+              <LabeledSelectV2
+                label="眷屬是否國外"
+                required
+                placeholder="請選擇"
+                value={dep.isForeign}
+                onChange={(val) => updateDependentField(dep.id, 'isForeign', val)}
+                options={selectOptionsMap.isForeign || []}
+              />
+            </div>
             <div className="absolute right-0 top-[-1.5px]">
               <ClearButton
                 label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
@@ -513,54 +629,7 @@ export default function Organization() {
             </div>
           </div>
         ))}
-        <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋投保歷程記錄</span>
-          <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
-          <ExtendButton
-            label={isInsure ? '收合' : '展開'}
-            className="w-[80px] h-[40px] ml-3"
-            onClick={() => setIsInsure((prev) => !prev)}
-          />
-        </div>
-        <div
-          className={`transition-all duration-300 overflow-hidden ${
-            isInsure ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
-          {isInsure && (
-            <div className="flex w-full gap-[24px]">
-              <LabeledDatePickerV2
-                label="異動日期"
-                required={true}
-                placeholder="請選擇"
-                className="w-[100%]"
-                value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-                onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
-              />
-              <LabeledInputV2
-                label="勞保級距"
-                value={formState.emp_id}
-                onChange={(val) => updateField('emp_id', val)}
-                placeholder="- -"
-                required={true}
-              />
-              <LabeledInputV2
-                label="健保級距"
-                value={formState.emp_id}
-                onChange={(val) => updateField('emp_id', val)}
-                placeholder="- -"
-                required={true}
-              />
-              <LabeledInputV2
-                label="異動原因"
-                value={formState.emp_id}
-                onChange={(val) => updateField('emp_id', val)}
-                placeholder="- -"
-                required={true}
-              />
-            </div>
-          )}
-        </div>
+
         <div className="flex items-center w-full mt-[40px]">
           <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📝其他</span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />

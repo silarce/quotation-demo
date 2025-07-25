@@ -102,16 +102,18 @@ export default function MonthCalendar({ year, monthIndex, holidays = [] }: Props
             return (
               <div
                 key={`${date.format('YYYY-MM-DD')}-${i}`}
-                className={`h-[80px] relative flex justify-end p-4 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
+                className={` h-[80px] relative flex justify-end p-5 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
               >
                 <div
                   className={`
-                    absolute top-[55%] left-0 right-0 h-[20px] bg-gray-300 px-10 text-xs text-left text-black flex items-center
-                    ${isStart ? 'rounded-l-full' : ''}
-                    ${isEnd ? 'rounded-r-full' : ''}
-                    ${isInRange ? 'rounded-none' : ''}
-                    ${isStart && isEnd ? 'rounded-full' : ''}
-                  `}
+                              absolute top-[60%] h-[20px] bg-gray-300 px-[44px] text-xs text-left text-black flex items-center 
+                              ${isStart ? 'left-[20px]' : 'left-0'} 
+                              ${isEnd ? 'right-[20px]' : 'right-0'}
+                              ${isStart ? 'rounded-l-full ' : ''}
+                              ${isEnd ? 'rounded-r-full' : ''}
+                              ${isInRange ? 'rounded-none' : ''}
+                              ${isStart && isEnd ? 'rounded-full' : ''}
+                            `}
                   style={{ transform: 'translateY(-50%)' }}
                 >
                   {isStart ? holiday.label : ''}
@@ -124,7 +126,7 @@ export default function MonthCalendar({ year, monthIndex, holidays = [] }: Props
           return (
             <div
               key={`${date.format('YYYY-MM-DD')}-${i}`}
-              className={`h-[80px] relative flex justify-end p-4 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
+              className={`h-[80px] relative flex justify-end p-5 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
             >
               {date.date()}
             </div>
