@@ -1018,6 +1018,8 @@ const reqModify = async ({
       //
       foreignTotal,
       tuneTotal: state_summary.tuneTotal || '0',
+
+      autoRefresh: true,
     };
 
     let isDoorModalNameEmpty = false;

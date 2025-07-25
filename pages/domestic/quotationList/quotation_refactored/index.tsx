@@ -286,6 +286,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     //
     exportState: exportState_product,
     restoreState: restoreState_product,
+    //
+
+    changeAllowProdAutoChange,
+    state_allowProdAutoChange,
   } = useQuotationProduct({
     raw_quotationProductArr: prodArr,
     raw_quotationDiscount: content?.discount,
@@ -297,6 +301,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         otherPriceAllTotal: instance_useQuotationOther.calcAllOtherTotalPrice(),
       });
     },
+    raw_autoRefresh: content?.autoRefresh ?? true,
   });
 
   const {
@@ -473,6 +478,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     instatnce_getQuotationId3,
     status: state_status,
     calcProductBody,
+    allowProdAutoChange: state_allowProdAutoChange,
   });
 
   // MARK:更新報價單
@@ -1145,6 +1151,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             disabled={disabled}
             instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
             prodTotal={allProdTotal.toLocaleString()}
+            changeAllowProdAutoChange={changeAllowProdAutoChange}
+            state_allowProdAutoChange={state_allowProdAutoChange}
             // isIterativeProdExist={!!iterativeContractProductArr?.length}
           />
           <br />
