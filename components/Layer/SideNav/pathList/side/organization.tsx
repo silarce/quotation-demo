@@ -1,5 +1,7 @@
 import { devPass, TsidePathConfig } from '../type';
 
+const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
+
 export default function SidePathPersonnel() {
   return ((): TsidePathConfig => {
     const path = '/organization';
@@ -10,36 +12,36 @@ export default function SidePathPersonnel() {
         {
           label: '全員工資料維護',
           path: path + '/company',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '單公司資料維護',
           path: path + '/editcompany',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '部門組織維護',
           path: path + '/department',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '員工資料維護',
           path: path + '/employee',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '系統管理',
-          erpFeature: 'allPass',
+          erpFeature: isInProd ? [] : 'allPass',
           list: [
             {
               label: '使用者維護',
               path: path + '/system/users',
-              erpFeature: 'allPass',
+              erpFeature: isInProd ? [] : 'allPass',
             },
             {
               label: '系統角色維護',
               path: path + '/system/roleManagement',
-              erpFeature: 'allPass',
+              erpFeature: isInProd ? [] : 'allPass',
             },
           ],
         },

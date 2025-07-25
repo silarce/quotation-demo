@@ -1,5 +1,7 @@
 import { devPass, TsidePathConfig } from '../type';
 
+const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
+
 export default function SidePathPersonnel() {
   return ((): TsidePathConfig => {
     const path = '/personnel';
@@ -10,27 +12,27 @@ export default function SidePathPersonnel() {
         {
           label: '班表',
           path: path + '/shift',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '請假模組',
           path: path + '/takeLeave',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '打卡資料匯入',
           path: path + '/checkIn',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '費用管理',
           path: path + '/feeApplication',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
         {
           label: '薪資結算',
           path: path + '/salary',
-          erpFeature: devPass,
+          erpFeature: isInProd ? [] : 'allPass',
         },
       ],
     };
