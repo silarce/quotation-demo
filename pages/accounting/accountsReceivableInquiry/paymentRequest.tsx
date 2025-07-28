@@ -1,12 +1,17 @@
-import Btn from 'components/global/gear/button/btn_fong';
+import { useState } from 'react';
+import classNames from 'classnames';
+
+import Btn, { Btn_UpDown } from 'components/global/gear/button/btn_fong';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
-import DataEntry, { DataEntry_fong } from 'components/global/gear/dataEntry';
+import DataEntry, { DataEntry_fong, Input, Select, DatePicker } from 'components/global/gear/dataEntry';
 
 import { Collapse } from 'components/global/myAntd/collapse';
 
 import scss from './paymentRequest.module.scss';
 
 export default function PaymentRequest() {
+  const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
+
   return (
     <div>
       {/*  */}
@@ -34,12 +39,17 @@ export default function PaymentRequest() {
         ]}
       />
       <br />
-      <div>
-        <div>
-          <div className="text-xl font-semibold">本次請款明細</div>
-          <Btn>收起</Btn>
+      <div className="mb-10">
+        <div className="flex gap-3 items-center mb-10">
+          <div className="text-xl font-semibold ">本次請款明細</div>
+          <Btn_UpDown isActive={isActive_detail} onClick={() => setState_isActive_deta((prev) => !prev)}>
+            展開
+          </Btn_UpDown>
         </div>
+        {isActive_detail && <Detail />}
       </div>
+      {/*  */}
+      <History />
       {/*  */}
     </div>
   );
@@ -49,7 +59,7 @@ export default function PaymentRequest() {
 
 const CurrentlyAccumulated = () => {
   return (
-    <div className="grid grid-cols-4 gap-fong">
+    <div className={classNames('grid grid-cols-4 gap-fong')}>
       <DataEntry_fong caption="目前累計請款金額" disabled={true}>
         fooo
       </DataEntry_fong>
@@ -85,6 +95,129 @@ const CurrentlyAccumulated = () => {
       </DataEntry_fong>
       <DataEntry_fong caption="統一編號" disabled={true}>
         fooo
+      </DataEntry_fong>
+    </div>
+  );
+};
+
+const Detail = ({
+  className,
+}: {
+  className?: string;
+} = {}) => {
+  return (
+    <div className="p-6 border border-gray05 rounded-lg shadow-[0px_4px_4px_0px_#00000040]">
+      <div className={classNames('grid grid-cols-4 gap-fong ', className)}>
+        <DataEntry_fong caption="類型" isMust={true} disabled={true}>
+          <Select />
+        </DataEntry_fong>
+        <DataEntry_fong caption="累計請款金額" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="營業稅(5%)" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="本期合計" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="保留款(%)" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="稅" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="保留款金額" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="金額總計" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="買受人" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <div />
+        <div />
+        <div />
+        <DataEntry_fong caption="發票日期" isMust={true} disabled={true}>
+          <DatePicker />
+        </DataEntry_fong>
+        <DataEntry_fong caption="發票號碼" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="發票金額" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+        <DataEntry_fong caption="統一編號" isMust={true} disabled={true}>
+          <Input />
+        </DataEntry_fong>
+      </div>
+      <div className="w-fit m-auto mt-10 mr-0 ml-auto">
+        <Btn theme="save">儲存</Btn>
+      </div>
+    </div>
+  );
+};
+
+const History = () => {
+  return (
+    <div>
+      <div className="text-xl font-semibold mb-6">請款紀錄</div>
+      <Collapse
+        items={[
+          {
+            key: '1',
+            label: '第O2期請款-OO 第O1期',
+            children: <HistoryDetail />,
+          },
+          {
+            key: '2',
+            label: '第O2期請款-OO 第O1期',
+            children: <HistoryDetail />,
+          },
+        ]}
+      />
+    </div>
+  );
+};
+
+const HistoryDetail = () => {
+  return (
+    <div className={classNames('grid grid-cols-4 gap-fong ')}>
+      <DataEntry_fong caption="本期請款金額" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="營業稅(5%)" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="本期合計" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="保留款(%)" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="稅" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="保留款金額" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="金額總計" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="發票日期" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="發票號碼" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="發票金額" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="買受人" disabled={true}>
+        foooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="統一編號" disabled={true}>
+        foooo
       </DataEntry_fong>
     </div>
   );
