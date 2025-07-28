@@ -1,7 +1,9 @@
 import Btn from 'components/global/gear/button/btn_fong';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
+import DataEntry, { DataEntry_fong } from 'components/global/gear/dataEntry';
 
-import { Collapse, UpDownArrow } from 'components/global/myAntd/collapse';
+import { Collapse } from 'components/global/myAntd/collapse';
+
 import scss from './paymentRequest.module.scss';
 
 export default function PaymentRequest() {
@@ -19,7 +21,7 @@ export default function PaymentRequest() {
       {/*  */}
       <Table_antd columns={columns} dataSource={fakeData_projectDetail} />
       <br />
-      {/* <Collapse_old
+      <Collapse
         items={[
           {
             key: '1',
@@ -27,13 +29,66 @@ export default function PaymentRequest() {
             classNames: {
               // header: scss.collapseTitle,
             },
-            children: <div>fooooooooooooo</div>,
+            children: <CurrentlyAccumulated />,
           },
         ]}
-      /> */}
+      />
+      <br />
+      <div>
+        <div>
+          <div className="text-xl font-semibold">本次請款明細</div>
+          <Btn>收起</Btn>
+        </div>
+      </div>
+      {/*  */}
     </div>
   );
 }
+
+// ==============================================================================
+
+const CurrentlyAccumulated = () => {
+  return (
+    <div className="grid grid-cols-4 gap-fong">
+      <DataEntry_fong caption="目前累計請款金額" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="營業稅(5%)" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="本期合計" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="保留款(%)" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="稅" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="保留款金額" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="金額總計" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="發票日期" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="發票號碼" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="發票金額" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="買受人" disabled={true}>
+        fooo
+      </DataEntry_fong>
+      <DataEntry_fong caption="統一編號" disabled={true}>
+        fooo
+      </DataEntry_fong>
+    </div>
+  );
+};
 
 // ==============================================================================
 
