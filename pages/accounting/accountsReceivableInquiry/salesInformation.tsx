@@ -12,6 +12,7 @@ import Selector_quotation, {
 } from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 
 import Icon_trash from 'public/image/icon/fong/trash.svg';
+import Icon_note from 'public/image/icon/fong/note.svg';
 
 // api
 import { TaccountsReceivable, useGetAccountsReceivables } from 'js/api/api_netCore/api_accountsReceivable';
@@ -157,8 +158,8 @@ export default function SalesInformation() {
         <div className="mt-10">
           <div className="mb-6">
             <span className="text-xl font-semibold mr-3">請款狀況</span>
-            <Link href="receivable">
-              <Btn theme="cross">新增資料</Btn>
+            <Link href="paymentRequest">
+              <Btn theme="cross">新增工程項目明細</Btn>
             </Link>
           </div>
           <Table_antd columns={columns_paymentRequests} dataSource={paymentRequests} pagination={false} />
@@ -269,7 +270,16 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
     width: 90,
     align: 'center',
     render: (_, record) => {
-      return <Icon_trash className="inline w-[16px] h-[16px] text-red01" />;
+      return (
+        <Link
+          href={{
+            pathname: 'paymentRequest',
+            query: { id: record.id },
+          }}
+        >
+          <Icon_note className="inline w-[16px] h-[16px] text-blue01" />
+        </Link>
+      );
     },
   },
 ];
