@@ -250,14 +250,14 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
   },
   {
     title: '實收金額',
-    dataIndex: 'amountReceived',
+    dataIndex: 'collect_amount',
     align: 'right',
     width: 150,
     render: (value: number | null) => toLocaleString(value),
   },
   {
     title: '折讓',
-    dataIndex: 'discount',
+    dataIndex: 'deduction',
     align: 'right',
     width: 150,
     render: (value: number | null) => toLocaleString(value),

@@ -619,9 +619,13 @@ interface TpaymentRequest_Dto {
   invoiceNumber: string | null;
   invoiceAmount: decimal | null;
 
-  paymentAmount: decimal | null;
+  paymentAmount: decimal | null; //請款金額
   paymentCurrency: string;
   foreignCurrencyAmount: decimal | null;
+
+  collect_amount?: number | null; //已收金額, // 實際上沒收到
+  receipt_balance?: number | null; //收款餘額 // 實際上沒收到
+  deduction?: number | null; //扣款金額 // 實際上沒收到
 }
 
 /**
