@@ -44,6 +44,8 @@ module.exports = {
         gray06: '#9D9D9D',
         gray07: '#FAFAFA',
         gray08: '#666666',
+        gray09: '#F3F4F6',
+        gray10: '#F9FAFB',
 
         red01: '#EA1833', // danger active
         red02: '#C5152B',
