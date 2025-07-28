@@ -16,20 +16,21 @@
 
 .collspse_fong.collspse_fong {
   @extend .collspse;
+  box-shadow: 0px 4px 4px 0px #00000040;
+
   overflow: hidden;
   :global(.ant-collapse-item) {
     :global(.ant-collapse-header) {
       padding: 12px;
-      background-color: theme("colors.blue04");
+      background-color: theme("colors.gray09");
 
       :global(.ant-collapse-header-text) {
         font-weight: 500;
       }
     }
     :global(.ant-collapse-content) {
-      background-color: inherit;
+      background-color: theme("colors.gray10");
       :global(.ant-collapse-content-box) {
-        background-color: inherit;
         padding: 24px;
       }
     }

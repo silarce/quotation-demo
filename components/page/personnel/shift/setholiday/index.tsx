@@ -8,11 +8,6 @@ import MonthCalendar from './MonthCalendar';
 //
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
-
-//svg
-import calender from 'public/image/icon/fong/calendar.svg';
-import setting from 'public/image/icon/fong/setting.svg';
-
 //
 import {
   //
@@ -36,13 +31,26 @@ export default function SetHoliday() {
   const [input, setInput] = useState('');
   const [isYearView, setIsYearView] = useState(false); // true = 年檢視, false = 月檢視
 
+  const holidayList = [
+    {
+      start: '2025-01-01',
+      end: '2025-01-01',
+      label: '元旦',
+    },
+    {
+      start: '2025-02-02',
+      end: '2025-02-08',
+      label: '春節連假',
+    },
+  ];
+
   const renderYearCalendar = () => {
     const year = currentDate.year(); //使用狀態中的 currentDate 控制年份
 
     return (
       <div className="grid grid-cols-3 gap-x-6 gap-y-11">
         {Array.from({ length: 12 }, (_, monthIndex) => (
-          <YearCalendar key={monthIndex} year={year} monthIndex={monthIndex} />
+          <YearCalendar key={monthIndex} year={year} monthIndex={monthIndex} holidays={holidayList} />
         ))}
       </div>
     );
@@ -183,7 +191,7 @@ export default function SetHoliday() {
               holidays={[
                 {
                   start: '2025-07-14',
-                  end: '2025-07-15',
+                  end: '2025-07-19',
                   label: '情人節',
                 },
               ]}
