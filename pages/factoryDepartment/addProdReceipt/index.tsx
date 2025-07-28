@@ -36,7 +36,7 @@ import icon_task_open from 'public/image/icon/fc_task_open.svg?url';
 
 //日期
 import dayjs, { Dayjs } from 'dayjs';
-import { Collapse } from 'components/global/myAntd/collapse';
+import { Collapse_old } from 'components/global/myAntd/collapse';
 import DragableModal from 'components/global/gear/dragableModal/dragableModal';
 import Tbody01 from '../ui/table/tbody01';
 
@@ -1394,7 +1394,7 @@ export default function AddProdReceipt() {
                                 }}
                               />
                             </span>
-                            <Collapse
+                            <Collapse_old
                               defaultActiveKey={[]}
                               onChange={() => onChange(_item)}
                               className={scss.customCollapse}
