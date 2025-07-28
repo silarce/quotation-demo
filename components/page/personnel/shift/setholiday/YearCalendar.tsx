@@ -1,32 +1,55 @@
 import dayjs from 'dayjs';
 import React from 'react';
 
+interface HolidayRange {
+  start: string;
+  end: string;
+  label: string;
+}
+
 interface Props {
   year: number;
   monthIndex: number;
+  holidays?: HolidayRange[];
 }
 
-export default function YearCalendar({ year, monthIndex }: Props) {
-  const monthStart = dayjs(`${year}-${monthIndex + 1}-01`); // 使用 monthIndex + 1 來獲取正確的月份
-  const daysInMonth = monthStart.daysInMonth(); //取得這個月有幾天
-  const firstDay = monthStart.day(); // 取得這個月第一天是星期幾
-  const lastDay = monthStart.endOf('month').day();
+export default function YearCalendar({ year, monthIndex, holidays = [] }: Props) {
+  const monthStart = dayjs(`${year}-${monthIndex + 1}-01`);
+  const firstDay = monthStart.day();
+  const daysInMonth = monthStart.daysInMonth();
+
+  const fullDays: dayjs.Dayjs[] = [];
 
   // 前月補格子
   const prevMonth = monthStart.subtract(1, 'month');
   const prevMonthDays = prevMonth.daysInMonth();
-  const prevDays = Array.from({ length: firstDay }, (_, i) => (prevMonthDays - firstDay + i + 1).toString());
 
-  // 本月天數
-  const currentDays = Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString());
+  for (let i = firstDay - 1; i >= 0; i--) {
+    fullDays.push(prevMonth.date(prevMonthDays - i));
+  }
 
-  // 補滿 42 格
-  const totalSlots = 42;
-  const days = [...prevDays, ...currentDays];
-  const remaining = totalSlots - days.length;
-  const nextDays = Array.from({ length: remaining }, (_, i) => (i + 1).toString());
+  // 本月
+  for (let i = 1; i <= daysInMonth; i++) {
+    fullDays.push(monthStart.date(i));
+  }
 
-  const fullDays = [...days, ...nextDays];
+  // 後月補滿到 42 格
+  const nextMonth = monthStart.add(1, 'month');
+  let day = 1;
+
+  while (fullDays.length < 42) {
+    fullDays.push(nextMonth.date(day++));
+  }
+
+  const holidayMap = new Map<string, HolidayRange>();
+  holidays.forEach((holiday) => {
+    const start = dayjs(holiday.start);
+    const end = dayjs(holiday.end);
+
+    for (let d = start; d.isBefore(end.add(1, 'day')); d = d.add(1, 'day')) {
+      holidayMap.set(d.format('YYYY-MM-DD'), holiday);
+    }
+  });
 
   return (
     <div className="flex flex-col">
@@ -45,13 +68,10 @@ export default function YearCalendar({ year, monthIndex }: Props) {
           ))}
         </div>
         <div className="grid grid-cols-7 text-sm text-center">
-          {fullDays.map((day, i) => {
+          {fullDays.map((date, i) => {
+            const isCurrentMonth = date.month() === monthIndex;
             const isSunday = i % 7 === 0;
             const isSaturday = i % 7 === 6;
-
-            const isPrevMonth = i < prevDays.length;
-            const isNextMonth = i >= prevDays.length + currentDays.length;
-            const isCurrentMonth = !isPrevMonth && !isNextMonth;
 
             const textColor = isCurrentMonth
               ? isSunday || isSaturday
@@ -59,14 +79,36 @@ export default function YearCalendar({ year, monthIndex }: Props) {
                 : 'text-black'
               : 'text-gray-400';
 
-            const bgColor = !isCurrentMonth ? 'bg-gray-100' : '';
+            const bgColor = isCurrentMonth ? '' : 'bg-gray-100';
+
+            const dateKey = date.format('YYYY-MM-DD');
+            const holiday = holidayMap.get(dateKey);
+            const isStart = holiday ? date.isSame(holiday.start, 'day') : false;
+            const isEnd = holiday ? date.isSame(holiday.end, 'day') : false;
+            const isInRange = holiday ? date.isAfter(holiday.start) && date.isBefore(holiday.end) : false;
 
             return (
               <div
                 key={i}
-                className={`h-[64px] flex items-center justify-center border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
+                className={`h-[64px] relative flex items-start justify-end p-2 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
               >
-                {day}
+                {holiday && (
+                  <div
+                    className={`
+    absolute top-[60%] left-0 right-0 h-[20px] bg-[#EA1833]
+    text-xs text-white flex items-center pl-[8px] pr-[8px]
+    ${isStart ? 'rounded-l-full left-5' : ''}
+    ${isEnd ? 'rounded-r-full right-5' : ''}
+    ${isInRange ? 'rounded-none' : ''}
+    ${isStart && isEnd ? 'rounded-full' : ''}
+    whitespace-nowrap overflow-hidden max-w-full
+  `}
+                    style={{ transform: 'translateY(-50%)' }}
+                  >
+                    {isStart ? holiday.label : ''}
+                  </div>
+                )}
+                <span className="relative z-10">{date.date()}</span>
               </div>
             );
           })}

@@ -106,7 +106,7 @@ export default function MonthCalendar({ year, monthIndex, holidays = [] }: Props
               >
                 <div
                   className={`
-                              absolute top-[60%] h-[20px] bg-gray-300 px-[44px] text-xs text-left text-black flex items-center 
+                              absolute top-[60%] h-[20px] bg-[#EA1833] px-[44px] text-xs text-left text-[#FFFFFF] flex items-center 
                               ${isStart ? 'left-[20px]' : 'left-0'} 
                               ${isEnd ? 'right-[20px]' : 'right-0'}
                               ${isStart ? 'rounded-l-full ' : ''}
