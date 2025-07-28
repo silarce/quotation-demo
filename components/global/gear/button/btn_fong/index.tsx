@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import classNames from 'classnames';
 
 import scss from './index.module.scss';
@@ -16,6 +18,7 @@ import Icon_send from 'public/image/icon/fong/send.svg';
 import Icon_warning from 'public/image/icon/fong/warning.svg';
 import Icon_setting from 'public/image/icon/fong/setting.svg';
 import Icon_calendar from 'public/image/icon/fong/calendar.svg';
+import Icon from '@ant-design/icons';
 
 // ================================================================================
 
@@ -57,6 +60,23 @@ function Btn_fong({
     </button>
   );
 }
+
+const Btn_UpDown = ({
+  className,
+  isActive,
+  ...props
+}: Tprops_btn & {
+  isActive?: boolean;
+}) => {
+  return (
+    <Btn
+      className={classNames(scss.btnUpDown, className)}
+      iconAfter={Icon_arrowDown}
+      props_iconAfter={{ className: classNames(scss.icon, isActive && scss.isActive) }}
+      {...props}
+    />
+  );
+};
 
 // ================================================================================
 
@@ -184,4 +204,5 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
 const Btn = Btn_fong;
 
 export default Btn;
+export { Btn_UpDown };
 export type { Tprops_btn };
