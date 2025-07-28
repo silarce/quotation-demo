@@ -597,31 +597,65 @@ interface TsalesOrderItemData_Dto {
   dualPrice: number; //牌價
 }
 
+// interface TpaymentRequest_Dto {
+//   id: Guid | null;
+//   createdAt: DateTime | null;
+//   createdBy: string;
+//   updatedAt: DateTime | null;
+//   updatedBy: string;
+
+//   sourceFormType: string;
+//   sourceFormId: Guid;
+
+//   accountsReceivableId: Guid | null;
+//   paymentRequestNumber: string | null;
+
+//   customerNumber: string;
+//   customerName: string;
+
+//   type: string;
+//   period: string;
+
+//   invoiceNumber: string | null;
+//   invoiceAmount: decimal | null;
+
+//   paymentAmount: decimal | null; //請款金額
+//   paymentCurrency: string;
+//   foreignCurrencyAmount: decimal | null;
+
+//   collect_amount?: number | null; //已收金額, // 實際上沒收到
+//   receipt_balance?: number | null; //收款餘額 // 實際上沒收到
+//   deduction?: number | null; //扣款金額 // 實際上沒收到
+// }
 interface TpaymentRequest_Dto {
-  id: Guid | null;
-  createdAt: DateTime | null;
-  createdBy: string;
-  updatedAt: DateTime | null;
-  updatedBy: string;
+  id: Guid | null; //請款單Id
+  createdAt: DateTime | null; //建立時間
+  createdBy: string | null; //建立人員
+  updatedAt: DateTime | null; //更新時間
+  updatedBy: string | null; // 更新人員
 
-  sourceFormType: string;
-  sourceFormId: Guid;
+  paymentRequestNumber: string | null; //請款單編號
+  sourceFormType: string | null; //來源表單類型
+  sourceFormId: Guid | null; //來源表單Id
 
-  accountsReceivableId: Guid | null;
-  paymentRequestNumber: string | null;
+  customerNumber: string; //客戶編號
+  customerName: string; //客戶名稱
 
-  customerNumber: string;
-  customerName: string;
+  invoiceNumber: string | null; //發票號碼
+  invoiceAmount: decimal | null; //發票金額
 
-  type: string;
-  period: string;
+  accountsReceivableId: Guid | null; //應收帳款Id
 
-  invoiceNumber: string | null;
-  invoiceAmount: decimal | null;
+  type: string; //請款單類型
+  period: string; //請款單期別
 
-  paymentAmount: decimal | null;
-  paymentCurrency: string;
-  foreignCurrencyAmount: decimal | null;
+  paymentCurrency: string; //請款幣別
+  foreignCurrencyAmount: decimal | null; //外幣金額
+
+  paymentAmount: decimal | null; //請款金額
+  collect_amount: decimal | null; //已收金額
+  receipt_balance: decimal | null; //收款餘額
+  deduction: decimal | null; //扣款金額
 }
 
 /**
@@ -683,6 +717,7 @@ export type {
   TaccountsReceivablesList_Dto,
   TquotationListViewModel_Dto,
   TaccountsReceivable,
+  TpaymentRequest_Dto,
 };
 
 export type {
