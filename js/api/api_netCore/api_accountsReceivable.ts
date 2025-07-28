@@ -12,6 +12,7 @@ import type {
   TaccountsReceivablesList_Dto,
   TquotationListViewModel_Dto,
   TaccountsReceivable,
+  TpaymentRequest_Dto,
 } from './_schemas';
 
 const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
@@ -194,11 +195,68 @@ const useGetAccountsReceivables = (
   };
 };
 
+// /api/AccountsReceivable/GetPaymentRequest?id=
+
+const apiGetPaymentRequest = async (paymentRequestiId: string) => {
+  const api = '/api/AccountsReceivable/GetPaymentRequest';
+
+  const params = { id: paymentRequestiId };
+
+  return axi_monkey.get<TpaymentRequest_Dto>(api, { params }).then(({ data }) => data);
+};
+
+const useGetPaymentRequest = (
+  paymentRequestiId: string | undefined,
+  {
+    isAutoUpdate = true,
+  }: {
+    isAutoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TpaymentRequest_Dto | null>();
+
+  const update = async () => {
+    if (isFetching || !paymentRequestiId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    const res = await apiGetPaymentRequest(paymentRequestiId)
+      .then((res) => {
+        setRes(res);
+
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.notify.error({ message: '無法取得應收請款資料', description: err.message });
+        setRes(null);
+
+        return null;
+      });
+
+    setIsFetching(false);
+
+    return res;
+  };
+
+  useEffect(() => {
+    isAutoUpdate && update();
+  }, [paymentRequestiId]);
+
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
+};
+
 // ========================================================================
 
 // ========================================================================
-export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto, TaccountsReceivable };
+export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto, TaccountsReceivable, TpaymentRequest_Dto };
 
 export { apiQuotationToAccountsReceivables };
 
-export { useApiGetAccountsReceivablesList, useApiGetQuotationList, useGetAccountsReceivables };
+export { useApiGetAccountsReceivablesList, useApiGetQuotationList, useGetAccountsReceivables, useGetPaymentRequest };
