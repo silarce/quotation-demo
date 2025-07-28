@@ -3,22 +3,30 @@ import Image, { ImageProps } from 'next/image';
 
 import classNames from 'classnames';
 // antd
-import { Collapse as Antd_Collapse, CollapseProps, CollapsePanelProps } from 'antd';
+import { Collapse as Antd_Collapse, CollapseProps } from 'antd';
 
 import upDonwArrow from 'public/image/icon/arrow_change_tray.svg?url';
+import Icon_arrowDown from 'public/image/icon/fong/arrowDown.svg';
 
 import scss from './index.module.scss';
 
-const { Panel: Antd_Panel } = Antd_Collapse;
-
 // ============================================================================
-function Collapse(
-  props?: CollapseProps & {
-    // 將top left right的border拿掉
-    noTlrBorder?: boolean;
-  }
-) {
-  const { noTlrBorder, ...antdProps } = props ?? {};
+
+function Collapse({ className, ...props }: CollapseProps = {}) {
+  return (
+    <Antd_Collapse
+      className={classNames(scss.collspse_fong, className)}
+      expandIconPosition="end"
+      expandIcon={({ isActive }) => {
+        return <Icon_arrowDown className={classNames(scss.icon, isActive && scss.active)} />;
+      }}
+      {...props}
+    />
+  );
+}
+
+function Collapse_old(props?: CollapseProps) {
+  const { ...antdProps } = props ?? {};
 
   return (
     <Antd_Collapse
@@ -26,8 +34,8 @@ function Collapse(
       {...antdProps}
       className={classNames(
         //
-        scss.collapse,
-        noTlrBorder && scss.noTlrBorder,
+        scss.collapse_old,
+
         props?.className
       )}
     />
@@ -73,4 +81,4 @@ const UpDownArrow = (
   );
 };
 
-export { Collapse, useActiveKey, UpDownArrow };
+export { Collapse_old, Collapse, useActiveKey, UpDownArrow };
