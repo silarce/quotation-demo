@@ -14,6 +14,8 @@ import Icon_tempIcon from 'public/image/icon/fong/tempIcon.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_send from 'public/image/icon/fong/send.svg';
 import Icon_warning from 'public/image/icon/fong/warning.svg';
+import Icon_setting from 'public/image/icon/fong/setting.svg';
+import Icon_calendar from 'public/image/icon/fong/calendar.svg';
 
 // ================================================================================
 
@@ -75,7 +77,9 @@ type TthemeName =
   | 'send'
   | 'brown'
   | 'warning'
-  | 'warning_2';
+  | 'warning_2'
+  | 'setting'
+  | 'calendar';
 
 type Tprops_btn = {
   theme?: TthemeName;
@@ -109,6 +113,7 @@ const lookup_icon = {
   tempIcon: Icon_tempIcon,
   trash: Icon_trash,
   send: Icon_send,
+  setting: Icon_setting,
 } as const;
 
 const lookup_theme: Record<TthemeName, Ttheme> = {
@@ -165,6 +170,14 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
   warning_2: {
     themeColor: 'yellow_I',
     Icon: Icon_warning,
+  },
+  setting: {
+    themeColor: 'blue_II',
+    Icon: Icon_setting,
+  },
+  calendar: {
+    themeColor: 'blue_II',
+    Icon: Icon_calendar,
   },
 };
 
