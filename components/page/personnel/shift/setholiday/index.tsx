@@ -164,10 +164,10 @@ export default function SetHoliday() {
               </div>
             </div>
             <div className=" flex gap-4 h-[40px]">
-              <Btn onClick={() => setIsYearView((prev) => !prev)} themeColor="blue_II" icon={calender}>
+              <Btn onClick={() => setIsYearView((prev) => !prev)} theme="calendar">
                 月/年檢視
               </Btn>
-              <Btn themeColor="blue_II" icon={setting} onClick={handle_addRoutine}>
+              <Btn theme="setting" onClick={handle_addRoutine}>
                 設定例行休假日
               </Btn>
               <Btn theme="add" onClick={handle_addHoliday}>

@@ -44,7 +44,8 @@
   background-color: theme("colors.white01");
   &:hover {
     border-color: theme('colors.blue02');
-    color: theme('colors.blue02');
+    color: theme('colors.white01');
+    background-color: theme('colors.blue02');
   }
   &:active {
     background-color: theme("colors.blue03");
