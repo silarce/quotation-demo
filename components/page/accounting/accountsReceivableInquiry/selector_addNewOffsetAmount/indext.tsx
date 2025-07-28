@@ -11,9 +11,11 @@ import { Checkbox } from 'components/global/gear/dataEntry';
 export default function Selector_addNewOffsetAmount({
   onConfirm,
   onCancel,
+  btn_confirm,
 }: {
   onConfirm?: (data: TfakeData | undefined) => void;
   onCancel?: () => void;
+  btn_confirm?: (data: TfakeData | undefined) => React.ReactNode;
 }) {
   const [data, setData] = useState<TfakeData>();
 
@@ -29,9 +31,13 @@ export default function Selector_addNewOffsetAmount({
       footerRight={
         <>
           <Btn onClick={onCancel}>取消</Btn>
-          <Btn theme="save" onClick={handle_confirm}>
-            儲存
-          </Btn>
+
+          {btn_confirm && btn_confirm(data)}
+          {!btn_confirm && (
+            <Btn theme="save" onClick={handle_confirm}>
+              儲存
+            </Btn>
+          )}
         </>
       }
     >
