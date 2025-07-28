@@ -23,7 +23,7 @@ import icon_save from 'public/image/icon/fc_save.svg?url';
 import icon_cancel from 'public/image/icon/fc_cancel.svg?url';
 import icon_delete from 'public/image/icon/fc_delete.svg?url';
 import icon_autoadd from 'public/image/icon/fc_autoadd.svg?url';
-import { Collapse } from 'components/global/myAntd/collapse';
+import { Collapse_old } from 'components/global/myAntd/collapse';
 import icon_fc_arrow_down from 'public/image/icon/fc_arrow_down.svg?url';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
 import icon_search from 'public/image/icon/fc_search.svg?url';
@@ -491,7 +491,7 @@ export default function POrderList() {
           {searchdata &&
             searchdata.map((_item: any, index: number) => (
               <CellWithBar key={index} className={scss.panelHeader15}>
-                <Collapse
+                <Collapse_old
                   defaultActiveKey={[]}
                   className={scss.customCollapse}
                   onChange={(key) => {
