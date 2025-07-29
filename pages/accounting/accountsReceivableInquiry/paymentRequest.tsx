@@ -17,7 +17,7 @@ import Icon_next from 'public/image/icon/fong/next.svg';
 
 import scss from './paymentRequest.module.scss';
 
-import { useApiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+import { useApiGetARPaymentData, useApiGetARPaymentDataInsert } from 'js/api/api_netCore/api_accountsReceivable';
 
 // ============================================================================
 
