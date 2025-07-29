@@ -307,64 +307,73 @@ const useApiGetARPaymentData = (
   };
 };
 
-const apiGetARPaymentDataInsert = async (accountsReceivableId: string) => {
+const apiGetPostARPaymentDataInsert = async (accountsReceivableId: string, body: Tres_apiGetARPaymentDataInsert) => {
   const api = '/api/AccountsReceivable/GetARPaymentDataInsert';
+
   const params = { accountsReceivableId };
 
-  return axi_monkey.get<Tres_apiGetARPaymentDataInsert>(api, { params }).then(({ data }) => data);
+  return axi_monkey.post(api, body, { params }).then(({ data }) => data);
 };
 
-const useApiGetARPaymentDataInsert = (
-  accountsReceivableId: string | undefined,
-  {
-    autoUpdate = true,
-  }: {
-    autoUpdate?: boolean;
-  } = {}
-) => {
-  const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<Tres_apiGetARPaymentDataInsert | null>();
+// const apiGetARPaymentDataInsert = async (accountsReceivableId: string) => {
+//   const api = '/api/AccountsReceivable/GetARPaymentDataInsert';
+//   const params = { accountsReceivableId };
 
-  const update = async () => {
-    if (isFetching || !accountsReceivableId) {
-      return;
-    }
+//   return axi_monkey.get<Tres_apiGetARPaymentDataInsert>(api, { params }).then(({ data }) => data);
+// };
 
-    setIsFetching(true);
+// const useApiGetARPaymentDataInsert = (
+//   accountsReceivableId: string | undefined,
+//   {
+//     autoUpdate = true,
+//   }: {
+//     autoUpdate?: boolean;
+//   } = {}
+// ) => {
+//   const [isFetching, setIsFetching] = useState(false);
+//   const [res, setRes] = useState<Tres_apiGetARPaymentDataInsert | null>();
 
-    const res = await apiGetARPaymentDataInsert(accountsReceivableId)
-      .then((res) => {
-        setRes(res);
+//   const update = async () => {
+//     if (isFetching || !accountsReceivableId) {
+//       return;
+//     }
 
-        return res;
-      })
-      .catch((err: AxiosError) => {
-        myAlert.notify.error({ message: '無法取得應收付款資料', description: err.message });
-        setRes(null);
+//     setIsFetching(true);
 
-        return null;
-      });
+//     const res = await apiGetARPaymentDataInsert(accountsReceivableId)
+//       .then((res) => {
+//         setRes(res);
 
-    setIsFetching(false);
+//         return res;
+//       })
+//       .catch((err: AxiosError) => {
+//         myAlert.notify.error({ message: '無法取得應收付款資料', description: err.message });
+//         setRes(null);
 
-    return res;
-  };
+//         return null;
+//       });
 
-  useEffect(() => {
-    autoUpdate && update();
-  }, [accountsReceivableId]);
+//     setIsFetching(false);
 
-  return {
-    isFetching,
-    data: res,
-    update,
-  };
-};
+//     return res;
+//   };
+
+//   useEffect(() => {
+//     autoUpdate && update();
+//   }, [accountsReceivableId]);
+
+//   return {
+//     isFetching,
+//     data: res,
+//     update,
+//   };
+// };
 
 // ========================================================================
 
 // MARK:Tres_apiGetARPaymentData
 interface Tres_apiGetARPaymentData {
+  // 目前累計
   accountsReceivables: {
     id: string; //應收帳款id
     accountsReceivableNumber: string; //應收帳款編號
@@ -395,6 +404,8 @@ interface Tres_apiGetARPaymentData {
     taxId: string | null;
     taxDeductionCategory: string | null;
   };
+
+  // 本次請款明細
   paymentRequest: {
     id: string | null; //請款單Id
     paymentRequestNumber: string | null; //請款單編號
@@ -417,36 +428,37 @@ interface Tres_apiGetARPaymentData {
     collect_amount: number | null; //已收金額,餘額在repo裡計算
     receipt_balance: number | null; //收款餘額
     deduction: number | null; //扣款金額
+
+    //請款單沖銷明細 // 沖銷明細
+    prOffsetDetails: {
+      id: string | null; //沖銷明細Id
+      prOffsetNumber: string | null; //沖銷編號
+      accountantId: string | null; //會計收管管理Id
+      paymentRequestId: string | null; //請款單Id
+      prOffsetDate: string; //沖銷日期
+      paymentCurrency: string | null; //請款幣別
+      exchangeRate: number | null; //匯率
+      paymentAmount: number; //收款金額
+      settlementSerial: string | null; //結算序號
+      isCashierSeen: boolean | null; //出納是否已查看
+      isWorkSupervisorSeen: boolean | null; // 工作主管是否已查看
+      isManagerSeen: boolean | null; // 總經理是否已查看
+      declarationCurrency: string | null; // PostgreSQL enum 建議轉 string 處理
+      declarationExchangeRate: number | null; // 申報匯率
+      declarationCurrencyPayment: number | null; // 申報幣別收款金額
+      declarationPayment: number | null; // 申報收款金額
+      exchangeBenefits: number | null; // 匯兌利益
+      customerNumber: string | null; // 客戶編號
+      customerName: string | null; // 客戶名稱
+      fee: number | null; // 手續費
+      totalAmount: number | null; // 總金額
+      account: string | null; // 會計科目
+      createdAt: string | null; //建立時間
+      createdBy: string | null; //建立人員
+      updatedAt: string | null; //更新時間
+      updatedBy: string | null; // 更新人員
+    }[];
   };
-  //請款單沖銷明細
-  prOffsetDetails: {
-    id: string | null; //沖銷明細Id
-    prOffsetNumber: string | null; //沖銷編號
-    accountantId: string | null; //會計收管管理Id
-    paymentRequestId: string | null; //請款單Id
-    prOffsetDate: string; //沖銷日期
-    paymentCurrency: string | null; //請款幣別
-    exchangeRate: number | null; //匯率
-    paymentAmount: number; //收款金額
-    settlementSerial: string | null; //結算序號
-    isCashierSeen: boolean | null; //出納是否已查看
-    isWorkSupervisorSeen: boolean | null; // 工作主管是否已查看
-    isManagerSeen: boolean | null; // 總經理是否已查看
-    declarationCurrency: string | null; // PostgreSQL enum 建議轉 string 處理
-    declarationExchangeRate: number | null; // 申報匯率
-    declarationCurrencyPayment: number | null; // 申報幣別收款金額
-    declarationPayment: number | null; // 申報收款金額
-    exchangeBenefits: number | null; // 匯兌利益
-    customerNumber: string | null; // 客戶編號
-    customerName: string | null; // 客戶名稱
-    fee: number | null; // 手續費
-    totalAmount: number | null; // 總金額
-    account: string | null; // 會計科目
-    createdAt: string | null; //建立時間
-    createdBy: string | null; //建立人員
-    updatedAt: string | null; //更新時間
-    updatedBy: string | null; // 更新人員
-  }[];
   salesOrder: {
     id: string; //銷售訂單id
     salesOrderNumber: string; //銷售訂單編號
@@ -473,22 +485,22 @@ interface Tres_apiGetARPaymentData {
     sourceType: string; //來源類型
     sourceId: string | null; //來源id
     quotationNumber: string | null; //報價單編號
-    //銷貨明細
+    //銷貨明細  // 工程項目明細
     salesOrderItems: {
-      Id: string; //銷貨明細id
-      ItemNumber: string; //項目編號
-      SalesOrderNumber: string; //銷售訂單編號
-      ProductId: string; //產品id
-      Discount: number | null; //折扣
-      ProductName: string; //產品名稱
-      ProductNumber: string; //產品編號
-      UnitPrice: number | null; //單價
-      Quantity: number | null; //數量
-      Amount: number | null; //金額
-      Taxes: number | null; //稅金
-      AttachedToProductId: string | null; //附加產品id
-      DualPrice: number; //牌價
-    };
+      id: string; //銷貨明細id
+      itemNumber: string; //項目編號
+      salesOrderNumber: string; //銷售訂單編號
+      productId: string; //產品id
+      discount: number | null; //折扣
+      productName: string; //產品名稱
+      productNumber: string; //產品編號
+      unitPrice: number | null; //單價
+      quantity: number | null; //數量
+      amount: number | null; //金額
+      taxes: number | null; //稅金
+      attachedToProductId: string | null; //附加產品id
+      dualPrice: number; //牌價
+    }[];
   };
 }
 
@@ -626,7 +638,7 @@ export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto, Taccoun
 
 export type { Tres_apiGetARPaymentData, Tres_apiGetARPaymentDataInsert };
 
-export { apiQuotationToAccountsReceivables, apiGetARPaymentDataInsert };
+export { apiQuotationToAccountsReceivables, apiGetPostARPaymentDataInsert };
 
 export {
   useApiGetAccountsReceivablesList,
@@ -634,5 +646,5 @@ export {
   useGetAccountsReceivables,
   useGetPaymentRequest,
   useApiGetARPaymentData,
-  useApiGetARPaymentDataInsert,
+  // useApiGetARPaymentDataInsert,
 };

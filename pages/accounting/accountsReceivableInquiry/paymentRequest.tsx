@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 
 import Btn from 'components/global/gear/button/btn_fong';
 
-import { useApiGetARPaymentData, useApiGetARPaymentDataInsert } from 'js/api/api_netCore/api_accountsReceivable';
+import { useApiGetARPaymentData, apiGetPostARPaymentDataInsert } from 'js/api/api_netCore/api_accountsReceivable';
 
 // component
 import CurrentlyAccumulated from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/currentlyAccumulated';
@@ -26,6 +26,7 @@ export default function PaymentRequest() {
   const { id } = query;
 
   const { data } = useApiGetARPaymentData(id);
+  const {} = data ?? {};
 
   // MARK:RENDER
 
@@ -41,9 +42,13 @@ export default function PaymentRequest() {
         </div>
       </div>
 
+      {/* 工程項目明細 */}
       <ProjectDetail className="mb-4" />
+      {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" />
+      {/* 本次請款明細 含沖銷明細 */}
       <CurrentPaymentRequestDetails className="mb-10" />
+      {/* 請款紀錄 */}
       <History />
 
       {/*  */}
