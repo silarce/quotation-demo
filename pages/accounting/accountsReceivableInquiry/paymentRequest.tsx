@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import classNames from 'classnames';
 import dayjs, { Dayjs } from 'dayjs';
+import Router from 'next/router';
 
 import Btn, { Btn_UpDown } from 'components/global/gear/button/btn_fong';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
@@ -29,7 +30,7 @@ export default function PaymentRequest() {
         <div className="flex justify-between items-center">
           <div className="text-xl font-semibold">工程項目明細</div>
           <div>
-            <Btn>返回</Btn>
+            <Btn onClick={Router.back}>返回</Btn>
           </div>
         </div>
       </div>
