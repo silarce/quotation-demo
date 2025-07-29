@@ -271,14 +271,17 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
     align: 'center',
     render: (_, record) => {
       return (
-        <Link
-          href={{
-            pathname: 'paymentRequest',
-            query: { id: record.id },
-          }}
-        >
+        <div className="flex justify-center items-center gap-6">
+          <Link
+            href={{
+              pathname: 'paymentRequest',
+              query: { id: record.id },
+            }}
+          >
+            <Icon_note className="inline w-[16px] h-[16px] text-blue01" />
+          </Link>
           <Icon_trash className="inline w-[16px] h-[16px] text-red01" />
-        </Link>
+        </div>
       );
     },
   },

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import classNames from 'classnames';
 import dayjs, { Dayjs } from 'dayjs';
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 
 import Btn, { Btn_UpDown } from 'components/global/gear/button/btn_fong';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
@@ -17,8 +17,23 @@ import Icon_next from 'public/image/icon/fong/next.svg';
 
 import scss from './paymentRequest.module.scss';
 
+import { useApiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+
+// ============================================================================
+
+interface Tquery {
+  id?: string;
+}
+
+// ============================================================================
 // MARK: START
 export default function PaymentRequest() {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const { id } = query;
+
+  const { data } = useApiGetARPaymentData(id);
+
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
 
   // MARK:RENDER
@@ -30,7 +45,7 @@ export default function PaymentRequest() {
         <div className="flex justify-between items-center">
           <div className="text-xl font-semibold">工程項目明細</div>
           <div>
-            <Btn onClick={Router.back}>返回</Btn>
+            <Btn onClick={router.back}>返回</Btn>
           </div>
         </div>
       </div>
