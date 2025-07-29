@@ -10,7 +10,7 @@ import Btn from 'components/global/gear/button/btn_fong';
 import Tab from 'components/global/gear/button/tab';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
-import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_addNewOffsetAmount/indext';
+import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
 import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
