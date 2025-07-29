@@ -53,6 +53,8 @@ import {
 } from 'js/api/api_certificated-doc';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+import { fixTailwindImgDisplay } from 'js/utils/dlPdf';
+
 // ===============================================================================
 
 type Tquery = {
@@ -1047,31 +1049,33 @@ const PdfPreview_pre = ({
     let isFirst = true;
     let item;
 
-    for (item of refPdf.current) {
-      if (!item) {
-        continue;
+    await fixTailwindImgDisplay(async () => {
+      for (item of refPdf.current) {
+        if (!item) {
+          continue;
+        }
+
+        const image = await html2canvas(item, {
+          scale: 3,
+          // useCORS: true,
+          // allowTaint: true,
+        }).then((canvas) => {
+          const image = canvas.toDataURL('image/JPEG');
+
+          return image;
+        });
+
+        if (!isFirst) {
+          doc.addPage();
+        }
+
+        isFirst = false;
+        // 留作參考
+        // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+        // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+        doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
       }
-
-      const image = await html2canvas(item, {
-        scale: 3,
-        // useCORS: true,
-        // allowTaint: true,
-      }).then((canvas) => {
-        const image = canvas.toDataURL('image/JPEG');
-
-        return image;
-      });
-
-      if (!isFirst) {
-        doc.addPage();
-      }
-
-      isFirst = false;
-      // 留作參考
-      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
-    }
+    });
 
     doc.save(`${docStyle}證明書_${projectName}.pdf`);
     showRootLoading(false);

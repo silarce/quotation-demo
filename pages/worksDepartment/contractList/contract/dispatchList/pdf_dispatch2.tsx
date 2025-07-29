@@ -166,7 +166,6 @@ export default function Pdf_dispatch2({
 
             <Cell className={classNames('col-span-8 row-span-8', scss.content)}>{content}</Cell>
 
-
             <Cell className={classNames('col-span-2 gap-6', cn2, ch6)}>{strToSpan('派工批價')}</Cell>
             {/* row7 */}
             <Cell className={cn2}>{booleanToV(合約內)}</Cell>

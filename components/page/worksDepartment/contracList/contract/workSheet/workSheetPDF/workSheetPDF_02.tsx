@@ -4,8 +4,6 @@ import _ from 'lodash';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-import { download } from 'js/utils/downloadPdf.js';
-
 // component
 import Miku_frontend_table02, { Tcontrol_table02 } from 'components/otherProject/miku-frontend/Table02';
 
@@ -21,6 +19,8 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import scss from './workSheetPDF.module.scss';
 
 // import { downloadExcel } from '../downloadExcel';
+
+import { fixTailwindImgDisplay } from 'js/utils/dlPdf';
 
 // =====================================================================
 
@@ -185,7 +185,7 @@ export default function WorkSheetPDF_02({
   //   });
   // };
 
-  const exportPDF2 = () => {
+  const exportPDF2 = async () => {
     const report = document.getElementById('report2');
 
     const svgElements = document.body.querySelectorAll('svg');
@@ -196,54 +196,56 @@ export default function WorkSheetPDF_02({
       item.style.height = '';
     });
 
-    html2canvas(report!, {
-      scale: 2,
-    }).then((canvas) => {
-      const pdf = new jsPDF('landscape', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imageWidth = canvas.width;
-      const imageHeight = canvas.height;
-      const w = report!.clientWidth;
-      const h = report!.clientHeight / pages2;
+    await fixTailwindImgDisplay(async () => {
+      html2canvas(report!, {
+        scale: 2,
+      }).then((canvas) => {
+        const pdf = new jsPDF('landscape', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imageWidth = canvas.width;
+        const imageHeight = canvas.height;
+        const w = report!.clientWidth;
+        const h = report!.clientHeight / pages2;
 
-      console.log(pageWidth, pageHeight, imageWidth, imageHeight, w, h);
+        console.log(pageWidth, pageHeight, imageWidth, imageHeight, w, h);
 
-      for (let i = 0; i < pages2; i++) {
-        const onePageCanvas = document.createElement('canvas');
-        onePageCanvas.setAttribute('width', imageWidth.toString());
-        onePageCanvas.setAttribute('height', (imageHeight / pages2).toString());
+        for (let i = 0; i < pages2; i++) {
+          const onePageCanvas = document.createElement('canvas');
+          onePageCanvas.setAttribute('width', imageWidth.toString());
+          onePageCanvas.setAttribute('height', (imageHeight / pages2).toString());
 
-        const sX = 0;
+          const sX = 0;
 
-        const sY = (imageHeight / pages2) * i;
+          const sY = (imageHeight / pages2) * i;
 
-        const sWidth = imageWidth;
+          const sWidth = imageWidth;
 
-        const sHeight = imageHeight / pages2;
+          const sHeight = imageHeight / pages2;
 
-        const dX = 0;
+          const dX = 0;
 
-        const dY = 0;
+          const dY = 0;
 
-        const dWidth = imageWidth;
+          const dWidth = imageWidth;
 
-        const dHeight = imageHeight / pages2;
+          const dHeight = imageHeight / pages2;
 
-        const ctx = onePageCanvas.getContext('2d');
-        ctx?.drawImage(canvas, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
+          const ctx = onePageCanvas.getContext('2d');
+          ctx?.drawImage(canvas, sX, sY, sWidth, sHeight, dX, dY, dWidth, dHeight);
 
-        const canvasDataURL = onePageCanvas.toDataURL('image/png', 1.0);
+          const canvasDataURL = onePageCanvas.toDataURL('image/png', 1.0);
 
-        const ratio = pageWidth / imageWidth;
-        pdf.addImage(canvasDataURL, 'PNG', 0, 0, imageWidth * ratio, (imageHeight / pages2) * ratio);
+          const ratio = pageWidth / imageWidth;
+          pdf.addImage(canvasDataURL, 'PNG', 0, 0, imageWidth * ratio, (imageHeight / pages2) * ratio);
 
-        if (i !== pages2 - 1) {
-          pdf.addPage();
+          if (i !== pages2 - 1) {
+            pdf.addPage();
+          }
         }
-      }
 
-      pdf.save(`${''} 廠務部工作表.pdf`);
+        pdf.save(`${''} 廠務部工作表.pdf`);
+      });
     });
   };
 
