@@ -34,7 +34,11 @@ export const getTaiwanDateStr = (
     withUnit?: boolean;
   } = {}
 ) => {
-  const d = dayjs(date || undefined);
+  if (!date) {
+    return '';
+  }
+
+  const d = dayjs(date);
 
   if (!d.isValid()) {
     return 'invalid date';
