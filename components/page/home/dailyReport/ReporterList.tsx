@@ -73,7 +73,7 @@ export default function ReporterList({
 
               const { date, employee, id: reportId, reviewStatus } = report;
               const { chName, id: employeeId } = employee;
-              const twDate = dayjs(convertDate_reduce1911(date)).format('y-MM-DD');
+              const twDate = getTaiwanDateStr(date);
 
               const tab: Ttab = {
                 reportId,
