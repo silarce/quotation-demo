@@ -277,7 +277,7 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
             query: { id: record.id },
           }}
         >
-          <Icon_note className="inline w-[16px] h-[16px] text-blue01" />
+          <Icon_trash className="inline w-[16px] h-[16px] text-red01" />
         </Link>
       );
     },
