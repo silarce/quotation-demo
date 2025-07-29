@@ -46,7 +46,7 @@ export default function PaymentRequest() {
       {/* 工程項目明細 */}
       <ProjectDetail className="mb-4" data={salesOrderItems} />
       {/* 目前累計 */}
-      <CurrentlyAccumulated className="mb-10" />
+      <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
       {/* 本次請款明細 含沖銷明細 */}
       <CurrentPaymentRequestDetails className="mb-10" />
       {/* 請款紀錄 */}
