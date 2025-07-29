@@ -102,11 +102,13 @@ export default function MonthCalendar({ year, monthIndex, holidays = [] }: Props
             return (
               <div
                 key={`${date.format('YYYY-MM-DD')}-${i}`}
-                className={` h-[80px] relative flex justify-end p-5 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
+                className={` h-[100px] relative flex justify-center p-5  border-b border-[#A8A8A8] ${textColor} ${bgColor} ${
+                  i % 7 === 6 ? 'border-r' : ''
+                }`}
               >
                 <div
                   className={`
-                              absolute top-[60%] h-[20px] bg-[#EA1833] px-[44px] text-xs text-left text-[#FFFFFF] flex items-center 
+                              absolute top-[50px] h-[20px] bg-[#EA1833] pl-[76px] text-xs text-left text-[#FFFFFF] flex items-center 
                               ${isStart ? 'left-[20px]' : 'left-0'} 
                               ${isEnd ? 'right-[20px]' : 'right-0'}
                               ${isStart ? 'rounded-l-full ' : ''}
@@ -126,7 +128,9 @@ export default function MonthCalendar({ year, monthIndex, holidays = [] }: Props
           return (
             <div
               key={`${date.format('YYYY-MM-DD')}-${i}`}
-              className={`h-[80px] relative flex justify-end p-5 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
+              className={`h-[100px] relative flex justify-center p-5 border-b border-[#A8A8A8] ${textColor} ${bgColor} ${
+                i % 7 === 6 ? 'border-r' : ''
+              }`}
             >
               {date.date()}
             </div>

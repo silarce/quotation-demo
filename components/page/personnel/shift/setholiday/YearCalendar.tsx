@@ -59,9 +59,9 @@ export default function YearCalendar({ year, monthIndex, holidays = [] }: Props)
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d, idx) => (
             <div
               key={d}
-              className={`h-[64px] flex items-center justify-center border-r border-b border-[#A8A8A8] ${
+              className={`h-[64px] flex items-center justify-center  border-b border-[#A8A8A8] ${
                 idx === 0 || idx === 6 ? 'text-red-500' : 'text-[#212121]'
-              }`}
+              } ${idx % 7 === 6 ? 'border-r' : ''}`}
             >
               {d}
             </div>
@@ -75,7 +75,7 @@ export default function YearCalendar({ year, monthIndex, holidays = [] }: Props)
 
             const textColor = isCurrentMonth
               ? isSunday || isSaturday
-                ? 'text-red-500'
+                ? 'text-[#EA1833]'
                 : 'text-black'
               : 'text-gray-400';
 
@@ -90,25 +90,27 @@ export default function YearCalendar({ year, monthIndex, holidays = [] }: Props)
             return (
               <div
                 key={i}
-                className={`h-[64px] relative flex items-start justify-end p-2 border-r border-b border-[#A8A8A8] ${textColor} ${bgColor}`}
+                className={`h-[64px] relative flex items-start justify-center p-2  border-b border-[#A8A8A8] ${bgColor} ${
+                  i % 7 === 6 ? 'border-r' : ''
+                }`}
               >
                 {holiday && (
                   <div
                     className={`
-    absolute top-[60%] left-0 right-0 h-[20px] bg-[#EA1833]
-    text-xs text-white flex items-center pl-[8px] pr-[8px]
-    ${isStart ? 'rounded-l-full left-5' : ''}
-    ${isEnd ? 'rounded-r-full right-5' : ''}
-    ${isInRange ? 'rounded-none' : ''}
-    ${isStart && isEnd ? 'rounded-full' : ''}
-    whitespace-nowrap overflow-hidden max-w-full
-  `}
+                                absolute top-[40px] left-0 right-0 h-[20px] bg-[#EA1833]
+                              text-xs text-white flex items-center pl-[8px] pr-[8px]
+                              ${isStart ? 'rounded-l-full left-5' : ''}
+                              ${isEnd ? 'rounded-r-full right-5' : ''}
+                              ${isInRange ? 'rounded-none' : ''}
+                              ${isStart && isEnd ? 'rounded-full' : ''}
+                              whitespace-nowrap overflow-hidden max-w-full
+                              `}
                     style={{ transform: 'translateY(-50%)' }}
                   >
                     {isStart ? holiday.label : ''}
                   </div>
                 )}
-                <span className="relative z-10">{date.date()}</span>
+                <span className={`relative z-10 ${textColor}`}>{date.date()}</span>
               </div>
             );
           })}

@@ -345,11 +345,22 @@
 .evenCheckboxGroup {
   display: flex;
   gap: 8px;
-
   :global(.ant-checkbox-group-item) {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  :global(.ant-radio-wrapper) {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-inline-end: 0 !important; // 移除多餘間距
+  }
+  :global(.ant-radio-group) {
+    display: flex;
+    justify-items: center;
+    background-color: yellow !important;
   }
 }
