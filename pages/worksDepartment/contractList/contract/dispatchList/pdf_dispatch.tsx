@@ -10,6 +10,8 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 // css
 import scss from './pdf_dispatch.module.scss';
 
+import { fixTailwindImgDisplay } from 'js/utils/dlPdf';
+
 // ===============================================================================
 
 type Tdata = {
@@ -59,20 +61,22 @@ export default function Pdf_dispatch({ data }: { data: Tdata }) {
 
       const pageHeight = doc.internal.pageSize.getHeight();
 
-      const image = await html2canvas(ref_pdf.current, {
-        scale: 5,
-        // useCORS: true,
-        // allowTaint: true,
-      }).then((canvas) => {
-        const image = canvas.toDataURL('image/JPEG');
+      await fixTailwindImgDisplay(async () => {
+        const image = await html2canvas(ref_pdf.current, {
+          scale: 5,
+          // useCORS: true,
+          // allowTaint: true,
+        }).then((canvas) => {
+          const image = canvas.toDataURL('image/JPEG');
 
-        return image;
+          return image;
+        });
+
+        // 留作參考
+        // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+        // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+        doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
       });
-
-      // 留作參考
-      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
 
       doc.save(`派工單_${data.customerName}_${data.idNumber}.pdf`);
 

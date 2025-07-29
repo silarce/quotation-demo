@@ -5,6 +5,8 @@ import dayjs from 'dayjs';
 // global gear
 import { showRootLoading } from 'components/global/gear/loadingCover/rootLoadingCover';
 
+import { fixTailwindImgDisplay } from 'js/utils/dlPdf';
+
 const dlPdf = async ({
   ref_pdf,
   fileName,
@@ -26,35 +28,38 @@ const dlPdf = async ({
   let isFirst = true;
   let item;
 
-  for (item of ref_pdf.current) {
-    if (!item) {
-      continue;
+  await fixTailwindImgDisplay(async () => {
+    for (item of ref_pdf.current) {
+      if (!item) {
+        continue;
+      }
+
+      // =====================================================
+
+      const image = await html2canvas(item, {
+        scale: 3,
+        // 關於cookie的問題，這三個都沒用
+        // useCORS: true,
+        // allowTaint: true,
+        // credentials: true,
+      }).then((canvas) => {
+        const image = canvas.toDataURL('image/JPEG');
+
+        return image;
+      });
+
+      // =====================================================
+      if (!isFirst) {
+        doc.addPage();
+      }
+
+      isFirst = false;
+      // 留作參考
+      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
     }
-
-    // =====================================================
-    const image = await html2canvas(item, {
-      scale: 3,
-      // 關於cookie的問題，這三個都沒用
-      // useCORS: true,
-      // allowTaint: true,
-      // credentials: true,
-    }).then((canvas) => {
-      const image = canvas.toDataURL('image/JPEG');
-
-      return image;
-    });
-
-    // =====================================================
-    if (!isFirst) {
-      doc.addPage();
-    }
-
-    isFirst = false;
-    // 留作參考
-    // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-    // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-    doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
-  }
+  });
 
   const today = dayjs().format('YYYY-MM-DD');
   doc.save(`${fileName}_${today}.pdf`);

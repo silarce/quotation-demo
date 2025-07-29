@@ -36,6 +36,8 @@ import { Class_legacyContract } from 'hooks/quotation/legacy/useLegacyContract';
 import { optionsCreator_quotationStatus } from 'js/utils/options/options';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
+import { fixTailwindImgDisplay } from 'js/utils/dlPdf';
+
 // ============================================================================
 
 const quotationStatusLookup: { [key: string]: string } = {};
@@ -166,31 +168,33 @@ export default function QuotationPdf({
     let isFirst = true;
     let item;
 
-    for (item of refPdf.current) {
-      if (!item) {
-        continue;
+    await fixTailwindImgDisplay(async () => {
+      for (item of refPdf.current) {
+        if (!item) {
+          continue;
+        }
+
+        const image = await html2canvas(item, {
+          scale: 3,
+          // useCORS: true,
+          // allowTaint: true,
+        }).then((canvas) => {
+          const image = canvas.toDataURL('image/JPEG');
+
+          return image;
+        });
+
+        if (!isFirst) {
+          doc.addPage();
+        }
+
+        isFirst = false;
+        // 留作參考
+        // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+        // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+        doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
       }
-
-      const image = await html2canvas(item, {
-        scale: 3,
-        // useCORS: true,
-        // allowTaint: true,
-      }).then((canvas) => {
-        const image = canvas.toDataURL('image/JPEG');
-
-        return image;
-      });
-
-      if (!isFirst) {
-        doc.addPage();
-      }
-
-      isFirst = false;
-      // 留作參考
-      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
-    }
+    });
 
     doc.save(`${quotationNumber}.pdf`);
     showRootLoading(false);

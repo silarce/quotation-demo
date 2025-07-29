@@ -23,6 +23,8 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import scss from './workSheetPDF.module.scss';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
+import { fixTailwindImgDisplay } from 'js/utils/dlPdf';
+
 // =====================================================================
 
 type Textends = {
@@ -454,27 +456,29 @@ const dlPdf = async ({ eleArr: eleArr, pdfName }: { eleArr: (HTMLDivElement | nu
   let isFirst = true;
   let item;
 
-  for (item of eleArr) {
-    if (!item) {
-      continue;
+  await fixTailwindImgDisplay(async () => {
+    for (item of eleArr) {
+      if (!item) {
+        continue;
+      }
+
+      const image = await html2canvas(item, {
+        scale: 3,
+      }).then((canvas) => {
+        const image = canvas.toDataURL('image/JPEG');
+
+        return image;
+      });
+
+      if (!isFirst) {
+        doc.addPage();
+      }
+
+      isFirst = false;
+
+      doc.addImage(image, 'png', 0, 0, pageWidth, pageHeight);
     }
-
-    const image = await html2canvas(item, {
-      scale: 3,
-    }).then((canvas) => {
-      const image = canvas.toDataURL('image/JPEG');
-
-      return image;
-    });
-
-    if (!isFirst) {
-      doc.addPage();
-    }
-
-    isFirst = false;
-
-    doc.addImage(image, 'png', 0, 0, pageWidth, pageHeight);
-  }
+  });
 
   doc.save(`工作表${pdfName}.pdf`);
   showRootLoading(false);
