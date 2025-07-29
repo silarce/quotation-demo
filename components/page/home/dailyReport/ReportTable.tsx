@@ -39,6 +39,7 @@ import iconMove from 'public/image/icon/move.svg?url';
 // other
 import { AppContext } from 'pages/_app';
 import { DailyReportContext } from 'pages/home/dailyReport';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // dnd
 import {
@@ -1190,7 +1191,8 @@ const TitlePanel = () => {
     reqApiPatchDailyReports_my,
   } = useContext(DailyReportContext);
   const employeeChName = reportInEdit?.employeeChName;
-  let date = dayjs(reportInEdit?.date).subtract(1911, 'year').format('y-MM-DD');
+
+  let date = getTaiwanDateStr(reportInEdit?.date);
 
   if (date === 'Invalid date') {
     date = '請選擇日期';

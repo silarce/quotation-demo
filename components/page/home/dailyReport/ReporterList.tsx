@@ -16,7 +16,7 @@ import scss from './reporterList.module.scss';
 import { TdailyReportDto } from 'js/api/api_dailyReport';
 import { TdailyReportReviewStatusDto } from 'js/api/dtoTypes';
 import { Ttab } from 'pages/home/dailyReport';
-import { convertDate_reduce1911 } from 'js/utils/helpers/date/convertDate';
+import { convertDate_reduce1911, getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 type TgroupReport = { date: string; reportArr: TdailyReportDto[] };
 
@@ -47,7 +47,8 @@ export default function ReporterList({
     <div className={scss.container}>
       {groupReportArr.map((group, gIndex) => {
         const { date, reportArr } = group;
-        const twDate = dayjs(convertDate_reduce1911(date)).format('y-MM-DD');
+
+        const twDate = getTaiwanDateStr(date);
 
         return (
           <div key={gIndex}>
@@ -72,7 +73,7 @@ export default function ReporterList({
 
               const { date, employee, id: reportId, reviewStatus } = report;
               const { chName, id: employeeId } = employee;
-              const twDate = dayjs(convertDate_reduce1911(date)).format('y-MM-DD');
+              const twDate = getTaiwanDateStr(date);
 
               const tab: Ttab = {
                 reportId,

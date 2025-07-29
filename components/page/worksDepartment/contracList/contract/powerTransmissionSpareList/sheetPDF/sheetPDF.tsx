@@ -13,6 +13,8 @@ import { showRootLoading } from 'components/global/gear/loadingCover/rootLoading
 
 import scss from './sheetPDF.module.scss';
 
+import { fixTailwindImgDisplay } from 'js/utils/dlPdf';
+
 // =====================================================================
 
 type Tcontrol_info = {
@@ -81,33 +83,35 @@ export default function SheetPDF({
     let isFirst = true;
     let item;
 
-    for (item of refPdf.current) {
-      if (!item) {
-        continue;
+    await fixTailwindImgDisplay(async () => {
+      for (item of refPdf.current) {
+        if (!item) {
+          continue;
+        }
+
+        const image = await html2canvas(
+          item
+          // ,{
+          //   useCORS: true,
+          //   allowTaint: true,
+          // }
+        ).then((canvas) => {
+          const image = canvas.toDataURL('image/JPEG');
+
+          return image;
+        });
+
+        if (!isFirst) {
+          doc.addPage();
+        }
+
+        isFirst = false;
+        // 留作參考
+        // doc.addImage(image, "JPEG", 0, 0, 595, 842);
+        // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
+        doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
       }
-
-      const image = await html2canvas(
-        item
-        // ,{
-        //   useCORS: true,
-        //   allowTaint: true,
-        // }
-      ).then((canvas) => {
-        const image = canvas.toDataURL('image/JPEG');
-
-        return image;
-      });
-
-      if (!isFirst) {
-        doc.addPage();
-      }
-
-      isFirst = false;
-      // 留作參考
-      // doc.addImage(image, "JPEG", 0, 0, 595, 842);
-      // doc.addImage(image, "JPEG", 0, 0, canvas.width, canvas.height);
-      doc.addImage(image, 'JPEG', 0, 0, pageWidth, pageHeight);
-    }
+    });
 
     doc.save(`${control_info.projectName}-${control_info.projectNumber}.pdf`);
     showRootLoading(false);

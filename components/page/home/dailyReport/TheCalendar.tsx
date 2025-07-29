@@ -5,7 +5,7 @@ import classNames from 'classnames';
 
 // 行事曆元件
 import BigCalendar from 'react-big-calendar';
-import { EventWrapperProps, Calendar, momentLocalizer } from 'react-big-calendar';
+import { EventWrapperProps, Calendar, dayjsLocalizer } from 'react-big-calendar';
 
 // global gear
 import MyButton from 'components/global/gear/button/myButton';
@@ -26,7 +26,7 @@ import { TuserDto, Tparams } from 'js/api/dtoTypes';
 import { TdailyReportDto } from 'js/api/api_dailyReport';
 import { Ttab } from 'pages/home/dailyReport';
 
-const localizer = momentLocalizer(dayjs);
+const localizer = dayjsLocalizer(dayjs);
 
 // ===========================================================================
 
