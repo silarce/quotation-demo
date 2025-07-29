@@ -1,16 +1,16 @@
 import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 import Input from 'components/global/myCom/Input/Input';
-import AddButton from 'components/global/myCom/button/AddButton';
 import { useEffect, useState } from 'react';
 import SearchButton from 'components/global/myCom/button/searchButton';
 import ClearButton from 'components/global/myCom/button/clearButton';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
-import editIcon from 'public/image/icon/note.svg?url';
+import listIcon from 'public/image/icon/fong/Procurement2.svg?url';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { Table } from 'antd';
 import { useRouter } from 'next/router';
 import MySelect from 'components/global/myCom/select/mySelect';
+import Btn from 'components/global/gear/button/btn_fong';
 
 // api
 import { getEmployeeList } from 'components/page/organization/employee/api';
@@ -168,7 +168,7 @@ export default function EmployeeData() {
       render: (_, record) => (
         <div className="flex justify-center gap-5">
           <Image
-            src={editIcon}
+            src={listIcon}
             alt="edit"
             onClick={() => router.push(`/setting/organization/employeeData?emp_id=${record.key}`)}
             style={{ cursor: 'pointer', width: '20px', height: '20px' }}
@@ -239,11 +239,15 @@ export default function EmployeeData() {
           <div className="flex gap-4 h-[40px]">
             <Input marginLeft="0px" value={input} onChange={setInput} placeholder="請輸入員工代碼/姓名" width="176px" />
             <MySelect className="w-full" marginLeft="0px" placeholder="選擇部門" />
-            <SearchButton onClick={fetchEmployeeList} />
+            <Btn theme="query" onClick={fetchEmployeeList} className="whitespace-nowrap">
+              查詢資料
+            </Btn>
           </div>
           <div className="flex gap-6 h-[40px]">
             {checkedEmployees.length > 0 && <ClearButton label="全部刪除" onClick={() => console.log('Clear!')} />}
-            <AddButton label="新增員工" onClick={() => router.push('/organization/employee/addEmployee')} />
+            <Btn theme="add" onClick={() => router.push('/organization/employee/addEmployee')}>
+              新增員工
+            </Btn>
           </div>
         </div>
         <div className="px-6">
