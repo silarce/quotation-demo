@@ -10,10 +10,9 @@ import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
 //
 import {
-  //
   DataEntry_fong,
   DatePicker,
-  Checkbox,
+  RadioGroup,
   DateRangePicker,
   Select,
   CheckboxGroup,
@@ -56,8 +55,6 @@ export default function SetHoliday() {
     );
   };
 
-  const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-
   const handle_addRoutine = () => {
     modal_empty({
       width: 500,
@@ -72,29 +69,21 @@ export default function SetHoliday() {
               </>
             }
           >
-            <DataEntry_fong caption={`日期區間`}>
+            <DataEntry_fong caption={`日期區間`} isMust={true}>
               <DateRangePicker disabled={false} />
             </DataEntry_fong>
             <div className="mt-5">
-              <span>選擇例行休假日</span>
-              {/* <div className="flex w-full mt-3">
-                {weekdays.map((day, idx) => (
-                  <Checkbox key={idx} className="flex-1 flex flex-col items-center gap-3">
-                    {day}
-                  </Checkbox>
-                ))}
-              </div> */}
-              <DataEntry_fong caption={``}>
+              <DataEntry_fong caption={`選擇例行休假日`} isMust={true}>
                 <CheckboxGroup
                   className={scss.evenCheckboxGroup}
                   options={[
                     { label: '日', value: '1' },
                     { label: '一', value: '2' },
                     { label: '二', value: '3' },
-                    { label: '三', value: '3' },
-                    { label: '四', value: '3' },
-                    { label: '五', value: '3' },
-                    { label: '六', value: '3' },
+                    { label: '三', value: '4' },
+                    { label: '四', value: '5' },
+                    { label: '五', value: '6' },
+                    { label: '六', value: '7' },
                   ]}
                 />
               </DataEntry_fong>
@@ -127,7 +116,7 @@ export default function SetHoliday() {
                 <DateRangePicker disabled={false} />
               </DataEntry_fong>
               <DataEntry_fong caption={`類型`} isMust={true}>
-                <CheckboxGroup
+                <RadioGroup
                   className={scss.evenCheckboxGroup}
                   options={[
                     { label: '國定假日', value: '1' },
