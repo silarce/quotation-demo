@@ -26,7 +26,8 @@ export default function PaymentRequest() {
   const { id } = query;
 
   const { data } = useApiGetARPaymentData(id);
-  const {} = data ?? {};
+  const { accountsReceivables, paymentRequest, salesOrder } = data ?? {};
+  const salesOrderItems = salesOrder?.salesOrderItems ?? [];
 
   // MARK:RENDER
 
@@ -43,7 +44,7 @@ export default function PaymentRequest() {
       </div>
 
       {/* 工程項目明細 */}
-      <ProjectDetail className="mb-4" />
+      <ProjectDetail className="mb-4" data={salesOrderItems} />
       {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" />
       {/* 本次請款明細 含沖銷明細 */}
