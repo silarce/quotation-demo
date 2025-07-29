@@ -22,6 +22,9 @@ import BackButton from 'components/global/myCom/button/BackButton';
 import ExtendButton from 'components/global/myCom/button/ExtendButton';
 import LabeledSelectV2 from 'components/global/myCom/select/mySelectV2';
 import LabeledDatePickerV2 from 'components/global/myCom/date/myDateV2';
+import Btn from 'components/global/gear/button/btn_fong';
+
+import { Checkbox } from 'components/global/gear/dataEntry';
 
 export type OptionType = {
   label: string;
@@ -35,6 +38,7 @@ interface Dependent {
   idNumber: string;
   isForeign: string;
   relation: string;
+  isInsured?: boolean;
 }
 
 interface InsuranceHistory {
@@ -157,7 +161,7 @@ export default function Organization() {
     ]);
   };
 
-  const updateDependentField = (id: string, key: keyof Dependent, value: string) => {
+  const updateDependentField = (id: string, key: keyof Dependent, value: string | boolean) => {
     setDependents((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
   };
 
@@ -225,8 +229,12 @@ export default function Organization() {
             }}
             className=" h-[40px]"
           />
-          <ClearButton label="刪除" className="h-[40px] " onClick={() => console.log('Clear!')} />
-          <SaveButton label="儲存" onClick={() => console.log('save')} className="h-[40px] w-[95px]" />
+          <Btn theme="trash" onClick={() => console.log('Clear!')}>
+            刪除
+          </Btn>
+          <Btn theme="save" onClick={() => console.log('save')}>
+            儲存
+          </Btn>
           <LeaveModal isOpen={isModalOpen} onConfirm={() => router.back()} onCancel={() => setIsModalOpen(false)} />
         </div>
       </div>
@@ -637,7 +645,14 @@ export default function Organization() {
         </div>
         {dependents.map((dep) => (
           <div key={dep.id} className="grid grid-cols-12 gap-[24px] relative mb-[16px]">
-            <div className="col-span-3">
+            <div className="flex col-span-3">
+              <div className="flex flex-col justify-center items-center pr-[24px]">
+                <Checkbox
+                  checked={!!dep.isInsured}
+                  onChange={(e) => updateDependentField(dep.id, 'isInsured', e.target.checked)}
+                ></Checkbox>
+                <span className="whitespace-nowrap">計入健保扶養</span>
+              </div>
               <LabeledInputV2
                 label="員工眷屬姓名"
                 value={dep.name}
@@ -649,11 +664,20 @@ export default function Organization() {
             <div className="col-span-3">
               <LabeledDatePickerV2
                 label="員工眷屬生日"
-                required
+                required={!!dep.isInsured}
                 placeholder="請選擇"
                 className="w-full"
                 value={dep.birthday ? dayjs(dep.birthday) : null}
                 onChange={(date, dateString) => updateDependentField(dep.id, 'birthday', dateString as string)}
+              />
+            </div>
+            <div className="col-span-2">
+              <LabeledInputV2
+                label="眷屬身分證"
+                value={dep.idNumber}
+                onChange={(val) => updateDependentField(dep.id, 'idNumber', val)}
+                placeholder="- -"
+                required={!!dep.isInsured}
               />
             </div>
             <div className="col-span-2">
@@ -667,18 +691,9 @@ export default function Organization() {
               />
             </div>
             <div className="col-span-2">
-              <LabeledInputV2
-                label="眷屬身分證"
-                value={dep.idNumber}
-                onChange={(val) => updateDependentField(dep.id, 'idNumber', val)}
-                placeholder="- -"
-                required
-              />
-            </div>
-            <div className="col-span-2">
               <LabeledSelectV2
                 label="眷屬是否國外"
-                required
+                required={!!dep.isInsured}
                 placeholder="請選擇"
                 value={dep.isForeign}
                 onChange={(val) => updateDependentField(dep.id, 'isForeign', val)}
