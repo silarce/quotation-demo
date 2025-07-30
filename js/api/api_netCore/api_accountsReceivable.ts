@@ -369,6 +369,18 @@ const apiGetPostARPaymentDataInsert = async (accountsReceivableId: string, body:
 //   };
 // };
 
+const apiPostInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => {
+  const api = '/api/AccountsReceivable/InsertPaymentRequest';
+
+  return axi_monkey.post(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '新增請款單失敗',
+      content: error.message,
+    });
+  });
+};
+
 // ========================================================================
 
 // MARK:Tres_apiGetARPaymentData
@@ -633,12 +645,52 @@ interface Tres_apiGetARPaymentDataInsert {
   };
 }
 
+// MARK:Tbody_insertPaymentRequest
+interface Tbody_insertPaymentRequest {
+  paymentRequest: {
+    createdAt: string; // 建立時間,
+    createdBy: string; // 建立人員(員工編號),
+    updatedAt: string; //  修改時間,
+    updatedBy: string; // 修改人員(員工編號),
+
+    accountsReceivableId: string; // 應收帳款Id,
+    sourceFormType: string; //  來源類別-accountsReceivableList.sourceType,
+    sourceFormId: string; // 來源ID-accountsReceivableList.sourceId,
+
+    customerNumber: string; // 客戶編號,
+    customerName: string; // 客戶名稱,
+
+    type: string; // 請款類別 "訂金"、"支軌"、"安裝"...,
+
+    paymentCurrency: string; // 請款幣別,
+    foreignCurrencyAmount: string; // 外幣金額,
+    paymentAmount: string; // 請款金額
+  };
+  // 有發票號碼的話要加invoice
+  invoice?: {
+    invoiceBookId: string; // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+    invoiceNumber: string; // 發票號碼 "MV34400404",
+    invoiceDate: string; // 發票開立日期 "2025-05-03",
+    period: string; //發票期數 "3" // 發票本的期數
+
+    buyer: string; // 客戶抬頭 "一代冷氣空調有限公司",
+    taxId: string; //  統一編號 "54741781",
+    taxAddress: string | null; //  發票地址 null,
+
+    amount: string; // 發票金額 9524,
+    taxes: string; // 發票稅額 476,
+    totalAmount: number; // 總金額 10000,
+
+    remark: string | null; // 備註 null ,
+  };
+}
+
 // ========================================================================
 export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto, TaccountsReceivable, TpaymentRequest_Dto };
 
 export type { Tres_apiGetARPaymentData, Tres_apiGetARPaymentDataInsert };
 
-export { apiQuotationToAccountsReceivables, apiGetPostARPaymentDataInsert };
+export { apiQuotationToAccountsReceivables, apiGetPostARPaymentDataInsert, apiPostInsertPaymentRequest };
 
 export {
   useApiGetAccountsReceivablesList,
