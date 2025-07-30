@@ -247,16 +247,65 @@ const DataEntry_fong = ({
 // =============================================================================
 
 // MARK:Input
-const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => {
+const Input = ({
+  //
+  className,
+  toLocalString,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  /**
+   * 當 disabled 或 readOnly 為 true 時，將數字 value/defaultValue 格式化。
+   * toLocalString 的結果會覆蓋 value、defaultValue、type。
+   */
+  toLocalString?: boolean;
+}) => {
+  const props_localString = (() => {
+    if (!toLocalString) {
+      return {};
+    }
+
+    const { disabled, readOnly } = props;
+
+    if (!disabled && !readOnly) {
+      return {};
+    }
+
+    let { value, defaultValue } = props;
+
+    value = fomatInputNumber(value);
+    defaultValue = fomatInputNumber(defaultValue);
+
+    return {
+      type: 'text',
+      value,
+      defaultValue,
+    };
+  })();
+
   return (
     <input
       // 避免使用者滾動page時意外編輯了input的值
       onWheel={(e) => e.currentTarget.blur()}
       placeholder="- -"
       {...props}
+      {...props_localString}
       className={classNames('w-full placeholder:text-gray06', className)}
     />
   );
+};
+
+const fomatInputNumber = (value: React.InputHTMLAttributes<HTMLInputElement>['value']) => {
+  if (value === undefined || value === null || value === '') {
+    return value;
+  }
+
+  const value_num = Number(value);
+
+  if (isNaN(value_num)) {
+    return value;
+  }
+
+  return value_num.toLocaleString();
 };
 
 // MARK:Textarea
