@@ -673,6 +673,22 @@ interface TaccountsReceivable {
 
 // ==============================================================================
 
+// region invoice
+
+interface Tinvoice_Dto {
+  fullInvoiceNumber: string;
+  buyer: string | null;
+  taxId: string | null;
+  projectName: string | null;
+  invoiceAmount: number;
+  invoiceTaxes: number;
+  totalAmount: number;
+}
+
+// endregion invoice_type
+
+// ==============================================================================
+
 export type {
   //
   TnetCoreApiBody,
@@ -718,6 +734,8 @@ export type {
   TquotationListViewModel_Dto,
   TaccountsReceivable,
   TpaymentRequest_Dto,
+  //
+  Tinvoice_Dto,
 };
 
 export type {
