@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import dayjs from 'dayjs';
+import _ from 'lodash';
 
 // layer
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -93,8 +93,10 @@ export default function DispatchList() {
 
   // ----------------------------------------------------
   const dispatch_simpleArr = useMemo(() => {
+    const dispatchingArr_ordered = _.orderBy(dispatchingArr, ['dispatchDate'], ['desc']);
+
     const dispatch_simpleArr =
-      dispatchingArr?.map((item) => {
+      dispatchingArr_ordered?.map((item) => {
         return {
           dispatchDate: getTaiwanDateStr(item.dispatchDate),
           workerNameArr: item.workerEmployee.map((worker) => worker.chName || worker.enName),
