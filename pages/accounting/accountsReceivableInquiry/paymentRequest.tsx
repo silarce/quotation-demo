@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 
 import Btn from 'components/global/gear/button/btn_fong';
 
-import { useApiGetARPaymentData, apiGetPostARPaymentDataInsert } from 'js/api/api_netCore/api_accountsReceivable';
+import { useApiGetARPaymentData, useApiGetARPaymentDataInsert } from 'js/api/api_netCore/api_accountsReceivable';
 
 // component
 import CurrentlyAccumulated from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/currentlyAccumulated';
@@ -16,6 +16,7 @@ import scss from './paymentRequest.module.scss';
 
 interface Tquery {
   id?: string;
+  accountsReceivableId?: string;
 }
 
 // ============================================================================
@@ -23,10 +24,13 @@ interface Tquery {
 export default function PaymentRequest() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { id } = query;
+  const { id: paymentQuestId, accountsReceivableId } = query;
+  const isNew = !paymentQuestId;
 
-  const { data } = useApiGetARPaymentData(id);
-  const { accountsReceivables, paymentRequest, salesOrder } = data ?? {};
+  const { data: data_paymentQuest } = useApiGetARPaymentData(paymentQuestId);
+  const { data: data_forNew } = useApiGetARPaymentDataInsert(isNew ? accountsReceivableId : undefined);
+
+  const { accountsReceivables, paymentRequest, salesOrder } = data_paymentQuest ?? data_forNew ?? {};
   const salesOrderItems = salesOrder?.salesOrderItems ?? [];
 
   // MARK:RENDER

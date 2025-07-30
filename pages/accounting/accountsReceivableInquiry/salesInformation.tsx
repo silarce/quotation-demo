@@ -32,10 +32,10 @@ type TpaymentRequest = TaccountsReceivable['paymentRequests'][0];
 
 export default function SalesInformation() {
   const router = useRouter();
-  const { id } = router.query as Tquery;
-  const isNew = !id;
+  const { id: accountsReceivableId } = router.query as Tquery;
+  const isNew = !accountsReceivableId;
 
-  const { data, isFetching } = useGetAccountsReceivables(id);
+  const { data, isFetching } = useGetAccountsReceivables(accountsReceivableId);
 
   const { accountsReceivablesList, paymentRequests, salesOrderItem } = data ?? {};
 
@@ -158,9 +158,18 @@ export default function SalesInformation() {
         <div className="mt-10">
           <div className="mb-6">
             <span className="text-xl font-semibold mr-3">請款狀況</span>
-            <Link href="paymentRequest">
-              <Btn theme="cross">新增請款單</Btn>
-            </Link>
+            {data && (
+              <Link
+                href={{
+                  pathname: 'paymentRequest',
+                  query: {
+                    accountsReceivableId: data.accountsReceivablesList.id,
+                  },
+                }}
+              >
+                <Btn theme="cross">新增請款單</Btn>
+              </Link>
+            )}
           </div>
           <Table_antd columns={columns_paymentRequests} dataSource={paymentRequests} pagination={false} />
         </div>

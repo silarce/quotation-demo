@@ -307,67 +307,60 @@ const useApiGetARPaymentData = (
   };
 };
 
-const apiGetPostARPaymentDataInsert = async (accountsReceivableId: string, body: Tres_apiGetARPaymentDataInsert) => {
+const apiGetARPaymentDataInsert = async (accountsReceivableId: string) => {
   const api = '/api/AccountsReceivable/GetARPaymentDataInsert';
 
   const params = { accountsReceivableId };
 
-  return axi_monkey.post(api, body, { params }).then(({ data }) => data);
+  return axi_monkey.get<Tres_apiGetARPaymentDataInsert>(api, { params }).then(({ data }) => data);
 };
 
-// const apiGetARPaymentDataInsert = async (accountsReceivableId: string) => {
-//   const api = '/api/AccountsReceivable/GetARPaymentDataInsert';
-//   const params = { accountsReceivableId };
+const useApiGetARPaymentDataInsert = (
+  accountsReceivableId: string | undefined,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<Tres_apiGetARPaymentDataInsert | null>();
 
-//   return axi_monkey.get<Tres_apiGetARPaymentDataInsert>(api, { params }).then(({ data }) => data);
-// };
+  const update = async () => {
+    if (isFetching || !accountsReceivableId) {
+      return;
+    }
 
-// const useApiGetARPaymentDataInsert = (
-//   accountsReceivableId: string | undefined,
-//   {
-//     autoUpdate = true,
-//   }: {
-//     autoUpdate?: boolean;
-//   } = {}
-// ) => {
-//   const [isFetching, setIsFetching] = useState(false);
-//   const [res, setRes] = useState<Tres_apiGetARPaymentDataInsert | null>();
+    setIsFetching(true);
 
-//   const update = async () => {
-//     if (isFetching || !accountsReceivableId) {
-//       return;
-//     }
+    const res = await apiGetARPaymentDataInsert(accountsReceivableId)
+      .then((res) => {
+        setRes(res);
 
-//     setIsFetching(true);
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.notify.error({ message: '無法取得應收付款資料', description: err.message });
+        setRes(null);
 
-//     const res = await apiGetARPaymentDataInsert(accountsReceivableId)
-//       .then((res) => {
-//         setRes(res);
+        return null;
+      });
 
-//         return res;
-//       })
-//       .catch((err: AxiosError) => {
-//         myAlert.notify.error({ message: '無法取得應收付款資料', description: err.message });
-//         setRes(null);
+    setIsFetching(false);
 
-//         return null;
-//       });
+    return res;
+  };
 
-//     setIsFetching(false);
+  useEffect(() => {
+    autoUpdate && update();
+  }, [accountsReceivableId]);
 
-//     return res;
-//   };
-
-//   useEffect(() => {
-//     autoUpdate && update();
-//   }, [accountsReceivableId]);
-
-//   return {
-//     isFetching,
-//     data: res,
-//     update,
-//   };
-// };
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
+};
 
 const apiPostInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => {
   const api = '/api/AccountsReceivable/InsertPaymentRequest';
@@ -641,7 +634,7 @@ interface Tres_apiGetARPaymentDataInsert {
       taxes: number | null; //稅金
       attachedToProductId: string | null; //附加產品id
       dualPrice: number; //牌價
-    };
+    }[];
   };
 }
 
@@ -690,7 +683,7 @@ export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto, Taccoun
 
 export type { Tres_apiGetARPaymentData, Tres_apiGetARPaymentDataInsert };
 
-export { apiQuotationToAccountsReceivables, apiGetPostARPaymentDataInsert, apiPostInsertPaymentRequest };
+export { apiQuotationToAccountsReceivables, apiGetARPaymentDataInsert, apiPostInsertPaymentRequest };
 
 export {
   useApiGetAccountsReceivablesList,
@@ -698,5 +691,5 @@ export {
   useGetAccountsReceivables,
   useGetPaymentRequest,
   useApiGetARPaymentData,
-  // useApiGetARPaymentDataInsert,
+  useApiGetARPaymentDataInsert,
 };
