@@ -7,6 +7,8 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 
 import scss from './licensePlateSelector.module.scss';
 
+import { licensePlateLookUp } from 'config/lookupTable';
+
 // other
 import { AppContext } from 'pages/_app';
 
@@ -73,17 +75,7 @@ export default function LicensePlateSelector({
   );
 }
 
-const licensePlateArrOption = [
-  { value: 'BRC-3939', label: 'BRC-3939' },
-  { value: 'BRW-3939', label: 'BRW-3939' },
-  { value: 'ABX-3939', label: 'ABX-3939' },
-  { value: 'AYP-3939', label: 'AYP-3939' },
-  { value: 'AYM-3939', label: 'AYM-3939' },
-  { value: 'AKL-3939', label: 'AKL-3939' },
-  { value: 'AVY-3939', label: 'AVY-3939' },
-  { value: 'AKC-3939', label: 'AKC-3939' },
-  { value: 'BJJ-3939', label: 'BJJ-3939' },
-  { value: '3208-J9', label: '3208-J9' },
-  { value: 'BGF-0950', label: 'BGF-0950' },
-  { value: 'ACQ-3939', label: 'ACQ-3939' },
-] as const;
+const licensePlateArrOption = Object.values(licensePlateLookUp).map((item) => ({
+  value: item.value,
+  label: item.name,
+}));

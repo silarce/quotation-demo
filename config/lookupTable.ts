@@ -35,3 +35,65 @@ export const annotationAndQuotationRangeTypeLookup: {
   'heat-protection': '阻熱',
   'heat-protection-smoke-covering': '阻熱遮煙',
 };
+
+// 公務車資料 // 車牌
+export const licensePlateLookUp: Record<
+  string,
+  {
+    value: string;
+    name: string;
+  }
+> = Object.freeze({
+  'BRC-3939': {
+    value: 'BRC-3939',
+    name: 'BRC-3939',
+  },
+  'BRW-3939': {
+    value: 'BRW-3939',
+    name: 'BRW-3939',
+  },
+  'ABX-3939': {
+    value: 'ABX-3939',
+    name: 'ABX-3939',
+  },
+  'AYP-3939': {
+    value: 'AYP-3939',
+    name: 'AYP-3939',
+  },
+  'AYM-3939': {
+    value: 'AYM-3939',
+    name: 'AYM-3939',
+  },
+  'AKL-3939': {
+    value: 'AKL-3939',
+    name: 'AKL-3939',
+  },
+  'AVY-3939': {
+    value: 'AVY-3939',
+    name: 'AVY-3939',
+  },
+  'AKC-3939': {
+    value: 'AKC-3939',
+    name: 'AKC-3939',
+  },
+  'BJJ-3939': {
+    value: 'BJJ-3939',
+    name: 'BJJ-3939',
+  },
+  '3208-J9': {
+    value: '3208-J9',
+    name: '3208-J9',
+  },
+  'BGF-0950': {
+    value: 'BGF-0950',
+    name: 'BGF-0950',
+  },
+  'ACQ-3939': {
+    value: 'ACQ-3939',
+    name: 'ACQ-3939',
+  },
+  'CBY-3939': {
+    value: 'CBY-3939',
+    name: 'CBY-3939',
+  },
+});
