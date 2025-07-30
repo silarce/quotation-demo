@@ -374,6 +374,13 @@ const apiPostInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => 
   });
 };
 
+// 未上beta，回應404
+const apiGetPaymentRequestType = async () => {
+  const api = '/api/AccountsReceivable/GetPaymentRequestType';
+
+  return axi_monkey.get<never>(api).then(({ data }) => data);
+};
+
 // ========================================================================
 
 // MARK:Tres_apiGetARPaymentData
@@ -693,3 +700,5 @@ export {
   useApiGetARPaymentData,
   useApiGetARPaymentDataInsert,
 };
+
+export { apiGetPaymentRequestType };
