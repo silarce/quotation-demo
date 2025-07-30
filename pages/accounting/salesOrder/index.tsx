@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useState, useEffect, useReducer, useMemo } from 'react';
 import Decimal from 'decimal.js';
 
 import Btn from 'components/global/gear/button/btn_fong';
@@ -14,6 +14,28 @@ import Icon_check from 'public/image/icon/fong/check.svg';
 import Icon_cancel from 'public/image/icon/fong/cancel.svg';
 
 import SalesDetails from 'components/page/accounting/salesOrder/salesDetails';
+
+import { Ttax_type } from 'js/api/api_netCore/_schemas';
+
+// ============================================================================
+
+interface Tstate {
+  contractNumber: string;
+  projectName: string;
+
+  customerNumber: string;
+  customerName: string;
+  customerTaxId: string;
+
+  price: number;
+  tax: number;
+  已請款總額: number;
+  銷售總額: number;
+  已收金額: number;
+  扣款折讓: number;
+  稅別: Ttax_type | null;
+  應稅外加: string;
+}
 
 // ============================================================================
 
@@ -93,3 +115,36 @@ export default function SalesOrder() {
 }
 
 // MARK: END
+// ==========================================================================
+
+const emptyState = (): Tstate => {
+  return {
+    contractNumber: '',
+    projectName: '',
+    customerNumber: '',
+    customerName: '',
+    customerTaxId: '',
+    price: 0,
+    tax: 0,
+    已請款總額: 0,
+    銷售總額: 0,
+    已收金額: 0,
+    扣款折讓: 0,
+    稅別: null,
+    應稅外加: '',
+  };
+};
+
+const useDefaultState = (raw: unknown | undefined | null) => {
+  return useMemo(emptyState, [raw]);
+};
+
+const useData = (raw: unknown | undefined | null) => {
+  const defaultState = useDefaultState(raw);
+
+  const [state, setState] = useState<Tstate>(defaultState);
+
+  useEffect(() => {
+    setState(defaultState);
+  }, [defaultState]);
+};
