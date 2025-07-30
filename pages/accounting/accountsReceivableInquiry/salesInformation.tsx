@@ -159,7 +159,7 @@ export default function SalesInformation() {
           <div className="mb-6">
             <span className="text-xl font-semibold mr-3">請款狀況</span>
             <Link href="paymentRequest">
-              <Btn theme="cross">新增工程項目明細</Btn>
+              <Btn theme="cross">新增請款單</Btn>
             </Link>
           </div>
           <Table_antd columns={columns_paymentRequests} dataSource={paymentRequests} pagination={false} />

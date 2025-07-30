@@ -34,12 +34,9 @@ export default function PaymentRequest() {
   return (
     <div>
       {/*  */}
-      <div
-        className="mb-6"
-        // className="pageTop"
-      >
+      <div className="pageTop">
         <div className="flex justify-between items-center">
-          <div className="text-xl font-semibold">工程項目明細</div>
+          <div className="text-xl font-semibold">請款單</div>
           <div>
             <Btn onClick={router.back}>返回</Btn>
           </div>

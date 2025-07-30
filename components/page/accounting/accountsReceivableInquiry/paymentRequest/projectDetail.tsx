@@ -9,7 +9,12 @@ type TdataArr = Tres_apiGetARPaymentData['salesOrder']['salesOrderItems'];
 // =============================================================================
 
 const ProjectDetail = ({ data, className }: { data: TdataArr | undefined; className?: string }) => {
-  return <Table_antd className={className} columns={columns_projectDetail} dataSource={data} />;
+  return (
+    <div>
+      <div className="text-xl font-semibold mb-8">工程項目明細</div>
+      <Table_antd className={className} columns={columns_projectDetail} dataSource={data} />
+    </div>
+  );
 };
 
 const columns_projectDetail: TableProps<TdataArr[number]>['columns'] = [
