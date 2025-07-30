@@ -48,7 +48,7 @@ export default function PaymentRequest() {
       {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
       {/* 本次請款明細 含沖銷明細 */}
-      <CurrentPaymentRequestDetails className="mb-10" />
+      <CurrentPaymentRequestDetails className="mb-10" paymentRequest={paymentRequest} />
       {/* 請款紀錄 */}
       <History />
 

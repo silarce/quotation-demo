@@ -14,14 +14,55 @@ import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_next from 'public/image/icon/fong/next.svg';
 
+import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+
+// =========================================================================
+
+type TpaymentRequest = Tres_apiGetARPaymentData['paymentRequest'];
+type TprOffsetDetails = TpaymentRequest['prOffsetDetails'][number];
+
+// =========================================================================
+
 // MARK:START
 
 const CurrentPaymentRequestDetails = ({
   className,
+  paymentRequest,
 }: {
   className?: string;
-} = {}) => {
+  paymentRequest: TpaymentRequest | undefined | null;
+}) => {
+  const {
+    prOffsetDetails,
+
+    createdAt, //建立時間
+    createdBy, //建立人員
+    updatedAt, //更新時間
+    updatedBy, // 更新人員
+
+    sourceFormId, //來源表單Id
+    sourceFormType, //來源表單類型
+    paymentRequestNumber, //請款單編號
+
+    customerNumber, //客戶編號
+    customerName, //客戶名稱
+
+    invoiceNumber, //發票號碼
+    invoiceAmount, //發票金額
+
+    accountsReceivableId, //應收帳款Id
+    type, //請款單類型
+    period, //請款單期別
+    paymentCurrency, //請款幣別
+    foreignCurrencyAmount, //外幣金額
+    paymentAmount, //請款金額
+    collect_amount, //已收金額,餘額在repo裡計算
+    receipt_balance, //收款餘額
+    deduction, //扣款金額
+  } = paymentRequest ?? {};
+
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const handle_accountingCollection = () => {
     const { destroy } = modal_empty({
@@ -96,47 +137,47 @@ const CurrentPaymentRequestDetails = ({
       {isActive_detail && (
         <div className="p-6 border border-gray05 rounded-lg shadow-[0px_4px_4px_0px_#00000040]">
           <div className={classNames('grid grid-cols-4 gap-fong ')}>
-            <DataEntry_fong caption="類型" isMust={true} disabled={true}>
-              <Select />
+            <DataEntry_fong caption="類型" isMust={true} disabled={disabled}>
+              <Select value={type} />
             </DataEntry_fong>
-            <DataEntry_fong caption="累計請款金額" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="累計請款金額" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="營業稅(5%)" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="營業稅(5%)" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="本期合計" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="本期合計" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="保留款(%)" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="保留款(%)" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="稅" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="稅" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="保留款金額" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="保留款金額" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="金額總計" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="金額總計" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="買受人" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="買受人" isMust={true} disabled={disabled}>
+              {customerName}
             </DataEntry_fong>
             <div />
             <div />
             <div />
-            <DataEntry_fong caption="發票日期" isMust={true} disabled={true}>
-              <DatePicker />
+            <DataEntry_fong caption="發票日期" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
-            <DataEntry_fong caption="發票號碼" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="發票號碼" isMust={true} disabled={disabled}>
+              {invoiceNumber}
             </DataEntry_fong>
-            <DataEntry_fong caption="發票金額" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="發票金額" isMust={true} disabled={disabled}>
+              {invoiceAmount}
             </DataEntry_fong>
-            <DataEntry_fong caption="統一編號" isMust={true} disabled={true}>
-              <Input />
+            <DataEntry_fong caption="統一編號" isMust={true} disabled={disabled}>
+              no property
             </DataEntry_fong>
           </div>
           <div className="w-fit m-auto mt-10 mr-0 ml-auto">
@@ -158,7 +199,7 @@ const CurrentPaymentRequestDetails = ({
             </div>
             <Table_antd
               className="mt-4"
-              dataSource={fakeData_reversalDetails}
+              dataSource={prOffsetDetails}
               columns={columns_reversalDetails}
               scroll={{
                 y: 400,
@@ -268,44 +309,44 @@ const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (f
 
 // ==========================================================================
 
-interface TfakeData_reversalDetails {
-  id: string;
-  serialNumber: string;
-  idNumber: string;
-  name: string;
-  accountingSubjects: string;
-  price: number;
-}
+// interface TfakeData_reversalDetails {
+//   id: string;
+//   serialNumber: string;
+//   idNumber: string;
+//   name: string;
+//   accountingSubjects: string;
+//   price: number;
+// }
 
-const createFakeData_reversalDetails = (count: number): TfakeData_reversalDetails[] => {
-  const data: TfakeData_reversalDetails[] = [];
+// const createFakeData_reversalDetails = (count: number): TfakeData_reversalDetails[] => {
+//   const data: TfakeData_reversalDetails[] = [];
 
-  for (let i = 1; i <= count; i++) {
-    data.push({
-      id: `${i}`,
-      serialNumber: `${i}`,
-      idNumber: `ID${String(1000 + i).padStart(4, '0')}`,
-      name: `項目名稱 ${i}`,
-      accountingSubjects: `會計科目 ${String.fromCharCode(65 + ((i - 1) % 26))}`,
-      price: Math.floor(Math.random() * 100000) + 5000,
-    });
-  }
+//   for (let i = 1; i <= count; i++) {
+//     data.push({
+//       id: `${i}`,
+//       serialNumber: `${i}`,
+//       idNumber: `ID${String(1000 + i).padStart(4, '0')}`,
+//       name: `項目名稱 ${i}`,
+//       accountingSubjects: `會計科目 ${String.fromCharCode(65 + ((i - 1) % 26))}`,
+//       price: Math.floor(Math.random() * 100000) + 5000,
+//     });
+//   }
 
-  return data;
-};
+//   return data;
+// };
 
-const fakeData_reversalDetails: TfakeData_reversalDetails[] = createFakeData_reversalDetails(10);
+// const fakeData_reversalDetails: TfakeData_reversalDetails[] = createFakeData_reversalDetails(10);
 
-const columns_reversalDetails: TableProps<TfakeData_reversalDetails>['columns'] = [
+const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
   {
     title: '序號',
-    dataIndex: 'serialNumber',
+    dataIndex: 'settlementSerial',
     align: 'center',
     width: 80,
   },
   {
     title: '代號',
-    dataIndex: 'idNumber',
+    dataIndex: 'prOffsetNumber',
     width: 120,
   },
   {
@@ -315,12 +356,12 @@ const columns_reversalDetails: TableProps<TfakeData_reversalDetails>['columns'] 
   },
   {
     title: '會科',
-    dataIndex: 'accountingSubjects',
+    dataIndex: 'account',
     width: 150,
   },
   {
     title: '金額',
-    dataIndex: 'price',
+    dataIndex: 'totalAmount',
     width: 150,
     align: 'right',
     render: (value) => '$' + value.toLocaleString(),
