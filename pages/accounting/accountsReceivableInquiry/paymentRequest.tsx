@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
+
 import { useRouter } from 'next/router';
 
 import Btn from 'components/global/gear/button/btn_fong';
 
-import { useApiGetARPaymentData, useApiGetARPaymentDataInsert } from 'js/api/api_netCore/api_accountsReceivable';
+import {
+  useApiGetARPaymentData,
+  useApiGetARPaymentDataInsert,
+  apiGetPaymentRequestType,
+} from 'js/api/api_netCore/api_accountsReceivable';
 
 // component
 import CurrentlyAccumulated from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/currentlyAccumulated';
@@ -10,7 +16,10 @@ import CurrentPaymentRequestDetails from 'components/page/accounting/accountsRec
 import History from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/history';
 import ProjectDetail from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/projectDetail';
 
+import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
+
 import scss from './paymentRequest.module.scss';
+import { modal_empty } from 'components/global/gear/modal/fongModal';
 
 // ============================================================================
 
@@ -33,6 +42,22 @@ export default function PaymentRequest() {
   const { accountsReceivables, paymentRequest, salesOrder } = data_paymentQuest ?? data_forNew ?? {};
   const salesOrderItems = salesOrder?.salesOrderItems ?? [];
 
+  // useEffect(() => {
+  //   apiGetPaymentRequestType();
+  // }, []);
+
+  const handle_test = () => {
+    const { destroy } = modal_empty({
+      content: (
+        <Selector_invoiceBook
+          onCancel={() => {
+            destroy();
+          }}
+        />
+      ),
+    });
+  };
+
   // MARK:RENDER
 
   return (
@@ -42,6 +67,7 @@ export default function PaymentRequest() {
         <div className="flex justify-between items-center">
           <div className="text-xl font-semibold">請款單</div>
           <div>
+            <Btn onClick={handle_test}>test</Btn>
             <Btn onClick={router.back}>返回</Btn>
           </div>
         </div>
