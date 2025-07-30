@@ -1,6 +1,6 @@
 import { devPass, erpFeaturesLookup, TsidePathConfig } from '../type';
 
-const isInProd = process.env.NEXT_PUBLLIC_NODE_ENV === 'prod';
+const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
 
 export default function SidePathAccountingDepartment() {
   return ((): TsidePathConfig => {
