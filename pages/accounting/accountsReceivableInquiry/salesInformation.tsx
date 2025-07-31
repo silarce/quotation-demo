@@ -135,17 +135,20 @@ export default function SalesInformation() {
           <DataEntry_fong caption="案場名稱" className="col-span-2">
             {projectName}
           </DataEntry_fong>
+
           <DataEntry_fong caption="客戶編號" className="col-span-2">
             {customerNumber}
           </DataEntry_fong>
           <DataEntry_fong caption="客戶名稱" className="col-span-2">
             {customerName}
           </DataEntry_fong>
+
           <DataEntry_fong caption="統一編號" className="col-span-2">
             {'customerTaxId'}
           </DataEntry_fong>
           <DataEntry_fong caption="稅別">{'taxType'}</DataEntry_fong>
           <DataEntry_fong caption="外幣">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
+
           <DataEntry_fong caption="銷售金額">
             {<span className="text-right">{toLocaleString(salesAmount)}</span>}
           </DataEntry_fong>
@@ -154,10 +157,16 @@ export default function SalesInformation() {
           </DataEntry_fong>
           <DataEntry_fong caption="追加減金額">{'attachmentTotal'}</DataEntry_fong>
           <DataEntry_fong caption="追加減金額稅金">{'attachmentTax'}</DataEntry_fong>
+
           <DataEntry_fong caption="已收金額">{'receivedAmount'}</DataEntry_fong>
           <DataEntry_fong caption="扣款折讓">{'discountAmount'}</DataEntry_fong>
           <DataEntry_fong caption="已請款總額">{prAmount}</DataEntry_fong>
           <DataEntry_fong caption="銷售總額">{totalAmount}</DataEntry_fong>
+
+          <DataEntry_fong caption="合約保留款類型"></DataEntry_fong>
+          <DataEntry_fong caption="稅別"></DataEntry_fong>
+          <DataEntry_fong caption="百分比%"></DataEntry_fong>
+          <DataEntry_fong caption="保留款金額"></DataEntry_fong>
         </div>
         {/*  */}
         <div className="mt-10">
@@ -178,7 +187,7 @@ export default function SalesInformation() {
                   },
                 }}
               >
-                <Btn theme="cross">新增請款單</Btn>
+                <Btn theme="cross">新增請款資料</Btn>
               </Link>
             )}
           </div>
@@ -251,11 +260,13 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
     title: '請款單號',
     dataIndex: 'paymentRequestNumber',
     width: 150,
+    align: 'right',
   },
   {
     title: '期別',
     dataIndex: 'period',
     width: 120,
+    align: 'right',
   },
   {
     title: '類型',
@@ -279,6 +290,19 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
   {
     title: '折讓',
     dataIndex: 'deduction',
+    align: 'right',
+    width: 150,
+    render: (value: number | null) => toLocaleString(value),
+  },
+  {
+    title: '發票號碼',
+    dataIndex: 'invoiceNumber',
+    align: 'right',
+    width: 150,
+  },
+  {
+    title: '發票金額',
+    dataIndex: 'invoiceAmount',
     align: 'right',
     width: 150,
     render: (value: number | null) => toLocaleString(value),
