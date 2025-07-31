@@ -67,7 +67,7 @@ export default function MyDatePicker({
   //     }
   //   : undefined;
 
-  const theOnChange = () => {
+  const theOnChange = (() => {
     if (onChange) {
       return (dayjs: Dayjs | null, dateString: string | string[]) => {
         if (typeof dateString === 'string') {
@@ -89,7 +89,7 @@ export default function MyDatePicker({
     }
 
     return undefined;
-  };
+  })();
 
   const datePickerBoxClassName = (() => {
     return `${scss.datePickerBox} ${boxClassName ?? ''}`;
