@@ -15,7 +15,11 @@ import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_note from 'public/image/icon/fong/note.svg';
 
 // api
-import { TaccountsReceivable, useGetAccountsReceivables } from 'js/api/api_netCore/api_accountsReceivable';
+import {
+  TaccountsReceivable,
+  apiQuotationToAccountsReceivables,
+  useGetAccountsReceivables,
+} from 'js/api/api_netCore/api_accountsReceivable';
 
 // ============================================================================
 
@@ -72,11 +76,13 @@ export default function SalesInformation() {
       return;
     }
 
-    router.replace({
-      query: {
-        ...router.query,
-        id: data.quotationNumber,
-      },
+    await apiQuotationToAccountsReceivables(data.quotationNumber).then((id) => {
+      router.replace({
+        query: {
+          ...router.query,
+          id: id,
+        },
+      });
     });
   };
 
