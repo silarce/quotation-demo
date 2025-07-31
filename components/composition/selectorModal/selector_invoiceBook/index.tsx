@@ -4,17 +4,32 @@ import classNames from 'classnames';
 import Table_antd, { TableProps, metaToPageProps } from 'components/global/myAntd/table';
 import Btn from 'components/global/gear/button/btn_fong';
 import { Container_confirm } from 'components/global/container/modal';
-import { modal_empty } from 'components/global/gear/modal/fongModal';
 
 import { useGetAccountantInvoiceBook, TaccountantInvoiceBookDto } from 'js/api/api_accountant';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
-const Selector_invoiceBook = ({ title = '發票本選擇', onCancel }: { title?: string; onCancel: () => void }) => {
+import scss from './index.module.scss';
+
+const Selector_invoiceBook = ({
+  title = '發票本選擇',
+  onConfirm,
+  onCancel,
+}: {
+  title?: string;
+  onConfirm?: (selected: TaccountantInvoiceBookDto | undefined) => void;
+  onCancel: () => void;
+}) => {
   const [page, setPage] = useState(1);
   const params = useMemo(() => ({ page }), [page]);
 
   const { data, meta } = useGetAccountantInvoiceBook({ params });
+
+  const [selected, setSelected] = useState<TaccountantInvoiceBookDto>();
+
+  const handle_confirm = () => {
+    onConfirm?.(selected);
+  };
 
   return (
     <Container_confirm
@@ -22,7 +37,7 @@ const Selector_invoiceBook = ({ title = '發票本選擇', onCancel }: { title?:
       footerRight={
         <>
           <Btn onClick={onCancel}>取消</Btn>
-          <Btn>確認</Btn>
+          <Btn onClick={handle_confirm}>確認</Btn>
         </>
       }
     >
@@ -30,6 +45,7 @@ const Selector_invoiceBook = ({ title = '發票本選擇', onCancel }: { title?:
         className="w-[940px]"
         dataSource={data}
         columns={columns}
+        rowHoverable={false}
         pagination={{
           current: meta?.page,
           pageSize: meta?.pageSize,
@@ -38,6 +54,15 @@ const Selector_invoiceBook = ({ title = '發票本選擇', onCancel }: { title?:
             setPage(page);
           },
         }}
+        onRow={(record) => {
+          return {
+            onClick: () => {
+              setSelected(record);
+            },
+            // className: classNames(' cursor-pointer', selected?.some((item) => item.id === record.id) && 'bg-blue05'),
+          };
+        }}
+        rowClassName={(record) => classNames(scss.row, selected?.id === record.id && scss.active)}
       />
     </Container_confirm>
   );

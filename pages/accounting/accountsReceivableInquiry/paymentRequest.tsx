@@ -50,6 +50,9 @@ export default function PaymentRequest() {
     const { destroy } = modal_empty({
       content: (
         <Selector_invoiceBook
+          onConfirm={(foo) => {
+            console.log(foo);
+          }}
           onCancel={() => {
             destroy();
           }}
