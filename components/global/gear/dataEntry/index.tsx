@@ -294,6 +294,29 @@ const Input = ({
   );
 };
 
+const Input_money = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
+  const props_localString = (() => {
+    const { disabled, readOnly } = props;
+
+    if (!disabled && !readOnly) {
+      return {};
+    }
+
+    let { value, defaultValue } = props;
+
+    value = fomatInputNumber(value);
+    defaultValue = fomatInputNumber(defaultValue);
+
+    return {
+      type: 'text',
+      value,
+      defaultValue,
+    };
+  })();
+
+  return <Input type="number" {...props} {...props_localString} />;
+};
+
 const fomatInputNumber = (value: React.InputHTMLAttributes<HTMLInputElement>['value']) => {
   if (value === undefined || value === null || value === '') {
     return value;
@@ -709,6 +732,8 @@ export {
   InputSelect,
   DateRangePicker,
   Textarea,
+  //
+  Input_money,
 };
 
 export { Form, FormItem };
