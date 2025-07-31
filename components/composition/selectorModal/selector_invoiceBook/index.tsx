@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
+import { Dayjs } from 'dayjs';
 
 import Table_antd, { TableProps, metaToPageProps } from 'components/global/myAntd/table';
 import Btn from 'components/global/gear/button/btn_fong';
 import { Container_confirm } from 'components/global/container/modal';
+import DataEntry, { DataEntry_fong, DatePicker } from 'components/global/gear/dataEntry';
 
 import { useGetAccountantInvoiceBook, TaccountantInvoiceBookDto } from 'js/api/api_accountant';
 
@@ -20,8 +22,34 @@ const Selector_invoiceBook = ({
   onConfirm?: (selected: TaccountantInvoiceBookDto | undefined) => void;
   onCancel: () => void;
 }) => {
+  const [date, setDate] = useState<Dayjs | null>(null);
+  const [date_param, setDate_param] = useState<Dayjs | null>(null);
+
   const [page, setPage] = useState(1);
-  const params = useMemo(() => ({ page }), [page]);
+  const params = useMemo(() => {
+    const filter = (() => {
+      if (!date_param) {
+        return undefined;
+      }
+
+      const year = date_param.year();
+      let month = date_param.month() + 1;
+
+      if (!(`${month}` in lookup_month)) {
+        month = month - 1;
+      }
+
+      return {
+        year: { $eq: `${year}` },
+        month: { $eq: `${month}` },
+      };
+    })();
+
+    return {
+      page,
+      filter,
+    };
+  }, [page, date_param]);
 
   const { data, meta } = useGetAccountantInvoiceBook({ params });
 
@@ -34,6 +62,26 @@ const Selector_invoiceBook = ({
   return (
     <Container_confirm
       title={title}
+      topRight={
+        <div className="flex gap-[16px]">
+          <DataEntry_fong>
+            <DatePicker
+              value={date}
+              onChange={(v) => {
+                setDate(v);
+              }}
+            />
+          </DataEntry_fong>
+          <Btn
+            theme="query"
+            onClick={() => {
+              setDate_param(date);
+            }}
+          >
+            搜索資料
+          </Btn>
+        </div>
+      }
       footerRight={
         <>
           <Btn onClick={onCancel}>取消</Btn>
