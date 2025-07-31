@@ -46,21 +46,6 @@ export default function PaymentRequest() {
   //   apiGetPaymentRequestType();
   // }, []);
 
-  const handle_test = () => {
-    const { destroy } = modal_empty({
-      content: (
-        <Selector_invoiceBook
-          onConfirm={(foo) => {
-            console.log(foo);
-          }}
-          onCancel={() => {
-            destroy();
-          }}
-        />
-      ),
-    });
-  };
-
   // MARK:RENDER
 
   return (
@@ -77,7 +62,7 @@ export default function PaymentRequest() {
       </div>
 
       {/* 工程項目明細 */}
-      <ProjectDetail className="mb-4" data={salesOrderItems} />
+      <ProjectDetail className="mb-4" data={salesOrderItems} allowEdit={isNew} />
       {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
       {/* 本次請款明細 含沖銷明細 */}
