@@ -140,20 +140,6 @@ const columns: TableProps<TaccountsReceivablesList_Dto>['columns'] = [
     width: 250,
   },
   {
-    title: '合約金額',
-    dataIndex: 'salesAmount',
-    width: 150,
-    align: 'right',
-    render: (_, record) => toLocaleString(record.salesAmount),
-  },
-  {
-    title: '稅金',
-    dataIndex: 'taxes',
-    align: 'right',
-    width: 150,
-    render: (_, record) => toLocaleString(record.taxes),
-  },
-  {
     title: '總金額',
     dataIndex: 'totalAmount',
     width: 150,
@@ -161,11 +147,18 @@ const columns: TableProps<TaccountsReceivablesList_Dto>['columns'] = [
     render: (_, record) => toLocaleString(record.totalAmount),
   },
   {
-    title: '應收款項金額',
-    dataIndex: 'requestAmount',
+    title: '已請款金額',
+    dataIndex: 'prAmount',
+    align: 'right',
+    width: 150,
+    render: (_, record) => toLocaleString(record.prAmount),
+  },
+  {
+    title: '已收款金額',
+    dataIndex: 'collectAmount',
     width: 150,
     align: 'right',
-    render: (_, record) => toLocaleString(record.requestAmount),
+    render: (_, record) => toLocaleString(record.collectAmount),
   },
   {
     title: '扣款金額',

@@ -539,6 +539,7 @@ interface TaccountsReceivablesList_Dto {
   quotationContractNumber: string | null; //合約編號
   projectName: string | null; //案場名稱
   salesOrderNumber: string | null; //銷售訂單編號
+  collectAmount: number | null;
 }
 
 interface TquotationListViewModel_Dto {
