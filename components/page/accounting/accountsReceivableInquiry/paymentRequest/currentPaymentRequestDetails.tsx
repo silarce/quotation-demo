@@ -1,14 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+
 import { Dayjs } from 'dayjs';
 import classNames from 'classnames';
 
 import Btn, { Btn_UpDown } from 'components/global/gear/button/btn_fong';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
-import { DataEntry_fong, Input, Select, DatePicker } from 'components/global/gear/dataEntry';
+import { DataEntry_fong, Input, Select, DatePicker, Input_money } from 'components/global/gear/dataEntry';
 
 import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
+import Selector_customer, { selector_customer } from 'components/composition/selectorModal/selector_customer';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
@@ -19,7 +21,28 @@ import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsRe
 // =========================================================================
 
 type TpaymentRequest = Tres_apiGetARPaymentData['paymentRequest'];
+type TpaymentRequest_noDetail = Omit<TpaymentRequest, 'prOffsetDetails'>;
+
 type TprOffsetDetails = TpaymentRequest['prOffsetDetails'][number];
+
+interface Tstate {
+  type: string;
+  累計請款金額: `${number}` | '';
+  營業稅: `${number}` | '';
+  本期合計: `${number}` | '';
+  保留款: `${number}` | '';
+  稅別: string;
+  保留款金額: `${number}` | '';
+
+  // 發票本: string | null;
+  發票日期: Dayjs | null;
+  invoiceNumber: string | null;
+  invoiceAmount: number | null;
+
+  customerName: string | null;
+  customerNumber: string | null;
+  統一編號: string | null;
+}
 
 // =========================================================================
 
@@ -63,6 +86,36 @@ const CurrentPaymentRequestDetails = ({
 
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
   const [disabled, setDisabled] = useState<boolean>(false);
+
+  // -----------------------------------------------------------------------------
+
+  const { state_paymentRequest, setState_paymentRequest, reset_paymentRequest } = usePaymentRequest(paymentRequest);
+
+  // -----------------------------------------------------------------------------
+
+  const handle_selectCustomer = () => {
+    const { destroy } = selector_customer({
+      onConfirm(customerArr) {
+        const func = () => {
+          const customer = customerArr[0];
+
+          if (!customer) {
+            return;
+          }
+
+          setState_paymentRequest((prev) => ({
+            ...prev,
+            customerName: customer.name,
+            customerNumber: customer.customerNumber,
+            統一編號: customer.taxId,
+          }));
+        };
+
+        func();
+        destroy();
+      },
+    });
+  };
 
   const handle_accountingCollection = () => {
     const { destroy } = modal_empty({
@@ -138,36 +191,82 @@ const CurrentPaymentRequestDetails = ({
         <div className="p-6 border border-gray05 rounded-lg shadow-[0px_4px_4px_0px_#00000040]">
           <div className={classNames('grid grid-cols-4 gap-fong ')}>
             <DataEntry_fong caption="類型" isMust={true} disabled={disabled}>
-              <Select value={type} />
+              <Select value={state_paymentRequest.type} />
             </DataEntry_fong>
-            <DataEntry_fong caption="累計請款金額" isMust={true} disabled={disabled}>
-              no property
+            <DataEntry_fong caption="累計請款金額 no property" isMust={true} disabled={disabled}>
+              <Input_money
+                value={state_paymentRequest.累計請款金額}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    累計請款金額: e.target.value as `${number}` | '',
+                  }));
+                }}
+              />
             </DataEntry_fong>
-            <DataEntry_fong caption="營業稅(5%)" isMust={true} disabled={disabled}>
-              no property
+            <DataEntry_fong caption="營業稅(5%) no property" isMust={true} disabled={disabled}>
+              <Input_money
+                value={state_paymentRequest.營業稅}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    營業稅: e.target.value as `${number}` | '',
+                  }));
+                }}
+              />
             </DataEntry_fong>
-            <DataEntry_fong caption="本期合計" isMust={true} disabled={disabled}>
-              no property
+            <DataEntry_fong caption="本期合計 no property" isMust={true} disabled={disabled}>
+              <Input_money
+                value={state_paymentRequest.本期合計}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    本期合計: e.target.value as `${number}` | '',
+                  }));
+                }}
+              />
             </DataEntry_fong>
-            <DataEntry_fong caption="保留款(%)" isMust={true} disabled={disabled}>
-              no property
+            <DataEntry_fong caption="保留款(%) no property" isMust={true} disabled={disabled}>
+              <Input
+                type="number"
+                value={state_paymentRequest.保留款}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    保留款: e.target.value as `${number}` | '',
+                  }));
+                }}
+              />
             </DataEntry_fong>
-            <DataEntry_fong caption="稅" isMust={true} disabled={disabled}>
-              no property
+            <DataEntry_fong caption="稅別 no property" isMust={true} disabled={disabled}>
+              <Select
+                value={state_paymentRequest.稅別}
+                onChange={(value) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    稅別: value,
+                  }));
+                }}
+              />
             </DataEntry_fong>
-            <DataEntry_fong caption="保留款金額" isMust={true} disabled={disabled}>
-              no property
+            <DataEntry_fong caption="保留款金額 no property" isMust={true} disabled={disabled}>
+              <Input_money
+                value={state_paymentRequest.保留款金額}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    保留款金額: e.target.value as `${number}` | '',
+                  }));
+                }}
+              />
             </DataEntry_fong>
-            <DataEntry_fong caption="金額總計" isMust={true} disabled={disabled}>
-              no property
-            </DataEntry_fong>
-            <DataEntry_fong caption="買受人" isMust={true} disabled={disabled}>
-              {customerName}
-            </DataEntry_fong>
+
             <div />
-            <div />
-            <div />
-            <DataEntry_fong caption="發票日期" isMust={true} disabled={disabled}>
+
+            {/* <DataEntry_fong caption="發票本" isMust={true} disabled={disabled}>
+              no property
+            </DataEntry_fong> */}
+            <DataEntry_fong caption="發票日期 no property" isMust={true} disabled={disabled}>
               no property
             </DataEntry_fong>
             <DataEntry_fong caption="發票號碼" isMust={true} disabled={disabled}>
@@ -176,8 +275,22 @@ const CurrentPaymentRequestDetails = ({
             <DataEntry_fong caption="發票金額" isMust={true} disabled={disabled}>
               {invoiceAmount}
             </DataEntry_fong>
-            <DataEntry_fong caption="統一編號" isMust={true} disabled={disabled}>
-              no property
+
+            <div />
+
+            <DataEntry_fong
+              caption="買受人"
+              isMust={true}
+              disabled={disabled}
+              childrenWrapperProps={{
+                onClick: handle_selectCustomer,
+              }}
+            >
+              {state_paymentRequest.customerName}
+            </DataEntry_fong>
+
+            <DataEntry_fong caption="統一編號 no property" isMust={true} disabled={disabled}>
+              {state_paymentRequest.統一編號}
             </DataEntry_fong>
           </div>
           <div className="w-fit m-auto mt-10 mr-0 ml-auto">
@@ -213,6 +326,132 @@ const CurrentPaymentRequestDetails = ({
 };
 
 // MARK:END
+
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+
+// MARK: useData
+
+const usePaymentRequest = (rawData: TpaymentRequest_noDetail | undefined | null) => {
+  const defaultState = useDefaultState(rawData);
+  const [state, setState] = useState<Tstate>(defaultState);
+
+  const reset = () => {
+    setState(emptyState());
+  };
+
+  // -----------------------------------------------------------------------
+  useEffect(() => {
+    setState(defaultState);
+  }, [defaultState]);
+
+  return {
+    state_paymentRequest: state,
+    setState_paymentRequest: setState,
+    reset_paymentRequest: reset,
+  };
+};
+
+const emptyState = (): Tstate => {
+  const state: Tstate = {
+    type: '',
+    累計請款金額: '',
+    營業稅: '',
+    本期合計: '',
+    保留款: '',
+    稅別: '',
+    保留款金額: '',
+
+    // 發票本: null,
+    發票日期: null,
+    invoiceNumber: null,
+    invoiceAmount: null,
+
+    customerName: null,
+    customerNumber: null,
+    統一編號: null,
+  };
+
+  return state;
+};
+
+const useDefaultState = (rawData: TpaymentRequest_noDetail | undefined | null): Tstate => {
+  return useMemo(() => {
+    if (!rawData) {
+      return emptyState();
+    }
+
+    const defaultState: Tstate = {
+      type: rawData.type || '',
+      累計請款金額: '',
+      營業稅: '',
+      本期合計: '',
+      保留款: '',
+      稅別: '',
+      保留款金額: '',
+
+      發票日期: null,
+      invoiceNumber: rawData.invoiceNumber,
+      invoiceAmount: rawData.invoiceAmount,
+
+      customerName: rawData.customerName,
+      customerNumber: rawData.customerNumber,
+      統一編號: null,
+    };
+
+    return defaultState;
+  }, [rawData]);
+};
+
+// ===============================================================================
+
+// MARK:columns_reversalDetails
+const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
+  {
+    title: '序號',
+    dataIndex: 'settlementSerial',
+    align: 'center',
+    width: 80,
+  },
+  {
+    title: '代號',
+    dataIndex: 'prOffsetNumber',
+    width: 120,
+  },
+  {
+    title: '名稱',
+    dataIndex: 'name',
+    width: 150,
+  },
+  {
+    title: '會科',
+    dataIndex: 'account',
+    width: 150,
+  },
+  {
+    title: '金額',
+    dataIndex: 'totalAmount',
+    width: 150,
+    align: 'right',
+    render: (value) => '$' + value.toLocaleString(),
+  },
+  {},
+  {
+    title: '操作',
+    key: 'action',
+    width: 80,
+    align: 'center',
+    render: () => (
+      <div className="flex gap-[16px] justify-center">
+        <Icon_note className="w-[16px] h-[16px] text-blue01" />
+        <Icon_trash className="w-[16px] h-[16px] text-red01" />
+      </div>
+    ),
+  },
+];
+
+// ===============================================================================
 
 const AddData = ({
   onConfirm,
@@ -308,77 +547,5 @@ const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (f
 };
 
 // ==========================================================================
-
-// interface TfakeData_reversalDetails {
-//   id: string;
-//   serialNumber: string;
-//   idNumber: string;
-//   name: string;
-//   accountingSubjects: string;
-//   price: number;
-// }
-
-// const createFakeData_reversalDetails = (count: number): TfakeData_reversalDetails[] => {
-//   const data: TfakeData_reversalDetails[] = [];
-
-//   for (let i = 1; i <= count; i++) {
-//     data.push({
-//       id: `${i}`,
-//       serialNumber: `${i}`,
-//       idNumber: `ID${String(1000 + i).padStart(4, '0')}`,
-//       name: `項目名稱 ${i}`,
-//       accountingSubjects: `會計科目 ${String.fromCharCode(65 + ((i - 1) % 26))}`,
-//       price: Math.floor(Math.random() * 100000) + 5000,
-//     });
-//   }
-
-//   return data;
-// };
-
-// const fakeData_reversalDetails: TfakeData_reversalDetails[] = createFakeData_reversalDetails(10);
-
-const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
-  {
-    title: '序號',
-    dataIndex: 'settlementSerial',
-    align: 'center',
-    width: 80,
-  },
-  {
-    title: '代號',
-    dataIndex: 'prOffsetNumber',
-    width: 120,
-  },
-  {
-    title: '名稱',
-    dataIndex: 'name',
-    width: 150,
-  },
-  {
-    title: '會科',
-    dataIndex: 'account',
-    width: 150,
-  },
-  {
-    title: '金額',
-    dataIndex: 'totalAmount',
-    width: 150,
-    align: 'right',
-    render: (value) => '$' + value.toLocaleString(),
-  },
-  {},
-  {
-    title: '操作',
-    key: 'action',
-    width: 80,
-    align: 'center',
-    render: () => (
-      <div className="flex gap-[16px] justify-center">
-        <Icon_note className="w-[16px] h-[16px] text-blue01" />
-        <Icon_trash className="w-[16px] h-[16px] text-red01" />
-      </div>
-    ),
-  },
-];
 
 export default CurrentPaymentRequestDetails;

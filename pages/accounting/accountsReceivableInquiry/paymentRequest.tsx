@@ -70,7 +70,7 @@ export default function PaymentRequest() {
         <div className="flex justify-between items-center">
           <div className="text-xl font-semibold">請款單</div>
           <div>
-            <Btn onClick={handle_test}>test</Btn>
+            {/* <Btn onClick={handle_test}>test</Btn> */}
             <Btn onClick={router.back}>返回</Btn>
           </div>
         </div>
