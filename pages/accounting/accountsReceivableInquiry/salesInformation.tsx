@@ -107,16 +107,21 @@ export default function SalesInformation() {
     <div>
       {/*  */}
       <div className="pageTop ">
-        <div className="flex gap-3 w-fit ml-auto mr-0">
-          <Btn onClick={router.back}>返回</Btn>
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="text-xl font-semibold">應收款編輯</span>
+          </div>
+          <div className="flex gap-3">
+            <Btn onClick={router.back}>返回</Btn>
 
-          {isNew && (
-            <>
-              <Btn theme="query" onClick={handle_search}>
-                新增應收款
-              </Btn>
-            </>
-          )}
+            {isNew && (
+              <>
+                <Btn theme="query" onClick={handle_search}>
+                  新增應收款
+                </Btn>
+              </>
+            )}
+          </div>
         </div>
       </div>
       {/*  */}
