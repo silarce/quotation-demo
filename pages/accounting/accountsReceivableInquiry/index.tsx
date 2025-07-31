@@ -50,7 +50,9 @@ export default function AccountsReceivableInquiry() {
   return (
     <div>
       <div className={'pageTop flex justify-between'}>
-        <Form className={classNames('flex gap-4', scss.form)} onFinish={handel_search}>
+        <Form className={classNames('flex gap-4 items-center', scss.form)} onFinish={handel_search}>
+          <div className="text-base font-semibold">應收款列表</div>
+
           <Form.Item className={scss.formItem} name="keyword">
             <DataEntry_fong
               childrenWrapperProps={{
