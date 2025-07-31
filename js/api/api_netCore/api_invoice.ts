@@ -18,10 +18,10 @@ const apiGetInvoiceNumberLists = (invoiceBookId: string) => {
 const useApiGetInvoiceNumberLists = (
   invoiceBookId: string,
   {
-    autoUpdate,
+    autoUpdate = true,
   }: {
     autoUpdate?: boolean;
-  }
+  } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<Tinvoice_Dto[] | null>();
@@ -67,5 +67,9 @@ const useApiGetInvoiceNumberLists = (
     update,
   };
 };
+
+// ============================================================================
+
+export type { Tinvoice_Dto };
 
 export { useApiGetInvoiceNumberLists };

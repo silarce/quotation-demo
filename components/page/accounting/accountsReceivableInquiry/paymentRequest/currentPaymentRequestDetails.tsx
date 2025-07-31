@@ -11,12 +11,16 @@ import Selector_accountant from 'components/page/accounting/accountsReceivableIn
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
 import Selector_customer, { selector_customer } from 'components/composition/selectorModal/selector_customer';
+import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
+import Selector_invoice from 'components/composition/selectorModal/selector_invoice';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_next from 'public/image/icon/fong/next.svg';
 
 import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // =========================================================================
 
@@ -92,6 +96,53 @@ const CurrentPaymentRequestDetails = ({
   const { state_paymentRequest, setState_paymentRequest, reset_paymentRequest } = usePaymentRequest(paymentRequest);
 
   // -----------------------------------------------------------------------------
+
+  const handle_selectInvoiceBook = () => {
+    const { destroy } = modal_empty({
+      content: (
+        <Selector_invoiceBook
+          onConfirm={async (invoiceBook) => {
+            if (invoiceBook) {
+              await handle_selectInvoice(invoiceBook.id);
+              destroy();
+            }
+          }}
+          onCancel={() => {
+            destroy();
+          }}
+        />
+      ),
+    });
+  };
+
+  const handle_selectInvoice = async (invoiceBookId: string) => {
+    return new Promise((resolve) => {
+      const { destroy } = modal_empty({
+        content: (
+          <Selector_invoice
+            invoiceBookId={invoiceBookId}
+            onCancel={() => {
+              destroy();
+              resolve(undefined);
+            }}
+            onConfirm={(invoice) => {
+              if (invoice) {
+                setState_paymentRequest((prev) => ({
+                  ...prev,
+                  // 發票日期: invoice.invoiceDate ? Dayjs(invoice.invoiceDate) : null,
+                  invoiceNumber: invoice.fullInvoiceNumber,
+                  invoiceAmount: invoice.invoiceAmount,
+                }));
+              }
+
+              destroy();
+              resolve(undefined);
+            }}
+          />
+        ),
+      });
+    });
+  };
 
   const handle_selectCustomer = () => {
     const { destroy } = selector_customer({
@@ -266,14 +317,23 @@ const CurrentPaymentRequestDetails = ({
             {/* <DataEntry_fong caption="發票本" isMust={true} disabled={disabled}>
               no property
             </DataEntry_fong> */}
-            <DataEntry_fong caption="發票日期 no property" isMust={true} disabled={disabled}>
-              no property
+            <DataEntry_fong caption="發票日期 no property" isMust={true} disabled={true}>
+              {getTaiwanDateStr(state_paymentRequest.發票日期)}
             </DataEntry_fong>
-            <DataEntry_fong caption="發票號碼" isMust={true} disabled={disabled}>
-              {invoiceNumber}
+
+            <DataEntry_fong
+              caption="發票號碼"
+              isMust={true}
+              disabled={disabled}
+              childrenWrapperProps={{
+                onClick: disabled ? undefined : handle_selectInvoiceBook,
+                className: disabled ? '' : 'cursor-pointer',
+              }}
+            >
+              {state_paymentRequest.invoiceNumber}
             </DataEntry_fong>
-            <DataEntry_fong caption="發票金額" isMust={true} disabled={disabled}>
-              {invoiceAmount}
+            <DataEntry_fong caption="發票金額" isMust={true} disabled={true}>
+              {state_paymentRequest.invoiceAmount}
             </DataEntry_fong>
 
             <div />
