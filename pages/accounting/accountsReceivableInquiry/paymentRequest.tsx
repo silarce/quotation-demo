@@ -53,7 +53,7 @@ export default function PaymentRequest() {
       {/*  */}
       <div className="pageTop">
         <div className="flex justify-between items-center">
-          <div className="text-xl font-semibold">請款單</div>
+          <div className="text-xl font-semibold">請款單編輯</div>
           <div>
             {/* <Btn onClick={handle_test}>test</Btn> */}
             <Btn onClick={router.back}>返回</Btn>
@@ -61,7 +61,7 @@ export default function PaymentRequest() {
         </div>
       </div>
 
-      {/* 工程項目明細 */}
+      {/* 項目明細 */}
       <ProjectDetail className="mb-4" data={salesOrderItems} allowEdit={isNew} />
       {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />

@@ -99,7 +99,7 @@ const ProjectDetail = ({
 
   return (
     <div>
-      <div className="text-xl font-semibold mb-8">工程項目明細</div>
+      <div className="text-xl font-semibold mb-8">項目明細</div>
       <Table_antd className={className} columns={columns_projectDetail} dataSource={stateArr} />
     </div>
   );
