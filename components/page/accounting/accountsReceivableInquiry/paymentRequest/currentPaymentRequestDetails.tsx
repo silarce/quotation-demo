@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react';
 
 import { Dayjs } from 'dayjs';
 import classNames from 'classnames';
@@ -10,7 +10,7 @@ import { DataEntry_fong, Input, Select, DatePicker, Input_money } from 'componen
 import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
-import Selector_customer, { selector_customer } from 'components/composition/selectorModal/selector_customer';
+import { selector_customer } from 'components/composition/selectorModal/selector_customer';
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
 import Selector_invoice from 'components/composition/selectorModal/selector_invoice';
 
@@ -20,38 +20,13 @@ import Icon_next from 'public/image/icon/fong/next.svg';
 
 import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
 
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { Tinstance_paymentRequest } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/usePaymentRequest';
 
 // =========================================================================
 
 type TpaymentRequest = Tres_apiGetARPaymentData['paymentRequest'];
-type TpaymentRequest_noDetail = Omit<TpaymentRequest, 'prOffsetDetails'>;
 
 type TprOffsetDetails = TpaymentRequest['prOffsetDetails'][number];
-
-interface Tstate {
-  type: string;
-  累計請款金額: `${number}` | '';
-  營業稅: `${number}` | '';
-  本期合計: `${number}` | '';
-  保留款: `${number}` | '';
-  稅別: string;
-  保留款金額: `${number}` | '';
-
-  發票本: {
-    id: string;
-    alphabeticLetter: string;
-    period: number;
-  } | null;
-
-  發票日期: Dayjs | null;
-  invoiceNumber: string | null;
-  invoiceAmount: `${number}` | '';
-
-  customerName: string | null;
-  customerNumber: string | null;
-  統一編號: string | null;
-}
 
 // =========================================================================
 
@@ -59,46 +34,20 @@ interface Tstate {
 
 const CurrentPaymentRequestDetails = ({
   className,
-  paymentRequest,
+  disabled,
+  instance_paymentRequest,
+  prOffsetDetails,
 }: {
   className?: string;
-  paymentRequest: TpaymentRequest | undefined | null;
+  disabled?: boolean;
+  instance_paymentRequest: Tinstance_paymentRequest;
+  prOffsetDetails: TprOffsetDetails[];
 }) => {
-  const {
-    prOffsetDetails,
-
-    // createdAt, //建立時間
-    // createdBy, //建立人員
-    // updatedAt, //更新時間
-    // updatedBy, // 更新人員
-
-    // sourceFormId, //來源表單Id
-    // sourceFormType, //來源表單類型
-    // paymentRequestNumber, //請款單編號
-
-    // customerNumber, //客戶編號
-    // customerName, //客戶名稱
-
-    // invoiceNumber, //發票號碼
-    // invoiceAmount, //發票金額
-
-    // accountsReceivableId, //應收帳款Id
-    // type, //請款單類型
-    // period, //請款單期別
-    // paymentCurrency, //請款幣別
-    // foreignCurrencyAmount, //外幣金額
-    // paymentAmount, //請款金額
-    // collect_amount, //已收金額,餘額在repo裡計算
-    // receipt_balance, //收款餘額
-    // deduction, //扣款金額
-  } = paymentRequest ?? {};
+  const { state_paymentRequest, setState_paymentRequest } = instance_paymentRequest;
 
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
-  const [disabled, setDisabled] = useState<boolean>(false);
 
   // -----------------------------------------------------------------------------
-
-  const { state_paymentRequest, setState_paymentRequest, reset_paymentRequest } = usePaymentRequest(paymentRequest);
 
   // -----------------------------------------------------------------------------
 
@@ -435,78 +384,6 @@ const CurrentPaymentRequestDetails = ({
 // ===============================================================================
 
 // MARK: useData
-
-const usePaymentRequest = (rawData: TpaymentRequest_noDetail | undefined | null) => {
-  const defaultState = useDefaultState(rawData);
-  const [state, setState] = useState<Tstate>(defaultState);
-
-  const reset = () => {
-    setState(emptyState());
-  };
-
-  // -----------------------------------------------------------------------
-  useEffect(() => {
-    setState(defaultState);
-  }, [defaultState]);
-
-  return {
-    state_paymentRequest: state,
-    setState_paymentRequest: setState,
-    reset_paymentRequest: reset,
-  };
-};
-
-const emptyState = (): Tstate => {
-  const state: Tstate = {
-    type: '',
-    累計請款金額: '',
-    營業稅: '',
-    本期合計: '',
-    保留款: '',
-    稅別: '',
-    保留款金額: '',
-
-    發票本: null,
-    發票日期: null,
-    invoiceNumber: null,
-    invoiceAmount: '',
-
-    customerName: null,
-    customerNumber: null,
-    統一編號: null,
-  };
-
-  return state;
-};
-
-const useDefaultState = (rawData: TpaymentRequest_noDetail | undefined | null): Tstate => {
-  return useMemo(() => {
-    if (!rawData) {
-      return emptyState();
-    }
-
-    const defaultState: Tstate = {
-      type: rawData.type || '',
-      累計請款金額: '',
-      營業稅: '',
-      本期合計: '',
-      保留款: '',
-      稅別: '',
-      保留款金額: '',
-
-      發票本: null,
-      發票日期: null,
-      invoiceNumber: rawData.invoiceNumber,
-      invoiceAmount: rawData.invoiceAmount === null ? '' : `${rawData.invoiceAmount}`,
-
-      customerName: rawData.customerName,
-      customerNumber: rawData.customerNumber,
-      統一編號: null,
-    };
-
-    return defaultState;
-  }, [rawData]);
-};
 
 // ===============================================================================
 
