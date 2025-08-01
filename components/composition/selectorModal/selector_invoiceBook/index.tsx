@@ -7,7 +7,7 @@ import Btn from 'components/global/gear/button/btn_fong';
 import { Container_confirm } from 'components/global/container/modal';
 import DataEntry, { DataEntry_fong, DatePicker } from 'components/global/gear/dataEntry';
 
-import { useGetAccountantInvoiceBook, TaccountantInvoiceBookDto } from 'js/api/api_accountant';
+import { Tparams, useGetAccountantInvoiceBook, TaccountantInvoiceBookDto } from 'js/api/api_accountant';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
@@ -26,7 +26,7 @@ const Selector_invoiceBook = ({
   const [date_param, setDate_param] = useState<Dayjs | null>(null);
 
   const [page, setPage] = useState(1);
-  const params = useMemo(() => {
+  const params: Tparams = useMemo(() => {
     const filter = (() => {
       if (!date_param) {
         return undefined;
@@ -46,6 +46,8 @@ const Selector_invoiceBook = ({
     })();
 
     return {
+      sort: 'createdAt',
+      order: 'DESC',
       page,
       filter,
     };
