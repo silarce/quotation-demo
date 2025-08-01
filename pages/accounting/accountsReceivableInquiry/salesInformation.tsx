@@ -144,9 +144,9 @@ export default function SalesInformation() {
           </DataEntry_fong>
 
           <DataEntry_fong caption="統一編號" className="col-span-2">
-            {'customerTaxId'}
+            {'no property'}
           </DataEntry_fong>
-          <DataEntry_fong caption="稅別">{'taxType'}</DataEntry_fong>
+          <DataEntry_fong caption="稅別">{'no property'}</DataEntry_fong>
           <DataEntry_fong caption="外幣">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
 
           <DataEntry_fong caption="銷售金額">
@@ -155,18 +155,18 @@ export default function SalesInformation() {
           <DataEntry_fong caption="銷售稅金">
             {<span className="text-right">{toLocaleString(taxes)}</span>}
           </DataEntry_fong>
-          <DataEntry_fong caption="追加減金額">{'attachmentTotal'}</DataEntry_fong>
-          <DataEntry_fong caption="追加減金額稅金">{'attachmentTax'}</DataEntry_fong>
+          <DataEntry_fong caption="追加減金額">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="追加減金額稅金">{'no property'}</DataEntry_fong>
 
-          <DataEntry_fong caption="已收金額">{'receivedAmount'}</DataEntry_fong>
-          <DataEntry_fong caption="扣款折讓">{'discountAmount'}</DataEntry_fong>
+          <DataEntry_fong caption="已收金額">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="扣款折讓">{'no property'}</DataEntry_fong>
           <DataEntry_fong caption="已請款總額">{prAmount}</DataEntry_fong>
           <DataEntry_fong caption="銷售總額">{totalAmount}</DataEntry_fong>
 
-          <DataEntry_fong caption="合約保留款類型"></DataEntry_fong>
-          <DataEntry_fong caption="稅別"></DataEntry_fong>
-          <DataEntry_fong caption="百分比%"></DataEntry_fong>
-          <DataEntry_fong caption="保留款金額"></DataEntry_fong>
+          <DataEntry_fong caption="合約保留款類型">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="稅別">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="百分比%">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="保留款金額">{'no property'}</DataEntry_fong>
         </div>
         {/*  */}
         <div className="mt-10">
