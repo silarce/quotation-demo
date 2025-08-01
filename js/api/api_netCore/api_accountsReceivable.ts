@@ -374,6 +374,18 @@ const apiPostInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => 
   });
 };
 
+const apiPatchInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => {
+  const api = '/api/AccountsReceivable/UpdateAccountsReceivables';
+
+  return axi_monkey.patch(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '更新請款單失敗',
+      content: error.message,
+    });
+  });
+};
+
 // 未上beta，回應404
 const apiGetPaymentRequestType = async () => {
   const api = '/api/AccountsReceivable/GetPaymentRequestType';
@@ -568,6 +580,7 @@ export {
   apiQuotationToAccountsReceivables,
   apiGetARPaymentDataInset as apiGetARPaymentDataInsert,
   apiPostInsertPaymentRequest,
+  apiPatchInsertPaymentRequest,
 };
 
 export {
