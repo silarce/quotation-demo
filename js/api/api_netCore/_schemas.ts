@@ -659,20 +659,27 @@ interface TinsertpaymentRequest {
     paymentCurrency: string; // 請款幣別,
     foreignCurrencyAmount: number; // 外幣金額,
     paymentAmount: number; // 請款金額,
-    retainageType: number; // "保留款",
+
+    retainageType: '保留款'; // "保留款",
     retainageTaxCategory: string; // 保留款稅別(含稅、未稅、無),
     retainageRate: number; // 保留款%數 10 ,
     retainageAmount: number; // 保留款金額 61601,
 
-    completedProduct: string; // 項目完成度，json格式字串 "[{\"salesOrderItemId\":\"f249e218-b2a6-44db-b6fc-297f988098c4\",\"completedPayment\":1305,\"completedQuantity\":0.1 }]"
+    completedProduct: {
+      salesOrderItemId: string;
+      completedPayment: number;
+      completedQuantity: number;
+    }[];
   };
   invoice?: {
     invoiceDate: string; // 發票開立日期 "2025-05-03",
     invoiceNumber: string; // 發票號碼 "MV34400404",
     buyer: string; // 客戶抬頭 "一代冷氣空調有限公司",
-    amount: number; // 發票金額 9524,
-    taxes: number; // 發票稅額 476,
-    totalAmount: number; //總金額 10000,
+
+    amount: number; // 發票金額 9524, //
+    taxes: number; // 發票稅額 476, //
+    totalAmount: number; //總金額 10000, // UI上叫總金額
+
     taxId: string; // 統一編號 "54741781",
     taxAddress: string | null; // 發票地址 null,
     remark: string | null; // 備註 null ,
@@ -680,6 +687,11 @@ interface TinsertpaymentRequest {
     invoiceBookId: string; // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
     period: `${number}`; //發票期數 "3"
   };
+}
+
+interface TpaymentRequestType {
+  codeName: string;
+  name: string;
 }
 
 // endregion accountsReceivable
@@ -762,4 +774,5 @@ export type {
   Treview_status,
   Treview_status__stages,
   TinsertpaymentRequest,
+  TpaymentRequestType,
 };
