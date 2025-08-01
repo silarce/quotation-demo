@@ -13,6 +13,7 @@ import type {
   TquotationListViewModel_Dto,
   TaccountsReceivable,
   TpaymentRequest_Dto,
+  TinsertpaymentRequest,
 } from './_schemas';
 
 const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
@@ -362,7 +363,7 @@ const useApiGetARPaymentDataInset = (
   };
 };
 
-const apiPostInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => {
+const apiPostInsertPaymentRequest = async (body: TinsertpaymentRequest) => {
   const api = '/api/AccountsReceivable/InsertPaymentRequest';
 
   return axi_monkey.post(api, body).catch((err) => {
@@ -374,7 +375,7 @@ const apiPostInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => 
   });
 };
 
-const apiPatchInsertPaymentRequest = async (body: Tbody_insertPaymentRequest) => {
+const apiPatchInsertPaymentRequest = async (body: unknown) => {
   const api = '/api/AccountsReceivable/UpdateAccountsReceivables';
 
   return axi_monkey.patch(api, body).catch((err) => {
@@ -432,26 +433,32 @@ interface Tres_apiGetARPaymentData {
   // 本次請款明細
   paymentRequest: {
     id: string | null; //請款單Id
-    paymentRequestNumber: string | null; //請款單編號
-    sourceFormType: string | null; //來源表單類型
-    sourceFormId: string | null; //來源表單Id
-    customerNumber: string; //客戶編號
-    customerName: string; //客戶名稱
+
     createdAt: string | null; //建立時間
     createdBy: string | null; //建立人員
     updatedAt: string | null; //更新時間
     updatedBy: string | null; // 更新人員
-    invoiceNumber: string | null; //發票號碼
-    invoiceAmount: number | null; //發票金額
+
     accountsReceivableId: string | null; //應收帳款Id
+    paymentRequestNumber: string | null; //請款單編號
     type: string; //請款單類型
     period: string; //請款單期別
+
+    sourceFormType: string | null; //來源表單類型
+    sourceFormId: string | null; //來源表單Id
+
+    customerNumber: string; //客戶編號
+    customerName: string; //客戶名稱
+
     paymentCurrency: string; //請款幣別
     foreignCurrencyAmount: number | null; //外幣金額
     paymentAmount: number | null; //請款金額
     collect_amount: number | null; //已收金額,餘額在repo裡計算
     receipt_balance: number | null; //收款餘額
     deduction: number | null; //扣款金額
+
+    invoiceNumber: string | null; //發票號碼
+    invoiceAmount: number | null; //發票金額
 
     //請款單沖銷明細 // 沖銷明細
     prOffsetDetails: {
@@ -532,47 +539,54 @@ interface Tres_apiGetARPaymentData {
 type Tres_apiGetARPaymentDataInsert = Omit<Tres_apiGetARPaymentData, 'paymentRequest'> & { paymentRequest: null };
 
 // MARK:Tbody_insertPaymentRequest
-interface Tbody_insertPaymentRequest {
-  paymentRequest: {
-    createdAt: string; // 建立時間,
-    createdBy: string; // 建立人員(員工編號),
-    updatedAt: string; //  修改時間,
-    updatedBy: string; // 修改人員(員工編號),
+// interface Tbody_insertPaymentRequest {
+//   paymentRequest: {
+//     createdAt: string; // 建立時間,
+//     createdBy: string; // 建立人員(員工編號),
+//     updatedAt: string; //  修改時間,
+//     updatedBy: string; // 修改人員(員工編號),
 
-    accountsReceivableId: string; // 應收帳款Id,
-    sourceFormType: string; //  來源類別-accountsReceivableList.sourceType,
-    sourceFormId: string; // 來源ID-accountsReceivableList.sourceId,
+//     accountsReceivableId: string; // 應收帳款Id,
+//     sourceFormType: string; //  來源類別-accountsReceivableList.sourceType,
+//     sourceFormId: string; // 來源ID-accountsReceivableList.sourceId,
 
-    customerNumber: string; // 客戶編號,
-    customerName: string; // 客戶名稱,
+//     customerNumber: string; // 客戶編號,
+//     customerName: string; // 客戶名稱,
 
-    type: string; // 請款類別 "訂金"、"支軌"、"安裝"...,
+//     type: string; // 請款類別 "訂金"、"支軌"、"安裝"...,
 
-    paymentCurrency: string; // 請款幣別,
-    foreignCurrencyAmount: string; // 外幣金額,
-    paymentAmount: string; // 請款金額
-  };
-  // 有發票號碼的話要加invoice
-  invoice?: {
-    invoiceBookId: string; // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
-    invoiceNumber: string; // 發票號碼 "MV34400404",
-    invoiceDate: string; // 發票開立日期 "2025-05-03",
-    period: string; //發票期數 "3" // 發票本的期數
+//     paymentCurrency: string; // 請款幣別,
+//     foreignCurrencyAmount: string; // 外幣金額,
+//     paymentAmount: string; // 請款金額
+//   };
+//   // 有發票號碼的話要加invoice
+//   invoice?: {
+//     invoiceBookId: string; // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+//     period: string; //發票期數 "3" // 發票本的期數
 
-    buyer: string; // 客戶抬頭 "一代冷氣空調有限公司",
-    taxId: string; //  統一編號 "54741781",
-    taxAddress: string | null; //  發票地址 null,
+//     invoiceNumber: string; // 發票號碼 "MV34400404",
+//     invoiceDate: string; // 發票開立日期 "2025-05-03",
 
-    amount: string; // 發票金額 9524,
-    taxes: string; // 發票稅額 476,
-    totalAmount: number; // 總金額 10000,
+//     buyer: string; // 客戶抬頭 "一代冷氣空調有限公司",
+//     taxId: string; //  統一編號 "54741781",
+//     taxAddress: string | null; //  發票地址 null,
 
-    remark: string | null; // 備註 null ,
-  };
-}
+//     amount: string; // 發票金額 9524,
+//     taxes: string; // 發票稅額 476,
+//     totalAmount: number; // 總金額 10000,
+
+//     remark: string | null; // 備註 null ,
+//   };
+// }
 
 // ========================================================================
-export type { TaccountsReceivablesList_Dto, TquotationListViewModel_Dto, TaccountsReceivable, TpaymentRequest_Dto };
+export type {
+  TaccountsReceivablesList_Dto,
+  TquotationListViewModel_Dto,
+  TaccountsReceivable,
+  TpaymentRequest_Dto,
+  TinsertpaymentRequest,
+};
 
 export type { Tres_apiGetARPaymentData, Tres_apiGetARPaymentDataInsert };
 
