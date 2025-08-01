@@ -365,7 +365,7 @@ const CurrentPaymentRequestDetails = ({
                   會計收款
                 </Btn>
                 <Btn theme="cross" onClick={handle_addFee}>
-                  新增手續費
+                  新增扣款
                 </Btn>
               </div>
               <div></div>
