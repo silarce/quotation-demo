@@ -24,7 +24,7 @@ type Tstate = Omit<
 
 // MARK: START
 
-const ProjectDetail = ({
+const SalesOrderItem = ({
   allowEdit = false,
   data,
   className,
@@ -169,4 +169,4 @@ const toLocalString = (value: number | null) => {
 // ====================================================================
 // ====================================================================
 
-export default ProjectDetail;
+export default SalesOrderItem;
