@@ -61,81 +61,81 @@ export default function PayentRequest() {
 
   const instance_paymentRequest = usePaymentRequest(paymentRequest);
 
-  // useEffect(() => {
-  //   apiGetPaymentRequestType();
-  // }, []);
+  useEffect(() => {
+    apiGetPaymentRequestType();
+  }, []);
 
-  // const req_postInsertPaymentRequest = async (paymentRequest: Tstate_paymentRequest) => {
-  //   if (!accountsReceivables) {
-  //     myAlert.err({ title: '未取得必要資料' });
+  const req_postInsertPaymentRequest = async (paymentRequest: Tstate_paymentRequest) => {
+    if (!accountsReceivables) {
+      myAlert.err({ title: '未取得必要資料' });
 
-  //     return;
-  //   }
+      return;
+    }
 
-  //   const { sourceType, sourceId } = accountsReceivables!;
+    const { sourceType, sourceId } = accountsReceivables!;
 
-  //   if (!sourceId) {
-  //     return;
-  //   }
+    if (!sourceId) {
+      return;
+    }
 
-  //   if (!userInfo) {
-  //     return;
-  //   }
+    if (!userInfo) {
+      return;
+    }
 
-  //   const isInvalid_paymentRequest = Object.values(paymentRequest).some((item) => !item);
+    const isInvalid_paymentRequest = Object.values(paymentRequest).some((item) => !item);
 
-  //   if (isInvalid_paymentRequest) {
-  //     return;
-  //   }
+    if (isInvalid_paymentRequest) {
+      return;
+    }
 
-  //   const validPaymentRequest = paymentRequest as DeepNonNullable<Tstate_paymentRequest>;
-  //   const {
-  //     type,
-  //     累計請款金額,
-  //     營業稅,
-  //     本期合計,
-  //     保留款,
-  //     稅別,
-  //     保留款金額,
-  //     發票本,
-  //     發票日期,
-  //     invoiceNumber,
-  //     invoiceAmount,
-  //     customerName,
-  //     customerNumber,
-  //     統一編號,
-  //   } = validPaymentRequest;
+    const validPaymentRequest = paymentRequest as DeepNonNullable<Tstate_paymentRequest>;
+    const {
+      type,
+      paymentAmount,
+      營業稅,
+      保留款,
+      稅別,
+      保留款金額,
+      發票本,
+      發票日期,
+      invoiceNumber,
+      invoiceAmount,
+      customerName,
+      customerNumber,
+      統一編號,
+    } = validPaymentRequest;
 
-  //   const body: TinsertpaymentRequest = {
-  //     paymentRequest: {
-  //       createdAt: new Date().toISOString(),
-  //       createdBy: userInfo.id,
-  //       updatedAt: new Date().toISOString(),
-  //       updatedBy: userInfo.id,
+    // const body: TinsertpaymentRequest = {
+    //   paymentRequest: {
+    //     createdAt: new Date().toISOString(),
+    //     createdBy: userInfo.id,
+    //     updatedAt: new Date().toISOString(),
+    //     updatedBy: userInfo.id,
 
-  //       sourceFormType: sourceType,
-  //       sourceFormId: sourceId,
-  //       accountsReceivableId: accountsReceivables.id,
+    //     sourceFormType: sourceType,
+    //     sourceFormId: sourceId,
+    //     accountsReceivableId: accountsReceivables.id,
 
-  //       customerNumber: customerNumber,
-  //       customerName: customerName,
+    //     customerNumber: customerNumber,
+    //     customerName: customerName,
 
-  //       type: type,
+    //     type: type,
 
-  //       paymentCurrency, // 請款幣別,
-  //       foreignCurrencyAmount, // 外幣金額,
-  //       paymentAmount, // 請款金額,
-  //       retainageType, // "保留款", // retainageType type?這是金額還是類型?
-  //       retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
-  //       retainageRate: Number(保留款), // 保留款%數 10 ,
-  //       retainageAmount: Number(保留款金額), // 保留款金額 61601,
+    //     paymentCurrency, // 請款幣別,
+    //     foreignCurrencyAmount, // 外幣金額,
+    //     paymentAmount: Number(paymentAmount), // 請款金額, // 本期合計
 
-  //       completedProduct,
-  //     },
-  //   };
+    //     retainageType: '保留款', // "保留款", // retainageType type?這是金額還是類型?
+    //     retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
+    //     retainageRate: Number(保留款), // 保留款%數 10 ,
+    //     retainageAmount: Number(保留款金額), // 保留款金額 61601,
 
-  //   // apiPostInsertPaymentRequest
-  // };
+    //     completedProduct,
+    //   },
+    // };
+
+    // apiPostInsertPaymentRequest
+  };
 
   // MARK:RENDER
 

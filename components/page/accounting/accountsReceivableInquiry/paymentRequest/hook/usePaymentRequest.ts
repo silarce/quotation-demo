@@ -9,9 +9,8 @@ type TpaymentRequest_noDetail = Omit<TpaymentRequest, 'prOffsetDetails'>;
 
 interface Tstate_paymentRequest {
   type: string;
-  累計請款金額: `${number}` | '';
+  paymentAmount: `${number}` | '';
   營業稅: `${number}` | '';
-  本期合計: `${number}` | '';
   保留款: `${number}` | '';
   稅別: string;
   保留款金額: `${number}` | '';
@@ -54,9 +53,8 @@ const usePaymentRequest = (rawData: TpaymentRequest_noDetail | undefined | null)
 const emptyState_paymentRequest = (): Tstate_paymentRequest => {
   const state: Tstate_paymentRequest = {
     type: '',
-    累計請款金額: '',
+    paymentAmount: '',
     營業稅: '',
-    本期合計: '',
     保留款: '',
     稅別: '',
     保留款金額: '',
@@ -84,9 +82,8 @@ const useDefaultState_paymentRequest = (
 
     const defaultState: Tstate_paymentRequest = {
       type: rawData.type || '',
-      累計請款金額: '',
+      paymentAmount: rawData.paymentAmount === null ? '' : `${rawData.paymentAmount}`,
       營業稅: '',
-      本期合計: '',
       保留款: '',
       稅別: '',
       保留款金額: '',

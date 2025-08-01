@@ -143,13 +143,13 @@ const CurrentPaymentRequestDetails = ({
             <DataEntry_fong caption="類型" isMust={true} disabled={disabled}>
               <Select value={state_paymentRequest.type} />
             </DataEntry_fong>
-            <DataEntry_fong caption="累計請款金額 no property" isMust={true} disabled={disabled}>
+            <DataEntry_fong caption="請款金額" isMust={true} disabled={disabled}>
               <Input_money
-                value={state_paymentRequest.累計請款金額}
+                value={state_paymentRequest.paymentAmount}
                 onChange={(e) => {
                   setState_paymentRequest((prev) => ({
                     ...prev,
-                    累計請款金額: e.target.value as `${number}` | '',
+                    paymentAmount: e.target.value as `${number}` | '',
                   }));
                 }}
               />
@@ -165,17 +165,7 @@ const CurrentPaymentRequestDetails = ({
                 }}
               />
             </DataEntry_fong>
-            <DataEntry_fong caption="本期合計 no property" isMust={true} disabled={disabled}>
-              <Input_money
-                value={state_paymentRequest.本期合計}
-                onChange={(e) => {
-                  setState_paymentRequest((prev) => ({
-                    ...prev,
-                    本期合計: e.target.value as `${number}` | '',
-                  }));
-                }}
-              />
-            </DataEntry_fong>
+
             <DataEntry_fong caption="保留款(%) no property" isMust={true} disabled={disabled}>
               <Input
                 type="number"
@@ -211,6 +201,7 @@ const CurrentPaymentRequestDetails = ({
               />
             </DataEntry_fong>
 
+            <div />
             <div />
 
             <DataEntry_fong
