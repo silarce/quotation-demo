@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import classNames from 'classnames';
 
@@ -15,6 +15,8 @@ import Selector_invoice from 'components/composition/selectorModal/selector_invo
 import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
 
 import { Tinstance_paymentRequest } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/usePaymentRequest';
+
+import { useApiGetPaymentRequestType } from 'js/api/api_netCore/api_accountsReceivable';
 
 // =========================================================================
 
@@ -37,6 +39,8 @@ const CurrentPaymentRequestDetails = ({
   instance_paymentRequest: Tinstance_paymentRequest;
   children?: React.ReactNode;
 }) => {
+  const { data: data_paymentRequestType } = useApiGetPaymentRequestType();
+
   const { state_paymentRequest, setState_paymentRequest } = instance_paymentRequest;
 
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
@@ -127,6 +131,18 @@ const CurrentPaymentRequestDetails = ({
     });
   };
 
+  // --------------------------------------------------------------------------
+
+  const options_paymentType = useMemo(() => {
+    return (
+      data_paymentRequestType?.map((item) => ({
+        value: item.name,
+        label: item.name,
+      })) ?? []
+    );
+  }, [data_paymentRequestType]);
+
+  // --------------------------------------------------------------------------
   // MARK:RENDER
   return (
     <div className={className}>
@@ -141,7 +157,16 @@ const CurrentPaymentRequestDetails = ({
         <div className="p-6 border border-gray05 rounded-lg shadow-[0px_4px_4px_0px_#00000040]">
           <div className={classNames('grid grid-cols-4 gap-fong ')}>
             <DataEntry_fong caption="類型" isMust={true} disabled={disabled}>
-              <Select value={state_paymentRequest.type} />
+              <Select
+                options={options_paymentType}
+                value={state_paymentRequest.type}
+                onChange={(value) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    type: value,
+                  }));
+                }}
+              />
             </DataEntry_fong>
             <DataEntry_fong caption="請款金額" isMust={true} disabled={disabled}>
               <Input_money

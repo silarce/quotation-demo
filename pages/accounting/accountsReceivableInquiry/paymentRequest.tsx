@@ -11,7 +11,7 @@ import {
   TinsertpaymentRequest,
   //
   useApiGetARPaymentData,
-  useApiGetARPaymentDataInsert,
+  useApiGetARPaymentDataInset,
   apiGetPaymentRequestType,
   apiPostInsertPaymentRequest,
   apiPatchInsertPaymentRequest,
@@ -54,7 +54,7 @@ export default function PayentRequest() {
   const { userInfo } = useGlobal_userInfo();
 
   const { data: data_paymentQuest } = useApiGetARPaymentData(paymentQuestId);
-  const { data: data_forNew } = useApiGetARPaymentDataInsert(isNew ? accountsReceivableId : undefined);
+  const { data: data_forNew } = useApiGetARPaymentDataInset(isNew ? accountsReceivableId : undefined);
 
   const { accountsReceivables, paymentRequest, salesOrder } = data_paymentQuest ?? data_forNew ?? {};
   const salesOrderItems = salesOrder?.salesOrderItems ?? [];
