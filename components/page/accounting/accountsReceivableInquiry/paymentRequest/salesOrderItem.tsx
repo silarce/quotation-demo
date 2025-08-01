@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import Decimal from 'decimal.js';
-
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import DataEntry, { Input_money } from 'components/global/gear/dataEntry';
 
 import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+
+import { Tinstance_salesOrderItem } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
 
 // =============================================================================
 
@@ -23,14 +22,14 @@ type Tstate = TsalesOrderItem & {
 
 const SalesOrderItem = ({
   allowEdit = false,
-  data,
   className,
+  instance_salesOrderItem,
 }: {
   allowEdit?: boolean;
-  data: TsalesOrderItemArr | undefined;
   className?: string;
+  instance_salesOrderItem: Tinstance_salesOrderItem;
 }) => {
-  const { stateArr, setCompletedInThisPeriod, reset } = useSalesOrderItemArr(data);
+  const { stateArr, setCompletedInThisPeriod } = instance_salesOrderItem;
 
   const columns_projectDetail: TableProps<Tstate>['columns'] = [
     {
@@ -107,52 +106,6 @@ const SalesOrderItem = ({
 // ============================================================================
 // ============================================================================
 // ============================================================================
-
-const useDefaultState = (rawData: TsalesOrderItemArr | undefined | null): Tstate[] => {
-  return useMemo(() => {
-    return (rawData ?? []).map((item) => ({
-      ...item,
-      completedQuantity: '',
-      completedPayment: null,
-    }));
-  }, [rawData]);
-};
-
-const useSalesOrderItemArr = (rawData: TsalesOrderItemArr | undefined | null) => {
-  const defaultState = useDefaultState(rawData);
-
-  const [stateArr, setStateArr] = useState<Tstate[]>(defaultState);
-
-  const setCompletedInThisPeriod = (index: number, value: `${number}` | '') => {
-    const copy = { ...stateArr[index] };
-    const unitPrice = copy.unitPrice || 0;
-
-    copy.completedQuantity = value;
-    copy.completedPayment = new Decimal(value || 0).mul(unitPrice).toDecimalPlaces(0).toNumber();
-
-    setStateArr((prev) => {
-      const newState = [...prev];
-      newState[index] = copy;
-
-      return newState;
-    });
-  };
-
-  const reset = () => {
-    setStateArr(defaultState);
-  };
-
-  useEffect(() => {
-    setStateArr(defaultState);
-  }, [defaultState]);
-
-  return {
-    stateArr,
-    setCompletedInThisPeriod,
-    reset,
-  };
-};
-
 // ============================================================================
 
 const toLocalString = (value: number | null) => {

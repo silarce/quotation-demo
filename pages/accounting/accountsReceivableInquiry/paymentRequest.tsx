@@ -24,10 +24,7 @@ import History from 'components/page/accounting/accountsReceivableInquiry/paymen
 import SalesOrderItem from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/salesOrderItem';
 import PrOffsetDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/prOffsetDetails';
 
-import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
-
 import scss from './paymentRequest.module.scss';
-import { modal_empty } from 'components/global/gear/modal/fongModal';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
@@ -35,6 +32,11 @@ import {
   usePaymentRequest,
   Tstate_paymentRequest,
 } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/usePaymentRequest';
+
+import {
+  Tstate_salesOrderItem,
+  useSalesOrderItemArr,
+} from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
 
 // ============================================================================
 
@@ -60,6 +62,7 @@ export default function PayentRequest() {
   const salesOrderItems = salesOrder?.salesOrderItems ?? [];
 
   const instance_paymentRequest = usePaymentRequest(paymentRequest);
+  const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
 
   useEffect(() => {
     apiGetPaymentRequestType();
@@ -105,6 +108,12 @@ export default function PayentRequest() {
       統一編號,
     } = validPaymentRequest;
 
+    const completedProduct = instance_salesOrderItem.stateArr.map((item) => ({
+      salesOrderItemId: item.id,
+      completedQuantity: Number(item.completedQuantity),
+      completedPayment: item.completedPayment ?? 0,
+    }));
+
     // const body: TinsertpaymentRequest = {
     //   paymentRequest: {
     //     createdAt: new Date().toISOString(),
@@ -130,7 +139,7 @@ export default function PayentRequest() {
     //     retainageRate: Number(保留款), // 保留款%數 10 ,
     //     retainageAmount: Number(保留款金額), // 保留款金額 61601,
 
-    //     completedProduct,
+    //     completedProduct: completedProduct,
     //   },
     // };
 
@@ -153,7 +162,7 @@ export default function PayentRequest() {
       </div>
 
       {/* 項目明細 */}
-      <SalesOrderItem className="mb-4" data={salesOrderItems} allowEdit={isNew} />
+      <SalesOrderItem className="mb-4" instance_salesOrderItem={instance_salesOrderItem} allowEdit={isNew} />
       {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
       {/* 本次請款明細 含沖銷明細 */}
