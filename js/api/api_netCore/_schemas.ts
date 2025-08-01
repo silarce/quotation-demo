@@ -678,7 +678,7 @@ interface TinsertpaymentRequest {
 
     amount: number; // 發票金額 9524, //
     taxes: number; // 發票稅額 476, //
-    totalAmount: number; //總金額 10000, // UI上叫總金額
+    totalAmount: number; //總金額 10000, // UI上叫發票金額
 
     taxId: string; // 統一編號 "54741781",
     taxAddress: string | null; // 發票地址 null,

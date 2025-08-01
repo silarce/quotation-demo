@@ -58,7 +58,7 @@ const CurrentPaymentRequestDetails = ({
               const { id, alphabeticLetter, period } = invoiceBook;
               setState_paymentRequest((prev) => ({
                 ...prev,
-                發票本: {
+                invoiceBook: {
                   id,
                   alphabeticLetter,
                   period,
@@ -77,7 +77,7 @@ const CurrentPaymentRequestDetails = ({
   };
 
   const handle_selectInvoice = () => {
-    const invoiceBookId = state_paymentRequest.發票本?.id;
+    const invoiceBookId = state_paymentRequest.invoiceBook?.id;
 
     if (!invoiceBookId) {
       return;
@@ -121,7 +121,7 @@ const CurrentPaymentRequestDetails = ({
             ...prev,
             customerName: customer.name,
             customerNumber: customer.customerNumber,
-            統一編號: customer.taxId,
+            customerTaxId: customer.taxId,
           }));
         };
 
@@ -194,11 +194,11 @@ const CurrentPaymentRequestDetails = ({
             <DataEntry_fong caption="保留款(%) no property" isMust={true} disabled={disabled}>
               <Input
                 type="number"
-                value={state_paymentRequest.保留款}
+                value={state_paymentRequest.retainageRate}
                 onChange={(e) => {
                   setState_paymentRequest((prev) => ({
                     ...prev,
-                    保留款: e.target.value as `${number}` | '',
+                    retainageRate: e.target.value as `${number}` | '',
                   }));
                 }}
               />
@@ -216,11 +216,11 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
             <DataEntry_fong caption="保留款金額 no property" isMust={true} disabled={disabled}>
               <Input_money
-                value={state_paymentRequest.保留款金額}
+                value={state_paymentRequest.retainageAmount}
                 onChange={(e) => {
                   setState_paymentRequest((prev) => ({
                     ...prev,
-                    保留款金額: e.target.value as `${number}` | '',
+                    retainageAmount: e.target.value as `${number}` | '',
                   }));
                 }}
               />
@@ -238,18 +238,18 @@ const CurrentPaymentRequestDetails = ({
                 onClick: disabled ? undefined : handle_selectInvoiceBook,
               }}
             >
-              {state_paymentRequest.發票本
-                ? state_paymentRequest.發票本?.alphabeticLetter + ' ' + `${state_paymentRequest.發票本?.period}期`
+              {state_paymentRequest.invoiceBook
+                ? state_paymentRequest.invoiceBook?.alphabeticLetter + ' ' + `${state_paymentRequest.invoiceBook?.period}期`
                 : '- -'}
             </DataEntry_fong>
 
             <DataEntry_fong caption="發票日期 no property" isMust={true} disabled={disabled}>
               <DatePicker
-                value={state_paymentRequest.發票日期}
+                value={state_paymentRequest.invoiceDate}
                 onChange={(date) => {
                   setState_paymentRequest((prev) => ({
                     ...prev,
-                    發票日期: date,
+                    invoiceDate: date,
                   }));
                 }}
               />
@@ -292,7 +292,7 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
 
             <DataEntry_fong caption="統一編號 no property" isMust={true} disabled={disabled}>
-              {state_paymentRequest.統一編號}
+              {state_paymentRequest.customerTaxId}
             </DataEntry_fong>
           </div>
           <div className="w-fit m-auto mt-10 mr-0 ml-auto">
