@@ -468,6 +468,7 @@ interface Tres_apiGetARPaymentData {
     exchangeRate: number | null; //匯率
     foreignCurrencyAmount: number | null; //外幣金額
     prAmount: number | null; //已請款金額 總計
+    requestAmount: number | null; // 突然冒出來的 // 或許本來就有，只是給我文件時沒有這個?
     collectAmount: number | null; //已收款項 總計
     uncollectedPayment: number | null; //未收款項 (已請款未收款項)
     totalAmount: number | null; //總金額

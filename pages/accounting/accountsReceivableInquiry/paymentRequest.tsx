@@ -114,50 +114,50 @@ export default function PayentRequest() {
       completedPayment: item.completedPayment ?? 0,
     }));
 
-    const body: TinsertpaymentRequest = {
-      paymentRequest: {
-        createdAt: new Date().toISOString(),
-        createdBy: userInfo.id,
-        updatedAt: new Date().toISOString(),
-        updatedBy: userInfo.id,
+    // const body: TinsertpaymentRequest = {
+    //   paymentRequest: {
+    //     createdAt: new Date().toISOString(),
+    //     createdBy: userInfo.id,
+    //     updatedAt: new Date().toISOString(),
+    //     updatedBy: userInfo.id,
 
-        sourceFormType: sourceType,
-        sourceFormId: sourceId,
-        accountsReceivableId: accountsReceivables.id,
+    //     sourceFormType: sourceType,
+    //     sourceFormId: sourceId,
+    //     accountsReceivableId: accountsReceivables.id,
 
-        customerNumber: customerNumber,
-        customerName: customerName,
+    //     customerNumber: customerNumber,
+    //     customerName: customerName,
 
-        type: type,
+    //     type: type,
 
-        paymentCurrency, // 請款幣別,
-        foreignCurrencyAmount, // 外幣金額,
-        paymentAmount: Number(paymentAmount), // 請款金額, // 本期合計
+    //     paymentCurrency, // 請款幣別,
+    //     foreignCurrencyAmount, // 外幣金額,
+    //     paymentAmount: Number(paymentAmount), // 請款金額, // 本期合計
 
-        retainageType: '保留款', // "保留款", // retainageType type?這是金額還是類型?
-        retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
-        retainageRate: Number(retainageRate), // 保留款%數 10 ,
-        retainageAmount: Number(retainageAmount), // 保留款金額 61601,
+    //     retainageType: '保留款', // "保留款", // retainageType type?這是金額還是類型?
+    //     retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
+    //     retainageRate: Number(retainageRate), // 保留款%數 10 ,
+    //     retainageAmount: Number(retainageAmount), // 保留款金額 61601,
 
-        completedProduct: completedProduct,
-      },
-      invoice: {
-        invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
-        invoiceNumber, // 發票號碼 "MV34400404",
-        buyer: customerName, // 客戶抬頭 "一代冷氣空調有限公司",
+    //     completedProduct: completedProduct,
+    //   },
+    //   invoice: {
+    //     invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
+    //     invoiceNumber, // 發票號碼 "MV34400404",
+    //     buyer: customerName, // 客戶抬頭 "一代冷氣空調有限公司",
 
-        amount, // 發票金額 9524, //
-        taxes, // 發票稅額 476, //
-        totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
+    //     amount, // 發票金額 9524, //
+    //     taxes, // 發票稅額 476, //
+    //     totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
 
-        taxId: customerTaxId, // 統一編號 "54741781",
-        taxAddress, // 發票地址 null,
-        remark, // 備註 null ,
+    //     taxId: customerTaxId, // 統一編號 "54741781",
+    //     taxAddress, // 發票地址 null,
+    //     remark, // 備註 null ,
 
-        invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
-        period: `${invoiceBook.period}`, //發票期數 "3"
-      },
-    };
+    //     invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+    //     period: `${invoiceBook.period}`, //發票期數 "3"
+    //   },
+    // };
 
     // apiPostInsertPaymentRequest
   };

@@ -1,3 +1,4 @@
+import { NumericDictionary } from 'lodash';
 import { TemployeeDto } from '../dtoTypes';
 
 type Guid = string;
@@ -512,7 +513,7 @@ interface TengineerContactExport {
 
 // region accountsReceivable
 
-interface TaccountsReceivablesList_Dto {
+interface TaccountsReceivablesList_Dto_depressed {
   id: Guid; //應收帳款id
   accountsReceivableNumber: string; //應收帳款編號
   sourceType: string; //來源類型
@@ -540,6 +541,37 @@ interface TaccountsReceivablesList_Dto {
   projectName: string | null; //案場名稱
   salesOrderNumber: string | null; //銷售訂單編號
   collectAmount: number | null;
+}
+interface TaccountsReceivablesList_Dto {
+  id: string; //應收帳款id
+  accountsReceivableNumber: string; //應收帳款編號
+  sourceType: string; //來源類型
+  sourceId: string; //來源id
+  customerNumber: string; //客戶編號
+  customerName: string; //客戶名稱
+  companyPhone: string; //公司電話
+  companyFax: string; //公司傳真
+  salesAmount: number; // 銷售金額
+  taxes: number; //稅金
+  salesCurrency: string; //幣別
+  exchangeRate: number; //匯率
+  requestAmount: number; //請款金額
+  foreignCurrencyAmount: number; //外幣金額
+  uncollectedPayment: number; //未收款項 (已請款未收款項)
+  collectAmount: number; //已收款項 總計
+  totalAmount: number; //總金額
+  createdAt: string; //建立時間
+  updatedAt: string; //更新時間
+  createdBy: null; //建立人
+  updatedBy: null; //更新人
+  status: string; //狀態
+  prAmount: number; //已請款金額 總計
+  deduction: number; //扣款金額
+  quotationContractNumber: string; //合約編號
+  projectName: string; //案場名稱
+  salesOrderNumber: string; //銷售訂單編號
+  taxId: string;
+  taxDeductionCategory: null;
 }
 
 interface TquotationListViewModel_Dto {
