@@ -1,5 +1,5 @@
 import { NumericDictionary } from 'lodash';
-import { TemployeeDto } from '../dtoTypes';
+import { TemployeeDto } from '../../dtoTypes';
 
 type Guid = string;
 type DateTime = string; // UTC

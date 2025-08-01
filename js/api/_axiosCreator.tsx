@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { TnetCoreApiBody } from './api_netCore/_schemas';
+import { TnetCoreApiBody } from './api_netCore/schemas';
 
 import Error429 from 'components/wholePage/error429';
 

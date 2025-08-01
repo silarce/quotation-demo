@@ -14,7 +14,7 @@ import type {
   TaccountsReceivable,
   TpaymentRequest_Dto,
   TinsertpaymentRequest,
-} from './_schemas';
+} from './schemas';
 
 const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
   // const api = '/api/AccountsReceivable/GetAccountsReceivablesList';

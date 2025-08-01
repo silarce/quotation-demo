@@ -1,4 +1,4 @@
-import type { Treview_status } from './api_netCore/_schemas';
+import type { Treview_status } from './api_netCore/schemas';
 
 // ---------------------------------------------------------------------------
 

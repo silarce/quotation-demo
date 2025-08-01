@@ -13,7 +13,7 @@ import type {
   TgetReviewById,
   TaddReview,
   TgetReview,
-} from './_schemas';
+} from './schemas';
 
 const subRoot = 'Review';
 

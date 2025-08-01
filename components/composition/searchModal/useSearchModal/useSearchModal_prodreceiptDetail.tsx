@@ -10,7 +10,7 @@ import {
   Tprodreceipt_Dto,
   // Tprodreceiptdetail_Dto,
 } from 'js/api/api_netCore/api_accountant';
-import type { Tprodreceiptdetail_Dto } from 'js/api/api_netCore/_schemas';
+import type { Tprodreceiptdetail_Dto } from 'js/api/api_netCore/schemas';
 
 import { useFilter } from '../useFilter';
 import { useInputSelProps } from '../useInputSelProps';

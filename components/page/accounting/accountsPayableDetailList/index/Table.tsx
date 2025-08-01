@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import Row, { Cell } from 'components/global/gear/table/row';
 
-import type { Treview_status } from 'js/api/api_netCore/_schemas';
+import type { Treview_status } from 'js/api/api_netCore/schemas';
 
 import { useTranslation } from 'react-i18next';
 

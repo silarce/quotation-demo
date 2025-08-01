@@ -45,7 +45,7 @@ import type {
   //
   Tprodreceipt_Dto,
   //
-} from './_schemas';
+} from './schemas';
 
 import { dtoSnakeToCamel } from '../apiUtils/dtoSnakeToCamel';
 
