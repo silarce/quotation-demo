@@ -331,7 +331,7 @@ const CurrentPaymentRequestDetails = ({
             <div />
 
             <DataEntry_fong
-              caption="發票本"
+              caption="發票本 no property"
               isMust={true}
               disabled={disabled}
               childrenWrapperProps={{
