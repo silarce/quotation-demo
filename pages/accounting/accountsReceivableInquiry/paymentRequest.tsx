@@ -22,6 +22,7 @@ import CurrentlyAccumulated from 'components/page/accounting/accountsReceivableI
 import CurrentPaymentRequestDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/currentPaymentRequestDetails';
 import History from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/history';
 import ProjectDetail from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/projectDetail';
+import PrOffsetDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/prOffsetDetails';
 
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
 
@@ -156,11 +157,9 @@ export default function PayentRequest() {
       {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
       {/* 本次請款明細 含沖銷明細 */}
-      <CurrentPaymentRequestDetails
-        className="mb-10"
-        prOffsetDetails={paymentRequest?.prOffsetDetails ?? []}
-        instance_paymentRequest={instance_paymentRequest}
-      />
+      <CurrentPaymentRequestDetails className="mb-10" instance_paymentRequest={instance_paymentRequest}>
+        <PrOffsetDetails prOffsetDetails={paymentRequest?.prOffsetDetails} />
+      </CurrentPaymentRequestDetails>
       {/* 請款紀錄 */}
       <History />
 
