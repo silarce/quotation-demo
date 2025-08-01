@@ -38,10 +38,15 @@ interface Tstate {
   稅別: string;
   保留款金額: `${number}` | '';
 
-  // 發票本: string | null;
+  發票本: {
+    id: string;
+    alphabeticLetter: string;
+    period: number;
+  } | null;
+
   發票日期: Dayjs | null;
   invoiceNumber: string | null;
-  invoiceAmount: number | null;
+  invoiceAmount: `${number}` | '';
 
   customerName: string | null;
   customerNumber: string | null;
@@ -62,30 +67,30 @@ const CurrentPaymentRequestDetails = ({
   const {
     prOffsetDetails,
 
-    createdAt, //建立時間
-    createdBy, //建立人員
-    updatedAt, //更新時間
-    updatedBy, // 更新人員
+    // createdAt, //建立時間
+    // createdBy, //建立人員
+    // updatedAt, //更新時間
+    // updatedBy, // 更新人員
 
-    sourceFormId, //來源表單Id
-    sourceFormType, //來源表單類型
-    paymentRequestNumber, //請款單編號
+    // sourceFormId, //來源表單Id
+    // sourceFormType, //來源表單類型
+    // paymentRequestNumber, //請款單編號
 
-    customerNumber, //客戶編號
-    customerName, //客戶名稱
+    // customerNumber, //客戶編號
+    // customerName, //客戶名稱
 
-    invoiceNumber, //發票號碼
-    invoiceAmount, //發票金額
+    // invoiceNumber, //發票號碼
+    // invoiceAmount, //發票金額
 
-    accountsReceivableId, //應收帳款Id
-    type, //請款單類型
-    period, //請款單期別
-    paymentCurrency, //請款幣別
-    foreignCurrencyAmount, //外幣金額
-    paymentAmount, //請款金額
-    collect_amount, //已收金額,餘額在repo裡計算
-    receipt_balance, //收款餘額
-    deduction, //扣款金額
+    // accountsReceivableId, //應收帳款Id
+    // type, //請款單類型
+    // period, //請款單期別
+    // paymentCurrency, //請款幣別
+    // foreignCurrencyAmount, //外幣金額
+    // paymentAmount, //請款金額
+    // collect_amount, //已收金額,餘額在repo裡計算
+    // receipt_balance, //收款餘額
+    // deduction, //扣款金額
   } = paymentRequest ?? {};
 
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
@@ -103,7 +108,16 @@ const CurrentPaymentRequestDetails = ({
         <Selector_invoiceBook
           onConfirm={async (invoiceBook) => {
             if (invoiceBook) {
-              await handle_selectInvoice(invoiceBook.id);
+              const { id, alphabeticLetter, period } = invoiceBook;
+              setState_paymentRequest((prev) => ({
+                ...prev,
+                發票本: {
+                  id,
+                  alphabeticLetter,
+                  period,
+                },
+              }));
+
               destroy();
             }
           }}
@@ -115,32 +129,34 @@ const CurrentPaymentRequestDetails = ({
     });
   };
 
-  const handle_selectInvoice = async (invoiceBookId: string) => {
-    return new Promise((resolve) => {
-      const { destroy } = modal_empty({
-        content: (
-          <Selector_invoice
-            invoiceBookId={invoiceBookId}
-            onCancel={() => {
-              destroy();
-              resolve(undefined);
-            }}
-            onConfirm={(invoice) => {
-              if (invoice) {
-                setState_paymentRequest((prev) => ({
-                  ...prev,
-                  // 發票日期: invoice.invoiceDate ? Dayjs(invoice.invoiceDate) : null,
-                  invoiceNumber: invoice.fullInvoiceNumber,
-                  invoiceAmount: invoice.invoiceAmount,
-                }));
-              }
+  const handle_selectInvoice = () => {
+    const invoiceBookId = state_paymentRequest.發票本?.id;
 
-              destroy();
-              resolve(undefined);
-            }}
-          />
-        ),
-      });
+    if (!invoiceBookId) {
+      return;
+    }
+
+    const { destroy } = modal_empty({
+      content: (
+        <Selector_invoice
+          invoiceBookId={invoiceBookId}
+          onCancel={() => {
+            destroy();
+          }}
+          onConfirm={(invoice) => {
+            if (invoice) {
+              setState_paymentRequest((prev) => ({
+                ...prev,
+                // 發票日期: invoice.invoiceDate ? Dayjs(invoice.invoiceDate) : null,
+                invoiceNumber: invoice.fullInvoiceNumber,
+                // invoiceAmount: invoice.invoiceAmount,
+              }));
+            }
+
+            destroy();
+          }}
+        />
+      ),
     });
   };
 
@@ -314,11 +330,30 @@ const CurrentPaymentRequestDetails = ({
 
             <div />
 
-            {/* <DataEntry_fong caption="發票本" isMust={true} disabled={disabled}>
-              no property
-            </DataEntry_fong> */}
-            <DataEntry_fong caption="發票日期 no property" isMust={true} disabled={true}>
-              {getTaiwanDateStr(state_paymentRequest.發票日期)}
+            <DataEntry_fong
+              caption="發票本"
+              isMust={true}
+              disabled={disabled}
+              childrenWrapperProps={{
+                className: disabled ? '' : 'cursor-pointer',
+                onClick: disabled ? undefined : handle_selectInvoiceBook,
+              }}
+            >
+              {state_paymentRequest.發票本
+                ? state_paymentRequest.發票本?.alphabeticLetter + ' ' + `${state_paymentRequest.發票本?.period}期`
+                : '- -'}
+            </DataEntry_fong>
+
+            <DataEntry_fong caption="發票日期 no property" isMust={true} disabled={disabled}>
+              <DatePicker
+                value={state_paymentRequest.發票日期}
+                onChange={(date) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    發票日期: date,
+                  }));
+                }}
+              />
             </DataEntry_fong>
 
             <DataEntry_fong
@@ -326,24 +361,32 @@ const CurrentPaymentRequestDetails = ({
               isMust={true}
               disabled={disabled}
               childrenWrapperProps={{
-                onClick: disabled ? undefined : handle_selectInvoiceBook,
+                onClick: disabled ? undefined : handle_selectInvoice,
                 className: disabled ? '' : 'cursor-pointer',
               }}
             >
               {state_paymentRequest.invoiceNumber}
             </DataEntry_fong>
-            <DataEntry_fong caption="發票金額" isMust={true} disabled={true}>
-              {state_paymentRequest.invoiceAmount}
+            <DataEntry_fong caption="發票金額" isMust={true} disabled={disabled}>
+              <Input_money
+                value={state_paymentRequest.invoiceAmount}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    invoiceAmount: e.target.value as `${number}` | '',
+                  }));
+                }}
+              />
             </DataEntry_fong>
-
-            <div />
 
             <DataEntry_fong
               caption="買受人"
               isMust={true}
               disabled={disabled}
               childrenWrapperProps={{
-                onClick: handle_selectCustomer,
+                // onClick: handle_selectCustomer,
+                onClick: disabled ? undefined : handle_selectCustomer,
+                className: disabled ? '' : 'cursor-pointer',
               }}
             >
               {state_paymentRequest.customerName}
@@ -423,10 +466,10 @@ const emptyState = (): Tstate => {
     稅別: '',
     保留款金額: '',
 
-    // 發票本: null,
+    發票本: null,
     發票日期: null,
     invoiceNumber: null,
-    invoiceAmount: null,
+    invoiceAmount: '',
 
     customerName: null,
     customerNumber: null,
@@ -451,9 +494,10 @@ const useDefaultState = (rawData: TpaymentRequest_noDetail | undefined | null): 
       稅別: '',
       保留款金額: '',
 
+      發票本: null,
       發票日期: null,
       invoiceNumber: rawData.invoiceNumber,
-      invoiceAmount: rawData.invoiceAmount,
+      invoiceAmount: rawData.invoiceAmount === null ? '' : `${rawData.invoiceAmount}`,
 
       customerName: rawData.customerName,
       customerNumber: rawData.customerNumber,
