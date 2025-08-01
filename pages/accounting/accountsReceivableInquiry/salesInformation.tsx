@@ -324,7 +324,6 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
           >
             <Icon_note className="inline w-[16px] h-[16px] text-blue01" />
           </Link>
-          <Icon_trash className="inline w-[16px] h-[16px] text-red01" />
         </div>
       );
     },
