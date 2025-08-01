@@ -1,3 +1,4 @@
+import { NumericDictionary } from 'lodash';
 import { TemployeeDto } from '../dtoTypes';
 
 type Guid = string;
@@ -512,7 +513,7 @@ interface TengineerContactExport {
 
 // region accountsReceivable
 
-interface TaccountsReceivablesList_Dto {
+interface TaccountsReceivablesList_Dto_depressed {
   id: Guid; //應收帳款id
   accountsReceivableNumber: string; //應收帳款編號
   sourceType: string; //來源類型
@@ -540,6 +541,37 @@ interface TaccountsReceivablesList_Dto {
   projectName: string | null; //案場名稱
   salesOrderNumber: string | null; //銷售訂單編號
   collectAmount: number | null;
+}
+interface TaccountsReceivablesList_Dto {
+  id: string; //應收帳款id
+  accountsReceivableNumber: string; //應收帳款編號
+  sourceType: string; //來源類型
+  sourceId: string; //來源id
+  customerNumber: string; //客戶編號
+  customerName: string; //客戶名稱
+  companyPhone: string; //公司電話
+  companyFax: string; //公司傳真
+  salesAmount: number; // 銷售金額
+  taxes: number; //稅金
+  salesCurrency: string; //幣別
+  exchangeRate: number; //匯率
+  requestAmount: number; //請款金額
+  foreignCurrencyAmount: number; //外幣金額
+  uncollectedPayment: number; //未收款項 (已請款未收款項)
+  collectAmount: number; //已收款項 總計
+  totalAmount: number; //總金額
+  createdAt: string; //建立時間
+  updatedAt: string; //更新時間
+  createdBy: null; //建立人
+  updatedBy: null; //更新人
+  status: string; //狀態
+  prAmount: number; //已請款金額 總計
+  deduction: number; //扣款金額
+  quotationContractNumber: string; //合約編號
+  projectName: string; //案場名稱
+  salesOrderNumber: string; //銷售訂單編號
+  taxId: string;
+  taxDeductionCategory: null;
 }
 
 interface TquotationListViewModel_Dto {
@@ -659,20 +691,27 @@ interface TinsertpaymentRequest {
     paymentCurrency: string; // 請款幣別,
     foreignCurrencyAmount: number; // 外幣金額,
     paymentAmount: number; // 請款金額,
-    retainageType: number; // "保留款",
+
+    retainageType: '保留款'; // "保留款",
     retainageTaxCategory: string; // 保留款稅別(含稅、未稅、無),
     retainageRate: number; // 保留款%數 10 ,
     retainageAmount: number; // 保留款金額 61601,
 
-    completedProduct: string; // 項目完成度，json格式字串 "[{\"salesOrderItemId\":\"f249e218-b2a6-44db-b6fc-297f988098c4\",\"completedPayment\":1305,\"completedQuantity\":0.1 }]"
+    completedProduct: {
+      salesOrderItemId: string;
+      completedPayment: number;
+      completedQuantity: number;
+    }[];
   };
   invoice?: {
     invoiceDate: string; // 發票開立日期 "2025-05-03",
     invoiceNumber: string; // 發票號碼 "MV34400404",
     buyer: string; // 客戶抬頭 "一代冷氣空調有限公司",
-    amount: number; // 發票金額 9524,
-    taxes: number; // 發票稅額 476,
-    totalAmount: number; //總金額 10000,
+
+    amount: number; // 發票金額 9524, //
+    taxes: number; // 發票稅額 476, //
+    totalAmount: number; //總金額 10000, // UI上叫發票金額
+
     taxId: string; // 統一編號 "54741781",
     taxAddress: string | null; // 發票地址 null,
     remark: string | null; // 備註 null ,
@@ -680,6 +719,11 @@ interface TinsertpaymentRequest {
     invoiceBookId: string; // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
     period: `${number}`; //發票期數 "3"
   };
+}
+
+interface TpaymentRequestType {
+  codeName: string;
+  name: string;
 }
 
 // endregion accountsReceivable
@@ -762,4 +806,5 @@ export type {
   Treview_status,
   Treview_status__stages,
   TinsertpaymentRequest,
+  TpaymentRequestType,
 };

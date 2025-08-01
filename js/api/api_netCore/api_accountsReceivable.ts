@@ -387,11 +387,65 @@ const apiPatchInsertPaymentRequest = async (body: unknown) => {
   });
 };
 
-// 未上beta，回應404
 const apiGetPaymentRequestType = async () => {
   const api = '/api/AccountsReceivable/GetPaymentRequestType';
 
-  return axi_monkey.get<never>(api).then(({ data }) => data);
+  return axi_monkey
+    .get<
+      {
+        codeName: string;
+        name: string;
+      }[]
+    >(api)
+    .then(({ data }) => data)
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.notify.error({
+        message: '取得請款單類型失敗',
+      });
+      console.error('apiGetPaymentRequestType error:', err);
+    });
+};
+
+const useApiGetPaymentRequestType = ({
+  autoUpdate = true,
+}: {
+  autoUpdate?: boolean;
+} = {}) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<{ codeName: string; name: string }[] | null>();
+
+  const update = async () => {
+    if (isFetching) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    const res = await apiGetPaymentRequestType();
+
+    if (!res) {
+      setIsFetching(false);
+      setRes(null);
+
+      return null;
+    }
+
+    setRes(res);
+    setIsFetching(false);
+
+    return res;
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, []);
+
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
 };
 
 // ========================================================================
@@ -414,6 +468,7 @@ interface Tres_apiGetARPaymentData {
     exchangeRate: number | null; //匯率
     foreignCurrencyAmount: number | null; //外幣金額
     prAmount: number | null; //已請款金額 總計
+    requestAmount: number | null; // 突然冒出來的 // 或許本來就有，只是給我文件時沒有這個?
     collectAmount: number | null; //已收款項 總計
     uncollectedPayment: number | null; //未收款項 (已請款未收款項)
     totalAmount: number | null; //總金額
@@ -603,7 +658,8 @@ export {
   useGetAccountsReceivables,
   useGetPaymentRequest,
   useApiGetARPaymentData,
-  useApiGetARPaymentDataInset as useApiGetARPaymentDataInsert,
+  useApiGetARPaymentDataInset,
+  useApiGetPaymentRequestType,
 };
 
 export { apiGetPaymentRequestType };

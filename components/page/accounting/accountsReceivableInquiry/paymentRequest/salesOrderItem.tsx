@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import Decimal from 'decimal.js';
-
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import DataEntry, { Input_money } from 'components/global/gear/dataEntry';
 
 import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+
+import { Tinstance_salesOrderItem } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
 
 // =============================================================================
 
@@ -12,28 +11,25 @@ type TsalesOrderItemArr = Tres_apiGetARPaymentData['salesOrder']['salesOrderItem
 
 type TsalesOrderItem = TsalesOrderItemArr[number];
 
-type Tstate = Omit<
-  TsalesOrderItem,
-  '' // 待api新增本期完成與本期金額的property
-> & {
-  completedInThisPeriod: `${number}` | ''; // 待api新增本期完成的property
-  amountInThisPeriod: number | null; // 待api新增本期完成的property
+type Tstate = TsalesOrderItem & {
+  completedQuantity: `${number}` | ''; // 待api新增本期完成的property
+  completedPayment: number | null; // 待api新增本期完成的property
 };
 
 // =============================================================================
 
 // MARK: START
 
-const ProjectDetail = ({
+const SalesOrderItem = ({
   allowEdit = false,
-  data,
   className,
+  instance_salesOrderItem,
 }: {
   allowEdit?: boolean;
-  data: TsalesOrderItemArr | undefined;
   className?: string;
+  instance_salesOrderItem: Tinstance_salesOrderItem;
 }) => {
-  const { stateArr, setCompletedInThisPeriod, reset } = useSalesOrderItemArr(data);
+  const { stateArr, setCompletedInThisPeriod } = instance_salesOrderItem;
 
   const columns_projectDetail: TableProps<Tstate>['columns'] = [
     {
@@ -66,7 +62,7 @@ const ProjectDetail = ({
     },
     {
       title: '本期完成 noProperty',
-      dataIndex: 'completedInThisPeriod',
+      dataIndex: 'completedQuantity',
       width: 150,
       render: (v, record, index) => {
         return (
@@ -84,7 +80,7 @@ const ProjectDetail = ({
     },
     {
       title: '本期金額 noProperty',
-      dataIndex: 'amountInThisPeriod',
+      dataIndex: 'completedPayment',
       width: 150,
       align: 'right',
       render: (v) => toLocalString(v),
@@ -110,52 +106,6 @@ const ProjectDetail = ({
 // ============================================================================
 // ============================================================================
 // ============================================================================
-
-const useDefaultState = (rawData: TsalesOrderItemArr | undefined | null): Tstate[] => {
-  return useMemo(() => {
-    return (rawData ?? []).map((item) => ({
-      ...item,
-      completedInThisPeriod: '',
-      amountInThisPeriod: null,
-    }));
-  }, [rawData]);
-};
-
-const useSalesOrderItemArr = (rawData: TsalesOrderItemArr | undefined | null) => {
-  const defaultState = useDefaultState(rawData);
-
-  const [stateArr, setStateArr] = useState<Tstate[]>(defaultState);
-
-  const setCompletedInThisPeriod = (index: number, value: `${number}` | '') => {
-    const copy = { ...stateArr[index] };
-    const unitPrice = copy.unitPrice || 0;
-
-    copy.completedInThisPeriod = value;
-    copy.amountInThisPeriod = new Decimal(value || 0).mul(unitPrice).toDecimalPlaces(0).toNumber();
-
-    setStateArr((prev) => {
-      const newState = [...prev];
-      newState[index] = copy;
-
-      return newState;
-    });
-  };
-
-  const reset = () => {
-    setStateArr(defaultState);
-  };
-
-  useEffect(() => {
-    setStateArr(defaultState);
-  }, [defaultState]);
-
-  return {
-    stateArr,
-    setCompletedInThisPeriod,
-    reset,
-  };
-};
-
 // ============================================================================
 
 const toLocalString = (value: number | null) => {
@@ -169,4 +119,4 @@ const toLocalString = (value: number | null) => {
 // ====================================================================
 // ====================================================================
 
-export default ProjectDetail;
+export default SalesOrderItem;

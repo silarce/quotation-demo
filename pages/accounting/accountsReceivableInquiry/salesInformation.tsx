@@ -58,6 +58,7 @@ export default function SalesInformation() {
     requestAmount,
     foreignCurrencyAmount,
     uncollectedPayment,
+    collectAmount,
     totalAmount,
     createdAt,
     updatedAt,
@@ -69,6 +70,8 @@ export default function SalesInformation() {
     quotationContractNumber,
     projectName,
     salesOrderNumber,
+    taxId,
+    taxDeductionCategory,
   } = accountsReceivablesList ?? {};
 
   const onSelectQuotation = async (data: TquotationListViewModel_Dto | undefined) => {
@@ -129,6 +132,8 @@ export default function SalesInformation() {
       <div className="border border-gray05 rounded-01 py-8 px-6">
         <div className="text-xl font-semibold mb-6">應收款</div>
         <div className="grid grid-cols-4 gap-fong ">
+          {/*  */}
+
           <DataEntry_fong caption="合約編號" isMust={true} className="col-span-2">
             {quotationContractNumber}
           </DataEntry_fong>
@@ -143,11 +148,10 @@ export default function SalesInformation() {
             {customerName}
           </DataEntry_fong>
 
-          <DataEntry_fong caption="統一編號" className="col-span-2">
-            {'no property'}
-          </DataEntry_fong>
-          <DataEntry_fong caption="稅別">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="統一編號">{taxId}</DataEntry_fong>
+          <DataEntry_fong caption="稅別">{taxDeductionCategory}</DataEntry_fong>
           <DataEntry_fong caption="外幣">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
+          <DataEntry_fong caption="匯率">{exchangeRate}</DataEntry_fong>
 
           <DataEntry_fong caption="銷售金額">
             {<span className="text-right">{toLocaleString(salesAmount)}</span>}
@@ -158,8 +162,8 @@ export default function SalesInformation() {
           <DataEntry_fong caption="追加減金額">{'no property'}</DataEntry_fong>
           <DataEntry_fong caption="追加減金額稅金">{'no property'}</DataEntry_fong>
 
-          <DataEntry_fong caption="已收金額">{'no property'}</DataEntry_fong>
-          <DataEntry_fong caption="扣款折讓">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="已收金額">{collectAmount}</DataEntry_fong>
+          <DataEntry_fong caption="扣款折讓">{deduction}</DataEntry_fong>
           <DataEntry_fong caption="已請款總額">{prAmount}</DataEntry_fong>
           <DataEntry_fong caption="銷售總額">{totalAmount}</DataEntry_fong>
 

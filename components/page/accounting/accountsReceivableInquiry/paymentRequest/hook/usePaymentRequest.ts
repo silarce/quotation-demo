@@ -9,26 +9,25 @@ type TpaymentRequest_noDetail = Omit<TpaymentRequest, 'prOffsetDetails'>;
 
 interface Tstate_paymentRequest {
   type: string;
-  累計請款金額: `${number}` | '';
+  paymentAmount: `${number}` | '';
   營業稅: `${number}` | '';
-  本期合計: `${number}` | '';
-  保留款: `${number}` | '';
+  retainageRate: `${number}` | '';
   稅別: string;
-  保留款金額: `${number}` | '';
+  retainageAmount: `${number}` | '';
 
-  發票本: {
+  invoiceBook: {
     id: string;
     alphabeticLetter: string;
     period: number;
   } | null;
 
-  發票日期: Dayjs | null;
+  invoiceDate: Dayjs | null;
   invoiceNumber: string | null;
   invoiceAmount: `${number}` | '';
 
   customerName: string | null;
   customerNumber: string | null;
-  統一編號: string | null;
+  customerTaxId: string | null;
 }
 
 const usePaymentRequest = (rawData: TpaymentRequest_noDetail | undefined | null) => {
@@ -54,21 +53,20 @@ const usePaymentRequest = (rawData: TpaymentRequest_noDetail | undefined | null)
 const emptyState_paymentRequest = (): Tstate_paymentRequest => {
   const state: Tstate_paymentRequest = {
     type: '',
-    累計請款金額: '',
+    paymentAmount: '',
     營業稅: '',
-    本期合計: '',
-    保留款: '',
+    retainageRate: '',
     稅別: '',
-    保留款金額: '',
+    retainageAmount: '',
 
-    發票本: null,
-    發票日期: null,
+    invoiceBook: null,
+    invoiceDate: null,
     invoiceNumber: null,
     invoiceAmount: '',
 
     customerName: null,
     customerNumber: null,
-    統一編號: null,
+    customerTaxId: null,
   };
 
   return state;
@@ -84,21 +82,20 @@ const useDefaultState_paymentRequest = (
 
     const defaultState: Tstate_paymentRequest = {
       type: rawData.type || '',
-      累計請款金額: '',
+      paymentAmount: rawData.paymentAmount === null ? '' : `${rawData.paymentAmount}`,
       營業稅: '',
-      本期合計: '',
-      保留款: '',
+      retainageRate: '',
       稅別: '',
-      保留款金額: '',
+      retainageAmount: '',
 
-      發票本: null,
-      發票日期: null,
+      invoiceBook: null,
+      invoiceDate: null,
       invoiceNumber: rawData.invoiceNumber,
       invoiceAmount: rawData.invoiceAmount === null ? '' : `${rawData.invoiceAmount}`,
 
       customerName: rawData.customerName,
       customerNumber: rawData.customerNumber,
-      統一編號: null,
+      customerTaxId: null,
     };
 
     return defaultState;
