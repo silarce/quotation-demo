@@ -68,30 +68,37 @@ export default function PayentRequest() {
     apiGetPaymentRequestType();
   }, []);
 
-  const req_postInsertPaymentRequest = async (paymentRequest: Tstate_paymentRequest) => {
+  const createBody = () => {
     if (!accountsReceivables) {
       myAlert.err({ title: '未取得必要資料' });
 
-      return;
+      return null;
     }
 
+    const { state_paymentRequest } = instance_paymentRequest;
     const { sourceType, sourceId } = accountsReceivables!;
 
     if (!sourceId) {
-      return;
+      myAlert.err({ title: '沒有sourceId' });
+
+      return null;
     }
 
     if (!userInfo) {
-      return;
+      myAlert.err({ title: '沒有userInfo' });
+
+      return null;
     }
 
-    const isInvalid_paymentRequest = Object.values(paymentRequest).some((item) => !item);
+    const isInvalid_paymentRequest = Object.values(state_paymentRequest).some((item) => !item);
 
     if (isInvalid_paymentRequest) {
-      return;
+      myAlert.err({ title: '本次請款明細資料未填妥' });
+
+      return null;
     }
 
-    const validPaymentRequest = paymentRequest as DeepNonNullable<Tstate_paymentRequest>;
+    const validPaymentRequest = state_paymentRequest as DeepNonNullable<Tstate_paymentRequest>;
     const {
       type,
       paymentAmount,
@@ -158,6 +165,10 @@ export default function PayentRequest() {
     //     period: `${invoiceBook.period}`, //發票期數 "3"
     //   },
     // };
+  };
+
+  const req_postInsertPaymentRequest = async () => {
+    const body = createBody();
 
     // apiPostInsertPaymentRequest
   };
@@ -182,7 +193,11 @@ export default function PayentRequest() {
       {/* 目前累計 */}
       <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
       {/* 本次請款明細 含沖銷明細 */}
-      <CurrentPaymentRequestDetails className="mb-10" instance_paymentRequest={instance_paymentRequest}>
+      <CurrentPaymentRequestDetails
+        className="mb-10"
+        instance_paymentRequest={instance_paymentRequest}
+        onConfirm={req_postInsertPaymentRequest}
+      >
         <PrOffsetDetails prOffsetDetails={paymentRequest?.prOffsetDetails} />
       </CurrentPaymentRequestDetails>
       {/* 請款紀錄 */}

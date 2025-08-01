@@ -33,11 +33,13 @@ const CurrentPaymentRequestDetails = ({
   disabled,
   instance_paymentRequest,
   children,
+  onConfirm,
 }: {
   className?: string;
   disabled?: boolean;
   instance_paymentRequest: Tinstance_paymentRequest;
   children?: React.ReactNode;
+  onConfirm?: () => void;
 }) => {
   const { data: data_paymentRequestType } = useApiGetPaymentRequestType();
 
@@ -239,7 +241,9 @@ const CurrentPaymentRequestDetails = ({
               }}
             >
               {state_paymentRequest.invoiceBook
-                ? state_paymentRequest.invoiceBook?.alphabeticLetter + ' ' + `${state_paymentRequest.invoiceBook?.period}期`
+                ? state_paymentRequest.invoiceBook?.alphabeticLetter +
+                  ' ' +
+                  `${state_paymentRequest.invoiceBook?.period}期`
                 : '- -'}
             </DataEntry_fong>
 
@@ -296,7 +300,9 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
           </div>
           <div className="w-fit m-auto mt-10 mr-0 ml-auto">
-            <Btn theme="save">儲存</Btn>
+            <Btn theme="save" onClick={onConfirm}>
+              儲存
+            </Btn>
           </div>
 
           {children}
