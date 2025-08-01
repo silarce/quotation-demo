@@ -1,8 +1,8 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useState, useEffect, useReducer, useMemo } from 'react';
 import Decimal from 'decimal.js';
 
 import Btn from 'components/global/gear/button/btn_fong';
-import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'components/global/gear/dataEntry';
+import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
@@ -13,14 +13,52 @@ import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_check from 'public/image/icon/fong/check.svg';
 import Icon_cancel from 'public/image/icon/fong/cancel.svg';
 
+import SalesDetails from 'components/page/accounting/salesOrder/salesDetails';
+
+import { Ttax_type } from 'js/api/api_netCore/_schemas';
+
 // ============================================================================
+
+interface Tstate {
+  contractNumber: string;
+  projectName: string;
+
+  customerNumber: string;
+  customerName: string;
+  customerTaxId: string;
+
+  price: `${number}` | '';
+  tax: `${number}` | '';
+  已請款總額: `${number}` | '';
+  銷售總額: `${number}` | '';
+  已收金額: `${number}` | '';
+  扣款折讓: `${number}` | '';
+  稅別: Ttax_type | null;
+  應稅外加: string;
+}
+
+// type Taction =
+//   | {
+//       type: 'contractNumber' | 'projectName' | '應稅外加' | 'customerNumber' | 'customerName' | 'customerTaxId';
+//       payload: string;
+//     }
+//   | {
+//       type: 'price' | 'tax' | '已請款總額' | '銷售總額' | '已收金額' | '扣款折讓';
+//       payload: `${number}` | '';
+//     }
+//   | {
+//       type: '稅別';
+//       payload: Ttax_type | null;
+//     };
 
 // ============================================================================
 
 // MARK:START
 
 export default function SalesOrder() {
-  const [state, dispatch] = useReducer(reducer, undefined);
+  const [disabled, setDisabled] = useState(false);
+
+  const { state, setState, reset } = useData(undefined);
 
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {
@@ -29,13 +67,6 @@ export default function SalesOrder() {
       content: <Selector_quotation />,
     });
   };
-
-  // ---------------------------------------------------------------------------
-
-  const columns = createColumns({
-    state,
-    dispatch,
-  });
 
   // ---------------------------------------------------------------------------
 
@@ -54,10 +85,13 @@ export default function SalesOrder() {
       </div>
       <div className="grid grid-cols-4 gap-fong">
         <DataEntry_fong caption="合約編號" className="col-span-2" isMust={true}>
-          <Input />
+          <Input
+            value={state.contractNumber}
+            onChange={(e) => setState({ ...state, contractNumber: e.target.value })}
+          />
         </DataEntry_fong>
         <DataEntry_fong caption="案場名稱" className="col-span-2" isMust={true}>
-          <Input />
+          <Input value={state.projectName} onChange={(e) => setState({ ...state, projectName: e.target.value })} />
         </DataEntry_fong>
         <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true}>
           <Input />
@@ -71,281 +105,111 @@ export default function SalesOrder() {
         <div />
         <div />
         <DataEntry_fong caption="銷售金額" isMust={true}>
-          <Input />
+          <Input
+            type="number"
+            toLocalString={disabled}
+            value={state.price}
+            onChange={(e) => setState({ ...state, price: e.target.value as `${number}` })}
+          />
         </DataEntry_fong>
         <DataEntry_fong caption="稅金" isMust={true}>
-          <Input />
+          <Input
+            type="number"
+            toLocalString={disabled}
+            value={state.tax}
+            onChange={(e) => setState({ ...state, tax: e.target.value as `${number}` })}
+          />
         </DataEntry_fong>
         <DataEntry_fong caption="已請款總額" isMust={true}>
-          <Input />
+          <Input
+            type="number"
+            toLocalString={disabled}
+            value={state.已請款總額}
+            onChange={(e) => setState({ ...state, 已請款總額: e.target.value as `${number}` })}
+          />
         </DataEntry_fong>
         <DataEntry_fong caption="銷售總額" isMust={true}>
-          <Input />
+          <Input
+            type="number"
+            toLocalString={disabled}
+            value={state.銷售總額}
+            onChange={(e) => setState({ ...state, 銷售總額: e.target.value as `${number}` })}
+          />
         </DataEntry_fong>
         <DataEntry_fong caption="已收金額" isMust={true}>
-          <Input />
+          <Input
+            type="number"
+            toLocalString={disabled}
+            value={state.已收金額}
+            onChange={(e) => setState({ ...state, 已收金額: e.target.value as `${number}` })}
+          />
         </DataEntry_fong>
         <DataEntry_fong caption="扣款折讓" isMust={true}>
-          <Input />
+          <Input
+            type="number"
+            toLocalString={disabled}
+            value={state.扣款折讓}
+            onChange={(e) => setState({ ...state, 扣款折讓: e.target.value as `${number}` })}
+          />
         </DataEntry_fong>
         <DataEntry_fong caption="稅別" isMust={true}>
-          <Input />
+          <Select />
         </DataEntry_fong>
         <DataEntry_fong caption="應稅外加" isMust={true}>
-          <Input />
+          <Input value={state.應稅外加} onChange={(e) => setState({ ...state, 應稅外加: e.target.value })} />
         </DataEntry_fong>
       </div>
-      <div className="mt-10 ">
-        <div className="text-xl font-semibold mb-6">銷貨明細</div>
-        <Table_antd
-          dataSource={fakeData}
-          columns={columns}
-          scroll={{
-            y: 400,
-          }}
-        />
-      </div>
+
+      <SalesDetails className={'mt-10'} />
     </div>
   );
 }
 
 // MARK: END
+// ==========================================================================
 
-// ==============================================================================
-
-interface Tstate {
-  id: string;
-  serialNumber: string;
-  idNumber: string;
-  name: string;
-  qty: `${number}` | '';
-  price: `${number}` | '';
-  totalPrice: number;
-}
-
-type Taction =
-  | {
-      type: 'set';
-      payload: Tstate;
-    }
-  | {
-      type: 'price';
-      payload: {
-        price: `${number}` | '';
-      };
-    }
-  | {
-      type: 'qty';
-      payload: {
-        qty: `${number}` | '';
-      };
-    }
-  | {
-      type: 'clear';
-      payload?: undefined;
-    };
-
-// ==============================================================================
-
-const reducer = (state: Tstate | undefined, action: Taction): Tstate | undefined => {
-  if (action.type === 'set') {
-    return action.payload;
-  }
-
-  if (!state) {
-    return state;
-  }
-
-  switch (action.type) {
-    case 'price': {
-      const price = action.payload.price;
-      const qty = state.qty || 0;
-      const totalPrice = new Decimal(price || 0).mul(qty).toNumber();
-
-      return { ...state, price, totalPrice };
-    }
-
-    case 'qty': {
-      const qty = action.payload.qty;
-      const price = state.price || 0;
-      const totalPrice = new Decimal(price).mul(qty || 0).toNumber();
-
-      return { ...state, qty, totalPrice };
-    }
-
-    case 'clear': {
-      return undefined;
-    }
-
-    default:
-      return state;
-  }
+const emptyState = (): Tstate => {
+  return {
+    contractNumber: '',
+    projectName: '',
+    customerNumber: '',
+    customerName: '',
+    customerTaxId: '',
+    price: '',
+    tax: '',
+    已請款總額: '',
+    銷售總額: '',
+    已收金額: '',
+    扣款折讓: '',
+    稅別: null,
+    應稅外加: '',
+  };
 };
 
-// ==============================================================================
-
-const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatch: React.Dispatch<Taction> }) => {
-  const columns: TableProps<TfakeData>['columns'] = [
-    {
-      dataIndex: 'serialNumber',
-      title: '序號',
-      align: 'center',
-      width: 80,
-      render: (v) => <MyDataEntry showBorder={false}>{v}</MyDataEntry>,
-    },
-    {
-      dataIndex: 'idNumber',
-      title: '產品代號',
-      width: 120,
-      render: (v) => <MyDataEntry showBorder={false}>{v}</MyDataEntry>,
-    },
-    {
-      dataIndex: 'name',
-      title: '產品名稱',
-      width: 150,
-      render: (v) => <MyDataEntry showBorder={false}>{v}</MyDataEntry>,
-    },
-    {
-      dataIndex: 'qty',
-      title: '數量',
-      align: 'right',
-      width: 150,
-      render: (text, record) => {
-        if (state?.id !== record.id) {
-          return <MyDataEntry showBorder={false}>{text}</MyDataEntry>;
-        }
-
-        return (
-          <MyDataEntry showBorder={true}>
-            <Input
-              type="number"
-              className="text-right "
-              value={state.qty}
-              onChange={(e) => {
-                const value = e.currentTarget.value as `${number}` | '';
-                dispatch({ type: 'qty', payload: { qty: value } });
-              }}
-            />
-          </MyDataEntry>
-        );
-      },
-    },
-    {
-      dataIndex: 'price',
-      title: '單價',
-      align: 'right',
-      width: 150,
-      render: (text, record) => {
-        if (record.id !== state?.id) {
-          return <MyDataEntry showBorder={false}>{'$' + text.toLocaleString()}</MyDataEntry>;
-        }
-
-        return (
-          <MyDataEntry showBorder={true}>
-            <Input
-              type="number"
-              className="text-right"
-              value={state.price}
-              onChange={(e) => {
-                const value = e.currentTarget.value as `${number}` | '';
-                dispatch({ type: 'price', payload: { price: value } });
-              }}
-            />
-          </MyDataEntry>
-        );
-      },
-    },
-    {
-      dataIndex: 'totalPrice',
-      title: '金額',
-      align: 'right',
-      width: 150,
-
-      render: (v, record) => {
-        const value = record.id !== state?.id ? v : state.totalPrice;
-
-        return <MyDataEntry showBorder={false}>{'$' + value.toLocaleString()}</MyDataEntry>;
-      },
-    },
-    {},
-    {
-      key: 'panel',
-      title: '操作',
-      align: 'center',
-      width: 100,
-      render: (_, record) => {
-        let node: React.ReactNode = null;
-
-        if (state?.id === record.id) {
-          node = (
-            <div className="flex gap-[16px] justify-center">
-              <Icon_cancel
-                className="w-[16px] h-[16px] text-red01 cursor-pointer"
-                onClick={() => {
-                  dispatch({ type: 'clear' });
-                }}
-              />
-              <Icon_check className="w-[16px] h-[16px] blue01 cursor-pointer" />
-            </div>
-          );
-        } else {
-          node = (
-            <div className="flex gap-[16px] justify-center">
-              <Icon_note
-                className="w-[16px] h-[16px] text-blue01 cursor-pointer"
-                onClick={() => {
-                  if (record.id === state?.id) {
-                    dispatch({ type: 'clear' });
-                  } else {
-                    dispatch({
-                      type: 'set',
-                      payload: {
-                        ...record,
-                        price: `${record.price}`,
-                        qty: `${record.qty}`,
-                        totalPrice: record.totalPrice,
-                      },
-                    });
-                  }
-                }}
-              />
-              <Icon_trash className="w-[16px] h-[16px] text-red01 cursor-pointer" />
-            </div>
-          );
-        }
-
-        return node;
-      },
-    },
-  ];
-
-  return columns;
+const useDefaultState = (raw: unknown | undefined | null) => {
+  return useMemo(emptyState, [raw]);
 };
 
-// ==============================================================================
+const useData = (raw: unknown | undefined | null) => {
+  const defaultState = useDefaultState(raw);
 
-const MyDataEntry = ({ fontSize = 14, ...props }: TdataEntrycontainerProps) => {
-  return <DataEntry fontSize={fontSize} {...props} />;
+  const [state, setState] = useState<Tstate>(defaultState);
+
+  // const dispatch = (action: Taction) => {
+  //   const { type, payload } = action;
+  // };
+
+  const reset = () => {
+    setState(defaultState);
+  };
+
+  useEffect(() => {
+    setState(defaultState);
+  }, [defaultState]);
+
+  return {
+    state,
+    setState,
+    reset,
+  };
 };
-
-// ==============================================================================
-
-interface TfakeData {
-  id: string;
-  serialNumber: string;
-  idNumber: string;
-  name: string;
-  qty: number;
-  price: number;
-  totalPrice: number;
-}
-
-const fakeData: TfakeData[] = Array.from({ length: 50 }, (_, index) => ({
-  id: `id-${index}`,
-  serialNumber: `${index + 1}`,
-  idNumber: `ID-${index + 1}`,
-  name: `商品 ${index + 1}`,
-  qty: Math.floor(Math.random() * 100) + 1,
-  price: 9999,
-  totalPrice: 9899999,
-}));

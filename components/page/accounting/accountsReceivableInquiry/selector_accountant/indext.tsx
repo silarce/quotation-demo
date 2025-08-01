@@ -1,57 +1,83 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import classNames from 'classnames';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import Btn from 'components/global/gear/button/btn_fong';
-
 import { Container_confirm } from 'components/global/container/modal';
-
 import { Checkbox } from 'components/global/gear/dataEntry';
 
-export default function Selector_addNewOffsetAmount({
+// api
+import { useGetAccountant, TaccountantDto } from 'js/api/api_accountant';
+
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+/**選擇器-會計收款 */
+export default function Selector_accountant({
+  title = '會計收款列表',
   onConfirm,
   onCancel,
+  btn_confirm,
 }: {
-  onConfirm?: (data: TfakeData | undefined) => void;
+  title?: string;
+  onConfirm?: (data: TaccountantDto | undefined) => void;
   onCancel?: () => void;
+  btn_confirm?: (data: TaccountantDto | undefined) => React.ReactNode;
 }) {
-  const [data, setData] = useState<TfakeData>();
+  const [page, setPage] = useState(1);
+  const params = useMemo(() => {
+    return { page };
+  }, [page]);
+
+  const { data: rawArr, meta } = useGetAccountant({ params });
+
+  const [selected, setSelected] = useState<TaccountantDto>();
 
   const handle_confirm = () => {
     if (onConfirm) {
-      onConfirm(data);
+      onConfirm(selected);
     }
   };
 
   return (
     <Container_confirm
-      title="新增沖帳金額"
+      title={title}
       footerRight={
         <>
           <Btn onClick={onCancel}>取消</Btn>
-          <Btn theme="save" onClick={handle_confirm}>
-            儲存
-          </Btn>
+
+          {btn_confirm && btn_confirm(selected)}
+          {!btn_confirm && (
+            <Btn theme="save" onClick={handle_confirm}>
+              儲存
+            </Btn>
+          )}
         </>
       }
     >
       <div className="mt-5">
         <Table_antd
+          className="w-[1420px]"
           columns={columns}
-          dataSource={fakeData}
+          dataSource={rawArr}
           rowHoverable={false}
           scroll={{
-            // x: '1330px',
+            x: 1400,
             y: 400,
           }}
           rowClassName={(record) => {
-            return classNames('cursor-pointer', record === data && 'bg-blue05');
+            return classNames('cursor-pointer', record === selected && 'bg-blue05');
           }}
           onRow={(record) => ({
             onClick: () => {
-              setData(record);
+              setSelected(record);
             },
           })}
+          pagination={{
+            current: meta?.page,
+            onChange(page) {
+              setPage(page);
+            },
+          }}
         />
       </div>
     </Container_confirm>
@@ -60,10 +86,10 @@ export default function Selector_addNewOffsetAmount({
 
 // ============================================================================
 
-const columns: TableProps<TfakeData>['columns'] = [
+const columns: TableProps<TaccountantDto>['columns'] = [
   {
     title: <span className="whitespace-pre-wrap">{'已匯入紙本\n應收帳款'}</span>,
-    dataIndex: 'importDate',
+    dataIndex: 'isImported',
     align: 'center',
     width: 120,
     render: (value) => (
@@ -74,18 +100,19 @@ const columns: TableProps<TfakeData>['columns'] = [
   },
   {
     title: '匯入日期',
-    dataIndex: 'importDate',
+    dataIndex: 'insertDate',
     width: 120,
+    render: (value) => getTaiwanDateStr(value),
   },
   {
     title: '付款帳號',
-    dataIndex: 'paymentAccount',
+    dataIndex: 'importAccountingNumber',
     width: 150,
   },
   {
     title: '存入帳號',
-    dataIndex: 'account',
-    width: 150,
+    dataIndex: 'accountingNumber',
+    width: 200,
   },
   {
     title: '廠商名稱',
@@ -96,7 +123,7 @@ const columns: TableProps<TfakeData>['columns'] = [
     title: '幣別',
     dataIndex: 'currency',
     align: 'center',
-    width: 82,
+    width: 120,
   },
   {
     title: '匯率',
@@ -106,14 +133,14 @@ const columns: TableProps<TfakeData>['columns'] = [
   },
   {
     title: '金額',
-    dataIndex: 'amount',
+    dataIndex: 'currencyValue',
     align: 'right',
     width: 120,
-    render: (value) => '$' + value.toLocaleString(),
+    render: (value) => '$' + Number(value).toLocaleString(),
   },
   {
-    title: '新台幣',
-    dataIndex: 'amountTWD',
+    title: '新臺幣',
+    dataIndex: 'price',
     align: 'right',
     width: 120,
     render: (value) => '$' + value.toLocaleString(),
@@ -121,38 +148,3 @@ const columns: TableProps<TfakeData>['columns'] = [
 ];
 
 // ============================================================================
-
-interface TfakeData {
-  id: string;
-  chcked: boolean;
-  // 匯入日期
-  importDate: string;
-  // 付款帳號
-  paymentAccount: string;
-  // 存入帳號
-  account: string;
-  // 廠商名稱
-  vendorName: string;
-  // 幣別
-  currency: string;
-  // 匯率
-  exchangeRate: string;
-  // 金額
-  amount: string;
-  // 新台幣
-  amountTWD: string;
-}
-
-// 10筆假資料
-const fakeData: TfakeData[] = Array.from({ length: 100 }, (_, i) => ({
-  id: `${i + 1}`,
-  chcked: false,
-  importDate: '100/10/01',
-  paymentAccount: `帳號 ${i + 1}`,
-  account: '銀行帳戶',
-  vendorName: `廠商 ${i + 1}`,
-  currency: 'TWD',
-  exchangeRate: '1',
-  amount: `${(i + 1) * 1000}`,
-  amountTWD: `${(i + 1) * 1000}`,
-}));
