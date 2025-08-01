@@ -12,12 +12,9 @@ type TsalesOrderItemArr = Tres_apiGetARPaymentData['salesOrder']['salesOrderItem
 
 type TsalesOrderItem = TsalesOrderItemArr[number];
 
-type Tstate = Omit<
-  TsalesOrderItem,
-  '' // 待api新增本期完成與本期金額的property
-> & {
-  completedInThisPeriod: `${number}` | ''; // 待api新增本期完成的property
-  amountInThisPeriod: number | null; // 待api新增本期完成的property
+type Tstate = TsalesOrderItem & {
+  completedQuantity: `${number}` | ''; // 待api新增本期完成的property
+  completedPayment: number | null; // 待api新增本期完成的property
 };
 
 // =============================================================================
@@ -66,7 +63,7 @@ const SalesOrderItem = ({
     },
     {
       title: '本期完成 noProperty',
-      dataIndex: 'completedInThisPeriod',
+      dataIndex: 'completedQuantity',
       width: 150,
       render: (v, record, index) => {
         return (
@@ -84,7 +81,7 @@ const SalesOrderItem = ({
     },
     {
       title: '本期金額 noProperty',
-      dataIndex: 'amountInThisPeriod',
+      dataIndex: 'completedPayment',
       width: 150,
       align: 'right',
       render: (v) => toLocalString(v),
@@ -115,8 +112,8 @@ const useDefaultState = (rawData: TsalesOrderItemArr | undefined | null): Tstate
   return useMemo(() => {
     return (rawData ?? []).map((item) => ({
       ...item,
-      completedInThisPeriod: '',
-      amountInThisPeriod: null,
+      completedQuantity: '',
+      completedPayment: null,
     }));
   }, [rawData]);
 };
@@ -130,8 +127,8 @@ const useSalesOrderItemArr = (rawData: TsalesOrderItemArr | undefined | null) =>
     const copy = { ...stateArr[index] };
     const unitPrice = copy.unitPrice || 0;
 
-    copy.completedInThisPeriod = value;
-    copy.amountInThisPeriod = new Decimal(value || 0).mul(unitPrice).toDecimalPlaces(0).toNumber();
+    copy.completedQuantity = value;
+    copy.completedPayment = new Decimal(value || 0).mul(unitPrice).toDecimalPlaces(0).toNumber();
 
     setStateArr((prev) => {
       const newState = [...prev];
