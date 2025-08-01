@@ -126,8 +126,19 @@
 }
 
 .yellow_I {
-  color: theme("colors.yellow02");
-  border-color: theme("colors.yellow02");
+  color: theme("colors.yellow01");
+  border-color: theme("colors.yellow01");
+  background-color: theme("colors.white01");
+  &:hover {
+    border-color: theme("colors.yellow02");
+    color: theme("colors.white01");
+    background-color: theme("colors.yellow02");
+  }
+  &:active {
+    background-color: theme("colors.yellow03");
+    border-color: theme("colors.yellow03");
+    color: theme("colors.white01");
+  }
 }
 
 .warning_I {
