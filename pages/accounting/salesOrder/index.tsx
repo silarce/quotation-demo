@@ -62,9 +62,70 @@ export default function SalesOrder() {
 
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {
-    modal_empty({
+    const { destroy } = modal_empty({
       width: 'fit-content',
-      content: <Selector_quotation />,
+      content: (
+        <Selector_quotation
+          onConfirm={([quotation]) => {
+            if (!quotation) {
+              return;
+            }
+
+            const {
+              id,
+              status,
+              reviewManagerEmployeeId,
+              managerReviewedAt,
+              quotationNumber,
+              version,
+              customerId,
+              projectName,
+              county,
+              district,
+              address,
+              contactPerson,
+              contactNumber,
+              quantity,
+              editNotes,
+              discount,
+              subTotal,
+              salesTax,
+              total,
+              deliveryLocation,
+              paymentMethods,
+              supervisorEmployeeId,
+              agentEmployeeId,
+              reviewSalesEmployeeId,
+              productsOrder,
+              tuneTotal,
+              averageDiscount,
+              estimatedDiscount,
+              type,
+              currency,
+              foreignTotal,
+              exchangeRate,
+              contractId,
+              contractStatus,
+              contractNumber,
+              customerName,
+              additionalAmount,
+            } = quotation;
+
+            setState((prev) => ({
+              ...prev,
+              contractNumber: contractNumber ?? '',
+              projectName,
+              customerNumber: 'no property',
+              customerName: customerName ?? '',
+              customerTaxId: 'no property',
+            }));
+
+            destroy();
+
+            //
+          }}
+        />
+      ),
     });
   };
 
