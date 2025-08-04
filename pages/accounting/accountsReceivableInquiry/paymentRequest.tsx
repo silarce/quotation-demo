@@ -116,7 +116,7 @@ export default function PayentRequest() {
     } = validPaymentRequest;
 
     const completedProduct = instance_salesOrderItem.stateArr.map((item) => ({
-      salesOrderItemId: item.id,
+      salesOrderItemId: item.salesOrderItemId,
       completedQuantity: Number(item.completedQuantity),
       completedPayment: item.completedPayment ?? 0,
     }));
