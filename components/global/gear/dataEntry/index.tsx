@@ -46,6 +46,7 @@ type TdataEntryProps = {
   showBorder?: boolean;
 
   childrenWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
+  // childrenWrapperProps?: React.HTMLAttributes<HTMLDivElement | HTMLLabelElement>;
 
   prefix?: React.ReactNode;
   prefixWrapperProps?: React.HTMLAttributes<HTMLDivElement>;
@@ -185,6 +186,49 @@ const DataEntry_fong = ({
 
   // --------------------------------------------------------------------------------
 
+  // ____________________________________________________________________________
+
+  // 這個功能可以使點擊到表單元素外外，boder內的空白時觸發focus，以改善UX
+  // 但是只有部分元件有效
+  // 為了避免使用者哪天說所有輸入欄位都要可跟Input一樣
+  // 決定不要沒事找事，乾脆不要應用這個功能了
+
+  // 未來哪天若真的嫌點不到input，UX不好，
+  // 可以為需要處理的元件表單元件加上border與padding
+  // 同時要取消container的border與padding
+
+  // let shouldWithLabel = false;
+
+  // if (React.isValidElement(children)) {
+  //   if (['input', 'textarea'].includes(children.type as string)) {
+  //     shouldWithLabel = true;
+  //   }
+
+  //   const displayName = (children.type as { displayName?: string | undefined }).displayName;
+
+  //   if (
+  //     displayName &&
+  //     [
+  //       // 只有這五個能用，其他的元件都不適合
+  //       'Input',
+  //       'Input_money',
+  //       'Textarea_autoHeight',
+  //       'Textarea',
+  //       'InputSelect',
+  //       // 'DatePicker', 'TimePicker', 'DateRangePicker', // 清除時會觸發focus
+  //       // 'Select', // 沒效果
+  //       // 'Select_rs', // 沒效果
+  //       // check與radio 不應該用,容易誤點
+  //     ].includes(displayName)
+  //   ) {
+  //     shouldWithLabel = true;
+  //   }
+  // }
+
+  // const ChildrenWrapper = shouldWithLabel ? Container_label : Container_div;
+
+  // ___________________________________________________________________________
+
   let processedChildren =
     syncDisabled === false || disabled === undefined ? children : doProcessedChildren(children, disabled);
 
@@ -222,9 +266,9 @@ const DataEntry_fong = ({
         className={classNames(
           scss.childrenWrapper,
           className_fontSize,
-          childrenWrapperClassName,
+          'p-[12px] rounded-lg',
           disabled && scss.disabled,
-          'p-[12px] rounded-lg'
+          childrenWrapperClassName
         )}
         {...childrenWrapperProps}
       >
@@ -239,6 +283,14 @@ const DataEntry_fong = ({
     </div>
   );
 };
+
+// const Container_div = (props: React.HTMLAttributes<HTMLDivElement>) => {
+//   return <div {...props} />;
+// };
+
+// const Container_label = (props: React.HTMLAttributes<HTMLLabelElement>) => {
+//   return <label {...props} />;
+// };
 
 // =============================================================================
 // =============================================================================
@@ -294,6 +346,10 @@ const Input = ({
   );
 };
 
+Input.displayName = 'Input';
+
+// MARK: Input_money
+
 const Input_money = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
   const props_localString = (() => {
     const { disabled, readOnly } = props;
@@ -316,6 +372,8 @@ const Input_money = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
 
   return <Input type="number" {...props} {...props_localString} />;
 };
+
+Input_money.displayName = 'Input_money';
 
 const fomatInputNumber = (value: React.InputHTMLAttributes<HTMLInputElement>['value']) => {
   if (value === undefined || value === null || value === '') {
@@ -343,6 +401,8 @@ const Textarea_autoHeight = ({ className, ...props }: TextareaAutosizeProps) => 
   );
 };
 
+Textarea_autoHeight.displayName = 'Textarea_autoHeight';
+
 const Textarea = ({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => {
   return (
     <textarea
@@ -353,6 +413,8 @@ const Textarea = ({ className, ...props }: React.TextareaHTMLAttributes<HTMLText
     />
   );
 };
+
+Textarea.displayName = 'Textarea';
 
 // MARK:DatePicker
 const DatePicker = ({
@@ -388,11 +450,17 @@ const DatePicker = ({
         return getTaiwanDateStr(theDayjs);
       }}
       placeholder="請選擇"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       {...suffixIcon}
       {...props}
     />
   );
 };
+
+DatePicker.displayName = 'DatePicker';
 
 // MARK:TimePicker
 const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
@@ -414,6 +482,8 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
   );
 };
 
+TimePicker.displayName = 'TimePicker';
+
 // MARK: DateRangePicker
 const DateRangePicker = ({ className, disabled, ...props }: RangePickerProps) => {
   const suffixIcon: { suffixIcon?: React.ReactNode } = {};
@@ -433,25 +503,35 @@ const DateRangePicker = ({ className, disabled, ...props }: RangePickerProps) =>
   );
 };
 
+DateRangePicker.displayName = 'DateRangePicker';
+
 // MARK:Checkbox
 const Checkbox = ({ className, ...props }: CheckboxProps) => {
   return <AntdCheckbox className={classNames(scss.checkbox, className)} {...props} />;
 };
+
+Checkbox.displayName = 'Checkbox';
 
 // MARK:CheckboxGroup
 const CheckboxGroup = ({ className, ...props }: CheckboxGroupProps) => {
   return <AntdCheckbox.Group className={classNames(scss.checkBoxGroup, scss.checkbox, className)} {...props} />;
 };
 
+CheckboxGroup.displayName = 'CheckboxGroup';
+
 // MARK:Radio
 const Radio = ({ className, ...props }: RadioProps) => {
   return <AntdRadio className={classNames(scss.radio, className)} {...props} />;
 };
 
+Radio.displayName = 'Radio';
+
 // MARK:RadioGroup
 const RadioGroup = ({ className, ...props }: RadioGroupProps) => {
   return <AntdRadio.Group {...props} className={classNames(scss.radioGroup, className)} />;
 };
+
+RadioGroup.displayName = 'RadioGroup';
 
 // MARK:Select
 function Select<Value, Option extends DefaultOptionType | BaseOptionType = DefaultOptionType>({
@@ -480,6 +560,8 @@ function Select<Value, Option extends DefaultOptionType | BaseOptionType = Defau
     />
   );
 }
+
+Select.displayName = 'Select';
 
 // MARK:Select_rs
 function Select_rs<
@@ -532,6 +614,7 @@ function Select_rs<
   );
 }
 
+Select_rs.displayName = 'Select_rs';
 Select_rs.findOption = findOption;
 
 // MARK:InputSelect
@@ -565,54 +648,6 @@ function InputSelect<
 
   return (
     <div {...divPros} className={classNames(scss.inputSelect, className)}>
-      {!disabled && (
-        <ReactSelect
-          className={scss.select}
-          // menuIsOpen={true}
-          isSearchable={false}
-          isDisabled={disabled}
-          options={options}
-          onChange={(option, action) => {
-            const value = option?.value ?? '';
-            onChange?.(value);
-            selectOnChange?.(option, action);
-            ref_input.current?.focus();
-
-            // 當value_props為undefined時作用，只是為了在未串接value_propse時方便測試
-            // 如果這個行為造成bug，直接刪掉就好了
-            value_props === undefined && ref_input.current && (ref_input.current.value = value);
-          }}
-          classNames={{
-            ...cn,
-            control(props) {
-              return classNames(scss.control_inputSelect, scss.plus, cn?.control?.(props));
-            },
-            valueContainer(props) {
-              return classNames(scss.valueContainer_inputSelect, scss.plus, cn?.valueContainer?.(props));
-            },
-            singleValue(props) {
-              return classNames(scss.singleValue_inputSelect, scss.plus, cn?.singleValue?.(props));
-            },
-            input(props) {
-              return classNames(scss.input_inputSelect, scss.plus, cn?.input?.(props));
-            },
-            indicatorsContainer(props) {
-              return classNames(scss.indicatorsContainer_inputSelect, scss.plus, cn?.indicatorsContainer?.(props));
-            },
-            indicatorSeparator(props) {
-              return classNames(scss.indicatorSeparator_inputSelect, scss.plus, cn?.indicatorSeparator?.(props));
-            },
-            menu(props) {
-              return classNames(scss.menu_inputSelect, scss.plus, cn?.menu?.(props));
-            },
-            option(props) {
-              return classNames(scss.option, scss.option_inputSelect, scss.plus, cn?.option?.(props));
-            },
-          }}
-          {...selectProps}
-        />
-      )}
-      {/* </label> */}
       <input
         ref={ref_input}
         value={value}
@@ -620,9 +655,65 @@ function InputSelect<
         readOnly={disabled}
         {...inputProps}
       />
+      {!disabled && (
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <ReactSelect
+            className={scss.select}
+            // menuIsOpen={true}
+            isSearchable={false}
+            isDisabled={disabled}
+            options={options}
+            onChange={(option, action) => {
+              const value = option?.value ?? '';
+              onChange?.(value);
+              selectOnChange?.(option, action);
+              ref_input.current?.focus();
+
+              // 當value_props為undefined時作用，只是為了在未串接value_propse時方便測試
+              // 如果這個行為造成bug，直接刪掉就好了
+              value_props === undefined && ref_input.current && (ref_input.current.value = value);
+            }}
+            classNames={{
+              ...cn,
+              control(props) {
+                return classNames(scss.control_inputSelect, scss.plus, cn?.control?.(props));
+              },
+              valueContainer(props) {
+                return classNames(scss.valueContainer_inputSelect, scss.plus, cn?.valueContainer?.(props));
+              },
+              singleValue(props) {
+                return classNames(scss.singleValue_inputSelect, scss.plus, cn?.singleValue?.(props));
+              },
+              input(props) {
+                return classNames(scss.input_inputSelect, scss.plus, cn?.input?.(props));
+              },
+              indicatorsContainer(props) {
+                return classNames(scss.indicatorsContainer_inputSelect, scss.plus, cn?.indicatorsContainer?.(props));
+              },
+              indicatorSeparator(props) {
+                return classNames(scss.indicatorSeparator_inputSelect, scss.plus, cn?.indicatorSeparator?.(props));
+              },
+              menu(props) {
+                return classNames(scss.menu_inputSelect, scss.plus, cn?.menu?.(props));
+              },
+              option(props) {
+                return classNames(scss.option, scss.option_inputSelect, scss.plus, cn?.option?.(props));
+              },
+            }}
+            {...selectProps}
+          />
+        </div>
+      )}
+      {/* </label> */}
     </div>
   );
 }
+
+InputSelect.displayName = 'InputSelect';
 
 // =============================================================================
 const MustTip = () => {
