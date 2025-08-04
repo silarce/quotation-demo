@@ -1,6 +1,7 @@
 // 使import路徑大小寫敏感
 // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
-CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+
 
 
 const dayjs = require('dayjs');
