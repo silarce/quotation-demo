@@ -1,0 +1,340 @@
+import { Tinvoice_type, Ttax_type, Treview_status, Tbase } from './shared';
+
+import { TemployeeDto } from 'js/api/dtoTypes';
+
+interface TaccountantPresetDto extends Tbase {
+  // 帳戶名稱
+  account_name: string;
+  // 帳號
+  account: string;
+  // 銀行代號
+  bank_code: string;
+  // 銀行名稱
+  bank_name: string;
+}
+
+type TcreateAccountantPresetDto = Omit<TaccountantPresetDto, keyof Tbase>;
+type TupdateAccountantPresetDto = Partial<TcreateAccountantPresetDto> & {
+  id: string;
+};
+
+// MARK:TapplyPaymentDto
+
+interface TapplyPayment_Dto extends Tbase {
+  serial_number: string; // 單號
+  payment_date: string; //  支出日期
+  total_price: number; //  合計
+  applicant_department: string; //  申請單位(支出部門)
+  description: string; // 備註說明
+  agent_employee_id: string; //  經辦人id
+  agent_employee: TemployeeDto; // 經辦人
+  status: string; // 付款狀態
+}
+
+interface TcreateApplyPayment_Dto {
+  payment_date: string;
+  total_price: `${number}`;
+  applicant_department: string;
+  description: string;
+  agent_employee_id: string;
+  data: TcreateApplyPayment_data_Dto[];
+}
+
+interface TupdateApplyPayment_Dto extends TcreateApplyPayment_Dto {
+  apply_payment_id: string;
+  data: TupdateApplyPayment_data_Dto[];
+}
+
+interface TcreateApplyPayment_data_Dto {
+  item: string;
+  invoice_business_title: string;
+  invoice_type: Tinvoice_type;
+  tax: `${number}`;
+  amount_total: `${number}`;
+  accounting_subject: string;
+  invoice_number: string;
+  note: string;
+
+  // w ------------------------------------------------
+  // 20241108
+  // 實際上api不收，但應該要收，所以先送過去吧，以後應該會收吧
+  subtotal: `${number}`;
+  // 20241108
+  // POST Accountant/AddApplyPayment
+  // 新增支出單，不收tax_type
+  // POST /Accountant/UpdateApplyPayment
+  // 編輯支出單 收tax_type
+  // 但是只對新增的detail有效，對舊有的detail無效
+  // 另外新增的detail若沒有送tax_type，該detail的tax_type會變成"0"
+  tax_type: Ttax_type;
+  // w ------------------------------------------------
+}
+interface TupdateApplyPayment_data_Dto extends TcreateApplyPayment_data_Dto {
+  id?: string;
+}
+
+// region TpurchaseInvoice_Dto
+interface TpurchaseInvoice_Dto extends Tbase {
+  date: string | null; // 發票日期
+  number: string | null; // 發票號碼
+  subtotal: number | null; // 發票小計
+  tax: number | null; // 發票稅額
+  amount_total: number | null; // 發票總計金額
+  title: string | null; // 發票抬頭
+  tax_id: string | null; // 發票統編
+  business_title: string | null; // 營業人抬頭
+  business_tax_id: string | null; // 營業人統編
+  type: Tinvoice_type | null; // 發票類別(二聯式/三聯式)
+  payment_status: string | null; // 付款狀態
+  tax_type: Ttax_type | null; // 稅別(應稅/零稅/免稅)
+  declaration_category: string | null; // 申報類別
+  is_offset: boolean | null; // 是否進項折抵
+  note: string | null; // 說明備註
+  apply_payment_uuid: string | null; // 支出單uuid
+  account_payable_uuid: string | null; // 付款申請uuid
+  address: string | null; // 發票地址
+  item: string | null; // 發票項目
+  accounting_subject: string | null; // 會計科目
+}
+
+// region purchaseCollectTicket
+interface TpurchaseCollectTicket_Dto extends Tbase {
+  serial_number: string; // 收票單號
+  applicant_department: string | null; // 申請單位
+  agent_employee_id: string; // 經辦人id
+  ticket_method: string | null; // 開票方式
+  invoice_number: string | null; // 發票號碼
+  invoice_price: number | null; // 發票金額
+  note: string | null; // 備註
+
+  acct_method: string | null; // 立帳方式
+  tax_deduction_category: string | null; //  扣稅類別
+
+  supplier_name: string | null;
+  supplier_uuid: string | null;
+}
+
+type TcreatePurchaseCollectTicket_Dto = Pick<
+  TpurchaseCollectTicket_Dto,
+  | 'applicant_department'
+  | 'agent_employee_id'
+  | 'ticket_method'
+  | 'invoice_number'
+  | 'invoice_price'
+  | 'note'
+  | 'acct_method'
+  | 'tax_deduction_category'
+  | 'supplier_name'
+  | 'supplier_uuid'
+> & {
+  data: TcreatePurchaseCollectTicketDetail_Dto[];
+};
+
+interface TupdatePurchaseCollectTicket_Dto extends TcreatePurchaseCollectTicket_Dto {
+  purchase_collect_ticket_uuid: string;
+  data: (TcreatePurchaseCollectTicketDetail_Dto | TupdatePurchaseCollectTicketDetail_Dto)[];
+}
+
+interface TpurchaseCollectTicketDetail_Dto extends Tbase {
+  purchase_collect_ticket_uuid: string; // 收票主檔uuid
+  item: string | null; // 項目名稱
+  prodreceipt_number: string | null; // 進貨單號
+  prodreceipt_uuid: string; // 進貨單uuid
+  transaction_date: string | null; // 交易日期
+  quantity: number | null; // 數量
+  goods_spec: string | null; // 貨品規格
+  unit: string | null; // 單位
+  unit_price: number | null; // 單價
+  amount: number | null; // 應開金額
+  note: string | null; // 摘要說明
+}
+
+type TcreatePurchaseCollectTicketDetail_Dto = Pick<
+  TpurchaseCollectTicketDetail_Dto,
+  'item' | 'goods_spec' | 'note' | 'transaction_date' | 'prodreceipt_uuid'
+> & {
+  // quantity: string;
+  unit_price: `${number}` | null;
+  // amount: string;
+};
+
+interface TupdatePurchaseCollectTicketDetail_Dto extends TcreatePurchaseCollectTicketDetail_Dto {
+  detail_uuid: string;
+}
+
+// MARK:payment_order
+
+interface Tpayment_order_Dto extends Tbase {
+  serial_number: string | null; // 申請單編號
+  beneficiary_uuid: string | null; // 廠商uuid
+  beneficiary_name: string | null; // 廠商名稱
+  applicant_date: string | null; // 申請日期
+  applicant_department: string | null; // 申請單位
+  agent_employee_id: string | null; // 經辦人Id
+  offset_method: string | null; // 沖銷方式
+  payable_method: string | null; // 支付方式
+  remittance_fee: number | null; // 匯費外加
+  deduction: number | null; // 折扣金額
+  actualpaid: number | null; // 實付金額
+  note: string | null; // 備註
+  total: number | null;
+}
+
+interface TpaymentOrderDetail_Dto extends Tbase {
+  account_payable_id: string | null; //應付帳款uuid
+  invoice_number: string | null; // 發票號碼
+  note: string | null; // 備註
+  payable_amount: number | null; // 應付帳款
+  payment_date: string | null; // 付款日期
+  payment_order_id: string | null; // 付款申請單uuid
+  source_number: string | null; // 立帳來源單號
+  transaction_date: string | null; // 交易日期
+
+  // settled_amount: number | null; // 已付帳款
+  // balance: number | null; // 未付款餘額
+  // payment_order_id: string; //付款申請主檔id
+}
+
+type TcreatePaymentOrderDetail_Dto = Pick<
+  TpaymentOrderDetail_Dto,
+  'source_number' | 'transaction_date' | 'payment_date' | 'invoice_number' | 'note'
+> & {
+  account_payable_id: string;
+  payable_amount: `${number}` | null;
+};
+
+interface TcreatePaymentOrder_Dto {
+  beneficiary_uuid: string | null;
+  applicant_date: string | null;
+  applicant_department: string | null;
+  agent_employee_id: string | null;
+  offset_method: string | null;
+  total: `${number}` | null;
+  remittance_fee: `${number}`;
+  deduction: `${number}`;
+  actualpaid: `${number}`;
+  note: string | null;
+  data: TcreatePaymentOrderDetail_Dto[];
+}
+
+// region account_payable
+interface Taccount_payable_Dto extends Tbase {
+  serial_number: string | null; // varchar(50) - 序號
+  review_status: Treview_status | null; // varchar(50) - 審核狀態
+  note: string | null; // varchar(200) - 摘要說明
+  agent_employee_id: string | null; // varchar - 經辦人員
+  invoice_title: string | null; // varchar - 發票抬頭
+  invoice_date: string | null; // timestamp - 發票日期
+  invoice_number: string | null; // varchar - 發票號碼
+  invoice_price: number | null; // int4 - 發票金額
+  payment_account: string | null; // 付款帳戶名稱
+  payment_account_uuid: string | null; // 付款帳戶id
+  payment_status: string | null; // varchar - 付款狀態
+  payment_order_uuid: string | null; // uuid - 付款申請單uuid
+  payment_order_serial_number: string | null; // varchar - 付款申請單號
+  purchase_invoice_uuid: string | null; // uuid - 進項發票uuid
+  supplier_uuid: string | null; // uuid - 廠商uuid
+  transaction_date: string | null; // timestamp - 交易日期(付款日期)
+  source_number: string | null; // varchar - 立帳單號
+  settled_amount: number | null; // int4 - 已付金額
+  balance: number | null; // int4 - 餘額
+  supplier: string | null; // varchar - 廠商名
+  supplier_id: string | null; // 廠商編號
+  payment_tenor_date: string | null; // 票期日
+  payment_method: string | null; // 支付方式
+  cheque_id: string | null; // 支票號碼
+  statistics_uuid: string | null; // 統計表uuid
+}
+
+interface Taccount_payable_statistics extends Tbase {
+  date: string;
+  note: string;
+}
+
+interface Taccount_payable_statistics_detail extends Tbase {
+  bank_account_uuid: string; // 付款帳號uui
+  payment: number; // 貨款金額
+  account_payable_statistics_id: string; // 應付帳款統計表uuid
+  note: string; //
+  bank_account_name: string; // 付款帳號名稱
+}
+
+interface Tprodreceipt_Dto extends Tbase {
+  prodreceiptid: number;
+  supplieruuid: string;
+  invoice: string | '';
+  purchaseorderuuid: string;
+  purchaseorderid: string;
+  inspected: boolean;
+  totalprice: number;
+  tax: number;
+  purchaseordercreate_at: string;
+  purchaseordercreate_by: string;
+  review_by: string;
+  review_at: string;
+  review_type: string;
+  status: string;
+  suppliername: string;
+  supplierphone: string;
+  supplieraddress: string;
+  suppliertaxid: string;
+  pay_status: string;
+  entry_status: string;
+  note: string;
+  batchid: string;
+
+  detail: Tprodreceiptdetail_Dto[];
+}
+
+interface Tprodreceiptdetail_Dto {
+  id: string;
+  batchid: string;
+
+  productuuid: string | null;
+  productid: string | null;
+
+  prodreceiptid: string | null;
+  prodreceiptuuid: string | null;
+
+  purchaseorderid: string | null;
+  purchaseorderuuid: string | null;
+
+  purchaseorderdetailuuid: string | null;
+
+  invoice: string | null;
+
+  quantity: number | null;
+  totalprice: number | null;
+  note: string | null;
+  unitprice: number | null;
+  name: string | null;
+  spec: string | null;
+  unit: string | null;
+}
+
+export type {
+  TaccountantPresetDto,
+  TcreateAccountantPresetDto,
+  TupdateAccountantPresetDto,
+  TapplyPayment_Dto,
+  TcreateApplyPayment_Dto,
+  TupdateApplyPayment_Dto,
+  TcreateApplyPayment_data_Dto,
+  TupdateApplyPayment_data_Dto,
+  TpurchaseInvoice_Dto,
+  TpurchaseCollectTicket_Dto,
+  TcreatePurchaseCollectTicket_Dto,
+  TupdatePurchaseCollectTicket_Dto,
+  TpurchaseCollectTicketDetail_Dto,
+  TcreatePurchaseCollectTicketDetail_Dto,
+  TupdatePurchaseCollectTicketDetail_Dto,
+  Tpayment_order_Dto,
+  TpaymentOrderDetail_Dto,
+  TcreatePaymentOrderDetail_Dto,
+  TcreatePaymentOrder_Dto,
+  Taccount_payable_Dto,
+  Taccount_payable_statistics,
+  Taccount_payable_statistics_detail,
+  Tprodreceipt_Dto,
+  Tprodreceiptdetail_Dto,
+};

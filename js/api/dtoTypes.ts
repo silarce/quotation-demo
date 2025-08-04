@@ -1,5 +1,3 @@
-import type { Treview_status } from './api_netCore/schemas';
-
 // ---------------------------------------------------------------------------
 
 export type TcustomerType = 'construction' | 'firm' | 'propertyOwner' | 'contractor' | 'supplier';
