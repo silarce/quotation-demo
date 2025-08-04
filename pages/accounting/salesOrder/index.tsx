@@ -155,13 +155,13 @@ export default function SalesOrder() {
           <Input value={state.projectName} onChange={(e) => setState({ ...state, projectName: e.target.value })} />
         </DataEntry_fong>
         <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true}>
-          <Input />
+          {state.customerNumber}
         </DataEntry_fong>
         <DataEntry_fong caption="客戶名稱" className="col-span-2" isMust={true}>
-          <Input />
+          {state.customerName}
         </DataEntry_fong>
         <DataEntry_fong caption="統一編號" className="col-span-2" isMust={true}>
-          <Input />
+          {state.customerTaxId}
         </DataEntry_fong>
         <div />
         <div />
