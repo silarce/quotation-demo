@@ -15,7 +15,7 @@ import Icon_cancel from 'public/image/icon/fong/cancel.svg';
 
 import SalesDetails from 'components/page/accounting/salesOrder/salesDetails';
 
-import { Ttax_type } from 'js/api/api_netCore/_schemas';
+import { Ttax_type } from 'js/api/api_netCore/schemas';
 
 // ============================================================================
 

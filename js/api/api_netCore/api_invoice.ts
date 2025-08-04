@@ -5,7 +5,7 @@ import { axi_monkey } from '../_axiosCreator';
 import type { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import type { TapiParams, Tmeta, Tinvoice_Dto } from './_schemas';
+import type { TapiParams, Tmeta, Tinvoice_Dto } from './schemas';
 
 const apiGetInvoiceNumberLists = (invoiceBookId: string) => {
   const api = `/api/Invoice/GetInvoiceNumberLists`;

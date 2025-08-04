@@ -4,7 +4,7 @@ import { axi_monkey } from '../_axiosCreator';
 
 import type { AxiosError } from 'axios';
 
-import type { TengineerContactExport } from './_schemas';
+import type { TengineerContactExport } from './schemas';
 
 import { useEngineeringContactAttachments } from '../api_engineering';
 
