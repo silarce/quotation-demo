@@ -1,6 +1,7 @@
 // 使import路徑大小寫敏感
 // https://www.npmjs.com/package/case-sensitive-paths-webpack-plugin
-CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+
 
 
 const dayjs = require('dayjs');
@@ -14,7 +15,6 @@ dayjs.extend(timezone);
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
   output: 'export',
   images: {
     unoptimized: true,
@@ -29,9 +29,6 @@ const nextConfig = {
 
 module.exports = {
   ...nextConfig,
-  future: {
-    webpack5: true,
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
