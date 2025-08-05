@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import classNames from 'classnames';
 
 import scss from './index.module.scss';
@@ -18,7 +16,7 @@ import Icon_send from 'public/image/icon/fong/send.svg';
 import Icon_warning from 'public/image/icon/fong/warning.svg';
 import Icon_setting from 'public/image/icon/fong/setting.svg';
 import Icon_calendar from 'public/image/icon/fong/calendar.svg';
-import Icon from '@ant-design/icons';
+import Icon_paper from 'public/image/icon/fong/paper2.svg';
 
 // ================================================================================
 
@@ -99,7 +97,8 @@ type TthemeName =
   | 'warning'
   | 'warning_2'
   | 'setting'
-  | 'calendar';
+  | 'calendar'
+  | 'document';
 
 type Tprops_btn = {
   theme?: TthemeName;
@@ -198,6 +197,10 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
   calendar: {
     themeColor: 'blue_II',
     Icon: Icon_calendar,
+  },
+  document: {
+    themeColor: 'green_I',
+    Icon: Icon_paper,
   },
 };
 
