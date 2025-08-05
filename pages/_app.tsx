@@ -2,12 +2,11 @@ import { useState, useEffect, createContext, useCallback } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import _ from 'lodash';
-
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
 
+import _ from 'lodash';
 import { useMediaQuery } from 'react-responsive';
 
 // antd
@@ -16,6 +15,7 @@ import locale from 'antd/locale/zh_TW';
 
 // conponents
 import Layer from 'components/Layer/Layer';
+import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
 
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
@@ -28,23 +28,21 @@ import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
-
 import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import { useGlobal_environment } from 'hooks/globalState/useGlobal_enviroment';
 
+//
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import duration from 'dayjs/plugin/duration';
 import utc from 'dayjs/plugin/utc';
-import 'dayjs/locale/zh-tw';
 
 // -----------------------------------------------------------------------------------
 
-import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
-
-// import ErrorBoundary from 'antd/lib/alert/ErrorBoundary';
+import 'dayjs/locale/zh-tw';
+import 'hooks/i18n';
 
 // -----------------------------------------------------------------------------------
 // 全域 css
@@ -57,64 +55,6 @@ import 'antd/dist/reset.css';
 //新增的
 import '../styles/tailwind.css';
 import '../styles/antd.scss';
-// -----------------------------------------------------------------------------------
-// i18n
-import 'hooks/i18n';
-
-// -----------------------------------------------------------------------------------
-
-// React 19 兼容
-// https://ant.design/docs/react/v5-for-19-cn
-
-// @ant-design/v5-patch-for-react-19不能用
-// 編譯時發生錯誤 (0 , _antd.unstableSetRender) is not a function
-// 所以採用在入口執行unstableSetRender的方案
-// @ant-design/v5-patch-for-react-19 v1.0.3其實是在做同樣的事
-unstableSetRender((node, container) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  container._reactRoot ||= createRoot(container);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const root = container._reactRoot;
-  root.render(node);
-
-  return async () => {
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    root.unmount();
-  };
-});
-
-// -----------------------------------------------------------------------------------
-
-dayjs.extend(isBetween);
-dayjs.extend(duration);
-dayjs.extend(utc);
-dayjs.locale('zh-tw');
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-locale.DatePicker.lang.yearFormat = (
-  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
-) => {
-  const year = date.subtract(1911, 'year').year();
-
-  return `${year}年`;
-};
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-locale.DatePicker.lang.cellYearFormat = (
-  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
-) => {
-  const year = date.subtract(1911, 'year').year();
-
-  return `${year}年`;
-};
-
-// -----------------------------------------------------------------------------------
-
-const AppContext = createContext<TappContext>(null!);
 
 // =============================================================================
 
@@ -146,6 +86,12 @@ type TmyPageProps = {
 };
 
 // =============================================================================
+
+const AppContext = createContext<TappContext>(null!);
+
+// =============================================================================
+
+// MARK: START
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const router = appProps.router;
 
@@ -299,6 +245,9 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   };
 
   // ------------------------------------------------------------------
+
+  // MARK: RENDER
+
   return (
     <AntdConfigProvider button={{ autoInsertSpace: false }} locale={locale}>
       <Head>
@@ -309,17 +258,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         <AppContext.Provider value={appContextValue}>
           {getLayout(
             <ErrorBoundary pathname={router.pathname}>
-              <Component
-                {...pageProps}
-                {...myPageProps}
-                // isAdmin={userInfo?.account === 'admin3'}
-                // userInfo={userInfo}
-                // userGrade={userGrade}
-                // userErpFeature={userErpFeature}
-                // rwd1023={rwd1023}
-                // rwd1439={rwd1439}
-                // onLogin={onLogin}
-              />
+              <Component {...pageProps} {...myPageProps} />
             </ErrorBoundary>
           )}
         </AppContext.Provider>
@@ -330,6 +269,63 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     </AntdConfigProvider>
   );
 }
+
+// MARK:END
+
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// =======================================================================
+// MARK:設定
+
+dayjs.extend(isBetween);
+dayjs.extend(duration);
+dayjs.extend(utc);
+dayjs.locale('zh-tw');
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+locale.DatePicker.lang.yearFormat = (
+  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
+) => {
+  const year = date.subtract(1911, 'year').year();
+
+  return `${year}年`;
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+locale.DatePicker.lang.cellYearFormat = (
+  date: Dayjs // yearFormat的型別是string，但實際上也可以是callback函式
+) => {
+  const year = date.subtract(1911, 'year').year();
+
+  return `${year}年`;
+};
+
+// ----------------------------------------------------------------------------
+
+// React 19 兼容
+// https://ant.design/docs/react/v5-for-19-cn
+
+// @ant-design/v5-patch-for-react-19不能用
+// 編譯時發生錯誤 (0 , _antd.unstableSetRender) is not a function
+// 所以採用在入口執行unstableSetRender的方案
+// @ant-design/v5-patch-for-react-19 v1.0.3其實是在做同樣的事
+unstableSetRender((node, container) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  container._reactRoot ||= createRoot(container);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const root = container._reactRoot;
+  root.render(node);
+
+  return async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    root.unmount();
+  };
+});
 
 // =======================================================================
 
