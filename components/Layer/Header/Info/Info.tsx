@@ -10,7 +10,7 @@ import iconMember from 'public/image/icon/member.svg?url';
 import iconGear from 'public/image/icon/gear.svg?url';
 
 // icon
-import logout from 'public/image/icon/logout.svg?url';
+import icon_logout from 'public/image/icon/logout.svg?url';
 
 // css
 import scss from './info.module.scss';
@@ -22,10 +22,15 @@ import { useTranslation } from 'react-i18next';
 
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
+import { apiLogout } from 'js/api/api_auth';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+
 // ===================================================================
 
 export default function Info() {
-  const { reqLogout, userInfo } = useContext(LayerCtx);
+  const { userInfo } = useContext(LayerCtx);
+  const { clear } = useGlobal_userInfo();
+
   const [showPwModal, setShowPwModal] = useState(false);
 
   const { t, i18n } = useTranslation('common');
@@ -56,6 +61,12 @@ export default function Info() {
   const onCancel = () => {
     setShowPwModal(false);
   };
+
+  const logout = async () => {
+    await apiLogout();
+    clear();
+  };
+
   // ----------------------------------------------
 
   return (
@@ -104,8 +115,8 @@ export default function Info() {
           <span>變更密碼</span>
         </div>
 
-        <div className={scss.logout} onClick={reqLogout}>
-          <Image src={logout} alt="登出" />
+        <div className={scss.logout} onClick={logout}>
+          <Image src={icon_logout} alt="登出" />
           <span>登出</span>
         </div>
 
