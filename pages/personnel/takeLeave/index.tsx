@@ -42,12 +42,12 @@ export default function TakeLeave() {
   const mapPageHeaderTop: MapPageHeader = {
     title: [
       {
-        name: '假別設定',
+        name: '假別基本設定',
         onClick: () => handleTabChange('leaveSetting'),
         className: activeTab === 'leaveSetting' ? activeClass : inactiveClass,
       },
       {
-        name: '新增人員假別',
+        name: '員工可用假別發放',
         onClick: () => handleTabChange('addStaffLeave'),
         className: activeTab === 'addStaffLeave' ? activeClass : inactiveClass,
       },
