@@ -18,7 +18,7 @@ import scss from './index.module.scss';
 // ==========================================================================
 
 interface Tprops {
-  onConfirm?: (customer: TquotationListViewModel_Dto[]) => void;
+  onConfirm?: (quotation: TquotationListViewModel_Dto[]) => void;
   onCancel?: () => void;
   confirmText?: React.ReactNode;
   limit?: number;

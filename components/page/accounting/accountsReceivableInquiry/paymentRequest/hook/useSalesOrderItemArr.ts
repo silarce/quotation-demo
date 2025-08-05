@@ -9,19 +9,22 @@ type TsalesOrderItemArr = Tres_apiGetARPaymentData['salesOrder']['salesOrderItem
 
 type TsalesOrderItem = TsalesOrderItemArr[number];
 
-type Tstate_salesOrderItem = TsalesOrderItem & {
+type Tstate_salesOrderItem = Omit<TsalesOrderItem, 'completedQuantity'> & {
   completedQuantity: `${number}` | ''; // 待api新增本期完成的property
-  completedPayment: number | null; // 待api新增本期完成的property
 };
 
 // =============================================================================
 const useDefaultState = (rawData: TsalesOrderItemArr | undefined | null): Tstate_salesOrderItem[] => {
   return useMemo(() => {
-    return (rawData ?? []).map((item) => ({
-      ...item,
-      completedQuantity: '',
-      completedPayment: null,
-    }));
+    return (rawData ?? []).map((item) => {
+      const state: Tstate_salesOrderItem = {
+        ...item,
+        completedQuantity: item.completedQuantity === null ? '' : `${item.completedQuantity}`,
+        completedPayment: item.completedPayment,
+      };
+
+      return state;
+    });
   }, [rawData]);
 };
 
@@ -64,5 +67,5 @@ const useSalesOrderItemArr = (rawData: TsalesOrderItemArr | undefined | null) =>
 
 type Tinstance_salesOrderItem = ReturnType<typeof useSalesOrderItemArr>;
 
-export type { Tstate_salesOrderItem, Tinstance_salesOrderItem };
+export type { Tinstance_salesOrderItem, TsalesOrderItemArr, TsalesOrderItem, Tstate_salesOrderItem };
 export { useSalesOrderItemArr };
