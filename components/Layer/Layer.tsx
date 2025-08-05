@@ -12,17 +12,7 @@ import SideNav from './SideNav/SideNav';
 import { TerpFeatureDto, TuserDto } from 'js/api/dtoTypes';
 
 // ======================================================================
-export default function Layer({
-  children,
-  reqLogout,
-  userInfo,
-  userErpFeature,
-}: {
-  children: React.ReactNode;
-  reqLogout: () => void;
-  userInfo: TuserDto;
-  userErpFeature: TerpFeatureDto[];
-}) {
+export default function Layer({ children }: { children: React.ReactNode }) {
   const { pathname } = useRouter();
 
   const ref_main = useRef<HTMLDivElement>(null!);

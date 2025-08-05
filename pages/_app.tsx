@@ -124,15 +124,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // ----------------------------------------------------------------------------
 
-  const reqLogout = async () => {
-    try {
-      await apiLogout();
-      clearUserInfo();
-    } catch {
-      myAlert.err({ title: '登出失敗' });
-    }
-  };
-
   // -----------------------------------------------------------------------
 
   useEffect(() => {
@@ -189,11 +180,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       getLayout = (page) => page;
     } else {
       getLayout = (page) => {
-        return (
-          <Layer reqLogout={reqLogout} userInfo={userInfo} userErpFeature={userErpFeature}>
-            {page}
-          </Layer>
-        );
+        return <Layer>{page}</Layer>;
       };
     }
   }
