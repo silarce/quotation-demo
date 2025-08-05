@@ -28,10 +28,10 @@ import type {
 } from 'js/api/dtoTypes';
 import { Toption } from 'js/utils/options/options';
 
-import { Tinvoice_reduce as Tperiod_reduce, Tstate_period } from './periodTable';
+import type { Tinvoice_reduce as Tperiod_reduce, Tstate_period } from './periodTable';
 
 // api
-import { TaccountantInvoiceBookDto, useGetAccountantInvoiceBook } from 'js/api/api_accountant';
+import { TaccountantInvoiceBookDto } from 'js/api/api_accountant';
 import { useGetAccountReceivableInvoices_all } from 'js/api/api_engineering';
 
 // icon
