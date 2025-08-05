@@ -82,7 +82,6 @@ type TmyPageProps = {
   userErpFeature: TerpFeatureDto[] | undefined | null;
   rwd1023: boolean;
   rwd1439: boolean;
-  onLogin: ({ account, password }: { account: string; password: string }) => Promise<void>;
 };
 
 // =============================================================================
@@ -124,15 +123,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const { isInIframe } = useGlobal_environment();
 
   // ----------------------------------------------------------------------------
-
-  const onLogin = async ({ account, password }: { account: string; password: string }) => {
-    try {
-      await apiLogin({ account, password });
-      await update_userInfo();
-    } catch {
-      myAlert.err({ title: '帳號或密碼錯誤' });
-    }
-  };
 
   const reqLogout = async () => {
     try {
@@ -221,7 +211,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     userErpFeature: userErpFeature,
     rwd1023: rwd1023,
     rwd1439: rwd1439,
-    onLogin: onLogin,
   };
 
   // ------------------------------------------------------------------

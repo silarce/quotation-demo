@@ -1,5 +1,4 @@
 import { useState, useContext, ReactElement } from 'react';
-import { NextPageWithLayout } from 'pages/_app';
 
 import Image from 'next/image';
 
@@ -23,43 +22,34 @@ import scss from './login.module.scss';
 
 import { AppContext } from 'pages/_app';
 
+import { apiLogin } from 'js/api/api_auth';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+
+// ===================================================================================
+
 const devAccount: { name: string; account: string; password: string }[] | undefined =
   process.env.NEXT_PUBLIC_NAV_DEV_DEVACCOUNT && JSON.parse(process.env.NEXT_PUBLIC_NAV_DEV_DEVACCOUNT);
 
-const Login: NextPageWithLayout<{
-  onLogin: (postBody: { account: string; password: string }) => void;
-}> = ({ onLogin }) => {
+const Login = () => {
+  const { update: update_userInfo } = useGlobal_userInfo();
+
   const { rwd1023 } = useContext(AppContext);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [account, setAccont] = useState('');
-  const [password, setPassword] = useState('');
+  const [state_account, setState_accont] = useState('');
+  const [state_password, setState_password] = useState('');
 
-  const reqLog = async () => {
+  const reqLog = async ({ acc, pw }: { acc?: string; pw?: string } = {}) => {
     if (isLoading) {
       return;
     }
 
     try {
       setIsLoading(true);
-      const acc = account.trim();
-      const pw = password.trim();
-      await onLogin({ account: acc, password: pw });
-    } catch {
-      myAlert.err({ title: '帳號或密碼錯誤' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const reqLog_dev = async (account: string, password: string) => {
-    if (isLoading) {
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await onLogin({ account, password });
+      const account = acc ?? state_account.trim();
+      const password = pw ?? state_password.trim();
+      await apiLogin({ account, password });
+      await update_userInfo();
     } catch {
       myAlert.err({ title: '帳號或密碼錯誤' });
     } finally {
@@ -98,8 +88,8 @@ const Login: NextPageWithLayout<{
         }}
       >
         <Input_pw
-          value={account}
-          onChange={setAccont}
+          value={state_account}
+          onChange={setState_accont}
           label={'帳號'}
           inputType={'text'}
           captionWidth="40px"
@@ -107,8 +97,8 @@ const Login: NextPageWithLayout<{
         />
         <Input_pw
           className="mt-[23px]"
-          value={password}
-          onChange={setPassword}
+          value={state_password}
+          onChange={setState_password}
           label={'密碼'}
           inputType={'auto'}
           captionWidth="40px"
@@ -137,7 +127,7 @@ const Login: NextPageWithLayout<{
             const { name, account, password } = item;
 
             return (
-              <div key={index} onClick={() => reqLog_dev(account, password)}>
+              <div key={index} onClick={() => reqLog({ acc: account, pw: password })}>
                 {name}
               </div>
             );
