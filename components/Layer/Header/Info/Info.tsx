@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import ChangePwPanel from 'components/global/gear/modal/changePwPanel';
 import Image from 'next/image';
 
@@ -6,7 +6,6 @@ import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import { Switch } from 'antd';
 
 // img
-import iconMember from 'public/image/icon/member.svg?url';
 import iconGear from 'public/image/icon/gear.svg?url';
 
 // icon
@@ -14,9 +13,6 @@ import icon_logout from 'public/image/icon/logout.svg?url';
 
 // css
 import scss from './info.module.scss';
-
-// ctx
-import { LayerCtx } from 'components/Layer/Layer';
 
 import { useTranslation } from 'react-i18next';
 
@@ -28,8 +24,7 @@ import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 // ===================================================================
 
 export default function Info() {
-  const { userInfo } = useContext(LayerCtx);
-  const { clear } = useGlobal_userInfo();
+  const { userInfo, clear } = useGlobal_userInfo();
 
   const [showPwModal, setShowPwModal] = useState(false);
 
@@ -41,17 +36,17 @@ export default function Info() {
   // ----------------------------------------------
 
   const userName = (() => {
-    if (userInfo.employee?.chName) {
-      return userInfo.employee.chName;
+    if (userInfo?.employee?.chName) {
+      return userInfo?.employee.chName;
     }
 
-    if (userInfo.employee?.enName) {
-      return userInfo.employee.enName;
+    if (userInfo?.employee?.enName) {
+      return userInfo?.employee.enName;
     }
 
-    return userInfo.username;
+    return userInfo?.username;
   })();
-  const departmentName = userInfo.employee?.jobs[0]?.department.name ?? '無部門';
+  const departmentName = userInfo?.employee?.jobs[0]?.department.name ?? '無部門';
 
   // ----------------------------------------------
   const openPwModal = () => {

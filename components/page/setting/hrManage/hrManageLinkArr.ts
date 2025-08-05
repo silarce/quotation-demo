@@ -1,15 +1,14 @@
-import { useContext } from 'react';
 import _ from 'lodash';
 
-import { LayerCtx } from 'components/Layer/Layer';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 import { Tlink } from 'components/PageHeader/PageHeader02/LinkList';
 
 export const useHrManageLinkArr = () => {
-  const { userErpFeature, userInfo } = useContext(LayerCtx);
+  const { userErpFeature, userInfo } = useGlobal_userInfo();
 
-  const idNumber = userInfo.employee?.idNumber;
-  const gradeArr = userInfo.employee?.jobs.map((job) => {
+  const idNumber = userInfo?.employee?.idNumber;
+  const gradeArr = userInfo?.employee?.jobs.map((job) => {
     return job.grade;
   });
   const heightGrade = _.max(gradeArr) || 0;
@@ -46,9 +45,11 @@ export const useHrManageLinkArr = () => {
 
   // ==============================================
 
-  const isHr = userErpFeature.some((feat) => {
-    return feat.name === '人事權限建立';
-  });
+  const isHr = !userErpFeature
+    ? false
+    : userErpFeature.some((feat) => {
+        return feat.name === '人事權限建立';
+      });
 
   if (isHr) {
     arr = arr1;

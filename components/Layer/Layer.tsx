@@ -11,14 +11,6 @@ import SideNav from './SideNav/SideNav';
 // type
 import { TerpFeatureDto, TuserDto } from 'js/api/dtoTypes';
 
-type TlayerCtx = {
-  reqLogout: () => void;
-  userInfo: TuserDto;
-  userErpFeature: TerpFeatureDto[];
-};
-
-export const LayerCtx = createContext<TlayerCtx>(null!);
-
 // ======================================================================
 export default function Layer({
   children,
@@ -41,17 +33,15 @@ export default function Layer({
 
   return (
     <div className={style.container}>
-      <LayerCtx.Provider value={{ reqLogout, userInfo, userErpFeature }}>
-        <Header />
-        <Header_mobile />
-        <div className={style.wrapper}>
-          <SideNav />
-          {/* main */}
-          <div ref={ref_main} className={style.main}>
-            {children}
-          </div>
+      <Header />
+      <Header_mobile />
+      <div className={style.wrapper}>
+        <SideNav />
+        {/* main */}
+        <div ref={ref_main} className={style.main}>
+          {children}
         </div>
-      </LayerCtx.Provider>
+      </div>
     </div>
   );
 }

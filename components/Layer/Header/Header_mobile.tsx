@@ -24,11 +24,11 @@ import iconHome from 'public/image/icon/home.svg?url';
 // css
 import scss from './header_mobile.module.scss';
 
-// ctx
-import { LayerCtx } from 'components/Layer/Layer';
-
 // 路由表
 import { sidePathList } from '../SideNav/pathList/side';
+
+import { apiLogout } from 'js/api/api_auth';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // ================================================================
 
@@ -47,24 +47,29 @@ export default function Header_mobile() {
 // ================================================================================
 
 const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => void }) => {
-  const { reqLogout, userInfo } = useContext(LayerCtx);
+  const { userInfo, clear } = useGlobal_userInfo();
   const [isShowChangePw, setIsShowChangePw] = useState(false);
   // ------
   const userName = (() => {
-    if (userInfo.employee?.chName) {
-      return userInfo.employee.chName;
+    if (userInfo?.employee?.chName) {
+      return userInfo?.employee.chName;
     }
 
-    if (userInfo.employee?.enName) {
-      return userInfo.employee.enName;
+    if (userInfo?.employee?.enName) {
+      return userInfo?.employee.enName;
     } else {
-      return userInfo.username;
+      return userInfo?.username;
     }
   })();
-  const departmentName = userInfo.employee?.jobs[0]?.department.name ?? '無部門';
+  const departmentName = userInfo?.employee?.jobs[0]?.department.name ?? '無部門';
   // ------
 
   const [activePanel, setActivePanel] = useState<string[]>([]);
+
+  const logout = async () => {
+    await apiLogout();
+    clear();
+  };
 
   return (
     <>
@@ -85,7 +90,7 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
             變更密碼
           </span>
           <div className={scss.center} />
-          <div className={scss.right} onClick={reqLogout}>
+          <div className={scss.right} onClick={logout}>
             <Image src={iconLogout} alt="logout" />
             <span>登出</span>
           </div>
