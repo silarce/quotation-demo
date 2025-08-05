@@ -5,7 +5,7 @@ import { Table, TableProps } from 'antd';
 import scss from './index.module.scss';
 
 import type { TpageMetaDto } from 'js/api/dtoTypes';
-import type { Tmeta } from 'js/api/api_netCore/_schemas';
+import type { Tmeta } from 'js/api/api_netCore/schemas';
 
 // ===========================================================================
 

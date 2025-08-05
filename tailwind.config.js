@@ -62,6 +62,7 @@ module.exports = {
         state02: "#2563EB",
         state03: "#D1FAE5",
         state04: "#FEE2E2",
+        state05: "#FFF6E5",
 
 
 

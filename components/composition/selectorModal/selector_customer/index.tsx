@@ -101,7 +101,7 @@ function Selector_customer({ onConfirm, onCancel, limit = 1 }: Tprops) {
 
 const selector_customer = (props?: Tprops) => {
   return modal_empty({
-    width: 710,
+    width: 1000,
     content: <Selector_customer {...props} />,
   });
 };
@@ -112,20 +112,21 @@ const columns: TableProps<TcustomerDto>['columns'] = [
   {
     title: '客戶編號',
     dataIndex: 'customerNumber',
-    width: 250,
-    align: 'right',
+    width: 100,
+    // align: 'right',
   },
   {
     title: '客戶名稱',
     dataIndex: 'name',
-    width: 250,
-    align: 'right',
+    // width: 250,
+    width: 'auto',
+    // align: 'right',
   },
   {
     title: '統一編號',
     dataIndex: 'taxId',
-    width: 152,
-    align: 'right',
+    width: 150,
+    // align: 'right',
   },
 ];
 

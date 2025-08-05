@@ -1,0 +1,249 @@
+import { useState } from 'react';
+
+import { Dayjs } from 'dayjs';
+
+import Btn from 'components/global/gear/button/btn_fong';
+import Table_antd, { TableProps } from 'components/global/myAntd/table';
+import { DataEntry_fong, Input, Select, DatePicker } from 'components/global/gear/dataEntry';
+
+import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
+import { modal_empty } from 'components/global/gear/modal/fongModal';
+import { Container_confirm } from 'components/global/container/modal';
+
+import Icon_note from 'public/image/icon/fong/note.svg';
+import Icon_trash from 'public/image/icon/fong/trash.svg';
+import Icon_next from 'public/image/icon/fong/next.svg';
+
+import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+
+type TpaymentRequest = Tres_apiGetARPaymentData['paymentRequest'];
+type TprOffsetDetails = TpaymentRequest['prOffsetDetails'][number];
+
+const PrOffsetDetails = ({ prOffsetDetails }: { prOffsetDetails: TprOffsetDetails[] | undefined | null }) => {
+  const handle_accountingCollection = () => {
+    const { destroy } = modal_empty({
+      content: (
+        <Selector_accountant
+          onCancel={() => {
+            destroy();
+          }}
+          btn_confirm={() => {
+            return (
+              <Btn
+                icon={Icon_next}
+                props_icon={{
+                  className: 'text-blue01',
+                }}
+                onClick={() => {
+                  handle_addData();
+                  destroy();
+                }}
+              >
+                下一步
+              </Btn>
+            );
+          }}
+        />
+      ),
+    });
+  };
+
+  const handle_addFee = () => {
+    const { destroy } = modal_empty({
+      content: (
+        <AddFee
+          onConfirm={(fee) => {
+            destroy();
+          }}
+          onCancel={() => {
+            destroy();
+          }}
+        />
+      ),
+      width: 350,
+    });
+  };
+
+  const handle_addData = () => {
+    const { destroy } = modal_empty({
+      content: (
+        <AddData
+          onConfirm={(data) => {
+            destroy();
+          }}
+          onCancel={() => {
+            destroy();
+          }}
+        />
+      ),
+      width: 350,
+    });
+  };
+
+  return (
+    <div>
+      <div className="mt-6">
+        <div className="flex gap-3 items-center">
+          <div className="text-xl font-semibold">沖銷明細</div>
+          <Btn theme="cross" onClick={handle_accountingCollection}>
+            會計收款
+          </Btn>
+          <Btn theme="cross" onClick={handle_addFee}>
+            新增扣款
+          </Btn>
+        </div>
+        <div></div>
+      </div>
+      <Table_antd
+        className="mt-4"
+        dataSource={prOffsetDetails ?? undefined}
+        columns={columns_reversalDetails}
+        scroll={{
+          y: 400,
+        }}
+      />
+    </div>
+  );
+};
+
+// ===============================================================================
+const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
+  {
+    title: '序號',
+    dataIndex: 'settlementSerial',
+    align: 'center',
+    width: 80,
+  },
+  {
+    title: '代號',
+    dataIndex: 'prOffsetNumber',
+    width: 120,
+  },
+  {
+    title: '名稱',
+    dataIndex: 'name',
+    width: 150,
+  },
+  {
+    title: '會科',
+    dataIndex: 'account',
+    width: 150,
+  },
+  {
+    title: '金額',
+    dataIndex: 'totalAmount',
+    width: 150,
+    align: 'right',
+    render: (value) => '$' + value.toLocaleString(),
+  },
+  {},
+  {
+    title: '操作',
+    key: 'action',
+    width: 80,
+    align: 'center',
+    render: () => (
+      <div className="flex gap-[16px] justify-center">
+        <Icon_note className="w-[16px] h-[16px] text-blue01" />
+        <Icon_trash className="w-[16px] h-[16px] text-red01" />
+      </div>
+    ),
+  },
+];
+// ===============================================================================
+
+const AddData = ({
+  onConfirm,
+  onCancel,
+}: {
+  onConfirm?: (props: { date: Dayjs | null; amount: string; incomeCategory: string; remarks: string }) => void;
+  onCancel?: () => void;
+}) => {
+  const [date, setDate] = useState<Dayjs | null>(null);
+  const [amount, setAmount] = useState<string>('');
+  const [incomeCategory, setIncomeCategory] = useState<string>('');
+  const [remarks, setRemarks] = useState<string>('');
+
+  const handle_confirm = () => {
+    onConfirm?.({
+      date,
+      amount,
+      incomeCategory,
+      remarks,
+    });
+  };
+
+  const handle_cancel = () => {
+    onCancel?.();
+  };
+
+  return (
+    <Container_confirm
+      title="新增資料"
+      footerRight={
+        <>
+          <Btn onClick={handle_cancel}>取消</Btn>
+          <Btn theme="save" onClick={handle_confirm}>
+            儲存
+          </Btn>
+        </>
+      }
+    >
+      <div className="grid gap-fong">
+        <DataEntry_fong caption="日期" isMust={true}>
+          <DatePicker value={date} onChange={(value) => setDate(value)} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="金額" isMust={true}>
+          <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="收入類別" isMust={true}>
+          <Select
+            options={[
+              { label: '類別一', value: 'category1' },
+              { label: '類別二', value: 'category2' },
+              { label: '類別三', value: 'category3' },
+            ]}
+            value={incomeCategory}
+            onChange={(value) => setIncomeCategory(value)}
+          />
+        </DataEntry_fong>
+        <DataEntry_fong caption="備註" isMust={true}>
+          <Input value={remarks} onChange={(e) => setRemarks(e.target.value)} />
+        </DataEntry_fong>
+      </div>
+    </Container_confirm>
+  );
+};
+
+const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (fee: string) => void }) => {
+  const [value, setValue] = useState<string>('');
+
+  const handle_confirm = () => {
+    onConfirm?.(value);
+  };
+
+  const handle_cancel = () => {
+    onCancel?.();
+  };
+
+  return (
+    <Container_confirm
+      title="手續費"
+      footerRight={
+        <>
+          <Btn onClick={handle_cancel}>取消</Btn>
+          <Btn theme="save" onClick={handle_confirm}>
+            儲存
+          </Btn>
+        </>
+      }
+    >
+      <DataEntry_fong caption="手續費" isMust={true}>
+        <Input value={value} onChange={(e) => setValue(e.target.value)} />
+      </DataEntry_fong>
+    </Container_confirm>
+  );
+};
+
+// ===============================================================================
+export default PrOffsetDetails;

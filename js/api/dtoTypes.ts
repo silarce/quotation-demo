@@ -1,5 +1,3 @@
-import type { Treview_status } from './api_netCore/_schemas';
-
 // ---------------------------------------------------------------------------
 
 export type TcustomerType = 'construction' | 'firm' | 'propertyOwner' | 'contractor' | 'supplier';
@@ -4612,9 +4610,9 @@ export type TaccountantDto = {
 
   // 收款類型
   paymentType: TaccountantPaymentType;
-  // 編號 / 現金存入帳號
+  // 編號 / 現金存入帳號 // 存入帳號
   accountingNumber: string | null;
-  // 匯入帳號 // 匯款來源帳號
+  // 匯入帳號 // 匯款來源帳號 // 付款帳號
   importAccountingNumber: string | null;
   // 匯入日期 // 收款日 // 收票日
   insertDate: string | null;

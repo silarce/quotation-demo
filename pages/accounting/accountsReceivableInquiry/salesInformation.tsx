@@ -15,7 +15,11 @@ import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_note from 'public/image/icon/fong/note.svg';
 
 // api
-import { TaccountsReceivable, useGetAccountsReceivables } from 'js/api/api_netCore/api_accountsReceivable';
+import {
+  TaccountsReceivable,
+  apiQuotationToAccountsReceivables,
+  useGetAccountsReceivables,
+} from 'js/api/api_netCore/api_accountsReceivable';
 
 // ============================================================================
 
@@ -32,10 +36,10 @@ type TpaymentRequest = TaccountsReceivable['paymentRequests'][0];
 
 export default function SalesInformation() {
   const router = useRouter();
-  const { id } = router.query as Tquery;
-  const isNew = !id;
+  const { id: accountsReceivableId } = router.query as Tquery;
+  const isNew = !accountsReceivableId;
 
-  const { data, isFetching } = useGetAccountsReceivables(id);
+  const { data, isFetching } = useGetAccountsReceivables(accountsReceivableId);
 
   const { accountsReceivablesList, paymentRequests, salesOrderItem } = data ?? {};
 
@@ -54,6 +58,7 @@ export default function SalesInformation() {
     requestAmount,
     foreignCurrencyAmount,
     uncollectedPayment,
+    collectAmount,
     totalAmount,
     createdAt,
     updatedAt,
@@ -65,6 +70,8 @@ export default function SalesInformation() {
     quotationContractNumber,
     projectName,
     salesOrderNumber,
+    taxId,
+    taxDeductionCategory,
   } = accountsReceivablesList ?? {};
 
   const onSelectQuotation = async (data: TquotationListViewModel_Dto | undefined) => {
@@ -72,11 +79,13 @@ export default function SalesInformation() {
       return;
     }
 
-    router.replace({
-      query: {
-        ...router.query,
-        id: data.quotationNumber,
-      },
+    await apiQuotationToAccountsReceivables(data.quotationNumber).then((id) => {
+      router.replace({
+        query: {
+          ...router.query,
+          id: id,
+        },
+      });
     });
   };
 
@@ -101,16 +110,21 @@ export default function SalesInformation() {
     <div>
       {/*  */}
       <div className="pageTop ">
-        <div className="flex gap-3 w-fit ml-auto mr-0">
-          <Btn onClick={router.back}>返回</Btn>
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="text-xl font-semibold">應收款編輯</span>
+          </div>
+          <div className="flex gap-3">
+            <Btn onClick={router.back}>返回</Btn>
 
-          {isNew && (
-            <>
-              <Btn theme="query" onClick={handle_search}>
-                新增應收款
-              </Btn>
-            </>
-          )}
+            {isNew && (
+              <>
+                <Btn theme="query" onClick={handle_search}>
+                  新增應收款
+                </Btn>
+              </>
+            )}
+          </div>
         </div>
       </div>
       {/*  */}
@@ -118,35 +132,45 @@ export default function SalesInformation() {
       <div className="border border-gray05 rounded-01 py-8 px-6">
         <div className="text-xl font-semibold mb-6">應收款</div>
         <div className="grid grid-cols-4 gap-fong ">
+          {/*  */}
+
           <DataEntry_fong caption="合約編號" isMust={true} className="col-span-2">
             {quotationContractNumber}
           </DataEntry_fong>
           <DataEntry_fong caption="案場名稱" className="col-span-2">
             {projectName}
           </DataEntry_fong>
+
           <DataEntry_fong caption="客戶編號" className="col-span-2">
             {customerNumber}
           </DataEntry_fong>
           <DataEntry_fong caption="客戶名稱" className="col-span-2">
             {customerName}
           </DataEntry_fong>
-          <DataEntry_fong caption="統一編號" className="col-span-2">
-            {'customerTaxId'}
-          </DataEntry_fong>
-          <DataEntry_fong caption="稅別">{'taxType'}</DataEntry_fong>
+
+          <DataEntry_fong caption="統一編號">{taxId}</DataEntry_fong>
+          <DataEntry_fong caption="稅別">{taxDeductionCategory}</DataEntry_fong>
           <DataEntry_fong caption="外幣">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
+          <DataEntry_fong caption="匯率">{exchangeRate}</DataEntry_fong>
+
           <DataEntry_fong caption="銷售金額">
             {<span className="text-right">{toLocaleString(salesAmount)}</span>}
           </DataEntry_fong>
           <DataEntry_fong caption="銷售稅金">
             {<span className="text-right">{toLocaleString(taxes)}</span>}
           </DataEntry_fong>
-          <DataEntry_fong caption="追加減金額">{'attachmentTotal'}</DataEntry_fong>
-          <DataEntry_fong caption="追加減金額稅金">{'attachmentTax'}</DataEntry_fong>
-          <DataEntry_fong caption="已收金額">{'receivedAmount'}</DataEntry_fong>
-          <DataEntry_fong caption="扣款折讓">{'discountAmount'}</DataEntry_fong>
+          <DataEntry_fong caption="追加減金額">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="追加減金額稅金">{'no property'}</DataEntry_fong>
+
+          <DataEntry_fong caption="已收金額">{collectAmount}</DataEntry_fong>
+          <DataEntry_fong caption="扣款折讓">{deduction}</DataEntry_fong>
           <DataEntry_fong caption="已請款總額">{prAmount}</DataEntry_fong>
           <DataEntry_fong caption="銷售總額">{totalAmount}</DataEntry_fong>
+
+          <DataEntry_fong caption="合約保留款類型">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="稅別">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="百分比%">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="保留款金額">{'no property'}</DataEntry_fong>
         </div>
         {/*  */}
         <div className="mt-10">
@@ -158,9 +182,18 @@ export default function SalesInformation() {
         <div className="mt-10">
           <div className="mb-6">
             <span className="text-xl font-semibold mr-3">請款狀況</span>
-            <Link href="paymentRequest">
-              <Btn theme="cross">新增工程項目明細</Btn>
-            </Link>
+            {data && (
+              <Link
+                href={{
+                  pathname: 'paymentRequest',
+                  query: {
+                    accountsReceivableId: data.accountsReceivablesList.id,
+                  },
+                }}
+              >
+                <Btn theme="cross">新增請款資料</Btn>
+              </Link>
+            )}
           </div>
           <Table_antd columns={columns_paymentRequests} dataSource={paymentRequests} pagination={false} />
         </div>
@@ -231,11 +264,13 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
     title: '請款單號',
     dataIndex: 'paymentRequestNumber',
     width: 150,
+    align: 'right',
   },
   {
     title: '期別',
     dataIndex: 'period',
     width: 120,
+    align: 'right',
   },
   {
     title: '類型',
@@ -263,6 +298,19 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
     width: 150,
     render: (value: number | null) => toLocaleString(value),
   },
+  {
+    title: '發票號碼',
+    dataIndex: 'invoiceNumber',
+    align: 'right',
+    width: 150,
+  },
+  {
+    title: '發票金額',
+    dataIndex: 'invoiceAmount',
+    align: 'right',
+    width: 150,
+    render: (value: number | null) => toLocaleString(value),
+  },
   {},
   {
     title: '操作',
@@ -271,14 +319,16 @@ const columns_paymentRequests: TableProps<TpaymentRequest>['columns'] = [
     align: 'center',
     render: (_, record) => {
       return (
-        <Link
-          href={{
-            pathname: 'paymentRequest',
-            query: { id: record.id },
-          }}
-        >
-          <Icon_note className="inline w-[16px] h-[16px] text-blue01" />
-        </Link>
+        <div className="flex justify-center items-center gap-6">
+          <Link
+            href={{
+              pathname: 'paymentRequest',
+              query: { id: record.id },
+            }}
+          >
+            <Icon_note className="inline w-[16px] h-[16px] text-blue01" />
+          </Link>
+        </div>
       );
     },
   },

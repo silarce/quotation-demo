@@ -7,7 +7,7 @@ import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/
 
 // api
 import { TpurchaseInvoice_Dto } from 'js/api/api_netCore/api_accountant';
-import { Ttax_type, Tinvoice_type } from 'js/api/api_netCore/_schemas';
+import { Ttax_type, Tinvoice_type } from 'js/api/api_netCore/schemas';
 
 // icon
 import { Icon_fc_add2, Icon_fc_delete } from 'public/image/icon/fcIconComponent/fcIcons';
