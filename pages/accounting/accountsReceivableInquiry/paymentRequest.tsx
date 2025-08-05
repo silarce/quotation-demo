@@ -58,7 +58,8 @@ export default function PayentRequest() {
   const { data: data_paymentQuest } = useApiGetARPaymentData(paymentQuestId);
   const { data: data_forNew } = useApiGetARPaymentDataInset(isNew ? accountsReceivableId : undefined);
 
-  const { accountsReceivables, paymentRequest, salesOrder } = data_paymentQuest ?? data_forNew ?? {};
+  const { accountsReceivables, paymentRequest, salesOrder, paymentRequestLogs } =
+    data_paymentQuest ?? data_forNew ?? {};
   const salesOrderItems = salesOrder?.salesOrderItems ?? [];
 
   const instance_paymentRequest = usePaymentRequest(paymentRequest);
@@ -201,7 +202,7 @@ export default function PayentRequest() {
         <PrOffsetDetails prOffsetDetails={paymentRequest?.prOffsetDetails} />
       </CurrentPaymentRequestDetails>
       {/* 請款紀錄 */}
-      <History />
+      <History paymentRequestLogs={paymentRequestLogs} />
 
       {/*  */}
     </div>
