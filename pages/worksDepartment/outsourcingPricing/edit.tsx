@@ -63,7 +63,7 @@ export default function OutsourcingPricingEdit({
   userInfo,
   readOnly,
 }: {
-  userInfo: TuserDto | undefined;
+  userInfo: TuserDto | undefined | null;
   readOnly?: boolean;
 }) {
   const userId = userInfo?.employee?.id;

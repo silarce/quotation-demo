@@ -70,16 +70,16 @@ type AppPropsWithLayout = AppProps & {
 type TappContext = {
   rwd1023: boolean;
   rwd1439: boolean;
-  userInfo: TuserDto | undefined;
+  userInfo: TuserDto | undefined | null;
   userGrade: number;
-  erpFeature: TerpFeatureDto[] | undefined;
+  erpFeature: TerpFeatureDto[] | undefined | null;
 };
 
 type TmyPageProps = {
   isAdmin: boolean;
-  userInfo: TuserDto | undefined;
+  userInfo: TuserDto | undefined | null;
   userGrade: number;
-  userErpFeature: TerpFeatureDto[] | undefined;
+  userErpFeature: TerpFeatureDto[] | undefined | null;
   rwd1023: boolean;
   rwd1439: boolean;
   onLogin: ({ account, password }: { account: string; password: string }) => Promise<void>;
@@ -98,7 +98,10 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' });
   const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
-  useGlobalErrorCatcher();
+  // 這個東西在產品環境沒用，因為程式都被編譯過了，即使有錯誤log也難以解讀
+  // useGlobalErrorCatcher();
+
+  // 檢查是否有備份的狀態過期並清除
   useClearBackup();
 
   // ----------------------------------------------------------------------------
@@ -108,33 +111,24 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
-  const { userInfo, setUserInfo, updateUserInfo } = useApiAuthMe();
-  const { erpFeature: userErpFeature, setErpFeature, updateErpFeature: updateUserErpFeature } = useApiErpFeaturesMe();
+
   const {
-    //
-    setUserInfo: setUserInfo_global,
-    setErpFeature: setErpFeature_global,
+    userInfo,
+    userErpFeature,
+    isAdmin,
+    userGrade,
+    update: update_userInfo,
+    clear: clearUserInfo,
   } = useGlobal_userInfo();
 
   const { isInIframe } = useGlobal_environment();
 
   // ----------------------------------------------------------------------------
 
-  let userGrade = 0;
-
-  if (userInfo && !userInfo.employee) {
-    userGrade = 16; // 代表admin // 實際上grade只到15
-  } else if (userInfo && userInfo.employee) {
-    userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
-  }
-
-  // ----------------------------------------------------------------------------
-
   const onLogin = async ({ account, password }: { account: string; password: string }) => {
     try {
       await apiLogin({ account, password });
-      await updateUserInfo();
-      await updateUserErpFeature();
+      await update_userInfo();
     } catch {
       myAlert.err({ title: '帳號或密碼錯誤' });
     }
@@ -143,10 +137,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const reqLogout = async () => {
     try {
       await apiLogout();
-      setUserInfo(undefined);
-      setErpFeature(undefined);
-      setUserInfo_global(undefined);
-      setErpFeature_global(undefined);
+      clearUserInfo();
     } catch {
       myAlert.err({ title: '登出失敗' });
     }
@@ -157,15 +148,9 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   useEffect(() => {
     (async () => {
       // 檢查是否已登入
-      try {
-        await updateUserInfo();
-        await updateUserErpFeature();
-      } catch {
-      } finally {
-        setReady(true);
-      }
+      await update_userInfo();
+      setReady(true);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -175,11 +160,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       globalState_review.update_2();
     }
   }, [userInfo]);
-
-  useEffect(() => {
-    setUserInfo_global(userInfo);
-    setErpFeature_global(userErpFeature);
-  }, [userInfo, userErpFeature]);
 
   useEffect(() => {
     optionalConfig.init();
@@ -235,7 +215,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // ------------------------------------------------------------------
 
   const myPageProps: TmyPageProps = {
-    isAdmin: userInfo?.account === 'admin3',
+    isAdmin: isAdmin,
     userInfo: userInfo,
     userGrade: userGrade,
     userErpFeature: userErpFeature,

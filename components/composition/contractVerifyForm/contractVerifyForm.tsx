@@ -1878,9 +1878,9 @@ const checkIsReviewer = ({
   // reviewerList,
   quotationContent,
 }: {
-  userInfo: TuserDto | undefined;
+  userInfo: TuserDto | undefined | null;
   // reviewerList: TreviewerList;
-  quotationContent: TquotationContentDto | undefined;
+  quotationContent: TquotationContentDto | undefined | null;
 }) => {
   const {
     toSupervisorAt,
