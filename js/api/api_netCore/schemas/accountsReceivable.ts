@@ -357,6 +357,37 @@ interface Tres_apiGetARPaymentData {
       totalCompletedQuantity: number | null; // 合計
     }[];
   };
+  paymentRequestLogs: {
+    id: string;
+    sourceFormType: string;
+    sourceFormId: string;
+    accountsReceivableId: string;
+    paymentRequestNumber: string;
+
+    customerNumber: string;
+    taxId: string;
+    customerName: string;
+
+    invoiceNumber: string | null;
+    invoiceAmount: 0;
+
+    type: string;
+    period: `${number}`;
+
+    paymentCurrency: string;
+    foreignCurrencyAmount: number | null;
+
+    paymentAmount: number | null;
+    collectAmount: number | null;
+    receiptBalance: number | null;
+    deduction: number | null;
+
+    retainageTaxCategory: string | null;
+    retainageRate: number | null;
+    retainageAmount: number | null;
+
+    invoiceDate: string | null;
+  }[];
 }
 
 type Tres_apiGetARPaymentDataInset = Omit<Tres_apiGetARPaymentData, 'paymentRequest'> & { paymentRequest: null };
