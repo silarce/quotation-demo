@@ -6,8 +6,6 @@ import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
 
-import { useMediaQuery } from 'react-responsive';
-
 // antd
 import { ConfigProvider as AntdConfigProvider, unstableSetRender } from 'antd';
 import locale from 'antd/locale/zh_TW';
@@ -67,8 +65,6 @@ type AppPropsWithLayout = AppProps & {
 };
 
 type TappContext = {
-  rwd1023: boolean;
-  rwd1439: boolean;
   userInfo: TuserDto | undefined | null;
   userGrade: number;
   erpFeature: TerpFeatureDto[] | undefined | null;
@@ -79,8 +75,6 @@ type TmyPageProps = {
   userInfo: TuserDto | undefined | null;
   userGrade: number;
   userErpFeature: TerpFeatureDto[] | undefined | null;
-  rwd1023: boolean;
-  rwd1439: boolean;
 };
 
 // =============================================================================
@@ -92,9 +86,6 @@ const AppContext = createContext<TappContext>(null!);
 // MARK: START
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const router = appProps.router;
-
-  const rwd1023 = useMediaQuery({ query: '(max-width: 1023px)' });
-  const rwd1439 = useMediaQuery({ query: '(max-width: 1439px)' });
 
   // 這個東西在產品環境沒用，因為程式都被編譯過了，即使有錯誤log也難以解讀
   // useGlobalErrorCatcher();
@@ -136,8 +127,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // -----------------------------------------------------------------------
   const appContextValue = {
-    rwd1023,
-    rwd1439,
     userInfo,
     userGrade,
     erpFeature: userErpFeature,
@@ -178,8 +167,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     userInfo: userInfo,
     userGrade: userGrade,
     userErpFeature: userErpFeature,
-    rwd1023: rwd1023,
-    rwd1439: rwd1439,
   };
 
   // ------------------------------------------------------------------

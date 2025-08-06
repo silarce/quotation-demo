@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import Image from 'next/image';
 
@@ -15,7 +15,7 @@ import scss from './contractSelector.module.scss';
 
 import { Tparams, TquotationContractDto, useContract_infinite } from 'js/api/api_quotation';
 
-import { AppContext } from 'pages/_app';
+import { useRwd } from 'hooks/globalState/useRwd';
 
 // icon
 import iconPlace from 'public/image/icon/place.svg?url';
@@ -51,7 +51,7 @@ export default function ContractSelector({
   isCancelOnConfirm?: boolean;
   exceptEmpCheck?: (emp: TquotationContractDto) => boolean;
 }) {
-  const { rwd1023 } = useContext(AppContext);
+  const { rwd1023 } = useRwd();
 
   // 被選的資料
   const [selContractArr, setSelContractArr] = useState<TquotationContractDto[]>([]);

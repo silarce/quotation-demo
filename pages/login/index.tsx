@@ -1,4 +1,4 @@
-import { useState, useContext, ReactElement } from 'react';
+import { useState, ReactElement } from 'react';
 
 import Image from 'next/image';
 
@@ -25,6 +25,8 @@ import { AppContext } from 'pages/_app';
 import { apiLogin } from 'js/api/api_auth';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
+import { useRwd } from 'hooks/globalState/useRwd';
+
 // ===================================================================================
 
 const devAccount: { name: string; account: string; password: string }[] | undefined =
@@ -33,7 +35,7 @@ const devAccount: { name: string; account: string; password: string }[] | undefi
 const Login = () => {
   const { update: update_userInfo } = useGlobal_userInfo();
 
-  const { rwd1023 } = useContext(AppContext);
+  const { rwd1023 } = useRwd();
 
   const [isLoading, setIsLoading] = useState(false);
   const [state_account, setState_accont] = useState('');

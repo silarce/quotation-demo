@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
 import Image from 'next/image';
@@ -37,9 +37,10 @@ import { IconCheck02 } from 'public/image/icon/svgComponent/svgIcons';
 import iconMove from 'public/image/icon/move.svg?url';
 
 // other
-import { AppContext } from 'pages/_app';
 import { DailyReportContext } from 'pages/home/dailyReport';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import { useRwd } from 'hooks/globalState/useRwd';
 
 // dnd
 import {
@@ -93,7 +94,7 @@ export default function ReportTable({
     reportItemKeyArr,
     setReportItemKeyArr,
   } = useContext(DailyReportContext);
-  const { rwd1023 } = useContext(AppContext);
+  const { rwd1023 } = useRwd();
 
   const {
     id,
