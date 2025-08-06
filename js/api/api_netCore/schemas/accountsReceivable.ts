@@ -59,6 +59,11 @@ interface TaccountsReceivablesList_Dto {
   salesOrderNumber: string; //銷售訂單編號
   taxId: string;
   taxDeductionCategory: null;
+
+  retainageAmount: number | null;
+  retainageRate: number | null;
+  retainageTaxCategory: string | null;
+  retainageType: string | null;
 }
 
 interface TquotationListViewModel_Dto {
