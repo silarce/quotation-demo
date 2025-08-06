@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useCallback } from 'react';
+import { useState, useEffect, createContext } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -6,7 +6,6 @@ import Head from 'next/head';
 import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
 
-import _ from 'lodash';
 import { useMediaQuery } from 'react-responsive';
 
 // antd
@@ -19,19 +18,17 @@ import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
 
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { TuserDto, apiLogout, useApiAuthMe, apiLogin } from 'js/api/api_auth';
-import { useApiErpFeaturesMe, TerpFeatureDto } from 'js/api/api_erpFeature';
+import { TuserDto } from 'js/api/api_auth';
+import { TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
-import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
+// import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
-import { useGlobal_environment } from 'hooks/globalState/useGlobal_enviroment';
 
 //
 import dayjs, { Dayjs } from 'dayjs';
@@ -55,6 +52,8 @@ import 'antd/dist/reset.css';
 //新增的
 import '../styles/tailwind.css';
 import '../styles/antd.scss';
+
+import { useGlobal_environment } from 'hooks/globalState/useGlobal_enviroment';
 
 // =============================================================================
 
@@ -111,20 +110,9 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
 
-  const {
-    userInfo,
-    userErpFeature,
-    isAdmin,
-    userGrade,
-    update: update_userInfo,
-    clear: clearUserInfo,
-  } = useGlobal_userInfo();
-
-  const { isInIframe } = useGlobal_environment();
+  const { userInfo, userErpFeature, isAdmin, userGrade, update: update_userInfo } = useGlobal_userInfo();
 
   // ----------------------------------------------------------------------------
-
-  // -----------------------------------------------------------------------
 
   useEffect(() => {
     (async () => {
@@ -173,9 +161,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   let getLayout = Component.getLayout;
 
-  if (isInIframe) {
-    getLayout = (page) => page;
-  } else if (!getLayout) {
+  if (!getLayout) {
     if (!userInfo || !userErpFeature) {
       getLayout = (page) => page;
     } else {
@@ -185,10 +171,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
     }
   }
 
-  /**
-  關於AntdConfigProvider的作用
-  根据 Ant Design 设计规范要求，我们会在按钮内(文本按钮和链接按钮除外)只有两个汉字时自动添加空格，如果你不需要这个特性，可以设置 ConfigProvider 的 autoInsertSpaceInButton 为 false。
-   */
   // ------------------------------------------------------------------
 
   const myPageProps: TmyPageProps = {
@@ -205,7 +187,12 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // MARK: RENDER
 
   return (
-    <AntdConfigProvider button={{ autoInsertSpace: false }} locale={locale}>
+    <AntdConfigProvider
+      // 根据 Ant Design 设计规范要求，我们会在按钮内(文本按钮和链接按钮除外)只有两个汉字时自动添加空格，
+      // 如果你不需要这个特性，可以设置 ConfigProvider 的 autoInsertSpaceInButton 为 false。
+      button={{ autoInsertSpace: false }}
+      locale={locale}
+    >
       <Head>
         <title>三久ERP</title>
       </Head>
