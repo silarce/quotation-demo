@@ -1,6 +1,8 @@
+// 直接複製後端的C#類型定義，懶得每個型別一個一個改，直接在這裡轉換並引出使用
 type Guid = string;
 type DateTime = string; // UTC
 type decimal = number;
+type int = number;
 
 interface Tmeta {
   hasNextPage: boolean;
@@ -43,15 +45,14 @@ interface Tbase {
   updated_at: string;
 }
 
+export type { Guid, DateTime, decimal, int };
+
 export type {
   Tbase,
   Tmeta,
   TapiParams,
   TpageResponse,
   TnetCoreApiBody,
-  Guid,
-  DateTime,
-  decimal,
   Tinvoice_type,
   Ttax_type,
   Treview_status,
