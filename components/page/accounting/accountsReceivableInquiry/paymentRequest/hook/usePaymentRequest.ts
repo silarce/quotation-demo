@@ -40,7 +40,7 @@ const usePaymentRequest = (rawData: TpaymentRequest_noDetail | undefined | null)
       const copy = { ...prev };
 
       copy.paymentAmount = v;
-      const 營業稅 = new Decimal(copy.paymentAmount || 0).mul(0.05);
+      const 營業稅 = new Decimal(copy.paymentAmount || 0).mul(0.05).toDecimalPlaces(0);
       const 本期合計請款金額 = new Decimal(copy.paymentAmount || 0).add(營業稅);
 
       return { ...copy, 營業稅: 營業稅.toNumber(), 本期合計請款金額: 本期合計請款金額.toNumber() };
