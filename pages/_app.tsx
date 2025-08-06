@@ -51,8 +51,6 @@ import 'antd/dist/reset.css';
 import '../styles/tailwind.css';
 import '../styles/antd.scss';
 
-import { useGlobal_environment } from 'hooks/globalState/useGlobal_enviroment';
-
 // =============================================================================
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
