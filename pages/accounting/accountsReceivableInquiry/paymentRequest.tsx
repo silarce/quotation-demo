@@ -63,7 +63,7 @@ export default function PayentRequest() {
     data_paymentQuest ?? data_forNew ?? {};
   const salesOrderItems = salesOrder?.salesOrderItems ?? [];
 
-  const instance_paymentRequest = usePaymentRequest(paymentRequest);
+  const instance_paymentRequest = usePaymentRequest(paymentRequest, accountsReceivables);
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
 
   useEffect(() => {

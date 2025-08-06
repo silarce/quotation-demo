@@ -31,8 +31,18 @@ interface Tstate_paymentRequest {
   customerTaxId: string | null;
 }
 
-const usePaymentRequest = (rawData: TpaymentRequest_noDetail | undefined | null) => {
-  const defaultState = useDefaultState_paymentRequest(rawData);
+const usePaymentRequest = (
+  //
+  rawData: TpaymentRequest_noDetail | undefined | null,
+  accountsReceivables:
+    | {
+        customerName: string | null;
+        taxId: string | null;
+      }
+    | undefined
+    | null
+) => {
+  const defaultState = useDefaultState_paymentRequest(rawData, accountsReceivables);
   const [state, setState] = useState<Tstate_paymentRequest>(defaultState);
 
   const setPaymentAmount = (v: Tstate_paymentRequest['paymentAmount']) => {
@@ -88,7 +98,14 @@ const emptyState_paymentRequest = (): Tstate_paymentRequest => {
 };
 
 const useDefaultState_paymentRequest = (
-  rawData: TpaymentRequest_noDetail | undefined | null
+  rawData: TpaymentRequest_noDetail | undefined | null,
+  accountsReceivables:
+    | {
+        customerName: string | null;
+        taxId: string | null;
+      }
+    | undefined
+    | null
 ): Tstate_paymentRequest => {
   return useMemo(() => {
     if (!rawData) {
@@ -109,9 +126,9 @@ const useDefaultState_paymentRequest = (
       invoiceNumber: rawData.invoiceNumber,
       invoiceAmount: rawData.invoiceAmount === null ? '' : `${rawData.invoiceAmount}`,
 
-      customerName: rawData.customerName,
+      customerName: accountsReceivables?.customerName ?? '',
       customerNumber: rawData.customerNumber,
-      customerTaxId: null,
+      customerTaxId: accountsReceivables?.taxId ?? '',
     };
 
     return defaultState;
