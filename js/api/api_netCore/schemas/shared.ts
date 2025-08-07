@@ -45,6 +45,11 @@ interface Tbase {
   updated_at: string;
 }
 
+interface TdropDown {
+  codeName: string;
+  name: string;
+}
+
 export type { Guid, DateTime, decimal, int };
 
 export type {
@@ -58,4 +63,5 @@ export type {
   Treview_status,
   Treview_status__stages,
   Tdocument_status,
+  TdropDown,
 };
