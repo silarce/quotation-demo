@@ -1583,11 +1583,18 @@ class ClassProd {
 
     this.renewSurface();
 
+    // 這時底座版還沒更新，底座的說明會不對
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
 
+    // 這個必須在第一個classComponent.onProdChangeMaterial後執行
     this.changeBottomBarAngleIronAndBottomBarPlate(this.state.data_componentDict.bottomBar?.material ?? 'undefined');
+
+    // 底座版更新，再執行一次，不是為了更新材質，是為了更新底座的說明
+    Object.values(this.classComponentDict).forEach((classComponent) => {
+      classComponent.onProdChangeMaterial(this.data.materialName);
+    });
 
     this.isAllowReqChain && this.reqChain_04();
 
