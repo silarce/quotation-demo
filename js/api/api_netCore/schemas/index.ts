@@ -16,6 +16,7 @@ export type {
   Guid,
   DateTime,
   decimal,
+  int,
   Tinvoice_type,
   Ttax_type,
   Treview_status,

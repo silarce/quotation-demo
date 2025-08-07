@@ -57,8 +57,14 @@ interface TaccountsReceivablesList_Dto {
   quotationContractNumber: string; //合約編號
   projectName: string; //案場名稱
   salesOrderNumber: string; //銷售訂單編號
-  taxId: string;
-  taxDeductionCategory: null;
+
+  retainageAmount: number | null;
+  retainageRate: number | null;
+  retainageTaxCategory: string | null;
+  retainageType: string | null;
+
+  taxId: string | null; // 統一編號
+  taxDeductionCategory: string | null; // 稅別
 }
 
 interface TquotationListViewModel_Dto {

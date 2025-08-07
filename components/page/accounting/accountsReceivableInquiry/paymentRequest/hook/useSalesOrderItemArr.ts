@@ -20,7 +20,6 @@ const useDefaultState = (rawData: TsalesOrderItemArr | undefined | null): Tstate
       const state: Tstate_salesOrderItem = {
         ...item,
         completedQuantity: item.completedQuantity === null ? '' : `${item.completedQuantity}`,
-        completedPayment: item.completedPayment,
       };
 
       return state;
@@ -39,6 +38,10 @@ const useSalesOrderItemArr = (rawData: TsalesOrderItemArr | undefined | null) =>
 
     copy.completedQuantity = value;
     copy.completedPayment = new Decimal(value || 0).mul(unitPrice).toDecimalPlaces(0).toNumber();
+
+    copy.totalCompletedQuantity = new Decimal(copy.prophaseCompletedQuantity || 0)
+      .add(copy.completedQuantity || 0)
+      .toNumber();
 
     setStateArr((prev) => {
       const newState = [...prev];

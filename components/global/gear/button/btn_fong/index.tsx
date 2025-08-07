@@ -17,6 +17,7 @@ import Icon_warning from 'public/image/icon/fong/warning.svg';
 import Icon_setting from 'public/image/icon/fong/setting.svg';
 import Icon_calendar from 'public/image/icon/fong/calendar.svg';
 import Icon_paper from 'public/image/icon/fong/paper2.svg';
+import Icon_process from 'public/image/icon/fong/process.svg';
 
 // ================================================================================
 
@@ -98,7 +99,8 @@ type TthemeName =
   | 'warning_2'
   | 'setting'
   | 'calendar'
-  | 'document';
+  | 'document'
+  | 'process';
 
 type Tprops_btn = {
   theme?: TthemeName;
@@ -201,6 +203,10 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
   document: {
     themeColor: 'green_I',
     Icon: Icon_paper,
+  },
+  process: {
+    themeColor: 'blue_I',
+    Icon: Icon_process,
   },
 };
 

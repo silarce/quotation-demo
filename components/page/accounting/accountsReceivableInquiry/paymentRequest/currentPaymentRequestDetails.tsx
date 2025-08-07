@@ -43,7 +43,7 @@ const CurrentPaymentRequestDetails = ({
 }) => {
   const { data: data_paymentRequestType } = useApiGetPaymentRequestType();
 
-  const { state_paymentRequest, setState_paymentRequest } = instance_paymentRequest;
+  const { state_paymentRequest, setState_paymentRequest, setPaymentAmount } = instance_paymentRequest;
 
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
 
@@ -174,23 +174,21 @@ const CurrentPaymentRequestDetails = ({
               <Input_money
                 value={state_paymentRequest.paymentAmount}
                 onChange={(e) => {
-                  setState_paymentRequest((prev) => ({
-                    ...prev,
-                    paymentAmount: e.target.value as `${number}` | '',
-                  }));
+                  setPaymentAmount(e.target.value as `${number}` | '');
+                  // setState_paymentRequest((prev) => ({
+                  //   ...prev,
+                  //   paymentAmount: e.target.value as `${number}` | '',
+                  // }));
                 }}
               />
             </DataEntry_fong>
-            <DataEntry_fong caption="營業稅(5%) no property" isMust={true} disabled={disabled}>
-              <Input_money
-                value={state_paymentRequest.營業稅}
-                onChange={(e) => {
-                  setState_paymentRequest((prev) => ({
-                    ...prev,
-                    營業稅: e.target.value as `${number}` | '',
-                  }));
-                }}
-              />
+
+            <DataEntry_fong caption="營業稅(5%) no property" disabled={disabled}>
+              {toMoneyString(state_paymentRequest.營業稅)}
+            </DataEntry_fong>
+
+            <DataEntry_fong caption="本期合計請款金額 no property" disabled={disabled}>
+              {toMoneyString(state_paymentRequest.本期合計請款金額)}
             </DataEntry_fong>
 
             <DataEntry_fong caption="保留款(%) no property" isMust={true} disabled={disabled}>
@@ -315,13 +313,13 @@ const CurrentPaymentRequestDetails = ({
 // MARK:END
 
 // ===============================================================================
-// ===============================================================================
-// ===============================================================================
 
-// MARK: useData
+const toMoneyString = (value: number | null) => {
+  if (value === null) {
+    return '';
+  }
 
-// ===============================================================================
-
-// ==========================================================================
+  return '$' + value.toLocaleString();
+};
 
 export default CurrentPaymentRequestDetails;

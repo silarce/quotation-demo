@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-
 import { useRouter } from 'next/router';
+
+import Decimal from 'decimal.js';
 
 import { DeepNonNullable } from 'ts-essentials';
 
@@ -62,7 +63,7 @@ export default function PayentRequest() {
     data_paymentQuest ?? data_forNew ?? {};
   const salesOrderItems = salesOrder?.salesOrderItems ?? [];
 
-  const instance_paymentRequest = usePaymentRequest(paymentRequest);
+  const instance_paymentRequest = usePaymentRequest(paymentRequest, accountsReceivables);
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
 
   useEffect(() => {
@@ -173,6 +174,22 @@ export default function PayentRequest() {
 
     // apiPostInsertPaymentRequest
   };
+
+  // ----------------------------------------------------------------------------
+
+  const completedPaymentTotal = useMemo(() => {
+    return instance_salesOrderItem.stateArr
+      .reduce((current, { completedPayment }) => {
+        return current.add(new Decimal(completedPayment || 0));
+      }, new Decimal(0))
+      .toNumber();
+  }, [instance_salesOrderItem.stateArr]);
+
+  useEffect(() => {
+    instance_paymentRequest.setPaymentAmount(`${completedPaymentTotal}`);
+  }, [completedPaymentTotal]);
+
+  // ----------------------------------------------------------------------------
 
   // MARK:RENDER
 

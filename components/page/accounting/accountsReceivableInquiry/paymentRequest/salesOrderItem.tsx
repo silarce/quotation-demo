@@ -52,7 +52,6 @@ const SalesOrderItem = ({
       dataIndex: 'prophaseCompletedQuantity',
       width: 150,
       align: 'right',
-      render: (v) => toLocalString(v),
     },
     {
       title: '本期完成 noProperty',
