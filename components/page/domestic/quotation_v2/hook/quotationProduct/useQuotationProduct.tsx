@@ -318,6 +318,13 @@ const useQuotationProduct = ({
     debouncedState: debounced_state_quotationDiscount,
     isBouncing: isBouncing_state_quotationDiscount,
   } = useDebounce(state_quotationDiscount, 300);
+
+  // 當防抖連續觸發時，防抖與防抖間會有延遲，所以做這個防抖的防抖
+  const { debouncedState: isBouncing } = useDebounce(
+    isBouncing_state_prodDict || isBouncing_state_iterativeProdDict || isBouncing_state_quotationDiscount,
+    200
+  );
+
   // ______________________________________________________________________
 
   const { avgDiscount, doorModelSummery } = useMemo(() => {
@@ -806,7 +813,7 @@ const useQuotationProduct = ({
   return {
     instance,
     instance_iterative,
-    isBouncing: isBouncing_state_prodDict || isBouncing_state_iterativeProdDict || isBouncing_state_quotationDiscount,
+    isBouncing,
     allProdTotal,
     allProdTotal_iterative,
     theProductTotal,

@@ -290,6 +290,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
     changeAllowProdAutoChange,
     state_allowProdAutoChange,
+
+    isBouncing,
   } = useQuotationProduct({
     raw_quotationProductArr: prodArr,
     raw_quotationDiscount: content?.discount,
@@ -446,7 +448,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       };
 
   // ----------------------------------------------------------------------
-
+  // console.log('isBouncing', isBouncing);
   // region REQUEST
 
   const {
@@ -483,6 +485,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:更新報價單
   const handlePatch = () => {
+    if (isBouncing) {
+      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+
+      return;
+    }
+
     if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
       myAlert.info({
         title: '付款資訊未正確填寫',
@@ -528,6 +536,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:新增報價單
   const handlePost = () => {
+    if (isBouncing) {
+      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+
+      return;
+    }
+
     if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
       myAlert.info({
         title: '付款資訊未正確填寫',
@@ -575,6 +589,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:追加追減報價單
   const handleModify = () => {
+    if (isBouncing) {
+      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+
+      return;
+    }
+
     if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
       myAlert.info({
         title: '付款資訊未正確填寫',
@@ -611,6 +631,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:更新追加追減報價單
   const handlePatchModify = () => {
+    if (isBouncing) {
+      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+
+      return;
+    }
+
     if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
       myAlert.info({
         title: '付款資訊未正確填寫',
@@ -646,6 +672,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:複製報價單
   const handleClone = async (isRelationQuotation?: boolean | undefined) => {
+    if (isBouncing) {
+      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+
+      return;
+    }
+
     const { destroy } = myAlert.clear({
       content: (
         <SearchModal_customer
