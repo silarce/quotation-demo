@@ -514,7 +514,7 @@ const createBody = ({
     projectProgress,
     discount: quotationDiscount || '0',
     averageDiscount: `${avgDiscount}` || null,
-    tuneTotal,
+    tuneTotal: tuneTotal || `0`,
     subTotal,
     salesTax,
     total,

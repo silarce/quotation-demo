@@ -1586,8 +1586,8 @@ class ClassProd {
     Object.values(this.classComponentDict).forEach((classComponent) => {
       classComponent.onProdChangeMaterial(this.data.materialName);
     });
-
     this.changeBottomBarAngleIronAndBottomBarPlate(this.state.data_componentDict.bottomBar?.material ?? 'undefined');
+    this.classComponentDict?.bottomBar?.renewDesc();
 
     this.isAllowReqChain && this.reqChain_04();
 
