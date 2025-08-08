@@ -61,7 +61,7 @@ export default function PayentRequest() {
 
   const { userInfo } = useGlobal_userInfo();
 
-  const { data: data_paymentQuest } = useApiGetARPaymentData(paymentQuestId);
+  const { data: data_paymentQuest, update: update_paymentQuest } = useApiGetARPaymentData(paymentQuestId);
   const { data: data_forNew } = useApiGetARPaymentDataInset(isNew ? accountsReceivableId : undefined);
 
   const { accountsReceivables, paymentRequest, salesOrder, paymentRequestLogs } =
@@ -245,6 +245,7 @@ export default function PayentRequest() {
     try {
       await apiPostInsertPrOffsetDetail(body, { returnError: true });
       destroy();
+      update_paymentQuest();
     } catch (error) {}
   };
 
@@ -289,11 +290,13 @@ export default function PayentRequest() {
         instance_paymentRequest={instance_paymentRequest}
         onConfirm={req_postInsertPaymentRequest}
       >
-        <PrOffsetDetails
-          prOffsetDetails={paymentRequest?.prOffsetDetails}
-          onAddDataConfirm={req_postInsertPrOffsetDetail}
-          onAddDeductionConfirm={req_postInsertPrOffsetDetail}
-        />
+        {!isNew && (
+          <PrOffsetDetails
+            prOffsetDetails={paymentRequest?.prOffsetDetails}
+            onAddDataConfirm={req_postInsertPrOffsetDetail}
+            onAddDeductionConfirm={req_postInsertPrOffsetDetail}
+          />
+        )}
       </CurrentPaymentRequestDetails>
       {/* 請款紀錄 */}
       <History paymentRequestLogs={paymentRequestLogs} />
