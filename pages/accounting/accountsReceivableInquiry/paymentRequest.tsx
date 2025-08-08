@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 
 import Decimal from 'decimal.js';
 
+import { Dayjs } from 'dayjs';
+
 import { DeepNonNullable } from 'ts-essentials';
 
 import Btn from 'components/global/gear/button/btn_fong';
@@ -25,9 +27,7 @@ import CurrentlyAccumulated from 'components/page/accounting/accountsReceivableI
 import CurrentPaymentRequestDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/currentPaymentRequestDetails';
 import History from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/history';
 import SalesOrderItem from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/salesOrderItem';
-import PrOffsetDetails, {
-  Tprops_prOffsetDetails,
-} from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/prOffsetDetails';
+import PrOffsetDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/prOffsetDetails';
 
 import scss from './paymentRequest.module.scss';
 
@@ -42,6 +42,7 @@ import {
   Tstate_salesOrderItem,
   useSalesOrderItemArr,
 } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
+import { TaccountantDto } from 'js/api/dtoTypes';
 
 // ============================================================================
 
@@ -179,32 +180,45 @@ export default function PayentRequest() {
     // apiPostInsertPaymentRequest
   };
 
-  const req_postInsertPrOffsetDetail: Tprops_prOffsetDetails['onAddDataConfirm'] = async ({
-    state_addData,
+  const req_postInsertPrOffsetDetail = async ({
+    state,
     accountant,
     destroy,
+  }: {
+    state: {
+      date: Dayjs | null;
+      amount: `${number}` | '';
+      type: string;
+      fee?: `${number}` | '';
+      remarks: string;
+    };
+    accountant: TaccountantDto;
+    destroy: () => void;
   }) => {
     const idNumber = userInfo?.employee?.idNumber;
-    const prOffsetDate = state_addData.date?.toISOString();
     const paymentRequestId = paymentRequest?.id;
     const accountantId = accountant.id;
     const customerName = accountsReceivables?.customerName;
     const customerNumber = accountsReceivables?.customerNumber;
+    const prOffsetDate = state.date?.toISOString();
+    const type = state.type;
 
-    let errorMessage = '';
+    let warningMessage = '';
 
     if (!idNumber) {
-      errorMessage = '沒有員工ID';
+      warningMessage = '沒有員工ID';
     } else if (!paymentRequestId) {
-      errorMessage = '請先建立請款單';
+      warningMessage = '請先建立請款單';
     } else if (!prOffsetDate) {
-      errorMessage = '請先選擇沖銷日期';
+      warningMessage = '請先選擇沖銷日期';
     } else if (!customerName || !customerNumber) {
-      errorMessage = '工程聯絡單沒有客戶資料';
+      warningMessage = '工程聯絡單沒有客戶資料';
+    } else if (!type) {
+      warningMessage = '請先選擇 請款類別/扣款類別';
     }
 
-    if (errorMessage) {
-      myAlert.err({ title: errorMessage });
+    if (warningMessage) {
+      myAlert.warning({ title: warningMessage });
 
       return;
     }
@@ -217,13 +231,13 @@ export default function PayentRequest() {
       accountantId,
       paymentRequestId: paymentRequestId!,
       prOffsetDate: prOffsetDate!,
-      prOffsetType: state_addData.incomeType, // 沖銷類別
+      prOffsetType: state.type, // 沖銷類別
       paymentCurrency: accountant.currency, // 請款幣別
       exchangeRate: Number(accountant.exchangeRate || 0), // 匯率
-      paymentAmount: Number(state_addData.amount || 0), // 沖銷金額
+      paymentAmount: Number(state.amount || 0), // 沖銷金額
       // 與paymentAmount同一個來源
-      totalAmount: Number(state_addData.amount || 0),
-      fee: Number(state_addData.fee || 0), // 手續費
+      totalAmount: Number(state.amount || 0),
+      fee: state.fee === undefined ? null : Number(state.fee || 0), // 手續費
       customerNumber: customerNumber!,
       customerName: customerName!,
     };
@@ -278,7 +292,7 @@ export default function PayentRequest() {
         <PrOffsetDetails
           prOffsetDetails={paymentRequest?.prOffsetDetails}
           onAddDataConfirm={req_postInsertPrOffsetDetail}
-          // onAccountantClick={req_postInsertPrOffsetDetail}
+          onAddDeductionConfirm={req_postInsertPrOffsetDetail}
         />
       </CurrentPaymentRequestDetails>
       {/* 請款紀錄 */}

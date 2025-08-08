@@ -680,7 +680,7 @@ interface Tbody_apiPostInsertPrOffsetDetail {
   paymentAmount: number; //收款金額
   customerNumber: string; // 客戶編號
   customerName: string; //客戶名稱
-  fee: number; //手續費
+  fee: number | null; //手續費
   totalAmount: number; //收款金額
 }
 
