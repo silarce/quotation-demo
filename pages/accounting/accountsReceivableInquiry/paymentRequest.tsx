@@ -182,6 +182,7 @@ export default function PayentRequest() {
   const req_postInsertPrOffsetDetail: Tprops_prOffsetDetails['onAddDataConfirm'] = async ({
     state_addData,
     accountant,
+    destroy,
   }) => {
     const idNumber = userInfo?.employee?.idNumber;
     const prOffsetDate = state_addData.date?.toISOString();
@@ -190,38 +191,32 @@ export default function PayentRequest() {
     const customerName = accountsReceivables?.customerName;
     const customerNumber = accountsReceivables?.customerNumber;
 
+    let errorMessage = '';
+
     if (!idNumber) {
-      myAlert.err({ title: '沒有員工ID' });
-
-      return null;
+      errorMessage = '沒有員工ID';
+    } else if (!paymentRequestId) {
+      errorMessage = '請先建立請款單';
+    } else if (!prOffsetDate) {
+      errorMessage = '請先選擇沖銷日期';
+    } else if (!customerName || !customerNumber) {
+      errorMessage = '工程聯絡單沒有客戶資料';
     }
 
-    if (!paymentRequestId) {
-      myAlert.err({ title: '請先建立請款單' });
+    if (errorMessage) {
+      myAlert.err({ title: errorMessage });
 
-      return null;
-    }
-
-    if (!prOffsetDate) {
-      myAlert.err({ title: '請先選擇沖銷日期' });
-
-      return null;
-    }
-
-    if (!customerName || !customerNumber) {
-      myAlert.err({ title: '工程聯絡單沒有客戶資料' });
-
-      return null;
+      return;
     }
 
     const body: Tbody_apiPostInsertPrOffsetDetail = {
       createdAt: new Date().toISOString(),
-      createdBy: idNumber,
+      createdBy: idNumber!,
       updatedAt: new Date().toISOString(),
-      updatedBy: idNumber,
+      updatedBy: idNumber!,
       accountantId,
-      paymentRequestId,
-      prOffsetDate,
+      paymentRequestId: paymentRequestId!,
+      prOffsetDate: prOffsetDate!,
       prOffsetType: state_addData.incomeType, // 沖銷類別
       paymentCurrency: accountant.currency, // 請款幣別
       exchangeRate: Number(accountant.exchangeRate || 0), // 匯率
@@ -229,13 +224,14 @@ export default function PayentRequest() {
       // 與paymentAmount同一個來源
       totalAmount: Number(state_addData.amount || 0),
       fee: Number(state_addData.fee || 0), // 手續費
-      customerNumber,
-      customerName,
+      customerNumber: customerNumber!,
+      customerName: customerName!,
     };
 
-    await apiPostInsertPrOffsetDetail(body);
-
-    return 'successed';
+    try {
+      await apiPostInsertPrOffsetDetail(body, { returnError: true });
+      destroy();
+    } catch (error) {}
   };
 
   // ----------------------------------------------------------------------------

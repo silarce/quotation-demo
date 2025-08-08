@@ -35,7 +35,7 @@ interface Tstate_addData {
 
 interface Tprops {
   prOffsetDetails: TprOffsetDetails[] | undefined | null;
-  onAddDataConfirm: (data: { state_addData: Tstate_addData; accountant: TaccountantDto }) => 'successed' | null;
+  onAddDataConfirm: (data: { state_addData: Tstate_addData; accountant: TaccountantDto; destroy: () => void }) => void;
 }
 
 // ======================================================================
@@ -91,9 +91,8 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm }: Tprops) => {
             onAddDataConfirm({
               state_addData,
               accountant,
+              destroy,
             });
-
-            destroy();
           }}
           onCancel={() => {
             destroy();

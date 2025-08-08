@@ -684,7 +684,14 @@ interface Tbody_apiPostInsertPrOffsetDetail {
   totalAmount: number; //收款金額
 }
 
-const apiPostInsertPrOffsetDetail = async (body: Tbody_apiPostInsertPrOffsetDetail) => {
+const apiPostInsertPrOffsetDetail = async (
+  body: Tbody_apiPostInsertPrOffsetDetail,
+  {
+    returnError = false,
+  }: {
+    returnError?: boolean;
+  } = {}
+) => {
   const api = '/api/AccountsReceivable/InsertPrOffsetDetail';
 
   return axi_monkey.post(api, body).catch((err) => {
@@ -693,6 +700,10 @@ const apiPostInsertPrOffsetDetail = async (body: Tbody_apiPostInsertPrOffsetDeta
       title: '新增請款單失敗',
       content: error.message,
     });
+
+    if (returnError) {
+      return Promise.reject(error);
+    }
   });
 };
 
