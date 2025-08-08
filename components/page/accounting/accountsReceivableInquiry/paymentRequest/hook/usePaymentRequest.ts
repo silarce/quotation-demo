@@ -13,7 +13,7 @@ interface Tstate_paymentRequest {
   營業稅: number | null;
   本期合計請款金額: number | null;
   retainageRate: `${number}` | ''; // 保留款(%)
-  稅別: string;
+  retainageTaxCategory: string; // 稅別
   retainageAmount: `${number}` | ''; // 保留款金額
 
   invoiceBook: {
@@ -81,7 +81,7 @@ const emptyState_paymentRequest = (): Tstate_paymentRequest => {
     營業稅: null,
     本期合計請款金額: null,
     retainageRate: '',
-    稅別: '',
+    retainageTaxCategory: '',
     retainageAmount: '',
 
     invoiceBook: null,
@@ -118,7 +118,7 @@ const useDefaultState_paymentRequest = (
       營業稅: null,
       本期合計請款金額: null,
       retainageRate: '',
-      稅別: '',
+      retainageTaxCategory: '',
       retainageAmount: '',
 
       invoiceBook: null,

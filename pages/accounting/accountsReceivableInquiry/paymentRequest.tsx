@@ -111,7 +111,7 @@ export default function PayentRequest() {
       paymentAmount,
       營業稅,
       retainageRate,
-      稅別,
+      retainageTaxCategory,
       retainageAmount,
       invoiceBook,
       invoiceDate,

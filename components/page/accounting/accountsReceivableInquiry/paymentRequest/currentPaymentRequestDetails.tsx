@@ -17,6 +17,7 @@ import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsRe
 import { Tinstance_paymentRequest } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/usePaymentRequest';
 
 import { useApiGetPaymentRequestType } from 'js/api/api_netCore/api_accountsReceivable';
+import { useApiGetDropDown } from 'js/api/api_netCore/api_commonControllers';
 
 // =========================================================================
 
@@ -42,6 +43,7 @@ const CurrentPaymentRequestDetails = ({
   onConfirm?: () => void;
 }) => {
   const { data: data_paymentRequestType } = useApiGetPaymentRequestType();
+  const { options: options_retainageTaxCategory } = useApiGetDropDown('RetainageTaxCategory');
 
   const { state_paymentRequest, setState_paymentRequest, setPaymentAmount } = instance_paymentRequest;
 
@@ -205,11 +207,12 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
             <DataEntry_fong caption="稅別 no property" isMust={true} disabled={disabled}>
               <Select
-                value={state_paymentRequest.稅別}
+                options={options_retainageTaxCategory}
+                value={state_paymentRequest.retainageTaxCategory}
                 onChange={(value) => {
                   setState_paymentRequest((prev) => ({
                     ...prev,
-                    稅別: value,
+                    retainageTaxCategory: value,
                   }));
                 }}
               />
