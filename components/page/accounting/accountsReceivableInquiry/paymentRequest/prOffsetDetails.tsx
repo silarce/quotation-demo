@@ -1,12 +1,14 @@
 import { useState } from 'react';
 
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 import Btn from 'components/global/gear/button/btn_fong';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, Select, DatePicker } from 'components/global/gear/dataEntry';
 
-import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
+import Selector_accountant, {
+  TaccountantDto,
+} from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
 
@@ -15,11 +17,34 @@ import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_next from 'public/image/icon/fong/next.svg';
 
 import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
+import { useApiGetDropDown } from 'js/api/api_netCore/api_commonControllers';
+
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+// ======================================================================
 
 type TpaymentRequest = Tres_apiGetARPaymentData['paymentRequest'];
 type TprOffsetDetails = TpaymentRequest['prOffsetDetails'][number];
 
-const PrOffsetDetails = ({ prOffsetDetails }: { prOffsetDetails: TprOffsetDetails[] | undefined | null }) => {
+interface Tstate_addData {
+  date: Dayjs | null;
+  amount: `${number}` | '';
+  incomeType: string;
+  fee: `${number}` | '';
+  remarks: string;
+}
+
+interface Tprops {
+  prOffsetDetails: TprOffsetDetails[] | undefined | null;
+  onAddDataConfirm: (data: { state_addData: Tstate_addData; accountant: TaccountantDto }) => 'successed' | null;
+}
+
+// ======================================================================
+
+const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm }: Tprops) => {
+  const { options: options_incomeType } = useApiGetDropDown('IncomeType');
+
+  // ======================================================================
+
   const handle_accountingCollection = () => {
     const { destroy } = modal_empty({
       content: (
@@ -27,7 +52,7 @@ const PrOffsetDetails = ({ prOffsetDetails }: { prOffsetDetails: TprOffsetDetail
           onCancel={() => {
             destroy();
           }}
-          btn_confirm={() => {
+          btn_confirm={(v) => {
             return (
               <Btn
                 icon={Icon_next}
@@ -35,7 +60,15 @@ const PrOffsetDetails = ({ prOffsetDetails }: { prOffsetDetails: TprOffsetDetail
                   className: 'text-blue01',
                 }}
                 onClick={() => {
-                  handle_addData();
+                  if (!v) {
+                    myAlert.info({
+                      title: '請選擇會計收款',
+                    });
+
+                    return;
+                  }
+
+                  handle_addData(v);
                   destroy();
                 }}
               >
@@ -48,11 +81,18 @@ const PrOffsetDetails = ({ prOffsetDetails }: { prOffsetDetails: TprOffsetDetail
     });
   };
 
-  const handle_addFee = () => {
+  const handle_addData = (accountant: TaccountantDto) => {
     const { destroy } = modal_empty({
       content: (
-        <AddFee
-          onConfirm={(fee) => {
+        <AddData
+          accountant={accountant}
+          options_incomeType={options_incomeType}
+          onConfirm={(state_addData) => {
+            onAddDataConfirm({
+              state_addData,
+              accountant,
+            });
+
             destroy();
           }}
           onCancel={() => {
@@ -64,11 +104,11 @@ const PrOffsetDetails = ({ prOffsetDetails }: { prOffsetDetails: TprOffsetDetail
     });
   };
 
-  const handle_addData = () => {
+  const handle_addFee = () => {
     const { destroy } = modal_empty({
       content: (
-        <AddData
-          onConfirm={(data) => {
+        <AddFee
+          onConfirm={(fee) => {
             destroy();
           }}
           onCancel={() => {
@@ -155,22 +195,24 @@ const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
 const AddData = ({
   onConfirm,
   onCancel,
+  options_incomeType,
+  accountant,
 }: {
-  onConfirm?: (props: { date: Dayjs | null; amount: string; incomeCategory: string; remarks: string }) => void;
+  onConfirm?: (props: Tstate_addData) => void;
   onCancel?: () => void;
+  options_incomeType: { label: string; value: string }[];
+  accountant: TaccountantDto;
 }) => {
-  const [date, setDate] = useState<Dayjs | null>(null);
-  const [amount, setAmount] = useState<string>('');
-  const [incomeCategory, setIncomeCategory] = useState<string>('');
-  const [remarks, setRemarks] = useState<string>('');
+  const [state, setState] = useState<Tstate_addData>({
+    date: accountant.insertDate ? dayjs(accountant.insertDate) : null,
+    incomeType: '收款',
+    amount: `${accountant.price}`,
+    fee: '',
+    remarks: '',
+  });
 
   const handle_confirm = () => {
-    onConfirm?.({
-      date,
-      amount,
-      incomeCategory,
-      remarks,
-    });
+    onConfirm?.(state);
   };
 
   const handle_cancel = () => {
@@ -191,24 +233,36 @@ const AddData = ({
     >
       <div className="grid gap-fong">
         <DataEntry_fong caption="日期" isMust={true}>
-          <DatePicker value={date} onChange={(value) => setDate(value)} />
+          <DatePicker value={state.date} onChange={(value) => setState({ ...state, date: value })} />
         </DataEntry_fong>
-        <DataEntry_fong caption="金額" isMust={true}>
-          <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
-        </DataEntry_fong>
+
         <DataEntry_fong caption="收入類別" isMust={true}>
           <Select
-            options={[
-              { label: '類別一', value: 'category1' },
-              { label: '類別二', value: 'category2' },
-              { label: '類別三', value: 'category3' },
-            ]}
-            value={incomeCategory}
-            onChange={(value) => setIncomeCategory(value)}
+            allowClear={false}
+            options={options_incomeType}
+            value={state.incomeType}
+            onChange={(value) => setState({ ...state, incomeType: value })}
           />
         </DataEntry_fong>
+
+        <DataEntry_fong caption="金額" isMust={true}>
+          <Input
+            type="number"
+            value={state.amount}
+            onChange={(e) => setState({ ...state, amount: e.target.value as `${number}` | '' })}
+          />
+        </DataEntry_fong>
+
+        <DataEntry_fong caption="手續費">
+          <Input
+            type="number"
+            value={state.fee}
+            onChange={(e) => setState({ ...state, fee: e.target.value as `${number}` | '' })}
+          />
+        </DataEntry_fong>
+
         <DataEntry_fong caption="備註" isMust={true}>
-          <Input value={remarks} onChange={(e) => setRemarks(e.target.value)} />
+          <Input value={state.remarks ?? ''} onChange={(e) => setState({ ...state, remarks: e.target.value })} />
         </DataEntry_fong>
       </div>
     </Container_confirm>
@@ -247,3 +301,4 @@ const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (f
 
 // ===============================================================================
 export default PrOffsetDetails;
+export type { Tprops as Tprops_prOffsetDetails };

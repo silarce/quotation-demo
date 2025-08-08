@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { axi_monkey } from '../_axiosCreator';
 
@@ -28,10 +28,21 @@ const useApiGetDropDown = (
     autoUpdate = true,
   }: {
     autoUpdate?: boolean;
-  }
+  } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TdropDown[] | null>();
+
+  const options = useMemo(() => {
+    if (!res) {
+      return [];
+    }
+
+    return res.map((item) => ({
+      label: item.name,
+      value: item.name,
+    }));
+  }, [res]);
 
   const update = async () => {
     setIsFetching(true);
@@ -61,6 +72,7 @@ const useApiGetDropDown = (
     isFetching,
     data: res,
     update,
+    options,
   };
 };
 

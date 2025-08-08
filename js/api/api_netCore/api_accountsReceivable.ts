@@ -673,7 +673,7 @@ interface Tbody_apiPostInsertPrOffsetDetail {
   paymentRequestId: string; //請款單Id
 
   prOffsetDate: string; //沖銷日期
-  prOffsetType: '收款'; //沖銷類別
+  prOffsetType: string; //沖銷類別
   paymentCurrency: string; //請款幣別
   exchangeRate: number; //匯率
 
@@ -705,7 +705,11 @@ export type {
   TinsertpaymentRequest,
 };
 
-export type { Tres_apiGetARPaymentData, Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert };
+export type {
+  Tres_apiGetARPaymentData,
+  Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert,
+  Tbody_apiPostInsertPrOffsetDetail,
+};
 
 export {
   apiQuotationToAccountsReceivables,

@@ -10,12 +10,14 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import {
   TinsertpaymentRequest,
+  Tbody_apiPostInsertPrOffsetDetail,
   //
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
   apiGetPaymentRequestType,
   apiPostInsertPaymentRequest,
   apiPatchInsertPaymentRequest,
+  apiPostInsertPrOffsetDetail,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
 // component
@@ -23,7 +25,9 @@ import CurrentlyAccumulated from 'components/page/accounting/accountsReceivableI
 import CurrentPaymentRequestDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/currentPaymentRequestDetails';
 import History from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/history';
 import SalesOrderItem from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/salesOrderItem';
-import PrOffsetDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/prOffsetDetails';
+import PrOffsetDetails, {
+  Tprops_prOffsetDetails,
+} from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/prOffsetDetails';
 
 import scss from './paymentRequest.module.scss';
 
@@ -175,6 +179,65 @@ export default function PayentRequest() {
     // apiPostInsertPaymentRequest
   };
 
+  const req_postInsertPrOffsetDetail: Tprops_prOffsetDetails['onAddDataConfirm'] = async ({
+    state_addData,
+    accountant,
+  }) => {
+    const idNumber = userInfo?.employee?.idNumber;
+    const prOffsetDate = state_addData.date?.toISOString();
+    const paymentRequestId = paymentRequest?.id;
+    const accountantId = accountant.id;
+    const customerName = accountsReceivables?.customerName;
+    const customerNumber = accountsReceivables?.customerNumber;
+
+    if (!idNumber) {
+      myAlert.err({ title: '沒有員工ID' });
+
+      return null;
+    }
+
+    if (!paymentRequestId) {
+      myAlert.err({ title: '請先建立請款單' });
+
+      return null;
+    }
+
+    if (!prOffsetDate) {
+      myAlert.err({ title: '請先選擇沖銷日期' });
+
+      return null;
+    }
+
+    if (!customerName || !customerNumber) {
+      myAlert.err({ title: '工程聯絡單沒有客戶資料' });
+
+      return null;
+    }
+
+    const body: Tbody_apiPostInsertPrOffsetDetail = {
+      createdAt: new Date().toISOString(),
+      createdBy: idNumber,
+      updatedAt: new Date().toISOString(),
+      updatedBy: idNumber,
+      accountantId,
+      paymentRequestId,
+      prOffsetDate,
+      prOffsetType: state_addData.incomeType, // 沖銷類別
+      paymentCurrency: accountant.currency, // 請款幣別
+      exchangeRate: Number(accountant.exchangeRate || 0), // 匯率
+      paymentAmount: Number(state_addData.amount || 0), // 沖銷金額
+      // 與paymentAmount同一個來源
+      totalAmount: Number(state_addData.amount || 0),
+      fee: Number(state_addData.fee || 0), // 手續費
+      customerNumber,
+      customerName,
+    };
+
+    await apiPostInsertPrOffsetDetail(body);
+
+    return 'successed';
+  };
+
   // ----------------------------------------------------------------------------
 
   const completedPaymentTotal = useMemo(() => {
@@ -216,7 +279,11 @@ export default function PayentRequest() {
         instance_paymentRequest={instance_paymentRequest}
         onConfirm={req_postInsertPaymentRequest}
       >
-        <PrOffsetDetails prOffsetDetails={paymentRequest?.prOffsetDetails} />
+        <PrOffsetDetails
+          prOffsetDetails={paymentRequest?.prOffsetDetails}
+          onAddDataConfirm={req_postInsertPrOffsetDetail}
+          // onAccountantClick={req_postInsertPrOffsetDetail}
+        />
       </CurrentPaymentRequestDetails>
       {/* 請款紀錄 */}
       <History paymentRequestLogs={paymentRequestLogs} />
