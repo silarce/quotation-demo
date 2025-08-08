@@ -227,7 +227,6 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
 
             <div />
-            <div />
 
             <DataEntry_fong
               caption="發票本 no property"
