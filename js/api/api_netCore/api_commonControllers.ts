@@ -6,7 +6,12 @@ import type { AxiosError } from 'axios';
 
 import type { TdropDown } from './schemas';
 
-type TdropDownParams = 'RetainageType' | 'RetainageTaxCategory' | 'InvoiceType' | 'IncomeType' | 'deduction_type';
+type TdropDownParams =
+  | 'RetainageType' // 合約保留款類型
+  | 'RetainageTaxCategory' // 保留款稅別
+  | 'InvoiceType' //發票類型
+  | 'IncomeType' // 收入類別
+  | 'deduction_type'; // 扣款類別
 
 const apiGetDropDown = async (ddtype: TdropDownParams) => {
   const api = '/api/CommonControllers/GetDropDownDate';
