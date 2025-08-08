@@ -159,8 +159,8 @@ const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
     width: 140,
   },
   {
-    title: '名稱 no property',
-    dataIndex: 'name',
+    title: '名稱',
+    dataIndex: 'prOffsetType',
     width: 150,
   },
   {
