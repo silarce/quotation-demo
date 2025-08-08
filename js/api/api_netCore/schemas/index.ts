@@ -22,8 +22,9 @@ export type {
   Treview_status,
   Treview_status__stages,
   Tdocument_status,
-  TdropDown,
 } from './shared';
+
+export type { TdropDown } from './commonControllers';
 
 export type {
   TaccountsReceivablesList_Dto_depressed,
