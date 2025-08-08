@@ -148,3 +148,5 @@ const columns: TableProps<TaccountantDto>['columns'] = [
 ];
 
 // ============================================================================
+
+export type { TaccountantDto };

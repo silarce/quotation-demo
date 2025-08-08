@@ -295,10 +295,13 @@ interface Tres_apiGetARPaymentData {
     //請款單沖銷明細 // 沖銷明細
     prOffsetDetails: {
       id: string | null; //沖銷明細Id
-      prOffsetNumber: string | null; //沖銷編號
       accountantId: string | null; //會計收管管理Id
       paymentRequestId: string | null; //請款單Id
+
       prOffsetDate: string; //沖銷日期
+      prOffsetType: string | null; //沖銷類別
+      prOffsetNumber: string | null; //沖銷編號
+
       paymentCurrency: string | null; //請款幣別
       exchangeRate: number | null; //匯率
       paymentAmount: number; //收款金額

@@ -22,6 +22,8 @@ import type {
   Tres_apiGetARPaymentDataInset,
 } from './schemas';
 
+import type { TemployeeDto } from '../dtoTypes';
+
 const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
   // const api = '/api/AccountsReceivable/GetAccountsReceivablesList';
   // return axi_monkey.get<TaccountsReceivablesList_Dto[]>(api).then(({ data }) => data);
@@ -661,6 +663,50 @@ const useApiGetSalesOrderById = (
   };
 };
 
+interface Tbody_apiPostInsertPrOffsetDetail {
+  createdAt: string; //建立時間
+  createdBy: TemployeeDto['idNumber']; // `EM-${number}-${number}` //建立人員
+  updatedAt: string; //修改時間
+  updatedBy: TemployeeDto['idNumber']; // `EM-${number}-${number}` //修改人員
+
+  accountantId: string; //會計收管管理Id
+  paymentRequestId: string; //請款單Id
+
+  prOffsetDate: string; //沖銷日期
+  prOffsetType: string; //沖銷類別
+  paymentCurrency: string; //請款幣別
+  exchangeRate: number; //匯率
+
+  paymentAmount: number; //收款金額
+  customerNumber: string; // 客戶編號
+  customerName: string; //客戶名稱
+  fee: number | null; //手續費
+  totalAmount: number; //收款金額
+}
+
+const apiPostInsertPrOffsetDetail = async (
+  body: Tbody_apiPostInsertPrOffsetDetail,
+  {
+    returnError = false,
+  }: {
+    returnError?: boolean;
+  } = {}
+) => {
+  const api = '/api/AccountsReceivable/InsertPrOffsetDetail';
+
+  return axi_monkey.post(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '新增請款單失敗',
+      content: error.message,
+    });
+
+    if (returnError) {
+      return Promise.reject(error);
+    }
+  });
+};
+
 // ========================================================================
 export type {
   TaccountsReceivablesList_Dto,
@@ -670,7 +716,11 @@ export type {
   TinsertpaymentRequest,
 };
 
-export type { Tres_apiGetARPaymentData, Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert };
+export type {
+  Tres_apiGetARPaymentData,
+  Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert,
+  Tbody_apiPostInsertPrOffsetDetail,
+};
 
 export {
   apiQuotationToAccountsReceivables,
@@ -679,6 +729,7 @@ export {
   apiPatchInsertPaymentRequest,
   apiInsertSalesOrderData,
   apiUpdateSalesOrderData,
+  apiPostInsertPrOffsetDetail,
 };
 
 export {
