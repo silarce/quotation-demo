@@ -108,6 +108,23 @@
     border: 0;
   }
 }
+.timeAmpmLeft.timeAmpmLeft.timeAmpmLeft {
+  :global {
+    /* 把 AM/PM 欄移到最左邊 */
+    .ant-picker-time-panel-column:last-child {
+      order: -1;
+    }
+
+    /*確認按鈕顏色 */
+    .ant-picker-ok .ant-btn-primary {
+      background-color: theme('colors.blue01');
+
+      > span {
+        color: theme('colors.white01');
+      }
+    }
+  }
+}
 
 .dateRangePicker.dateRangePicker.dateRangePicker {
   display: flex;
