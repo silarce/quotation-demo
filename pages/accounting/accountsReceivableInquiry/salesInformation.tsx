@@ -163,7 +163,9 @@ export default function SalesInformation() {
 
           <DataEntry_fong caption="外幣金額">{'no property'}</DataEntry_fong>
 
-          <DataEntry_fong caption="匯率">{exchangeRate}</DataEntry_fong>
+          <DataEntry_fong className="col-span-2" caption="匯率">
+            {exchangeRate}
+          </DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="銷售金額">
             {<span className="text-right">{toLocaleString(salesAmount)}</span>}
