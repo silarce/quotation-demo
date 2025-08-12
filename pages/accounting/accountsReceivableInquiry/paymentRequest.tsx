@@ -68,7 +68,10 @@ export default function PayentRequest() {
     data_paymentQuest ?? data_forNew ?? {};
   const salesOrderItems = salesOrder?.salesOrderItems;
 
-  const instance_paymentRequest = usePaymentRequest(paymentRequest, accountsReceivables);
+  const instance_paymentRequest = usePaymentRequest({
+    rawData_paymentRequest: paymentRequest,
+    rawData_accountsReceivables: accountsReceivables,
+  });
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
 
   useEffect(() => {
@@ -128,22 +131,52 @@ export default function PayentRequest() {
       completedPayment: item.completedPayment ?? 0,
     }));
 
-    const invoice: TinsertpaymentRequest['invoice'] = {
-      invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
-      invoiceNumber, // 發票號碼
-      buyer: customerName, // 客戶抬頭
+    // const invoice: TinsertpaymentRequest['invoice'] | undefined = invoiceBook
+    //   ? {
+    //       invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
+    //       invoiceNumber, // 發票號碼
+    //       buyer: customerName, // 客戶抬頭
 
-      amount: null, // 發票金額 9524,
-      taxes: null, // 發票稅額 476,
-      totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
+    //       amount: null, // 發票金額 9524,
+    //       taxes: null, // 發票稅額 476,
+    //       totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
 
-      taxId: customerTaxId, // 統一編號 "54741781",
-      taxAddress: null, // 發票地址 null,
-      remark: null, // 備註 null ,
+    //       taxId: customerTaxId, // 統一編號 "54741781",
+    //       taxAddress: null, // 發票地址 null,
+    //       remark: null, // 備註 null ,
 
-      invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
-      period: `${invoiceBook.period}`, //發票期數 "3"
-    };
+    //       invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+    //       period: `${invoiceBook.period}`, //發票期數 "3"
+    //     }
+    //   : undefined;
+    const invoice: TinsertpaymentRequest['invoice'] | undefined = (() => {
+      if (!invoiceBook) {
+        return undefined;
+      }
+
+      const totalAmount = Number(invoiceAmount);
+      const amount = new Decimal(totalAmount).div(1.05).toNumber();
+      const taxes = new Decimal(amount).mul(0.05).toNumber();
+
+      const incoice: TinsertpaymentRequest['invoice'] = {
+        invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
+        invoiceNumber, // 發票號碼
+        buyer: customerName, // 客戶抬頭
+
+        amount, // 發票金額
+        taxes, // 發票稅額
+        totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
+
+        taxId: customerTaxId, // 統一編號 "54741781",
+        taxAddress: null, // 發票地址 null,
+        remark: null, // 備註 null ,
+
+        invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+        period: `${invoiceBook.period}`, //發票期數 "3"
+      };
+
+      return incoice;
+    })();
 
     const body: TinsertpaymentRequest = {
       paymentRequest: {
@@ -172,7 +205,7 @@ export default function PayentRequest() {
 
         completedProduct: completedProduct,
       },
-      // invoice,
+      invoice,
     };
 
     return body;

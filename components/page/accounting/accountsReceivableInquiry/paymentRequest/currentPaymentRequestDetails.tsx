@@ -12,18 +12,13 @@ import { selector_customer } from 'components/composition/selectorModal/selector
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
 import Selector_invoice from 'components/composition/selectorModal/selector_invoice';
 
-import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
-
 import { Tinstance_paymentRequest } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/usePaymentRequest';
 
 import { useApiGetPaymentRequestType } from 'js/api/api_netCore/api_accountsReceivable';
 import { useApiGetDropDown } from 'js/api/api_netCore/api_commonControllers';
 
-// =========================================================================
-
-type TpaymentRequest = Tres_apiGetARPaymentData['paymentRequest'];
-
-type TprOffsetDetails = TpaymentRequest['prOffsetDetails'][number];
+import IconQuery from 'public/image/icon/fong/query.svg';
+import IconCancel from 'public/image/icon/fong/cancel.svg';
 
 // =========================================================================
 
@@ -45,11 +40,12 @@ const CurrentPaymentRequestDetails = ({
   const { data: data_paymentRequestType } = useApiGetPaymentRequestType();
   const { options: options_retainageTaxCategory } = useApiGetDropDown('RetainageTaxCategory');
 
-  const { state_paymentRequest, setState_paymentRequest, setPaymentAmount } = instance_paymentRequest;
+  const { state_paymentRequest, allowedInvoiceDate, setState_paymentRequest, setPaymentAmount, setInvoiceBood } =
+    instance_paymentRequest;
+
+  const invoiceBook = state_paymentRequest.invoiceBook;
 
   const [isActive_detail, setState_isActive_deta] = useState<boolean>(true);
-
-  // -----------------------------------------------------------------------------
 
   // -----------------------------------------------------------------------------
 
@@ -59,15 +55,10 @@ const CurrentPaymentRequestDetails = ({
         <Selector_invoiceBook
           onConfirm={async (invoiceBook) => {
             if (invoiceBook) {
-              const { id, alphabeticLetter, period } = invoiceBook;
-              setState_paymentRequest((prev) => ({
-                ...prev,
-                invoiceBook: {
-                  id,
-                  alphabeticLetter,
-                  period,
-                },
-              }));
+              const year = invoiceBook.year as `${number}`;
+              const month = invoiceBook.month as `${number}`;
+
+              setInvoiceBood({ ...invoiceBook, year, month });
 
               destroy();
             }
@@ -233,22 +224,34 @@ const CurrentPaymentRequestDetails = ({
 
             <DataEntry_fong
               caption="發票本 no property"
-              isMust={true}
               disabled={disabled}
               childrenWrapperProps={{
-                className: disabled ? '' : 'cursor-pointer',
-                onClick: disabled ? undefined : handle_selectInvoiceBook,
+                className: 'flex gap-4',
               }}
             >
-              {state_paymentRequest.invoiceBook
-                ? state_paymentRequest.invoiceBook?.alphabeticLetter +
-                  ' ' +
-                  `${state_paymentRequest.invoiceBook?.period}期`
-                : '- -'}
+              <span
+                onClick={disabled ? undefined : handle_selectInvoiceBook}
+                className={classNames('w-full', disabled ? '' : 'cursor-pointer')}
+              >
+                {state_paymentRequest.invoiceBook
+                  ? state_paymentRequest.invoiceBook?.alphabeticLetter +
+                    ' ' +
+                    `${state_paymentRequest.invoiceBook?.period}期`
+                  : '- -'}
+              </span>
+              <IconCancel
+                className={classNames('cursor-pointer', disabled ? 'invisible' : 'visible')}
+                onClick={() => setInvoiceBood(null)}
+              />
             </DataEntry_fong>
 
-            <DataEntry_fong caption="發票日期 no property" isMust={true} disabled={disabled}>
+            <DataEntry_fong
+              caption="發票日期 no property"
+              isMust={!!invoiceBook}
+              disabled={!state_paymentRequest.invoiceBook || disabled}
+            >
               <DatePicker
+                placeholder={!state_paymentRequest.invoiceBook ? '請先選擇發票本' : undefined}
                 value={state_paymentRequest.invoiceDate}
                 onChange={(date) => {
                   setState_paymentRequest((prev) => ({
@@ -256,21 +259,23 @@ const CurrentPaymentRequestDetails = ({
                     invoiceDate: date,
                   }));
                 }}
+                minDate={allowedInvoiceDate?.startDate}
+                maxDate={allowedInvoiceDate?.endDate}
               />
             </DataEntry_fong>
 
             <DataEntry_fong
               caption="發票號碼"
-              isMust={true}
-              disabled={disabled}
+              isMust={!!invoiceBook}
+              disabled={!state_paymentRequest.invoiceBook || disabled}
               childrenWrapperProps={{
-                onClick: disabled ? undefined : handle_selectInvoice,
+                onClick: disabled || !state_paymentRequest.invoiceBook ? undefined : handle_selectInvoice,
                 className: disabled ? '' : 'cursor-pointer',
               }}
             >
-              {state_paymentRequest.invoiceNumber}
+              {state_paymentRequest.invoiceBook ? state_paymentRequest.invoiceNumber : '請先選擇發票本'}
             </DataEntry_fong>
-            <DataEntry_fong caption="發票金額" isMust={true} disabled={disabled}>
+            <DataEntry_fong caption="發票金額" isMust={!!invoiceBook} disabled={disabled}>
               <Input_money
                 value={state_paymentRequest.invoiceAmount}
                 onChange={(e) => {
@@ -284,19 +289,39 @@ const CurrentPaymentRequestDetails = ({
 
             <DataEntry_fong
               caption="買受人"
-              isMust={true}
+              isMust={!!invoiceBook}
               disabled={disabled}
               childrenWrapperProps={{
-                // onClick: handle_selectCustomer,
-                onClick: disabled ? undefined : handle_selectCustomer,
-                className: disabled ? '' : 'cursor-pointer',
+                className: 'flex gap-4',
               }}
             >
-              {state_paymentRequest.customerName}
+              <Input
+                value={state_paymentRequest.customerName ?? ''}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    customerName: e.target.value,
+                  }));
+                }}
+              />
+              {
+                <IconQuery
+                  onClick={handle_selectCustomer}
+                  className={classNames('cursor-pointer', disabled && 'invisible')}
+                />
+              }
             </DataEntry_fong>
 
-            <DataEntry_fong caption="統一編號 no property" isMust={true} disabled={disabled}>
-              {state_paymentRequest.customerTaxId}
+            <DataEntry_fong caption="統一編號 no property" isMust={!!invoiceBook} disabled={disabled}>
+              <Input
+                value={state_paymentRequest.customerTaxId ?? ''}
+                onChange={(e) => {
+                  setState_paymentRequest((prev) => ({
+                    ...prev,
+                    customerTaxId: e.target.value,
+                  }));
+                }}
+              />
             </DataEntry_fong>
           </div>
           <div className="w-fit m-auto mt-10 mr-0 ml-auto">
