@@ -9,9 +9,9 @@ type TpaymentRequest_noDetail = Omit<TpaymentRequest, 'prOffsetDetails'>;
 
 interface Tstate_paymentRequest {
   type: string;
-  paymentAmount: `${number}` | ''; // 請款金額
-  營業稅: number | null;
-  本期合計請款金額: number | null;
+  請款金額: `${number}` | ''; // 請款金額
+  營業稅: number;
+  paymentAmount: number; // 本期合計請款金額
   retainageRate: `${number}` | ''; // 保留款(%)
   retainageTaxCategory: string; // 稅別
   retainageAmount: `${number}` | ''; // 保留款金額
@@ -45,15 +45,15 @@ const usePaymentRequest = (
   const defaultState = useDefaultState_paymentRequest(rawData, accountsReceivables);
   const [state, setState] = useState<Tstate_paymentRequest>(defaultState);
 
-  const setPaymentAmount = (v: Tstate_paymentRequest['paymentAmount']) => {
+  const setPaymentAmount = (v: Tstate_paymentRequest['請款金額']) => {
     setState((prev) => {
       const copy = { ...prev };
 
-      copy.paymentAmount = v;
-      const 營業稅 = new Decimal(copy.paymentAmount || 0).mul(0.05).toDecimalPlaces(0);
-      const 本期合計請款金額 = new Decimal(copy.paymentAmount || 0).add(營業稅);
+      copy.請款金額 = v;
+      const 營業稅 = new Decimal(copy.請款金額 || 0).mul(0.05).toDecimalPlaces(0);
+      const 本期合計請款金額 = new Decimal(copy.請款金額 || 0).add(營業稅);
 
-      return { ...copy, 營業稅: 營業稅.toNumber(), 本期合計請款金額: 本期合計請款金額.toNumber() };
+      return { ...copy, 營業稅: 營業稅.toNumber(), paymentAmount: 本期合計請款金額.toNumber() };
     });
   };
 
@@ -77,9 +77,9 @@ const usePaymentRequest = (
 const emptyState_paymentRequest = (): Tstate_paymentRequest => {
   const state: Tstate_paymentRequest = {
     type: '',
-    paymentAmount: '',
-    營業稅: null,
-    本期合計請款金額: null,
+    請款金額: '',
+    營業稅: 0,
+    paymentAmount: 0,
     retainageRate: '',
     retainageTaxCategory: '',
     retainageAmount: '',
@@ -112,11 +112,15 @@ const useDefaultState_paymentRequest = (
       return emptyState_paymentRequest();
     }
 
+    const paymentAmount = rawData.paymentAmount || 0;
+    const 請款金額 = new Decimal(paymentAmount || 0).div(1.05).toNumber();
+    const 營業稅 = new Decimal(請款金額).mul(0.05).toNumber();
+
     const defaultState: Tstate_paymentRequest = {
       type: rawData.type || '',
-      paymentAmount: rawData.paymentAmount === null ? '' : `${rawData.paymentAmount}`,
-      營業稅: null,
-      本期合計請款金額: null,
+      請款金額: `${請款金額}`,
+      營業稅: 營業稅,
+      paymentAmount,
       retainageRate: '',
       retainageTaxCategory: '',
       retainageAmount: '',

@@ -66,7 +66,7 @@ export default function PayentRequest() {
 
   const { accountsReceivables, paymentRequest, salesOrder, paymentRequestLogs } =
     data_paymentQuest ?? data_forNew ?? {};
-  const salesOrderItems = salesOrder?.salesOrderItems ?? [];
+  const salesOrderItems = salesOrder?.salesOrderItems;
 
   const instance_paymentRequest = usePaymentRequest(paymentRequest, accountsReceivables);
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
@@ -108,7 +108,7 @@ export default function PayentRequest() {
     const validPaymentRequest = state_paymentRequest as DeepNonNullable<Tstate_paymentRequest>;
     const {
       type,
-      paymentAmount,
+      請款金額: paymentAmount,
       營業稅,
       retainageRate,
       retainageTaxCategory,
@@ -128,56 +128,62 @@ export default function PayentRequest() {
       completedPayment: item.completedPayment ?? 0,
     }));
 
-    // const body: TinsertpaymentRequest = {
-    //   paymentRequest: {
-    //     createdAt: new Date().toISOString(),
-    //     createdBy: userInfo.id,
-    //     updatedAt: new Date().toISOString(),
-    //     updatedBy: userInfo.id,
+    const invoice: TinsertpaymentRequest['invoice'] = {
+      invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
+      invoiceNumber, // 發票號碼
+      buyer: customerName, // 客戶抬頭
 
-    //     sourceFormType: sourceType,
-    //     sourceFormId: sourceId,
-    //     accountsReceivableId: accountsReceivables.id,
+      amount: null, // 發票金額 9524,
+      taxes: null, // 發票稅額 476,
+      totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
 
-    //     customerNumber: customerNumber,
-    //     customerName: customerName,
+      taxId: customerTaxId, // 統一編號 "54741781",
+      taxAddress: null, // 發票地址 null,
+      remark: null, // 備註 null ,
 
-    //     type: type,
+      invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+      period: `${invoiceBook.period}`, //發票期數 "3"
+    };
 
-    //     paymentCurrency, // 請款幣別,
-    //     foreignCurrencyAmount, // 外幣金額,
-    //     paymentAmount: Number(paymentAmount), // 請款金額, // 本期合計
+    const body: TinsertpaymentRequest = {
+      paymentRequest: {
+        createdAt: new Date().toISOString(),
+        createdBy: userInfo.id,
+        updatedAt: new Date().toISOString(),
+        updatedBy: userInfo.id,
 
-    //     retainageType: '保留款', // "保留款", // retainageType type?這是金額還是類型?
-    //     retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
-    //     retainageRate: Number(retainageRate), // 保留款%數 10 ,
-    //     retainageAmount: Number(retainageAmount), // 保留款金額 61601,
+        sourceFormType: sourceType,
+        sourceFormId: sourceId,
+        accountsReceivableId: accountsReceivables.id,
 
-    //     completedProduct: completedProduct,
-    //   },
-    //   invoice: {
-    //     invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
-    //     invoiceNumber, // 發票號碼 "MV34400404",
-    //     buyer: customerName, // 客戶抬頭 "一代冷氣空調有限公司",
+        customerNumber: customerNumber,
+        customerName: customerName,
 
-    //     amount, // 發票金額 9524, //
-    //     taxes, // 發票稅額 476, //
-    //     totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
+        type: type,
 
-    //     taxId: customerTaxId, // 統一編號 "54741781",
-    //     taxAddress, // 發票地址 null,
-    //     remark, // 備註 null ,
+        paymentCurrency: 'TWD 新台幣', // 請款幣別,
+        foreignCurrencyAmount: null, // 外幣金額,
+        paymentAmount: Number(paymentAmount), //本期合計請款金額
 
-    //     invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
-    //     period: `${invoiceBook.period}`, //發票期數 "3"
-    //   },
-    // };
+        retainageType: '保留款', // 固定值 "保留款"
+        retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
+        retainageRate: Number(retainageRate), // 保留款%數 10 ,
+        retainageAmount: Number(retainageAmount), // 保留款金額 61601,
+
+        completedProduct: completedProduct,
+      },
+      // invoice,
+    };
+
+    return body;
   };
 
   const req_postInsertPaymentRequest = async () => {
     const body = createBody();
 
-    // apiPostInsertPaymentRequest
+    if (body) {
+      await apiPostInsertPaymentRequest(body);
+    }
   };
 
   const req_postInsertPrOffsetDetail = async ({

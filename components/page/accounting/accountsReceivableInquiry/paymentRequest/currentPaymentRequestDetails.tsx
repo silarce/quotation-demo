@@ -174,7 +174,7 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
             <DataEntry_fong caption="請款金額" isMust={true} disabled={disabled}>
               <Input_money
-                value={state_paymentRequest.paymentAmount}
+                value={state_paymentRequest.請款金額}
                 onChange={(e) => {
                   setPaymentAmount(e.target.value as `${number}` | '');
                   // setState_paymentRequest((prev) => ({
@@ -190,7 +190,7 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
 
             <DataEntry_fong caption="本期合計請款金額 no property" disabled={disabled}>
-              {toMoneyString(state_paymentRequest.本期合計請款金額)}
+              {toMoneyString(state_paymentRequest.paymentAmount)}
             </DataEntry_fong>
 
             <DataEntry_fong caption="保留款(%) no property" isMust={true} disabled={disabled}>

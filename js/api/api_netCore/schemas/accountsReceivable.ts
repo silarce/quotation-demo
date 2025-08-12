@@ -1,4 +1,4 @@
-// import { string, string, number } from './';
+import type { DeepNullable } from 'ts-essentials';
 
 interface TaccountsReceivablesList_Dto_depressed {
   id: string; //應收帳款id
@@ -174,7 +174,7 @@ interface TaccountsReceivable {
   salesOrderItem: TsalesOrderItemData_Dto[];
 }
 
-interface TinsertpaymentRequest {
+interface TinsertpaymentRequest_pre {
   paymentRequest: {
     createdAt: string; // 建立時間,
     createdBy: string; // 建立人員(員工編號),
@@ -222,6 +222,8 @@ interface TinsertpaymentRequest {
     period: `${number}`; //發票期數 "3"
   };
 }
+
+type TinsertpaymentRequest = DeepNullable<TinsertpaymentRequest_pre>;
 
 interface TpaymentRequestType {
   codeName: string;
@@ -284,8 +286,8 @@ interface Tres_apiGetARPaymentData {
 
     paymentCurrency: string; //請款幣別
     foreignCurrencyAmount: number | null; //外幣金額
-    paymentAmount: number | null; //請款金額
-    collect_amount: number | null; //已收金額,餘額在repo裡計算
+    paymentAmount: number | null; // 本期合計請款金額
+    collect_amount: number | null; //已收金額
     receipt_balance: number | null; //收款餘額
     deduction: number | null; //扣款金額
 
