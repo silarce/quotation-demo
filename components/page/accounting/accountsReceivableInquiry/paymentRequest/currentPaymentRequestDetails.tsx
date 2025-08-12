@@ -186,7 +186,7 @@ const CurrentPaymentRequestDetails = ({
                   setPaymentAmount(e.target.value as `${number}` | '');
                 }}
               /> */}
-              <span>幣值</span>
+              <span>幣別</span>
               {toMoneyString(state_paymentRequest.請款金額)}
             </DataEntry_fong>
 
