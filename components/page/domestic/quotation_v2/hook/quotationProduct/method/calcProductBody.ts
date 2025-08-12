@@ -19,14 +19,14 @@ const calcProductBody = ({
   state_prodDict: TstateProdDict;
   state_iterativeProdDict: TstateProdDict;
 }) => {
-  const totalQty_decimal = new Decimal(0);
+  let totalQty_decimal = new Decimal(0);
   let isAllDoorModalValid = true;
 
   let stateProdArr = prodKeyArr.map((key) => state_prodDict[key]);
 
   stateProdArr = stateProdArr.map((stateProd, index) => {
     const { doorModelName, quantity } = stateProd.data_prod;
-    totalQty_decimal.add(quantity || 0);
+    totalQty_decimal = totalQty_decimal.add(quantity || 0);
 
     !doorModelName && (isAllDoorModalValid = false);
 
