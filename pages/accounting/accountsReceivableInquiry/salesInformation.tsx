@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import _ from 'lodash';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong } from 'components/global/gear/dataEntry';
@@ -11,7 +13,6 @@ import Selector_quotation, {
   TquotationListViewModel_Dto,
 } from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 
-import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_note from 'public/image/icon/fong/note.svg';
 
 // api
@@ -42,6 +43,10 @@ export default function SalesInformation() {
   const { data, isFetching } = useGetAccountsReceivables(accountsReceivableId);
 
   const { accountsReceivablesList, paymentRequests, salesOrderItem } = data ?? {};
+
+  const orderedPaymentRequests = useMemo(() => {
+    return _.orderBy(paymentRequests, (item) => Number(item.period));
+  }, [paymentRequests]);
 
   const {
     accountsReceivableNumber,
@@ -195,7 +200,7 @@ export default function SalesInformation() {
               </Link>
             )}
           </div>
-          <Table_antd columns={columns_paymentRequests} dataSource={paymentRequests} pagination={false} />
+          <Table_antd columns={columns_paymentRequests} dataSource={orderedPaymentRequests} pagination={false} />
         </div>
       </div>
     </div>
