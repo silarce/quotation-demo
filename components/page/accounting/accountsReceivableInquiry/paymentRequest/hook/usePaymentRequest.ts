@@ -45,6 +45,7 @@ interface Tstate_paymentRequest {
 const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables }: Tprops) => {
   const invoiceDesc = rawData_paymentRequest?.invoiceBook;
   const isAllowEditInvoice = typeof invoiceDesc !== 'string';
+  const isAllowEdit = !rawData_paymentRequest;
 
   const defaultState = useDefaultState_paymentRequest({ rawData_paymentRequest, rawData_accountsReceivables });
   const [state, setState] = useState<Tstate_paymentRequest>(defaultState);
@@ -106,6 +107,7 @@ const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables
     allowedInvoiceDate,
     invoiceDesc,
     isAllowEditInvoice,
+    isAllowEdit,
 
     setState_paymentRequest: setState,
     setPaymentAmount,
