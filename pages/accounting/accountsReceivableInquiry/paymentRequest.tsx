@@ -196,8 +196,24 @@ export default function PayentRequest() {
   const req_postInsertPaymentRequest = async () => {
     const body = createBody();
 
-    if (body) {
-      await apiPostInsertPaymentRequest(body);
+    if (!body) {
+      return;
+    }
+
+    if (isNew) {
+      const paymentQuestId = await apiPostInsertPaymentRequest(body);
+
+      if (paymentQuestId) {
+        router.replace({
+          query: {
+            ...query,
+            id: paymentQuestId,
+          },
+        });
+      }
+    } else {
+      await apiPatchInsertPaymentRequest(body);
+      await update_paymentQuest();
     }
   };
 

@@ -374,16 +374,19 @@ const useApiGetARPaymentDataInset = (
 const apiPostInsertPaymentRequest = async (body: TinsertpaymentRequest) => {
   const api = '/api/AccountsReceivable/InsertPaymentRequest';
 
-  return axi_monkey.post(api, body).catch((err) => {
-    const error = err as AxiosError;
-    myAlert.err({
-      title: '新增請款單失敗',
-      content: error.message,
+  return axi_monkey
+    .post<string>(api, body)
+    .then(({ data: paymentQuestId }) => paymentQuestId)
+    .catch((err) => {
+      const error = err as AxiosError;
+      myAlert.err({
+        title: '新增請款單失敗',
+        content: error.message,
+      });
     });
-  });
 };
 
-const apiPatchInsertPaymentRequest = async (body: unknown) => {
+const apiPatchInsertPaymentRequest = async (body: TinsertpaymentRequest) => {
   const api = '/api/AccountsReceivable/UpdateAccountsReceivables';
 
   return axi_monkey.patch(api, body).catch((err) => {
