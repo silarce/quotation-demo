@@ -173,13 +173,20 @@ const CurrentPaymentRequestDetails = ({
               />
             </DataEntry_fong>
 
-            <DataEntry_fong caption="請款金額" disabled={true}>
+            <DataEntry_fong
+              caption="請款金額"
+              disabled={true}
+              childrenWrapperProps={{
+                className: 'flex gap-1',
+              }}
+            >
               {/* <Input_money
                 value={state_paymentRequest.請款金額}
                 onChange={(e) => {
                   setPaymentAmount(e.target.value as `${number}` | '');
                 }}
               /> */}
+              <span>幣值</span>
               {toMoneyString(state_paymentRequest.請款金額)}
             </DataEntry_fong>
 
