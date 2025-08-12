@@ -20,6 +20,7 @@ import type {
   TinsertpaymentRequest,
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
+  Tbody_updatePRInvoice,
 } from './schemas';
 
 import type { TemployeeDto } from '../dtoTypes';
@@ -386,10 +387,10 @@ const apiPostInsertPaymentRequest = async (body: TinsertpaymentRequest) => {
     });
 };
 
-const apiPatchInsertPaymentRequest = async (body: TinsertpaymentRequest) => {
-  const api = '/api/AccountsReceivable/UpdateAccountsReceivables';
+const apiPatchInsertPaymentRequest = async (body: Tbody_updatePRInvoice) => {
+  const api = '/api/Invoice/UpdatePRInvoice';
 
-  return axi_monkey.patch(api, body).catch((err) => {
+  return axi_monkey.put(api, body).catch((err) => {
     const error = err as AxiosError;
     myAlert.err({
       title: '更新請款單失敗',
@@ -723,6 +724,7 @@ export type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert,
   Tbody_apiPostInsertPrOffsetDetail,
+  Tbody_updatePRInvoice,
 };
 
 export {

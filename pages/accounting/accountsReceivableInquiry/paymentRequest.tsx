@@ -13,6 +13,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import {
   TinsertpaymentRequest,
   Tbody_apiPostInsertPrOffsetDetail,
+  Tbody_updatePRInvoice,
   //
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
@@ -212,7 +213,18 @@ export default function PayentRequest() {
         });
       }
     } else {
-      await apiPatchInsertPaymentRequest(body);
+      const paymentRequestId = paymentRequest?.id;
+
+      if (!paymentRequestId) {
+        return;
+      }
+
+      const body_patch: Tbody_updatePRInvoice = {
+        paymentRequestId: paymentRequest!.id!,
+        invoice: body.invoice,
+      };
+
+      await apiPatchInsertPaymentRequest(body_patch);
       await update_paymentQuest();
     }
   };

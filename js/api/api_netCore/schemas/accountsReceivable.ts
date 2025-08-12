@@ -225,6 +225,11 @@ interface TinsertpaymentRequest_pre {
 
 type TinsertpaymentRequest = DeepNullable<TinsertpaymentRequest_pre>;
 
+type Tbody_updatePRInvoice = {
+  paymentRequestId: string;
+  invoice: TinsertpaymentRequest['invoice'];
+};
+
 interface TpaymentRequestType {
   codeName: string;
   name: string;
@@ -421,4 +426,5 @@ export type {
   TpaymentRequestType,
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
+  Tbody_updatePRInvoice,
 };
