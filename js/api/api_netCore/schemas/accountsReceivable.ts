@@ -291,8 +291,14 @@ interface Tres_apiGetARPaymentData {
     receipt_balance: number | null; //收款餘額
     deduction: number | null; //扣款金額
 
+    retainageRate: number | null; //保留款比例
+    retainageTaxCategory: string | null; //保留款稅別
+    retainageAmount: number | null; //保留款金額
+
+    invoiceBook: string | null; // 發票本 //w 這個不是id，是描述
     invoiceNumber: string | null; //發票號碼
     invoiceAmount: number | null; //發票金額
+    invoiceDate: string | null; //發票日期
 
     //請款單沖銷明細 // 沖銷明細
     prOffsetDetails: {

@@ -100,23 +100,23 @@ export default function PayentRequest() {
       return null;
     }
 
-    const isInvalid_paymentRequest = Object.values(state_paymentRequest).some((item) => !item);
+    // const isInvalid_paymentRequest = Object.values(state_paymentRequest).some((item) => !item);
 
-    if (isInvalid_paymentRequest) {
-      myAlert.err({ title: '本次請款明細資料未填妥' });
+    // if (isInvalid_paymentRequest) {
+    //   myAlert.err({ title: '本次請款明細資料未填妥' });
 
-      return null;
-    }
+    //   return null;
+    // }
 
     const validPaymentRequest = state_paymentRequest as DeepNonNullable<Tstate_paymentRequest>;
+
     const {
       type,
-      請款金額: paymentAmount,
-      營業稅,
+      paymentAmount,
       retainageRate,
       retainageTaxCategory,
       retainageAmount,
-      invoiceBook,
+      invoiceBookInfo: invoiceBook,
       invoiceDate,
       invoiceNumber,
       invoiceAmount,
@@ -131,24 +131,6 @@ export default function PayentRequest() {
       completedPayment: item.completedPayment ?? 0,
     }));
 
-    // const invoice: TinsertpaymentRequest['invoice'] | undefined = invoiceBook
-    //   ? {
-    //       invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
-    //       invoiceNumber, // 發票號碼
-    //       buyer: customerName, // 客戶抬頭
-
-    //       amount: null, // 發票金額 9524,
-    //       taxes: null, // 發票稅額 476,
-    //       totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
-
-    //       taxId: customerTaxId, // 統一編號 "54741781",
-    //       taxAddress: null, // 發票地址 null,
-    //       remark: null, // 備註 null ,
-
-    //       invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
-    //       period: `${invoiceBook.period}`, //發票期數 "3"
-    //     }
-    //   : undefined;
     const invoice: TinsertpaymentRequest['invoice'] | undefined = (() => {
       if (!invoiceBook) {
         return undefined;

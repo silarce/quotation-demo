@@ -11,7 +11,10 @@ type TaccountsReceivable = Tres_apiGetARPaymentData['accountsReceivables'];
 
 interface Tprops {
   rawData_paymentRequest: TpaymentRequest_noDetail | undefined | null;
-  rawData_accountsReceivables: Pick<TaccountsReceivable, 'customerName' | 'taxId'> | undefined | null;
+  rawData_accountsReceivables:
+    | Pick<TaccountsReceivable, 'customerName' | 'customerNumber' | 'taxId'>
+    | undefined
+    | null;
 }
 
 interface Tstate_paymentRequest {
@@ -23,14 +26,13 @@ interface Tstate_paymentRequest {
   retainageTaxCategory: string; // 稅別
   retainageAmount: `${number}` | ''; // 保留款金額
 
-  invoiceBook: {
+  invoiceBookInfo: {
     id: string;
     alphabeticLetter: string;
     period: number;
     year: `${number}`;
     month: `${number}`;
   } | null;
-
   invoiceDate: Dayjs | null;
   invoiceNumber: string | null;
   invoiceAmount: `${number}` | '';
@@ -41,6 +43,9 @@ interface Tstate_paymentRequest {
 }
 
 const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables }: Tprops) => {
+  const invoiceDesc = rawData_paymentRequest?.invoiceBook;
+  const isAllowEditInvoice = typeof invoiceDesc !== 'string';
+
   const defaultState = useDefaultState_paymentRequest({ rawData_paymentRequest, rawData_accountsReceivables });
   const [state, setState] = useState<Tstate_paymentRequest>(defaultState);
 
@@ -56,10 +61,10 @@ const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables
     });
   };
 
-  const setInvoiceBood = (invoiceBook: Tstate_paymentRequest['invoiceBook']) => {
+  const setInvoiceBood = (invoiceBook: Tstate_paymentRequest['invoiceBookInfo']) => {
     setState((prev) => {
       const copy = { ...prev };
-      copy.invoiceBook = invoiceBook;
+      copy.invoiceBookInfo = invoiceBook;
       copy.invoiceDate = null;
       copy.invoiceNumber = null;
 
@@ -74,11 +79,11 @@ const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables
   // -----------------------------------------------------------------------
 
   const allowedInvoiceDate = useMemo(() => {
-    if (!state.invoiceBook) {
+    if (!state.invoiceBookInfo) {
       return undefined;
     }
 
-    const { year, month } = state.invoiceBook;
+    const { year, month } = state.invoiceBookInfo;
 
     const startDate = dayjs(`${year}-${month}-01`);
     const endDate = startDate.month(startDate.month() + 1).endOf('month');
@@ -89,7 +94,7 @@ const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables
       startDate,
       endDate,
     };
-  }, [state.invoiceBook]);
+  }, [state.invoiceBookInfo]);
 
   // -----------------------------------------------------------------------
   useEffect(() => {
@@ -99,6 +104,8 @@ const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables
   return {
     state_paymentRequest: state,
     allowedInvoiceDate,
+    invoiceDesc,
+    isAllowEditInvoice,
 
     setState_paymentRequest: setState,
     setPaymentAmount,
@@ -107,6 +114,12 @@ const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables
     reset_paymentRequest: reset,
   };
 };
+
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
+// ===============================================================================
 
 const emptyState_paymentRequest = (): Tstate_paymentRequest => {
   const state: Tstate_paymentRequest = {
@@ -118,7 +131,7 @@ const emptyState_paymentRequest = (): Tstate_paymentRequest => {
     retainageTaxCategory: '',
     retainageAmount: '',
 
-    invoiceBook: null,
+    invoiceBookInfo: null,
     invoiceDate: null,
     invoiceNumber: null,
     invoiceAmount: '',
@@ -137,7 +150,13 @@ const useDefaultState_paymentRequest = ({
 }: Tprops): Tstate_paymentRequest => {
   return useMemo(() => {
     if (!rawData_paymentRequest) {
-      return emptyState_paymentRequest();
+      return {
+        ...emptyState_paymentRequest(),
+
+        customerNumber: rawData_accountsReceivables?.customerNumber || '',
+        customerName: rawData_accountsReceivables?.customerName || '',
+        customerTaxId: rawData_accountsReceivables?.taxId || '',
+      };
     }
 
     const paymentAmount = rawData_paymentRequest.paymentAmount || 0;
@@ -149,22 +168,23 @@ const useDefaultState_paymentRequest = ({
       請款金額: `${請款金額}`,
       營業稅: 營業稅,
       paymentAmount,
-      retainageRate: '',
-      retainageTaxCategory: '',
-      retainageAmount: '',
+      retainageRate: rawData_paymentRequest.retainageRate === null ? '' : `${rawData_paymentRequest.retainageRate}`,
+      retainageTaxCategory: rawData_paymentRequest.retainageTaxCategory || '',
+      retainageAmount:
+        rawData_paymentRequest.retainageAmount === null ? '' : `${rawData_paymentRequest.retainageAmount}`,
 
-      invoiceBook: null,
-      invoiceDate: null,
+      invoiceBookInfo: null,
+      invoiceDate: rawData_paymentRequest?.invoiceDate ? dayjs(rawData_paymentRequest.invoiceDate) : null,
       invoiceNumber: rawData_paymentRequest.invoiceNumber,
       invoiceAmount: rawData_paymentRequest.invoiceAmount === null ? '' : `${rawData_paymentRequest.invoiceAmount}`,
 
-      customerName: rawData_accountsReceivables?.customerName ?? '',
       customerNumber: rawData_paymentRequest.customerNumber,
+      customerName: rawData_paymentRequest?.customerName ?? '',
       customerTaxId: rawData_accountsReceivables?.taxId ?? '',
     };
 
     return defaultState;
-  }, [rawData_paymentRequest]);
+  }, [rawData_paymentRequest, rawData_accountsReceivables]);
 };
 
 type Tinstance_paymentRequest = ReturnType<typeof usePaymentRequest>;
