@@ -382,6 +382,7 @@ interface Tres_apiGetARPaymentData {
 
     type: string;
     period: `${number}`;
+    typePeriod: `${number}`;
 
     paymentCurrency: string;
     foreignCurrencyAmount: number | null;

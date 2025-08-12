@@ -17,7 +17,7 @@ const History = ({ paymentRequestLogs }: { paymentRequestLogs: TpaymentRequestLo
         items={paymentRequestLogs?.map((log) => {
           const period = log.period.padStart(2, '0');
           const type = log.type;
-          const typePeriod = 'no property';
+          const typePeriod = log.typePeriod && log.typePeriod.padStart(2, '0');
 
           return {
             key: log.id,
