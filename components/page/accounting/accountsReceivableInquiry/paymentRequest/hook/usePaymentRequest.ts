@@ -162,8 +162,8 @@ const useDefaultState_paymentRequest = ({
     }
 
     const paymentAmount = rawData_paymentRequest.paymentAmount || 0;
-    const 請款金額 = new Decimal(paymentAmount || 0).div(1.05).toNumber();
-    const 營業稅 = new Decimal(請款金額).mul(0.05).toNumber();
+    const 請款金額 = new Decimal(paymentAmount || 0).div(1.05).toDecimalPlaces(0).toNumber();
+    const 營業稅 = new Decimal(請款金額).mul(0.05).toDecimalPlaces(0).toNumber();
 
     const defaultState: Tstate_paymentRequest = {
       type: rawData_paymentRequest.type || '',
