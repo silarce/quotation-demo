@@ -673,13 +673,13 @@ interface Tbody_apiPostInsertPrOffsetDetail {
   updatedAt: string; //修改時間
   updatedBy: TemployeeDto['idNumber']; // `EM-${number}-${number}` //修改人員
 
-  accountantId: string; //會計收管管理Id
+  accountantId: string | null; //會計收管管理Id
   paymentRequestId: string; //請款單Id
 
   prOffsetDate: string; //沖銷日期
   prOffsetType: string; //沖銷類別
-  paymentCurrency: string; //請款幣別
-  exchangeRate: number; //匯率
+  paymentCurrency: string | null; //請款幣別
+  exchangeRate: number | null; //匯率
 
   paymentAmount: number; //收款金額
   customerNumber: string; // 客戶編號

@@ -45,7 +45,7 @@ interface Tprops {
   onAddDataConfirm: (data: { state: Tstate_addData; accountant: TaccountantDto; destroy: () => void }) => void;
   onAddDeductionConfirm: (data: {
     state: Tstate_addDeduction;
-    accountant: TaccountantDto;
+    // accountant: TaccountantDto;
     destroy: () => void;
   }) => void;
 }
@@ -116,16 +116,38 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
     });
   };
 
-  const handle_addDeduction = (accountant: TaccountantDto) => {
+  // const handle_addDeduction = (accountant: TaccountantDto) => {
+  //   const { destroy } = modal_empty({
+  //     content: (
+  //       <AddDeduction
+  //         accountant={accountant}
+  //         options_deductionType={options_deductionType}
+  //         onConfirm={(state_addDeduction) => {
+  //           onAddDeductionConfirm({
+  //             state: state_addDeduction,
+  //             accountant,
+  //             destroy,
+  //           });
+  //         }}
+  //         onCancel={() => {
+  //           destroy();
+  //         }}
+  //       />
+  //     ),
+  //     width: 350,
+  //   });
+  // };
+
+  const handle_addDeduction_noAccountant = () => {
     const { destroy } = modal_empty({
       content: (
         <AddDeduction
-          accountant={accountant}
+          // accountant={accountant}
           options_deductionType={options_deductionType}
           onConfirm={(state_addDeduction) => {
             onAddDeductionConfirm({
               state: state_addDeduction,
-              accountant,
+              // accountant,
               destroy,
             });
           }}
@@ -172,7 +194,8 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
           <Btn
             theme="cross"
             onClick={() => {
-              handle_accountingCollection(handle_addDeduction);
+              // handle_accountingCollection(handle_addDeduction);
+              handle_addDeduction_noAccountant();
             }}
           >
             新增沖銷扣款
@@ -211,7 +234,7 @@ const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
     width: 140,
   },
   {
-    title: '名稱',
+    title: '沖銷日期',
     dataIndex: 'prOffsetType',
     width: 150,
   },
@@ -360,17 +383,19 @@ const AddDeduction = ({
   onConfirm,
   onCancel,
   options_deductionType,
-  accountant,
-}: {
+}: // accountant,
+{
   onConfirm?: (props: Tstate_addDeduction) => void;
   onCancel?: () => void;
   options_deductionType: { label: string; value: string }[];
-  accountant: TaccountantDto;
+  // accountant: TaccountantDto;
 }) => {
   const [state, setState] = useState<Tstate_addDeduction>({
-    date: accountant.insertDate ? dayjs(accountant.insertDate) : null,
+    // date: accountant.insertDate ? dayjs(accountant.insertDate) : null,
+    date: null,
     type: '',
-    amount: `${accountant.price}`,
+    // amount: `${accountant.price}`,
+    amount: '',
     remarks: '',
   });
 

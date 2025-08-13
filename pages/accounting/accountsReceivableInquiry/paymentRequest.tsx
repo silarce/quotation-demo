@@ -75,10 +75,6 @@ export default function PayentRequest() {
   });
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
 
-  useEffect(() => {
-    apiGetPaymentRequestType();
-  }, []);
-
   const createBody = () => {
     if (!accountsReceivables) {
       myAlert.err({ title: '未取得必要資料' });
@@ -241,16 +237,19 @@ export default function PayentRequest() {
       fee?: `${number}` | '';
       remarks: string;
     };
-    accountant: TaccountantDto;
+    accountant?: TaccountantDto;
     destroy: () => void;
   }) => {
     const idNumber = userInfo?.employee?.idNumber;
     const paymentRequestId = paymentRequest?.id;
-    const accountantId = accountant.id;
     const customerName = accountsReceivables?.customerName;
     const customerNumber = accountsReceivables?.customerNumber;
     const prOffsetDate = state.date?.toISOString();
     const type = state.type;
+
+    const accountantId = accountant?.id || null;
+    const paymentCurrency = accountant?.currency || null;
+    const exchangeRate = (accountant && Number(accountant.exchangeRate || 0)) || null;
 
     let warningMessage = '';
 
@@ -281,8 +280,8 @@ export default function PayentRequest() {
       paymentRequestId: paymentRequestId!,
       prOffsetDate: prOffsetDate!,
       prOffsetType: state.type, // 沖銷類別
-      paymentCurrency: accountant.currency, // 請款幣別
-      exchangeRate: Number(accountant.exchangeRate || 0), // 匯率
+      paymentCurrency: paymentCurrency, // 請款幣別
+      exchangeRate: exchangeRate, // 匯率
       paymentAmount: Number(state.amount || 0), // 沖銷金額
       // 與paymentAmount同一個來源
       totalAmount: Number(state.amount || 0),
