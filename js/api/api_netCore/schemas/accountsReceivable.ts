@@ -1,4 +1,4 @@
-// import { string, string, number } from './';
+import type { DeepNullable } from 'ts-essentials';
 
 interface TaccountsReceivablesList_Dto_depressed {
   id: string; //應收帳款id
@@ -174,7 +174,7 @@ interface TaccountsReceivable {
   salesOrderItem: TsalesOrderItemData_Dto[];
 }
 
-interface TinsertpaymentRequest {
+interface TinsertpaymentRequest_pre {
   paymentRequest: {
     createdAt: string; // 建立時間,
     createdBy: string; // 建立人員(員工編號),
@@ -222,6 +222,13 @@ interface TinsertpaymentRequest {
     period: `${number}`; //發票期數 "3"
   };
 }
+
+type TinsertpaymentRequest = DeepNullable<TinsertpaymentRequest_pre>;
+
+type Tbody_updatePRInvoice = {
+  paymentRequestId: string;
+  invoice: TinsertpaymentRequest['invoice'];
+};
 
 interface TpaymentRequestType {
   codeName: string;
@@ -284,13 +291,19 @@ interface Tres_apiGetARPaymentData {
 
     paymentCurrency: string; //請款幣別
     foreignCurrencyAmount: number | null; //外幣金額
-    paymentAmount: number | null; //請款金額
-    collect_amount: number | null; //已收金額,餘額在repo裡計算
+    paymentAmount: number | null; // 本期合計請款金額
+    collect_amount: number | null; //已收金額
     receipt_balance: number | null; //收款餘額
     deduction: number | null; //扣款金額
 
+    retainageRate: number | null; //保留款比例
+    retainageTaxCategory: string | null; //保留款稅別
+    retainageAmount: number | null; //保留款金額
+
+    invoiceBook: string | null; // 發票本 //w 這個不是id，是描述
     invoiceNumber: string | null; //發票號碼
     invoiceAmount: number | null; //發票金額
+    invoiceDate: string | null; //發票日期
 
     //請款單沖銷明細 // 沖銷明細
     prOffsetDetails: {
@@ -382,6 +395,7 @@ interface Tres_apiGetARPaymentData {
 
     type: string;
     period: `${number}`;
+    typePeriod: `${number}`;
 
     paymentCurrency: string;
     foreignCurrencyAmount: number | null;
@@ -412,4 +426,5 @@ export type {
   TpaymentRequestType,
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
+  Tbody_updatePRInvoice,
 };

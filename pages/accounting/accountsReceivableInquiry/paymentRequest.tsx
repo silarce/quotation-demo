@@ -13,6 +13,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import {
   TinsertpaymentRequest,
   Tbody_apiPostInsertPrOffsetDetail,
+  Tbody_updatePRInvoice,
   //
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
@@ -66,9 +67,12 @@ export default function PayentRequest() {
 
   const { accountsReceivables, paymentRequest, salesOrder, paymentRequestLogs } =
     data_paymentQuest ?? data_forNew ?? {};
-  const salesOrderItems = salesOrder?.salesOrderItems ?? [];
+  const salesOrderItems = salesOrder?.salesOrderItems;
 
-  const instance_paymentRequest = usePaymentRequest(paymentRequest, accountsReceivables);
+  const instance_paymentRequest = usePaymentRequest({
+    rawData_paymentRequest: paymentRequest,
+    rawData_accountsReceivables: accountsReceivables,
+  });
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
 
   useEffect(() => {
@@ -97,23 +101,23 @@ export default function PayentRequest() {
       return null;
     }
 
-    const isInvalid_paymentRequest = Object.values(state_paymentRequest).some((item) => !item);
+    // const isInvalid_paymentRequest = Object.values(state_paymentRequest).some((item) => !item);
 
-    if (isInvalid_paymentRequest) {
-      myAlert.err({ title: '本次請款明細資料未填妥' });
+    // if (isInvalid_paymentRequest) {
+    //   myAlert.err({ title: '本次請款明細資料未填妥' });
 
-      return null;
-    }
+    //   return null;
+    // }
 
     const validPaymentRequest = state_paymentRequest as DeepNonNullable<Tstate_paymentRequest>;
+
     const {
       type,
       paymentAmount,
-      營業稅,
       retainageRate,
-      稅別,
+      retainageTaxCategory,
       retainageAmount,
-      invoiceBook,
+      invoiceBookInfo: invoiceBook,
       invoiceDate,
       invoiceNumber,
       invoiceAmount,
@@ -128,56 +132,101 @@ export default function PayentRequest() {
       completedPayment: item.completedPayment ?? 0,
     }));
 
-    // const body: TinsertpaymentRequest = {
-    //   paymentRequest: {
-    //     createdAt: new Date().toISOString(),
-    //     createdBy: userInfo.id,
-    //     updatedAt: new Date().toISOString(),
-    //     updatedBy: userInfo.id,
+    const invoice: TinsertpaymentRequest['invoice'] | undefined = (() => {
+      if (!invoiceBook) {
+        return undefined;
+      }
 
-    //     sourceFormType: sourceType,
-    //     sourceFormId: sourceId,
-    //     accountsReceivableId: accountsReceivables.id,
+      const totalAmount = Number(invoiceAmount);
+      const amount = new Decimal(totalAmount).div(1.05).toNumber();
+      const taxes = new Decimal(amount).mul(0.05).toNumber();
 
-    //     customerNumber: customerNumber,
-    //     customerName: customerName,
+      const incoice: TinsertpaymentRequest['invoice'] = {
+        invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
+        invoiceNumber, // 發票號碼
+        buyer: customerName, // 客戶抬頭
 
-    //     type: type,
+        amount, // 發票金額
+        taxes, // 發票稅額
+        totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
 
-    //     paymentCurrency, // 請款幣別,
-    //     foreignCurrencyAmount, // 外幣金額,
-    //     paymentAmount: Number(paymentAmount), // 請款金額, // 本期合計
+        taxId: customerTaxId, // 統一編號 "54741781",
+        taxAddress: null, // 發票地址 null,
+        remark: null, // 備註 null ,
 
-    //     retainageType: '保留款', // "保留款", // retainageType type?這是金額還是類型?
-    //     retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
-    //     retainageRate: Number(retainageRate), // 保留款%數 10 ,
-    //     retainageAmount: Number(retainageAmount), // 保留款金額 61601,
+        invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+        period: `${invoiceBook.period}`, //發票期數 "3"
+      };
 
-    //     completedProduct: completedProduct,
-    //   },
-    //   invoice: {
-    //     invoiceDate: invoiceDate.format('YYYY-MM-DD'), // 發票開立日期 "2025-05-03",
-    //     invoiceNumber, // 發票號碼 "MV34400404",
-    //     buyer: customerName, // 客戶抬頭 "一代冷氣空調有限公司",
+      return incoice;
+    })();
 
-    //     amount, // 發票金額 9524, //
-    //     taxes, // 發票稅額 476, //
-    //     totalAmount: Number(invoiceAmount), //總金額 10000, // UI上叫發票金額
+    const body: TinsertpaymentRequest = {
+      paymentRequest: {
+        createdAt: new Date().toISOString(),
+        createdBy: userInfo.id,
+        updatedAt: new Date().toISOString(),
+        updatedBy: userInfo.id,
 
-    //     taxId: customerTaxId, // 統一編號 "54741781",
-    //     taxAddress, // 發票地址 null,
-    //     remark, // 備註 null ,
+        sourceFormType: sourceType,
+        sourceFormId: sourceId,
+        accountsReceivableId: accountsReceivables.id,
 
-    //     invoiceBookId: invoiceBook.id, // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
-    //     period: `${invoiceBook.period}`, //發票期數 "3"
-    //   },
-    // };
+        customerNumber: customerNumber,
+        customerName: customerName,
+
+        type: type,
+
+        paymentCurrency: 'TWD 新台幣', // 請款幣別,
+        foreignCurrencyAmount: null, // 外幣金額,
+        paymentAmount: Number(paymentAmount), //本期合計請款金額
+
+        retainageType: '保留款', // 固定值 "保留款"
+        retainageTaxCategory, // 保留款稅別(含稅、未稅、無),
+        retainageRate: Number(retainageRate), // 保留款%數 10 ,
+        retainageAmount: Number(retainageAmount), // 保留款金額 61601,
+
+        completedProduct: completedProduct,
+      },
+      invoice,
+    };
+
+    return body;
   };
 
   const req_postInsertPaymentRequest = async () => {
     const body = createBody();
 
-    // apiPostInsertPaymentRequest
+    if (!body) {
+      return;
+    }
+
+    if (isNew) {
+      const paymentQuestId = await apiPostInsertPaymentRequest(body);
+
+      if (paymentQuestId) {
+        router.replace({
+          query: {
+            ...query,
+            id: paymentQuestId,
+          },
+        });
+      }
+    } else {
+      const paymentRequestId = paymentRequest?.id;
+
+      if (!paymentRequestId) {
+        return;
+      }
+
+      const body_patch: Tbody_updatePRInvoice = {
+        paymentRequestId: paymentRequest!.id!,
+        invoice: body.invoice,
+      };
+
+      await apiPatchInsertPaymentRequest(body_patch);
+      await update_paymentQuest();
+    }
   };
 
   const req_postInsertPrOffsetDetail = async ({

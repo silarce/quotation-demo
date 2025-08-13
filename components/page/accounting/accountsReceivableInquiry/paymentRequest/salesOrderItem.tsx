@@ -41,20 +41,27 @@ const SalesOrderItem = ({
       align: 'right',
     },
     {
+      title: '幣別 no property',
+      key: 'currency',
+      width: 80,
+      align: 'center',
+    },
+    {
       title: '合約單價',
       dataIndex: 'unitPrice',
       width: 150,
       align: 'right',
       render: (v) => toLocalString(v),
     },
+
     {
-      title: '前期已完成 noProperty',
+      title: '前期已完成',
       dataIndex: 'prophaseCompletedQuantity',
       width: 150,
       align: 'right',
     },
     {
-      title: '本期完成 noProperty',
+      title: '本期完成',
       dataIndex: 'completedQuantity',
       width: 150,
       align: 'right',
@@ -74,7 +81,7 @@ const SalesOrderItem = ({
       },
     },
     {
-      title: '本期金額 noProperty',
+      title: '本期金額',
       dataIndex: 'completedPayment',
       width: 150,
       align: 'right',
