@@ -224,18 +224,18 @@ const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
     render: (value) => '$' + value.toLocaleString(),
   },
   {},
-  {
-    title: '操作',
-    key: 'action',
-    width: 80,
-    align: 'center',
-    render: () => (
-      <div className="flex gap-[16px] justify-center">
-        <Icon_note className="w-[16px] h-[16px] text-blue01" />
-        <Icon_trash className="w-[16px] h-[16px] text-red01" />
-      </div>
-    ),
-  },
+  // {
+  //   title: '操作',
+  //   key: 'action',
+  //   width: 80,
+  //   align: 'center',
+  //   render: () => (
+  //     <div className="flex gap-[16px] justify-center">
+  //       <Icon_note className="w-[16px] h-[16px] text-blue01" />
+  //       <Icon_trash className="w-[16px] h-[16px] text-red01" />
+  //     </div>
+  //   ),
+  // },
 ];
 // ===============================================================================
 
