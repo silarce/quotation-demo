@@ -13,16 +13,24 @@ import scss from './employeeData.module.scss';
 import { getAllEmployeeSelectOptions, createEmployee } from 'components/page/organization/employee/api';
 
 //components
-import SaveButton from 'components/global/myCom/button/SaveButton';
 import AddButton from 'components/global/myCom/button/AddButton';
 import ClearButton from 'components/global/myCom/button/clearButton';
 import LabeledInputV2 from 'components/global/myCom/Input/InputV2';
 import LeaveModal from 'components/global/myCom/myModal/leaveModal';
-import BackButton from 'components/global/myCom/button/BackButton';
 import ExtendButton from 'components/global/myCom/button/ExtendButton';
 import LabeledSelectV2 from 'components/global/myCom/select/mySelectV2';
 import LabeledDatePickerV2 from 'components/global/myCom/date/myDateV2';
 import Btn from 'components/global/gear/button/btn_fong';
+
+//Icon
+import Icon_IDcard from 'public/image/icon/fong/id-card.svg';
+import Icon_phone from 'public/image/icon/fong/phone.svg';
+import Icon_mana from 'public/image/icon/fong/user-management.svg';
+import Icon_time from 'public/image/icon/fong/user-time.svg';
+import Icon_security from 'public/image/icon/fong/security.svg';
+import Icon_security2 from 'public/image/icon/fong/security2.svg';
+import Icon_house from 'public/image/icon/fong/pepicons-pop_house.svg';
+import Icon_folder from 'public/image/icon/fong/folder.svg';
 
 import { Checkbox } from 'components/global/gear/dataEntry';
 
@@ -107,9 +115,9 @@ export default function Organization() {
     try {
       const payload = {
         emp_code: formState.emp_id, // 這邊假設 emp_code 來自 emp_id
-        id_no: 'A123456789', // ➜ 若你有對應欄位可取代這個
+        id_no: 'A123456789',
         emp_ch_name: formState.emp_name,
-        emp_en_name: '', // ➜ 若你有英文名欄位，請補上
+        emp_en_name: '',
         email: formState.email,
         birthday_date: formState.birthday_date,
         gender_pcode: formState.gender_pcode,
@@ -222,13 +230,13 @@ export default function Organization() {
       <div className="flex justify-between">
         <PageHeader {...mapPageHeaderTop} />
         <div className="flex items-center  gap-4">
-          <BackButton
-            label="返回"
+          <Btn
             onClick={() => {
               router.push(`/organization/employee`);
             }}
-            className=" h-[40px]"
-          />
+          >
+            返回
+          </Btn>
           <Btn theme="trash" onClick={() => console.log('Clear!')}>
             刪除
           </Btn>
@@ -238,8 +246,12 @@ export default function Organization() {
           <LeaveModal isOpen={isModalOpen} onConfirm={() => router.back()} onCancel={() => setIsModalOpen(false)} />
         </div>
       </div>
+      {/* MARK:人員基本資料  */}
       <div className="flex items-center justify-center w-full mb-[20px] mt-[40px]">
-        <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👤人員基本資料</span>
+        <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex items-center gap-2">
+          <Icon_IDcard style={{ width: '24px', height: '24px' }} />
+          人員基本資料
+        </span>
         <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
       </div>
       <div className="flex w-full flex-col mt-3">
@@ -305,8 +317,12 @@ export default function Organization() {
             options={selectOptionsMap.gender_pcode || []}
           />
         </div>
+        {/* MARK:聯絡與通訊資料  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📞聯絡與通訊資料</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_phone style={{ width: '24px', height: '24px' }} />
+            聯絡與通訊資料
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="grid grid-cols-6 gap-[24px]">
@@ -393,8 +409,12 @@ export default function Organization() {
             />
           </div>
         </div>
+        {/* MARK:職務與任用設定  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">💼職務與任用設定</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_mana style={{ width: '24px', height: '24px' }} />
+            職務與任用設定
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="grid grid-cols-6 gap-[24px]">
@@ -489,10 +509,15 @@ export default function Organization() {
             onChange={(val) => updateField('emp_id', val)}
             placeholder="- -"
             required={true}
+            isPassword
           />
         </div>
+        {/* MARK:員工打卡與排班設定  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">🆔️員工打卡與排班設定</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_time style={{ width: '24px', height: '24px' }} />
+            員工打卡與排班設定
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="flex w-full gap-[24px]">
@@ -528,8 +553,12 @@ export default function Organization() {
             options={selectOptionsMap.gender_pcode || []}
           />
         </div>
+        {/* MARK:勞保歷程記錄  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋勞保歷程記錄</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_security style={{ width: '24px', height: '24px' }} />
+            勞保歷程記錄
+          </span>
           <AddButton label="歷程記錄" onClick={handleAddLaborInsurance} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
           <ExtendButton
@@ -583,8 +612,12 @@ export default function Organization() {
             </div>
           ))}
         </div>
+        {/* MARK:健保歷程記錄  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋健保歷程記錄</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_security2 style={{ width: '24px', height: '24px' }} />
+            健保歷程記錄
+          </span>
           <AddButton label="歷程記錄" onClick={() => handleAddHealthInsurance()} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
           <ExtendButton
@@ -638,8 +671,12 @@ export default function Organization() {
             </div>
           ))}
         </div>
+        {/* MARK:眷屬資料  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👨‍👩‍👧‍👦眷屬資料</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_house style={{ width: '24px', height: '24px' }} />
+            眷屬資料
+          </span>
           <AddButton label="新增眷屬" onClick={() => handleAddDependent()} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
@@ -710,9 +747,12 @@ export default function Organization() {
             </div>
           </div>
         ))}
-
+        {/* MARK:其他  */}
         <div className="flex items-center w-full mt-[40px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📝其他</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_folder style={{ width: '24px', height: '24px' }} />
+            其他
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
 
