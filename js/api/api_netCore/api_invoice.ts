@@ -16,7 +16,7 @@ const apiGetInvoiceNumberLists = (invoiceBookId: string) => {
 };
 
 const useApiGetInvoiceNumberLists = (
-  invoiceBookId: string,
+  invoiceBookId: string | undefined,
   {
     autoUpdate = true,
   }: {

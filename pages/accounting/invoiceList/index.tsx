@@ -19,6 +19,8 @@ import {
   apiGetAccountantInvoiceBook,
 } from 'js/api/api_accountant';
 
+import { Tinvoice_Dto, useApiGetInvoiceNumberLists } from 'js/api/api_netCore/api_invoice';
+
 // ==========================================================================
 
 interface Tquery {
@@ -37,6 +39,8 @@ export default function InvoiceList() {
   const [state_invoiceBook, setState_invoiceBook] = useState<TaccountantInvoiceBookDto>();
 
   const invoiceBookDesc = state_invoiceBook && getInvoiceBookDesc(state_invoiceBook);
+
+  const { data: raw_invoiceArr } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
 
   const handle_searchInvoiceBood = () => {
     const { destroy } = modal_empty({
@@ -102,8 +106,8 @@ export default function InvoiceList() {
             選擇發票本
           </Btn>
         </div>
-        <div></div>
       </div>
+      <Table_antd dataSource={raw_invoiceArr || []} columns={columns} pagination={{}} />
     </div>
   );
 }
@@ -119,3 +123,33 @@ const getInvoiceBookDesc = (invoiceBook: TaccountantInvoiceBookDto) => {
 
   return `${twYear}年 ${monthRanve} ${alphabeticLetter} 第${period}期`;
 };
+
+const columns: TableProps<Tinvoice_Dto>['columns'] = [
+  {
+    title: '發票號碼',
+    dataIndex: 'fullInvoiceNumber',
+    width: 150,
+  },
+  {
+    title: '專案名稱',
+    dataIndex: 'projectName',
+  },
+  {
+    title: '買受人',
+    dataIndex: 'buyer',
+    width: 300,
+  },
+  {
+    title: '未稅金額',
+    dataIndex: 'invoiceAmount',
+    width: 150,
+  },
+  {
+    title: '稅金',
+    dataIndex: 'invoiceTaxes',
+  },
+  {
+    title: '發票金額',
+    dataIndex: 'totalAmount',
+  },
+];
