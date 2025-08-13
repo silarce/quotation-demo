@@ -54,6 +54,9 @@ const useApiGetInvoiceNumberLists = (
         setRes(null);
 
         return null;
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
   };
 
