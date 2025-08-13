@@ -14,6 +14,7 @@ import {
   TinsertpaymentRequest,
   Tbody_apiPostInsertPrOffsetDetail,
   Tbody_updatePRInvoice,
+  Tbody_apiPostInsertPRDeduction,
   //
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
@@ -21,6 +22,7 @@ import {
   apiPostInsertPaymentRequest,
   apiPatchInsertPaymentRequest,
   apiPostInsertPrOffsetDetail,
+  apiPostInsertPRDeduction,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
 // component
@@ -271,17 +273,16 @@ export default function PayentRequest() {
       return;
     }
 
-    const body: Tbody_apiPostInsertPrOffsetDetail = {
+    const body_apiPostInsertPRDeduction: Tbody_apiPostInsertPRDeduction = {
       createdAt: new Date().toISOString(),
       createdBy: idNumber!,
       updatedAt: new Date().toISOString(),
       updatedBy: idNumber!,
-      accountantId,
+
       paymentRequestId: paymentRequestId!,
       prOffsetDate: prOffsetDate!,
       prOffsetType: state.type, // 沖銷類別
-      paymentCurrency: paymentCurrency, // 請款幣別
-      exchangeRate: exchangeRate, // 匯率
+
       paymentAmount: Number(state.amount || 0), // 沖銷金額
       // 與paymentAmount同一個來源
       totalAmount: Number(state.amount || 0),
@@ -291,7 +292,18 @@ export default function PayentRequest() {
     };
 
     try {
-      await apiPostInsertPrOffsetDetail(body, { returnError: true });
+      if (accountantId && paymentCurrency && exchangeRate !== null) {
+        const body: Tbody_apiPostInsertPrOffsetDetail = {
+          ...body_apiPostInsertPRDeduction,
+          accountantId,
+          paymentCurrency: paymentCurrency, // 請款幣別
+          exchangeRate: exchangeRate, // 匯率
+        };
+        await apiPostInsertPrOffsetDetail(body);
+      } else {
+        await apiPostInsertPRDeduction(body_apiPostInsertPRDeduction);
+      }
+
       destroy();
       update_paymentQuest();
     } catch (error) {}

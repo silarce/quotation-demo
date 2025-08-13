@@ -116,38 +116,14 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
     });
   };
 
-  // const handle_addDeduction = (accountant: TaccountantDto) => {
-  //   const { destroy } = modal_empty({
-  //     content: (
-  //       <AddDeduction
-  //         accountant={accountant}
-  //         options_deductionType={options_deductionType}
-  //         onConfirm={(state_addDeduction) => {
-  //           onAddDeductionConfirm({
-  //             state: state_addDeduction,
-  //             accountant,
-  //             destroy,
-  //           });
-  //         }}
-  //         onCancel={() => {
-  //           destroy();
-  //         }}
-  //       />
-  //     ),
-  //     width: 350,
-  //   });
-  // };
-
   const handle_addDeduction_noAccountant = () => {
     const { destroy } = modal_empty({
       content: (
         <AddDeduction
-          // accountant={accountant}
           options_deductionType={options_deductionType}
           onConfirm={(state_addDeduction) => {
             onAddDeductionConfirm({
               state: state_addDeduction,
-              // accountant,
               destroy,
             });
           }}
@@ -160,21 +136,21 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
     });
   };
 
-  const handle_addFee = () => {
-    const { destroy } = modal_empty({
-      content: (
-        <AddFee
-          onConfirm={(fee) => {
-            destroy();
-          }}
-          onCancel={() => {
-            destroy();
-          }}
-        />
-      ),
-      width: 350,
-    });
-  };
+  // const handle_addFee = () => {
+  //   const { destroy } = modal_empty({
+  //     content: (
+  //       <AddFee
+  //         onConfirm={(fee) => {
+  //           destroy();
+  //         }}
+  //         onCancel={() => {
+  //           destroy();
+  //         }}
+  //       />
+  //     ),
+  //     width: 350,
+  //   });
+  // };
 
   // MARK: RENDER
 
@@ -199,9 +175,6 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
             }}
           >
             新增沖銷扣款
-          </Btn>
-          <Btn theme="cross" onClick={handle_addFee}>
-            新增扣款
           </Btn>
         </div>
         <div></div>
@@ -347,35 +320,35 @@ const AddData = ({
 
 // MARK: AddFee
 
-const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (fee: string) => void }) => {
-  const [value, setValue] = useState<string>('');
+// const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (fee: string) => void }) => {
+//   const [value, setValue] = useState<string>('');
 
-  const handle_confirm = () => {
-    onConfirm?.(value);
-  };
+//   const handle_confirm = () => {
+//     onConfirm?.(value);
+//   };
 
-  const handle_cancel = () => {
-    onCancel?.();
-  };
+//   const handle_cancel = () => {
+//     onCancel?.();
+//   };
 
-  return (
-    <Container_confirm
-      title="手續費"
-      footerRight={
-        <>
-          <Btn onClick={handle_cancel}>取消</Btn>
-          <Btn theme="save" onClick={handle_confirm}>
-            儲存
-          </Btn>
-        </>
-      }
-    >
-      <DataEntry_fong caption="手續費" isMust={true}>
-        <Input value={value} onChange={(e) => setValue(e.target.value)} />
-      </DataEntry_fong>
-    </Container_confirm>
-  );
-};
+//   return (
+//     <Container_confirm
+//       title="手續費"
+//       footerRight={
+//         <>
+//           <Btn onClick={handle_cancel}>取消</Btn>
+//           <Btn theme="save" onClick={handle_confirm}>
+//             儲存
+//           </Btn>
+//         </>
+//       }
+//     >
+//       <DataEntry_fong caption="手續費" isMust={true}>
+//         <Input value={value} onChange={(e) => setValue(e.target.value)} />
+//       </DataEntry_fong>
+//     </Container_confirm>
+//   );
+// };
 
 // MARK: AddDeduction
 

@@ -673,13 +673,13 @@ interface Tbody_apiPostInsertPrOffsetDetail {
   updatedAt: string; //修改時間
   updatedBy: TemployeeDto['idNumber']; // `EM-${number}-${number}` //修改人員
 
-  accountantId: string | null; //會計收管管理Id
+  accountantId: string; //會計收管管理Id
   paymentRequestId: string; //請款單Id
 
   prOffsetDate: string; //沖銷日期
   prOffsetType: string; //沖銷類別
-  paymentCurrency: string | null; //請款幣別
-  exchangeRate: number | null; //匯率
+  paymentCurrency: string; //請款幣別
+  exchangeRate: number; //匯率
 
   paymentAmount: number; //收款金額
   customerNumber: string; // 客戶編號
@@ -687,6 +687,11 @@ interface Tbody_apiPostInsertPrOffsetDetail {
   fee: number | null; //手續費
   totalAmount: number; //收款金額
 }
+
+type Tbody_apiPostInsertPRDeduction = Omit<
+  Tbody_apiPostInsertPrOffsetDetail,
+  'accountantId' | 'paymentCurrency' | 'exchangeRate'
+>;
 
 const apiPostInsertPrOffsetDetail = async (
   body: Tbody_apiPostInsertPrOffsetDetail,
@@ -701,7 +706,30 @@ const apiPostInsertPrOffsetDetail = async (
   return axi_monkey.post(api, body).catch((err) => {
     const error = err as AxiosError;
     myAlert.err({
-      title: '新增請款單失敗',
+      title: '新增沖銷明細失敗',
+      content: error.message,
+    });
+
+    if (returnError) {
+      return Promise.reject(error);
+    }
+  });
+};
+
+const apiPostInsertPRDeduction = async (
+  body: Tbody_apiPostInsertPRDeduction,
+  {
+    returnError = false,
+  }: {
+    returnError?: boolean;
+  } = {}
+) => {
+  const api = '/api/AccountsReceivable/InsertPRDeduction';
+
+  return axi_monkey.post(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '新增沖銷明細失敗',
       content: error.message,
     });
 
@@ -725,6 +753,7 @@ export type {
   Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert,
   Tbody_apiPostInsertPrOffsetDetail,
   Tbody_updatePRInvoice,
+  Tbody_apiPostInsertPRDeduction,
 };
 
 export {
@@ -735,6 +764,7 @@ export {
   apiInsertSalesOrderData,
   apiUpdateSalesOrderData,
   apiPostInsertPrOffsetDetail,
+  apiPostInsertPRDeduction,
 };
 
 export {
