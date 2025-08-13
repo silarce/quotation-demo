@@ -1,3 +1,4 @@
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import classNames from 'classnames';
@@ -5,12 +6,18 @@ import classNames from 'classnames';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, DatePicker } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
-import { Form } from 'antd';
-
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
+
+import {
+  Tparams,
+  useGetAccountantInvoiceBook,
+  TaccountantInvoiceBookDto,
+  apiGetAccountantInvoiceBook,
+} from 'js/api/api_accountant';
 
 // ==========================================================================
 
@@ -27,29 +34,72 @@ export default function InvoiceList() {
   const query = router.query as Tquery;
   const { id: invoiceBookId } = query;
 
+  const [state_invoiceBook, setState_invoiceBook] = useState<TaccountantInvoiceBookDto>();
+
+  const invoiceBookDesc = state_invoiceBook && getInvoiceBookDesc(state_invoiceBook);
+
   const handle_searchInvoiceBood = () => {
     const { destroy } = modal_empty({
       content: (
         <Selector_invoiceBook
           onCancel={() => destroy()}
-          onConfirm={(selectd) => {
-            destroy();
+          onConfirm={(invoiceBook) => {
+            if (invoiceBook) {
+              setState_invoiceBook(invoiceBook);
+            }
 
-            console.log('Selected Invoice Book:', selectd);
+            if (invoiceBook?.id) {
+              router.replace({
+                query: {
+                  ...query,
+                  id: invoiceBook.id,
+                },
+              });
+            }
+
+            destroy();
           }}
         />
       ),
     });
   };
 
+  // ----------------------------------------------------------------------------
+
+  useEffect(() => {
+    (async () => {
+      if (!invoiceBookId) {
+        return;
+      }
+
+      await apiGetAccountantInvoiceBook({
+        filter: {
+          id: { $eq: invoiceBookId },
+        },
+      })
+        .then(({ data: invoiceBookArr }) => {
+          setState_invoiceBook(invoiceBookArr[0]);
+        })
+        .catch(() => {
+          myAlert.notify.error({ message: '取得發票本失敗' });
+        });
+    })();
+  }, []);
+
+  // ----------------------------------------------------------------------------
+
+  // MARK: RENDER
+
   return (
     <div>
       <div className={'pageTop flex justify-between'}>
         <div className={classNames('flex gap-4 items-center')}>
-          <div className="text-base font-semibold">應收款列表</div>
+          <div className="text-base font-semibold">發票列表</div>
+
+          <span className="w-[150px]">{invoiceBookDesc}</span>
 
           <Btn theme="query" onClick={handle_searchInvoiceBood}>
-            搜索資料
+            選擇發票本
           </Btn>
         </div>
         <div></div>
@@ -59,3 +109,13 @@ export default function InvoiceList() {
 }
 
 // MARK: END
+
+const getInvoiceBookDesc = (invoiceBook: TaccountantInvoiceBookDto) => {
+  const { year, month, period, alphabeticLetter } = invoiceBook;
+
+  const twYear = Number(year) - 1911;
+
+  const monthRanve = `${month}-${Number(month) + 1}`;
+
+  return `${twYear}年 ${monthRanve} ${alphabeticLetter} 第${period}期`;
+};
