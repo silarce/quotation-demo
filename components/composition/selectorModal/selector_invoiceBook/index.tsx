@@ -1,11 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import classNames from 'classnames';
-import { Dayjs } from 'dayjs';
 
-import Table_antd, { TableProps, metaToPageProps } from 'components/global/myAntd/table';
+import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import Btn from 'components/global/gear/button/btn_fong';
 import { Container_confirm } from 'components/global/container/modal';
-import DataEntry, { DataEntry_fong, DatePicker } from 'components/global/gear/dataEntry';
+import { DataEntry_fong, Select } from 'components/global/gear/dataEntry';
 
 import { Tparams, useGetAccountantInvoiceBook, TaccountantInvoiceBookDto } from 'js/api/api_accountant';
 
@@ -22,26 +21,23 @@ const Selector_invoiceBook = ({
   onConfirm?: (selected: TaccountantInvoiceBookDto | undefined) => void;
   onCancel: () => void;
 }) => {
-  const [date, setDate] = useState<Dayjs | null>(null);
-  const [date_param, setDate_param] = useState<Dayjs | null>(null);
-
   const [page, setPage] = useState(1);
+
+  const [state_year, setState_year] = useState<`${number}` | null>(null);
+  const [state_month, setState_month] = useState<`${number}` | null>(null);
+  const [yearMonth, setYearMonth] = useState<{
+    year: `${number}` | null;
+    month: `${number}` | null;
+  }>();
+
   const params: Tparams = useMemo(() => {
     const filter = (() => {
-      if (!date_param) {
-        return undefined;
-      }
-
-      const year = date_param.year();
-      let month = date_param.month() + 1;
-
-      if (!(`${month}` in lookup_month)) {
-        month = month - 1;
-      }
+      const year = yearMonth?.year || undefined;
+      const month = yearMonth?.month || undefined;
 
       return {
-        year: { $eq: `${year}` },
-        month: { $eq: `${month}` },
+        year: { $eq: year },
+        month: { $eq: month },
       };
     })();
 
@@ -51,11 +47,19 @@ const Selector_invoiceBook = ({
       page,
       filter,
     };
-  }, [page, date_param]);
+  }, [yearMonth, page]);
 
   const { data, meta } = useGetAccountantInvoiceBook({ params });
 
   const [selected, setSelected] = useState<TaccountantInvoiceBookDto>();
+
+  const handle_search = () => {
+    setYearMonth({
+      year: state_year,
+      month: state_month,
+    });
+    setPage(1);
+  };
 
   const handle_confirm = () => {
     onConfirm?.(selected);
@@ -66,18 +70,29 @@ const Selector_invoiceBook = ({
       title={title}
       topRight={
         <div className="flex gap-[16px]">
-          <DataEntry_fong>
-            <DatePicker
-              value={date}
-              onChange={(v) => {
-                setDate(v);
+          <DataEntry_fong className="w-[100px]">
+            <Select
+              options={options_year}
+              value={state_year}
+              onChange={(value) => {
+                setState_year(value);
+              }}
+              placeholder="選擇年分"
+            />
+          </DataEntry_fong>
+          <DataEntry_fong className="w-[100px]">
+            <Select
+              options={options_month}
+              value={state_month}
+              onChange={(value) => {
+                setState_month(value);
               }}
             />
           </DataEntry_fong>
           <Btn
             theme="query"
             onClick={() => {
-              setDate_param(date);
+              handle_search();
             }}
           >
             搜索資料
@@ -109,7 +124,6 @@ const Selector_invoiceBook = ({
             onClick: () => {
               setSelected(record);
             },
-            // className: classNames(' cursor-pointer', selected?.some((item) => item.id === record.id) && 'bg-blue05'),
           };
         }}
         rowClassName={(record) => classNames(scss.row, selected?.id === record.id && scss.active)}
@@ -182,5 +196,40 @@ const lookup_month = {
   '9': '9-10',
   '11': '11-12',
 } as const;
+
+const thisYear = new Date().getFullYear();
+const options_year = Array.from({ length: 10 }).map((_, index) => {
+  return {
+    label: `${thisYear - index - 1911}年`,
+    value: thisYear - index,
+  };
+});
+
+const options_month = [
+  {
+    value: '1',
+    label: '1-2',
+  },
+  {
+    value: '3',
+    label: '3-4',
+  },
+  {
+    value: '5',
+    label: '5-6',
+  },
+  {
+    value: '7',
+    label: '7-8',
+  },
+  {
+    value: '9',
+    label: '9-10',
+  },
+  {
+    value: '11',
+    label: '11-12',
+  },
+];
 
 export default Selector_invoiceBook;
