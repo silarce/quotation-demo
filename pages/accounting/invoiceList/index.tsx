@@ -107,7 +107,7 @@ export default function InvoiceList() {
           </Btn>
         </div>
       </div>
-      <Table_antd dataSource={raw_invoiceArr || []} columns={columns} pagination={{}} />
+      <Table_antd key={state_invoiceBook?.id} dataSource={raw_invoiceArr || []} columns={columns} pagination={{}} />
     </div>
   );
 }
@@ -143,13 +143,21 @@ const columns: TableProps<Tinvoice_Dto>['columns'] = [
     title: '未稅金額',
     dataIndex: 'invoiceAmount',
     width: 150,
+    align: 'right',
+    render: (text) => text?.toLocaleString(),
   },
   {
     title: '稅金',
     dataIndex: 'invoiceTaxes',
+    width: 150,
+    align: 'right',
+    render: (text) => text?.toLocaleString(),
   },
   {
     title: '發票金額',
     dataIndex: 'totalAmount',
+    width: 150,
+    align: 'right',
+    render: (text) => text?.toLocaleString(),
   },
 ];
