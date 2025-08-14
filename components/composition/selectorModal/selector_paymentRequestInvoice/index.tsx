@@ -41,7 +41,6 @@ const Selector_paymentRequest_invoice = ({
         }
       >
         <Table_antd
-          rowKey={'fullInvoiceNumber'}
           rowHoverable={false}
           className="w-[1400px]"
           dataSource={data ?? []}
@@ -132,3 +131,5 @@ const columns: TableProps<TpaymentRequestInvoiceList_Dto>['columns'] = [
 ];
 
 export default Selector_paymentRequest_invoice;
+
+export type { TpaymentRequestInvoiceList_Dto };
