@@ -229,7 +229,22 @@ type TinsertpaymentRequest = DeepNullable<TinsertpaymentRequest_pre>;
 
 type Tbody_updatePRInvoice = {
   paymentRequestId: string;
-  invoice: TinsertpaymentRequest['invoice'];
+  invoice: {
+    invoiceDate: string; // 發票開立日期 "2025-05-03",
+    invoiceNumber: string; // 發票號碼 "MV34400404",
+    buyer: string; // 客戶抬頭 "一代冷氣空調有限公司",
+
+    amount: number; // 發票金額 9524, //
+    taxes: number; // 發票稅額 476, //
+    totalAmount: number; //總金額 10000, // UI上叫發票金額
+
+    taxId: string; // 統一編號 "54741781",
+    taxAddress: string | null; // 發票地址 null,
+    remark: string | null; // 備註 null ,
+
+    invoiceBookId: string; // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
+    period: `${number}`; //發票期數 "3"
+  };
 };
 
 interface TpaymentRequestType {

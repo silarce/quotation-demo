@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { axi_monkey } from '../_axiosCreator';
 
@@ -454,9 +454,19 @@ const useApiGetPaymentRequestType = ({
     autoUpdate && update();
   }, []);
 
+  const options = useMemo(() => {
+    return (
+      res?.map((item) => ({
+        label: item.name,
+        value: item.name,
+      })) ?? []
+    );
+  }, [res]);
+
   return {
     isFetching,
     data: res,
+    options,
     update,
   };
 };
@@ -758,6 +768,18 @@ const useApiGetPaymentRequestInvoiceList = ({
   };
 };
 
+const apiUpdatePRInvoice = async (body: Tbody_updatePRInvoice) => {
+  const api = '/api/Invoice/UpdatePRInvoice';
+
+  return axi_monkey.put(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '開立發票失敗',
+      content: error.message,
+    });
+  });
+};
+
 // ========================================================================
 export type {
   TaccountsReceivablesList_Dto,
@@ -783,6 +805,7 @@ export {
   apiInsertSalesOrderData,
   apiUpdateSalesOrderData,
   apiPostInsertPrOffsetDetail,
+  apiUpdatePRInvoice,
 };
 
 export {
