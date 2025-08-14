@@ -6,6 +6,7 @@ import classNames from 'classnames';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, DatePicker } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
+import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
@@ -41,6 +42,10 @@ export default function InvoiceList() {
   const invoiceBookDesc = state_invoiceBook && getInvoiceBookDesc(state_invoiceBook);
 
   const { data: raw_invoiceArr } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
+
+  // ----------------------------------------------------------------------------
+
+  // ----------------------------------------------------------------------------
 
   const handle_searchInvoiceBood = () => {
     const { destroy } = modal_empty({
@@ -144,20 +149,28 @@ const columns: TableProps<Tinvoice_Dto>['columns'] = [
     dataIndex: 'invoiceAmount',
     width: 150,
     align: 'right',
-    render: (text) => text?.toLocaleString(),
+    render: (text) => '$' + text?.toLocaleString(),
   },
   {
     title: '稅金',
     dataIndex: 'invoiceTaxes',
     width: 150,
     align: 'right',
-    render: (text) => text?.toLocaleString(),
+    render: (text) => '$' + text?.toLocaleString(),
   },
   {
     title: '發票金額',
     dataIndex: 'totalAmount',
     width: 150,
     align: 'right',
-    render: (text) => text?.toLocaleString(),
+    render: (text) => '$' + text?.toLocaleString(),
+  },
+  {
+    key: 'panel',
+    width: 100,
+    align: 'center',
+    render: (text) => {
+      return <SquareBtn sharp="mini">開立</SquareBtn>;
+    },
   },
 ];
