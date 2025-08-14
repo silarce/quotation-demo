@@ -21,6 +21,7 @@ import type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  TpaymentRequestInvoiceList_Dto,
 } from './schemas';
 
 import type { TemployeeDto } from '../dtoTypes';
@@ -711,6 +712,52 @@ const apiPostInsertPrOffsetDetail = async (
   });
 };
 
+const apiGetPRInvoiceList = async () => {
+  const api = '/api/AccountsReceivable/GetPRInvoiceList';
+
+  return axi_monkey.get<TpaymentRequestInvoiceList_Dto[]>(api).then(({ data }) => data);
+};
+
+const useApiGetPaymentRequestInvoiceList = ({
+  autoUpdate = true,
+}: {
+  autoUpdate?: boolean;
+} = {}) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TpaymentRequestInvoiceList_Dto[] | null>();
+
+  const update = async () => {
+    if (isFetching) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    const res = await apiGetPRInvoiceList().catch((err: AxiosError) => {
+      console.error('useApiGetPaymentRequestInvoiceList error:', err);
+      myAlert.notify.error({
+        message: '取得請款單失敗',
+        description: err.message,
+      });
+
+      return null;
+    });
+
+    setRes(res);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, []);
+
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
+};
+
 // ========================================================================
 export type {
   TaccountsReceivablesList_Dto,
@@ -745,6 +792,7 @@ export {
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
   useApiGetPaymentRequestType,
+  useApiGetPaymentRequestInvoiceList,
 };
 
 export { apiGetPaymentRequestType };
