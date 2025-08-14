@@ -12,6 +12,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
+import Selector_paymentRequest_invoice from 'components/composition/selectorModal/selector_paymentRequestInvoice';
 
 import {
   Tparams,
@@ -42,8 +43,6 @@ export default function InvoiceList() {
   const invoiceBookDesc = state_invoiceBook && getInvoiceBookDesc(state_invoiceBook);
 
   const { data: raw_invoiceArr } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
-
-  // ----------------------------------------------------------------------------
 
   // ----------------------------------------------------------------------------
 
@@ -170,7 +169,23 @@ const columns: TableProps<Tinvoice_Dto>['columns'] = [
     width: 100,
     align: 'center',
     render: (text) => {
-      return <SquareBtn sharp="mini">開立</SquareBtn>;
+      return (
+        <SquareBtn sharp="mini" onClick={handle_searchPaymentRequest}>
+          開立
+        </SquareBtn>
+      );
     },
   },
 ];
+
+const handle_searchPaymentRequest = () => {
+  const { destroy } = modal_empty({
+    content: (
+      <Selector_paymentRequest_invoice
+        onCancel={() => {
+          destroy;
+        }}
+      />
+    ),
+  });
+};

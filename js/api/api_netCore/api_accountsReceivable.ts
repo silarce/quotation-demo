@@ -765,6 +765,7 @@ export type {
   TaccountsReceivable,
   TpaymentRequest_Dto,
   TinsertpaymentRequest,
+  TpaymentRequestInvoiceList_Dto,
 };
 
 export type {
