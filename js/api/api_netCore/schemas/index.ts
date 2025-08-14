@@ -38,6 +38,7 @@ export type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  TpaymentRequestInvoiceList_Dto,
 } from './accountsReceivable';
 
 export type { Tinvoice_Dto } from './invoice';

@@ -554,6 +554,7 @@ export {
   //  // apiPatchAccountant_accountReceivable,
   apiPostAccountantInvoiceBook,
   apiPatchAccountantInvoiceBook,
+  apiGetAccountantInvoiceBook,
   deleteAccountantInvoiceBook,
   //
   useGetAccountant_infinite,
