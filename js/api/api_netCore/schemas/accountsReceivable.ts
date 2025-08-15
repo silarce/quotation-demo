@@ -100,9 +100,9 @@ interface TquotationListViewModel_Dto {
   quantity: number | null; // 摚數
   discount: number | null; // 折扣
   subTotal: number | null; // 小計
+  tuneTotal: number | null; // 總金額調整
   salesTax: number | null; // 銷售稅
   total: number | null; // 總金額
-  tuneTotal: number | null; // 調整總金額
   averageDiscount: number | null; // 平均折扣
   estimatedDiscount: number | null; // 預估折扣
 

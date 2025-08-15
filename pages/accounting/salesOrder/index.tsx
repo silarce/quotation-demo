@@ -26,6 +26,7 @@ import { Ttax_type } from 'js/api/api_netCore/schemas';
 
 import {
   useApiGetSalesOrderById,
+  TsalesOrder_Dto,
   apiPostSalesOrderData,
   apiPatchSalesOrderData,
 } from 'js/api/api_netCore/api_accountsReceivable';
@@ -37,23 +38,24 @@ interface Tquery {
 }
 
 interface Tstate {
-  合約單號: string;
-  專案名稱: string;
+  quotationContractNumber: string;
+  constructionSite: string;
 
   customerNumber: string;
   customerName: string;
 
   salesAmount: `${number}` | ''; //銷售金額
   taxes: `${number}` | ''; //稅金
-  totalAmount: `${number}` | '';
-  稅別: string | null;
+  totalAmount: `${number}` | ''; //總金額
 
   類別: string | null;
+
   客戶聯絡電話1: string;
   客戶聯絡電話2: string;
 
   invoiceType: string | null;
   taxId: string;
+  taxDeductionCategory: string | null; // 稅別
 
   salesCurrency: string | null;
   exchangeRate: `${number}` | '';
@@ -72,13 +74,13 @@ export default function SalesOrder() {
 
   const [disabled, setDisabled] = useState(false);
 
-  const { state, setState, reset } = useData(undefined);
-
   const {
     data: salesOrderData,
     isFetching: isFetchingSalesOrder,
     update: updateSalesOrder,
   } = useApiGetSalesOrderById(query.id);
+
+  const { state, setState, reset } = useSalesOrder(salesOrderData);
 
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {
@@ -97,52 +99,35 @@ export default function SalesOrder() {
             }
 
             const {
-              id,
-              status,
-              reviewManagerEmployeeId,
-              managerReviewedAt,
-              quotationNumber,
-              version,
-              customerId,
               projectName,
-              county,
-              district,
-              address,
-              contactPerson,
-              contactNumber,
-              quantity,
-              editNotes,
-              discount,
               subTotal,
               salesTax,
               total,
-              deliveryLocation,
-              paymentMethods,
-              supervisorEmployeeId,
-              agentEmployeeId,
-              reviewSalesEmployeeId,
-              productsOrder,
-              tuneTotal,
-              averageDiscount,
-              estimatedDiscount,
-              type,
               currency,
               foreignTotal,
               exchangeRate,
-              contractId,
-              contractStatus,
               contractNumber,
               customerName,
-              additionalAmount,
             } = quotation;
 
             setState((prev) => ({
               ...prev,
-              合約單號: contractNumber ?? '',
-              專案名稱: projectName,
-              customerNumber: 'no property',
-              customerName: customerName ?? '',
-              taxId: 'no property',
+              quotationContractNumber: contractNumber || '',
+              constructionSite: projectName || '',
+              customerNumber: '',
+              customerName: customerName || '',
+              salesAmount: `${subTotal || ''}`,
+              taxes: `${salesTax || ''}`,
+              totalAmount: `${total || ''}`,
+              類別: '',
+              客戶聯絡電話1: '',
+              客戶聯絡電話2: '',
+              invoiceType: '',
+              taxId: '',
+              taxDeductionCategory: '',
+              salesCurrency: currency,
+              exchangeRate: `${exchangeRate || ''}`,
+              currencyAmount: `${foreignTotal || ''}`,
             }));
 
             destroy();
@@ -165,7 +150,9 @@ export default function SalesOrder() {
           <Btn theme="import" onClick={handle_importContract}>
             合約匯入
           </Btn>
-          <Btn theme="trash">清空</Btn>
+          <Btn themeColor="red_I" onClick={reset}>
+            重置
+          </Btn>
           <Btn theme="save">儲存</Btn>
         </div>
       </div>
@@ -177,11 +164,17 @@ export default function SalesOrder() {
         </DataEntry_fong>
 
         <DataEntry_fong caption="合約編號" className="">
-          <Input value={state.合約單號} onChange={(e) => setState({ ...state, 合約單號: e.target.value })} />
+          <Input
+            value={state.quotationContractNumber}
+            onChange={(e) => setState({ ...state, quotationContractNumber: e.target.value })}
+          />
         </DataEntry_fong>
 
         <DataEntry_fong caption="案場名稱" className="col-span-2">
-          <Input value={state.專案名稱} onChange={(e) => setState({ ...state, 專案名稱: e.target.value })} />
+          <Input
+            value={state.constructionSite}
+            onChange={(e) => setState({ ...state, constructionSite: e.target.value })}
+          />
         </DataEntry_fong>
         {/*  */}
         <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true}>
@@ -246,7 +239,10 @@ export default function SalesOrder() {
         </DataEntry_fong>
 
         <DataEntry_fong caption="稅別" className="" isMust={true}>
-          <Select value={state.稅別} onChange={(e) => setState({ ...state, 稅別: e as Ttax_type })} />
+          <Select
+            value={state.taxDeductionCategory}
+            onChange={(e) => setState({ ...state, taxDeductionCategory: e as Ttax_type })}
+          />
         </DataEntry_fong>
 
         <DataEntry_fong caption="稅金" isMust={true}>
@@ -274,15 +270,15 @@ export default function SalesOrder() {
 
 const emptyState = (): Tstate => {
   return {
-    合約單號: '',
-    專案名稱: '',
+    quotationContractNumber: '',
+    constructionSite: '',
     customerNumber: '',
     customerName: '',
     taxId: '',
     salesAmount: '',
     taxes: '',
     totalAmount: '',
-    稅別: null,
+    taxDeductionCategory: null,
 
     類別: null,
     客戶聯絡電話1: '',
@@ -294,18 +290,73 @@ const emptyState = (): Tstate => {
   };
 };
 
-const useDefaultState = (raw: unknown | undefined | null) => {
-  return useMemo(emptyState, [raw]);
+const useDefaultState = (raw: TsalesOrder_Dto | undefined | null) => {
+  return useMemo(() => {
+    if (!raw) {
+      return emptyState();
+    }
+
+    const {
+      salesOrderNumber,
+
+      customerId,
+      customerNumber,
+      customerName,
+      companyPhone,
+      companyFax,
+
+      constructionSite,
+      address,
+
+      salesCurrency,
+      exchangeRate,
+      currencyAmount,
+
+      salesAmount,
+      taxes,
+      changedAmount,
+      changedTaxes,
+      totalAmount,
+
+      status,
+      sourceType,
+      sourceId,
+      quotationNumber,
+      quotationContractNumber,
+
+      taxId,
+      taxDeductionCategory,
+      invoiceType,
+      salesOrderItems,
+    } = raw;
+
+    const state: Tstate = {
+      quotationContractNumber: quotationContractNumber || '',
+      constructionSite: constructionSite || '',
+      customerNumber: customerNumber || '',
+      customerName: customerName || '',
+      salesAmount: `${salesAmount || ''}`,
+      taxes: `${taxes || ''}`,
+      totalAmount: `${totalAmount || ''}`,
+      類別: '',
+      客戶聯絡電話1: '',
+      客戶聯絡電話2: '',
+      invoiceType,
+      taxId: taxId || '',
+      taxDeductionCategory,
+      salesCurrency,
+      exchangeRate: `${exchangeRate || ''}`,
+      currencyAmount: `${currencyAmount || ''}`,
+    };
+
+    return state;
+  }, [raw]);
 };
 
-const useData = (raw: unknown | undefined | null) => {
+const useSalesOrder = (raw: TsalesOrder_Dto | undefined | null) => {
   const defaultState = useDefaultState(raw);
 
   const [state, setState] = useState<Tstate>(defaultState);
-
-  // const dispatch = (action: Taction) => {
-  //   const { type, payload } = action;
-  // };
 
   const reset = () => {
     setState(defaultState);

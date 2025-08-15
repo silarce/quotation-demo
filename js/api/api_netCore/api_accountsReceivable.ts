@@ -730,6 +730,12 @@ export type {
   TaccountsReceivable,
   TpaymentRequest_Dto,
   TinsertpaymentRequest,
+  TsalesOrderItem_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrderItem_post_Dto,
+  TsalesOrder_patch_Dto,
+  TsalesOrderItem_patch_Dto,
+  TsalesOrder_Dto,
 };
 
 export type {
