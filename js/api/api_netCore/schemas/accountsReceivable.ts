@@ -424,31 +424,38 @@ interface TsalesOrder_Dto {
   updatedAt: string | null;
   createdBy: string | null;
   updatedBy: string | null;
+
   salesOrderNumber: string | null;
+
   customerId: string | null;
   customerNumber: string | null;
   customerName: string | null;
-  constructionSite: string | null;
   companyPhone: string | null;
   companyFax: string | null;
+
+  constructionSite: string | null; //工地名稱
   address: string | null;
-  salesCurrency: string | null;
-  exchangeRate: number | null;
-  currencyAmount: number | null;
-  salesAmount: number | null;
-  taxes: number | null;
-  changedAmount: number | null;
-  changedTaxes: number | null;
-  totalAmount: number | null;
-  status: number | null;
-  sourceType: string | null;
-  sourceId: string | null;
+
+  salesCurrency: string | null; //幣別
+  exchangeRate: number | null; //匯率
+  currencyAmount: number | null; //外幣金額
+
+  salesAmount: number | null; //銷售金額
+  taxes: number | null; //稅金
+  changedAmount: number | null; //追加減金額
+  changedTaxes: number | null; //追加減稅金
+  totalAmount: number | null; //總金額
+
+  status: number | null; //狀態
+  sourceType: string | null; //來源類型
+  sourceId: string | null; //來源id(合約ID)
   quotationNumber: string | null;
   quotationContractNumber: string | null;
-  taxId: string | null;
-  taxDeductionCategory: string | null;
-  invoiceType: string | null;
-  salesOrderItems: TsalesOrderItem_Dto[] | null;
+
+  taxId: string | null; //統一編號
+  taxDeductionCategory: string | null; //稅別
+  invoiceType: string | null; //發票類型
+  salesOrderItems: TsalesOrderItem_Dto[] | null; //銷售訂單明細
 }
 
 interface TsalesOrderItem_Dto {

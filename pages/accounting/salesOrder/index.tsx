@@ -24,7 +24,11 @@ import SalesDetails from 'components/page/accounting/salesOrder/salesDetails';
 
 import { Ttax_type } from 'js/api/api_netCore/schemas';
 
-import { useApiGetSalesOrderById } from 'js/api/api_netCore/api_accountsReceivable';
+import {
+  useApiGetSalesOrderById,
+  apiPostSalesOrderData,
+  apiPatchSalesOrderData,
+} from 'js/api/api_netCore/api_accountsReceivable';
 
 // ============================================================================
 
@@ -33,43 +37,28 @@ interface Tquery {
 }
 
 interface Tstate {
-  contractNumber: string;
-  projectName: string;
+  合約單號: string;
+  專案名稱: string;
 
   customerNumber: string;
   customerName: string;
-  customerTaxId: string;
 
-  price: `${number}` | '';
-  tax: `${number}` | '';
-  已請款總額: `${number}` | '';
-  銷售總額: `${number}` | '';
-  已收金額: `${number}` | '';
-  扣款折讓: `${number}` | '';
-  稅別: Ttax_type | null;
+  salesAmount: `${number}` | ''; //銷售金額
+  taxes: `${number}` | ''; //稅金
+  totalAmount: `${number}` | '';
+  稅別: string | null;
 
   類別: string | null;
   客戶聯絡電話1: string;
   客戶聯絡電話2: string;
-  發票類型: string | null;
-  幣別: string | null;
-  匯率: `${number}` | '';
-  外幣金額: `${number}` | '';
-}
 
-// type Taction =
-//   | {
-//       type: 'contractNumber' | 'projectName' | '應稅外加' | 'customerNumber' | 'customerName' | 'customerTaxId';
-//       payload: string;
-//     }
-//   | {
-//       type: 'price' | 'tax' | '已請款總額' | '銷售總額' | '已收金額' | '扣款折讓';
-//       payload: `${number}` | '';
-//     }
-//   | {
-//       type: '稅別';
-//       payload: Ttax_type | null;
-//     };
+  invoiceType: string | null;
+  taxId: string;
+
+  salesCurrency: string | null;
+  exchangeRate: `${number}` | '';
+  currencyAmount: `${number}` | '';
+}
 
 // ============================================================================
 
@@ -79,11 +68,17 @@ export default function SalesOrder() {
   const router = useRouter();
   const query = router.query as Tquery;
 
+  const isNew = !query.id;
+
   const [disabled, setDisabled] = useState(false);
 
   const { state, setState, reset } = useData(undefined);
 
-  const {} = useApiGetSalesOrderById(query.id);
+  const {
+    data: salesOrderData,
+    isFetching: isFetchingSalesOrder,
+    update: updateSalesOrder,
+  } = useApiGetSalesOrderById(query.id);
 
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {
@@ -143,11 +138,11 @@ export default function SalesOrder() {
 
             setState((prev) => ({
               ...prev,
-              contractNumber: contractNumber ?? '',
-              projectName,
+              合約單號: contractNumber ?? '',
+              專案名稱: projectName,
               customerNumber: 'no property',
               customerName: customerName ?? '',
-              customerTaxId: 'no property',
+              taxId: 'no property',
             }));
 
             destroy();
@@ -182,14 +177,11 @@ export default function SalesOrder() {
         </DataEntry_fong>
 
         <DataEntry_fong caption="合約編號" className="">
-          <Input
-            value={state.contractNumber}
-            onChange={(e) => setState({ ...state, contractNumber: e.target.value })}
-          />
+          <Input value={state.合約單號} onChange={(e) => setState({ ...state, 合約單號: e.target.value })} />
         </DataEntry_fong>
 
         <DataEntry_fong caption="案場名稱" className="col-span-2">
-          <Input value={state.projectName} onChange={(e) => setState({ ...state, projectName: e.target.value })} />
+          <Input value={state.專案名稱} onChange={(e) => setState({ ...state, 專案名稱: e.target.value })} />
         </DataEntry_fong>
         {/*  */}
         <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true}>
@@ -215,30 +207,30 @@ export default function SalesOrder() {
         {/*  */}
 
         <DataEntry_fong caption="統一編號" className="col-span-2">
-          {state.customerTaxId}
+          {state.taxId}
         </DataEntry_fong>
 
         <DataEntry_fong caption="發票類型" className="">
-          <Select value={state.發票類型} onChange={(e) => setState({ ...state, 發票類型: e as string })} />
+          <Select value={state.invoiceType} onChange={(e) => setState({ ...state, invoiceType: e as string })} />
         </DataEntry_fong>
 
         <div />
 
         {/*  */}
         <DataEntry_fong caption="幣別" className="" isMust={true}>
-          <Select value={state.幣別} onChange={(e) => setState({ ...state, 幣別: e as string })} />
+          <Select value={state.salesCurrency} onChange={(e) => setState({ ...state, salesCurrency: e as string })} />
         </DataEntry_fong>
         <DataEntry_fong caption="匯率" className="" isMust={true}>
           <Input
             type="number"
-            value={state.匯率}
-            onChange={(e) => setState({ ...state, 匯率: e.target.value as `${number}` })}
+            value={state.exchangeRate}
+            onChange={(e) => setState({ ...state, exchangeRate: e.target.value as `${number}` })}
           />
         </DataEntry_fong>
         <DataEntry_fong caption="外幣金額" className="" isMust={true}>
           <Input_money
-            value={state.外幣金額}
-            onChange={(e) => setState({ ...state, 外幣金額: e.target.value as `${number}` })}
+            value={state.currencyAmount}
+            onChange={(e) => setState({ ...state, currencyAmount: e.target.value as `${number}` })}
           />
         </DataEntry_fong>
 
@@ -248,8 +240,8 @@ export default function SalesOrder() {
 
         <DataEntry_fong caption="銷售金額" isMust={true}>
           <Input_money
-            value={state.price}
-            onChange={(e) => setState({ ...state, price: e.target.value as `${number}` })}
+            value={state.salesAmount}
+            onChange={(e) => setState({ ...state, salesAmount: e.target.value as `${number}` })}
           />
         </DataEntry_fong>
 
@@ -258,36 +250,16 @@ export default function SalesOrder() {
         </DataEntry_fong>
 
         <DataEntry_fong caption="稅金" isMust={true}>
-          <Input_money value={state.tax} onChange={(e) => setState({ ...state, tax: e.target.value as `${number}` })} />
+          <Input_money
+            value={state.taxes}
+            onChange={(e) => setState({ ...state, taxes: e.target.value as `${number}` })}
+          />
         </DataEntry_fong>
 
         <DataEntry_fong caption="銷售總額" isMust={true}>
           <Input_money
-            value={state.銷售總額}
-            onChange={(e) => setState({ ...state, 銷售總額: e.target.value as `${number}` })}
-          />
-        </DataEntry_fong>
-
-        {/*  */}
-
-        <DataEntry_fong caption="已請款總額" isMust={true}>
-          <Input_money
-            value={state.已請款總額}
-            onChange={(e) => setState({ ...state, 已請款總額: e.target.value as `${number}` })}
-          />
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="已收金額" isMust={true}>
-          <Input_money
-            value={state.已收金額}
-            onChange={(e) => setState({ ...state, 已收金額: e.target.value as `${number}` })}
-          />
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="扣款折讓" isMust={true}>
-          <Input_money
-            value={state.扣款折讓}
-            onChange={(e) => setState({ ...state, 扣款折讓: e.target.value as `${number}` })}
+            value={state.totalAmount}
+            onChange={(e) => setState({ ...state, totalAmount: e.target.value as `${number}` })}
           />
         </DataEntry_fong>
       </div>
@@ -302,26 +274,23 @@ export default function SalesOrder() {
 
 const emptyState = (): Tstate => {
   return {
-    contractNumber: '',
-    projectName: '',
+    合約單號: '',
+    專案名稱: '',
     customerNumber: '',
     customerName: '',
-    customerTaxId: '',
-    price: '',
-    tax: '',
-    已請款總額: '',
-    銷售總額: '',
-    已收金額: '',
-    扣款折讓: '',
+    taxId: '',
+    salesAmount: '',
+    taxes: '',
+    totalAmount: '',
     稅別: null,
 
     類別: null,
     客戶聯絡電話1: '',
     客戶聯絡電話2: '',
-    發票類型: null,
-    幣別: null,
-    匯率: '',
-    外幣金額: '',
+    invoiceType: null,
+    salesCurrency: null,
+    exchangeRate: '',
+    currencyAmount: '',
   };
 };
 
@@ -352,3 +321,5 @@ const useData = (raw: unknown | undefined | null) => {
     reset,
   };
 };
+
+// ============================================================================
