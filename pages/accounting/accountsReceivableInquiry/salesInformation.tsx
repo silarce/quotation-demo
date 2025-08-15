@@ -82,6 +82,8 @@ export default function SalesInformation() {
     retainageRate,
     retainageTaxCategory,
     retainageType,
+
+    currency,
   } = accountsReceivablesList ?? {};
 
   const onSelectQuotation = async (data: TquotationListViewModel_Dto | undefined) => {
@@ -164,9 +166,9 @@ export default function SalesInformation() {
           <DataEntry_fong className="col-span-2" caption="稅別">
             {taxDeductionCategory}
           </DataEntry_fong>
-          <DataEntry_fong caption="外幣">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
+          <DataEntry_fong caption="幣別">{currency}</DataEntry_fong>
 
-          <DataEntry_fong caption="外幣金額">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="外幣金額">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="匯率">
             {exchangeRate}

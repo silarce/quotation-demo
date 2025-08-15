@@ -65,6 +65,8 @@ interface TaccountsReceivablesList_Dto {
 
   taxId: string | null; // 統一編號
   taxDeductionCategory: string | null; // 稅別
+
+  currency: string | null; // 幣別 // 建立這個型別時後端還沒實際給這個property
 }
 
 interface TquotationListViewModel_Dto {
