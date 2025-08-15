@@ -509,7 +509,8 @@ interface TsalesOrderItem_post_Dto {
   // id: Guid | null; //銷貨明細id // 貓拉，POST的時候哪來的id
   id: null; //銷貨明細id // 貓拉，POST的時候哪來的id
   itemNumber: string | null; //項目編號
-  salesOrderNumber: string; //銷售訂單編號
+  // salesOrderNumber: string; //銷售訂單編號 // 我要先有銷貨單號還可以新增銷貨單?
+  salesOrderNumber: null; //銷售訂單編號 // 我要先有銷貨單號還可以新增銷貨單?
   productId: Guid; //產品id
   discount: decimal | null; //折扣
   productName: string; //產品名稱

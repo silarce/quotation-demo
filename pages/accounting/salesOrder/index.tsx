@@ -2,6 +2,8 @@ import { useState, useEffect, useReducer, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 import Btn from 'components/global/gear/button/btn_fong';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
@@ -13,12 +15,16 @@ import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrder
 import {
   useApiGetSalesOrderById,
   TsalesOrder_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrder_patch_Dto,
   apiPostSalesOrderData,
   apiPatchSalesOrderData,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
 import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
+
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // ============================================================================
 
@@ -33,6 +39,8 @@ interface Tquery {
 export default function SalesOrder() {
   const router = useRouter();
   const query = router.query as Tquery;
+
+  const { userInfo } = useGlobal_userInfo();
 
   const isNew = !query.id;
 
@@ -49,6 +57,7 @@ export default function SalesOrder() {
   const instance_salesOrderItemArr = useSalesOrderItemArr(salesOrderData?.salesOrderItems);
 
   // ---------------------------------------------------------------------------
+
   const handle_importContract = () => {
     const { destroy } = modal_empty({
       width: 'fit-content',
@@ -65,6 +74,8 @@ export default function SalesOrder() {
             }
 
             const {
+              quotationNumber,
+              contractNumber,
               projectName,
               subTotal,
               salesTax,
@@ -72,12 +83,12 @@ export default function SalesOrder() {
               currency,
               foreignTotal,
               exchangeRate,
-              contractNumber,
               customerName,
             } = quotation;
 
             instance_salesOrder.setState((prev) => ({
               ...prev,
+              quotationNumber,
               quotationContractNumber: contractNumber || '',
               constructionSite: projectName || '',
               customerNumber: '',
@@ -85,10 +96,10 @@ export default function SalesOrder() {
               salesAmount: `${subTotal || ''}`,
               taxes: `${salesTax || ''}`,
               totalAmount: `${total || ''}`,
-              類別: '',
+              sourceType: '',
               客戶聯絡電話1: '',
               客戶聯絡電話2: '',
-              客戶地址: '',
+              address: '',
               invoiceType: '',
               taxId: '',
               taxDeductionCategory: '',
@@ -108,6 +119,137 @@ export default function SalesOrder() {
 
   // ---------------------------------------------------------------------------
 
+  const createBody_post = () => {
+    // TsalesOrder_post_Dto,
+    // TsalesOrder_patch_Dto,
+    //     instance_salesOrder
+    const { state: state_salesOrder } = instance_salesOrder;
+    const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
+
+    const {
+      quotationNumber,
+      quotationContractNumber,
+      constructionSite,
+
+      customerId,
+      customerNumber,
+      customerName,
+      companyPhone,
+      companyFax,
+
+      salesAmount,
+      taxes,
+      totalAmount,
+      sourceType: 類別,
+      客戶聯絡電話1,
+      客戶聯絡電話2,
+      address,
+      invoiceType,
+      taxId,
+      taxDeductionCategory,
+      salesCurrency,
+      exchangeRate,
+      currencyAmount,
+    } = state_salesOrder;
+
+    const userIdNumber = userInfo?.employee?.idNumber;
+
+    const errorMessage: string[] = [];
+
+    !userIdNumber && errorMessage.push('User idNumber is undefined');
+    !salesCurrency && errorMessage.push('請選擇幣別');
+    !exchangeRate && errorMessage.push('請輸入匯率');
+    !currencyAmount && errorMessage.push('請輸入外幣金額');
+    !salesAmount && errorMessage.push('請輸入銷貨金額');
+    !taxes && errorMessage.push('請輸入稅額');
+    !totalAmount && errorMessage.push('請輸入銷售總總額');
+
+    if (errorMessage.length) {
+      myAlert.err({
+        title: '錯誤',
+        content: errorMessage.join('\n'),
+      });
+
+      return null;
+    }
+
+    const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = [];
+
+    // const salesOrderItems = state_salesOrderItemArr.map((item) => {
+    //   const { raw, quantity, unitPrice, amount } = item;
+
+    //   const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
+    //     ...raw,
+    //     id: null,
+    //     salesOrderNumber: null,
+    //     quantity: Number(quantity),
+    //     unitPrice: Number(unitPrice),
+    //     amount,
+    //   };
+
+    //   return salesOrderItem;
+    // });
+
+    const body: TsalesOrder_post_Dto = {
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: userIdNumber!,
+      updatedBy: userIdNumber!,
+
+      customerId,
+      customerNumber,
+      customerName,
+      constructionSite,
+      companyPhone,
+      companyFax,
+      address,
+      salesCurrency,
+      exchangeRate: Number(exchangeRate),
+      currencyAmount: Number(currencyAmount),
+
+      salesAmount: Number(salesAmount),
+      taxes: Number(taxes),
+      changedAmount: null,
+      changedTaxes: null,
+      totalAmount: Number(totalAmount),
+
+      status: null,
+      // sourceType: null,
+      sourceType: 'test',
+      sourceId: null,
+      quotationNumber,
+      quotationContractNumber,
+      taxId,
+      taxDeductionCategory,
+      invoiceType,
+      salesOrderItems,
+    };
+
+    return body;
+
+    //
+    //
+    //
+  };
+
+  const req_postOrPatch = async () => {
+    const body = createBody_post();
+
+    if (body) {
+      await apiPostSalesOrderData(body);
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+
+  const handle_save = () => {
+    if (isNew) {
+      req_postOrPatch();
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+
   // MARK: RENDER
   return (
     <div>
@@ -120,7 +262,9 @@ export default function SalesOrder() {
           <Btn themeColor="red_I" onClick={instance_salesOrder.reset}>
             重置
           </Btn>
-          <Btn theme="save">儲存</Btn>
+          <Btn theme="save" onClick={handle_save}>
+            儲存
+          </Btn>
         </div>
       </div>
 

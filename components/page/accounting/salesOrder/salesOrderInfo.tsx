@@ -31,7 +31,17 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         setState_salesOrder((prev) => {
           const copy = { ...prev };
 
-          const { contacts, customerNumber, name, address, taxId } = customer;
+          const {
+            id,
+            contacts,
+            customerNumber,
+            name,
+            address,
+            taxId,
+
+            phone,
+            fax,
+          } = customer;
 
           const [c1, c2] = contacts ?? [];
           const phone1 = c1?.phone ?? '';
@@ -39,12 +49,15 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
 
           return {
             ...copy,
+            customerId: id,
             customerNumber,
             customerName: name,
-            客戶地址: address,
+            address,
             客戶聯絡電話1: phone1,
             客戶聯絡電話2: phone2,
             taxId,
+            companyPhone: phone,
+            companyFax: fax,
           };
         });
         destroy();
@@ -58,19 +71,16 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
   return (
     <div className="grid grid-cols-4 gap-fong">
       {/*  */}
-      <DataEntry_fong caption="類別 no get no post" className="" isMust={true}>
+      <DataEntry_fong caption="類別" className="" isMust={true}>
         <Select
           options={options_salesOrderType}
-          value={state_salesOrder.類別}
-          onChange={(v) => setState_salesOrder({ ...state_salesOrder, 類別: v })}
+          value={state_salesOrder.sourceType}
+          onChange={(v) => setState_salesOrder({ ...state_salesOrder, sourceType: v })}
         />
       </DataEntry_fong>
 
-      <DataEntry_fong caption="合約編號" className="">
-        <Input
-          value={state_salesOrder.quotationContractNumber}
-          onChange={(e) => setState_salesOrder({ ...state_salesOrder, quotationContractNumber: e.target.value })}
-        />
+      <DataEntry_fong caption="合約編號" className="" isMust={true} disabled={true}>
+        {state_salesOrder.quotationContractNumber || '請匯入合約'}
       </DataEntry_fong>
 
       <DataEntry_fong caption="案場名稱" className="col-span-2">
@@ -90,7 +100,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
       {/*  */}
 
       <DataEntry_fong caption="客戶地址 no get no post" className="col-span-2" disabled={true}>
-        {state_salesOrder.客戶地址}
+        {state_salesOrder.address}
       </DataEntry_fong>
 
       <DataEntry_fong caption="客戶聯絡電話1 no get no post" className="">

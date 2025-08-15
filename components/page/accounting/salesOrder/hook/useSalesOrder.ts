@@ -3,27 +3,31 @@ import { useState, useEffect, useMemo } from 'react';
 import { TsalesOrder_Dto } from 'js/api/api_netCore/api_accountsReceivable';
 
 interface Tstate {
+  quotationNumber: string;
   quotationContractNumber: string;
   constructionSite: string;
 
+  customerId: string;
   customerNumber: string;
   customerName: string;
+  companyPhone: string;
+  companyFax: string;
+  address: string;
 
   salesAmount: `${number}` | ''; //銷售金額
   taxes: `${number}` | ''; //稅金
   totalAmount: `${number}` | ''; //總金額
 
-  類別: string | null;
+  sourceType: string | null;
 
   客戶聯絡電話1: string;
   客戶聯絡電話2: string;
-  客戶地址: string;
 
   invoiceType: string | null;
   taxId: string;
   taxDeductionCategory: string | null; // 稅別
 
-  salesCurrency: string | null;
+  salesCurrency: string;
   exchangeRate: `${number}` | '';
   currencyAmount: `${number}` | '';
 }
@@ -32,10 +36,17 @@ type Tinstance_salesOrder = ReturnType<typeof useSalesOrder>;
 
 const emptyState = (): Tstate => {
   return {
+    quotationNumber: '',
     quotationContractNumber: '',
     constructionSite: '',
+
+    customerId: '',
     customerNumber: '',
     customerName: '',
+    companyPhone: '',
+    companyFax: '',
+    address: '',
+
     taxId: '',
     salesAmount: '',
     taxes: '',
@@ -43,14 +54,13 @@ const emptyState = (): Tstate => {
     taxDeductionCategory: null,
 
     invoiceType: null,
-    salesCurrency: null,
+    salesCurrency: '',
     exchangeRate: '',
     currencyAmount: '',
 
-    類別: null,
+    sourceType: null,
     客戶聯絡電話1: '',
     客戶聯絡電話2: '',
-    客戶地址: '',
   };
 };
 
@@ -94,21 +104,27 @@ const useDefaultState = (raw: TsalesOrder_Dto | undefined | null) => {
     } = raw;
 
     const state: Tstate = {
+      quotationNumber: quotationNumber ?? '',
       quotationContractNumber: quotationContractNumber || '',
       constructionSite: constructionSite || '',
+
+      customerId: customerId || '',
       customerNumber: customerNumber || '',
       customerName: customerName || '',
+      companyPhone: companyPhone || '',
+      companyFax: companyFax || '',
+      address: address ?? '',
+
       salesAmount: `${salesAmount || ''}`,
       taxes: `${taxes || ''}`,
       totalAmount: `${totalAmount || ''}`,
-      類別: '',
+      sourceType,
       客戶聯絡電話1: '',
       客戶聯絡電話2: '',
-      客戶地址: '',
       invoiceType,
       taxId: taxId || '',
       taxDeductionCategory,
-      salesCurrency,
+      salesCurrency: salesCurrency || '',
       exchangeRate: `${exchangeRate || ''}`,
       currencyAmount: `${currencyAmount || ''}`,
     };
