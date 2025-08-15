@@ -6,11 +6,14 @@ import SearchButton from 'components/global/myCom/button/searchButton';
 import ClearButton from 'components/global/myCom/button/clearButton';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
+import Icon_list from 'public/image/icon/fong/Procurement2.svg';
 import editIcon from 'public/image/icon/note.svg?url';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { Table } from 'antd';
 import { useRouter } from 'next/router';
 import DeleteModal from 'components/global/myCom/myModal/deleteModal';
+
+import Btn from 'components/global/gear/button/btn_fong';
 
 //api
 import { getCompanyList, deleteCompany } from 'components/page/organization/company/api';
@@ -21,10 +24,11 @@ import tableScss from 'components/global/myCom/myTable/table.module.scss';
 
 interface DetailItem {
   key: string;
-  com_code: string;
-  com_ch_name: string;
-  com_en_name: string;
-  is_enable: boolean;
+  comId: string;
+  comCode: string;
+  comChName: string;
+  comEnName: string;
+  isEnable: boolean;
 }
 
 export default function Companydata() {
@@ -41,7 +45,7 @@ export default function Companydata() {
   const fetchCompanyList = async () => {
     try {
       const fe_search = `${input}`.trim();
-      const res = await getCompanyList(fe_search);
+      const res = await getCompanyList({ keyword: '', pageIndex: 1, pageSize: 10 });
 
       if (res.return_code !== 0) {
         console.log('取得公司資料失敗');
@@ -50,10 +54,10 @@ export default function Companydata() {
       // 將 API 資料轉成你目前的欄位格式（DetailItem）
       const formattedData: DetailItem[] = res.data.map((item: any) => ({
         key: item.com_id,
-        com_code: item.com_code,
-        com_ch_name: item.com_ch_name,
-        com_en_name: item.com_en_name,
-        is_enable: item.is_enable,
+        comCode: item.comCode,
+        comChName: item.comChName,
+        comEnName: item.comEnName,
+        isEnable: item.isEnable,
       }));
 
       setCompanyList(formattedData);
@@ -77,7 +81,7 @@ export default function Companydata() {
   const handleBulkDelete = async () => {
     try {
       await Promise.all(
-        companyList.filter((c) => checkedCompanies.includes(c.com_code)).map((item) => deleteCompany(item.key)) // key 是 com_id
+        companyList.filter((c) => checkedCompanies.includes(c.comId)).map((item) => deleteCompany(item.key)) // key 是 com_id
       );
 
       setCheckedCompanies([]);
@@ -92,15 +96,13 @@ export default function Companydata() {
   }, []);
 
   //控制勾選
-  const handleCheck = (com_code: string) => {
-    setCheckedCompanies((prev) =>
-      prev.includes(com_code) ? prev.filter((code) => code !== com_code) : [...prev, com_code]
-    );
+  const handleCheck = (comId: string) => {
+    setCheckedCompanies((prev) => (prev.includes(comId) ? prev.filter((code) => code !== comId) : [...prev, comId]));
   };
 
   //控制全選與反選
   const handleSelectAll = () => {
-    const allCodes = companyList.map((item) => item.com_code);
+    const allCodes = companyList.map((item) => item.comId);
 
     if (checkedCompanies.length === allCodes.length) {
       setCheckedCompanies([]);
@@ -139,13 +141,13 @@ export default function Companydata() {
       dataIndex: 'check_box',
       key: 'check_box',
       align: 'left',
-      width: '5%',
+      width: '5.1%',
       render: (_, record) => (
         <label className={scss.checkboxWrapperTable}>
           <input
             type="checkbox"
-            checked={checkedCompanies.includes(record.com_code)}
-            onChange={() => handleCheck(record.com_code)}
+            checked={checkedCompanies.includes(record.comId)}
+            onChange={() => handleCheck(record.comId)}
           />
           <span className={scss.customCheckmarkTable}></span>
         </label>
@@ -153,34 +155,42 @@ export default function Companydata() {
     },
     {
       title: '公司代碼',
-      dataIndex: 'com_code',
-      key: 'com_code',
+      dataIndex: 'comCode',
+      key: 'comCode',
       align: 'left',
-      width: '9.19%',
+      width: '6.38%',
     },
     {
       title: '公司名稱',
-      dataIndex: 'com_ch_name',
-      key: 'com_ch_name',
+      dataIndex: 'comChName',
+      key: 'comChName',
       align: 'left',
-      width: '34.38%',
+      width: '25.51%',
     },
     {
       title: '公司英文名稱',
-      dataIndex: 'com_en_name',
-      key: 'com_en_name',
+      dataIndex: 'comEnName',
+      key: 'comEnName',
       align: 'left',
-      width: '34.38%',
+      width: '25.51%',
+      // render: (_, record) => <div className="">{record.description}</div>,
+    },
+    {
+      title: '',
+      dataIndex: '',
+      key: '',
+      align: 'left',
+      width: '27.29%',
       // render: (_, record) => <div className="">{record.description}</div>,
     },
     {
       title: '啟用狀態',
-      dataIndex: 'is_enable',
-      key: 'is_enable',
+      dataIndex: 'isEnable',
+      key: 'isEnable',
       align: 'center',
-      width: '7.35%',
-      render: (_, { is_enable }) => {
-        const statusText = is_enable ? '啟用' : '停用';
+      width: '5.1%',
+      render: (_, { isEnable }) => {
+        const statusText = isEnable ? '啟用' : '停用';
 
         const styles: Record<string, React.CSSProperties> = {
           啟用: {
@@ -210,12 +220,10 @@ export default function Companydata() {
       title: '操作',
       key: 'action',
       align: 'center',
-      width: '7.35%',
+      width: '5.1%',
       render: (_, record) => (
         <div className="flex justify-center gap-5">
-          <Image
-            src={editIcon}
-            alt="edit"
+          <Icon_list
             onClick={() => router.push(`/setting/organization/company/addCompany?com_id=${record.key}`)}
             style={{ cursor: 'pointer', width: '20px', height: '20px' }}
           />
@@ -238,15 +246,27 @@ export default function Companydata() {
   return (
     <>
       <PageHeader {...mapPageHeaderTop} />
-      <div className="border-[1px] border-[#616161] rounded-lg py-8">
+      <div className="border-[1px] border-[#616161] rounded-lg py-8 mt-7">
         <div className="px-6  pb-6 flex justify-between">
           <div className="flex gap-4 h-[40px]">
-            <Input label="搜尋欄" value={input} onChange={setInput} placeholder="請輸入代碼/名稱" width="176px" />
-            <SearchButton onClick={fetchCompanyList} />
+            <Input
+              label=""
+              value={input}
+              onChange={setInput}
+              placeholder="請輸入公司代號 / 公司名稱"
+              width="196px"
+              marginLeft="0px"
+              className="flex-1"
+            />
+            <Btn theme="query" onClick={fetchCompanyList} className="flex-1">
+              搜尋資料
+            </Btn>
           </div>
           <div className="flex gap-6 h-[40px]">
             {checkedCompanies.length > 0 && <ClearButton label="全部刪除" onClick={handleBulkDelete} />}
-            <AddButton label="新增公司" onClick={() => router.push('/organization/company/addCompany')} />
+            <Btn theme="add" onClick={() => router.push('/organization/company/addCompany')}>
+              新增公司
+            </Btn>
           </div>
         </div>
         <div className="px-6">
