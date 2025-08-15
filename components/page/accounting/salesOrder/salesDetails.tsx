@@ -1,28 +1,78 @@
-import { useState, useEffect, useReducer } from 'react';
+import { useState, useMemo, useEffect, useReducer } from 'react';
 import Decimal from 'decimal.js';
 
 import Btn from 'components/global/gear/button/btn_fong';
 import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_check from 'public/image/icon/fong/check.svg';
 import Icon_cancel from 'public/image/icon/fong/cancel.svg';
 
-const SalesDetails = ({ className }: { className?: string }) => {
-  const [state, dispatch] = useReducer(reducer, undefined);
+import {
+  useApiGetSalesOrderById,
+  TsalesOrder_Dto,
+  apiPostSalesOrderData,
+  apiPatchSalesOrderData,
+} from 'js/api/api_netCore/api_accountsReceivable';
 
-  const columns = createColumns({
-    state,
-    dispatch,
-  });
+// ============================================================================
+
+type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
+
+interface Tstate {
+  raw: TsalesOrderItem;
+  quantity: `${number}` | '';
+  unitPrice: `${number}` | '';
+  amount: number;
+}
+
+type Taction_salsesOrderItem =
+  | {
+      type: 'quantity';
+      payload: {
+        index: number;
+        quantity: `${number}` | '';
+      };
+    }
+  | {
+      type: 'unitPrice';
+      payload: {
+        index: number;
+        unitPrice: `${number}` | '';
+      };
+    }
+  | {
+      type: 'replace';
+      payload: Tstate[];
+    }
+  | {
+      type: 'delete';
+      payload: {
+        index: number;
+      };
+    };
+
+// ============================================================================
+
+const SalesDetails = ({
+  salesOrderItemArr,
+  className,
+}: {
+  salesOrderItemArr: TsalesOrderItem[] | undefined | null;
+  className?: string;
+}) => {
+  const { state, dispatch, reset } = useSalesOrderItemArr(salesOrderItemArr);
+
+  const columns = createColoumns(dispatch);
 
   return (
     <div className={className}>
       <div className="text-xl font-semibold mb-6">銷貨明細</div>
       <Table_antd
-        dataSource={fakeData}
+        dataSource={state}
         columns={columns}
         scroll={{
           y: 400,
@@ -34,121 +84,130 @@ const SalesDetails = ({ className }: { className?: string }) => {
 
 // ===========================================================================
 
-interface Tstate {
-  id: string;
-  serialNumber: string;
-  idNumber: string;
-  name: string;
-  qty: `${number}` | '';
-  price: `${number}` | '';
-  totalPrice: number;
-}
-
-type Taction =
-  | {
-      type: 'set';
-      payload: Tstate;
-    }
-  | {
-      type: 'price';
-      payload: {
-        price: `${number}` | '';
-      };
-    }
-  | {
-      type: 'qty';
-      payload: {
-        qty: `${number}` | '';
-      };
-    }
-  | {
-      type: 'clear';
-      payload?: undefined;
-    };
-
-const reducer = (state: Tstate | undefined, action: Taction): Tstate | undefined => {
-  if (action.type === 'set') {
+const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
+  if (action.type === 'replace') {
     return action.payload;
   }
 
-  if (!state) {
+  if (!state[action.payload.index]) {
+    myAlert.notify.error({
+      message: 'reducer,無效的索引',
+    });
+
     return state;
   }
 
-  switch (action.type) {
-    case 'price': {
-      const price = action.payload.price;
-      const qty = state.qty || 0;
-      const totalPrice = new Decimal(price || 0).mul(qty).toNumber();
+  const copy = [...state];
+  let target = { ...copy[action.payload.index] };
 
-      return { ...state, price, totalPrice };
-    }
+  if (action.type === 'delete') {
+    copy.splice(action.payload.index, 1);
 
-    case 'qty': {
-      const qty = action.payload.qty;
-      const price = state.price || 0;
-      const totalPrice = new Decimal(price).mul(qty || 0).toNumber();
-
-      return { ...state, qty, totalPrice };
-    }
-
-    case 'clear': {
-      return undefined;
-    }
-
-    default:
-      return state;
+    return copy;
   }
+
+  switch (action.type) {
+    case 'quantity': {
+      const quantity = action.payload.quantity;
+      const unitPrice = target.unitPrice;
+      const amount = new Decimal(quantity || 0).mul(unitPrice || 0).toNumber();
+      target = {
+        ...target,
+        quantity,
+        amount,
+      };
+      break;
+    }
+
+    case 'unitPrice': {
+      const unitPrice = action.payload.unitPrice;
+      const quantity = target.quantity;
+      const amount = new Decimal(unitPrice || 0).mul(quantity || 0).toNumber();
+      target = {
+        ...target,
+        unitPrice,
+        amount,
+      };
+      break;
+    }
+  }
+
+  copy[action.payload.index] = target;
+
+  return copy;
+};
+
+const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
+  return useMemo(() => {
+    if (!raw) {
+      return [];
+    }
+
+    return raw.map((item) => ({
+      raw: item,
+      quantity: `${item.quantity || ''}`,
+      unitPrice: `${item.unitPrice || ''}`,
+      amount: item.amount || 0,
+    }));
+  }, [raw]);
+};
+
+const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
+  const defaultState = useDefaultState(raw);
+
+  const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
+
+  const reset = () => {
+    dispatch({ type: 'replace', payload: defaultState });
+  };
+
+  useEffect(() => {
+    reset();
+  }, [defaultState]);
+
+  return {
+    state,
+    dispatch,
+    reset,
+  };
 };
 
 // ===========================================================================
 
-const MyDataEntry = ({ fontSize = 14, ...props }: TdataEntrycontainerProps) => {
-  return <DataEntry fontSize={fontSize} {...props} />;
-};
-
-// ===========================================================================
-
-const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatch: React.Dispatch<Taction> }) => {
-  const columns: TableProps<TfakeData>['columns'] = [
+const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOrderItem]>) => {
+  const columns: TableProps<Tstate>['columns'] = [
     {
-      dataIndex: 'serialNumber',
+      key: 'salesOrderNumber',
       title: '序號',
-      align: 'center',
-      width: 80,
-      render: (v) => <MyDataEntry showBorder={false}>{v}</MyDataEntry>,
+
+      width: 120,
+      render: (_, { raw: { salesOrderNumber } }) => <MyDataEntry showBorder={false}>{salesOrderNumber}</MyDataEntry>,
     },
     {
-      dataIndex: 'idNumber',
+      key: 'productNumber',
       title: '產品代號',
       width: 120,
-      render: (v) => <MyDataEntry showBorder={false}>{v}</MyDataEntry>,
+      render: (_, { raw: { productNumber } }) => <MyDataEntry showBorder={false}>{productNumber}</MyDataEntry>,
     },
     {
-      dataIndex: 'name',
+      key: 'productName',
       title: '產品名稱',
       width: 150,
-      render: (v) => <MyDataEntry showBorder={false}>{v}</MyDataEntry>,
+      render: (_, { raw: { productName } }) => <MyDataEntry showBorder={false}>{productName}</MyDataEntry>,
     },
     {
-      dataIndex: 'qty',
+      dataIndex: 'quantity',
       title: '數量',
-      align: 'right',
-      width: 150,
-      render: (text, record) => {
-        if (state?.id !== record.id) {
-          return <MyDataEntry showBorder={false}>{text}</MyDataEntry>;
-        }
-
+      width: 80,
+      render: (value, _, index) => {
         return (
           <MyDataEntry showBorder={true}>
             <Input
               type="number"
-              className="text-right "
-              value={state.qty}
+              value={value}
               onChange={(e) => {
                 const value = e.currentTarget.value as `${number}` | '';
-                dispatch({ type: 'qty', payload: { qty: value } });
+                dispatch({ type: 'quantity', payload: { index, quantity: value } });
               }}
             />
           </MyDataEntry>
@@ -156,24 +215,20 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
       },
     },
     {
-      dataIndex: 'price',
+      dataIndex: 'unitPrice',
       title: '單價',
       align: 'right',
       width: 150,
-      render: (text, record) => {
-        if (record.id !== state?.id) {
-          return <MyDataEntry showBorder={false}>{'$' + text.toLocaleString()}</MyDataEntry>;
-        }
-
+      render: (value, _, index) => {
         return (
           <MyDataEntry showBorder={true}>
             <Input
               type="number"
               className="text-right"
-              value={state.price}
+              value={value}
               onChange={(e) => {
                 const value = e.currentTarget.value as `${number}` | '';
-                dispatch({ type: 'price', payload: { price: value } });
+                dispatch({ type: 'unitPrice', payload: { index, unitPrice: value } });
               }}
             />
           </MyDataEntry>
@@ -181,14 +236,12 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
       },
     },
     {
-      dataIndex: 'totalPrice',
+      dataIndex: 'amount',
       title: '金額',
       align: 'right',
       width: 150,
 
-      render: (v, record) => {
-        const value = record.id !== state?.id ? v : state.totalPrice;
-
+      render: (value) => {
         return <MyDataEntry showBorder={false}>{'$' + value.toLocaleString()}</MyDataEntry>;
       },
     },
@@ -198,48 +251,24 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
       title: '操作',
       align: 'center',
       width: 100,
-      render: (_, record) => {
-        let node: React.ReactNode = null;
-
-        if (state?.id === record.id) {
-          node = (
-            <div className="flex gap-[16px] justify-center">
-              <Icon_cancel
-                className="w-[16px] h-[16px] text-red01 cursor-pointer"
-                onClick={() => {
-                  dispatch({ type: 'clear' });
-                }}
-              />
-              <Icon_check className="w-[16px] h-[16px] blue01 cursor-pointer" />
-            </div>
-          );
-        } else {
-          node = (
-            <div className="flex gap-[16px] justify-center">
-              <Icon_note
-                className="w-[16px] h-[16px] text-blue01 cursor-pointer"
-                onClick={() => {
-                  if (record.id === state?.id) {
-                    dispatch({ type: 'clear' });
-                  } else {
-                    dispatch({
-                      type: 'set',
-                      payload: {
-                        ...record,
-                        price: `${record.price}`,
-                        qty: `${record.qty}`,
-                        totalPrice: record.totalPrice,
-                      },
-                    });
-                  }
-                }}
-              />
-              <Icon_trash className="w-[16px] h-[16px] text-red01 cursor-pointer" />
-            </div>
-          );
-        }
-
-        return node;
+      render: (_, __, index) => {
+        return (
+          <div className="flex gap-[16px] justify-center">
+            <Icon_trash
+              className="w-[16px] h-[16px] text-red01 cursor-pointer"
+              onClick={() => {
+                myAlert.confirm({
+                  title: '確定刪除?',
+                  props: {
+                    onOk() {
+                      dispatch({ type: 'delete', payload: { index } });
+                    },
+                  },
+                });
+              }}
+            />
+          </div>
+        );
       },
     },
   ];
@@ -249,24 +278,10 @@ const createColumns = ({ state, dispatch }: { state: Tstate | undefined; dispatc
 
 // ===========================================================================
 
-interface TfakeData {
-  id: string;
-  serialNumber: string;
-  idNumber: string;
-  name: string;
-  qty: number;
-  price: number;
-  totalPrice: number;
-}
+const MyDataEntry = ({ fontSize = 14, ...props }: TdataEntrycontainerProps) => {
+  return <DataEntry fontSize={fontSize} {...props} />;
+};
 
-const fakeData: TfakeData[] = Array.from({ length: 50 }, (_, index) => ({
-  id: `id-${index}`,
-  serialNumber: `${index + 1}`,
-  idNumber: `ID-${index + 1}`,
-  name: `商品 ${index + 1}`,
-  qty: Math.floor(Math.random() * 100) + 1,
-  price: 9999,
-  totalPrice: 9899999,
-}));
+// ===========================================================================
 
 export default SalesDetails;
