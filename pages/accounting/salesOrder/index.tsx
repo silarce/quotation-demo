@@ -20,7 +20,7 @@ import Icon_trash from 'public/image/icon/fong/trash.svg';
 import Icon_check from 'public/image/icon/fong/check.svg';
 import Icon_cancel from 'public/image/icon/fong/cancel.svg';
 
-import SalesDetails from 'components/page/accounting/salesOrder/salesDetails';
+import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
 
 import { Ttax_type } from 'js/api/api_netCore/schemas';
 
@@ -283,7 +283,7 @@ export default function SalesOrder() {
         </DataEntry_fong>
       </div>
 
-      <SalesDetails className={'mt-10'} salesOrderItemArr={salesOrderItemArr} />
+      <SalesOrderItemList className={'mt-10'} salesOrderItemArr={salesOrderItemArr} />
     </div>
   );
 }

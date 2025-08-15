@@ -57,7 +57,7 @@ type Taction_salsesOrderItem =
 
 // ============================================================================
 
-const SalesDetails = ({
+const SalesOrderItemList = ({
   salesOrderItemArr,
   className,
 }: {
@@ -284,4 +284,4 @@ const MyDataEntry = ({ fontSize = 14, ...props }: TdataEntrycontainerProps) => {
 
 // ===========================================================================
 
-export default SalesDetails;
+export default SalesOrderItemList;
