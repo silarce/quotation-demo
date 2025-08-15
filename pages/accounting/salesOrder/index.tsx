@@ -1,5 +1,6 @@
 import { useState, useEffect, useReducer, useMemo } from 'react';
 import Decimal from 'decimal.js';
+import { useRouter } from 'next/router';
 
 import Btn from 'components/global/gear/button/btn_fong';
 import DataEntry, {
@@ -23,7 +24,13 @@ import SalesDetails from 'components/page/accounting/salesOrder/salesDetails';
 
 import { Ttax_type } from 'js/api/api_netCore/schemas';
 
+import { useApiGetSalesOrderById } from 'js/api/api_netCore/api_accountsReceivable';
+
 // ============================================================================
+
+interface Tquery {
+  id?: string;
+}
 
 interface Tstate {
   contractNumber: string;
@@ -69,9 +76,14 @@ interface Tstate {
 // MARK:START
 
 export default function SalesOrder() {
+  const router = useRouter();
+  const query = router.query as Tquery;
+
   const [disabled, setDisabled] = useState(false);
 
   const { state, setState, reset } = useData(undefined);
+
+  const {} = useApiGetSalesOrderById(query.id);
 
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {

@@ -572,17 +572,63 @@ const apiUpdateSalesOrderData = async (body: Tbody_apiUpdateSalesOrderData) => {
   });
 };
 
-interface Tres_apiGetSalesOrderById {
+// interface Tres_apiGetSalesOrderById {
+//   id: string;
+//   salesOrderNumber: string;
+//   customerId: string;
+//   customerNumber: string;
+//   customerName: string;
+//   constructionSite: string;
+//   companyPhone: string;
+//   companyFax: string;
+//   address: string;
+//   salesCurrency: string;
+//   exchangeRate: number | null;
+//   currencyAmount: number | null;
+//   salesAmount: number | null;
+//   taxes: number | null;
+//   changedAmount: number | null;
+//   changedTaxes: number | null;
+//   totalAmount: number | null;
+//   createdAt: string | null;
+//   updatedAt: string | null;
+//   createdBy: string | null;
+//   updatedBy: string | null;
+//   status: number | null;
+//   sourceType: string | null;
+//   sourceId: string | null;
+//   salesOrderItems: {
+//     id: string;
+//     itemNumber: null;
+//     salesOrderNumber: string | null;
+//     productId: string | null;
+//     discount: number | null;
+//     productName: string | null;
+//     productNumber: string | null;
+//     unitPrice: number | null;
+//     quantity: number | null;
+//     amount: number | null;
+//     taxes: number | null;
+//     attachedToProductId: string | null;
+//     dualPrice: number | null;
+//   }[];
+// }
+interface TsalesOrder_Dto {
   id: string;
-  salesOrderNumber: string;
-  customerId: string;
-  customerNumber: string;
-  customerName: string;
-  constructionSite: string;
-  companyPhone: string;
-  companyFax: string;
-  address: string;
-  salesCurrency: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+
+  salesOrderNumber: string | null;
+  customerId: string | null;
+  customerNumber: string | null;
+  customerName: string | null;
+  constructionSite: string | null;
+  companyPhone: string | null;
+  companyFax: string | null;
+  address: string | null;
+  salesCurrency: string | null;
   exchangeRate: number | null;
   currencyAmount: number | null;
   salesAmount: number | null;
@@ -590,35 +636,38 @@ interface Tres_apiGetSalesOrderById {
   changedAmount: number | null;
   changedTaxes: number | null;
   totalAmount: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
   status: number | null;
   sourceType: string | null;
   sourceId: string | null;
-  salesOrderItems: {
-    id: string;
-    itemNumber: null;
-    salesOrderNumber: string | null;
-    productId: string | null;
-    discount: number | null;
-    productName: string | null;
-    productNumber: string | null;
-    unitPrice: number | null;
-    quantity: number | null;
-    amount: number | null;
-    taxes: number | null;
-    attachedToProductId: string | null;
-    dualPrice: number | null;
-  }[];
+  quotationNumber: string | null;
+  quotationContractNumber: string | null;
+  taxId: string | null;
+  taxDeductionCategory: string | null;
+  invoiceType: string | null;
+  salesOrderItems:
+    | {
+        id: string;
+        itemNumber: string | null;
+        salesOrderNumber: string | null;
+        productId: string | null;
+        discount: number | null;
+        productName: string | null;
+        productNumber: string | null;
+        unitPrice: number | null;
+        quantity: number | null;
+        amount: number | null;
+        taxes: number | null;
+        attachedToProductId: string | null;
+        dualPrice: number | null;
+      }[]
+    | null;
 }
 
 const apiGetSalesOrderById = async (salesOrderId: string) => {
   const api = '/api/AccountsReceivable/GetSalesOrderById';
   const params = { id: salesOrderId };
 
-  return axi_monkey.get<Tres_apiGetSalesOrderById>(api, { params }).then(({ data }) => data);
+  return axi_monkey.get<TsalesOrder_Dto>(api, { params }).then(({ data }) => data);
 };
 
 const useApiGetSalesOrderById = (
@@ -630,7 +679,7 @@ const useApiGetSalesOrderById = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<Tres_apiGetSalesOrderById | null>();
+  const [res, setRes] = useState<TsalesOrder_Dto | null>();
 
   const update = async () => {
     if (isFetching || !salesOrderId) {
@@ -775,6 +824,7 @@ export {
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
   useApiGetPaymentRequestType,
+  useApiGetSalesOrderById,
 };
 
 export { apiGetPaymentRequestType };
