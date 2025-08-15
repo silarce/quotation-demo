@@ -475,7 +475,7 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
       //
       {...suffixIcon}
       autoComplete="off"
-      placeholder="- -"
+      placeholder="請選擇"
       format="a hh:mm"
       use12Hours
       {...props}
