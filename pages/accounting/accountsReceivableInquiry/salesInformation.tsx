@@ -77,6 +77,11 @@ export default function SalesInformation() {
     salesOrderNumber,
     taxId,
     taxDeductionCategory,
+
+    retainageAmount,
+    retainageRate,
+    retainageTaxCategory,
+    retainageType,
   } = accountsReceivablesList ?? {};
 
   const onSelectQuotation = async (data: TquotationListViewModel_Dto | undefined) => {
@@ -181,29 +186,29 @@ export default function SalesInformation() {
           </DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="已收金額">
-            {collectAmount}
+            {toLocaleString(collectAmount)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="扣款折讓">
-            {deduction}
+            {toLocaleString(deduction)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="已請款總額">
-            {prAmount}
+            {toLocaleString(prAmount)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="銷售總額">
-            {totalAmount}
+            {toLocaleString(totalAmount)}
           </DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="合約保留款類型">
-            {'no property'}
+            {retainageType}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="稅別">
-            {'no property'}
+            {retainageTaxCategory}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="百分比%">
-            {'no property'}
+            {retainageRate}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="保留款金額">
-            {'no property'}
+            {toLocaleString(retainageAmount)}
           </DataEntry_fong>
         </div>
         {/*  */}
