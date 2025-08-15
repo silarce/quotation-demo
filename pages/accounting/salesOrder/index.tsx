@@ -32,6 +32,7 @@ import {
 } from 'js/api/api_netCore/api_accountsReceivable';
 
 import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
+import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
 
 // ============================================================================
 
@@ -294,110 +295,3 @@ export default function SalesOrder() {
 
 // MARK: END
 // ==========================================================================
-
-const emptyState = (): Tstate => {
-  return {
-    quotationContractNumber: '',
-    constructionSite: '',
-    customerNumber: '',
-    customerName: '',
-    taxId: '',
-    salesAmount: '',
-    taxes: '',
-    totalAmount: '',
-    taxDeductionCategory: null,
-
-    類別: null,
-    客戶聯絡電話1: '',
-    客戶聯絡電話2: '',
-    invoiceType: null,
-    salesCurrency: null,
-    exchangeRate: '',
-    currencyAmount: '',
-  };
-};
-
-const useDefaultState = (raw: TsalesOrder_Dto | undefined | null) => {
-  return useMemo(() => {
-    if (!raw) {
-      return emptyState();
-    }
-
-    const {
-      salesOrderNumber,
-
-      customerId,
-      customerNumber,
-      customerName,
-      companyPhone,
-      companyFax,
-
-      constructionSite,
-      address,
-
-      salesCurrency,
-      exchangeRate,
-      currencyAmount,
-
-      salesAmount,
-      taxes,
-      changedAmount,
-      changedTaxes,
-      totalAmount,
-
-      status,
-      sourceType,
-      sourceId,
-      quotationNumber,
-      quotationContractNumber,
-
-      taxId,
-      taxDeductionCategory,
-      invoiceType,
-      salesOrderItems,
-    } = raw;
-
-    const state: Tstate = {
-      quotationContractNumber: quotationContractNumber || '',
-      constructionSite: constructionSite || '',
-      customerNumber: customerNumber || '',
-      customerName: customerName || '',
-      salesAmount: `${salesAmount || ''}`,
-      taxes: `${taxes || ''}`,
-      totalAmount: `${totalAmount || ''}`,
-      類別: '',
-      客戶聯絡電話1: '',
-      客戶聯絡電話2: '',
-      invoiceType,
-      taxId: taxId || '',
-      taxDeductionCategory,
-      salesCurrency,
-      exchangeRate: `${exchangeRate || ''}`,
-      currencyAmount: `${currencyAmount || ''}`,
-    };
-
-    return state;
-  }, [raw]);
-};
-
-const useSalesOrder = (raw: TsalesOrder_Dto | undefined | null) => {
-  const defaultState = useDefaultState(raw);
-
-  const [state, setState] = useState<Tstate>(defaultState);
-
-  const reset = () => {
-    setState(defaultState);
-  };
-
-  useEffect(() => {
-    setState(defaultState);
-  }, [defaultState]);
-
-  return {
-    state,
-    setState,
-    reset,
-  };
-};
-
-// ============================================================================
