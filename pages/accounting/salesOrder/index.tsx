@@ -127,6 +127,7 @@ export default function SalesOrder() {
     const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
 
     const {
+      sourceType,
       quotationNumber,
       quotationContractNumber,
       constructionSite,
@@ -157,6 +158,7 @@ export default function SalesOrder() {
     const errorMessage: string[] = [];
 
     !userIdNumber && errorMessage.push('User idNumber is undefined');
+    !sourceType && errorMessage.push('請選擇類別');
     !salesCurrency && errorMessage.push('請選擇幣別');
     !exchangeRate && errorMessage.push('請輸入匯率');
     !currencyAmount && errorMessage.push('請輸入外幣金額');
@@ -214,8 +216,8 @@ export default function SalesOrder() {
       totalAmount: Number(totalAmount),
 
       status: null,
-      // sourceType: null,
-      sourceType: 'test',
+      sourceType: sourceType!,
+
       sourceId: null,
       quotationNumber,
       quotationContractNumber,
