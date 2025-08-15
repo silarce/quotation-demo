@@ -1,6 +1,3 @@
-import { useState, useMemo, useEffect, useReducer } from 'react';
-import Decimal from 'decimal.js';
-
 import Btn from 'components/global/gear/button/btn_fong';
 import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
@@ -12,59 +9,23 @@ import Icon_check from 'public/image/icon/fong/check.svg';
 import Icon_cancel from 'public/image/icon/fong/cancel.svg';
 
 import {
-  useApiGetSalesOrderById,
-  TsalesOrder_Dto,
-  apiPostSalesOrderData,
-  apiPatchSalesOrderData,
-} from 'js/api/api_netCore/api_accountsReceivable';
+  Tinstance_salesOrderItemArr,
+  Tstate,
+  Taction_salsesOrderItem,
+} from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
 // ============================================================================
-
-type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
-
-interface Tstate {
-  raw: TsalesOrderItem;
-  quantity: `${number}` | '';
-  unitPrice: `${number}` | '';
-  amount: number;
-}
-
-type Taction_salsesOrderItem =
-  | {
-      type: 'quantity';
-      payload: {
-        index: number;
-        quantity: `${number}` | '';
-      };
-    }
-  | {
-      type: 'unitPrice';
-      payload: {
-        index: number;
-        unitPrice: `${number}` | '';
-      };
-    }
-  | {
-      type: 'replace';
-      payload: Tstate[];
-    }
-  | {
-      type: 'delete';
-      payload: {
-        index: number;
-      };
-    };
 
 // ============================================================================
 
 const SalesOrderItemList = ({
-  salesOrderItemArr,
+  instance_salesOrderItemArr,
   className,
 }: {
-  salesOrderItemArr: TsalesOrderItem[] | undefined | null;
+  instance_salesOrderItemArr: Tinstance_salesOrderItemArr;
   className?: string;
 }) => {
-  const { state, dispatch, reset } = useSalesOrderItemArr(salesOrderItemArr);
+  const { state, dispatch, reset } = instance_salesOrderItemArr;
 
   const columns = createColoumns(dispatch);
 
@@ -84,93 +45,93 @@ const SalesOrderItemList = ({
 
 // ===========================================================================
 
-const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
-  if (action.type === 'replace') {
-    return action.payload;
-  }
+// const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
+//   if (action.type === 'replace') {
+//     return action.payload;
+//   }
 
-  if (!state[action.payload.index]) {
-    myAlert.notify.error({
-      message: 'reducer,無效的索引',
-    });
+//   if (!state[action.payload.index]) {
+//     myAlert.notify.error({
+//       message: 'reducer,無效的索引',
+//     });
 
-    return state;
-  }
+//     return state;
+//   }
 
-  const copy = [...state];
-  let target = { ...copy[action.payload.index] };
+//   const copy = [...state];
+//   let target = { ...copy[action.payload.index] };
 
-  if (action.type === 'delete') {
-    copy.splice(action.payload.index, 1);
+//   if (action.type === 'delete') {
+//     copy.splice(action.payload.index, 1);
 
-    return copy;
-  }
+//     return copy;
+//   }
 
-  switch (action.type) {
-    case 'quantity': {
-      const quantity = action.payload.quantity;
-      const unitPrice = target.unitPrice;
-      const amount = new Decimal(quantity || 0).mul(unitPrice || 0).toNumber();
-      target = {
-        ...target,
-        quantity,
-        amount,
-      };
-      break;
-    }
+//   switch (action.type) {
+//     case 'quantity': {
+//       const quantity = action.payload.quantity;
+//       const unitPrice = target.unitPrice;
+//       const amount = new Decimal(quantity || 0).mul(unitPrice || 0).toNumber();
+//       target = {
+//         ...target,
+//         quantity,
+//         amount,
+//       };
+//       break;
+//     }
 
-    case 'unitPrice': {
-      const unitPrice = action.payload.unitPrice;
-      const quantity = target.quantity;
-      const amount = new Decimal(unitPrice || 0).mul(quantity || 0).toNumber();
-      target = {
-        ...target,
-        unitPrice,
-        amount,
-      };
-      break;
-    }
-  }
+//     case 'unitPrice': {
+//       const unitPrice = action.payload.unitPrice;
+//       const quantity = target.quantity;
+//       const amount = new Decimal(unitPrice || 0).mul(quantity || 0).toNumber();
+//       target = {
+//         ...target,
+//         unitPrice,
+//         amount,
+//       };
+//       break;
+//     }
+//   }
 
-  copy[action.payload.index] = target;
+//   copy[action.payload.index] = target;
 
-  return copy;
-};
+//   return copy;
+// };
 
-const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
-  return useMemo(() => {
-    if (!raw) {
-      return [];
-    }
+// const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
+//   return useMemo(() => {
+//     if (!raw) {
+//       return [];
+//     }
 
-    return raw.map((item) => ({
-      raw: item,
-      quantity: `${item.quantity || ''}`,
-      unitPrice: `${item.unitPrice || ''}`,
-      amount: item.amount || 0,
-    }));
-  }, [raw]);
-};
+//     return raw.map((item) => ({
+//       raw: item,
+//       quantity: `${item.quantity || ''}`,
+//       unitPrice: `${item.unitPrice || ''}`,
+//       amount: item.amount || 0,
+//     }));
+//   }, [raw]);
+// };
 
-const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
-  const defaultState = useDefaultState(raw);
+// const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
+//   const defaultState = useDefaultState(raw);
 
-  const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
+//   const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
 
-  const reset = () => {
-    dispatch({ type: 'replace', payload: defaultState });
-  };
+//   const reset = () => {
+//     dispatch({ type: 'replace', payload: defaultState });
+//   };
 
-  useEffect(() => {
-    reset();
-  }, [defaultState]);
+//   useEffect(() => {
+//     reset();
+//   }, [defaultState]);
 
-  return {
-    state,
-    dispatch,
-    reset,
-  };
-};
+//   return {
+//     state,
+//     dispatch,
+//     reset,
+//   };
+// };
 
 // ===========================================================================
 

@@ -31,6 +31,8 @@ import {
   apiPatchSalesOrderData,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
+import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
+
 // ============================================================================
 
 interface Tquery {
@@ -87,6 +89,8 @@ export default function SalesOrder() {
     setState: setState_salesOrder,
     reset: reset_salesOrder,
   } = useSalesOrder(salesOrderData);
+
+  const instance_salesOrderItemArr = useSalesOrderItemArr(salesOrderData?.salesOrderItems);
 
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {
@@ -283,7 +287,7 @@ export default function SalesOrder() {
         </DataEntry_fong>
       </div>
 
-      <SalesOrderItemList className={'mt-10'} salesOrderItemArr={salesOrderItemArr} />
+      <SalesOrderItemList className={'mt-10'} instance_salesOrderItemArr={instance_salesOrderItemArr} />
     </div>
   );
 }
