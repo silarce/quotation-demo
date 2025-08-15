@@ -173,10 +173,10 @@ export default function SalesInformation() {
           </DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="銷售金額">
-            {<span className="text-right">{toLocaleString(salesAmount)}</span>}
+            {toLocaleString(salesAmount)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="銷售稅金">
-            {<span className="text-right">{toLocaleString(taxes)}</span>}
+            {toLocaleString(taxes)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="追加減金額">
             {'no property'}
