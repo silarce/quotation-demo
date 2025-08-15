@@ -2,88 +2,190 @@ import axios from 'axios';
 import { CreateEmployeePayload } from './type';
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_FARM_URL;
 import Cookies from 'js-cookie';
-import { headers } from 'next/headers';
 const token = Cookies.get('token');
 
-interface GetEmployeeParams {
-  fe_search?: string; // 可選，查詢關鍵字
-  dep_id?: string; // 可選，部門 ID
+export interface GetEmployeeParams {
+  keyword?: string;
+  departmentId?: string;
+  pageIndex?: number;
+  pageSize?: number;
 }
 
-export const getEmployeeList = async ({ fe_search, dep_id }: GetEmployeeParams = {}) => {
+export interface EmployeeItem {
+  empId: string;
+  empCode?: string;
+  userId?: string;
+  idNo?: string;
+  empChName?: string;
+  empEnName?: string;
+  nationalityPcode?: string;
+  nationalityPcodeText?: string;
+  defaultShiftName?: string;
+  workTypePcode?: string;
+  workTypePcodeText?: string;
+  workLocationPcode?: string;
+  workLocationPcodeText?: string;
+  salaryAccountPcode?: string;
+  salaryAccountPcodeText?: string;
+  startDate?: string;
+  department?: string;
+  departmentText?: string;
+  jobGradeId?: string;
+  jobGradeIdText?: string;
+  seniority?: string | number;
+  familyRelativeCount?: number;
+  basicSalary?: string | number;
+  laborRetirePercentage?: number;
+}
+
+export interface QueryEmployeesAPIResp {
+  returnCode: number; // 0: 成功
+  returnMessage: string;
+  beginTimestamp: string;
+  endTimestamp: string;
+  elapsedMilliseconds: number;
+  totalCount: number;
+  pageIndex: number;
+  pageSize: number;
+  data: EmployeeItem[];
+}
+
+const getAuthHeader = () => {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  const token = localStorage.getItem('access_token');
+  const type = localStorage.getItem('token_type') || 'Bearer';
+
+  return token ? { Authorization: `${type} ${token}` } : {};
+};
+
+export const getEmployeeList = async ({
+  keyword = '',
+  departmentId = '',
+  pageIndex = 1,
+  pageSize = 10,
+}: GetEmployeeParams = {}): Promise<QueryEmployeesAPIResp> => {
   try {
-    const response = await axios.get(`http://mspc1140427:8080/api/org/employee`, {
-      params: {
-        ...(fe_search ? { fe_search } : {}),
-        ...(dep_id ? { dep_id } : {}),
+    const res = await axios.get<QueryEmployeesAPIResp>(`${BASE_URL}/api/org/employee/query`, {
+      params: { keyword, departmentId, pageIndex, pageSize },
+      headers: {
+        ...getAuthHeader(), // ✅ 沒 token 就不送，避免 "Bearer undefined"
       },
-      headers: { Authorization: `Bearer ${token}` },
     });
 
-    if (response.data.return_code !== 0) {
-      console.error('取得員工資料失敗:', response.data.return_message);
-
-      return [];
-    }
-
-    return response.data.data;
-  } catch (error) {
-    console.error('API 錯誤:', error);
-    // 如果 API 錯誤，回傳空陣列
-
-    return [];
+    return res.data;
+  } catch (e) {
+    return {
+      returnCode: 1,
+      returnMessage: 'Network or server error',
+      beginTimestamp: '',
+      endTimestamp: '',
+      elapsedMilliseconds: 0,
+      totalCount: 0,
+      pageIndex,
+      pageSize,
+      data: [],
+    };
   }
 };
 
-export const getAllEmployeeSelectOptions = async () => {
-  const params = new URLSearchParams();
+type AllOpts = {
+  countyCode?: string; // 給 DistrictPcode 用
+  departmentId?: string; // 有帶才查職稱
+};
 
-  // target elements
-  const targets = [
-    'gender_pcode',
-    'marital_pcode',
-    'education_pcode',
-    'residence_county_pcode',
-    'residence_district_pcode',
-    'mailing_county_pcode',
-    'mailing_district_pcode',
-    'military_service_type_pcode',
-    'emergency_contact_relationship',
-    'department',
-    'job_grade_id',
+export async function getAllEmployeeSelectOptions({ countyCode = '', departmentId }: AllOpts = {}) {
+  const targets: string[] = [
+    'genderPcode',
+    'nationalityPcode',
+    'CountyPcode',
+    'DistrictPcode',
+    'militaryServiceTypePcode',
+    'emergencyContactRelationshipPcode',
+    'workTypePcode',
+    'workLocationPcode',
+    'departmentId',
+    // 'jobId',  // 先別加，等下視情況 push
+    'shiftId',
+    'salaryAccountPcode',
+    'laborInsuranceSettingId',
+    'healthInsuranceSettingId',
   ];
-
-  const modules = ['ORG', 'ORG', 'ORG', 'MDM', 'MDM', 'MDM', 'MDM', 'MDM', 'ORG', 'ORG', 'ORG'];
-
-  const codes = [
+  const modules: string[] = [
+    'MDM',
+    'MDM',
+    'MDM',
+    'MDM',
+    'HRM',
+    'HRM',
+    'HRM',
+    'HRM',
+    'HRM',
+    // 'HRM', // jobId
+    'HRM',
+    'SAL',
+    'HRM',
+    'HRM',
+  ];
+  const codes: string[] = [
     'GENDER_CODE',
-    'MARITAL_CODE',
-    'EDUCATION_CODE',
-    'COUNTY_CODE',
-    'DISTRICT_CODE',
+    'NATIONALITY_CODE',
     'COUNTY_CODE',
     'DISTRICT_CODE',
     'MILITARY_SERVICE_TYPE_CODE',
-    'EMERGENCY_CONTACT_RELATIONSHIP',
-    'DEPARTMENT',
-    'JOB_GRADE_ID',
+    'EMERGENCY_CONTACT_RELATIONSHIP_CODE',
+    'WORK_TYPE_CODE',
+    'WORK_LOCATION_CODE',
+    'DEPARTMENT_ID',
+    // 'JOB_ID', // jobId
+    'SHIFT_ID',
+    'SALARY_ACCOUNT_CODE',
+    'LABOR_INSURANCE_SETTING_ID',
+    'HEALTH_INSURANCE_SETTING_ID',
+  ];
+  const conds: string[] = [
+    '',
+    '', // gender, nationality
+    '',
+    countyCode, // county, district (區需要縣市代碼)
+    '',
+    '', // military, emergency relationship
+    '',
+    '', // work type, work location
+    '', // department
+    // departmentId ?? '', // jobId 需部門ID，但我們未加入 jobId，這行也先不加
+    '', // shift
+    '', // salary account
+    '',
+    '', // labor, health
   ];
 
-  const conditions = ['', '', '', '', '65000', '', '65000', '', '', '', ''];
+  // 若有部門才把 jobId 插入同樣索引位置（對齊四個陣列）
+  if (departmentId) {
+    // 插回正確位置（departmentId 之後、shiftId 之前）
+    const insertAt = targets.indexOf('departmentId') + 1;
+    targets.splice(insertAt, 0, 'jobId');
+    modules.splice(insertAt, 0, 'HRM');
+    codes.splice(insertAt, 0, 'JOB_ID');
+    conds.splice(insertAt, 0, departmentId);
+  }
 
-  // append all to URLSearchParams
-  targets.forEach((v) => params.append('fe_target_element', v));
-  modules.forEach((v) => params.append('fe_module_code', v));
-  codes.forEach((v) => params.append('fe_param_code', v));
-  conditions.forEach((v) => params.append('fe_param_value_condition', v));
+  // 構成 querystring
+  const qs = new URLSearchParams();
+  targets.forEach((v) => qs.append('feTargetElement', v));
+  modules.forEach((v) => qs.append('feModuleCode', v));
+  codes.forEach((v) => qs.append('feParamCode', v));
+  conds.forEach((v) => qs.append('feParamValueCondition', v));
 
-  const response = await axios.get(`${BASE_URL}/org/employee/QueryDataSource`, {
-    params,
-    headers: { Authorization: `Bearer ${token}` },
+  const res = await axios.get(`${BASE_URL}/api/org/employee/QueryDataSource`, {
+    params: qs,
+    headers: { ...getAuthHeader() },
   });
 
-  return response.data;
-};
+  return res.data;
+}
 
 export const createEmployee = async (data: CreateEmployeePayload) => {
   try {
