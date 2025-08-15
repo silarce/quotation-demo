@@ -1,4 +1,5 @@
 import type { DeepNullable } from 'ts-essentials';
+import type { Guid, decimal, int, DateTime } from './shared';
 
 interface TaccountsReceivablesList_Dto_depressed {
   id: string; //應收帳款id
@@ -417,6 +418,118 @@ interface Tres_apiGetARPaymentData {
 
 type Tres_apiGetARPaymentDataInset = Omit<Tres_apiGetARPaymentData, 'paymentRequest'> & { paymentRequest: null };
 
+interface TsalesOrder_Dto {
+  id: string;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  salesOrderNumber: string | null;
+  customerId: string | null;
+  customerNumber: string | null;
+  customerName: string | null;
+  constructionSite: string | null;
+  companyPhone: string | null;
+  companyFax: string | null;
+  address: string | null;
+  salesCurrency: string | null;
+  exchangeRate: number | null;
+  currencyAmount: number | null;
+  salesAmount: number | null;
+  taxes: number | null;
+  changedAmount: number | null;
+  changedTaxes: number | null;
+  totalAmount: number | null;
+  status: number | null;
+  sourceType: string | null;
+  sourceId: string | null;
+  quotationNumber: string | null;
+  quotationContractNumber: string | null;
+  taxId: string | null;
+  taxDeductionCategory: string | null;
+  invoiceType: string | null;
+  salesOrderItems: TsalesOrderItem_Dto[] | null;
+}
+
+interface TsalesOrderItem_Dto {
+  id: string;
+  itemNumber: string | null;
+  salesOrderNumber: string | null;
+  productId: string | null;
+  discount: number | null;
+  productName: string | null;
+  productNumber: string | null;
+  unitPrice: number | null;
+  quantity: number | null;
+  amount: number | null;
+  taxes: number | null;
+  attachedToProductId: string | null;
+  dualPrice: number | null;
+}
+
+type TsalesOrder_post_Dto = {
+  customerId: Guid | null; //客戶id
+  customerNumber: string | null; //客戶編號
+  customerName: string; //客戶名稱
+  constructionSite: string; //工地名稱
+  companyPhone: string; //公司電話
+  companyFax: string; //公司傳真
+  address: string; //地址
+  salesCurrency: string; //幣別
+  exchangeRate: decimal | null; //匯率
+  currencyAmount: decimal | null; //外幣金額
+  salesAmount: decimal; //銷售金額
+  taxes: decimal; //稅金
+  changedAmount: decimal | null; //追加減金額
+  changedTaxes: decimal | null; //追加減稅金
+  totalAmount: decimal; //總金額
+  createdAt: DateTime | null; //建立時間
+  updatedAt: DateTime | null; //更新時間
+  createdBy: string | null; //建立人員
+  updatedBy: string | null; //更新人員
+  status: int | null; //狀態
+  sourceType: string; //來源類型
+  sourceId: Guid | null; //來源id(合約ID)
+  quotationNumber: string | null; //報價單編號
+  quotationContractNumber: string | null; //合約編號
+  taxId: string | null; //統一編號
+  taxDeductionCategory: string | null; //稅別
+  invoiceType: string | null; //發票類型
+  salesOrderItems: TsalesOrderItem_post_Dto[]; //銷售訂單明細
+};
+
+interface TsalesOrderItem_post_Dto {
+  // id: Guid | null; //銷貨明細id // 貓拉，POST的時候哪來的id
+  id: null; //銷貨明細id // 貓拉，POST的時候哪來的id
+  itemNumber: string | null; //項目編號
+  salesOrderNumber: string; //銷售訂單編號
+  productId: Guid; //產品id
+  discount: decimal | null; //折扣
+  productName: string; //產品名稱
+  productNumber: string; //產品編號
+  unitPrice: decimal | null; //單價
+  quantity: decimal | null; //數量
+  amount: decimal | null; //金額
+  taxes: decimal | null; //稅金
+  attachedToProductId: Guid | null; //附加產品id
+  dualPrice: decimal | null; //牌價
+}
+
+type TsalesOrder_patch_Dto = TsalesOrder_post_Dto & {
+  id: string; //銷售訂單id
+  salesOrderNumber: string; //銷售訂單編號
+
+  salesOrderItems: TsalesOrderItem_patch_Dto[];
+};
+
+type TsalesOrderItem_patch_Dto = TsalesOrderItem_post_Dto & {
+  id: string;
+  itemNumber: string;
+  salesOrderNumber: string;
+  productName: string;
+  productNumber: string;
+};
+
 export type {
   TaccountsReceivablesList_Dto_depressed,
   TaccountsReceivablesList_Dto,
@@ -429,4 +542,11 @@ export type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  //
+  TsalesOrder_Dto,
+  TsalesOrderItem_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrderItem_post_Dto,
+  TsalesOrder_patch_Dto,
+  TsalesOrderItem_patch_Dto,
 };

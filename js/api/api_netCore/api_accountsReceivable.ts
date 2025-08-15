@@ -21,6 +21,12 @@ import type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  TsalesOrder_Dto,
+  TsalesOrderItem_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrderItem_post_Dto,
+  TsalesOrder_patch_Dto,
+  TsalesOrderItem_patch_Dto,
 } from './schemas';
 
 import type { TemployeeDto } from '../dtoTypes';
@@ -572,97 +578,6 @@ const apiUpdateSalesOrderData = async (body: Tbody_apiUpdateSalesOrderData) => {
   });
 };
 
-// interface Tres_apiGetSalesOrderById {
-//   id: string;
-//   salesOrderNumber: string;
-//   customerId: string;
-//   customerNumber: string;
-//   customerName: string;
-//   constructionSite: string;
-//   companyPhone: string;
-//   companyFax: string;
-//   address: string;
-//   salesCurrency: string;
-//   exchangeRate: number | null;
-//   currencyAmount: number | null;
-//   salesAmount: number | null;
-//   taxes: number | null;
-//   changedAmount: number | null;
-//   changedTaxes: number | null;
-//   totalAmount: number | null;
-//   createdAt: string | null;
-//   updatedAt: string | null;
-//   createdBy: string | null;
-//   updatedBy: string | null;
-//   status: number | null;
-//   sourceType: string | null;
-//   sourceId: string | null;
-//   salesOrderItems: {
-//     id: string;
-//     itemNumber: null;
-//     salesOrderNumber: string | null;
-//     productId: string | null;
-//     discount: number | null;
-//     productName: string | null;
-//     productNumber: string | null;
-//     unitPrice: number | null;
-//     quantity: number | null;
-//     amount: number | null;
-//     taxes: number | null;
-//     attachedToProductId: string | null;
-//     dualPrice: number | null;
-//   }[];
-// }
-interface TsalesOrder_Dto {
-  id: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-
-  salesOrderNumber: string | null;
-  customerId: string | null;
-  customerNumber: string | null;
-  customerName: string | null;
-  constructionSite: string | null;
-  companyPhone: string | null;
-  companyFax: string | null;
-  address: string | null;
-  salesCurrency: string | null;
-  exchangeRate: number | null;
-  currencyAmount: number | null;
-  salesAmount: number | null;
-  taxes: number | null;
-  changedAmount: number | null;
-  changedTaxes: number | null;
-  totalAmount: number | null;
-  status: number | null;
-  sourceType: string | null;
-  sourceId: string | null;
-  quotationNumber: string | null;
-  quotationContractNumber: string | null;
-  taxId: string | null;
-  taxDeductionCategory: string | null;
-  invoiceType: string | null;
-  salesOrderItems:
-    | {
-        id: string;
-        itemNumber: string | null;
-        salesOrderNumber: string | null;
-        productId: string | null;
-        discount: number | null;
-        productName: string | null;
-        productNumber: string | null;
-        unitPrice: number | null;
-        quantity: number | null;
-        amount: number | null;
-        taxes: number | null;
-        attachedToProductId: string | null;
-        dualPrice: number | null;
-      }[]
-    | null;
-}
-
 const apiGetSalesOrderById = async (salesOrderId: string) => {
   const api = '/api/AccountsReceivable/GetSalesOrderById';
   const params = { id: salesOrderId };
@@ -714,6 +629,26 @@ const useApiGetSalesOrderById = (
     data: res,
     update,
   };
+};
+
+const apiPostSalesOrderData = async (body: TsalesOrder_post_Dto) => {
+  const api = '/api/AccountsReceivable/InsertSalesOrderData';
+
+  return axi_monkey.post<string>(api, body).catch((err) => {
+    myAlert.err({
+      title: '新增銷售單失敗',
+    });
+  });
+};
+
+const apiPatchSalesOrderData = async (body: TsalesOrder_patch_Dto) => {
+  const api = '/api/AccountsReceivable/UpdateSalesOrderData';
+
+  return axi_monkey.patch(api, body).catch((err) => {
+    myAlert.err({
+      title: '更新銷售單失敗',
+    });
+  });
 };
 
 interface Tbody_apiPostInsertPrOffsetDetail {
@@ -814,6 +749,8 @@ export {
   apiUpdateSalesOrderData,
   apiPostInsertPrOffsetDetail,
   apiPostInsertPRDeduction,
+  apiPostSalesOrderData,
+  apiPatchSalesOrderData,
 };
 
 export {
