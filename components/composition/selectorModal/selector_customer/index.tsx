@@ -6,7 +6,7 @@ import Btn from 'components/global/gear/button/btn_fong';
 import { Container_confirm } from 'components/global/container/modal';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
-import { useCustomers, TcustomerDto } from 'js/api/api_customer';
+import { TapiGetCustomersParams, useCustomers, TcustomerDto } from 'js/api/api_customer';
 
 // ===========================================================================
 
@@ -21,8 +21,9 @@ interface Tprops {
 function Selector_customer({ onConfirm, onCancel, limit = 1 }: Tprops) {
   const [page, setPage] = useState(1);
 
-  const params = useMemo(() => {
+  const params: TapiGetCustomersParams = useMemo(() => {
     return {
+      populate: ['contacts'],
       page,
     };
   }, [page]);

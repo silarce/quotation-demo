@@ -88,6 +88,7 @@ export default function SalesOrder() {
               類別: '',
               客戶聯絡電話1: '',
               客戶聯絡電話2: '',
+              客戶地址: '',
               invoiceType: '',
               taxId: '',
               taxDeductionCategory: '',

@@ -17,6 +17,7 @@ interface Tstate {
 
   客戶聯絡電話1: string;
   客戶聯絡電話2: string;
+  客戶地址: string;
 
   invoiceType: string | null;
   taxId: string;
@@ -41,13 +42,15 @@ const emptyState = (): Tstate => {
     totalAmount: '',
     taxDeductionCategory: null,
 
-    類別: null,
-    客戶聯絡電話1: '',
-    客戶聯絡電話2: '',
     invoiceType: null,
     salesCurrency: null,
     exchangeRate: '',
     currencyAmount: '',
+
+    類別: null,
+    客戶聯絡電話1: '',
+    客戶聯絡電話2: '',
+    客戶地址: '',
   };
 };
 
@@ -88,7 +91,6 @@ const useDefaultState = (raw: TsalesOrder_Dto | undefined | null) => {
       taxId,
       taxDeductionCategory,
       invoiceType,
-      salesOrderItems,
     } = raw;
 
     const state: Tstate = {
@@ -102,6 +104,7 @@ const useDefaultState = (raw: TsalesOrder_Dto | undefined | null) => {
       類別: '',
       客戶聯絡電話1: '',
       客戶聯絡電話2: '',
+      客戶地址: '',
       invoiceType,
       taxId: taxId || '',
       taxDeductionCategory,

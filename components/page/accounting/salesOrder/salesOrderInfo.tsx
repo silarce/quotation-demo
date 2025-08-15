@@ -4,16 +4,65 @@ import { Ttax_type } from 'js/api/api_netCore/schemas';
 
 import { Tinstance_salesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
 
+import { useApiGetDropDown } from 'js/api/api_netCore/api_commonControllers';
+
+import { optionsCreator_currency } from 'js/utils/options/options';
+
+const options_currency = optionsCreator_currency();
+
+import { selector_customer } from 'components/composition/selectorModal/selector_customer';
+
 export default function SalesOrderInfo({ instance_salesOrder }: { instance_salesOrder: Tinstance_salesOrder }) {
   const { state: state_salesOrder, setState: setState_salesOrder } = instance_salesOrder;
+
+  const { options: options_invoiceType } = useApiGetDropDown('InvoiceType');
+  const { options: options_salesOrderType } = useApiGetDropDown('sales_order_type');
+  const { options: options_taxCategory } = useApiGetDropDown('RetainageTaxCategory');
+
+  const hancle_selectCustomer = () => {
+    const { destroy } = selector_customer({
+      onConfirm: (customerArr) => {
+        const customer = customerArr[0];
+
+        if (!customer) {
+          return;
+        }
+
+        setState_salesOrder((prev) => {
+          const copy = { ...prev };
+
+          const { contacts, customerNumber, name, address, taxId } = customer;
+
+          const [c1, c2] = contacts ?? [];
+          const phone1 = c1?.phone ?? '';
+          const phone2 = c2?.phone ?? '';
+
+          return {
+            ...copy,
+            customerNumber,
+            customerName: name,
+            客戶地址: address,
+            客戶聯絡電話1: phone1,
+            客戶聯絡電話2: phone2,
+            taxId,
+          };
+        });
+        destroy();
+      },
+      onCancel() {
+        destroy();
+      },
+    });
+  };
 
   return (
     <div className="grid grid-cols-4 gap-fong">
       {/*  */}
-      <DataEntry_fong caption="類別" className="" isMust={true}>
+      <DataEntry_fong caption="類別 no get no post" className="" isMust={true}>
         <Select
+          options={options_salesOrderType}
           value={state_salesOrder.類別}
-          onChange={(e) => setState_salesOrder({ ...state_salesOrder, 類別: e as string })}
+          onChange={(v) => setState_salesOrder({ ...state_salesOrder, 類別: v })}
         />
       </DataEntry_fong>
 
@@ -31,26 +80,26 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         />
       </DataEntry_fong>
       {/*  */}
-      <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true}>
+      <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true} onClick={hancle_selectCustomer}>
         {state_salesOrder.customerNumber}
       </DataEntry_fong>
 
-      <DataEntry_fong caption="客戶名稱" className="col-span-2" isMust={true}>
+      <DataEntry_fong caption="客戶名稱" className="col-span-2" disabled={true}>
         {state_salesOrder.customerName}
       </DataEntry_fong>
       {/*  */}
 
-      <DataEntry_fong caption="客戶地址" className="col-span-2">
-        {state_salesOrder.customerName}
+      <DataEntry_fong caption="客戶地址 no get no post" className="col-span-2" disabled={true}>
+        {state_salesOrder.客戶地址}
       </DataEntry_fong>
 
-      <DataEntry_fong caption="客戶聯絡電話1" className="">
+      <DataEntry_fong caption="客戶聯絡電話1 no get no post" className="">
         <Input
           value={state_salesOrder.客戶聯絡電話1}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, 客戶聯絡電話1: e.target.value })}
         />
       </DataEntry_fong>
-      <DataEntry_fong caption="客戶聯絡電話2" className="">
+      <DataEntry_fong caption="客戶聯絡電話2 no get no post" className="">
         <Input
           value={state_salesOrder.客戶聯絡電話2}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, 客戶聯絡電話2: e.target.value })}
@@ -59,12 +108,13 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
 
       {/*  */}
 
-      <DataEntry_fong caption="統一編號" className="col-span-2">
+      <DataEntry_fong caption="統一編號" className="col-span-2" disabled={true}>
         {state_salesOrder.taxId}
       </DataEntry_fong>
 
       <DataEntry_fong caption="發票類型" className="">
         <Select
+          options={options_invoiceType}
           value={state_salesOrder.invoiceType}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, invoiceType: e as string })}
         />
@@ -75,6 +125,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
       {/*  */}
       <DataEntry_fong caption="幣別" className="" isMust={true}>
         <Select
+          options={options_currency}
           value={state_salesOrder.salesCurrency}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, salesCurrency: e as string })}
         />
@@ -106,6 +157,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
 
       <DataEntry_fong caption="稅別" className="" isMust={true}>
         <Select
+          options={options_taxCategory}
           value={state_salesOrder.taxDeductionCategory}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, taxDeductionCategory: e as Ttax_type })}
         />
