@@ -462,10 +462,12 @@ interface TsalesOrderItem_Dto {
   id: string;
   itemNumber: string | null;
   salesOrderNumber: string | null;
-  productId: string | null;
   discount: number | null;
+
+  productId: string;
   productName: string | null;
   productNumber: string | null;
+
   unitPrice: number | null;
   quantity: number | null;
   amount: number | null;

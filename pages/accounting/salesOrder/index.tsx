@@ -173,22 +173,22 @@ export default function SalesOrder() {
       return null;
     }
 
-    const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = [];
+    const salesOrderItems = state_salesOrderItemArr.map((item) => {
+      const { raw, quantity, unitPrice, amount } = item;
 
-    // const salesOrderItems = state_salesOrderItemArr.map((item) => {
-    //   const { raw, quantity, unitPrice, amount } = item;
+      const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
+        ...raw,
+        id: null,
+        salesOrderNumber: null,
+        quantity: Number(quantity),
+        unitPrice: Number(unitPrice),
+        amount,
+        productName: raw.productName || '',
+        productNumber: raw.productNumber || '',
+      };
 
-    //   const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
-    //     ...raw,
-    //     id: null,
-    //     salesOrderNumber: null,
-    //     quantity: Number(quantity),
-    //     unitPrice: Number(unitPrice),
-    //     amount,
-    //   };
-
-    //   return salesOrderItem;
-    // });
+      return salesOrderItem;
+    });
 
     const body: TsalesOrder_post_Dto = {
       createdAt: new Date().toISOString(),
