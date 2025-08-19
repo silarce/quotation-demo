@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 import Decimal from 'decimal.js';
@@ -561,7 +561,7 @@ const Panel = ({
 
   // ------------------------------------------------------------------------
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setState({
       installationDate,
       shippingDate,
@@ -573,7 +573,16 @@ const Panel = ({
     setState_installationItem(
       installationItem ? { value: installationItem as TdeliveryStatusInstallationItem, label: installationItem } : null
     );
-  };
+  }, [
+    //
+    installationDate,
+    installationItem,
+    installer_employeeArr,
+    installer_outsourcing,
+    itemName,
+    notes,
+    shippingDate,
+  ]);
 
   // ------------------------------------------------------------------------
   const defaultSeletedDataArrArr = useMemo(() => {
@@ -588,6 +597,12 @@ const Panel = ({
 
     return arr;
   }, [state_outsourcing, state_employeeArr]);
+
+  // ------------------------------------------------------------------------
+
+  useEffect(() => {
+    reset();
+  }, [reset]);
 
   // ------------------------------------------------------------------------
 
