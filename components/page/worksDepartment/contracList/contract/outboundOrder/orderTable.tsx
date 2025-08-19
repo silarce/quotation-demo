@@ -599,6 +599,7 @@ const Panel = ({
         <InputSel
           name="shippingDate"
           disabled={disabled}
+          fontSize="16"
           datePickerProps={{
             props: {
               value: state.shippingDate ? dayjs(state.shippingDate) : undefined,
@@ -680,6 +681,7 @@ const Panel = ({
         <InputSel
           name="installationItem"
           disabled={disabled}
+          fontSize="16"
           selectProps={{
             props: {
               menuPortalTarget: undefined,
@@ -700,6 +702,7 @@ const Panel = ({
         <InputSel
           name="installationDate"
           disabled={disabled}
+          fontSize="16"
           datePickerProps={{
             props: {
               value: state.installationDate ? dayjs(state.installationDate) : undefined,
@@ -718,6 +721,7 @@ const Panel = ({
         <InputSel
           name="installerEmployees"
           disabled={disabled}
+          fontSize="16"
           onClick={() => {
             !disabled && setShowModal(true);
           }}
@@ -749,6 +753,7 @@ const Panel = ({
         <InputSel
           name="itemName"
           disabled={disabled}
+          fontSize="16"
           inputProps={{
             props: {
               value: state.itemName,
@@ -766,6 +771,7 @@ const Panel = ({
         <InputSel
           name="notes"
           disabled={disabled}
+          fontSize="16"
           inputProps={{
             props: {
               value: state.notes,
@@ -873,7 +879,7 @@ type TconfigList = {
 const config: TconfigList = {
   serialNumber: {
     caption: '序號',
-    className: 'w-7',
+    className: 'w-10',
   },
   projectName: {
     caption: '工程名稱',
@@ -922,7 +928,7 @@ const config: TconfigList = {
   },
   material: {
     caption: '材料',
-    className: 'w-14',
+    className: 'w-[60px]',
   },
   horsepower: {
     caption: '馬力',
