@@ -222,7 +222,7 @@ const CurrentPaymentRequestDetails = ({
                 }}
               />
             </DataEntry_fong>
-            <DataEntry_fong caption="保留款金額 no property" isMust={true} disabled={!isAllowEdit}>
+            <DataEntry_fong caption="保留款金額" isMust={true} disabled={!isAllowEdit}>
               <Input_money
                 value={state_paymentRequest.retainageAmount}
                 onChange={(e) => {
