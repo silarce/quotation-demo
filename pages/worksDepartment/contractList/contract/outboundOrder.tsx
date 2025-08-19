@@ -253,14 +253,10 @@ export default function OutboundOrder({
     }
 
     try {
-      const res = await apiPostDeliveryStatus({
+      await apiPostDeliveryStatus({
         id: engineeringDeliveryListId,
         body,
       });
-
-      update_finalProduce();
-
-      // return res;
     } catch (error) {
       const err = error as Error;
       myAlert.err({ title: '新增失敗', content: err.message });
@@ -383,9 +379,11 @@ export default function OutboundOrder({
       };
 
       await reqPost_2(body);
-      setSeletedWorksheetItem({});
-      setShowBatchAddModal(false);
     }
+
+    await update_finalProduce();
+    setSeletedWorksheetItem({});
+    setShowBatchAddModal(false);
   };
 
   // --------------------------------------------------------------------------
