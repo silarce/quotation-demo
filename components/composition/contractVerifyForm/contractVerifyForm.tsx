@@ -1491,7 +1491,12 @@ function ReviewForm({
       <br />
       <br />
       <br />
-      <PDFBody ref={ref_pdf} ref_head={ref_head} ref_itemArr={ref_itemArr} />
+      {/* 
+      不條件的話渲染會有這個問題
+      Runtime Error
+      Error: ReactDOMInput: Mixing React and non-React radio inputs with the same `name` is not supported.
+       */}
+      {disabled && <PDFBody ref={ref_pdf} ref_head={ref_head} ref_itemArr={ref_itemArr} />}
 
       {/*  */}
       {/*  */}
