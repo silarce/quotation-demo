@@ -117,7 +117,7 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({ defaultPreviewUrl, o
             style={{ marginLeft }}
           >
             <PictureOutlined className="mr-2 text-base" />
-            <span>上傳檔案</span>
+            <span className="text-[#14256A]">上傳檔案</span>
           </div>
         </Upload>
       </div>

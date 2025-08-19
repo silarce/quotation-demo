@@ -102,7 +102,7 @@ export default function Companydata() {
 
   //控制全選與反選
   const handleSelectAll = () => {
-    const allCodes = companyList.map((item) => item.comId);
+    const allCodes = companyList.map((item) => item.comCode);
 
     if (checkedCompanies.length === allCodes.length) {
       setCheckedCompanies([]);
@@ -146,8 +146,8 @@ export default function Companydata() {
         <label className={scss.checkboxWrapperTable}>
           <input
             type="checkbox"
-            checked={checkedCompanies.includes(record.comId)}
-            onChange={() => handleCheck(record.comId)}
+            checked={checkedCompanies.includes(record.comCode)}
+            onChange={() => handleCheck(record.comCode)}
           />
           <span className={scss.customCheckmarkTable}></span>
         </label>
@@ -263,7 +263,12 @@ export default function Companydata() {
             </Btn>
           </div>
           <div className="flex gap-6 h-[40px]">
-            {checkedCompanies.length > 0 && <ClearButton label="全部刪除" onClick={handleBulkDelete} />}
+            {/* {checkedCompanies.length > 0 && <ClearButton label="全部刪除" onClick={handleBulkDelete} />} */}
+            {checkedCompanies.length > 0 && (
+              <Btn theme="trash" onClick={handleBulkDelete}>
+                刪除
+              </Btn>
+            )}
             <Btn theme="add" onClick={() => router.push('/organization/company/addCompany')}>
               新增公司
             </Btn>
@@ -271,10 +276,10 @@ export default function Companydata() {
         </div>
         <div className="px-6">
           <Table
+            rowKey="comId"
             className={tableScss.customTable}
             columns={columns}
             dataSource={companyList}
-            rowKey="key"
             bordered
             style={{ minWidth: '50%' }}
           />
