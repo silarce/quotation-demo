@@ -19,18 +19,12 @@ import {
 } from 'components/page/organization/company/addCompany/api';
 
 //components
-import SaveButton from 'components/global/myCom/button/SaveButton';
-import AddButton from 'components/global/myCom/button/AddButton';
-import ClearButton from 'components/global/myCom/button/clearButton';
-import LabeledInput from 'components/global/myCom/Input/Input';
 import { LogoUploader } from 'components/global/myCom/uploader/Uploader';
-import LeaveModal from 'components/global/myCom/myModal/leaveModal';
-import BackButton from 'components/global/myCom/button/BackButton';
 import Btn from 'components/global/gear/button/btn_fong';
 
-import { DataEntry_fong, Input, Select, Select_rs } from 'components/global/gear/dataEntry';
+import { DataEntry_fong, Input, Select_rs } from 'components/global/gear/dataEntry';
 import Icon_folder from 'public/image/icon/fong/folder.svg';
-import Icon_Company from 'public/image/icon/fong/Company.svg';
+import Icon_Company from 'public/image/icon/fong/company.svg';
 
 export default function AddCompany() {
   const mapPageHeaderTop: MapPageHeader = {
