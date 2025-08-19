@@ -19,13 +19,12 @@ import {
 } from 'components/page/organization/company/addCompany/api';
 
 //components
-import SaveButton from 'components/global/myCom/button/SaveButton';
-import AddButton from 'components/global/myCom/button/AddButton';
-import ClearButton from 'components/global/myCom/button/clearButton';
-import LabeledInput from 'components/global/myCom/Input/Input';
 import { LogoUploader } from 'components/global/myCom/uploader/Uploader';
-import LeaveModal from 'components/global/myCom/myModal/leaveModal';
-import BackButton from 'components/global/myCom/button/BackButton';
+import Btn from 'components/global/gear/button/btn_fong';
+
+import { DataEntry_fong, Input, Select_rs } from 'components/global/gear/dataEntry';
+import Icon_folder from 'public/image/icon/fong/folder.svg';
+import Icon_Company from 'public/image/icon/fong/company.svg';
 
 export default function AddCompany() {
   const mapPageHeaderTop: MapPageHeader = {
@@ -169,166 +168,100 @@ export default function AddCompany() {
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex justify-between h-[40px]">
         <PageHeader {...mapPageHeaderTop} />
         <div className="flex items-center  gap-4">
-          <ClearButton label="刪除" className="h-[40px] " onClick={() => console.log('Delete')} />
-          <BackButton
+          {/* <ClearButton label="刪除" className="h-[40px] " onClick={() => console.log('Delete')} /> */}
+          {/* <BackButton
             label="返回"
             onClick={() => {
               setIsModalOpen(true);
             }}
             className=" h-[40px]"
-          />
-          <AddButton label="新增公司" onClick={handleSave} className="h-[40px] " />
-
-          <SaveButton label="儲存" onClick={handleSave} className="h-[40px] w-[95px]" />
-          <LeaveModal isOpen={isModalOpen} onConfirm={() => router.back()} onCancel={() => setIsModalOpen(false)} />
+          /> */}
+          {/* <AddButton label="新增公司" onClick={handleSave} className="h-[40px] " /> */}
+          <Btn onClick={() => router.back()} className="h-[40px] w-[95px]">
+            取消
+          </Btn>
+          <Btn theme="save" onClick={handleSave}>
+            儲存
+          </Btn>
+          {/* <LeaveModal isOpen={isModalOpen} onConfirm={() => router.back()} onCancel={() => setIsModalOpen(false)} /> */}
         </div>
       </div>
-      <div className="flex items-center justify-center w-full mt-[22.5px]">
-        <span className="font-semibold mr-2 whitespace-nowrap">🏢公司基本資料</span>
+      <div className="flex items-center justify-center w-full mt-10">
+        <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+          <Icon_Company style={{ width: '24px', height: '24px' }} />
+          公司基本資料
+        </span>
         <div className="h-px bg-black flex-1 rounded-[10px]" />
       </div>
-      <div className="flex w-full flex-col mt-3">
-        <div className="flex w-full gap-[37px]">
-          <LabeledInput
-            label="中文名稱"
-            value={formState.com_ch_name}
-            onChange={(val) => updateField('com_ch_name', val)}
-            placeholder="請輸入公司名稱"
-            labelWidth="w-[10%]"
-          />
-          <LabeledInput
-            label="英文名稱"
-            value={formState.com_en_name}
-            onChange={(val) => updateField('com_en_name', val)}
-            placeholder="請輸入公司英文名稱"
-            labelWidth="w-[10%]"
-          />
+      <div className="flex w-full flex-col mt-6">
+        <div className="grid grid-cols-4 w-full gap-6">
+          <DataEntry_fong caption="公司名稱" isMust className="col-span-3">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司中文簡稱">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司英文名稱" className="col-span-3">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司英文簡稱">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司自訂代碼" isMust>
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司統一編號">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司所在城市">
+            <Select_rs value={formState.com_ch_name} placeholder="請選擇"></Select_rs>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司所在地區">
+            <Select_rs value={formState.com_ch_name}></Select_rs>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司中文地址" isMust className="col-span-4">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司英文地址" className="col-span-4">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="聯絡人" isMust>
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司電話" isMust>
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司信箱">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
+          <DataEntry_fong caption="公司傳真號碼">
+            <Input value={formState.com_ch_name} placeholder="- -"></Input>
+          </DataEntry_fong>
         </div>
 
-        <div className="flex w-full mt-[20px] gap-[37px]">
-          <LabeledInput
-            label="中文簡稱"
-            value={formState.com_ch_short_name}
-            onChange={(val) => updateField('com_ch_short_name', val)}
-            placeholder="請輸入公司中文簡稱"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-          <LabeledInput
-            label="英文簡稱"
-            value={formState.com_en_short_name}
-            onChange={(val) => updateField('com_en_short_name', val)}
-            placeholder="請輸入公司英文簡稱"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-          <LabeledInput
-            label="自訂代碼"
-            value={formState.com_code}
-            onChange={(val) => updateField('com_code', val)}
-            placeholder="請輸入自訂代碼"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-          <LabeledInput
-            label="統一編號"
-            value={formState.fax_code}
-            onChange={(val) => updateField('fax_code', val)}
-            placeholder="請輸入統一編號"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-        </div>
-
-        <div className="flex w-full mt-[20px] gap-[37px]">
-          <LabeledInput
-            label="所在城市"
-            value={formState.county}
-            onChange={(val) => updateField('county', val)}
-            placeholder="請輸入城市"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-          <LabeledInput
-            label="所在地區"
-            value={formState.district}
-            onChange={(val) => updateField('district', val)}
-            placeholder="請輸入地區"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-          <LabeledInput
-            label="公司電話"
-            value={formState.contact_phone}
-            onChange={(val) => updateField('contact_phone', val)}
-            placeholder="請輸入電話"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-          <LabeledInput
-            label="傳真號碼"
-            value={formState.fax}
-            onChange={(val) => updateField('fax', val)}
-            placeholder="請輸入傳真"
-            labelWidth="w-[23%]"
-            marginLeft="16px"
-          />
-        </div>
-
-        <div className="flex w-full mt-[20px]">
-          <LabeledInput
-            label="中文地址"
-            value={formState.ch_address}
-            onChange={(val) => updateField('ch_address', val)}
-            placeholder="戶籍地址 (含路名、巷弄、號、樓層等)"
-            labelWidth="w-[4.7%]"
-          />
-        </div>
-
-        <div className="flex w-full mt-[20px]">
-          <LabeledInput
-            label="英文地址"
-            value={formState.en_address}
-            onChange={(val) => updateField('en_address', val)}
-            placeholder="戶籍地址 (含路名、巷弄、號、樓層等)"
-            labelWidth="w-[4.7%]"
-          />
-        </div>
-
-        <div className="flex w-full mt-[20px] gap-[37px]">
-          <LabeledInput
-            label="聯絡人"
-            value={formState.contact_person}
-            onChange={(val) => updateField('contact_person', val)}
-            placeholder="請輸入聯絡人"
-            labelWidth="w-[10%]"
-          />
-          <LabeledInput
-            label="公司信箱"
-            value={formState.contact_email}
-            onChange={(val) => updateField('contact_email', val)}
-            placeholder="請輸入公司信箱"
-            labelWidth="w-[10%]"
-          />
-        </div>
-
-        <div className="flex items-center w-full mt-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap">📝其他</span>
+        <div className="flex items-center w-full mt-[40px]">
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_folder style={{ width: '24px', height: '24px' }} />
+            其他
+          </span>
           <div className="h-px bg-black flex-1 rounded-[10px]" />
         </div>
 
-        <div className="mt-[12px] ml-[12px] flex justify-between">
+        <div className="mt-6 flex justify-between">
           <div>
+            <p className="mb-[10px]">LOGO圖示</p>
             <LogoUploader defaultPreviewUrl={previewLogoUrl} onFileChange={(file) => setLogoFile(file)} />
-            <div className="mt-[20px] ml-3 flex">
+            <div className="mt-[20px] ">
               <p className="mr-[16px]">啟用狀態</p>
-              <Switch checked={isEnable} onChange={setIsEnable} />
+              <Switch checked={isEnable} onChange={setIsEnable} className="mt-[10px]" />
             </div>
           </div>
-          <div className="mr-6 text-[#909090]">
+        </div>
+        <div className="flex justify-end">
+          <div className="mr-6 text-[#909090] mt-10">
             <div className="flex gap-4 ">
               <p>建立者:王大名</p>
               <p>建立日期:2024/04/30</p>

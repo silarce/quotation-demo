@@ -540,6 +540,30 @@ type TsalesOrderItem_patch_Dto = TsalesOrderItem_post_Dto & {
   productNumber: string;
 };
 
+interface TpaymentRequestInvoiceList_Dto {
+  id: Guid | null; //請款單Id
+  paymentRequestNumber: string | null; //請款單編號
+  quotationNumber: string | null; //報價單編號
+  constructionSite: string | null; //工地名稱
+  customerNumber: string | null; //客戶編號
+  customerName: string | null; //客戶名稱
+  paymentAmount: decimal | null; //請款金額
+  accountsReceivableId: Guid | null; //應收帳款Id
+  type: string | null; //請款單類型
+  period: string | null; //請款單期別
+  paymentCurrency: string | null; //請款幣別
+  foreignCurrencyAmount: decimal | null; //外幣金額
+  collectAmount: decimal | null; //已收金額,餘額在repo裡計算
+  receiptBalance: decimal | null; //收款餘額
+  deduction: decimal | null; //扣款金額
+  taxId: string | null; //統一編號
+  retainageTaxCategory: string | null; //保留款稅別
+  retainageRate: decimal | null; //保留款比例
+  retainageAmount: decimal | null; //保留款金額
+  typePeriod: int | null; //分類期別
+  contractNumber: string | null; //合約編號
+}
+
 export type {
   TaccountsReceivablesList_Dto_depressed,
   TaccountsReceivablesList_Dto,
@@ -559,4 +583,5 @@ export type {
   TsalesOrderItem_post_Dto,
   TsalesOrder_patch_Dto,
   TsalesOrderItem_patch_Dto,
+  TpaymentRequestInvoiceList_Dto,
 };

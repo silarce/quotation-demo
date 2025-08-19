@@ -21,14 +21,18 @@ export const initialFormState = {
   county: '',
   district: '',
   logo_file_id: '',
-  gender_pcode: undefined,
+  genderPcode: undefined,
   marital_pcode: undefined,
   education_pcode: undefined,
-  military_service_type_pcode: undefined,
-  emergency_contact_relationship: undefined,
+  militaryServiceTypePcode: undefined,
+  emergencyContactRelationshipPcode: undefined,
   residence_county_pcode: undefined,
-  department: undefined,
-  job_grade_id: undefined,
+  departmentId: undefined,
+  jobId: undefined,
+  nationalityPcode: undefined,
+  workLocationPcode: undefined,
+  workTypePcode: undefined,
+  shiftId: undefined,
 };
 
 export function useFormReducer() {

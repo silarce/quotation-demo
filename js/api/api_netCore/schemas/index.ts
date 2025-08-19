@@ -44,6 +44,7 @@ export type {
   TsalesOrderItem_post_Dto,
   TsalesOrder_patch_Dto,
   TsalesOrderItem_patch_Dto,
+  TpaymentRequestInvoiceList_Dto,
 } from './accountsReceivable';
 
 export type { Tinvoice_Dto } from './invoice';

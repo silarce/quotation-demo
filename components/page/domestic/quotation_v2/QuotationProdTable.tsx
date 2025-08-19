@@ -333,7 +333,8 @@ const Table_prod = ({
               const isActive = activedProd === stateProd;
 
               return (
-                <QuotationRow_dealClass_memo
+                // <QuotationRow_dealClass_memo
+                <QuotationRow_dealClass
                   key={prodKey}
                   rerenderTrigger01={stateProd.renderCount}
                   prodKey={prodKey}
@@ -446,13 +447,14 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
             );
 
             return (
-              <QuotationRow_dnd_memo
+              // <QuotationRow_dnd_memo
+              <QuotationRow_dnd
                 //
-                rerenderTrigger01={classComponent.state}
-                rerenderTrigger02={classComponent.state.renderCount}
-                rerenderTrigger03={disabled}
-                rerenderTrigger04={cellKeyArr_component} // 應該不需要
-                rerenderTrigger05={classComponent.constructor} // 應該不需要
+                // rerenderTrigger01={classComponent.state}
+                // rerenderTrigger02={classComponent.state.renderCount}
+                // rerenderTrigger03={disabled}
+                // rerenderTrigger04={cellKeyArr_component} // 應該不需要
+                // rerenderTrigger05={classComponent.constructor} // 應該不需要
                 //
                 key={componentKey}
                 id={componentKey}
@@ -484,7 +486,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
                     </Cell>
                   );
                 })}
-              </QuotationRow_dnd_memo>
+              </QuotationRow_dnd>
             );
           })}
           {/*  */}
@@ -507,12 +509,13 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
             );
 
             return (
-              <QuotationRow_dnd_memo
+              // <QuotationRow_dnd_memo
+              <QuotationRow_dnd
                 //
-                rerenderTrigger01={classComponent.state.renderCount}
-                rerenderTrigger02={disabled}
-                rerenderTrigger03={null}
-                rerenderTrigger04={null}
+                // rerenderTrigger01={classComponent.state.renderCount}
+                // rerenderTrigger02={disabled}
+                // rerenderTrigger03={null}
+                // rerenderTrigger04={null}
                 //
                 key={classComponent.key}
                 id={classComponent.key}
@@ -540,7 +543,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
                     </Cell>
                   );
                 })}
-              </QuotationRow_dnd_memo>
+              </QuotationRow_dnd>
             );
           })}
         </Table_dnd>
@@ -916,6 +919,24 @@ const QuotationRow_dealClass = ({
   );
 };
 
+// const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) => {
+//   return false;
+
+//   // const [rerenderTrigger02_prev] = [prev.instance_useQuotationProductInstance.isIterativeProdExist];
+//   // const [rerenderTrigger02_next] = [next.instance_useQuotationProductInstance.isIterativeProdExist];
+
+//   // return (
+//   //   prev.rerenderTrigger01 === next.rerenderTrigger01 &&
+//   //   rerenderTrigger02_prev === rerenderTrigger02_next &&
+//   //   // prev.stateProd === next.stateProd &&
+//   //   prev.disabled === next.disabled &&
+//   //   prev.isActive === next.isActive &&
+//   //   prev.cellKeyArr === next.cellKeyArr &&
+//   //   prev.index === next.index
+//   //   // &&
+//   //   // prev.createClassProd === next.createClassProd
+//   // );
+// });
 const QuotationRow_dealClass_memo = memo(QuotationRow_dealClass, (prev, next) => {
   return false;
 

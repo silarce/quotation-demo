@@ -13,23 +13,38 @@ import scss from './employeeData.module.scss';
 import { getAllEmployeeSelectOptions, createEmployee } from 'components/page/organization/employee/api';
 
 //components
-import SaveButton from 'components/global/myCom/button/SaveButton';
 import AddButton from 'components/global/myCom/button/AddButton';
 import ClearButton from 'components/global/myCom/button/clearButton';
 import LabeledInputV2 from 'components/global/myCom/Input/InputV2';
 import LeaveModal from 'components/global/myCom/myModal/leaveModal';
-import BackButton from 'components/global/myCom/button/BackButton';
 import ExtendButton from 'components/global/myCom/button/ExtendButton';
 import LabeledSelectV2 from 'components/global/myCom/select/mySelectV2';
 import LabeledDatePickerV2 from 'components/global/myCom/date/myDateV2';
 import Btn from 'components/global/gear/button/btn_fong';
 
+//Icon
+import Icon_IDcard from 'public/image/icon/fong/id-card.svg';
+import Icon_phone from 'public/image/icon/fong/phone.svg';
+import Icon_mana from 'public/image/icon/fong/user-management.svg';
+import Icon_time from 'public/image/icon/fong/user-time.svg';
+import Icon_security from 'public/image/icon/fong/security.svg';
+import Icon_security2 from 'public/image/icon/fong/security2.svg';
+import Icon_house from 'public/image/icon/fong/pepicons-pop_house.svg';
+import Icon_folder from 'public/image/icon/fong/folder.svg';
+
 import { Checkbox } from 'components/global/gear/dataEntry';
 
-export type OptionType = {
-  label: string;
-  value: string;
+type OptionType = { label: string; value: string }; // value 用 string，最單純
+type ApiItem = { value: string; label: string };
+type ApiGroup = {
+  targetElement: string;
+  moduleCode: string;
+  paramCode: string;
+  totalCount?: number;
+  items: ApiItem[];
 };
+
+type SelectOptionsMap = Record<string, OptionType[]>;
 
 interface Dependent {
   id: string;
@@ -79,21 +94,30 @@ export default function Organization() {
   const router = useRouter();
   const { com_id } = router.query;
 
-  const [selectOptionsMap, setSelectOptionsMap] = useState<Record<string, { label: string; value: string }[]>>({});
+  const [selectOptionsMap, setSelectOptionsMap] = useState<Record<string, OptionType[]>>({});
+
+  const toOptionsMap = (resp: any): SelectOptionsMap => {
+    const groups: ApiGroup[] = Array.isArray(resp?.data) ? resp.data : [];
+
+    return groups.reduce<SelectOptionsMap>((acc, g) => {
+      const opts: OptionType[] = [
+        { label: '請選擇', value: '' },
+        ...(g.items ?? []).map((it) => ({ label: it.label, value: String(it.value) })),
+      ];
+      acc[g.targetElement] = opts;
+
+      return acc;
+    }, {});
+  };
 
   useEffect(() => {
     const fetchSelectOptions = async () => {
       try {
-        const data = await getAllEmployeeSelectOptions();
-        const map: Record<string, OptionType[]> = {};
-
-        data.data.forEach((item: any) => {
-          // 在每個欄位選項前加入「請選擇」
-          const options = [{ label: '請選擇', value: '' }, ...item.items];
-          map[item.target] = options;
+        const data = await getAllEmployeeSelectOptions({
+          countyCode: formState.residence_county_pcode ?? '',
+          departmentId: formState.departmentId ?? '',
         });
-
-        setSelectOptionsMap(map);
+        setSelectOptionsMap(toOptionsMap(data));
       } catch (err) {
         console.error('Failed to load select options:', err);
       }
@@ -103,48 +127,48 @@ export default function Organization() {
   }, []);
 
   //新增員工
-  const handleSave = async () => {
-    try {
-      const payload = {
-        emp_code: formState.emp_id, // 這邊假設 emp_code 來自 emp_id
-        id_no: 'A123456789', // ➜ 若你有對應欄位可取代這個
-        emp_ch_name: formState.emp_name,
-        emp_en_name: '', // ➜ 若你有英文名欄位，請補上
-        email: formState.email,
-        birthday_date: formState.birthday_date,
-        gender_pcode: formState.gender_pcode,
-        marital_pcode: formState.marital_pcode,
-        education_pcode: formState.education_pcode,
-        phone1: formState.contact_phone,
-        phone2: formState.contact_phone2,
-        residence_county_pcode: formState.residence_county_pcode,
-        residence_district_pcode: '', // ➜ 請補上對應區域欄位
-        residence_address: formState.residence_address,
-        mailing_county_pcode: formState.mailing_county_pcode,
-        mailing_district_pcode: '', // ➜ 請補上對應區域欄位
-        mailing_address: formState.mailing_address,
-        seniority: formState.seniority,
-        start_date: formState.start_date,
-        leave_date: formState.leave_date,
-        retire_date: formState.retire__date,
-        severance_date: formState.severance__date,
-        military_service_type_pcode: formState.military_service_type_pcode,
-        emergency_contact_phone: formState.urgent_phone,
-        emergency_contact_relationship: formState.emergency_contact_relationship,
-        phone_number: formState.contact_phone,
-        department: formState.department,
-        job_grade_id: formState.job_grade_id,
-        hire_date: formState.start_date,
-        is_enable: isEnable,
-      };
+  // const handleSave = async () => {
+  //   try {
+  //     const payload = {
+  //       emp_code: formState.emp_id, // 這邊假設 emp_code 來自 emp_id
+  //       id_no: 'A123456789',
+  //       emp_ch_name: formState.emp_name,
+  //       emp_en_name: '',
+  //       email: formState.email,
+  //       birthday_date: formState.birthday_date,
+  //       gender_pcode: formState.genderPcode,
+  //       marital_pcode: formState.marital_pcode,
+  //       education_pcode: formState.education_pcode,
+  //       phone1: formState.contact_phone,
+  //       phone2: formState.contact_phone2,
+  //       residence_county_pcode: formState.residence_county_pcode,
+  //       residence_district_pcode: '', // ➜ 請補上對應區域欄位
+  //       residence_address: formState.residence_address,
+  //       mailing_county_pcode: formState.mailing_county_pcode,
+  //       mailing_district_pcode: '', // ➜ 請補上對應區域欄位
+  //       mailing_address: formState.mailing_address,
+  //       seniority: formState.seniority,
+  //       start_date: formState.start_date,
+  //       leave_date: formState.leave_date,
+  //       retire_date: formState.retire__date,
+  //       severance_date: formState.severance__date,
+  //       military_service_type_pcode: formState.military_service_type_pcode,
+  //       emergency_contact_phone: formState.urgent_phone,
+  //       emergency_contact_relationship: formState.emergency_contact_relationship,
+  //       phone_number: formState.contact_phone,
+  //       department: formState.department,
+  //       job_grade_id: formState.job_grade_id,
+  //       hire_date: formState.start_date,
+  //       is_enable: isEnable,
+  //     };
 
-      const res = await createEmployee(payload);
-      console.log('✅ 新增成功:', res);
-      // 可加跳轉或提示
-    } catch (error) {
-      console.error('❌ 新增失敗:', error);
-    }
-  };
+  //     const res = await createEmployee(payload);
+  //     console.log('✅ 新增成功:', res);
+  //     // 可加跳轉或提示
+  //   } catch (error) {
+  //     console.error('❌ 新增失敗:', error);
+  //   }
+  // };
 
   //新增眷屬
   const handleAddDependent = () => {
@@ -222,13 +246,13 @@ export default function Organization() {
       <div className="flex justify-between">
         <PageHeader {...mapPageHeaderTop} />
         <div className="flex items-center  gap-4">
-          <BackButton
-            label="返回"
+          <Btn
             onClick={() => {
               router.push(`/organization/employee`);
             }}
-            className=" h-[40px]"
-          />
+          >
+            返回
+          </Btn>
           <Btn theme="trash" onClick={() => console.log('Clear!')}>
             刪除
           </Btn>
@@ -238,8 +262,12 @@ export default function Organization() {
           <LeaveModal isOpen={isModalOpen} onConfirm={() => router.back()} onCancel={() => setIsModalOpen(false)} />
         </div>
       </div>
+      {/* MARK:人員基本資料  */}
       <div className="flex items-center justify-center w-full mb-[20px] mt-[40px]">
-        <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👤人員基本資料</span>
+        <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex items-center gap-2">
+          <Icon_IDcard style={{ width: '24px', height: '24px' }} />
+          人員基本資料
+        </span>
         <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
       </div>
       <div className="flex w-full flex-col mt-3">
@@ -253,12 +281,12 @@ export default function Organization() {
           />
           <LabeledSelectV2
             label="性別"
-            required={true}
+            required
             placeholder="請選擇"
-            className="w-[100%]"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
+            className="w-full"
+            value={formState.genderPcode ?? ''}
+            onChange={(val) => updateField('genderPcode', val)}
+            options={selectOptionsMap.genderPcode || []}
           />
           <LabeledDatePickerV2
             label="出生日期"
@@ -291,22 +319,26 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.military_service_type_pcode}
-            onChange={(val) => updateField('military_service_type_pcode', val)}
-            options={selectOptionsMap.military_service_type_pcode || []}
+            value={formState.militaryServiceTypePcode}
+            onChange={(val) => updateField('militaryServiceTypePcode', val)}
+            options={selectOptionsMap.militaryServiceTypePcode || []}
           />
           <LabeledSelectV2
             label="國籍"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
+            value={formState.nationalityPcode}
+            onChange={(val) => updateField('nationalityPcode', val)}
+            options={selectOptionsMap.nationalityPcode || []}
           />
         </div>
+        {/* MARK:聯絡與通訊資料  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📞聯絡與通訊資料</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_phone style={{ width: '24px', height: '24px' }} />
+            聯絡與通訊資料
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="grid grid-cols-6 gap-[24px]">
@@ -343,9 +375,9 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.emergency_contact_relationship}
-            onChange={(val) => updateField('emergency_contact_relationship', val)}
-            options={selectOptionsMap.emergency_contact_relationship || []}
+            value={formState.emergencyContactRelationshipPcode}
+            onChange={(val) => updateField('emergencyContactRelationshipPcode', val)}
+            options={selectOptionsMap.emergencyContactRelationshipPcode || []}
           />
           <LabeledInputV2
             label="緊急連絡人電話"
@@ -363,7 +395,7 @@ export default function Organization() {
             placeholder="請選擇"
             value={formState.residence_county_pcode}
             onChange={(val) => updateField('residence_county_pcode', val)}
-            options={selectOptionsMap.residence_county_pcode || []}
+            options={selectOptionsMap.CountyPcode || []}
           />
           <div className="col-span-2">
             <LabeledInputV2
@@ -381,7 +413,7 @@ export default function Organization() {
             placeholder="請選擇"
             value={formState.mailing_county_pcode}
             onChange={(val) => updateField('mailing_county_pcode', val)}
-            options={selectOptionsMap.mailing_county_pcode || []}
+            options={selectOptionsMap.CountyPcode || []}
           />
           <div className="col-span-2">
             <LabeledInputV2
@@ -393,8 +425,12 @@ export default function Organization() {
             />
           </div>
         </div>
+        {/* MARK:職務與任用設定  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">💼職務與任用設定</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_mana style={{ width: '24px', height: '24px' }} />
+            職務與任用設定
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="grid grid-cols-6 gap-[24px]">
@@ -402,25 +438,25 @@ export default function Organization() {
             label="工作地點"
             required={true}
             placeholder="請選擇"
-            value={formState.job_grade_id}
-            onChange={(val) => updateField('job_grade_id', val)}
-            options={selectOptionsMap.job_grade_id || []}
-          />
-          <LabeledSelectV2
-            label="職稱"
-            required={true}
-            placeholder="請選擇"
-            value={formState.job_grade_id}
-            onChange={(val) => updateField('job_grade_id', val)}
-            options={selectOptionsMap.job_grade_id || []}
+            value={formState.workLocationPcode}
+            onChange={(val) => updateField('workLocationPcode', val)}
+            options={selectOptionsMap.workLocationPcode || []}
           />
           <LabeledSelectV2
             label="部門"
             required={true}
             placeholder="請選擇"
-            value={formState.department}
-            onChange={(val) => updateField('department', val)}
-            options={selectOptionsMap.department || []}
+            value={formState.departmentId}
+            onChange={(val) => updateField('departmentId', val)}
+            options={selectOptionsMap.departmentId || []}
+          />
+          <LabeledSelectV2
+            label="職稱"
+            required={true}
+            placeholder="請選擇"
+            value={formState.jobId}
+            onChange={(val) => updateField('jobId', val)}
+            options={selectOptionsMap.jobId || []}
           />
           <LabeledInputV2
             label="分機"
@@ -489,10 +525,15 @@ export default function Organization() {
             onChange={(val) => updateField('emp_id', val)}
             placeholder="- -"
             required={true}
+            isPassword
           />
         </div>
+        {/* MARK:員工打卡與排班設定  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">🆔️員工打卡與排班設定</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_time style={{ width: '24px', height: '24px' }} />
+            員工打卡與排班設定
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
         <div className="flex w-full gap-[24px]">
@@ -503,33 +544,36 @@ export default function Organization() {
             placeholder="- -"
             required={true}
           />
-          <LabeledSelectV2
+          <LabeledInputV2
             label="卡號設定"
+            value={formState.emp_id}
+            onChange={(val) => updateField('emp_id', val)}
+            placeholder="- -"
             required={true}
-            placeholder="請選擇"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
           />
           <LabeledSelectV2
             label="勤務"
             required={true}
             placeholder="請選擇"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
+            value={formState.workTypePcode}
+            onChange={(val) => updateField('workTypePcode', val)}
+            options={selectOptionsMap.workTypePcode || []}
           />
           <LabeledSelectV2
             label="班別"
             required={true}
             placeholder="請選擇"
-            value={formState.gender_pcode}
-            onChange={(val) => updateField('gender_pcode', val)}
-            options={selectOptionsMap.gender_pcode || []}
+            value={formState.shiftId}
+            onChange={(val) => updateField('shiftId', val)}
+            options={selectOptionsMap.shiftId || []}
           />
         </div>
+        {/* MARK:勞保歷程記錄  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋勞保歷程記錄</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_security style={{ width: '24px', height: '24px' }} />
+            勞保歷程記錄
+          </span>
           <AddButton label="歷程記錄" onClick={handleAddLaborInsurance} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
           <ExtendButton
@@ -583,8 +627,12 @@ export default function Organization() {
             </div>
           ))}
         </div>
+        {/* MARK:健保歷程記錄  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📋健保歷程記錄</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_security2 style={{ width: '24px', height: '24px' }} />
+            健保歷程記錄
+          </span>
           <AddButton label="歷程記錄" onClick={() => handleAddHealthInsurance()} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
           <ExtendButton
@@ -638,8 +686,12 @@ export default function Organization() {
             </div>
           ))}
         </div>
+        {/* MARK:眷屬資料  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">👨‍👩‍👧‍👦眷屬資料</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_house style={{ width: '24px', height: '24px' }} />
+            眷屬資料
+          </span>
           <AddButton label="新增眷屬" onClick={() => handleAddDependent()} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
@@ -710,9 +762,12 @@ export default function Organization() {
             </div>
           </div>
         ))}
-
+        {/* MARK:其他  */}
         <div className="flex items-center w-full mt-[40px]">
-          <span className="font-semibold mr-2 whitespace-nowrap text-[16px]">📝其他</span>
+          <span className="font-semibold mr-2 whitespace-nowrap text-[16px] flex gap-2">
+            <Icon_folder style={{ width: '24px', height: '24px' }} />
+            其他
+          </span>
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
 

@@ -60,7 +60,7 @@ const SelectorGroup = selectModalCreator_multi<['employee', 'outsourcing']>({
 
 // ============================================================================
 export default function Modal_newDeliveryStatu({
-  visible,
+  open,
   onCancel,
   onConfirm,
 }: {
@@ -132,13 +132,13 @@ export default function Modal_newDeliveryStatu({
   // -----------------------------------------------------------------------------
 
   useEffect(() => {
-    !visible && reset();
-  }, [visible]);
+    !open && reset();
+  }, [open]);
 
   // -----------------------------------------------------------------------------
 
   return (
-    <Modal open={visible} onCancel={onCancel} footer={null} destroyOnHidden={true} width={800}>
+    <Modal open={open} onCancel={onCancel} footer={null} destroyOnHidden={true} width={800}>
       <div className={scss.body}>
         <p className={scss.caption}>批次新增管理單</p>
 
