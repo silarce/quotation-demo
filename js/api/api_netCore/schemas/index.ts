@@ -38,8 +38,16 @@ export type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  TsalesOrder_Dto,
+  TsalesOrderItem_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrderItem_post_Dto,
+  TsalesOrder_patch_Dto,
+  TsalesOrderItem_patch_Dto,
   TpaymentRequestInvoiceList_Dto,
 } from './accountsReceivable';
+
+export type { TsalesOrder_simple_Dto } from './salesOrder';
 
 export type { Tinvoice_Dto } from './invoice';
 

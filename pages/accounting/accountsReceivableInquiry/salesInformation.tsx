@@ -77,6 +77,13 @@ export default function SalesInformation() {
     salesOrderNumber,
     taxId,
     taxDeductionCategory,
+
+    retainageAmount,
+    retainageRate,
+    retainageTaxCategory,
+    retainageType,
+
+    currency,
   } = accountsReceivablesList ?? {};
 
   const onSelectQuotation = async (data: TquotationListViewModel_Dto | undefined) => {
@@ -159,19 +166,19 @@ export default function SalesInformation() {
           <DataEntry_fong className="col-span-2" caption="稅別">
             {taxDeductionCategory}
           </DataEntry_fong>
-          <DataEntry_fong caption="外幣">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
+          <DataEntry_fong caption="幣別">{currency}</DataEntry_fong>
 
-          <DataEntry_fong caption="外幣金額">{'no property'}</DataEntry_fong>
+          <DataEntry_fong caption="外幣金額">{toLocaleString(foreignCurrencyAmount)}</DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="匯率">
             {exchangeRate}
           </DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="銷售金額">
-            {<span className="text-right">{toLocaleString(salesAmount)}</span>}
+            {toLocaleString(salesAmount)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="銷售稅金">
-            {<span className="text-right">{toLocaleString(taxes)}</span>}
+            {toLocaleString(taxes)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="追加減金額">
             {'no property'}
@@ -181,29 +188,29 @@ export default function SalesInformation() {
           </DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="已收金額">
-            {collectAmount}
+            {toLocaleString(collectAmount)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="扣款折讓">
-            {deduction}
+            {toLocaleString(deduction)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="已請款總額">
-            {prAmount}
+            {toLocaleString(prAmount)}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="銷售總額">
-            {totalAmount}
+            {toLocaleString(totalAmount)}
           </DataEntry_fong>
 
           <DataEntry_fong className="col-span-2" caption="合約保留款類型">
-            {'no property'}
+            {retainageType}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="稅別">
-            {'no property'}
+            {retainageTaxCategory}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="百分比%">
-            {'no property'}
+            {retainageRate}
           </DataEntry_fong>
           <DataEntry_fong className="col-span-2" caption="保留款金額">
-            {'no property'}
+            {toLocaleString(retainageAmount)}
           </DataEntry_fong>
         </div>
         {/*  */}

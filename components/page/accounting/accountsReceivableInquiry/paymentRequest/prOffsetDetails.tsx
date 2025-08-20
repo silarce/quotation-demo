@@ -45,7 +45,7 @@ interface Tprops {
   onAddDataConfirm: (data: { state: Tstate_addData; accountant: TaccountantDto; destroy: () => void }) => void;
   onAddDeductionConfirm: (data: {
     state: Tstate_addDeduction;
-    accountant: TaccountantDto;
+    // accountant: TaccountantDto;
     destroy: () => void;
   }) => void;
 }
@@ -116,16 +116,14 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
     });
   };
 
-  const handle_addDeduction = (accountant: TaccountantDto) => {
+  const handle_addDeduction_noAccountant = () => {
     const { destroy } = modal_empty({
       content: (
         <AddDeduction
-          accountant={accountant}
           options_deductionType={options_deductionType}
           onConfirm={(state_addDeduction) => {
             onAddDeductionConfirm({
               state: state_addDeduction,
-              accountant,
               destroy,
             });
           }}
@@ -138,21 +136,21 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
     });
   };
 
-  const handle_addFee = () => {
-    const { destroy } = modal_empty({
-      content: (
-        <AddFee
-          onConfirm={(fee) => {
-            destroy();
-          }}
-          onCancel={() => {
-            destroy();
-          }}
-        />
-      ),
-      width: 350,
-    });
-  };
+  // const handle_addFee = () => {
+  //   const { destroy } = modal_empty({
+  //     content: (
+  //       <AddFee
+  //         onConfirm={(fee) => {
+  //           destroy();
+  //         }}
+  //         onCancel={() => {
+  //           destroy();
+  //         }}
+  //       />
+  //     ),
+  //     width: 350,
+  //   });
+  // };
 
   // MARK: RENDER
 
@@ -172,13 +170,11 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
           <Btn
             theme="cross"
             onClick={() => {
-              handle_accountingCollection(handle_addDeduction);
+              // handle_accountingCollection(handle_addDeduction);
+              handle_addDeduction_noAccountant();
             }}
           >
             新增沖銷扣款
-          </Btn>
-          <Btn theme="cross" onClick={handle_addFee}>
-            新增扣款
           </Btn>
         </div>
         <div></div>
@@ -211,7 +207,7 @@ const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
     width: 140,
   },
   {
-    title: '名稱',
+    title: '沖銷日期',
     dataIndex: 'prOffsetType',
     width: 150,
   },
@@ -228,18 +224,18 @@ const columns_reversalDetails: TableProps<TprOffsetDetails>['columns'] = [
     render: (value) => '$' + value.toLocaleString(),
   },
   {},
-  {
-    title: '操作',
-    key: 'action',
-    width: 80,
-    align: 'center',
-    render: () => (
-      <div className="flex gap-[16px] justify-center">
-        <Icon_note className="w-[16px] h-[16px] text-blue01" />
-        <Icon_trash className="w-[16px] h-[16px] text-red01" />
-      </div>
-    ),
-  },
+  // {
+  //   title: '操作',
+  //   key: 'action',
+  //   width: 80,
+  //   align: 'center',
+  //   render: () => (
+  //     <div className="flex gap-[16px] justify-center">
+  //       <Icon_note className="w-[16px] h-[16px] text-blue01" />
+  //       <Icon_trash className="w-[16px] h-[16px] text-red01" />
+  //     </div>
+  //   ),
+  // },
 ];
 // ===============================================================================
 
@@ -324,35 +320,35 @@ const AddData = ({
 
 // MARK: AddFee
 
-const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (fee: string) => void }) => {
-  const [value, setValue] = useState<string>('');
+// const AddFee = ({ onCancel, onConfirm }: { onCancel?: () => void; onConfirm?: (fee: string) => void }) => {
+//   const [value, setValue] = useState<string>('');
 
-  const handle_confirm = () => {
-    onConfirm?.(value);
-  };
+//   const handle_confirm = () => {
+//     onConfirm?.(value);
+//   };
 
-  const handle_cancel = () => {
-    onCancel?.();
-  };
+//   const handle_cancel = () => {
+//     onCancel?.();
+//   };
 
-  return (
-    <Container_confirm
-      title="手續費"
-      footerRight={
-        <>
-          <Btn onClick={handle_cancel}>取消</Btn>
-          <Btn theme="save" onClick={handle_confirm}>
-            儲存
-          </Btn>
-        </>
-      }
-    >
-      <DataEntry_fong caption="手續費" isMust={true}>
-        <Input value={value} onChange={(e) => setValue(e.target.value)} />
-      </DataEntry_fong>
-    </Container_confirm>
-  );
-};
+//   return (
+//     <Container_confirm
+//       title="手續費"
+//       footerRight={
+//         <>
+//           <Btn onClick={handle_cancel}>取消</Btn>
+//           <Btn theme="save" onClick={handle_confirm}>
+//             儲存
+//           </Btn>
+//         </>
+//       }
+//     >
+//       <DataEntry_fong caption="手續費" isMust={true}>
+//         <Input value={value} onChange={(e) => setValue(e.target.value)} />
+//       </DataEntry_fong>
+//     </Container_confirm>
+//   );
+// };
 
 // MARK: AddDeduction
 
@@ -360,17 +356,19 @@ const AddDeduction = ({
   onConfirm,
   onCancel,
   options_deductionType,
-  accountant,
-}: {
+}: // accountant,
+{
   onConfirm?: (props: Tstate_addDeduction) => void;
   onCancel?: () => void;
   options_deductionType: { label: string; value: string }[];
-  accountant: TaccountantDto;
+  // accountant: TaccountantDto;
 }) => {
   const [state, setState] = useState<Tstate_addDeduction>({
-    date: accountant.insertDate ? dayjs(accountant.insertDate) : null,
+    // date: accountant.insertDate ? dayjs(accountant.insertDate) : null,
+    date: null,
     type: '',
-    amount: `${accountant.price}`,
+    // amount: `${accountant.price}`,
+    amount: '',
     remarks: '',
   });
 

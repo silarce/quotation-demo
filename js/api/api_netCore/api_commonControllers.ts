@@ -7,6 +7,7 @@ import type { AxiosError } from 'axios';
 import type { TdropDown } from './schemas';
 
 type TdropDownParams =
+  | 'sales_order_type' // 銷貨單類別
   | 'RetainageType' // 合約保留款類型
   | 'RetainageTaxCategory' // 保留款稅別
   | 'InvoiceType' //發票類型

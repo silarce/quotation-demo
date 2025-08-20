@@ -18,6 +18,11 @@ const CurrentlyAccumulated = ({ data, className }: { data: Tdata | undefined; cl
 
     customerName,
     taxId,
+
+    retainageType,
+    retainageTaxCategory,
+    retainageRate,
+    retainageAmount,
   } = data ?? {};
 
   return (
@@ -38,13 +43,13 @@ const CurrentlyAccumulated = ({ data, className }: { data: Tdata | undefined; cl
                 no property
               </DataEntry_fong>
               <DataEntry_fong caption="保留款(%)" disabled={true}>
-                no property
+                {retainageRate}
               </DataEntry_fong>
               <DataEntry_fong caption="稅" disabled={true}>
                 no property
               </DataEntry_fong>
               <DataEntry_fong caption="保留款金額" disabled={true}>
-                no property
+                {toLocaleString(retainageAmount)}
               </DataEntry_fong>
               <DataEntry_fong caption="金額總計" disabled={true}>
                 {toLocaleString(totalAmount)}

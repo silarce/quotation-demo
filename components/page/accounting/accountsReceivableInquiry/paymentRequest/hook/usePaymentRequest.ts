@@ -114,6 +114,8 @@ const usePaymentRequest = ({ rawData_paymentRequest, rawData_accountsReceivables
     setInvoiceBood,
 
     reset_paymentRequest: reset,
+
+    paymentCurrency: rawData_paymentRequest?.paymentCurrency,
   };
 };
 
