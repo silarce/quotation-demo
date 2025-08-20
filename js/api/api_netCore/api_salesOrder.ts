@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import _ from 'lodash';
 
 import { axi_monkey } from '../_axiosCreator';
 
@@ -22,7 +23,9 @@ const useApiGetSalesOrderDataList = ({ autoUpdate = true }: { autoUpdate?: boole
 
     await apiGetSalesOrderDataList()
       .then((res) => {
-        setRes(res);
+        const sorted = _.sortBy(res, 'salesOrderNumber').reverse();
+
+        setRes(sorted);
       })
       .catch(() => {
         setRes(null);
