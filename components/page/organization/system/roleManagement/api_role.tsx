@@ -1,78 +1,105 @@
 import { Role, UpdateRole } from './newRole/schema/system';
+import axios from 'axios';
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 
 import Cookies from 'js-cookie';
 const token = Cookies.get('token');
 
+const getAuthHeader = () => {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  const token = localStorage.getItem('access_token');
+  const type = localStorage.getItem('token_type') || 'Bearer';
+
+  return token ? { Authorization: `${type} ${token}` } : {};
+};
+
 //獲得完整角色資料
 
-export const getRoleList = async (keyword = '') => {
-  const token = Cookies.get('token'); // ← 從 Cookie 取 token
+export const getRoleList = async (keyword = ''): Promise<any[]> => {
+  try {
+    const res = await axios.get(`${BASE_URL}/api/v1/sys/role`, {
+      params: { fe_search_keyword: keyword },
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader(), // 從 localStorage 取 token
+      },
+    });
 
-  const res = await fetch(`${BASE_URL}/api/v2/sys/role?fe_search_keyword=${keyword}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    // credentials: 'include', // 通常 fetch 有帶 token 就不用了，除非有設 cookie-based session
-    mode: 'cors',
-  });
-
-  if (!res.ok) {
-    console.error('取得角色資料失敗', res.status);
+    return res.data.data; // API 回傳格式為 { data: [...] }
+  } catch (e) {
+    console.error('取得角色資料失敗', e);
 
     return [];
   }
-
-  const result = await res.json();
-
-  return result.data;
 };
 
 //新增角色
 export const createRole = async (role: Role) => {
-  const res = await fetch(`${BASE_URL}/api/v2/sys/role`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(role),
-  });
+  try {
+    const res = await axios.post(
+      `${BASE_URL}/api/v1/sys/role`,
+      role, // axios 會自動幫你轉成 JSON
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader(),
+        },
+      }
+    );
 
-  const data = await res.json();
+    return res.data;
+  } catch (error) {
+    console.error('新增角色失敗:', error);
 
-  return handleResponse(data);
+    throw error;
+  }
 };
 
 //=================================================
-//修改角色
+// 更新角色
 export async function updateRole(role: UpdateRole) {
   const { role_id, ...body } = role;
 
-  const res = await fetch(`${BASE_URL}/api/v2/sys/role/${role_id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ role_id, ...body }),
-  });
-  const data = await res.json();
+  try {
+    const res = await axios.put(
+      `${BASE_URL}/api/v1/sys/role/${role_id}`,
+      { role_id, ...body }, // axios 會自動轉 JSON
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader(),
+        },
+      }
+    );
 
-  return handleResponse(data);
+    return handleResponse(res.data);
+  } catch (error) {
+    console.error('更新角色失敗:', error);
+
+    throw error;
+  }
 }
 
+// 刪除角色
 export const deleteRoleById = async (role_id: string) => {
-  const res = await fetch(`${BASE_URL}/api/v2/sys/role/?role_id=${role_id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const res = await axios.delete(`${BASE_URL}/api/v1/sys/role/`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader(),
+      },
+      params: { role_id }, // axios delete 建議用 params 傳 query string
+    });
 
-  const result = await res.json();
+    return res.data;
+  } catch (error) {
+    console.error('刪除角色失敗:', error);
 
-  return result;
+    throw error;
+  }
 };
 
 //=================================================

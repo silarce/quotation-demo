@@ -1,4 +1,4 @@
-import { Input, message } from 'antd';
+import { Input } from 'antd';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import scss from './AddRoleTable.module.scss';
@@ -7,11 +7,6 @@ import scss from './AddRoleTable.module.scss';
 import SaveButton from 'components/global/myCom/button/SaveButton';
 import AddButton from 'components/global/myCom/button/AddButton';
 import ClearButton from 'components/global/myCom/button/clearButton';
-
-import { IconTrash, IconSave, IconAddRole } from 'public/image/icon/svgComponent/svgIcons';
-
-//api
-import { createRole } from '../api_role';
 
 //type
 import { AddRoleType, UpdateRole } from './schema/system';
@@ -43,33 +38,24 @@ const RoleForm: React.FC<RoleFormProps> = ({
       return;
     }
 
-    try {
-      if (!editingRole) {
-        const result = await createRole({ role_name: roleName, description: description, role_code: roleCode });
-        onAddRole({
-          role_id: result.role_id,
-          role_name: roleName,
-          role_code: roleCode,
-          description,
-        });
-        message.success('角色已新增');
-        setRoleName('');
-        setDescription('');
-        setRoleCode('');
-        onCancel(); // 可觸發父層重新整理列表等
-      } else {
-        onUpdate?.({
-          role_id: editingRole.role_id,
-          role_name: roleName,
-          description,
-          role_code: roleCode,
-          created_by: editingRole.created_by,
-          created_at: editingRole.created_at,
-          updated_at: new Date().toISOString(),
-        });
-      }
-    } catch (error: any) {
-      message.error(error.message || '新增失敗');
+    if (!editingRole) {
+      // 只把表單資料交給父層
+      onAddRole({
+        role_id: '', // 父層 API 建立後帶回正確 id
+        role_name: roleName,
+        role_code: roleCode,
+        description,
+      });
+    } else {
+      onUpdate?.({
+        role_id: editingRole.role_id,
+        role_name: roleName,
+        description,
+        role_code: roleCode,
+        created_by: editingRole.created_by,
+        created_at: editingRole.created_at,
+        updated_at: new Date().toISOString(),
+      });
     }
   };
 
@@ -89,21 +75,21 @@ const RoleForm: React.FC<RoleFormProps> = ({
 
   return (
     <div
-      className={`${scss.formBlock} h-full bg-white border border-[#616161]  flex flex-col px-6 pt-8 relative rounded-lg drop-shadow-lg`}
+      className={`${scss.formBlock} h-full bg-white border border-[#616161] flex flex-col px-6 pt-8 relative rounded-lg drop-shadow-lg`}
     >
       <div>
         <div className="flex items-center mb-5">
           <span className="w-[5%] font-semibold">角色名稱</span>
           <Input
             placeholder="請輸入角色"
-            className={` h-[40px]`}
+            className="h-[40px]"
             defaultValue={defaultRole}
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
           />
         </div>
         <div className="flex items-center mb-5">
-          <span className="w-[5%] font-semibold ">角色代碼</span>
+          <span className="w-[5%] font-semibold">角色代碼</span>
           <Input
             className="h-[40px]"
             placeholder="請輸入代碼"
@@ -111,7 +97,7 @@ const RoleForm: React.FC<RoleFormProps> = ({
             onChange={(e) => setRoleCode(e.target.value)}
           />
         </div>
-        <div className="flex items-center ">
+        <div className="flex items-center">
           <span className="w-[5%] font-semibold">角色描述</span>
           <Input
             className="h-[40px]"
