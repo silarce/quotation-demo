@@ -60,10 +60,10 @@ export default function LeaveSetting() {
       align: 'center',
     },
     {
-      title: '全勤影響',
+      title: '影響全勤計算',
       dataIndex: 'affectFullAttendance',
       key: 'affectFullAttendance',
-      width: '5%',
+      width: '7%',
       align: 'center',
       render: (val: boolean) =>
         val ? (
@@ -77,10 +77,10 @@ export default function LeaveSetting() {
         ),
     },
     {
-      title: '帶薪通知',
+      title: '需人資開通',
       dataIndex: 'notifyWhenPaid',
       key: 'notifyWhenPaid',
-      width: '5%',
+      width: '6%',
       align: 'center',
       render: (val: boolean) =>
         val ? (

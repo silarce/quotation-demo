@@ -1,13 +1,9 @@
 import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 import Input from 'components/global/myCom/Input/Input';
-import AddButton from 'components/global/myCom/button/AddButton';
 import { useEffect, useState } from 'react';
-import SearchButton from 'components/global/myCom/button/searchButton';
-import ClearButton from 'components/global/myCom/button/clearButton';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
 import Icon_list from 'public/image/icon/fong/Procurement2.svg';
-import editIcon from 'public/image/icon/note.svg?url';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { Table } from 'antd';
 import { useRouter } from 'next/router';
