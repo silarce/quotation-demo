@@ -162,7 +162,7 @@ export default function ChangePwPanel({ open: visible, onCancel }: { open: boole
           確認
         </Button> */}
         <div className={`${scss.mobileBtn} flex mt-10 gap-4 justify-end`}>
-          <Btn>返回</Btn>
+          <Btn onClick={onCancel}>返回</Btn>
           <Btn theme="send" onClick={theOnConfirm}>
             送出
           </Btn>
