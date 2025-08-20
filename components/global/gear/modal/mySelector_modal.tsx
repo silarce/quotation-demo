@@ -53,8 +53,6 @@ export default function MySelector_modal<Tdata extends Tdata_ex>({
   configArr: readonly Tconfig<keyof Tdata>[];
   modalWidth: '800' | '1000' | '1200';
 }) {
-  // const { rwd1023 } = useContext(AppContext);
-
   // 被選的資料
   const [selData, setSelData] = useState<Tdata[]>([]);
 

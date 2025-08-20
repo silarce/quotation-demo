@@ -20,8 +20,6 @@ import Imgbanner_mobile from 'public/image/loginBanner_mobile.png';
 // css
 import scss from './login.module.scss';
 
-import { AppContext } from 'pages/_app';
-
 import { apiLogin } from 'js/api/api_auth';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 

@@ -14,7 +14,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 import { setting } from '../../factoryDepartment/wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
@@ -50,7 +50,7 @@ export default function FlowList() {
   const [leftbaropen, setLeftbaropen] = useState<boolean>(true);
 
   //登入者資料
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   //資料列宣告
   const [data, setData] = useState<any[]>([]);
   // const [data2, setData2] = useState<any[]>([]);

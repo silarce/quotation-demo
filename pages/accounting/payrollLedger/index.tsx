@@ -1,7 +1,7 @@
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import scss from './payrollLedger.module.scss';
-import { createRef, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { setting } from '../../factoryDepartment/wareHouseList/index';
 import { useRouter } from 'next/router';
 import { content } from 'html2canvas/dist/types/css/property-descriptors/content';
@@ -19,7 +19,6 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import icon_cancel from 'public/image/icon/fc_cancel.svg?url';
 import icon_fc_check from 'public/image/icon/fc_check.svg?url';
 import icon_cancel2 from 'public/image/icon/fc_cancel2.svg?url';
-import { AppContext } from 'pages/_app';
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg?url';
 import icon_edit from 'public/image/icon/fc_edit.svg?url';
 import icon_delete from 'public/image/icon/fc_delete.svg?url';
@@ -49,9 +48,6 @@ export default function PayrollLedger() {
   //#region =============【變數宣告】===============================================================================
   // Loading
   const [isLoading, setIsLoading] = useState(false);
-
-  //登入者資料
-  const { userInfo } = useContext(AppContext);
 
   // 資料列
   const [data, setData] = useState<any[]>([]); // 物料data
