@@ -1,333 +1,141 @@
-import { useState, useEffect, useReducer, useMemo } from 'react';
-
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
+import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
+import Table_antd, { TableProps } from 'components/global/myAntd/table';
+import { Spin } from 'antd';
 
-import { modal_empty } from 'components/global/gear/modal/fongModal';
-import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
-
-import SalesOrderInfo from 'components/page/accounting/salesOrder/salesOrderInfo';
-import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
-
-import {
-  useApiGetSalesOrderById,
-  TsalesOrder_Dto,
-  TsalesOrder_post_Dto,
-  TsalesOrder_patch_Dto,
-  apiPostSalesOrderData,
-  apiPatchSalesOrderData,
-} from 'js/api/api_netCore/api_accountsReceivable';
-
-import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
-import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
-
-import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
-import { id } from 'date-fns/locale';
+import { useApiGetSalesOrderDataList, TsalesOrder_simple_Dto } from 'js/api/api_netCore/api_salesOrder';
+import Icon_note from 'public/image/icon/fong/note.svg';
+import Icon_query from 'public/image/icon/fong/query.svg';
 
 // ============================================================================
 
 interface Tquery {
-  id?: string;
+  keyword?: string;
 }
 
 // ============================================================================
-
-// MARK:START
-
-export default function SalesOrder() {
+export default function List() {
   const router = useRouter();
   const query = router.query as Tquery;
 
-  const { userInfo } = useGlobal_userInfo();
+  const { data, isFetching } = useApiGetSalesOrderDataList();
 
-  const isNew = !query.id;
+  const [state_keyword, setState_keyword] = useState(query.keyword ?? '');
 
-  const [disabled, setDisabled] = useState(false);
+  const filteredData = useMemo(() => {
+    if (!data) {
+      return [];
+    }
 
-  const {
-    data: salesOrderData,
-    isFetching: isFetchingSalesOrder,
-    update: updateSalesOrder,
-  } = useApiGetSalesOrderById(query.id);
+    if (!state_keyword) {
+      return data;
+    }
 
-  const instance_salesOrder = useSalesOrder(salesOrderData);
+    return data.filter(
+      (item) =>
+        item.salesOrderNumber.includes(state_keyword) ||
+        item.quotationContractNumber?.includes(state_keyword) ||
+        item.customerName.includes(state_keyword) ||
+        item.constructionSite.includes(state_keyword) ||
+        item.totalAmount === Number(state_keyword)
+    );
+  }, [query.keyword, data]);
 
-  const instance_salesOrderItemArr = useSalesOrderItemArr(salesOrderData?.salesOrderItems);
-
-  // ---------------------------------------------------------------------------
-
-  const handle_importContract = () => {
-    const { destroy } = modal_empty({
-      width: 'fit-content',
-      content: (
-        <Selector_quotation
-          onCancel={() => {
-            destroy();
-          }}
-          onConfirm={([quotation]) => {
-            if (!quotation) {
-              destroy();
-
-              return;
-            }
-
-            const {
-              quotationNumber,
-              contractNumber,
-              projectName,
-              subTotal,
-              salesTax,
-              total,
-              currency,
-              foreignTotal,
-              exchangeRate,
-              customerName,
-            } = quotation;
-
-            instance_salesOrder.setState((prev) => ({
-              ...prev,
-              quotationNumber,
-              quotationContractNumber: contractNumber || '',
-              constructionSite: projectName || '',
-              customerNumber: '',
-              customerName: customerName || '',
-              salesAmount: `${subTotal || ''}`,
-              taxes: `${salesTax || ''}`,
-              totalAmount: `${total || ''}`,
-              sourceType: '',
-              客戶聯絡電話1: '',
-              客戶聯絡電話2: '',
-              address: '',
-              invoiceType: '',
-              taxId: '',
-              taxDeductionCategory: '',
-              salesCurrency: currency,
-              exchangeRate: `${exchangeRate || ''}`,
-              currencyAmount: `${foreignTotal || ''}`,
-            }));
-
-            destroy();
-
-            //
-          }}
-        />
-      ),
+  const handle_search = () => {
+    router.replace({
+      query: {
+        ...query,
+        keyword: state_keyword,
+      },
     });
   };
 
-  // ---------------------------------------------------------------------------
-
-  const createBody_post = () => {
-    const { state: state_salesOrder } = instance_salesOrder;
-    const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
-
-    const {
-      sourceType,
-      quotationNumber,
-      quotationContractNumber,
-      constructionSite,
-
-      customerId,
-      customerNumber,
-      customerName,
-      companyPhone,
-      companyFax,
-
-      salesAmount,
-      taxes,
-      totalAmount,
-      sourceType: 類別,
-      客戶聯絡電話1,
-      客戶聯絡電話2,
-      address,
-      invoiceType,
-      taxId,
-      taxDeductionCategory,
-      salesCurrency,
-      exchangeRate,
-      currencyAmount,
-    } = state_salesOrder;
-
-    const userIdNumber = userInfo?.employee?.idNumber;
-
-    const errorMessage: string[] = [];
-
-    !userIdNumber && errorMessage.push('User idNumber is undefined');
-    !sourceType && errorMessage.push('請選擇類別');
-    !salesCurrency && errorMessage.push('請選擇幣別');
-    !exchangeRate && errorMessage.push('請輸入匯率');
-    !currencyAmount && errorMessage.push('請輸入外幣金額');
-    !salesAmount && errorMessage.push('請輸入銷貨金額');
-    !taxes && errorMessage.push('請輸入稅額');
-    !totalAmount && errorMessage.push('請輸入銷售總總額');
-
-    if (errorMessage.length) {
-      myAlert.err({
-        title: '錯誤',
-        content: errorMessage.join('\n'),
-      });
-
-      return null;
-    }
-
-    const salesOrderItems = state_salesOrderItemArr.map((item) => {
-      const { raw, quantity, unitPrice, amount } = item;
-
-      const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
-        ...raw,
-        id: null,
-        salesOrderNumber: null,
-        quantity: Number(quantity),
-        unitPrice: Number(unitPrice),
-        amount,
-        productName: raw.productName || '',
-        productNumber: raw.productNumber || '',
-      };
-
-      return salesOrderItem;
-    });
-
-    const body: TsalesOrder_post_Dto = {
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      createdBy: userIdNumber!,
-      updatedBy: userIdNumber!,
-
-      customerId,
-      customerNumber,
-      customerName,
-      constructionSite,
-      companyPhone,
-      companyFax,
-      address,
-      salesCurrency,
-      exchangeRate: Number(exchangeRate),
-      currencyAmount: Number(currencyAmount),
-
-      salesAmount: Number(salesAmount),
-      taxes: Number(taxes),
-      changedAmount: null,
-      changedTaxes: null,
-      totalAmount: Number(totalAmount),
-
-      status: null,
-      sourceType: sourceType!,
-
-      sourceId: null,
-      quotationNumber,
-      quotationContractNumber,
-      taxId,
-      taxDeductionCategory,
-      invoiceType,
-      salesOrderItems,
-    };
-
-    return body;
-  };
-
-  const createBody_patch = () => {
-    if (!salesOrderData || !salesOrderData.salesOrderNumber) {
-      return;
-    }
-
-    const body_post = createBody_post();
-
-    if (!body_post) {
-      return body_post;
-    }
-
-    const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
-
-    const salesOrderItems = state_salesOrderItemArr.map((item, index) => {
-      const { raw, quantity, unitPrice, amount } = item;
-
-      const salesOrderItem: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
-        ...raw,
-        quantity: Number(quantity),
-        unitPrice: Number(unitPrice),
-        amount,
-        productName: raw.productName || '',
-        productNumber: raw.productNumber || '',
-
-        itemNumber: `${index}`,
-      };
-
-      return salesOrderItem;
-    });
-
-    const body: TsalesOrder_patch_Dto = {
-      ...body_post,
-      id: salesOrderData.id,
-      salesOrderNumber: salesOrderData.salesOrderNumber,
-      salesOrderItems,
-      itemNumber: '',
-    };
-
-    return body;
-  };
-
-  const req_postOrPatch = async () => {
-    if (isNew) {
-      const body = createBody_post();
-
-      if (body) {
-        try {
-          const id = await apiPostSalesOrderData(body);
-          router.replace({
-            query: {
-              ...query,
-              id,
-            },
-          });
-        } catch (error) {}
-      }
-    } else {
-      const body = createBody_patch();
-
-      if (body) {
-        try {
-          await apiPatchSalesOrderData(body);
-          await updateSalesOrder();
-        } catch (error) {}
-      }
-    }
-  };
-
-  // ---------------------------------------------------------------------------
-
-  const handle_save = () => {
-    req_postOrPatch();
-  };
-
-  // ---------------------------------------------------------------------------
-
-  // MARK: RENDER
   return (
     <div>
       <div className="pageTop flex justify-between items-center">
-        <div className="text-xl font-semibold">銷貨單</div>
+        <div className="text-xl font-semibold">銷貨單列表</div>
         <div className="flex gap-3">
-          <Btn theme="import" onClick={handle_importContract}>
-            合約匯入
-          </Btn>
-          <Btn themeColor="red_I" onClick={instance_salesOrder.reset}>
-            重置
-          </Btn>
-          <Btn theme="save" onClick={handle_save}>
-            儲存
-          </Btn>
+          <Btn onClick={() => router.push('salesOrder/edit')}>新建</Btn>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handle_search();
+            }}
+          >
+            <DataEntry_fong>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <Input
+                  placeholder="搜尋"
+                  value={state_keyword}
+                  onChange={(e) => {
+                    setState_keyword(e.target.value);
+                  }}
+                />
+                <Icon_query className=" cursor-pointer" onClick={handle_search} />
+              </div>
+            </DataEntry_fong>
+          </form>
         </div>
       </div>
 
-      <SalesOrderInfo instance_salesOrder={instance_salesOrder} />
-
-      <SalesOrderItemList className={'mt-10'} instance_salesOrderItemArr={instance_salesOrderItemArr} />
+      {/*  */}
+      <Spin spinning={isFetching} delay={500}>
+        <Table_antd columns={columns} dataSource={filteredData} />
+      </Spin>
+      {/*  */}
     </div>
   );
 }
 
-// MARK: END
-// ==========================================================================
+// =====================================================================
+
+const columns: TableProps<TsalesOrder_simple_Dto>['columns'] = [
+  {
+    title: '銷貨單號',
+    dataIndex: 'salesOrderNumber',
+    width: 150,
+  },
+  {
+    title: '合約編號',
+    dataIndex: 'quotationContractNumber',
+    width: 150,
+  },
+  {
+    title: '客戶名稱',
+    dataIndex: 'customerName',
+    width: 300,
+  },
+  {
+    title: '工地名稱',
+    dataIndex: 'constructionSite',
+    width: 400,
+  },
+  {
+    title: '總金額',
+    dataIndex: 'totalAmount',
+    width: 150,
+    align: 'right',
+    render: (v) => (v === null ? v : '$' + v.toLocaleString()),
+  },
+  {},
+  {
+    key: 'panel',
+    width: 50,
+    align: 'center',
+    render: (_, record) => (
+      <Link
+        href={{
+          pathname: 'salesOrder/edit',
+          query: { id: record.id },
+        }}
+      >
+        <Icon_note />
+      </Link>
+    ),
+  },
+];
