@@ -2,8 +2,16 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 
 import axios from 'axios';
 
-import Cookies from 'js-cookie';
-const token = Cookies.get('token');
+const getAuthHeader = () => {
+  if (typeof window === 'undefined') {
+    return {};
+  }
+
+  const token = localStorage.getItem('access_token');
+  const type = localStorage.getItem('token_type') || 'Bearer';
+
+  return token ? { Authorization: `${type} ${token}` } : {};
+};
 
 export interface RawUserItem {
   user_id: string;
@@ -15,10 +23,10 @@ export interface RawUserItem {
 
 //取得使用者列表
 export const getUserList = async (keyword = '') => {
-  const res = await axios.get(`${BASE_URL}/api/v2/sys/user`, {
+  const res = await axios.get(`${BASE_URL}/api/v1/sys/user`, {
     params: { fe_search_keyword: keyword },
     headers: {
-      Authorization: `Bearer ${token}`,
+      ...getAuthHeader(),
     },
   });
 
@@ -34,7 +42,7 @@ export const deleteUser = async (user_id: string) => {
   try {
     const response = await axios.delete(`${BASE_URL}/api/v2/sys/user/${user_id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...getAuthHeader(),
       },
     });
 
@@ -49,7 +57,7 @@ export const getBindableEmployeeList = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/api/v2/sys/user/querybindableemplist`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...getAuthHeader(),
       },
     });
 
@@ -64,7 +72,7 @@ export const bindUserToEmployee = async (user_id: string, emp_id: string) => {
     user_id,
     emp_id,
     headers: {
-      Authorization: `Bearer ${token}`,
+      ...getAuthHeader(),
     },
   });
 

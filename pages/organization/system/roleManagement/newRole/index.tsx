@@ -1,67 +1,80 @@
-// components/page/setting/system/roleManagement/AddRolePage.tsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AddRoleForm from 'components/page/organization/system/roleManagement/newRole/AddRoleTable';
 import RoleTable from 'components/page/organization/system/roleManagement/newRole/RoleTable';
 import { message } from 'antd';
 
-// hooks & types
-import { useRoleReducer, Role } from 'components/page/organization/system/roleManagement/newRole/hook/useRoleReducer';
-import { getRoleList, deleteRoleById, updateRole } from 'components/page/organization/system/roleManagement/api_role';
+// api
+import {
+  getRoleList,
+  createRole,
+  deleteRoleById,
+  updateRole,
+} from 'components/page/organization/system/roleManagement/api_role';
+import { Role } from 'components/page/organization/system/roleManagement/newRole/hook/useRoleReducer';
 
 export default function AddRolePage() {
-  const [state, dispatchRole] = useRoleReducer();
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
+  // 取得角色列表
   const getRoles = async () => {
     const roleList = await getRoleList();
-    dispatchRole({ type: 'SET_ROLE_LIST', payload: roleList });
+    setRoles(roleList);
   };
 
   useEffect(() => {
     getRoles();
   }, []);
 
+  // 刪除角色
   const handleDelete = async (role_id: string) => {
     try {
       await deleteRoleById(role_id);
       message.success('角色已刪除');
-      getRoles();
-      dispatchRole({ type: 'CANCEL_EDIT' });
+      await getRoles();
+      setEditingRole(null);
     } catch (err) {
       console.error('刪除錯誤：', err);
     }
   };
 
+  // 更新角色
   const handleUpdate = async (role: Role) => {
     try {
-      const newRole = await updateRole(role);
-      dispatchRole({ type: 'UPDATE_ROLE', payload: newRole });
-      getRoles();
+      await updateRole(role);
       message.success('角色已更新');
+      await getRoles();
+      setEditingRole(null);
     } catch (err) {
       console.error('更新錯誤：', err);
     }
   };
 
-  return (
-    <>
-      <div className="w-full">
-        <AddRoleForm
-          onAddRole={(data) => dispatchRole({ type: 'ADD_ROLE', payload: data })}
-          editingRole={state.editingRole}
-          onUpdate={handleUpdate}
-          onCancel={() => dispatchRole({ type: 'CANCEL_EDIT' })}
-        />
+  // 新增角色
+  const handleAdd = async (data: Omit<Role, 'role_id' | 'created_by' | 'created_at'>) => {
+    try {
+      await createRole(data);
+      message.success('角色已新增');
+      await getRoles();
+    } catch (err) {
+      message.error('新增失敗');
+    }
+  };
 
-        <div className="w-full mt-8 flex justify-center">
-          <div className="w-full overflow-hidden">
-            <RoleTable
-              data={state.roles}
-              onEdit={(role) => dispatchRole({ type: 'START_EDIT', payload: role })}
-              onDelete={handleDelete}
-            />
-          </div>
+  return (
+    <div className="w-full">
+      <AddRoleForm
+        onAddRole={handleAdd}
+        editingRole={editingRole || undefined}
+        onUpdate={handleUpdate}
+        onCancel={() => setEditingRole(null)}
+      />
+
+      <div className="w-full mt-8 flex justify-center">
+        <div className="w-full overflow-hidden">
+          <RoleTable data={roles} onEdit={(role) => setEditingRole(role)} onDelete={handleDelete} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
