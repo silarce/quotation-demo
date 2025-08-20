@@ -62,22 +62,12 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-type TappContext = {
-  userInfo: TuserDto | undefined | null;
-  userGrade: number;
-  erpFeature: TerpFeatureDto[] | undefined | null;
-};
-
 type TmyPageProps = {
   isAdmin: boolean;
   userInfo: TuserDto | undefined | null;
   userGrade: number;
   userErpFeature: TerpFeatureDto[] | undefined | null;
 };
-
-// =============================================================================
-
-const AppContext = createContext<TappContext>(null!);
 
 // =============================================================================
 
@@ -183,13 +173,11 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       </Head>
 
       <ErrorBoundary>
-        <AppContext.Provider value={appContextValue}>
-          {getLayout(
-            <ErrorBoundary pathname={router.pathname}>
-              <Component {...pageProps} {...myPageProps} />
-            </ErrorBoundary>
-          )}
-        </AppContext.Provider>
+        {getLayout(
+          <ErrorBoundary pathname={router.pathname}>
+            <Component {...pageProps} {...myPageProps} />
+          </ErrorBoundary>
+        )}
       </ErrorBoundary>
       {/* 全域loading cover */}
       {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
@@ -277,5 +265,4 @@ Object.clearAndAssign = function <T extends Record<string, any>>(target: T, sour
 
 export default MyApp;
 
-export type { NextPageWithLayout, TappContext, TmyPageProps };
-export { AppContext };
+export type { NextPageWithLayout, TmyPageProps };
