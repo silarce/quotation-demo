@@ -12,6 +12,9 @@ import scss from './changePwPanel.module.scss';
 // api
 import { apiAuthPassword } from 'js/api/api_auth';
 
+import { DataEntry_fong, Input_Password } from '../dataEntry';
+import Btn from '../button/btn_fong';
+
 type TpwPostBody = {
   oldPassword: string;
   newPassword: string;
@@ -96,6 +99,7 @@ export default function ChangePwPanel({ open: visible, onCancel }: { open: boole
   // -------------------------------------------------------------------------
   return (
     <Modal
+      width={350}
       className={scss.antdModalChangePw}
       open={visible}
       closable={false}
@@ -108,7 +112,7 @@ export default function ChangePwPanel({ open: visible, onCancel }: { open: boole
     >
       <div className={scss.header}>
         <div>
-          <span>變更密碼</span>
+          <span className="text-[16px] font-bold">變更密碼</span>
         </div>
       </div>
 
@@ -116,7 +120,19 @@ export default function ChangePwPanel({ open: visible, onCancel }: { open: boole
         <form className={scss.inputContainer} onSubmit={(e) => e.preventDefault}>
           {/* 為了讓瀏覽器不要在控制台跳警告 */}
           <input type="text" name="username" autoComplete="username" style={{ display: 'none' }} />
-          <Input_pw
+          <div className="flex flex-col gap-5 mt-6">
+            <DataEntry_fong caption="舊密碼" isMust>
+              <Input_Password value={oldPw} onChange={(e) => setOldPw(e.target.value)}></Input_Password>
+            </DataEntry_fong>
+            <DataEntry_fong caption="新密碼" isMust>
+              <Input_Password value={newPw} onChange={(e) => setNewPw(e.target.value)}></Input_Password>
+            </DataEntry_fong>
+            <DataEntry_fong caption="確認新密碼" isMust>
+              <Input_Password value={newPw2} onChange={(e) => setNewPw2(e.target.value)}></Input_Password>
+            </DataEntry_fong>
+          </div>
+
+          {/* <Input_pw
             value={oldPw}
             onChange={setOldPw}
             label="舊密碼"
@@ -139,12 +155,18 @@ export default function ChangePwPanel({ open: visible, onCancel }: { open: boole
             inputType="auto"
             captionWidth="100px"
             firstGap="40px"
-          />
+          /> */}
         </form>
 
-        <Button loading={isLoading} className={scss.confirmBtn} onClick={theOnConfirm}>
+        {/* <Button loading={isLoading} className={scss.confirmBtn} onClick={theOnConfirm}>
           確認
-        </Button>
+        </Button> */}
+        <div className={`${scss.mobileBtn} flex mt-10 gap-4 justify-end`}>
+          <Btn onClick={onCancel}>返回</Btn>
+          <Btn theme="send" onClick={theOnConfirm}>
+            送出
+          </Btn>
+        </div>
       </div>
     </Modal>
   );

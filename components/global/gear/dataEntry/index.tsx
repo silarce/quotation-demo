@@ -17,6 +17,7 @@ import {
   TimePickerProps,
   Select as AntdSelect,
   SelectProps as AntdSelectProps,
+  Input as AntdInput,
 } from 'antd';
 import type { RangePickerProps } from 'antd/es/date-picker';
 
@@ -347,6 +348,19 @@ const Input = ({
 };
 
 Input.displayName = 'Input';
+
+//MARK:Input_password
+const Input_Password = ({ className, ...props }: React.ComponentProps<typeof AntdInput.Password>) => {
+  return (
+    <AntdInput.Password
+      // 避免使用者滾動 page 時意外改到密碼欄位
+      onWheel={(e) => e.currentTarget.blur()}
+      placeholder="- -"
+      {...props}
+      className={classNames('w-full placeholder:text-gray06', className, scss.inputPassword)}
+    />
+  );
+};
 
 // MARK: Input_money
 
@@ -826,6 +840,7 @@ export {
   DateRangePicker,
   Textarea,
   //
+  Input_Password,
   Input_money,
 };
 
