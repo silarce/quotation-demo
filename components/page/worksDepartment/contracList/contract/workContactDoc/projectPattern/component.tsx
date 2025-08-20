@@ -1,11 +1,11 @@
-import { useContext, useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import classNames from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // antd
 import { Upload, Image as AntdImage, Spin } from 'antd';
@@ -13,7 +13,6 @@ import { UploadChangeParam } from 'antd/lib/upload';
 
 // gear
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
-import ProcessChain, { TstatusLabelProps } from 'components/global/gear/processChain';
 import ReviewFlowSelector from 'components/composition/review/reviewFlowSelector';
 import { useReviewFlow } from 'components/composition/review/reviewFlow';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -146,7 +145,7 @@ const Pattern = ({
   // setReviewConfirm: (confirm: (isPass: boolean) => void) => void;
   // statusArr: TstatusLabelProps[];
 }) => {
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   const userId = userInfo?.employee?.id;
 
   const { name: patternName } = lookup_pattern[patternType];

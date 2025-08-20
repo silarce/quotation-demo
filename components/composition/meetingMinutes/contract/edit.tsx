@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext, forwardRef, useImperativeHandle } from 'react';
+import { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react';
 import classNames from 'classnames';
 import dayjs from 'dayjs';
 
@@ -30,8 +30,7 @@ import {
   useGetMeetingMinutes_id_attachments,
 } from 'js/api/api_meetingMinutes';
 
-// context
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // ================================================================================================
 
@@ -114,7 +113,7 @@ function MeetingMinuteEdit_component(
 
   // ---------------------------------------------------------------------
 
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
 
   // ---------------------------------------------------------------------
 
