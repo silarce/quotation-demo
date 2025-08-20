@@ -1,5 +1,6 @@
 import type { DeepNullable } from 'ts-essentials';
 import type { Guid, decimal, int, DateTime } from './shared';
+import type { TsalesOrder_simple_Dto } from './salesOrder';
 
 interface TaccountsReceivablesList_Dto_depressed {
   id: string; //應收帳款id
@@ -418,45 +419,9 @@ interface Tres_apiGetARPaymentData {
 
 type Tres_apiGetARPaymentDataInset = Omit<Tres_apiGetARPaymentData, 'paymentRequest'> & { paymentRequest: null };
 
-interface TsalesOrder_Dto {
-  id: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-
-  salesOrderNumber: string;
-
-  customerId: string | null;
-  customerNumber: string | null;
-  customerName: string | null;
-  companyPhone: string | null;
-  companyFax: string | null;
-
-  constructionSite: string | null; //工地名稱
-  address: string | null;
-
-  salesCurrency: string | null; //幣別
-  exchangeRate: number | null; //匯率
-  currencyAmount: number | null; //外幣金額
-
-  salesAmount: number | null; //銷售金額
-  taxes: number | null; //稅金
-  changedAmount: number | null; //追加減金額
-  changedTaxes: number | null; //追加減稅金
-  totalAmount: number | null; //總金額
-
-  status: number | null; //狀態
-  sourceType: string | null; //來源類型
-  sourceId: string | null; //來源id(合約ID)
-  quotationNumber: string | null;
-  quotationContractNumber: string | null;
-
-  taxId: string | null; //統一編號
-  taxDeductionCategory: string | null; //稅別
-  invoiceType: string | null; //發票類型
+type TsalesOrder_Dto = Omit<TsalesOrder_simple_Dto, 'salesOrderItems'> & {
   salesOrderItems: TsalesOrderItem_Dto[] | null; //銷售訂單明細
-}
+};
 
 interface TsalesOrderItem_Dto {
   id: string;
