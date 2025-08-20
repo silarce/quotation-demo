@@ -271,6 +271,11 @@ interface Tres_apiGetARPaymentData {
     salesOrderNumber: string | null; //銷售訂單編號
     taxId: string | null;
     taxDeductionCategory: string | null;
+
+    retainageType: string | null;
+    retainageTaxCategory: string | null;
+    retainageRate: number | null;
+    retainageAmount: number | null;
   };
 
   // 本次請款明細
