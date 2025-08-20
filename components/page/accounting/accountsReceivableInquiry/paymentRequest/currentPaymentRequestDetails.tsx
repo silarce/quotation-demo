@@ -202,7 +202,7 @@ const CurrentPaymentRequestDetails = ({
                 }}
               />
             </DataEntry_fong>
-            <DataEntry_fong className="col-span-2" caption="稅別" isMust={true} disabled={!isAllowEdit}>
+            <DataEntry_fong className="col-span-2" caption="保留款稅別" isMust={true} disabled={!isAllowEdit}>
               <Select
                 options={options_retainageTaxCategory}
                 value={state_paymentRequest.retainageTaxCategory}
