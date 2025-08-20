@@ -25,6 +25,7 @@ import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook
 import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+import { id } from 'date-fns/locale';
 
 // ============================================================================
 
@@ -120,9 +121,6 @@ export default function SalesOrder() {
   // ---------------------------------------------------------------------------
 
   const createBody_post = () => {
-    // TsalesOrder_post_Dto,
-    // TsalesOrder_patch_Dto,
-    //     instance_salesOrder
     const { state: state_salesOrder } = instance_salesOrder;
     const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
 
@@ -228,17 +226,65 @@ export default function SalesOrder() {
     };
 
     return body;
+  };
 
-    //
-    //
-    //
+  const createBody_patch = () => {
+    if (!salesOrderData || !salesOrderData.salesOrderNumber) {
+      return;
+    }
+
+    const body_post = createBody_post();
+
+    if (!body_post) {
+      return body_post;
+    }
+
+    const salesOrderItems = body_post.salesOrderItems.map((item, index) => {
+      const salesOrderItems: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
+        ...item,
+        id: item.id!,
+        itemNumber: `${index}`,
+        salesOrderNumber: item.salesOrderNumber!,
+        productName: item.productName,
+        productNumber: item.productNumber,
+      };
+
+      return salesOrderItems;
+    });
+
+    const body: TsalesOrder_patch_Dto = {
+      ...body_post,
+      id: salesOrderData.id,
+      salesOrderNumber: salesOrderData.salesOrderNumber,
+      salesOrderItems,
+    };
+
+    return body;
   };
 
   const req_postOrPatch = async () => {
-    const body = createBody_post();
+    if (isNew) {
+      const body = createBody_post();
 
-    if (body) {
-      await apiPostSalesOrderData(body);
+      if (body) {
+        const id = await apiPostSalesOrderData(body);
+
+        if (id) {
+          router.replace({
+            query: {
+              ...query,
+              id,
+            },
+          });
+        }
+      }
+    } else {
+      const body = createBody_patch();
+
+      if (body) {
+        await apiPatchSalesOrderData(body);
+        await updateSalesOrder();
+      }
     }
   };
 

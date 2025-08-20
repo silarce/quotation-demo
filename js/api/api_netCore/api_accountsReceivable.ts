@@ -645,11 +645,14 @@ const useApiGetSalesOrderById = (
 const apiPostSalesOrderData = async (body: TsalesOrder_post_Dto) => {
   const api = '/api/AccountsReceivable/InsertSalesOrderData';
 
-  return axi_monkey.post<string>(api, body).catch((err) => {
-    myAlert.err({
-      title: '新增銷售單失敗',
+  return axi_monkey
+    .post<string>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      myAlert.err({
+        title: '新增銷售單失敗',
+      });
     });
-  });
 };
 
 const apiPatchSalesOrderData = async (body: TsalesOrder_patch_Dto) => {

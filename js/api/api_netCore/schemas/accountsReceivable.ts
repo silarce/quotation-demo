@@ -425,7 +425,7 @@ interface TsalesOrder_Dto {
   createdBy: string | null;
   updatedBy: string | null;
 
-  salesOrderNumber: string | null;
+  salesOrderNumber: string;
 
   customerId: string | null;
   customerNumber: string | null;
@@ -460,13 +460,13 @@ interface TsalesOrder_Dto {
 
 interface TsalesOrderItem_Dto {
   id: string;
-  itemNumber: string | null;
-  salesOrderNumber: string | null;
+  itemNumber: string; // 後端說這是排序，喵的是不是不知道什麼叫語意化
+  salesOrderNumber: string;
   discount: number | null;
 
   productId: string;
-  productName: string | null;
-  productNumber: string | null;
+  productName: string;
+  productNumber: string;
 
   unitPrice: number | null;
   quantity: number | null;
@@ -510,9 +510,9 @@ type TsalesOrder_post_Dto = {
 interface TsalesOrderItem_post_Dto {
   // id: Guid | null; //銷貨明細id // 貓拉，POST的時候哪來的id
   id: null; //銷貨明細id // 貓拉，POST的時候哪來的id
-  itemNumber: string | null; //項目編號
-  // salesOrderNumber: string; //銷售訂單編號 // 我要先有銷貨單號還可以新增銷貨單?
-  salesOrderNumber: null; //銷售訂單編號 // 我要先有銷貨單號還可以新增銷貨單?
+  itemNumber: string | null; // 排序
+  // salesOrderNumber: string; //銷售訂單編號 // 要先有銷貨單號才可以新增銷貨明細的樣子
+  salesOrderNumber: null; //銷售訂單編號 // 要先有銷貨單號才可以新增銷貨明細的樣子
   productId: Guid; //產品id
   discount: decimal | null; //折扣
   productName: string; //產品名稱
@@ -525,16 +525,18 @@ interface TsalesOrderItem_post_Dto {
   dualPrice: decimal | null; //牌價
 }
 
-type TsalesOrder_patch_Dto = TsalesOrder_post_Dto & {
+type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
   id: string; //銷售訂單id
   salesOrderNumber: string; //銷售訂單編號
-
   salesOrderItems: TsalesOrderItem_patch_Dto[];
 };
 
-type TsalesOrderItem_patch_Dto = TsalesOrderItem_post_Dto & {
+type TsalesOrderItem_patch_Dto = Omit<
+  TsalesOrderItem_post_Dto,
+  'id' | 'itemNumber' | 'salesOrderNumber' | 'productName' | 'productNumber'
+> & {
   id: string;
-  itemNumber: string;
+  itemNumber: string; // 排序，post的時候可以null為什麼patch就不可以，莫名其妙
   salesOrderNumber: string;
   productName: string;
   productNumber: string;
