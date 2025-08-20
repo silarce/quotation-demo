@@ -99,7 +99,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
       </DataEntry_fong>
       {/*  */}
 
-      <DataEntry_fong caption="客戶地址 no get no post" className="col-span-2" disabled={true}>
+      <DataEntry_fong caption="客戶地址" className="col-span-2" disabled={true}>
         {state_salesOrder.address}
       </DataEntry_fong>
 

@@ -529,6 +529,7 @@ type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
   id: string; //銷售訂單id
   salesOrderNumber: string; //銷售訂單編號
   salesOrderItems: TsalesOrderItem_patch_Dto[];
+  itemNumber: string;
 };
 
 type TsalesOrderItem_patch_Dto = Omit<

@@ -652,6 +652,8 @@ const apiPostSalesOrderData = async (body: TsalesOrder_post_Dto) => {
       myAlert.err({
         title: '新增銷售單失敗',
       });
+
+      return Promise.reject(err);
     });
 };
 
@@ -662,6 +664,8 @@ const apiPatchSalesOrderData = async (body: TsalesOrder_patch_Dto) => {
     myAlert.err({
       title: '更新銷售單失敗',
     });
+
+    return Promise.reject(err);
   });
 };
 

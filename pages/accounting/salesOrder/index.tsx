@@ -239,17 +239,23 @@ export default function SalesOrder() {
       return body_post;
     }
 
-    const salesOrderItems = body_post.salesOrderItems.map((item, index) => {
-      const salesOrderItems: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
-        ...item,
-        id: item.id!,
+    const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
+
+    const salesOrderItems = state_salesOrderItemArr.map((item, index) => {
+      const { raw, quantity, unitPrice, amount } = item;
+
+      const salesOrderItem: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
+        ...raw,
+        quantity: Number(quantity),
+        unitPrice: Number(unitPrice),
+        amount,
+        productName: raw.productName || '',
+        productNumber: raw.productNumber || '',
+
         itemNumber: `${index}`,
-        salesOrderNumber: item.salesOrderNumber!,
-        productName: item.productName,
-        productNumber: item.productNumber,
       };
 
-      return salesOrderItems;
+      return salesOrderItem;
     });
 
     const body: TsalesOrder_patch_Dto = {
@@ -257,6 +263,7 @@ export default function SalesOrder() {
       id: salesOrderData.id,
       salesOrderNumber: salesOrderData.salesOrderNumber,
       salesOrderItems,
+      itemNumber: '',
     };
 
     return body;
@@ -267,23 +274,24 @@ export default function SalesOrder() {
       const body = createBody_post();
 
       if (body) {
-        const id = await apiPostSalesOrderData(body);
-
-        if (id) {
+        try {
+          const id = await apiPostSalesOrderData(body);
           router.replace({
             query: {
               ...query,
               id,
             },
           });
-        }
+        } catch (error) {}
       }
     } else {
       const body = createBody_patch();
 
       if (body) {
-        await apiPatchSalesOrderData(body);
-        await updateSalesOrder();
+        try {
+          await apiPatchSalesOrderData(body);
+          await updateSalesOrder();
+        } catch (error) {}
       }
     }
   };
@@ -291,9 +299,7 @@ export default function SalesOrder() {
   // ---------------------------------------------------------------------------
 
   const handle_save = () => {
-    if (isNew) {
-      req_postOrPatch();
-    }
+    req_postOrPatch();
   };
 
   // ---------------------------------------------------------------------------
