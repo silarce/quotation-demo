@@ -12,20 +12,26 @@ import { Collapse, Drawer } from 'antd';
 import ChangePwPanel from 'components/global/gear/modal/changePwPanel';
 
 // img
-import iconMember from 'public/image/icon/member.svg?url';
+import IconRole from 'public/image/icon/fong/role.svg';
+import IconMember from 'public/image/icon/fong/member.svg';
+import IconDepartment from 'public/image/icon/fong/department.svg';
+import IconLogout from 'public/image/icon/fong/logout.svg';
+import IconPassword from 'public/image/icon/fong/password.svg';
 import logo from 'public/image/logo/logo_header_mobile.png';
 
 // icon
-import iconMenu from 'public/image/icon/menu02.svg?url';
-import iconLogout from 'public/image/icon/logout.svg?url';
-import iconCross from 'public/image/icon/cross_hover.svg?url';
+import IconMenu from 'public/image/icon/fong/menu.svg';
+import IconCross from 'public/image/icon/fong/cross_hover.svg';
 import iconHome from 'public/image/icon/home.svg?url';
+import IconLogo from 'public/image/logo/logo01.svg';
+import IconWeb from 'public/image/icon/fong/web.svg';
 
 // css
 import scss from './header_mobile.module.scss';
 
 // 路由表
 import { sidePathList } from '../SideNav/pathList/side';
+import Icon from '@ant-design/icons';
 
 import { apiLogout } from 'js/api/api_auth';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -34,11 +40,31 @@ import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 export default function Header_mobile() {
   const [isShowMenu, setIsShowMenu] = useState(false);
+  const router = useRouter();
+
+  // 預設標題
+  let currentTitle = '首頁';
+
+  // 如果路徑包含 /mobile/leaveApplication 就改成「請假作業」
+  if (router.asPath.includes('/mobile/leaveApplication')) {
+    currentTitle = '請假作業';
+  }
 
   return (
     <div className={scss.container}>
-      <Image src={logo} alt="logo" />
-      <Image className={scss.iconMenu} src={iconMenu} alt="menu" onClick={() => setIsShowMenu(true)} />
+      <div className="flex items-center gap-[14px]">
+        <IconMenu
+          className={scss.iconMenu}
+          onClick={() => setIsShowMenu(true)}
+          style={{ width: '48px', height: '48px' }}
+        />
+        {router.asPath !== '/lab/mobile/home' && <span onClick={() => router.back()}>返回</span>}
+      </div>
+      <span className="absolute left-1/2 -translate-x-1/2 font-bold text-[16px]">{currentTitle}</span>
+      <Link href="/lab/mobile/home" className="flex items-center">
+        {/* <Image src={logo} alt="logo" /> */}
+        <IconLogo style={{ width: '32px', height: '24px' }} />
+      </Link>
       <Menu showMenu={isShowMenu} closeMenu={() => setIsShowMenu(false)} />
     </div>
   );
@@ -73,19 +99,55 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
 
   return (
     <>
-      <Drawer className={scss.menu} open={showMenu} width={317} closable={false}>
+      <Drawer className={scss.menu} open={showMenu} width="80%" closable={false} placement="left">
         {/* close btn */}
-        <Image className="absolute top-[21px] right-[26px] w-[18px]" src={iconCross} alt="close" onClick={closeMenu} />
-        {/*  */}
+        {/* <Image
+          className="absolute top-[21px] right-[26px] w-[18px] text-white"
+          src={iconCross}
+          alt="close"
+          onClick={closeMenu}
+        /> */}
+        <IconCross className="absolute top-[21px] right-[26px] w-[18px] text-white" onClick={closeMenu} />
         <div className={scss.info}>
-          <Image src={iconMember} alt="avatar" />
-          <div>
-            <p>{userName}</p>
-            <p>{departmentName}</p>
+          {/* <Image src={iconMember} alt="avatar" /> */}
+          <IconMember style={{ width: '56px', height: '56px', color: 'white' }} />
+          <div className="flex flex-col justify-center items-start gap-6">
+            <p className="flex gap-2 items-center">
+              <IconMember style={{ width: '24px', height: '24px', color: 'white' }} /> {userName}
+            </p>
+            <p className="flex gap-2 items-center">
+              <IconRole style={{ width: '24px', height: '24px', color: 'white', marginLeft: '1px' }} />
+              模組管理員、一般人員
+            </p>
+            <p className="flex gap-2 items-center">
+              <IconDepartment style={{ width: '24px', height: '24px', color: 'white' }} />
+              {departmentName}
+            </p>
           </div>
         </div>
-        {/*  */}
-        <div className={scss.panel}>
+        <div className="grid grid-cols-1">
+          <div className="px-4 py-2 h-[40px] flex items-center gap-2">
+            <IconWeb style={{ width: '24px', height: '24px', color: '#616161' }} />
+            語言切換
+          </div>
+          <div className="px-4 py-2 h-[40px] flex items-center gap-2">
+            <IconRole style={{ width: '24px', height: '24px', color: '#616161' }} />
+            身分切換
+          </div>
+          <div
+            className="px-4 py-2 h-[40px] flex items-center gap-2 text-blue01"
+            onClick={() => setIsShowChangePw(true)}
+          >
+            <IconPassword style={{ width: '24px', height: '24px' }} />
+            變更密碼
+          </div>
+          <div className="px-4 py-2 h-[40px] flex items-center gap-2 text-[#EA1833]">
+            <IconLogout style={{ width: '24px', height: '24px', color: '#EA1833' }} />
+            登出
+          </div>
+        </div>
+
+        {/* <div className={scss.panel}>
           <span className={scss.left} onClick={() => setIsShowChangePw(true)}>
             變更密碼
           </span>
@@ -94,10 +156,9 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
             <Image src={iconLogout} alt="logout" />
             <span>登出</span>
           </div>
-        </div>
-        {/*  */}
+        </div> */}
 
-        <Collapse
+        {/* <Collapse
           className={scss.navWrapper}
           ghost
           onChange={(v) => {
@@ -110,7 +171,7 @@ const Menu = ({ showMenu, closeMenu }: { showMenu: boolean; closeMenu: () => voi
               children: <PanelBody />,
             },
           ]}
-        />
+        /> */}
       </Drawer>
 
       <ChangePwPanel open={isShowChangePw} onCancel={() => setIsShowChangePw(false)} />

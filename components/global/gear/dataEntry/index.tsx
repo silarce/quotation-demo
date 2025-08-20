@@ -474,10 +474,12 @@ const TimePicker = ({ className, disabled, ...props }: TimePickerProps) => {
       disabled={disabled}
       //
       {...suffixIcon}
-      format="HH-mm"
       autoComplete="off"
-      placeholder="- -"
+      placeholder="請選擇"
+      format="a hh:mm"
+      use12Hours
       {...props}
+      popupClassName={scss.timeAmpmLeft}
     />
   );
 };

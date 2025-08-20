@@ -12,7 +12,7 @@ import type {
 
 import type { TstateProd, TstateProdData, TstateProdDict, TstateComponentData } from './type';
 import type { TquotationProductDto_addition } from 'js/api/api_quotation';
-import { TprodSource } from './useQuotationProduct';
+import type { TprodSource } from './useQuotationProduct';
 
 import { calcQtyReduceModified } from './method/calcProd';
 

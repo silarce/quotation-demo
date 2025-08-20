@@ -16,12 +16,15 @@ export type {
   Guid,
   DateTime,
   decimal,
+  int,
   Tinvoice_type,
   Ttax_type,
   Treview_status,
   Treview_status__stages,
   Tdocument_status,
 } from './shared';
+
+export type { TdropDown } from './commonControllers';
 
 export type {
   TaccountsReceivablesList_Dto_depressed,
@@ -32,6 +35,10 @@ export type {
   TaccountsReceivable,
   TinsertpaymentRequest,
   TpaymentRequestType,
+  Tres_apiGetARPaymentData,
+  Tres_apiGetARPaymentDataInset,
+  Tbody_updatePRInvoice,
+  TpaymentRequestInvoiceList_Dto,
 } from './accountsReceivable';
 
 export type { Tinvoice_Dto } from './invoice';

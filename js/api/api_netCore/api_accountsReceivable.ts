@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { axi_monkey } from '../_axiosCreator';
 
@@ -9,12 +9,22 @@ import type {
   TapiParams,
   Tmeta,
   TpageResponse,
+  Guid,
+  decimal,
+  DateTime,
+  int,
   TaccountsReceivablesList_Dto,
   TquotationListViewModel_Dto,
   TaccountsReceivable,
   TpaymentRequest_Dto,
   TinsertpaymentRequest,
+  Tres_apiGetARPaymentData,
+  Tres_apiGetARPaymentDataInset,
+  Tbody_updatePRInvoice,
+  TpaymentRequestInvoiceList_Dto,
 } from './schemas';
+
+import type { TemployeeDto } from '../dtoTypes';
 
 const apiGetAccountsReceivablesList = async (params?: TapiParams & { filter?: string }) => {
   // const api = '/api/AccountsReceivable/GetAccountsReceivablesList';
@@ -313,7 +323,7 @@ const apiGetARPaymentDataInset = async (accountsReceivableId: string) => {
 
   const params = { accountsReceivableId };
 
-  return axi_monkey.get<Tres_apiGetARPaymentDataInsert>(api, { params }).then(({ data }) => data);
+  return axi_monkey.get<Tres_apiGetARPaymentDataInset>(api, { params }).then(({ data }) => data);
 };
 
 const useApiGetARPaymentDataInset = (
@@ -325,7 +335,7 @@ const useApiGetARPaymentDataInset = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<Tres_apiGetARPaymentDataInsert | null>();
+  const [res, setRes] = useState<Tres_apiGetARPaymentDataInset | null>();
 
   const update = async () => {
     if (isFetching || !accountsReceivableId) {
@@ -366,19 +376,22 @@ const useApiGetARPaymentDataInset = (
 const apiPostInsertPaymentRequest = async (body: TinsertpaymentRequest) => {
   const api = '/api/AccountsReceivable/InsertPaymentRequest';
 
-  return axi_monkey.post(api, body).catch((err) => {
-    const error = err as AxiosError;
-    myAlert.err({
-      title: '新增請款單失敗',
-      content: error.message,
+  return axi_monkey
+    .post<string>(api, body)
+    .then(({ data: paymentQuestId }) => paymentQuestId)
+    .catch((err) => {
+      const error = err as AxiosError;
+      myAlert.err({
+        title: '新增請款單失敗',
+        content: error.message,
+      });
     });
-  });
 };
 
-const apiPatchInsertPaymentRequest = async (body: unknown) => {
-  const api = '/api/AccountsReceivable/UpdateAccountsReceivables';
+const apiPatchInsertPaymentRequest = async (body: Tbody_updatePRInvoice) => {
+  const api = '/api/Invoice/UpdatePRInvoice';
 
-  return axi_monkey.patch(api, body).catch((err) => {
+  return axi_monkey.put(api, body).catch((err) => {
     const error = err as AxiosError;
     myAlert.err({
       title: '更新請款單失敗',
@@ -441,6 +454,223 @@ const useApiGetPaymentRequestType = ({
     autoUpdate && update();
   }, []);
 
+  const options = useMemo(() => {
+    return (
+      res?.map((item) => ({
+        label: item.name,
+        value: item.name,
+      })) ?? []
+    );
+  }, [res]);
+
+  return {
+    isFetching,
+    data: res,
+    options,
+    update,
+  };
+};
+
+interface Tbody_apiInsertSalesOrderData {
+  CustomerId: Guid | null; //客戶id
+  CustomerNumber: string | null; //客戶編號
+  CustomerName: string; //客戶名稱
+  ConstructionSite: string; //工地名稱
+  CompanyPhone: string; //公司電話
+  CompanyFax: string; //公司傳真
+  Address: string; //地址
+  SalesCurrency: string; //幣別
+  ExchangeRate: decimal | null; //匯率
+  CurrencyAmount: decimal | null; //外幣金額
+  SalesAmount: decimal; //銷售金額
+  Taxes: decimal; //稅金
+  ChangedAmount: decimal | null; //追加減金額
+  ChangedTaxes: decimal | null; //追加減稅金
+  TotalAmount: decimal; //總金額
+  CreatedAt: DateTime | null; //建立時間
+  UpdatedAt: DateTime | null; //更新時間
+  CreatedBy: string | null; //建立人員
+  UpdatedBy: string | null; //更新人員
+  Status: int | null; //狀態
+  SourceType: string; //來源類型
+  SourceId: Guid | null; //來源id(合約ID)
+  QuotationNumber: string | null; //報價單編號
+  QuotationContractNumber: string | null; //合約編號
+  TaxId: string | null; //統一編號
+  TaxDeductionCategory: string | null; //稅別
+  InvoiceType: string | null; //發票類型
+  SalesOrderItems: {
+    Id: Guid | null; //銷貨明細id
+    ItemNumber: string | null; //項目編號
+    SalesOrderNumber: string; //銷售訂單編號
+    ProductId: Guid; //產品id
+    Discount: decimal | null; //折扣
+    ProductName: string; //產品名稱
+    ProductNumber: string; //產品編號
+    UnitPrice: decimal | null; //單價
+    Quantity: decimal | null; //數量
+    Amount: decimal | null; //金額
+    Taxes: decimal | null; //稅金
+    AttachedToProductId: Guid | null; //附加產品id
+    DualPrice: decimal | null; //牌價
+  }[]; //銷貨明細
+}
+
+const apiInsertSalesOrderData = async (body: Tbody_apiInsertSalesOrderData) => {
+  const api = '/api/AccountsReceivable/InsertSalesOrderData';
+
+  return axi_monkey.post(api, body).catch((err) => {
+    myAlert.err({
+      title: '新增銷售單失敗',
+    });
+  });
+};
+
+interface Tbody_apiUpdateSalesOrderData {
+  Id: Guid; //銷售訂單id
+  SalesOrderNumber: string; //銷售訂單編號
+  CustomerId: Guid | null; //客戶id
+  CustomerNumber: string | null; //客戶編號
+  CustomerName: string; //客戶名稱
+  ConstructionSite: string; //工地名稱
+  CompanyPhone: string; //公司電話
+  CompanyFax: string; //公司傳真
+  Address: string; //地址
+  SalesCurrency: string; //幣別
+  ExchangeRate: decimal | null; //匯率
+  CurrencyAmount: decimal | null; //外幣金額
+  SalesAmount: decimal; //銷售金額
+  Taxes: decimal; //稅金
+  ChangedAmount: decimal | null; //追加減金額
+  ChangedTaxes: decimal | null; //追加減稅金
+  TotalAmount: decimal; //總金額
+  CreatedAt: DateTime; //建立時間
+  UpdatedAt: DateTime; //更新時間
+  CreatedBy: string | null; //建立人員
+  UpdatedBy: string | null; //更新人員
+  Status: int | null; //狀態
+  SourceType: string; //來源類型
+  SourceId: Guid | null; //來源id(合約ID)
+  QuotationNumber: string | null; //報價單編號
+  QuotationContractNumber: string | null; //報價單合約編號
+  TaxId: string | null; //統一編號
+  TaxDeductionCategory: string | null; //稅別
+  InvoiceType: string | null; //發票類型
+  SalesOrderItems: {
+    Id: Guid; //銷貨明細id
+    ItemNumber: string; //項目編號
+    SalesOrderNumber: string; //銷售訂單編號
+    ProductId: Guid; //產品id
+    Discount: decimal | null; //折扣
+    ProductName: string; //產品名稱
+    ProductNumber: string; //產品編號
+    UnitPrice: decimal | null; //單價
+    Quantity: decimal | null; //數量
+    Amount: decimal | null; //金額
+    Taxes: decimal | null; //稅金
+    AttachedToProductId: Guid | null; //附加產品id
+    DualPrice: decimal | null; //牌價
+  }[]; //銷貨明細
+}
+
+const apiUpdateSalesOrderData = async (body: Tbody_apiUpdateSalesOrderData) => {
+  const api = '/api/AccountsReceivable/UpdateSalesOrderData';
+
+  return axi_monkey.patch(api, body).catch((err) => {
+    myAlert.err({
+      title: '更新銷售單失敗',
+    });
+  });
+};
+
+interface Tres_apiGetSalesOrderById {
+  id: string;
+  salesOrderNumber: string;
+  customerId: string;
+  customerNumber: string;
+  customerName: string;
+  constructionSite: string;
+  companyPhone: string;
+  companyFax: string;
+  address: string;
+  salesCurrency: string;
+  exchangeRate: number | null;
+  currencyAmount: number | null;
+  salesAmount: number | null;
+  taxes: number | null;
+  changedAmount: number | null;
+  changedTaxes: number | null;
+  totalAmount: number | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  createdBy: string | null;
+  updatedBy: string | null;
+  status: number | null;
+  sourceType: string | null;
+  sourceId: string | null;
+  salesOrderItems: {
+    id: string;
+    itemNumber: null;
+    salesOrderNumber: string | null;
+    productId: string | null;
+    discount: number | null;
+    productName: string | null;
+    productNumber: string | null;
+    unitPrice: number | null;
+    quantity: number | null;
+    amount: number | null;
+    taxes: number | null;
+    attachedToProductId: string | null;
+    dualPrice: number | null;
+  }[];
+}
+
+const apiGetSalesOrderById = async (salesOrderId: string) => {
+  const api = '/api/AccountsReceivable/GetSalesOrderById';
+  const params = { id: salesOrderId };
+
+  return axi_monkey.get<Tres_apiGetSalesOrderById>(api, { params }).then(({ data }) => data);
+};
+
+const useApiGetSalesOrderById = (
+  salesOrderId: string | undefined,
+  {
+    autoUpdate = true,
+  }: {
+    autoUpdate?: boolean;
+  } = {}
+) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<Tres_apiGetSalesOrderById | null>();
+
+  const update = async () => {
+    if (isFetching || !salesOrderId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    const res = await apiGetSalesOrderById(salesOrderId)
+      .then((res) => {
+        setRes(res);
+
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.notify.error({ message: '無法取得銷售單資料', description: err.message });
+        setRes(null);
+
+        return null;
+      });
+    setIsFetching(false);
+
+    return res;
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [salesOrderId]);
+
   return {
     isFetching,
     data: res,
@@ -448,191 +678,107 @@ const useApiGetPaymentRequestType = ({
   };
 };
 
-// ========================================================================
+interface Tbody_apiPostInsertPrOffsetDetail {
+  createdAt: string; //建立時間
+  createdBy: TemployeeDto['idNumber']; // `EM-${number}-${number}` //建立人員
+  updatedAt: string; //修改時間
+  updatedBy: TemployeeDto['idNumber']; // `EM-${number}-${number}` //修改人員
 
-// MARK:Tres_apiGetARPaymentData
-interface Tres_apiGetARPaymentData {
-  // 目前累計
-  accountsReceivables: {
-    id: string; //應收帳款id
-    accountsReceivableNumber: string; //應收帳款編號
-    sourceType: string; //來源類型
-    sourceId: string | null; //來源id
-    customerNumber: string; //客戶編號
-    customerName: string; //客戶名稱
-    companyPhone: string; //公司電話
-    companyFax: string; //公司傳真
-    salesAmount: number | null; // 銷售金額
-    taxes: number | null; //稅金
-    salesCurrency: string; //幣別
-    exchangeRate: number | null; //匯率
-    foreignCurrencyAmount: number | null; //外幣金額
-    prAmount: number | null; //已請款金額 總計
-    requestAmount: number | null; // 突然冒出來的 // 或許本來就有，只是給我文件時沒有這個?
-    collectAmount: number | null; //已收款項 總計
-    uncollectedPayment: number | null; //未收款項 (已請款未收款項)
-    totalAmount: number | null; //總金額
-    createdAt: string | null; //建立時間
-    updatedAt: string | null; //更新時間
-    createdBy: string | null; //建立人
-    updatedBy: string | null; //更新人
-    status: string | null; //狀態
-    deduction: number | null; //扣款金額
-    quotationContractNumber: string | null; //合約編號
-    projectName: string | null; //案場名稱
-    salesOrderNumber: string | null; //銷售訂單編號
-    taxId: string | null;
-    taxDeductionCategory: string | null;
-  };
+  accountantId: string; //會計收管管理Id
+  paymentRequestId: string; //請款單Id
 
-  // 本次請款明細
-  paymentRequest: {
-    id: string | null; //請款單Id
+  prOffsetDate: string; //沖銷日期
+  prOffsetType: string; //沖銷類別
+  paymentCurrency: string; //請款幣別
+  exchangeRate: number; //匯率
 
-    createdAt: string | null; //建立時間
-    createdBy: string | null; //建立人員
-    updatedAt: string | null; //更新時間
-    updatedBy: string | null; // 更新人員
-
-    accountsReceivableId: string | null; //應收帳款Id
-    paymentRequestNumber: string | null; //請款單編號
-    type: string; //請款單類型
-    period: string; //請款單期別
-
-    sourceFormType: string | null; //來源表單類型
-    sourceFormId: string | null; //來源表單Id
-
-    customerNumber: string; //客戶編號
-    customerName: string; //客戶名稱
-
-    paymentCurrency: string; //請款幣別
-    foreignCurrencyAmount: number | null; //外幣金額
-    paymentAmount: number | null; //請款金額
-    collect_amount: number | null; //已收金額,餘額在repo裡計算
-    receipt_balance: number | null; //收款餘額
-    deduction: number | null; //扣款金額
-
-    invoiceNumber: string | null; //發票號碼
-    invoiceAmount: number | null; //發票金額
-
-    //請款單沖銷明細 // 沖銷明細
-    prOffsetDetails: {
-      id: string | null; //沖銷明細Id
-      prOffsetNumber: string | null; //沖銷編號
-      accountantId: string | null; //會計收管管理Id
-      paymentRequestId: string | null; //請款單Id
-      prOffsetDate: string; //沖銷日期
-      paymentCurrency: string | null; //請款幣別
-      exchangeRate: number | null; //匯率
-      paymentAmount: number; //收款金額
-      settlementSerial: string | null; //結算序號
-      isCashierSeen: boolean | null; //出納是否已查看
-      isWorkSupervisorSeen: boolean | null; // 工作主管是否已查看
-      isManagerSeen: boolean | null; // 總經理是否已查看
-      declarationCurrency: string | null; // PostgreSQL enum 建議轉 string 處理
-      declarationExchangeRate: number | null; // 申報匯率
-      declarationCurrencyPayment: number | null; // 申報幣別收款金額
-      declarationPayment: number | null; // 申報收款金額
-      exchangeBenefits: number | null; // 匯兌利益
-      customerNumber: string | null; // 客戶編號
-      customerName: string | null; // 客戶名稱
-      fee: number | null; // 手續費
-      totalAmount: number | null; // 總金額
-      account: string | null; // 會計科目
-      createdAt: string | null; //建立時間
-      createdBy: string | null; //建立人員
-      updatedAt: string | null; //更新時間
-      updatedBy: string | null; // 更新人員
-    }[];
-  };
-  salesOrder: {
-    id: string; //銷售訂單id
-    salesOrderNumber: string; //銷售訂單編號
-    customerId: string; //客戶id
-    customerNumber: string; //客戶編號
-    customerName: string; //客戶名稱
-    constructionSite: string; //工地名稱
-    companyPhone: string; //公司電話
-    companyFax: string; //公司傳真
-    address: string; //地址
-    salesCurrency: string; //幣別
-    exchangeRate: number | null; //匯率
-    currencyAmount: number | null; //外幣金額
-    salesAmount: number | null; //銷售金額
-    taxes: number | null; //稅金
-    changedAmount: number | null; //追加減金額
-    changedTaxes: number | null; //追加減稅金
-    totalAmount: number | null; //總金額
-    createdAt: string; //建立時間
-    updatedAt: string; //更新時間
-    createdBy: string | null; //建立人員
-    updatedBy: string | null; //更新人員
-    status: number | null; //狀態
-    sourceType: string; //來源類型
-    sourceId: string | null; //來源id
-    quotationNumber: string | null; //報價單編號
-    //銷貨明細  // 工程項目明細
-    salesOrderItems: {
-      id: string; //銷貨明細id
-      itemNumber: string; //項目編號
-      salesOrderNumber: string; //銷售訂單編號
-      productId: string; //產品id
-      discount: number | null; //折扣
-      productName: string; //產品名稱
-      productNumber: string; //產品編號
-      unitPrice: number | null; //單價
-      quantity: number | null; //數量
-      amount: number | null; //金額
-      taxes: number | null; //稅金
-      attachedToProductId: string | null; //附加產品id
-      dualPrice: number; //牌價
-    }[];
-  };
+  paymentAmount: number; //收款金額
+  customerNumber: string; // 客戶編號
+  customerName: string; //客戶名稱
+  fee: number | null; //手續費
+  totalAmount: number; //收款金額
 }
 
-// MARK:Tres_apiGetARPaymentDataInsert
-type Tres_apiGetARPaymentDataInsert = Omit<Tres_apiGetARPaymentData, 'paymentRequest'> & { paymentRequest: null };
+const apiPostInsertPrOffsetDetail = async (
+  body: Tbody_apiPostInsertPrOffsetDetail,
+  {
+    returnError = false,
+  }: {
+    returnError?: boolean;
+  } = {}
+) => {
+  const api = '/api/AccountsReceivable/InsertPrOffsetDetail';
 
-// MARK:Tbody_insertPaymentRequest
-// interface Tbody_insertPaymentRequest {
-//   paymentRequest: {
-//     createdAt: string; // 建立時間,
-//     createdBy: string; // 建立人員(員工編號),
-//     updatedAt: string; //  修改時間,
-//     updatedBy: string; // 修改人員(員工編號),
+  return axi_monkey.post(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '新增請款單失敗',
+      content: error.message,
+    });
 
-//     accountsReceivableId: string; // 應收帳款Id,
-//     sourceFormType: string; //  來源類別-accountsReceivableList.sourceType,
-//     sourceFormId: string; // 來源ID-accountsReceivableList.sourceId,
+    if (returnError) {
+      return Promise.reject(error);
+    }
+  });
+};
 
-//     customerNumber: string; // 客戶編號,
-//     customerName: string; // 客戶名稱,
+const apiGetPRInvoiceList = async () => {
+  const api = '/api/AccountsReceivable/GetPRInvoiceList';
 
-//     type: string; // 請款類別 "訂金"、"支軌"、"安裝"...,
+  return axi_monkey.get<TpaymentRequestInvoiceList_Dto[]>(api).then(({ data }) => data);
+};
 
-//     paymentCurrency: string; // 請款幣別,
-//     foreignCurrencyAmount: string; // 外幣金額,
-//     paymentAmount: string; // 請款金額
-//   };
-//   // 有發票號碼的話要加invoice
-//   invoice?: {
-//     invoiceBookId: string; // 發票本Id "6600f3cb-d0f5-4a17-b88e-7eb7f002e354",
-//     period: string; //發票期數 "3" // 發票本的期數
+const useApiGetPaymentRequestInvoiceList = ({
+  autoUpdate = true,
+}: {
+  autoUpdate?: boolean;
+} = {}) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TpaymentRequestInvoiceList_Dto[] | null>();
 
-//     invoiceNumber: string; // 發票號碼 "MV34400404",
-//     invoiceDate: string; // 發票開立日期 "2025-05-03",
+  const update = async () => {
+    if (isFetching) {
+      return;
+    }
 
-//     buyer: string; // 客戶抬頭 "一代冷氣空調有限公司",
-//     taxId: string; //  統一編號 "54741781",
-//     taxAddress: string | null; //  發票地址 null,
+    setIsFetching(true);
 
-//     amount: string; // 發票金額 9524,
-//     taxes: string; // 發票稅額 476,
-//     totalAmount: number; // 總金額 10000,
+    const res = await apiGetPRInvoiceList().catch((err: AxiosError) => {
+      console.error('useApiGetPaymentRequestInvoiceList error:', err);
+      myAlert.notify.error({
+        message: '取得請款單失敗',
+        description: err.message,
+      });
 
-//     remark: string | null; // 備註 null ,
-//   };
-// }
+      return null;
+    });
+
+    setRes(res);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, []);
+
+  return {
+    isFetching,
+    data: res,
+    update,
+  };
+};
+
+const apiUpdatePRInvoice = async (body: Tbody_updatePRInvoice) => {
+  const api = '/api/Invoice/UpdatePRInvoice';
+
+  return axi_monkey.put(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '開立發票失敗',
+      content: error.message,
+    });
+  });
+};
 
 // ========================================================================
 export type {
@@ -641,15 +787,25 @@ export type {
   TaccountsReceivable,
   TpaymentRequest_Dto,
   TinsertpaymentRequest,
+  TpaymentRequestInvoiceList_Dto,
 };
 
-export type { Tres_apiGetARPaymentData, Tres_apiGetARPaymentDataInsert };
+export type {
+  Tres_apiGetARPaymentData,
+  Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert,
+  Tbody_apiPostInsertPrOffsetDetail,
+  Tbody_updatePRInvoice,
+};
 
 export {
   apiQuotationToAccountsReceivables,
   apiGetARPaymentDataInset as apiGetARPaymentDataInsert,
   apiPostInsertPaymentRequest,
   apiPatchInsertPaymentRequest,
+  apiInsertSalesOrderData,
+  apiUpdateSalesOrderData,
+  apiPostInsertPrOffsetDetail,
+  apiUpdatePRInvoice,
 };
 
 export {
@@ -660,6 +816,7 @@ export {
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
   useApiGetPaymentRequestType,
+  useApiGetPaymentRequestInvoiceList,
 };
 
 export { apiGetPaymentRequestType };

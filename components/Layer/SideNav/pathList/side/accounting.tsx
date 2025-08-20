@@ -70,6 +70,11 @@ export default function SidePathAccountingDepartment() {
               path: path + '/invoiceManagement',
               erpFeature: [accountingDepartment],
             },
+            {
+              label: '發票列表',
+              path: path + '/invoiceList',
+              erpFeature: [accountingDepartment],
+            },
           ],
         },
         {

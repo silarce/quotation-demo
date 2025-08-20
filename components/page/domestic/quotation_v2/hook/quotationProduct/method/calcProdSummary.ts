@@ -40,7 +40,7 @@ const calcProdSummary = ({
     });
 
     prodQty_d = prodQty_d.add(quantity || 0);
-    prodDiscountTotal_d = prodDiscountTotal_d.add(priceDiscount_percent);
+    prodDiscountTotal_d = prodDiscountTotal_d.add(new Decimal(priceDiscount_percent || 0).mul(quantity || 0));
 
     doorModelSummery_d[doorModelName] ??= {
       doorModel: doorModelName,

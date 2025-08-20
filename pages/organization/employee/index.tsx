@@ -41,22 +41,71 @@ export default function EmployeeData() {
 
   const fetchEmployeeList = async () => {
     try {
-      const res = await getEmployeeList({ fe_search: input.trim() });
+      const resp = await getEmployeeList({
+        keyword: input.trim() || undefined,
+        pageIndex: 1,
+        pageSize: 10,
+      });
 
-      if (res.length === 0) {
+      // 失敗或沒資料就清空
+      if (resp.returnCode !== 0 || !Array.isArray(resp.data) || resp.data.length === 0) {
+        setEmployeeList([]);
+
         return;
       }
 
-      const formattedData: EmployeeItem[] = res.map((item: any) => ({
-        key: item.emp_id,
-        emp_code: item.emp_code,
-        department: item.department,
-        emp_ch_name: item.emp_ch_name,
+      // 工具：把 "YYYY-MM-DD" 轉 "YYYY/MM/DD"
+      const fmtDate = (s?: string) => {
+        if (!s) {
+          return '';
+        }
+
+        const [y, m, d] = s.split('-');
+
+        if (!y || !m || !d) {
+          return s;
+        } // 非預期格式就原樣回傳
+
+        return `${y}/${m}/${d}`;
+      };
+
+      // 工具：年資（四捨五入到小數點一位）
+      const calcSeniority = (start?: string) => {
+        if (!start) {
+          return 0;
+        }
+
+        const startDate = new Date(start);
+
+        if (isNaN(startDate.getTime())) {
+          return 0;
+        }
+
+        const now = new Date();
+        const years = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+
+        return Math.round(years * 10) / 10;
+      };
+
+      const rows: EmployeeItem[] = resp.data.map((it) => ({
+        key: it.empId,
+        emp_code: it.empCode ?? '',
+        department: it.departmentText ?? it.department ?? '',
+        job_title: it.jobGradeIdText ?? '', // 若有真正職稱欄位再改這裡
+        emp_ch_name: it.empChName ?? '',
+        nationality: it.nationalityPcodeText ?? '',
+        work_location: it.workLocationPcodeText ?? '',
+        shift: it.defaultShiftName ?? '',
+        duty_type: it.workTypePcodeText ?? '',
+        salary_type: it.salaryAccountPcodeText ?? '',
+        onboard_date: fmtDate(it.startDate),
+        seniority: calcSeniority(it.startDate),
       }));
 
-      setEmployeeList(formattedData);
+      setEmployeeList(rows);
     } catch (err) {
       console.error('取得員工資料失敗', err);
+      setEmployeeList([]);
     }
   };
 
@@ -143,7 +192,7 @@ export default function EmployeeData() {
       title: '到職日',
       dataIndex: 'onboard_date',
       key: 'onboard_date',
-      width: '1%',
+      width: '5%',
       align: 'right',
     },
     {
@@ -254,7 +303,7 @@ export default function EmployeeData() {
           <Table
             className={tableScss.customTable}
             columns={columns}
-            dataSource={data}
+            dataSource={employeeList}
             rowKey="key"
             bordered
             style={{ minWidth: '50%' }}

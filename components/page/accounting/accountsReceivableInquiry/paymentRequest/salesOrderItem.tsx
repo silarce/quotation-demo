@@ -1,20 +1,10 @@
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import DataEntry, { Input_money } from 'components/global/gear/dataEntry';
 
-import type { Tres_apiGetARPaymentData } from 'js/api/api_netCore/api_accountsReceivable';
-
-import { Tinstance_salesOrderItem } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
-
-// =============================================================================
-
-type TsalesOrderItemArr = Tres_apiGetARPaymentData['salesOrder']['salesOrderItems'];
-
-type TsalesOrderItem = TsalesOrderItemArr[number];
-
-type Tstate = TsalesOrderItem & {
-  completedQuantity: `${number}` | ''; // 待api新增本期完成的property
-  completedPayment: number | null; // 待api新增本期完成的property
-};
+import type {
+  Tinstance_salesOrderItem,
+  Tstate_salesOrderItem,
+} from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
 
 // =============================================================================
 
@@ -31,43 +21,55 @@ const SalesOrderItem = ({
 }) => {
   const { stateArr, setCompletedInThisPeriod } = instance_salesOrderItem;
 
-  const columns_projectDetail: TableProps<Tstate>['columns'] = [
+  const columns_projectDetail: TableProps<Tstate_salesOrderItem>['columns'] = [
     {
       title: '項目',
-      dataIndex: 'itemNumber',
+      dataIndex: 'itemName',
       width: 80,
+      align: 'center',
     },
     {
-      title: '尺寸 noProperty',
-      dataIndex: 'size',
+      title: '尺寸',
+      dataIndex: 'sizeString',
       width: 200,
-      render: () => 'no property',
+      align: 'right',
     },
     {
       title: '數量',
       dataIndex: 'quantity',
       width: 100,
+      align: 'right',
+    },
+    {
+      title: '幣別 no property',
+      key: 'currency',
+      width: 80,
+      align: 'center',
     },
     {
       title: '合約單價',
       dataIndex: 'unitPrice',
       width: 150,
+      align: 'right',
+      render: (v) => toLocalString(v),
     },
-    {
-      title: '前期已完成 noProperty',
-      dataIndex: 'completedInLastPeriod',
-      width: 150,
 
-      render: () => 'no property',
+    {
+      title: '前期已完成',
+      dataIndex: 'prophaseCompletedQuantity',
+      width: 150,
+      align: 'right',
     },
     {
-      title: '本期完成 noProperty',
+      title: '本期完成',
       dataIndex: 'completedQuantity',
       width: 150,
+      align: 'right',
       render: (v, record, index) => {
         return (
           <DataEntry showBorder={allowEdit} fontSize={14}>
             <Input_money
+              className="text-right"
               readOnly={!allowEdit}
               value={v}
               onChange={(e) => {
@@ -79,16 +81,17 @@ const SalesOrderItem = ({
       },
     },
     {
-      title: '本期金額 noProperty',
+      title: '本期金額',
       dataIndex: 'completedPayment',
       width: 150,
       align: 'right',
       render: (v) => toLocalString(v),
     },
     {
-      title: '合計 noProperty',
-      dataIndex: 'totalAmount',
+      title: '合計',
+      dataIndex: 'totalCompletedQuantity',
       width: 100,
+      align: 'right',
     },
     {},
   ];
@@ -109,7 +112,7 @@ const SalesOrderItem = ({
 // ============================================================================
 
 const toLocalString = (value: number | null) => {
-  if (value === null) {
+  if (value === null || value === undefined) {
     return '';
   }
 

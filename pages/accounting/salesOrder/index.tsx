@@ -2,7 +2,13 @@ import { useState, useEffect, useReducer, useMemo } from 'react';
 import Decimal from 'decimal.js';
 
 import Btn from 'components/global/gear/button/btn_fong';
-import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry';
+import DataEntry, {
+  TdataEntrycontainerProps,
+  DataEntry_fong,
+  Input,
+  Input_money,
+  Select,
+} from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 
 import { modal_empty } from 'components/global/gear/modal/fongModal';
@@ -34,7 +40,14 @@ interface Tstate {
   已收金額: `${number}` | '';
   扣款折讓: `${number}` | '';
   稅別: Ttax_type | null;
-  應稅外加: string;
+
+  類別: string | null;
+  客戶聯絡電話1: string;
+  客戶聯絡電話2: string;
+  發票類型: string | null;
+  幣別: string | null;
+  匯率: `${number}` | '';
+  外幣金額: `${number}` | '';
 }
 
 // type Taction =
@@ -62,9 +75,75 @@ export default function SalesOrder() {
 
   // ---------------------------------------------------------------------------
   const handle_importContract = () => {
-    modal_empty({
+    const { destroy } = modal_empty({
       width: 'fit-content',
-      content: <Selector_quotation />,
+      content: (
+        <Selector_quotation
+          onCancel={() => {
+            destroy();
+          }}
+          onConfirm={([quotation]) => {
+            if (!quotation) {
+              destroy();
+
+              return;
+            }
+
+            const {
+              id,
+              status,
+              reviewManagerEmployeeId,
+              managerReviewedAt,
+              quotationNumber,
+              version,
+              customerId,
+              projectName,
+              county,
+              district,
+              address,
+              contactPerson,
+              contactNumber,
+              quantity,
+              editNotes,
+              discount,
+              subTotal,
+              salesTax,
+              total,
+              deliveryLocation,
+              paymentMethods,
+              supervisorEmployeeId,
+              agentEmployeeId,
+              reviewSalesEmployeeId,
+              productsOrder,
+              tuneTotal,
+              averageDiscount,
+              estimatedDiscount,
+              type,
+              currency,
+              foreignTotal,
+              exchangeRate,
+              contractId,
+              contractStatus,
+              contractNumber,
+              customerName,
+              additionalAmount,
+            } = quotation;
+
+            setState((prev) => ({
+              ...prev,
+              contractNumber: contractNumber ?? '',
+              projectName,
+              customerNumber: 'no property',
+              customerName: customerName ?? '',
+              customerTaxId: 'no property',
+            }));
+
+            destroy();
+
+            //
+          }}
+        />
+      ),
     });
   };
 
@@ -83,80 +162,121 @@ export default function SalesOrder() {
           <Btn theme="save">儲存</Btn>
         </div>
       </div>
+
       <div className="grid grid-cols-4 gap-fong">
-        <DataEntry_fong caption="合約編號" className="col-span-2" isMust={true}>
+        {/*  */}
+        <DataEntry_fong caption="類別" className="" isMust={true}>
+          <Select value={state.類別} onChange={(e) => setState({ ...state, 類別: e as string })} />
+        </DataEntry_fong>
+
+        <DataEntry_fong caption="合約編號" className="">
           <Input
             value={state.contractNumber}
             onChange={(e) => setState({ ...state, contractNumber: e.target.value })}
           />
         </DataEntry_fong>
-        <DataEntry_fong caption="案場名稱" className="col-span-2" isMust={true}>
+
+        <DataEntry_fong caption="案場名稱" className="col-span-2">
           <Input value={state.projectName} onChange={(e) => setState({ ...state, projectName: e.target.value })} />
         </DataEntry_fong>
+        {/*  */}
         <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true}>
-          <Input />
+          {state.customerNumber}
         </DataEntry_fong>
+
         <DataEntry_fong caption="客戶名稱" className="col-span-2" isMust={true}>
-          <Input />
+          {state.customerName}
         </DataEntry_fong>
-        <DataEntry_fong caption="統一編號" className="col-span-2" isMust={true}>
-          <Input />
+        {/*  */}
+
+        <DataEntry_fong caption="客戶地址" className="col-span-2">
+          {state.customerName}
         </DataEntry_fong>
+
+        <DataEntry_fong caption="客戶聯絡電話1" className="">
+          <Input value={state.客戶聯絡電話1} onChange={(e) => setState({ ...state, 客戶聯絡電話1: e.target.value })} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="客戶聯絡電話2" className="">
+          <Input value={state.客戶聯絡電話2} onChange={(e) => setState({ ...state, 客戶聯絡電話2: e.target.value })} />
+        </DataEntry_fong>
+
+        {/*  */}
+
+        <DataEntry_fong caption="統一編號" className="col-span-2">
+          {state.customerTaxId}
+        </DataEntry_fong>
+
+        <DataEntry_fong caption="發票類型" className="">
+          <Select value={state.發票類型} onChange={(e) => setState({ ...state, 發票類型: e as string })} />
+        </DataEntry_fong>
+
         <div />
-        <div />
-        <DataEntry_fong caption="銷售金額" isMust={true}>
+
+        {/*  */}
+        <DataEntry_fong caption="幣別" className="" isMust={true}>
+          <Select value={state.幣別} onChange={(e) => setState({ ...state, 幣別: e as string })} />
+        </DataEntry_fong>
+        <DataEntry_fong caption="匯率" className="" isMust={true}>
           <Input
             type="number"
-            toLocalString={disabled}
+            value={state.匯率}
+            onChange={(e) => setState({ ...state, 匯率: e.target.value as `${number}` })}
+          />
+        </DataEntry_fong>
+        <DataEntry_fong caption="外幣金額" className="" isMust={true}>
+          <Input_money
+            value={state.外幣金額}
+            onChange={(e) => setState({ ...state, 外幣金額: e.target.value as `${number}` })}
+          />
+        </DataEntry_fong>
+
+        <div />
+
+        {/*  */}
+
+        <DataEntry_fong caption="銷售金額" isMust={true}>
+          <Input_money
             value={state.price}
             onChange={(e) => setState({ ...state, price: e.target.value as `${number}` })}
           />
         </DataEntry_fong>
+
+        <DataEntry_fong caption="稅別" className="" isMust={true}>
+          <Select value={state.稅別} onChange={(e) => setState({ ...state, 稅別: e as Ttax_type })} />
+        </DataEntry_fong>
+
         <DataEntry_fong caption="稅金" isMust={true}>
-          <Input
-            type="number"
-            toLocalString={disabled}
-            value={state.tax}
-            onChange={(e) => setState({ ...state, tax: e.target.value as `${number}` })}
-          />
+          <Input_money value={state.tax} onChange={(e) => setState({ ...state, tax: e.target.value as `${number}` })} />
         </DataEntry_fong>
-        <DataEntry_fong caption="已請款總額" isMust={true}>
-          <Input
-            type="number"
-            toLocalString={disabled}
-            value={state.已請款總額}
-            onChange={(e) => setState({ ...state, 已請款總額: e.target.value as `${number}` })}
-          />
-        </DataEntry_fong>
+
         <DataEntry_fong caption="銷售總額" isMust={true}>
-          <Input
-            type="number"
-            toLocalString={disabled}
+          <Input_money
             value={state.銷售總額}
             onChange={(e) => setState({ ...state, 銷售總額: e.target.value as `${number}` })}
           />
         </DataEntry_fong>
+
+        {/*  */}
+
+        <DataEntry_fong caption="已請款總額" isMust={true}>
+          <Input_money
+            value={state.已請款總額}
+            onChange={(e) => setState({ ...state, 已請款總額: e.target.value as `${number}` })}
+          />
+        </DataEntry_fong>
+
         <DataEntry_fong caption="已收金額" isMust={true}>
-          <Input
-            type="number"
-            toLocalString={disabled}
+          <Input_money
             value={state.已收金額}
             onChange={(e) => setState({ ...state, 已收金額: e.target.value as `${number}` })}
           />
         </DataEntry_fong>
+
         <DataEntry_fong caption="扣款折讓" isMust={true}>
-          <Input
-            type="number"
-            toLocalString={disabled}
+          <Input_money
             value={state.扣款折讓}
             onChange={(e) => setState({ ...state, 扣款折讓: e.target.value as `${number}` })}
           />
-        </DataEntry_fong>
-        <DataEntry_fong caption="稅別" isMust={true}>
-          <Select />
-        </DataEntry_fong>
-        <DataEntry_fong caption="應稅外加" isMust={true}>
-          <Input value={state.應稅外加} onChange={(e) => setState({ ...state, 應稅外加: e.target.value })} />
         </DataEntry_fong>
       </div>
 
@@ -182,7 +302,14 @@ const emptyState = (): Tstate => {
     已收金額: '',
     扣款折讓: '',
     稅別: null,
-    應稅外加: '',
+
+    類別: null,
+    客戶聯絡電話1: '',
+    客戶聯絡電話2: '',
+    發票類型: null,
+    幣別: null,
+    匯率: '',
+    外幣金額: '',
   };
 };
 

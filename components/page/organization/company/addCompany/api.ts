@@ -6,7 +6,7 @@ import axios from 'axios';
 import { CompanyData } from './type';
 
 export const createCompany = async (companyData: CompanyData) => {
-  const response = await axios.post(`${BASE_URL}/org/company`, companyData, {
+  const response = await axios.post(`${BASE_URL}/api/org/company`, companyData, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -14,7 +14,7 @@ export const createCompany = async (companyData: CompanyData) => {
 };
 
 export const getCompanyDetail = async (com_id: string) => {
-  const res = await axios.get(`${BASE_URL}/org/company/${com_id}`, {
+  const res = await axios.get(`${BASE_URL}/api/org/company/${com_id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -22,7 +22,7 @@ export const getCompanyDetail = async (com_id: string) => {
 };
 
 export const updateCompany = async (com_id: string, companyData: CompanyData) => {
-  const res = await axios.put(`${BASE_URL}/org/company/${com_id}`, companyData, {
+  const res = await axios.put(`${BASE_URL}/api/org/company/${com_id}`, companyData, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -34,7 +34,7 @@ export const uploadCompanyLogo = async (com_id: string, file: File) => {
   formData.append('com_id', com_id);
   formData.append('fe_logo_file', file);
 
-  const res = await axios.post(`${BASE_URL}/org/company/Logo`, formData, {
+  const res = await axios.post(`${BASE_URL}/api/org/company/Logo`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
       Authorization: `Bearer ${token}`,

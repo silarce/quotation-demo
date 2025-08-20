@@ -16,7 +16,7 @@ const apiGetInvoiceNumberLists = (invoiceBookId: string) => {
 };
 
 const useApiGetInvoiceNumberLists = (
-  invoiceBookId: string,
+  invoiceBookId: string | undefined,
   {
     autoUpdate = true,
   }: {
@@ -54,6 +54,9 @@ const useApiGetInvoiceNumberLists = (
         setRes(null);
 
         return null;
+      })
+      .finally(() => {
+        setIsFetching(false);
       });
   };
 

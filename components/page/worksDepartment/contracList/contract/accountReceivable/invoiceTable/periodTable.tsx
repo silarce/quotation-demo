@@ -301,6 +301,7 @@ export default function PeriodTable({
         quantity,
         unitPrice,
         spec,
+        description,
         // isDisplayedOnAccountReceivable,
       } = other;
 
@@ -309,7 +310,8 @@ export default function PeriodTable({
 
       return {
         itemName: item,
-        size: spec,
+        // size: spec,
+        size: description,
         qty: quantity,
         // contractPrice: unitPrice.toLocaleString(),
         contractPrice: (
@@ -535,7 +537,7 @@ const Left = ({
           return (
             <div key={index} className={classNames(scss.row)}>
               <span>{itemName}</span>
-              <span>{size}</span>
+              <span className="whitespace-pre-wrap break-all">{size}</span>
               <span>{qty}</span>
               <span>{contractPrice}</span>
             </div>

@@ -8,19 +8,20 @@ useMyDebounce用於防抖應用，接收一個值value和一個延遲時間
 以debounceState代替value作為其他hook的依賴，可以達到防抖效果
  */
 function useDebounce<T>(value: T, delay: number) {
-  const [state, setState] = useState(value);
+  const [state, setState] = useState<T>(value);
   const [isBouncing, setIsBouncing] = useState(false);
 
-  const debouncedState = useMemo(() => {
-    setIsBouncing(false);
-
-    return state;
-  }, [state]);
-
   useEffect(() => {
+    if (value === state) {
+      setIsBouncing(false);
+
+      return;
+    }
+
     setIsBouncing(true);
     const timeoutToken = setTimeout(() => {
       setState(value);
+      setIsBouncing(false);
     }, delay);
 
     return () => {
@@ -28,7 +29,7 @@ function useDebounce<T>(value: T, delay: number) {
     };
   }, [value, delay]);
 
-  return { debouncedState, isBouncing };
+  return { debouncedState: state, isBouncing };
 }
 
 export { useDebounce };

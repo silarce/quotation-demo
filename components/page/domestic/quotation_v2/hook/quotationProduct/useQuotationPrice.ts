@@ -41,7 +41,7 @@ const useQuotationTotalPrice = ({
       copy.prodPriceTotal = value;
 
       const { tuneTotal, prodPriceTotal } = copy;
-      const subTotal = new Decimal(prodPriceTotal).add(tuneTotal).toNumber();
+      const subTotal = new Decimal(prodPriceTotal || 0).add(tuneTotal || 0).toNumber();
 
       copy.subTotal = subTotal;
 
