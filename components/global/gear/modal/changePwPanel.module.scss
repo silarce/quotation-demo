@@ -1,6 +1,4 @@
-@use "styles/theme01" as *;
-
-
+@use 'styles/theme01' as *;
 
 .antdModalChangePw {
   :global(.ant-modal-body) {
@@ -8,69 +6,55 @@
   }
 
   .header {
-    border-bottom: solid 2px $colorActive01;
-    > div {
-      width: fit-content;
-      padding: 15px 48px;
-      background-color: $bgc01;
-      > span {
-        font-size: 18px;
-        font-weight: 400;
-        color: $colorMain;
-      }
-    }
+    // border-bottom: solid 2px $colorActive01;
+    // > div {
+    //   width: fit-content;
+    //   padding: 15px 48px;
+    //   background-color: $bgc01;
+    //   > span {
+    //     font-size: 18px;
+    //     font-weight: 400;
+    //     color: $colorMain;
+    //   }
+    // }
   }
-  .body {
-    border: solid 1px $colorBorder01;
-    border-top: 0;
-    .inputContainer {
-      display: grid;
-      gap: 17px;
-      padding: 50px 48px;
-    }
-    .confirmBtn {
-      width: 100%;
-      padding: 14px;
-      background-color: $bgc01;
-      border-top: solid 1px $colorBorder01;
-      > span {
-        font-size: 16px;
-        font-weight: 500;
-        color: $colorMain;
-      }
-      // width: 100%;
-      height: fit-content;
-      // padding: 10px 0;
-      // margin-top: 40px;
-      // background-color: $bgc01;
-      // border: solid 1px $colorBorder01;
-      // > span {
-      //   font-weight: 500;
-      //   font-size: 16px;
-      //   color: $colorMain;
-      // }
+  // .body {
+  //   border: solid 1px $colorBorder01;
+  //   border-top: 0;
+  //   .inputContainer {
+  //     display: grid;
+  //     gap: 17px;
+  //     padding: 50px 48px;
+  //   }
+  //   .confirmBtn {
+  //     width: 100%;
+  //     padding: 14px;
+  //     background-color: $bgc01;
+  //     border-top: solid 1px $colorBorder01;
+  //     > span {
+  //       font-size: 16px;
+  //       font-weight: 500;
+  //       color: $colorMain;
+  //     }
+  //     // width: 100%;
+  //     height: fit-content;
+  //     // padding: 10px 0;
+  //     // margin-top: 40px;
+  //     // background-color: $bgc01;
+  //     // border: solid 1px $colorBorder01;
+  //     // > span {
+  //     //   font-weight: 500;
+  //     //   font-size: 16px;
+  //     //   color: $colorMain;
+  //     // }
+  //   }
+  // }
+}
+
+.mobileBtn {
+  @media screen and (max-width: 400px) {
+    > * {
+      flex: 1;
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
