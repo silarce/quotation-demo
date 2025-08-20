@@ -5,7 +5,7 @@ import { ParsedUrlQuery } from 'querystring';
 import Link from 'next/link'; // LinkProps
 import classNames from 'classnames';
 
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import { erpFeaturesLookup } from 'components/Layer/SideNav/pathList/type';
 
 import scss from './index.module.scss';
@@ -33,7 +33,7 @@ const documentType: TdocType = '保固書';
 // =======================================================================
 
 const Nav_worksDepartment = ({ contactThatSkipContract = false }: { contactThatSkipContract: boolean | undefined }) => {
-  const { erpFeature } = useContext(AppContext);
+  const { userErpFeature: erpFeature } = useGlobal_userInfo();
 
   const isShowAccountReceivable = !!erpFeature?.find((item) => item.name === '應收帳款');
 

@@ -1,25 +1,21 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import _ from 'lodash';
 
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+
 // api
-import {
-  TuserDto,
-  //  apiLogout, useApiAuthMe, apiLogin
-} from 'js/api/api_auth';
-import {
-  // useApiErpFeaturesMe,
-  TerpFeatureDto,
-} from 'js/api/api_erpFeature';
+import { TuserDto, useApiAuthMe, apiAuthMe } from 'js/api/api_auth';
+import { useApiErpFeaturesMe, TerpFeatureDto, apiErpFeaturesMe } from 'js/api/api_erpFeature';
 
 interface Tglobal_userInfo {
-  userInfo: TuserDto | undefined;
-  userErpFeature: TerpFeatureDto[] | undefined;
+  userInfo: TuserDto | undefined | null;
+  userErpFeature: TerpFeatureDto[] | undefined | null;
 
-  setUserInfo: (userInfo: TuserDto | undefined) => void;
-  setErpFeature: (erpFeature: TerpFeatureDto[] | undefined) => void;
+  setUserInfo: (userInfo: TuserDto | undefined | null) => void;
+  setErpFeature: (erpFeature: TerpFeatureDto[] | undefined | null) => void;
 }
 
 const instance_immer = immer<Tglobal_userInfo>((set) => {
@@ -45,18 +41,80 @@ const instance_immer = immer<Tglobal_userInfo>((set) => {
 
 const useStore = create<Tglobal_userInfo>()(instance_immer);
 
+// const useGlobal_userInfo = () => {
+//   const { userInfo, userErpFeature, setUserInfo, setErpFeature } = useStore();
+
+//   const { isAdmin, userGrade } = useMemo(() => {
+//     const isAdmin = userInfo?.account === 'admin3';
+
+//     let userGrade = 0;
+
+//     if (userInfo && !userInfo.employee) {
+//       userGrade = 16; // 代表admin // 實際上grade只到15
+//     } else if (userInfo && userInfo.employee?.jobs.length) {
+//       userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
+//     }
+
+//     return {
+//       isAdmin,
+//       userGrade,
+//     };
+//   }, [userInfo]);
+
+//   return {
+//     userInfo,
+//     userErpFeature,
+//     setUserInfo,
+//     setErpFeature,
+//     //
+//     isAdmin,
+//     userGrade,
+//   };
+// };
+
 const useGlobal_userInfo = () => {
   const { userInfo, userErpFeature, setUserInfo, setErpFeature } = useStore();
 
+  const update = ({
+    noAlert = true,
+  }: {
+    noAlert?: boolean;
+  } = {}) => {
+    return Promise.all([apiAuthMe(), apiErpFeaturesMe()])
+      .then(([userInfo, userErpFeature]) => {
+        setUserInfo(userInfo);
+        setErpFeature(userErpFeature);
+
+        return { userInfo, userErpFeature };
+      })
+      .catch((err) => {
+        if (!noAlert) {
+          myAlert.err({
+            title: '取得使用者資料失敗',
+          });
+        }
+
+        setUserInfo(null);
+        setErpFeature(null);
+
+        return null;
+      });
+  };
+
+  const clear = () => {
+    setUserInfo(undefined);
+    setErpFeature(undefined);
+  };
+
   const { isAdmin, userGrade } = useMemo(() => {
-    const isAdmin = userInfo?.account === 'admin3';
+    const isAdmin = userInfo?.account === 'admin3' || userInfo?.account === 'admin';
 
     let userGrade = 0;
 
-    if (userInfo && !userInfo.employee) {
+    if (isAdmin) {
       userGrade = 16; // 代表admin // 實際上grade只到15
     } else if (userInfo && userInfo.employee?.jobs.length) {
-      userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
+      userGrade = _.sortBy(userInfo.employee.jobs, 'grade').reverse()[0].grade;
     }
 
     return {
@@ -65,14 +123,17 @@ const useGlobal_userInfo = () => {
     };
   }, [userInfo]);
 
+  // useEffect(() => {
+  //   update();
+  // }, []);
+
   return {
     userInfo,
     userErpFeature,
-    setUserInfo,
-    setErpFeature,
-    //
     isAdmin,
     userGrade,
+    update,
+    clear,
   };
 };
 

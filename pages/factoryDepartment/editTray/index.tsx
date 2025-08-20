@@ -8,7 +8,7 @@ import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSe
 
 import { ButtonBase } from '@mui/material';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 //路由
 import { useRouter } from 'next/router';
 //參數(從warehouseList取得
@@ -55,8 +55,7 @@ export default function EditTray() {
   //#endregion
 
   //#region ===========【登入者】
-  const { userInfo } = useContext(AppContext);
-  const { erpFeature } = useContext(AppContext);
+  const { userInfo, userErpFeature: erpFeature } = useGlobal_userInfo();
   //#endregion
 
   //#region ===========【變數宣告】

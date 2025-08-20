@@ -31,6 +31,7 @@ export const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 // =================================================================================
 
 let is429ing = false;
+let is401ing = false;
 
 // =================================================================================
 axi.interceptors.request.use(
@@ -57,8 +58,8 @@ axi.interceptors.response.use(
     return res;
   },
   (err) => {
-    const url = err.config?.url ?? '';
-    const ignore401 = ['/auth/login', '/auth/me'];
+    const url = err.config?.url;
+    const ignore401 = ['/auth/login', '/auth/me', '/erp-features/me'];
 
     if (err.response) {
       switch (err.response.status) {
@@ -67,9 +68,12 @@ axi.interceptors.response.use(
             break;
           }
 
+          if (is401ing) {
+            break;
+          }
+
           myAlert.warning({
-            title: '系統提醒',
-            content: '登入過期，請重新登入',
+            title: '登入過期，請重新登入',
             props: {
               onOk: () => {
                 window.location.reload();
@@ -79,6 +83,9 @@ axi.interceptors.response.use(
               },
             },
           });
+
+          is401ing = true;
+
           console.log('401，沒有權限');
           break;
 
@@ -176,9 +183,12 @@ axi_netCore.interceptors.response.use(
 
     switch (status) {
       case 401:
+        if (is401ing) {
+          break;
+        }
+
         myAlert.warning({
-          title: '系統提醒',
-          content: '登入過期，請重新登入',
+          title: '登入過期，請重新登入',
           props: {
             onOk: () => {
               window.location.reload();
@@ -188,6 +198,9 @@ axi_netCore.interceptors.response.use(
             },
           },
         });
+
+        is401ing = true;
+
         console.log('401，沒有權限');
         break;
 
@@ -222,9 +235,12 @@ axi_monkey.interceptors.response.use(
 
     switch (status) {
       case 401:
+        if (is401ing) {
+          break;
+        }
+
         myAlert.warning({
-          title: '系統提醒',
-          content: '登入過期，請重新登入',
+          title: '登入過期，請重新登入',
           props: {
             onOk: () => {
               window.location.reload();
@@ -234,6 +250,9 @@ axi_monkey.interceptors.response.use(
             },
           },
         });
+
+        is401ing = true;
+
         console.log('401，沒有權限');
         break;
 

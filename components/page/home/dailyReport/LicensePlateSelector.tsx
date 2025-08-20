@@ -1,5 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
-import _ from 'lodash';
+import { useState, useEffect } from 'react';
 
 // gear
 import ModalListSelectorWithSearch from 'components/global/gear/modal/modalListSelectorWithSearch';
@@ -9,8 +8,7 @@ import scss from './licensePlateSelector.module.scss';
 
 import { licensePlateLookUp } from 'config/lookupTable';
 
-// other
-import { AppContext } from 'pages/_app';
+import { useRwd } from 'hooks/globalState/useRwd';
 
 /**車牌選擇器 */
 export default function LicensePlateSelector({
@@ -26,7 +24,7 @@ export default function LicensePlateSelector({
   label?: string;
   tip?: string;
 }) {
-  const { rwd1023 } = useContext(AppContext);
+  const { rwd1023 } = useRwd();
 
   const [sel, setSel] = useState<string>();
 

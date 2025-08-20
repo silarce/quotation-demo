@@ -21,7 +21,7 @@ import { optionsCreator_county, Toption } from 'js/utils/options/countryAndDistr
 import { quotationStatusLookup } from 'config/lookupTable';
 
 // context
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 import { TquotationStatus } from 'js/api/dtoTypes';
 
@@ -49,7 +49,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   const query = router.query as Tquery;
   const { county, customerName, keyWord: keyWord, reviewStatus, status } = query;
 
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   const userEmp = userInfo?.employee;
   let userId = userEmp?.id;
 

@@ -8,7 +8,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHeader02/PageHeader02';
 import { quotationStatusLookup } from 'config/lookupTable';
 import { TquotationStatus } from 'js/api/dtoTypes';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -63,7 +63,7 @@ export default function WareHouseList() {
   const status = router.query.status as TquotationStatus;
   const { wareHouseId } = router.query as Tquery;
   const [isLoading, setIsLoading] = useState(false);
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
 
   const urlRefs = useRef(data.map(() => createRef<HTMLInputElement>()));
   const noteRefs = useRef(data.map(() => createRef<HTMLInputElement>()));

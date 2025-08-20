@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 
@@ -14,7 +14,7 @@ import scss from './employeeSelector.module.scss';
 // api
 import { TemployeeDto, useApiDailyReports_reviewers } from 'js/api/api_dailyReport';
 
-import { AppContext } from 'pages/_app';
+import { useRwd } from 'hooks/globalState/useRwd';
 
 export type { TemployeeDto };
 
@@ -39,7 +39,7 @@ export default function ReviewerSelector({
   exceptEmpArr?: { id: string }[];
   isCancelOnConfirm?: boolean;
 }) {
-  const { rwd1023 } = useContext(AppContext);
+  const { rwd1023 } = useRwd();
   const [isLoading, setIsLoading] = useState(false);
 
   // 取得所有檢視人員

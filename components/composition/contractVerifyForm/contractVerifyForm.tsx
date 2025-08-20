@@ -1,13 +1,4 @@
-import {
-  //
-  useState,
-  useEffect,
-  useMemo,
-  useContext,
-  forwardRef,
-  useRef,
-  useImperativeHandle,
-} from 'react';
+import { useState, useEffect, useMemo, forwardRef, useRef, useImperativeHandle } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import { nanoid } from 'nanoid';
@@ -17,7 +8,7 @@ import {
   // useFormState
 } from 'react-hook-form';
 
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // antd
 import { Modal } from 'antd';
@@ -54,7 +45,6 @@ import scss from './contractVerifyForm.module.scss';
 import {
   TpaymentRatioDto,
   TcreateQuotationVerifyFormDto,
-  TquotationVerifyFormDto,
   //
   TquotationContentDto,
   TuserDto,
@@ -178,7 +168,7 @@ function ReviewForm({
   onConfirm,
 }: Tprops_reviewForm) {
   //
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   //
 
   const stateObj_disabled = useState(true);
@@ -1883,9 +1873,9 @@ const checkIsReviewer = ({
   // reviewerList,
   quotationContent,
 }: {
-  userInfo: TuserDto | undefined;
+  userInfo: TuserDto | undefined | null;
   // reviewerList: TreviewerList;
-  quotationContent: TquotationContentDto | undefined;
+  quotationContent: TquotationContentDto | undefined | null;
 }) => {
   const {
     toSupervisorAt,

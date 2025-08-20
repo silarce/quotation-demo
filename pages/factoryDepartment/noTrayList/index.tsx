@@ -1,5 +1,5 @@
 import { useState, MouseEvent, createContext, useEffect, Key, useContext, useRef, createRef, useMemo } from 'react';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import scss from './noTrayList.module.scss';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import SubLayer from 'components/Layer/SubLayer/SubLayer';
@@ -33,7 +33,7 @@ export default function noTrayList() {
     //#endregion
 
     //#region ===========【登入者】
-    const { userInfo } = useContext(AppContext);
+    const { userInfo } = useGlobal_userInfo();
     //#endregion
 
     //#region ===========【變數宣告】

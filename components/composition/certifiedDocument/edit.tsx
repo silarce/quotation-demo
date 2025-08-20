@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, memo, useContext } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import classNames from 'classnames';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -11,11 +11,7 @@ import { Wrapper_inpuSel_01, WrappedTextarea } from 'components/page/worksDepart
 
 // ui
 import InputSel, { TinputSelProps } from 'components/global/gear/inputAndSel_v2/inputSel';
-import SignatureBar, {
-  // Tcontrol_signatureBar,
-  // TsignatureBarItem,
-  TemployeeDto,
-} from 'components/global/gear/signatureBar_v2';
+
 import { selectModalCreator_multi } from 'components/global/gear/modal/selectorModalCreator_multi/selectorModalCreator_multi';
 import Table01, { Ttable, Tconfig_table } from 'components/global/gear/table/table01';
 
@@ -31,7 +27,7 @@ import { optionsCreator_certifyType } from 'js/utils/options/productOptions';
 import { IconAddCircle, IconRemoveCircle } from 'public/image/icon/svgComponent/svgIcons';
 
 // type
-import { TdocType, TquotationContractDto, TuserDto } from 'js/api/dtoTypes';
+import { TdocType, TquotationContractDto } from 'js/api/dtoTypes';
 
 // css
 import scss from './edit.module.scss';
@@ -45,13 +41,10 @@ import {
   useGetCertificatedDoc_id,
   apiPostCertificatedDoc,
   apiPatchCertificatedDoc,
-  apiPatchCertificatedDoc_submit,
-  apiPatchCertificatedDoc_review,
   apiDeleteCertificatedDoc,
 } from 'js/api/api_certificated-doc';
 
-// context
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // =========================================================================
 
@@ -158,7 +151,7 @@ export default function Edit({
   const isNew = !certifiedDocumentId;
   // ---------------------------------------------------------------------------
 
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   const userId = userInfo?.employee?.id;
 
   // ---------------------------------------------------------------------------

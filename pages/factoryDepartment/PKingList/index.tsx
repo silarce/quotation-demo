@@ -12,7 +12,7 @@ import PageHeader02, { Toption, TpanelList } from 'components/PageHeader/PageHea
 import { setting } from '../wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { parseJSON } from 'date-fns';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
@@ -73,8 +73,7 @@ export default function PKingList() {
   //#endregion
 
   //#region ===========【登入者】
-  const { userInfo } = useContext(AppContext);
-  const { erpFeature } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   //#endregion
 
   //#region ===========【變數宣告】

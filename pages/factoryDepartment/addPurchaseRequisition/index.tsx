@@ -14,7 +14,7 @@ import { TquotationStatus } from 'js/api/dtoTypes';
 import { setting } from '../wareHouseList/index';
 import InputSel from 'components/global/gear/inputAndSel_v2/inputSel';
 import { WrappedTextarea, inputSelProps } from 'components/page/worksDepartment/ui/wrapper_inpuSel_01';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
 import { nextDay, parseJSON } from 'date-fns';
@@ -61,8 +61,7 @@ export default function AddPurchaseRequisition() {
   };
 
   //登入者資料
-  const { userInfo } = useContext(AppContext);
-  const { erpFeature } = useContext(AppContext);
+  const { userInfo, userErpFeature: erpFeature } = useGlobal_userInfo();
   //資料列宣告
   const [data, setData] = useState<any[]>([]);
   const [data1, setData1] = useState<any[]>([]);

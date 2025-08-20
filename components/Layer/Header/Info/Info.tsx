@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import ChangePwPanel from 'components/global/gear/modal/changePwPanel';
 import Image from 'next/image';
 
@@ -6,26 +6,26 @@ import Dropdown from 'components/global/gear/dropdown/Dropdown';
 import { Switch } from 'antd';
 
 // img
-import iconMember from 'public/image/icon/member.svg?url';
 import iconGear from 'public/image/icon/gear.svg?url';
 
 // icon
-import logout from 'public/image/icon/logout.svg?url';
+import icon_logout from 'public/image/icon/logout.svg?url';
 
 // css
 import scss from './info.module.scss';
-
-// ctx
-import { LayerCtx } from 'components/Layer/Layer';
 
 import { useTranslation } from 'react-i18next';
 
 import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
+import { apiLogout } from 'js/api/api_auth';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+
 // ===================================================================
 
 export default function Info() {
-  const { reqLogout, userInfo } = useContext(LayerCtx);
+  const { userInfo, clear } = useGlobal_userInfo();
+
   const [showPwModal, setShowPwModal] = useState(false);
 
   const { t, i18n } = useTranslation('common');
@@ -36,17 +36,17 @@ export default function Info() {
   // ----------------------------------------------
 
   const userName = (() => {
-    if (userInfo.employee?.chName) {
-      return userInfo.employee.chName;
+    if (userInfo?.employee?.chName) {
+      return userInfo?.employee.chName;
     }
 
-    if (userInfo.employee?.enName) {
-      return userInfo.employee.enName;
+    if (userInfo?.employee?.enName) {
+      return userInfo?.employee.enName;
     }
 
-    return userInfo.username;
+    return userInfo?.username;
   })();
-  const departmentName = userInfo.employee?.jobs[0]?.department.name ?? '無部門';
+  const departmentName = userInfo?.employee?.jobs[0]?.department.name ?? '無部門';
 
   // ----------------------------------------------
   const openPwModal = () => {
@@ -56,6 +56,12 @@ export default function Info() {
   const onCancel = () => {
     setShowPwModal(false);
   };
+
+  const logout = async () => {
+    await apiLogout();
+    clear();
+  };
+
   // ----------------------------------------------
 
   return (
@@ -104,8 +110,8 @@ export default function Info() {
           <span>變更密碼</span>
         </div>
 
-        <div className={scss.logout} onClick={reqLogout}>
-          <Image src={logout} alt="登出" />
+        <div className={scss.logout} onClick={logout}>
+          <Image src={icon_logout} alt="登出" />
           <span>登出</span>
         </div>
 
