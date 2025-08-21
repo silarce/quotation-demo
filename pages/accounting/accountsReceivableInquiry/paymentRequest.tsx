@@ -1,11 +1,10 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-
 import Decimal from 'decimal.js';
-
 import { Dayjs } from 'dayjs';
-
 import { DeepNonNullable } from 'ts-essentials';
+
+import { Spin } from 'antd';
 
 import Btn from 'components/global/gear/button/btn_fong';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -18,7 +17,7 @@ import {
   //
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
-  apiGetPaymentRequestType,
+  //
   apiPostInsertPaymentRequest,
   apiPatchInsertPaymentRequest,
   apiPostInsertPrOffsetDetail,
@@ -32,8 +31,6 @@ import History from 'components/page/accounting/accountsReceivableInquiry/paymen
 import SalesOrderItem from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/salesOrderItem';
 import PrOffsetDetails from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/prOffsetDetails';
 
-import scss from './paymentRequest.module.scss';
-
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 import {
@@ -41,10 +38,7 @@ import {
   Tstate_paymentRequest,
 } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/usePaymentRequest';
 
-import {
-  Tstate_salesOrderItem,
-  useSalesOrderItemArr,
-} from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
+import { useSalesOrderItemArr } from 'components/page/accounting/accountsReceivableInquiry/paymentRequest/hook/useSalesOrderItemArr';
 import { TaccountantDto } from 'js/api/dtoTypes';
 
 // ============================================================================
@@ -56,7 +50,7 @@ interface Tquery {
 
 // ============================================================================
 // MARK: START
-export default function PayentRequest() {
+export default function PaymentRequest() {
   const router = useRouter();
   const query = router.query as Tquery;
   const { id: paymentQuestId, accountsReceivableId } = query;
@@ -64,8 +58,10 @@ export default function PayentRequest() {
 
   const { userInfo } = useGlobal_userInfo();
 
-  const { data: data_paymentQuest, update: update_paymentQuest } = useApiGetARPaymentData(paymentQuestId);
-  const { data: data_forNew } = useApiGetARPaymentDataInset(isNew ? accountsReceivableId : undefined);
+  const { data: data_paymentQuest, update: update_paymentQuest, isFetching } = useApiGetARPaymentData(paymentQuestId);
+  const { data: data_forNew, isFetching: isFetching_forNew } = useApiGetARPaymentDataInset(
+    isNew ? accountsReceivableId : undefined
+  );
 
   const { accountsReceivables, paymentRequest, salesOrder, paymentRequestLogs } =
     data_paymentQuest ?? data_forNew ?? {};
@@ -329,7 +325,6 @@ export default function PayentRequest() {
 
   return (
     <div>
-      {/*  */}
       <div className="pageTop">
         <div className="flex justify-between items-center">
           <div className="text-xl font-semibold">請款單編輯</div>
@@ -340,28 +335,28 @@ export default function PayentRequest() {
         </div>
       </div>
 
-      {/* 項目明細 */}
-      <SalesOrderItem className="mb-4" instance_salesOrderItem={instance_salesOrderItem} allowEdit={isNew} />
-      {/* 目前累計 */}
-      <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
-      {/* 本次請款明細 含沖銷明細 */}
-      <CurrentPaymentRequestDetails
-        className="mb-10"
-        instance_paymentRequest={instance_paymentRequest}
-        onConfirm={req_postInsertPaymentRequest}
-      >
-        {!isNew && (
-          <PrOffsetDetails
-            prOffsetDetails={paymentRequest?.prOffsetDetails}
-            onAddDataConfirm={req_postInsertPrOffsetDetail}
-            onAddDeductionConfirm={req_postInsertPrOffsetDetail}
-          />
-        )}
-      </CurrentPaymentRequestDetails>
-      {/* 請款紀錄 */}
-      <History paymentRequestLogs={paymentRequestLogs} />
-
-      {/*  */}
+      <Spin spinning={isFetching || isFetching_forNew} delay={300}>
+        {/* 項目明細 */}
+        <SalesOrderItem className="mb-4" instance_salesOrderItem={instance_salesOrderItem} allowEdit={isNew} />
+        {/* 目前累計 */}
+        <CurrentlyAccumulated className="mb-10" data={accountsReceivables} />
+        {/* 本次請款明細 含沖銷明細 */}
+        <CurrentPaymentRequestDetails
+          className="mb-10"
+          instance_paymentRequest={instance_paymentRequest}
+          onConfirm={req_postInsertPaymentRequest}
+        >
+          {!isNew && (
+            <PrOffsetDetails
+              prOffsetDetails={paymentRequest?.prOffsetDetails}
+              onAddDataConfirm={req_postInsertPrOffsetDetail}
+              onAddDeductionConfirm={req_postInsertPrOffsetDetail}
+            />
+          )}
+        </CurrentPaymentRequestDetails>
+        {/* 請款紀錄 */}
+        <History paymentRequestLogs={paymentRequestLogs} />
+      </Spin>
     </div>
   );
 }

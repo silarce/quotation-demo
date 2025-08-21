@@ -1,14 +1,12 @@
 import { useState, useEffect, useReducer, useMemo } from 'react';
-
 import { useRouter } from 'next/router';
 
+import { Spin } from 'antd';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
 import Btn from 'components/global/gear/button/btn_fong';
-
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
-
 import SalesOrderInfo from 'components/page/accounting/salesOrder/salesOrderInfo';
 import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
 
@@ -25,7 +23,6 @@ import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook
 import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
-import { id } from 'date-fns/locale';
 
 // ============================================================================
 
@@ -321,10 +318,10 @@ export default function SalesOrder() {
           </Btn>
         </div>
       </div>
-
-      <SalesOrderInfo instance_salesOrder={instance_salesOrder} />
-
-      <SalesOrderItemList className={'mt-10'} instance_salesOrderItemArr={instance_salesOrderItemArr} />
+      <Spin spinning={isFetchingSalesOrder} delay={300}>
+        <SalesOrderInfo instance_salesOrder={instance_salesOrder} />
+        <SalesOrderItemList className={'mt-10'} instance_salesOrderItemArr={instance_salesOrderItemArr} />
+      </Spin>
     </div>
   );
 }

@@ -84,7 +84,7 @@ export default function List() {
       </div>
 
       {/*  */}
-      <Spin spinning={isFetching} delay={500}>
+      <Spin spinning={isFetching} delay={300}>
         <Table_antd columns={columns} dataSource={filteredData} />
       </Spin>
       {/*  */}
