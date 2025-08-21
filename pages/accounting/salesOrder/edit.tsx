@@ -1,20 +1,16 @@
-import { useState, useEffect, useReducer, useMemo } from 'react';
-
 import { useRouter } from 'next/router';
 
+import { Spin } from 'antd';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-
 import Btn from 'components/global/gear/button/btn_fong';
-
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
-
 import SalesOrderInfo from 'components/page/accounting/salesOrder/salesOrderInfo';
 import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
 
 import {
   useApiGetSalesOrderById,
-  TsalesOrder_Dto,
   TsalesOrder_post_Dto,
   TsalesOrder_patch_Dto,
   apiPostSalesOrderData,
@@ -25,7 +21,6 @@ import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook
 import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
-import { id } from 'date-fns/locale';
 
 // ============================================================================
 
@@ -44,8 +39,6 @@ export default function SalesOrder() {
   const { userInfo } = useGlobal_userInfo();
 
   const isNew = !query.id;
-
-  const [disabled, setDisabled] = useState(false);
 
   const {
     data: salesOrderData,
@@ -173,18 +166,30 @@ export default function SalesOrder() {
       return null;
     }
 
-    const salesOrderItems = state_salesOrderItemArr.map((item) => {
-      const { raw, quantity, unitPrice, amount } = item;
+    const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = state_salesOrderItemArr.map((item, index) => {
+      const {
+        attachedToProductId,
+        productId,
+        productName,
+        productNumber,
+
+        quantity,
+        unitPrice,
+        amount,
+      } = item;
 
       const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
-        ...raw,
         id: null,
+        attachedToProductId,
         salesOrderNumber: null,
+        itemNumber: `${index}`,
+
         quantity: Number(quantity),
         unitPrice: Number(unitPrice),
         amount,
-        productName: raw.productName || '',
-        productNumber: raw.productNumber || '',
+        productId,
+        productName,
+        productNumber,
       };
 
       return salesOrderItem;
@@ -242,17 +247,28 @@ export default function SalesOrder() {
     const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
 
     const salesOrderItems = state_salesOrderItemArr.map((item, index) => {
-      const { raw, quantity, unitPrice, amount } = item;
+      const {
+        quantity,
+        unitPrice,
+        amount,
+
+        productName,
+        productNumber,
+      } = item;
 
       const salesOrderItem: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
-        ...raw,
+        attachedToProductId: item.attachedToProductId,
+        productId: item.productId,
+
         quantity: Number(quantity),
         unitPrice: Number(unitPrice),
         amount,
-        productName: raw.productName || '',
-        productNumber: raw.productNumber || '',
-
+        productName,
+        productNumber,
         itemNumber: `${index}`,
+
+        id: null,
+        salesOrderNumber: salesOrderData.salesOrderNumber,
       };
 
       return salesOrderItem;
@@ -321,10 +337,10 @@ export default function SalesOrder() {
           </Btn>
         </div>
       </div>
-
-      <SalesOrderInfo instance_salesOrder={instance_salesOrder} />
-
-      <SalesOrderItemList className={'mt-10'} instance_salesOrderItemArr={instance_salesOrderItemArr} />
+      <Spin spinning={isFetchingSalesOrder} delay={300}>
+        <SalesOrderInfo instance_salesOrder={instance_salesOrder} />
+        <SalesOrderItemList className={'mt-10'} instance_salesOrderItemArr={instance_salesOrderItemArr} />
+      </Spin>
     </div>
   );
 }

@@ -1,27 +1,22 @@
 import { useMemo } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
-
 import Router, { useRouter } from 'next/router';
 import Link from 'next/link';
-
 import classNames from 'classnames';
-
-import scss from './index.module.scss';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, DatePicker } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
-
-import { Form } from 'antd';
-
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
-import Icon_note from 'public/image/icon/fong/note.svg';
+import { Form, Spin } from 'antd';
 
 import {
   useApiGetAccountsReceivablesList,
   TaccountsReceivablesList_Dto,
 } from 'js/api/api_netCore/api_accountsReceivable';
+
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import Icon_note from 'public/image/icon/fong/note.svg';
+import scss from './index.module.scss';
 
 export default function AccountsReceivableInquiry() {
   const router = useRouter();
@@ -35,7 +30,7 @@ export default function AccountsReceivableInquiry() {
     };
   }, [keyword, createdAt, page]);
 
-  const { data: accountsReceivablesArr, meta } = useApiGetAccountsReceivablesList(apiParam);
+  const { data: accountsReceivablesArr, meta, isFetching } = useApiGetAccountsReceivablesList(apiParam);
 
   const handel_search = ({ keyword, createdAt }: { keyword?: string; createdAt?: Dayjs }) => {
     router.replace({
@@ -81,26 +76,28 @@ export default function AccountsReceivableInquiry() {
         </div>
       </div>
 
-      <Table_antd
-        columns={columns}
-        dataSource={accountsReceivablesArr ?? undefined}
-        scroll={{
-          y: '550px',
-        }}
-        pagination={{
-          current: Number(page || 1),
-          pageSize: meta?.pageSize,
-          total: meta?.itemCount,
-          onChange(page) {
-            router.replace({
-              query: {
-                ...query,
-                page: page,
-              },
-            });
-          },
-        }}
-      />
+      <Spin spinning={isFetching} delay={300}>
+        <Table_antd
+          columns={columns}
+          dataSource={accountsReceivablesArr ?? undefined}
+          scroll={{
+            y: '550px',
+          }}
+          pagination={{
+            current: Number(page || 1),
+            pageSize: meta?.pageSize,
+            total: meta?.itemCount,
+            onChange(page) {
+              router.replace({
+                query: {
+                  ...query,
+                  page: page,
+                },
+              });
+            },
+          }}
+        />
+      </Spin>
     </div>
   );
 }

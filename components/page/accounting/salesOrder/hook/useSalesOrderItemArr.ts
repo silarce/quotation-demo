@@ -8,10 +8,15 @@ import { TsalesOrder_Dto } from 'js/api/api_netCore/api_accountsReceivable';
 type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
 
 interface Tstate {
-  raw: TsalesOrderItem;
+  readonly attachedToProductId: string | null;
+
   quantity: `${number}` | '';
   unitPrice: `${number}` | '';
   amount: number;
+
+  productId: string | null;
+  productNumber: string;
+  productName: string;
 }
 
 type Taction_salsesOrderItem =
@@ -34,6 +39,30 @@ type Taction_salsesOrderItem =
       payload: Tstate[];
     }
   | {
+      type: 'productId';
+      payload: {
+        index: number;
+        productId: string | null;
+      };
+    }
+  | {
+      type: 'productNumber';
+      payload: {
+        index: number;
+        productNumber: string;
+      };
+    }
+  | {
+      type: 'productName';
+      payload: {
+        index: number;
+        productName: string;
+      };
+    }
+  | {
+      type: 'add';
+    }
+  | {
       type: 'delete';
       payload: {
         index: number;
@@ -42,9 +71,142 @@ type Taction_salsesOrderItem =
 
 type Tinstance_salesOrderItemArr = ReturnType<typeof useSalesOrderItemArr>;
 
+// ===============================================================================
+
+const customProductNumber = 'A99999';
+
+// ===============================================================================
+
+// MARK: HOOK
+
+const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
+  return useMemo(() => {
+    if (!raw) {
+      return [];
+    }
+
+    return raw.map((item) => ({
+      // raw: item,
+      attachedToProductId: item.attachedToProductId,
+      productId: item.productId,
+
+      quantity: `${item.quantity || ''}`,
+      unitPrice: `${item.unitPrice || ''}`,
+      amount: item.amount || 0,
+      productName: item.productName,
+      productNumber: item.productNumber,
+    }));
+  }, [raw]);
+};
+
+const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
+  const defaultState = useDefaultState(raw);
+
+  const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
+
+  const reset = () => {
+    dispatch({ type: 'replace', payload: defaultState });
+  };
+
+  const setProduct_custom = (index: number, value: string) => {
+    dispatch({
+      type: 'productId',
+      payload: { index: index, productId: null },
+    });
+
+    dispatch({
+      type: 'productName',
+      payload: { index: index, productName: value },
+    });
+    dispatch({
+      type: 'productNumber',
+      payload: { index: index, productNumber: customProductNumber },
+    });
+  };
+
+  const setProduct = (
+    index: number,
+    value: {
+      productId: string;
+      productName: string;
+      productNumber: string;
+      price: number;
+    }
+  ) => {
+    const { productId, productName, productNumber, price } = value;
+
+    if (!state[index]) {
+      myAlert.notify.error({
+        message: 'state無效的索引',
+      });
+
+      return;
+    }
+
+    dispatch({
+      type: 'productId',
+      payload: { index: index, productId },
+    });
+
+    dispatch({
+      type: 'productName',
+      payload: { index: index, productName: productName },
+    });
+    dispatch({
+      type: 'productNumber',
+      payload: { index: index, productNumber: productNumber },
+    });
+    dispatch({
+      type: 'unitPrice',
+      payload: { index: index, unitPrice: `${price}` },
+    });
+  };
+
+  const setUnitPrice = (index: number, unitPrice: `${number}` | '') => {
+    if (!state[index]) {
+      myAlert.notify.error({
+        message: 'setUnitPrice,無效的索引',
+      });
+
+      return;
+    }
+
+    if (!checkIsAllowCustom(state[index].productNumber)) {
+      myAlert.warning({ title: '非客制化主產品不可以編輯單價' });
+
+      return;
+    }
+
+    dispatch({ type: 'unitPrice', payload: { index, unitPrice } });
+  };
+
+  useEffect(() => {
+    reset();
+  }, [defaultState]);
+
+  return {
+    state,
+    dispatch,
+    //
+    setUnitPrice,
+    setProduct_custom,
+    setProduct,
+    //
+    reset,
+    checkIsAllowCustom,
+  };
+};
+
+// MARK: reducer
 const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
   if (action.type === 'replace') {
     return action.payload;
+  }
+
+  if (action.type === 'add') {
+    const newItem: Tstate = emptyState();
+
+    return [...state, newItem];
   }
 
   if (!state[action.payload.index]) {
@@ -88,6 +250,30 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
       };
       break;
     }
+
+    case 'productId': {
+      target = {
+        ...target,
+        productId: action.payload.productId,
+      };
+      break;
+    }
+
+    case 'productNumber': {
+      target = {
+        ...target,
+        productNumber: action.payload.productNumber,
+      };
+      break;
+    }
+
+    case 'productName': {
+      target = {
+        ...target,
+        productName: action.payload.productName,
+      };
+      break;
+    }
   }
 
   copy[action.payload.index] = target;
@@ -95,39 +281,24 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
   return copy;
 };
 
-const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
-  return useMemo(() => {
-    if (!raw) {
-      return [];
-    }
+// ===============================================================================
 
-    return raw.map((item) => ({
-      raw: item,
-      quantity: `${item.quantity || ''}`,
-      unitPrice: `${item.unitPrice || ''}`,
-      amount: item.amount || 0,
-    }));
-  }, [raw]);
-};
+const emptyState = (): Tstate => ({
+  attachedToProductId: null,
+  productId: null,
+  quantity: '',
+  unitPrice: '',
+  amount: 0,
+  productName: '',
+  productNumber: customProductNumber,
+});
 
-const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
-  const defaultState = useDefaultState(raw);
+const checkIsAllowCustom = (productNumber: string) => {
+  if (productNumber === customProductNumber) {
+    return true;
+  }
 
-  const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
-
-  const reset = () => {
-    dispatch({ type: 'replace', payload: defaultState });
-  };
-
-  useEffect(() => {
-    reset();
-  }, [defaultState]);
-
-  return {
-    state,
-    dispatch,
-    reset,
-  };
+  return false;
 };
 
 export { useSalesOrderItemArr };

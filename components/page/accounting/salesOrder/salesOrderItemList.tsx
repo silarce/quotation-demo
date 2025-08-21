@@ -1,7 +1,17 @@
+import { useMemo } from 'react';
+
+import classNames from 'classnames';
+
 import Btn from 'components/global/gear/button/btn_fong';
-import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'components/global/gear/dataEntry';
+import DataEntry, {
+  TdataEntrycontainerProps,
+  DataEntry_fong,
+  Input,
+  InputSelect,
+} from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { modal_delete } from 'components/global/gear/modal/fongModal';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
@@ -14,6 +24,13 @@ import {
   Taction_salsesOrderItem,
 } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
+import { useApiGetProductProfileList } from 'js/api/api_netCore/api_salesOrder';
+
+// ============================================================================
+
+type Tinstance_useApiGetProductProfileList = ReturnType<typeof useApiGetProductProfileList>;
+type Toptions_productProfile = Tinstance_useApiGetProductProfileList['options'];
+
 // ============================================================================
 
 const SalesOrderItemList = ({
@@ -23,13 +40,24 @@ const SalesOrderItemList = ({
   instance_salesOrderItemArr: Tinstance_salesOrderItemArr;
   className?: string;
 }) => {
+  const { options } = useApiGetProductProfileList();
+
   const { state, dispatch, reset } = instance_salesOrderItemArr;
 
-  const columns = createColoumns(dispatch);
+  const columns = createColoumns(instance_salesOrderItemArr, options);
+
+  const handle_add = () => {
+    dispatch({ type: 'add' });
+  };
 
   return (
-    <div className={className}>
-      <div className="text-xl font-semibold mb-6">銷貨明細</div>
+    <div className={classNames(className)}>
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-xl font-semibold ">銷貨明細</div>
+        <Btn theme="add" onClick={handle_add}>
+          新增
+        </Btn>
+      </div>
       <Table_antd
         dataSource={state}
         columns={columns}
@@ -37,33 +65,71 @@ const SalesOrderItemList = ({
           y: 400,
         }}
       />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
     </div>
   );
 };
 
 // ===========================================================================
 
-const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOrderItem]>) => {
+const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr, options: Toptions_productProfile) => {
+  const { dispatch, setProduct_custom, setUnitPrice, setProduct } = instance_salesOrderItemArr;
+
   const columns: TableProps<Tstate>['columns'] = [
     {
-      key: 'salesOrderNumber',
-      title: '序號',
-
-      width: 120,
-      render: (_, { raw: { salesOrderNumber } }) => <MyDataEntry showBorder={false}>{salesOrderNumber}</MyDataEntry>,
-    },
-    {
-      key: 'productNumber',
-      title: '產品代號',
-      width: 120,
-      render: (_, { raw: { productNumber } }) => <MyDataEntry showBorder={false}>{productNumber}</MyDataEntry>,
-    },
-    {
-      key: 'productName',
+      dataIndex: 'productName',
       title: '產品名稱',
-      width: 150,
-      render: (_, { raw: { productName } }) => <MyDataEntry showBorder={false}>{productName}</MyDataEntry>,
+      width: 200,
+      render: (v, _, index) => (
+        <MyDataEntry showBorder={true}>
+          {
+            <InputSelect
+              options={options}
+              value={v}
+              inputProps={{
+                onChange: (e) => {
+                  const value = e.currentTarget.value;
+                  setProduct_custom(index, value);
+                },
+              }}
+              selectProps={{
+                menuPortalTarget: document.body,
+                onChange: (option) => {
+                  if (!option) {
+                    dispatch({
+                      type: 'productName',
+                      payload: { index: index, productName: '' },
+                    });
+
+                    return;
+                  }
+
+                  const { label, raw } = option;
+
+                  setProduct(index, {
+                    productId: raw.id,
+                    productName: label,
+                    productNumber: raw.productNumber,
+                    price: raw.price,
+                  });
+                },
+              }}
+            />
+          }
+        </MyDataEntry>
+      ),
     },
+    {
+      dataIndex: 'productNumber',
+      title: '產品代號',
+      width: 150,
+    },
+
     {
       dataIndex: 'quantity',
       title: '數量',
@@ -88,7 +154,7 @@ const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOr
       title: '單價',
       align: 'right',
       width: 150,
-      render: (value, _, index) => {
+      render: (value, record, index) => {
         return (
           <MyDataEntry showBorder={true}>
             <Input
@@ -97,7 +163,7 @@ const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOr
               value={value}
               onChange={(e) => {
                 const value = e.currentTarget.value as `${number}` | '';
-                dispatch({ type: 'unitPrice', payload: { index, unitPrice: value } });
+                setUnitPrice(index, value);
               }}
             />
           </MyDataEntry>
@@ -126,12 +192,11 @@ const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOr
             <Icon_trash
               className="w-[16px] h-[16px] text-red01 cursor-pointer"
               onClick={() => {
-                myAlert.confirm({
-                  title: '確定刪除?',
-                  props: {
-                    onOk() {
-                      dispatch({ type: 'delete', payload: { index } });
-                    },
+                modal_delete({
+                  title: '確認刪除嗎？',
+                  content: null,
+                  onConfirm: () => {
+                    dispatch({ type: 'delete', payload: { index } });
                   },
                 });
               }}
