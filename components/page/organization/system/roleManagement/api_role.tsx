@@ -2,9 +2,6 @@ import { Role, UpdateRole } from './newRole/schema/system';
 import axios from 'axios';
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 
-import Cookies from 'js-cookie';
-const token = Cookies.get('token');
-
 const getAuthHeader = () => {
   if (typeof window === 'undefined') {
     return {};
@@ -58,7 +55,6 @@ export const createRole = async (role: Role) => {
   }
 };
 
-//=================================================
 // 更新角色
 export async function updateRole(role: UpdateRole) {
   const { role_id, ...body } = role;
@@ -75,7 +71,7 @@ export async function updateRole(role: UpdateRole) {
       }
     );
 
-    return handleResponse(res.data);
+    return res.data;
   } catch (error) {
     console.error('更新角色失敗:', error);
 
@@ -101,12 +97,3 @@ export const deleteRoleById = async (role_id: string) => {
     throw error;
   }
 };
-
-//=================================================
-async function handleResponse(res: any) {
-  if (res.return_code === 0) {
-    return res.data;
-  } else {
-    throw new Error(res.return_message);
-  }
-}
