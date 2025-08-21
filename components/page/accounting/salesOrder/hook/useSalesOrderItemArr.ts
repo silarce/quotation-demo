@@ -8,10 +8,15 @@ import { TsalesOrder_Dto } from 'js/api/api_netCore/api_accountsReceivable';
 type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
 
 interface Tstate {
-  raw: TsalesOrderItem;
+  readonly attachedToProductId: string | null;
+  readonly productId: string | null;
+
   quantity: `${number}` | '';
   unitPrice: `${number}` | '';
   amount: number;
+
+  productNumber: string;
+  productName: string;
 }
 
 type Taction_salsesOrderItem =
@@ -34,6 +39,23 @@ type Taction_salsesOrderItem =
       payload: Tstate[];
     }
   | {
+      type: 'productNumber';
+      payload: {
+        index: number;
+        productNumber: string;
+      };
+    }
+  | {
+      type: 'productName';
+      payload: {
+        index: number;
+        productName: string;
+      };
+    }
+  | {
+      type: 'add';
+    }
+  | {
       type: 'delete';
       payload: {
         index: number;
@@ -45,6 +67,12 @@ type Tinstance_salesOrderItemArr = ReturnType<typeof useSalesOrderItemArr>;
 const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
   if (action.type === 'replace') {
     return action.payload;
+  }
+
+  if (action.type === 'add') {
+    const newItem: Tstate = emptyState();
+
+    return [...state, newItem];
   }
 
   if (!state[action.payload.index]) {
@@ -88,6 +116,22 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
       };
       break;
     }
+
+    case 'productNumber': {
+      target = {
+        ...target,
+        productNumber: action.payload.productNumber,
+      };
+      break;
+    }
+
+    case 'productName': {
+      target = {
+        ...target,
+        productName: action.payload.productName,
+      };
+      break;
+    }
   }
 
   copy[action.payload.index] = target;
@@ -102,10 +146,15 @@ const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] =>
     }
 
     return raw.map((item) => ({
-      raw: item,
+      // raw: item,
+      attachedToProductId: item.attachedToProductId,
+      productId: item.productId,
+
       quantity: `${item.quantity || ''}`,
       unitPrice: `${item.unitPrice || ''}`,
       amount: item.amount || 0,
+      productName: item.productName,
+      productNumber: item.productNumber,
     }));
   }, [raw]);
 };
@@ -129,6 +178,16 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
     reset,
   };
 };
+
+const emptyState = (): Tstate => ({
+  attachedToProductId: null,
+  productId: null,
+  quantity: '',
+  unitPrice: '',
+  amount: 0,
+  productName: '',
+  productNumber: '',
+});
 
 export { useSalesOrderItemArr };
 

@@ -2,6 +2,7 @@ import Btn from 'components/global/gear/button/btn_fong';
 import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+import { modal_delete } from 'components/global/gear/modal/fongModal';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
@@ -27,11 +28,17 @@ const SalesOrderItemList = ({
 
   const columns = createColoumns(dispatch);
 
+  const handle_add = () => {
+    dispatch({ type: 'add' });
+  };
+
   return (
     <div className={className}>
       <div className="flex justify-between items-center mb-6">
         <div className="text-xl font-semibold ">銷貨明細</div>
-        <Btn theme="add">新增</Btn>
+        <Btn theme="add" onClick={handle_add}>
+          新增
+        </Btn>
       </div>
       <Table_antd
         dataSource={state}
@@ -48,24 +55,54 @@ const SalesOrderItemList = ({
 
 const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOrderItem]>) => {
   const columns: TableProps<Tstate>['columns'] = [
-    {
-      key: 'salesOrderNumber',
-      title: '序號',
+    // {
+    //   key: 'salesOrderNumber',
+    //   title: '序號',
 
-      width: 120,
-      render: (_, { raw: { salesOrderNumber } }) => <MyDataEntry showBorder={false}>{salesOrderNumber}</MyDataEntry>,
-    },
+    //   width: 120,
+    //   render: (_, { raw: { salesOrderNumber } }) => <MyDataEntry showBorder={false}>{salesOrderNumber}</MyDataEntry>,
+    // },
     {
-      key: 'productNumber',
+      dataIndex: 'productNumber',
       title: '產品代號',
       width: 120,
-      render: (_, { raw: { productNumber } }) => <MyDataEntry showBorder={false}>{productNumber}</MyDataEntry>,
+      render: (v, _, index) => (
+        <MyDataEntry showBorder={true}>
+          {
+            <Input
+              value={v}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                dispatch({
+                  type: 'productNumber',
+                  payload: { index: index, productNumber: value },
+                });
+              }}
+            />
+          }
+        </MyDataEntry>
+      ),
     },
     {
-      key: 'productName',
+      dataIndex: 'productName',
       title: '產品名稱',
       width: 150,
-      render: (_, { raw: { productName } }) => <MyDataEntry showBorder={false}>{productName}</MyDataEntry>,
+      render: (v, _, index) => (
+        <MyDataEntry showBorder={true}>
+          {
+            <Input
+              value={v}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                dispatch({
+                  type: 'productName',
+                  payload: { index: index, productName: value },
+                });
+              }}
+            />
+          }
+        </MyDataEntry>
+      ),
     },
     {
       dataIndex: 'quantity',
@@ -129,12 +166,11 @@ const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOr
             <Icon_trash
               className="w-[16px] h-[16px] text-red01 cursor-pointer"
               onClick={() => {
-                myAlert.confirm({
-                  title: '確定刪除?',
-                  props: {
-                    onOk() {
-                      dispatch({ type: 'delete', payload: { index } });
-                    },
+                modal_delete({
+                  title: '確認刪除嗎？',
+                  content: null,
+                  onConfirm: () => {
+                    dispatch({ type: 'delete', payload: { index } });
                   },
                 });
               }}
