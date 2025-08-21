@@ -1,11 +1,9 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 import { useEffect, useMemo, useState } from 'react';
 import EmployeeFilterForm from 'components/page/organization/system/roleManagement/roleAssignment/EmployeeFilterForm';
 import EmployeeTable from 'components/page/organization/system/roleManagement/roleAssignment/employeeTable';
+import { getEmployeeList, saveUserRoles } from 'components/page/organization/system/roleManagement/roleAssignment/api';
 
 import Cookies from 'js-cookie';
-const token = Cookies.get('token');
-
 interface User {
   role_id: string;
   user_id: string;
@@ -25,25 +23,22 @@ export default function RoleAssignmentPage() {
   // 被勾選的員工 ID 清單
   const [checkedUserIds, setCheckedUserIds] = useState<string[]>([]);
 
-  const getEmployeeList = async () => {
+  const fetchUsers = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/v2/sys/role/users`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-      setAllData(data.data || []);
-    } catch (error) {
-      console.error('取得員工資料失敗:', error);
+      const data = await getEmployeeList();
+      setAllData(data);
+    } catch (err) {
+      console.error('取得員工清單失敗', err);
     }
   };
 
+  const handleSaveUserRoles = async (user_id: string, role_ids: string[]) => {
+    await saveUserRoles(user_id, role_ids); // API 呼叫
+    await fetchUsers(); // 重撈最新資料
+  };
+
   useEffect(() => {
-    getEmployeeList();
+    fetchUsers();
   }, []);
 
   // 過濾員工資料（依搜尋關鍵字與角色）
@@ -51,8 +46,8 @@ export default function RoleAssignmentPage() {
     return allData.filter((user) => {
       const textMatch =
         user.user_name.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.emp_code.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.dep_ch_name.toLowerCase().includes(searchText.toLowerCase());
+        user.emp_code.toLowerCase().includes(searchText.toLowerCase());
+      // user.dep_ch_name.toLowerCase().includes(searchText.toLowerCase());
 
       const roleMatch = selectedRole ? user.user_roles?.includes?.(selectedRole) : true;
 
@@ -75,6 +70,7 @@ export default function RoleAssignmentPage() {
       <EmployeeTable
         data={filteredUsers}
         onReload={getEmployeeList}
+        onSaveRoles={handleSaveUserRoles}
         checkedUserIds={checkedUserIds}
         setCheckedUserIds={setCheckedUserIds}
       />

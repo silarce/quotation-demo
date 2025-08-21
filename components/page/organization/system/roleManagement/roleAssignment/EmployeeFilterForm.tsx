@@ -2,10 +2,12 @@ import ClearButton from 'components/global/myCom/button/clearButton';
 import MyInput from 'components/global/myCom/Input/Input';
 import CustomSelect from 'components/page/organization/system/usres/CustomSelect';
 
+import Btn from 'components/global/gear/button/btn_fong';
 import SearchButton from 'components/global/myCom/button/searchButton';
 import { getRoleList } from '../api_role';
 import { useEffect, useState } from 'react';
 import scss from './EmployeeFilterForm.module.scss';
+import { DataEntry_fong, Select_rs } from 'components/global/gear/dataEntry';
 
 interface Props {
   searchText: string;
@@ -57,17 +59,34 @@ const EmployeeFilterForm = ({ searchText, setSearchText, selectedRole, setSelect
               marginLeft="16px"
             />
           </div>
-          <div className="w-[150px]">
-            <CustomSelect
+          <div className="w-[150px] h-[40px]">
+            <DataEntry_fong>
+              <Select_rs
+                options={roleOptions}
+                value={roleOptions.find((option) => option.value === localSelectedRole) || null}
+                onChange={(selectedOption) => {
+                  if (selectedOption) {
+                    setLocalSelectedRole(selectedOption.value);
+                  } else {
+                    setLocalSelectedRole('');
+                  }
+                }}
+              ></Select_rs>
+            </DataEntry_fong>
+            {/* <CustomSelect
               options={roleOptions}
               placeholder="請選擇角色"
               value={roleOptions.find((option) => option.value === localSelectedRole) || null}
               onChange={(selectedOption) => setLocalSelectedRole(selectedOption.value)}
-            />
+            /> */}
           </div>
           <SearchButton onClick={handleSearch} className="h-[40px]" />
         </div>
-        {checkedUserIds.length > 0 && <ClearButton label="全部刪除" onClick={() => console.log('Hi')} />}
+        {checkedUserIds.length > 0 && (
+          <Btn theme="trash" onClick={() => console.log('Hi')}>
+            全部刪除
+          </Btn>
+        )}
       </div>
     </>
   );

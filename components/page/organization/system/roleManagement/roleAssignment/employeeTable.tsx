@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Table } from 'antd';
@@ -16,6 +16,7 @@ import scss from './table.module.scss';
 
 //api
 import { getRoleList } from '../api_role';
+import { saveUserRoles } from 'components/page/organization/system/roleManagement/roleAssignment/api';
 
 import Cookies from 'js-cookie';
 const token = Cookies.get('token');
@@ -32,11 +33,12 @@ interface User {
 interface Props {
   data: User[];
   onReload: () => void;
+  onSaveRoles: (user_id: string, role_ids: string[]) => Promise<void>;
   checkedUserIds: string[];
   setCheckedUserIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const EmployeeTable: React.FC<Props> = ({ data, onReload, checkedUserIds, setCheckedUserIds }) => {
+const EmployeeTable: React.FC<Props> = ({ data, onReload, onSaveRoles, checkedUserIds, setCheckedUserIds }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [checkedRoles, setCheckedRoles] = useState<string[]>([]);
@@ -167,21 +169,22 @@ const EmployeeTable: React.FC<Props> = ({ data, onReload, checkedUserIds, setChe
     }
   };
 
-  //儲存使用者角色
-  const saveUserRoles = async (user_id: string, role_ids: string[]) => {
-    const res = await axios.post(`${BASE_URL}/sys/role/update_user_roles`, {
-      user_id,
-      role_ids,
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  // 獲取授權標頭
+  const getAuthHeader = () => {
+    if (typeof window === 'undefined') {
+      return {};
+    }
 
-    return res;
+    const token = localStorage.getItem('access_token');
+    const type = localStorage.getItem('token_type') || 'Bearer';
+
+    return token ? { Authorization: `${type} ${token}` } : {};
   };
 
   //刪除使用者擁有角色
   const handleDeleteUserRoles = async (user_id: string) => {
     try {
-      await axios.delete(`${BASE_URL}/sys/role/role_user`, {
+      await axios.delete(`${BASE_URL}/api/v1/sys/role/role_user`, {
         params: { user_id },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -204,7 +207,7 @@ const EmployeeTable: React.FC<Props> = ({ data, onReload, checkedUserIds, setChe
         className={scss.customTable}
         columns={columns}
         dataSource={data}
-        rowKey="role_id"
+        rowKey="user_id"
         bordered
         style={{ minWidth: '50%' }}
       />
@@ -237,7 +240,7 @@ const EmployeeTable: React.FC<Props> = ({ data, onReload, checkedUserIds, setChe
           const validRoleIds = checkedRoles.filter((id) => !!id); // 過濾掉 null 或 undefined
 
           try {
-            await saveUserRoles(selectedEmployee.user_id, validRoleIds);
+            await onSaveRoles(selectedEmployee.user_id, validRoleIds);
             setIsModalVisible(false);
             setSelectedEmployee(null);
           } catch (error) {
