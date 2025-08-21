@@ -41,4 +41,13 @@ interface TsalesOrder_simple_Dto {
   salesOrderItems: null;
 }
 
-export type { TsalesOrder_simple_Dto };
+interface TproductView_Dto {
+  id: string; // 產品ID (Guid)
+  productNumber: string; // 產品編號
+  productName: string; // 產品名稱
+  productSpec: string; // 規格
+  unit: string; // 單位
+  price: number; // 單價 (decimal)
+}
+
+export type { TsalesOrder_simple_Dto, TproductView_Dto };
