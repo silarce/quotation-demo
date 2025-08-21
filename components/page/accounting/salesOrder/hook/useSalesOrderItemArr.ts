@@ -9,12 +9,12 @@ type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
 
 interface Tstate {
   readonly attachedToProductId: string | null;
-  readonly productId: string | null;
 
   quantity: `${number}` | '';
   unitPrice: `${number}` | '';
   amount: number;
 
+  productId: string | null;
   productNumber: string;
   productName: string;
 }
@@ -37,6 +37,13 @@ type Taction_salsesOrderItem =
   | {
       type: 'replace';
       payload: Tstate[];
+    }
+  | {
+      type: 'productId';
+      payload: {
+        index: number;
+        productId: string | null;
+      };
     }
   | {
       type: 'productNumber';
@@ -103,6 +110,11 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
 
   const setProduct_custom = (index: number, value: string) => {
     dispatch({
+      type: 'productId',
+      payload: { index: index, productId: null },
+    });
+
+    dispatch({
       type: 'productName',
       payload: { index: index, productName: value },
     });
@@ -115,12 +127,13 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
   const setProduct = (
     index: number,
     value: {
+      productId: string;
       productName: string;
       productNumber: string;
       price: number;
     }
   ) => {
-    const { productName, productNumber, price } = value;
+    const { productId, productName, productNumber, price } = value;
 
     if (!state[index]) {
       myAlert.notify.error({
@@ -129,6 +142,11 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
 
       return;
     }
+
+    dispatch({
+      type: 'productId',
+      payload: { index: index, productId },
+    });
 
     dispatch({
       type: 'productName',
@@ -229,6 +247,14 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
         ...target,
         unitPrice,
         amount,
+      };
+      break;
+    }
+
+    case 'productId': {
+      target = {
+        ...target,
+        productId: action.payload.productId,
       };
       break;
     }

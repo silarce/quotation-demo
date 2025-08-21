@@ -483,7 +483,7 @@ interface TsalesOrderItem_post_Dto {
 
   salesOrderNumber: null; //銷售訂單編號
 
-  productId: null; //產品id
+  productId: string | null; //產品id
   productName: string; //產品名稱
   productNumber: string; //產品編號
 
@@ -511,7 +511,7 @@ type TsalesOrderItem_patch_Dto = Omit<
 > & {
   // id: string; // 後端說不需要
   itemNumber: string; // 排序，post的時候可以null為什麼patch就不可以，莫名其妙
-  salesOrderNumber: string | null;
+  salesOrderNumber: string;
   productId: Guid | null; //產品id
 };
 

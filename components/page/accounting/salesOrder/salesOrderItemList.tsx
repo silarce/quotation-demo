@@ -112,6 +112,7 @@ const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr,
                   const { label, raw } = option;
 
                   setProduct(index, {
+                    productId: raw.id,
                     productName: label,
                     productNumber: raw.productNumber,
                     price: raw.price,

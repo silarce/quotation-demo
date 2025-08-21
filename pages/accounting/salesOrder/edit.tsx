@@ -1,4 +1,3 @@
-import { useState, useEffect, useReducer, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 import { Spin } from 'antd';
@@ -12,7 +11,6 @@ import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrder
 
 import {
   useApiGetSalesOrderById,
-  TsalesOrder_Dto,
   TsalesOrder_post_Dto,
   TsalesOrder_patch_Dto,
   apiPostSalesOrderData,
@@ -168,25 +166,34 @@ export default function SalesOrder() {
       return null;
     }
 
-    // const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = state_salesOrderItemArr.map((item) => {
-    //   const { raw, quantity, unitPrice, amount } = item;
+    const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = state_salesOrderItemArr.map((item, index) => {
+      const {
+        attachedToProductId,
+        productId,
+        productName,
+        productNumber,
 
-    //   const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
-    //     ...raw,
-    //     id: null,
-    //     salesOrderNumber: null,
-    //     quantity: Number(quantity),
-    //     unitPrice: Number(unitPrice),
-    //     amount,
-    //     productName: raw.productName || '',
-    //     productNumber: raw.productNumber || '',
-    //   };
+        quantity,
+        unitPrice,
+        amount,
+      } = item;
 
-    //   return salesOrderItem;
-    // });
+      const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
+        id: null,
+        attachedToProductId,
+        salesOrderNumber: null,
+        itemNumber: `${index}`,
 
-    // post時哪來的salesOrderNumber，直接放空陣列
-    const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = [];
+        quantity: Number(quantity),
+        unitPrice: Number(unitPrice),
+        amount,
+        productId,
+        productName,
+        productNumber,
+      };
+
+      return salesOrderItem;
+    });
 
     const body: TsalesOrder_post_Dto = {
       createdAt: new Date().toISOString(),
@@ -261,7 +268,7 @@ export default function SalesOrder() {
         itemNumber: `${index}`,
 
         id: null,
-        salesOrderNumber: null,
+        salesOrderNumber: salesOrderData.salesOrderNumber,
       };
 
       return salesOrderItem;
