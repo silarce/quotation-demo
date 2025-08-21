@@ -64,6 +64,122 @@ type Taction_salsesOrderItem =
 
 type Tinstance_salesOrderItemArr = ReturnType<typeof useSalesOrderItemArr>;
 
+// ===============================================================================
+
+const customProductNumber = 'A99999';
+
+// ===============================================================================
+
+// MARK: HOOK
+
+const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
+  return useMemo(() => {
+    if (!raw) {
+      return [];
+    }
+
+    return raw.map((item) => ({
+      // raw: item,
+      attachedToProductId: item.attachedToProductId,
+      productId: item.productId,
+
+      quantity: `${item.quantity || ''}`,
+      unitPrice: `${item.unitPrice || ''}`,
+      amount: item.amount || 0,
+      productName: item.productName,
+      productNumber: item.productNumber,
+    }));
+  }, [raw]);
+};
+
+const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
+  const defaultState = useDefaultState(raw);
+
+  const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
+
+  const reset = () => {
+    dispatch({ type: 'replace', payload: defaultState });
+  };
+
+  const setProduct_custom = (index: number, value: string) => {
+    dispatch({
+      type: 'productName',
+      payload: { index: index, productName: value },
+    });
+    dispatch({
+      type: 'productNumber',
+      payload: { index: index, productNumber: customProductNumber },
+    });
+  };
+
+  const setProduct = (
+    index: number,
+    value: {
+      productName: string;
+      productNumber: string;
+      price: number;
+    }
+  ) => {
+    const { productName, productNumber, price } = value;
+
+    if (!state[index]) {
+      myAlert.notify.error({
+        message: 'state無效的索引',
+      });
+
+      return;
+    }
+
+    dispatch({
+      type: 'productName',
+      payload: { index: index, productName: productName },
+    });
+    dispatch({
+      type: 'productNumber',
+      payload: { index: index, productNumber: productNumber },
+    });
+    dispatch({
+      type: 'unitPrice',
+      payload: { index: index, unitPrice: `${price}` },
+    });
+  };
+
+  const setUnitPrice = (index: number, unitPrice: `${number}` | '') => {
+    if (!state[index]) {
+      myAlert.notify.error({
+        message: 'setUnitPrice,無效的索引',
+      });
+
+      return;
+    }
+
+    if (!checkIsAllowCustom(state[index].productNumber)) {
+      myAlert.warning({ title: '非客制化主產品不可以編輯單價' });
+
+      return;
+    }
+
+    dispatch({ type: 'unitPrice', payload: { index, unitPrice } });
+  };
+
+  useEffect(() => {
+    reset();
+  }, [defaultState]);
+
+  return {
+    state,
+    dispatch,
+    //
+    setUnitPrice,
+    setProduct_custom,
+    setProduct,
+    //
+    reset,
+    checkIsAllowCustom,
+  };
+};
+
+// MARK: reducer
 const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
   if (action.type === 'replace') {
     return action.payload;
@@ -139,45 +255,7 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
   return copy;
 };
 
-const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
-  return useMemo(() => {
-    if (!raw) {
-      return [];
-    }
-
-    return raw.map((item) => ({
-      // raw: item,
-      attachedToProductId: item.attachedToProductId,
-      productId: item.productId,
-
-      quantity: `${item.quantity || ''}`,
-      unitPrice: `${item.unitPrice || ''}`,
-      amount: item.amount || 0,
-      productName: item.productName,
-      productNumber: item.productNumber,
-    }));
-  }, [raw]);
-};
-
-const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
-  const defaultState = useDefaultState(raw);
-
-  const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
-
-  const reset = () => {
-    dispatch({ type: 'replace', payload: defaultState });
-  };
-
-  useEffect(() => {
-    reset();
-  }, [defaultState]);
-
-  return {
-    state,
-    dispatch,
-    reset,
-  };
-};
+// ===============================================================================
 
 const emptyState = (): Tstate => ({
   attachedToProductId: null,
@@ -186,8 +264,16 @@ const emptyState = (): Tstate => ({
   unitPrice: '',
   amount: 0,
   productName: '',
-  productNumber: '',
+  productNumber: customProductNumber,
 });
+
+const checkIsAllowCustom = (productNumber: string) => {
+  if (productNumber === customProductNumber) {
+    return true;
+  }
+
+  return false;
+};
 
 export { useSalesOrderItemArr };
 

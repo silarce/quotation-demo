@@ -1,5 +1,14 @@
+import { useMemo } from 'react';
+
+import classNames from 'classnames';
+
 import Btn from 'components/global/gear/button/btn_fong';
-import DataEntry, { TdataEntrycontainerProps, DataEntry_fong, Input } from 'components/global/gear/dataEntry';
+import DataEntry, {
+  TdataEntrycontainerProps,
+  DataEntry_fong,
+  Input,
+  InputSelect,
+} from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { modal_delete } from 'components/global/gear/modal/fongModal';
@@ -15,6 +24,13 @@ import {
   Taction_salsesOrderItem,
 } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
+import { useApiGetProductProfileList } from 'js/api/api_netCore/api_salesOrder';
+
+// ============================================================================
+
+type Tinstance_useApiGetProductProfileList = ReturnType<typeof useApiGetProductProfileList>;
+type Toptions_productProfile = Tinstance_useApiGetProductProfileList['options'];
+
 // ============================================================================
 
 const SalesOrderItemList = ({
@@ -24,16 +40,18 @@ const SalesOrderItemList = ({
   instance_salesOrderItemArr: Tinstance_salesOrderItemArr;
   className?: string;
 }) => {
+  const { options } = useApiGetProductProfileList();
+
   const { state, dispatch, reset } = instance_salesOrderItemArr;
 
-  const columns = createColoumns(dispatch);
+  const columns = createColoumns(instance_salesOrderItemArr, options);
 
   const handle_add = () => {
     dispatch({ type: 'add' });
   };
 
   return (
-    <div className={className}>
+    <div className={classNames(className)}>
       <div className="flex justify-between items-center mb-6">
         <div className="text-xl font-semibold ">銷貨明細</div>
         <Btn theme="add" onClick={handle_add}>
@@ -47,63 +65,70 @@ const SalesOrderItemList = ({
           y: 400,
         }}
       />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
     </div>
   );
 };
 
 // ===========================================================================
 
-const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOrderItem]>) => {
-  const columns: TableProps<Tstate>['columns'] = [
-    // {
-    //   key: 'salesOrderNumber',
-    //   title: '序號',
+const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr, options: Toptions_productProfile) => {
+  const { dispatch, setProduct_custom, setUnitPrice, setProduct } = instance_salesOrderItemArr;
 
-    //   width: 120,
-    //   render: (_, { raw: { salesOrderNumber } }) => <MyDataEntry showBorder={false}>{salesOrderNumber}</MyDataEntry>,
-    // },
-    {
-      dataIndex: 'productNumber',
-      title: '產品代號',
-      width: 120,
-      render: (v, _, index) => (
-        <MyDataEntry showBorder={true}>
-          {
-            <Input
-              value={v}
-              onChange={(e) => {
-                const value = e.currentTarget.value;
-                dispatch({
-                  type: 'productNumber',
-                  payload: { index: index, productNumber: value },
-                });
-              }}
-            />
-          }
-        </MyDataEntry>
-      ),
-    },
+  const columns: TableProps<Tstate>['columns'] = [
     {
       dataIndex: 'productName',
       title: '產品名稱',
-      width: 150,
+      width: 200,
       render: (v, _, index) => (
         <MyDataEntry showBorder={true}>
           {
-            <Input
+            <InputSelect
+              options={options}
               value={v}
-              onChange={(e) => {
-                const value = e.currentTarget.value;
-                dispatch({
-                  type: 'productName',
-                  payload: { index: index, productName: value },
-                });
+              inputProps={{
+                onChange: (e) => {
+                  const value = e.currentTarget.value;
+                  setProduct_custom(index, value);
+                },
+              }}
+              selectProps={{
+                menuPortalTarget: document.body,
+                onChange: (option) => {
+                  if (!option) {
+                    dispatch({
+                      type: 'productName',
+                      payload: { index: index, productName: '' },
+                    });
+
+                    return;
+                  }
+
+                  const { label, raw } = option;
+
+                  setProduct(index, {
+                    productName: label,
+                    productNumber: raw.productNumber,
+                    price: raw.price,
+                  });
+                },
               }}
             />
           }
         </MyDataEntry>
       ),
     },
+    {
+      dataIndex: 'productNumber',
+      title: '產品代號',
+      width: 150,
+    },
+
     {
       dataIndex: 'quantity',
       title: '數量',
@@ -128,7 +153,7 @@ const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOr
       title: '單價',
       align: 'right',
       width: 150,
-      render: (value, _, index) => {
+      render: (value, record, index) => {
         return (
           <MyDataEntry showBorder={true}>
             <Input
@@ -137,7 +162,7 @@ const createColoumns = (dispatch: React.ActionDispatch<[action: Taction_salsesOr
               value={value}
               onChange={(e) => {
                 const value = e.currentTarget.value as `${number}` | '';
-                dispatch({ type: 'unitPrice', payload: { index, unitPrice: value } });
+                setUnitPrice(index, value);
               }}
             />
           </MyDataEntry>
