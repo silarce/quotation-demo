@@ -478,15 +478,16 @@ type TsalesOrder_post_Dto = {
 };
 
 interface TsalesOrderItem_post_Dto {
-  // id: Guid | null; //銷貨明細id // 貓拉，POST的時候哪來的id
-  id: null; //銷貨明細id // 貓拉，POST的時候哪來的id
+  id: null;
   itemNumber: string | null; // 排序
-  // salesOrderNumber: string; //銷售訂單編號 // 要先有銷貨單號才可以新增銷貨明細的樣子
-  salesOrderNumber: null; //銷售訂單編號 // 要先有銷貨單號才可以新增銷貨明細的樣子
-  productId: Guid; //產品id
-  discount: decimal | null; //折扣
+
+  salesOrderNumber: null; //銷售訂單編號
+
+  productId: null; //產品id
   productName: string; //產品名稱
   productNumber: string; //產品編號
+
+  discount: decimal | null; //折扣
   unitPrice: decimal | null; //單價
   quantity: decimal | null; //數量
   amount: decimal | null; //金額
@@ -504,13 +505,13 @@ type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
 
 type TsalesOrderItem_patch_Dto = Omit<
   TsalesOrderItem_post_Dto,
-  'id' | 'itemNumber' | 'salesOrderNumber' | 'productName' | 'productNumber'
+  // 'id' |
+  'itemNumber' | 'salesOrderNumber' | 'productId'
 > & {
-  id: string;
+  // id: string; // 後端說不需要
   itemNumber: string; // 排序，post的時候可以null為什麼patch就不可以，莫名其妙
   salesOrderNumber: string;
-  productName: string;
-  productNumber: string;
+  productId: Guid | null; //產品id
 };
 
 interface TpaymentRequestInvoiceList_Dto {

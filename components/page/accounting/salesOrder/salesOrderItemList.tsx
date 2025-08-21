@@ -29,7 +29,10 @@ const SalesOrderItemList = ({
 
   return (
     <div className={className}>
-      <div className="text-xl font-semibold mb-6">銷貨明細</div>
+      <div className="flex justify-between items-center mb-6">
+        <div className="text-xl font-semibold ">銷貨明細</div>
+        <Btn theme="add">新增</Btn>
+      </div>
       <Table_antd
         dataSource={state}
         columns={columns}

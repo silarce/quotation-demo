@@ -42,8 +42,6 @@ export default function SalesOrder() {
 
   const isNew = !query.id;
 
-  const [disabled, setDisabled] = useState(false);
-
   const {
     data: salesOrderData,
     isFetching: isFetchingSalesOrder,
@@ -170,22 +168,25 @@ export default function SalesOrder() {
       return null;
     }
 
-    const salesOrderItems = state_salesOrderItemArr.map((item) => {
-      const { raw, quantity, unitPrice, amount } = item;
+    // const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = state_salesOrderItemArr.map((item) => {
+    //   const { raw, quantity, unitPrice, amount } = item;
 
-      const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
-        ...raw,
-        id: null,
-        salesOrderNumber: null,
-        quantity: Number(quantity),
-        unitPrice: Number(unitPrice),
-        amount,
-        productName: raw.productName || '',
-        productNumber: raw.productNumber || '',
-      };
+    //   const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
+    //     ...raw,
+    //     id: null,
+    //     salesOrderNumber: null,
+    //     quantity: Number(quantity),
+    //     unitPrice: Number(unitPrice),
+    //     amount,
+    //     productName: raw.productName || '',
+    //     productNumber: raw.productNumber || '',
+    //   };
 
-      return salesOrderItem;
-    });
+    //   return salesOrderItem;
+    // });
+
+    // post時哪來的salesOrderNumber，直接放空陣列
+    const salesOrderItems: TsalesOrder_post_Dto['salesOrderItems'] = [];
 
     const body: TsalesOrder_post_Dto = {
       createdAt: new Date().toISOString(),
@@ -243,6 +244,7 @@ export default function SalesOrder() {
 
       const salesOrderItem: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
         ...raw,
+        id: null,
         quantity: Number(quantity),
         unitPrice: Number(unitPrice),
         amount,
