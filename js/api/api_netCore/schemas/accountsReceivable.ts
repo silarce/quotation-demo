@@ -487,13 +487,14 @@ interface TsalesOrderItem_post_Dto {
   productName: string; //產品名稱
   productNumber: string; //產品編號
 
-  discount: decimal | null; //折扣
   unitPrice: decimal | null; //單價
   quantity: decimal | null; //數量
   amount: decimal | null; //金額
-  taxes: decimal | null; //稅金
   attachedToProductId: Guid | null; //附加產品id
-  dualPrice: decimal | null; //牌價
+
+  discount?: decimal | null; //折扣
+  dualPrice?: decimal | null; //牌價
+  taxes?: decimal | null; //稅金
 }
 
 type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
@@ -510,7 +511,7 @@ type TsalesOrderItem_patch_Dto = Omit<
 > & {
   // id: string; // 後端說不需要
   itemNumber: string; // 排序，post的時候可以null為什麼patch就不可以，莫名其妙
-  salesOrderNumber: string;
+  salesOrderNumber: string | null;
   productId: Guid | null; //產品id
 };
 

@@ -240,18 +240,28 @@ export default function SalesOrder() {
     const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
 
     const salesOrderItems = state_salesOrderItemArr.map((item, index) => {
-      const { raw, quantity, unitPrice, amount } = item;
+      const {
+        quantity,
+        unitPrice,
+        amount,
+
+        productName,
+        productNumber,
+      } = item;
 
       const salesOrderItem: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
-        ...raw,
-        id: null,
+        attachedToProductId: item.attachedToProductId,
+        productId: item.productId,
+
         quantity: Number(quantity),
         unitPrice: Number(unitPrice),
         amount,
-        productName: raw.productName || '',
-        productNumber: raw.productNumber || '',
-
+        productName,
+        productNumber,
         itemNumber: `${index}`,
+
+        id: null,
+        salesOrderNumber: null,
       };
 
       return salesOrderItem;
