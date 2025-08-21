@@ -27,8 +27,6 @@ import { optionsCreator_month, optionsCreator_year } from 'js/utils/options/opti
 const monthOptionArr = optionsCreator_month({ emptyOption: true });
 const yearOptionArr = optionsCreator_year();
 
-// import { AppContext } from 'pages/_app';
-
 // ==========================================================================
 type TselectPropsArr = Parameters<typeof SelectBar>[0]['selectPropsArr'];
 
@@ -65,8 +63,6 @@ export default function PaymentRecordSelector({
   // exceptAccountantCheck?: (data: TaccountantDto) => boolean;
   exceptAccountantCheck?: (data: TaccountantDto) => boolean;
 }) {
-  // const { rwd1023 } = useContext(AppContext);
-
   const [paymentType, setPaymentType] = useState<string | undefined>();
   const [year, setYear] = useState<string | undefined>(undefined);
   const [month, setMonth] = useState<string | undefined>(undefined);

@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
@@ -17,9 +17,8 @@ import { Tparams } from 'js/api/dtoTypes';
 
 // api
 import { useApiGetDailyReportsWorkers, TdailyReportWokerDto } from 'js/api/api_dailyReport';
-// import { useDepartments } from 'js/api/api_department';
 
-import { AppContext } from 'pages/_app';
+import { useRwd } from 'hooks/globalState/useRwd';
 
 export default function WorkerSelector({
   showModal,
@@ -36,7 +35,7 @@ export default function WorkerSelector({
   tip?: React.ReactNode;
   selLimit?: 1;
 }) {
-  const { rwd1023 } = useContext(AppContext);
+  const { rwd1023 } = useRwd();
   const [isLoading, setIsLoading] = useState(false);
 
   // 被選的資料

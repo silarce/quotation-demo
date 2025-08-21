@@ -60,7 +60,7 @@ import iconRedLock from 'public/image/icon/redLock.svg?url';
 // css
 import style from './quotation.module.scss';
 
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -172,7 +172,7 @@ export default function Quotation() {
 
 function TheQuotation({ router }: { router: NextRouter }) {
   const { id: quotationId, contentId, contentVersion } = router.query as Tquery;
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   const userId = userInfo?.employee?.id;
 
   // -----------------------------------------------------

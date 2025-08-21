@@ -46,6 +46,7 @@ const CurrentPaymentRequestDetails = ({
     invoiceDesc,
     isAllowEditInvoice,
     isAllowEdit,
+    paymentCurrency,
 
     setState_paymentRequest,
     setPaymentAmount,
@@ -159,8 +160,8 @@ const CurrentPaymentRequestDetails = ({
 
       {isActive_detail && (
         <div className="p-6 border border-gray05 rounded-lg shadow-[0px_4px_4px_0px_#00000040]">
-          <div className={classNames('grid grid-cols-4 gap-fong ')}>
-            <DataEntry_fong caption="類型" isMust={true} disabled={!isAllowEdit}>
+          <div className={classNames('grid grid-cols-8 gap-fong ')}>
+            <DataEntry_fong className="col-span-2" caption="類型" isMust={true} disabled={!isAllowEdit}>
               <Select
                 options={options_paymentType}
                 value={state_paymentRequest.type}
@@ -173,32 +174,23 @@ const CurrentPaymentRequestDetails = ({
               />
             </DataEntry_fong>
 
-            <DataEntry_fong
-              caption="請款金額"
-              disabled={true}
-              childrenWrapperProps={{
-                className: 'flex gap-1',
-              }}
-            >
-              {/* <Input_money
-                value={state_paymentRequest.請款金額}
-                onChange={(e) => {
-                  setPaymentAmount(e.target.value as `${number}` | '');
-                }}
-              /> */}
-              <span>幣別</span>
+            <DataEntry_fong caption="幣別" disabled={true}>
+              {paymentCurrency}
+            </DataEntry_fong>
+
+            <DataEntry_fong caption="請款金額" disabled={true}>
               {toMoneyString(state_paymentRequest.請款金額)}
             </DataEntry_fong>
 
-            <DataEntry_fong caption="營業稅(5%)" disabled={true}>
+            <DataEntry_fong className="col-span-2" caption="營業稅(5%)" disabled={true}>
               {toMoneyString(state_paymentRequest.營業稅)}
             </DataEntry_fong>
 
-            <DataEntry_fong caption="本期合計請款金額" disabled={true}>
+            <DataEntry_fong className="col-span-2" caption="本期合計請款金額" disabled={true}>
               {toMoneyString(state_paymentRequest.paymentAmount)}
             </DataEntry_fong>
 
-            <DataEntry_fong caption="保留款(%)" isMust={true} disabled={!isAllowEdit}>
+            <DataEntry_fong className="col-span-2" caption="保留款(%)" isMust={true} disabled={!isAllowEdit}>
               <Input
                 type="number"
                 value={state_paymentRequest.retainageRate}
@@ -210,7 +202,7 @@ const CurrentPaymentRequestDetails = ({
                 }}
               />
             </DataEntry_fong>
-            <DataEntry_fong caption="稅別" isMust={true} disabled={!isAllowEdit}>
+            <DataEntry_fong className="col-span-2" caption="保留款稅別" isMust={true} disabled={!isAllowEdit}>
               <Select
                 options={options_retainageTaxCategory}
                 value={state_paymentRequest.retainageTaxCategory}
@@ -222,7 +214,7 @@ const CurrentPaymentRequestDetails = ({
                 }}
               />
             </DataEntry_fong>
-            <DataEntry_fong caption="保留款金額 no property" isMust={true} disabled={!isAllowEdit}>
+            <DataEntry_fong className="col-span-2" caption="保留款金額" isMust={true} disabled={!isAllowEdit}>
               <Input_money
                 value={state_paymentRequest.retainageAmount}
                 onChange={(e) => {
@@ -237,6 +229,7 @@ const CurrentPaymentRequestDetails = ({
             <div />
 
             <DataEntry_fong
+              className="col-span-2"
               caption="發票本"
               disabled={!isAllowEditInvoice}
               childrenWrapperProps={{
@@ -266,6 +259,7 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
 
             <DataEntry_fong
+              className="col-span-2"
               caption="發票日期"
               isMust={!!invoiceBook}
               disabled={!state_paymentRequest.invoiceBookInfo || !isAllowEditInvoice}
@@ -285,6 +279,7 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
 
             <DataEntry_fong
+              className="col-span-2"
               caption="發票號碼"
               isMust={!!invoiceBook}
               disabled={!state_paymentRequest.invoiceBookInfo || !isAllowEditInvoice}
@@ -295,7 +290,12 @@ const CurrentPaymentRequestDetails = ({
             >
               {state_paymentRequest.invoiceBookInfo ? state_paymentRequest.invoiceNumber : '請先選擇發票本'}
             </DataEntry_fong>
-            <DataEntry_fong caption="發票金額" isMust={!!invoiceBook} disabled={!isAllowEditInvoice}>
+            <DataEntry_fong
+              className="col-span-2"
+              caption="發票金額"
+              isMust={!!invoiceBook}
+              disabled={!isAllowEditInvoice}
+            >
               <Input_money
                 placeholder={!state_paymentRequest.invoiceBookInfo ? '請先選擇發票本' : undefined}
                 value={state_paymentRequest.invoiceAmount}
@@ -309,6 +309,7 @@ const CurrentPaymentRequestDetails = ({
             </DataEntry_fong>
 
             <DataEntry_fong
+              className="col-span-2"
               caption="買受人"
               isMust={true}
               disabled={!isAllowEditInvoice}
@@ -332,7 +333,7 @@ const CurrentPaymentRequestDetails = ({
               /> */}
             </DataEntry_fong>
 
-            <DataEntry_fong caption="統一編號" disabled={!isAllowEditInvoice} isMust={true}>
+            <DataEntry_fong className="col-span-2" caption="統一編號" disabled={!isAllowEditInvoice} isMust={true}>
               <Input
                 value={state_paymentRequest.customerTaxId ?? ''}
                 onChange={(e) => {

@@ -14,7 +14,7 @@ import MyButton_v2 from 'components/global/gear/button/myButton_v2';
 import { display } from 'html2canvas/dist/types/css/property-descriptors/display';
 import { setting } from '../wareHouseList/index';
 import { IconDetail } from 'public/image/icon/svgComponent/svgIcons';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import icon_search from 'public/image/icon/fc_search.svg?url';
 
 type Tquery = {
@@ -55,8 +55,7 @@ export default function EditWHPosition() {
   //#endregion
 
   //#region ===========【登入者】
-  const { userInfo } = useContext(AppContext);
-  const { erpFeature } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   //#endregion
 
   //#region ===========【變數宣告】

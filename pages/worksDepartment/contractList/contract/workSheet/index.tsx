@@ -103,7 +103,7 @@ export default function Worksheet({
   userInfo,
 }: {
   isAdmin: boolean;
-  userErpFeature: TerpFeatureDto[] | undefined;
+  userErpFeature: TerpFeatureDto[] | undefined | null;
   userInfo: TuserDto;
 }) {
   const { req_reviewBack, req_backThanAdd } = useGlobal_review();

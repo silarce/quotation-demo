@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -9,22 +8,20 @@ import { Badge } from 'antd';
 // css
 import scss from './nav.module.scss';
 
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+
 // 路由表
-import {
-  TtopPathListConfig,
-  erpFeaturesLookup,
-  swappedErpFeaturesLookup,
-} from 'components/Layer/SideNav/pathList/type';
+import { TtopPathListConfig, swappedErpFeaturesLookup } from 'components/Layer/SideNav/pathList/type';
 
 import { topPathList } from 'components/Layer/SideNav/pathList/top';
 
 // context
-import { LayerCtx } from 'components/Layer/Layer';
+
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 
 export default function Nav() {
   const router = useRouter();
-  const { userErpFeature } = useContext(LayerCtx);
+  const { userErpFeature } = useGlobal_userInfo();
   const { reviewQty } = useGlobal_review();
 
   const pathname = router.pathname;
@@ -46,7 +43,7 @@ export default function Nav() {
           return null;
         }
 
-        const userErpFeatureKeyArr = userErpFeature.map((item) => {
+        const userErpFeatureKeyArr = (userErpFeature ?? []).map((item) => {
           return swappedErpFeaturesLookup[item.name];
         });
 
@@ -102,7 +99,7 @@ const checkErpFeature = ({
   userErpFeature,
 }: {
   erpFeature: string[] | 'allPass';
-  userErpFeature: { name: string }[];
+  userErpFeature: { name: string }[] | undefined | null;
 }) => {
   let isPassed = false;
 
@@ -110,9 +107,11 @@ const checkErpFeature = ({
     return true;
   }
 
-  isPassed = userErpFeature.some((item1) => {
-    return erpFeature.includes(item1.name);
-  });
+  isPassed = !userErpFeature
+    ? false
+    : userErpFeature.some((item1) => {
+        return erpFeature.includes(item1.name);
+      });
 
   return isPassed;
 };

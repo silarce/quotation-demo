@@ -23,7 +23,7 @@ import { quotationStatusLookup } from 'config/lookupTable';
 // context
 import { TquotationStatus, TupdateOutsourcingDto } from 'js/api/dtoTypes';
 import WareHouseList from '../wareHouseList';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 import scss from './addWareHouse.module.scss'
 import TextareaModal from 'components/global/gear/modal/simpleModal/textareaModal';
@@ -50,7 +50,7 @@ export default function AddWareHouse({ userGrade }: { userGrade: number }) {
     const { warehouseName, reviewStatus } = router.query as { [key: string]: string };
     const status = router.query.status as TquotationStatus;
 
-    const { userInfo } = useContext(AppContext);
+    const { userInfo } = useGlobal_userInfo();
     const userEmp = userInfo?.employee;
     let userId = userEmp?.id;
 

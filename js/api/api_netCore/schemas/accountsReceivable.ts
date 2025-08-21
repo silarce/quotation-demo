@@ -1,6 +1,6 @@
 import type { DeepNullable } from 'ts-essentials';
-
-import type { Guid, decimal, int } from './shared';
+import type { Guid, decimal, int, DateTime } from './shared';
+import type { TsalesOrder_simple_Dto } from './salesOrder';
 
 interface TaccountsReceivablesList_Dto_depressed {
   id: string; //應收帳款id
@@ -67,6 +67,8 @@ interface TaccountsReceivablesList_Dto {
 
   taxId: string | null; // 統一編號
   taxDeductionCategory: string | null; // 稅別
+
+  currency: string | null; // 幣別 // 建立這個型別時後端還沒實際給這個property
 }
 
 interface TquotationListViewModel_Dto {
@@ -99,9 +101,9 @@ interface TquotationListViewModel_Dto {
   quantity: number | null; // 摚數
   discount: number | null; // 折扣
   subTotal: number | null; // 小計
+  tuneTotal: number | null; // 總金額調整
   salesTax: number | null; // 銷售稅
   total: number | null; // 總金額
-  tuneTotal: number | null; // 調整總金額
   averageDiscount: number | null; // 平均折扣
   estimatedDiscount: number | null; // 預估折扣
 
@@ -269,6 +271,11 @@ interface Tres_apiGetARPaymentData {
     salesOrderNumber: string | null; //銷售訂單編號
     taxId: string | null;
     taxDeductionCategory: string | null;
+
+    retainageType: string | null;
+    retainageTaxCategory: string | null;
+    retainageRate: number | null;
+    retainageAmount: number | null;
   };
 
   // 本次請款明細
@@ -417,6 +424,95 @@ interface Tres_apiGetARPaymentData {
 
 type Tres_apiGetARPaymentDataInset = Omit<Tres_apiGetARPaymentData, 'paymentRequest'> & { paymentRequest: null };
 
+type TsalesOrder_Dto = Omit<TsalesOrder_simple_Dto, 'salesOrderItems'> & {
+  salesOrderItems: TsalesOrderItem_Dto[] | null; //銷售訂單明細
+};
+
+interface TsalesOrderItem_Dto {
+  id: string;
+  itemNumber: string; // 後端說這是排序，喵的是不是不知道什麼叫語意化
+  salesOrderNumber: string;
+  discount: number | null;
+
+  productId: string;
+  productName: string;
+  productNumber: string;
+
+  unitPrice: number | null;
+  quantity: number | null;
+  amount: number | null;
+  taxes: number | null;
+  attachedToProductId: string | null;
+  dualPrice: number | null;
+}
+
+type TsalesOrder_post_Dto = {
+  customerId: Guid | null; //客戶id
+  customerNumber: string | null; //客戶編號
+  customerName: string; //客戶名稱
+  constructionSite: string; //工地名稱
+  companyPhone: string; //公司電話
+  companyFax: string; //公司傳真
+  address: string; //地址
+  salesCurrency: string; //幣別
+  exchangeRate: decimal | null; //匯率
+  currencyAmount: decimal | null; //外幣金額
+  salesAmount: decimal; //銷售金額
+  taxes: decimal; //稅金
+  changedAmount: decimal | null; //追加減金額
+  changedTaxes: decimal | null; //追加減稅金
+  totalAmount: decimal; //總金額
+  createdAt: DateTime | null; //建立時間
+  updatedAt: DateTime | null; //更新時間
+  createdBy: string | null; //建立人員
+  updatedBy: string | null; //更新人員
+  status: int | null; //狀態
+  sourceType: string; //來源類型
+  sourceId: Guid | null; //來源id(合約ID)
+  quotationNumber: string | null; //報價單編號
+  quotationContractNumber: string | null; //合約編號
+  taxId: string | null; //統一編號
+  taxDeductionCategory: string | null; //稅別
+  invoiceType: string | null; //發票類型
+  salesOrderItems: TsalesOrderItem_post_Dto[]; //銷售訂單明細
+};
+
+interface TsalesOrderItem_post_Dto {
+  // id: Guid | null; //銷貨明細id // 貓拉，POST的時候哪來的id
+  id: null; //銷貨明細id // 貓拉，POST的時候哪來的id
+  itemNumber: string | null; // 排序
+  // salesOrderNumber: string; //銷售訂單編號 // 要先有銷貨單號才可以新增銷貨明細的樣子
+  salesOrderNumber: null; //銷售訂單編號 // 要先有銷貨單號才可以新增銷貨明細的樣子
+  productId: Guid; //產品id
+  discount: decimal | null; //折扣
+  productName: string; //產品名稱
+  productNumber: string; //產品編號
+  unitPrice: decimal | null; //單價
+  quantity: decimal | null; //數量
+  amount: decimal | null; //金額
+  taxes: decimal | null; //稅金
+  attachedToProductId: Guid | null; //附加產品id
+  dualPrice: decimal | null; //牌價
+}
+
+type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
+  id: string; //銷售訂單id
+  salesOrderNumber: string; //銷售訂單編號
+  salesOrderItems: TsalesOrderItem_patch_Dto[];
+  itemNumber: string;
+};
+
+type TsalesOrderItem_patch_Dto = Omit<
+  TsalesOrderItem_post_Dto,
+  'id' | 'itemNumber' | 'salesOrderNumber' | 'productName' | 'productNumber'
+> & {
+  id: string;
+  itemNumber: string; // 排序，post的時候可以null為什麼patch就不可以，莫名其妙
+  salesOrderNumber: string;
+  productName: string;
+  productNumber: string;
+};
+
 interface TpaymentRequestInvoiceList_Dto {
   id: Guid | null; //請款單Id
   paymentRequestNumber: string | null; //請款單編號
@@ -453,5 +549,12 @@ export type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  //
+  TsalesOrder_Dto,
+  TsalesOrderItem_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrderItem_post_Dto,
+  TsalesOrder_patch_Dto,
+  TsalesOrderItem_patch_Dto,
   TpaymentRequestInvoiceList_Dto,
 };

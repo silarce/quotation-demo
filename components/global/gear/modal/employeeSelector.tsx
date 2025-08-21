@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 
 // global gear
@@ -17,7 +17,7 @@ import { TemployeeDto } from 'js/api/dtoTypes';
 import { Tparams, useEmployee_infinite } from 'js/api/api_employee';
 import { useDepartments } from 'js/api/api_department';
 
-import { AppContext } from 'pages/_app';
+import { useRwd } from 'hooks/globalState/useRwd';
 
 export type { TemployeeDto };
 
@@ -50,7 +50,7 @@ export default function EmployeeSelector({
   isCancelOnConfirm?: boolean;
   exceptEmpCheck?: (emp: TemployeeDto) => boolean;
 }) {
-  const { rwd1023 } = useContext(AppContext);
+  const { rwd1023 } = useRwd();
 
   // 被選的資料
   const [selEmployeeArr, setSelEmployeeArr] = useState<TemployeeDto[]>([]);

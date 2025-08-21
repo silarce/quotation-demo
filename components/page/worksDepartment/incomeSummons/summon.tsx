@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, forwardRef, useContext } from 'react';
+import React, { useState, useMemo, useEffect, forwardRef } from 'react';
 import classNames from 'classnames';
 import dayjs, { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
@@ -35,8 +35,7 @@ import { calcIncomeBillUnpaidPayment, calcIncomeBillExchangeBenefits } from 'js/
 // global state
 import { useVipInfo } from 'hooks/globalState/useVipInfo';
 
-// context
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 import { optionsCreator_currency } from 'js/utils/options/options';
 
@@ -216,7 +215,7 @@ const Summons_pre = (
   },
   ref: React.Ref<HTMLDivElement>
 ) => {
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   const userId = userInfo?.employee?.id;
 
   const router = useRouter();

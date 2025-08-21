@@ -19,7 +19,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import icon_cancel from 'public/image/icon/fc_cancel.svg?url';
 import icon_fc_check from 'public/image/icon/fc_check.svg?url';
 import icon_cancel2 from 'public/image/icon/fc_cancel2.svg?url';
-import { AppContext } from 'pages/_app';
+
 import icon_cancel3 from 'public/image/icon/fc_cancel3.svg?url';
 import icon_edit from 'public/image/icon/fc_edit.svg?url';
 import icon_delete from 'public/image/icon/fc_delete.svg?url';
@@ -30,6 +30,8 @@ import icon_cir_add from 'public/image/icon/addCircle.svg?url';
 import icon_cir_remove from 'public/image/icon/removeCircle.svg?url';
 import icon_arrow_right from 'public/image/icon/fc_arrow_right.svg?url';
 import icon_search2 from 'public/image/icon/search.svg?url';
+
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 //時間
 import { Modal, Radio, Space } from 'antd';
@@ -50,7 +52,7 @@ export default function BonusLedger() {
   const [isLoading, setIsLoading] = useState(false);
 
   //登入者資料
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
 
   // 資料列
   const [data, setData] = useState<any[]>([]);

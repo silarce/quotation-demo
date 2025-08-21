@@ -10,7 +10,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { setting } from '../wareHouseList/index';
 import { userInfo } from 'os';
-import { AppContext } from 'pages/_app';
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 import { parse } from 'path';
 
 type Tquery = {
@@ -47,7 +47,7 @@ export interface TrayModel {
 }
 
 export default function AddTray() {
-  const { userInfo } = useContext(AppContext);
+  const { userInfo } = useGlobal_userInfo();
   // 備分原本model
   const [data, setData] = useState<WHPositionModel>([]);
   const [data1, setData1] = useState<WHPositionModel>([]);

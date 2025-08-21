@@ -21,6 +21,12 @@ import type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  TsalesOrder_Dto,
+  TsalesOrderItem_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrderItem_post_Dto,
+  TsalesOrder_patch_Dto,
+  TsalesOrderItem_patch_Dto,
   TpaymentRequestInvoiceList_Dto,
 } from './schemas';
 
@@ -583,53 +589,11 @@ const apiUpdateSalesOrderData = async (body: Tbody_apiUpdateSalesOrderData) => {
   });
 };
 
-interface Tres_apiGetSalesOrderById {
-  id: string;
-  salesOrderNumber: string;
-  customerId: string;
-  customerNumber: string;
-  customerName: string;
-  constructionSite: string;
-  companyPhone: string;
-  companyFax: string;
-  address: string;
-  salesCurrency: string;
-  exchangeRate: number | null;
-  currencyAmount: number | null;
-  salesAmount: number | null;
-  taxes: number | null;
-  changedAmount: number | null;
-  changedTaxes: number | null;
-  totalAmount: number | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-  createdBy: string | null;
-  updatedBy: string | null;
-  status: number | null;
-  sourceType: string | null;
-  sourceId: string | null;
-  salesOrderItems: {
-    id: string;
-    itemNumber: null;
-    salesOrderNumber: string | null;
-    productId: string | null;
-    discount: number | null;
-    productName: string | null;
-    productNumber: string | null;
-    unitPrice: number | null;
-    quantity: number | null;
-    amount: number | null;
-    taxes: number | null;
-    attachedToProductId: string | null;
-    dualPrice: number | null;
-  }[];
-}
-
 const apiGetSalesOrderById = async (salesOrderId: string) => {
   const api = '/api/AccountsReceivable/GetSalesOrderById';
   const params = { id: salesOrderId };
 
-  return axi_monkey.get<Tres_apiGetSalesOrderById>(api, { params }).then(({ data }) => data);
+  return axi_monkey.get<TsalesOrder_Dto>(api, { params }).then(({ data }) => data);
 };
 
 const useApiGetSalesOrderById = (
@@ -641,7 +605,7 @@ const useApiGetSalesOrderById = (
   } = {}
 ) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<Tres_apiGetSalesOrderById | null>();
+  const [res, setRes] = useState<TsalesOrder_Dto | null>();
 
   const update = async () => {
     if (isFetching || !salesOrderId) {
@@ -678,6 +642,33 @@ const useApiGetSalesOrderById = (
   };
 };
 
+const apiPostSalesOrderData = async (body: TsalesOrder_post_Dto) => {
+  const api = '/api/AccountsReceivable/InsertSalesOrderData';
+
+  return axi_monkey
+    .post<string>(api, body)
+    .then(({ data }) => data)
+    .catch((err) => {
+      myAlert.err({
+        title: '新增銷售單失敗',
+      });
+
+      return Promise.reject(err);
+    });
+};
+
+const apiPatchSalesOrderData = async (body: TsalesOrder_patch_Dto) => {
+  const api = '/api/AccountsReceivable/UpdateSalesOrderData';
+
+  return axi_monkey.patch(api, body).catch((err) => {
+    myAlert.err({
+      title: '更新銷售單失敗',
+    });
+
+    return Promise.reject(err);
+  });
+};
+
 interface Tbody_apiPostInsertPrOffsetDetail {
   createdAt: string; //建立時間
   createdBy: TemployeeDto['idNumber']; // `EM-${number}-${number}` //建立人員
@@ -699,6 +690,11 @@ interface Tbody_apiPostInsertPrOffsetDetail {
   totalAmount: number; //收款金額
 }
 
+type Tbody_apiPostInsertPRDeduction = Omit<
+  Tbody_apiPostInsertPrOffsetDetail,
+  'accountantId' | 'paymentCurrency' | 'exchangeRate'
+>;
+
 const apiPostInsertPrOffsetDetail = async (
   body: Tbody_apiPostInsertPrOffsetDetail,
   {
@@ -712,7 +708,30 @@ const apiPostInsertPrOffsetDetail = async (
   return axi_monkey.post(api, body).catch((err) => {
     const error = err as AxiosError;
     myAlert.err({
-      title: '新增請款單失敗',
+      title: '新增沖銷明細失敗',
+      content: error.message,
+    });
+
+    if (returnError) {
+      return Promise.reject(error);
+    }
+  });
+};
+
+const apiPostInsertPRDeduction = async (
+  body: Tbody_apiPostInsertPRDeduction,
+  {
+    returnError = false,
+  }: {
+    returnError?: boolean;
+  } = {}
+) => {
+  const api = '/api/AccountsReceivable/InsertPRDeduction';
+
+  return axi_monkey.post(api, body).catch((err) => {
+    const error = err as AxiosError;
+    myAlert.err({
+      title: '新增沖銷明細失敗',
       content: error.message,
     });
 
@@ -787,6 +806,12 @@ export type {
   TaccountsReceivable,
   TpaymentRequest_Dto,
   TinsertpaymentRequest,
+  TsalesOrderItem_Dto,
+  TsalesOrder_post_Dto,
+  TsalesOrderItem_post_Dto,
+  TsalesOrder_patch_Dto,
+  TsalesOrderItem_patch_Dto,
+  TsalesOrder_Dto,
   TpaymentRequestInvoiceList_Dto,
 };
 
@@ -795,6 +820,7 @@ export type {
   Tres_apiGetARPaymentDataInset as Tres_apiGetARPaymentDataInsert,
   Tbody_apiPostInsertPrOffsetDetail,
   Tbody_updatePRInvoice,
+  Tbody_apiPostInsertPRDeduction,
 };
 
 export {
@@ -805,6 +831,9 @@ export {
   apiInsertSalesOrderData,
   apiUpdateSalesOrderData,
   apiPostInsertPrOffsetDetail,
+  apiPostInsertPRDeduction,
+  apiPostSalesOrderData,
+  apiPatchSalesOrderData,
   apiUpdatePRInvoice,
 };
 
@@ -816,6 +845,7 @@ export {
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
   useApiGetPaymentRequestType,
+  useApiGetSalesOrderById,
   useApiGetPaymentRequestInvoiceList,
 };
 

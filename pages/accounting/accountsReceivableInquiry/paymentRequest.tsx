@@ -14,6 +14,7 @@ import {
   TinsertpaymentRequest,
   Tbody_apiPostInsertPrOffsetDetail,
   Tbody_updatePRInvoice,
+  Tbody_apiPostInsertPRDeduction,
   //
   useApiGetARPaymentData,
   useApiGetARPaymentDataInset,
@@ -21,6 +22,7 @@ import {
   apiPostInsertPaymentRequest,
   apiPatchInsertPaymentRequest,
   apiPostInsertPrOffsetDetail,
+  apiPostInsertPRDeduction,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
 // component
@@ -74,10 +76,6 @@ export default function PayentRequest() {
     rawData_accountsReceivables: accountsReceivables,
   });
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
-
-  useEffect(() => {
-    apiGetPaymentRequestType();
-  }, []);
 
   const createBody = () => {
     if (!accountsReceivables) {
@@ -241,16 +239,19 @@ export default function PayentRequest() {
       fee?: `${number}` | '';
       remarks: string;
     };
-    accountant: TaccountantDto;
+    accountant?: TaccountantDto;
     destroy: () => void;
   }) => {
     const idNumber = userInfo?.employee?.idNumber;
     const paymentRequestId = paymentRequest?.id;
-    const accountantId = accountant.id;
     const customerName = accountsReceivables?.customerName;
     const customerNumber = accountsReceivables?.customerNumber;
     const prOffsetDate = state.date?.toISOString();
     const type = state.type;
+
+    const accountantId = accountant?.id || null;
+    const paymentCurrency = accountant?.currency || null;
+    const exchangeRate = (accountant && Number(accountant.exchangeRate || 0)) || null;
 
     let warningMessage = '';
 
@@ -272,17 +273,16 @@ export default function PayentRequest() {
       return;
     }
 
-    const body: Tbody_apiPostInsertPrOffsetDetail = {
+    const body_apiPostInsertPRDeduction: Tbody_apiPostInsertPRDeduction = {
       createdAt: new Date().toISOString(),
       createdBy: idNumber!,
       updatedAt: new Date().toISOString(),
       updatedBy: idNumber!,
-      accountantId,
+
       paymentRequestId: paymentRequestId!,
       prOffsetDate: prOffsetDate!,
       prOffsetType: state.type, // 沖銷類別
-      paymentCurrency: accountant.currency, // 請款幣別
-      exchangeRate: Number(accountant.exchangeRate || 0), // 匯率
+
       paymentAmount: Number(state.amount || 0), // 沖銷金額
       // 與paymentAmount同一個來源
       totalAmount: Number(state.amount || 0),
@@ -292,7 +292,18 @@ export default function PayentRequest() {
     };
 
     try {
-      await apiPostInsertPrOffsetDetail(body, { returnError: true });
+      if (accountantId && paymentCurrency && exchangeRate !== null) {
+        const body: Tbody_apiPostInsertPrOffsetDetail = {
+          ...body_apiPostInsertPRDeduction,
+          accountantId,
+          paymentCurrency: paymentCurrency, // 請款幣別
+          exchangeRate: exchangeRate, // 匯率
+        };
+        await apiPostInsertPrOffsetDetail(body);
+      } else {
+        await apiPostInsertPRDeduction(body_apiPostInsertPRDeduction);
+      }
+
       destroy();
       update_paymentQuest();
     } catch (error) {}

@@ -1,4 +1,3 @@
-import { useContext } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import classNames from 'classnames';
@@ -13,13 +12,14 @@ import style from './side.module.scss';
 // 路由表
 import { sidePathList } from './pathList/side';
 
-// context
-import { LayerCtx } from '../Layer';
 import { TuserDto } from 'js/api/dtoTypes';
+
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 export default function SideNav() {
   const router = useRouter();
-  const { userErpFeature, userInfo } = useContext(LayerCtx);
+
+  const { userErpFeature, userInfo } = useGlobal_userInfo();
 
   // -------------------------------------------------------------------
   // pathname與route在404的時候值是"_error"
@@ -132,7 +132,7 @@ const checkErpFeature = ({
   userErpFeature,
 }: {
   erpFeature: string[] | 'allPass';
-  userErpFeature: { name: string }[];
+  userErpFeature: { name: string }[] | undefined | null;
 }) => {
   let isPassed = false;
 
@@ -140,9 +140,11 @@ const checkErpFeature = ({
     return true;
   }
 
-  isPassed = userErpFeature.some((item1) => {
-    return erpFeature.includes(item1.name);
-  });
+  isPassed = !userErpFeature
+    ? false
+    : userErpFeature.some((item1) => {
+        return erpFeature.includes(item1.name);
+      });
 
   return isPassed;
 };
@@ -152,7 +154,7 @@ const checkOtherPermissions = ({
   otherPermissions,
   exception,
 }: {
-  userInfo: TuserDto;
+  userInfo: TuserDto | undefined | null;
   otherPermissions: {
     grade?: number;
   };

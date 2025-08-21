@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames';
 
 // global gear
@@ -7,7 +7,7 @@ import CellWithBar from 'components/global/gear/cell/cellWithBar';
 import { ModalInfo } from 'components/global/gear/modal/simpleModal/alertModals';
 import LoadingCoverWrapper01 from '../loadingCover/loadingCoverWrapper01';
 
-import { AppContext } from 'pages/_app';
+import { useRwd } from 'hooks/globalState/useRwd';
 
 // css
 import scss from './selectorModalCreator.module.scss';
@@ -90,7 +90,7 @@ export function selectModalCreator<Tdata extends Tobject>({
     //
     //
 
-    const { rwd1023 } = useContext(AppContext);
+    const { rwd1023 } = useRwd();
 
     const [selDataArr, setSelDataArr] = useState<Tdata[]>([]);
     const [searchValue, setSearchValue] = useState<string[]>([]);
