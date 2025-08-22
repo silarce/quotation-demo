@@ -27,6 +27,7 @@ import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalCo
 // import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+import { useWindow } from 'hooks/globalState/useInIrame';
 
 //
 import dayjs, { Dayjs } from 'dayjs';
@@ -85,6 +86,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   const globalState_review = useGlobal_review();
   const optionalConfig = useGlobal_OptionalConfig();
+  const { isInIframe } = useWindow();
 
   // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
@@ -136,17 +138,23 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   }
   // ------------------------------------------------------------------
 
-  let getLayout = Component.getLayout;
+  const getLayout = (() => {
+    let getLayout = Component.getLayout;
 
-  if (!getLayout) {
-    if (!userInfo || !userErpFeature) {
+    if (getLayout) {
+      return getLayout;
+    }
+
+    if (!userInfo || !userErpFeature || isInIframe) {
       getLayout = (page) => page;
     } else {
       getLayout = (page) => {
         return <Layer>{page}</Layer>;
       };
     }
-  }
+
+    return getLayout;
+  })();
 
   // ------------------------------------------------------------------
 
