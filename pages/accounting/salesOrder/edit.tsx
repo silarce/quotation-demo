@@ -111,6 +111,11 @@ export default function SalesOrder() {
     });
   };
 
+  const handle_reset = () => {
+    instance_salesOrder.reset();
+    instance_salesOrderItemArr.reset();
+  };
+
   // ---------------------------------------------------------------------------
 
   const createBody_post = () => {
@@ -329,7 +334,7 @@ export default function SalesOrder() {
           <Btn theme="import" onClick={handle_importContract}>
             合約匯入
           </Btn>
-          <Btn themeColor="red_I" onClick={instance_salesOrder.reset}>
+          <Btn themeColor="red_I" onClick={handle_reset}>
             重置
           </Btn>
           <Btn theme="save" onClick={handle_save}>
