@@ -35,6 +35,12 @@
     gap: 20px 24px;
   }
 
+  .wrapper_fong {
+    border: solid 1px theme("colors.gray05");
+    border-radius: theme("border.radius.normal");
+    padding: theme("padding.layoutY") theme("padding.layoutX");
+  }
+
   .global-state {
     @apply w-fit font-medium px-2 py-1 rounded-full;
   }
