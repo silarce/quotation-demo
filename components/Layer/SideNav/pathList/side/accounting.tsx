@@ -1,7 +1,5 @@
 import { devPass, erpFeaturesLookup, TsidePathConfig } from '../type';
 
-const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
-
 export default function SidePathAccountingDepartment() {
   return ((): TsidePathConfig => {
     const path = '/accounting';
@@ -47,12 +45,12 @@ export default function SidePathAccountingDepartment() {
             {
               label: '應收帳款查詢',
               path: path + '/accountsReceivableInquiry',
-              erpFeature: isInProd ? [] : 'allPass',
+              erpFeature: 'allPass',
             },
             {
               label: '銷貨單',
               path: path + '/salesOrder',
-              erpFeature: isInProd ? [] : 'allPass',
+              erpFeature: 'allPass',
             },
           ],
         },
