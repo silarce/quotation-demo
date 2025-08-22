@@ -141,10 +141,10 @@ const SearchPanel = ({
         onSearch();
       }}
     >
-      <DataEntry_fong>
-        <Input value={idNumber} onChange={(e) => setIdNumber(e.target.value)} />
+      <DataEntry_fong className={'w-[102px]'}>
+        <Input value={idNumber} onChange={(e) => setIdNumber(e.target.value)} placeholder="請輸入單號" />
       </DataEntry_fong>
-      <DataEntry_fong>
+      <DataEntry_fong className={'w-[118px]'}>
         <Select
           options={[
             { value: '1', label: '類型1' },
@@ -156,7 +156,7 @@ const SearchPanel = ({
         />
       </DataEntry_fong>
       <Btn theme="query" type="submit">
-        搜尋資料
+        搜索資料
       </Btn>
     </form>
   );
