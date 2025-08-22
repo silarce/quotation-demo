@@ -8,6 +8,7 @@ import { modal_empty } from 'components/global/gear/modal/fongModal';
 import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 import SalesOrderInfo from 'components/page/accounting/salesOrder/salesOrderInfo';
 import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
+import { modal_leave } from 'components/global/gear/modal/fongModal';
 
 import {
   useApiGetSalesOrderById,
@@ -51,70 +52,6 @@ export default function SalesOrder() {
   const instance_salesOrderItemArr = useSalesOrderItemArr(salesOrderData?.salesOrderItems);
 
   // ---------------------------------------------------------------------------
-
-  const handle_importContract = () => {
-    const { destroy } = modal_empty({
-      width: 'fit-content',
-      content: (
-        <Selector_quotation
-          onCancel={() => {
-            destroy();
-          }}
-          onConfirm={([quotation]) => {
-            if (!quotation) {
-              destroy();
-
-              return;
-            }
-
-            const {
-              quotationNumber,
-              contractNumber,
-              projectName,
-              subTotal,
-              salesTax,
-              total,
-              currency,
-              foreignTotal,
-              exchangeRate,
-              customerName,
-            } = quotation;
-
-            instance_salesOrder.setState((prev) => ({
-              ...prev,
-              quotationNumber,
-              quotationContractNumber: contractNumber || '',
-              constructionSite: projectName || '',
-              customerNumber: '',
-              customerName: customerName || '',
-              salesAmount: `${subTotal || ''}`,
-              taxes: `${salesTax || ''}`,
-              totalAmount: `${total || ''}`,
-              sourceType: '',
-              客戶聯絡電話1: '',
-              客戶聯絡電話2: '',
-              address: '',
-              invoiceType: '',
-              taxId: '',
-              taxDeductionCategory: '',
-              salesCurrency: currency,
-              exchangeRate: `${exchangeRate || ''}`,
-              currencyAmount: `${foreignTotal || ''}`,
-            }));
-
-            destroy();
-
-            //
-          }}
-        />
-      ),
-    });
-  };
-
-  const handle_reset = () => {
-    instance_salesOrder.reset();
-    instance_salesOrderItemArr.reset();
-  };
 
   // ---------------------------------------------------------------------------
 
@@ -297,6 +234,9 @@ export default function SalesOrder() {
       if (body) {
         try {
           const id = await apiPostSalesOrderData(body);
+          myAlert.success({
+            title: '銷貨單已新增',
+          });
           router.replace({
             query: {
               ...query,
@@ -312,12 +252,84 @@ export default function SalesOrder() {
         try {
           await apiPatchSalesOrderData(body);
           await updateSalesOrder();
+          myAlert.success({
+            title: '銷貨單已更新',
+          });
         } catch (error) {}
       }
     }
   };
 
   // ---------------------------------------------------------------------------
+
+  const handle_importContract = () => {
+    const { destroy } = modal_empty({
+      width: 'fit-content',
+      content: (
+        <Selector_quotation
+          onCancel={() => {
+            destroy();
+          }}
+          onConfirm={([quotation]) => {
+            if (!quotation) {
+              destroy();
+
+              return;
+            }
+
+            const {
+              quotationNumber,
+              contractNumber,
+              projectName,
+              subTotal,
+              salesTax,
+              total,
+              currency,
+              foreignTotal,
+              exchangeRate,
+              customerName,
+            } = quotation;
+
+            instance_salesOrder.setState((prev) => ({
+              ...prev,
+              quotationNumber,
+              quotationContractNumber: contractNumber || '',
+              constructionSite: projectName || '',
+              customerNumber: '',
+              customerName: customerName || '',
+              salesAmount: `${subTotal || ''}`,
+              taxes: `${salesTax || ''}`,
+              totalAmount: `${total || ''}`,
+              sourceType: '',
+              客戶聯絡電話1: '',
+              客戶聯絡電話2: '',
+              address: '',
+              invoiceType: '',
+              taxId: '',
+              taxDeductionCategory: '',
+              salesCurrency: currency,
+              exchangeRate: `${exchangeRate || ''}`,
+              currencyAmount: `${foreignTotal || ''}`,
+            }));
+
+            destroy();
+
+            //
+          }}
+        />
+      ),
+    });
+  };
+
+  const handle_reset = () => {
+    modal_leave({
+      title: '確認重置嗎？',
+      onConfirm: () => {
+        instance_salesOrder.reset();
+        instance_salesOrderItemArr.reset();
+      },
+    });
+  };
 
   const handle_save = () => {
     req_postOrPatch();
