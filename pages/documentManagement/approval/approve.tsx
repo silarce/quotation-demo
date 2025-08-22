@@ -1,3 +1,5 @@
+import { useRef, useEffect } from 'react';
+
 import classNames from 'classnames';
 
 import { Tabs } from 'antd';
@@ -11,9 +13,13 @@ import Btn_fong from 'components/global/gear/button/btn_fong_old';
 
 import DataEntry, { Input, DataEntry_fong } from 'components/global/gear/dataEntry';
 
+import { sendMessage_iframe, createOnHandShake } from 'hooks/globalState/useInIrame';
+
 // ===========================================================================
 
 export default function Approve() {
+  const ref_iframe = useRef<HTMLIFrameElement>(null);
+
   const items = [
     {
       key: 'a',
@@ -27,10 +33,20 @@ export default function Approve() {
     },
   ];
 
+  useEffect(() => {
+    const onMessage = createOnHandShake(() => {
+      sendMessage_iframe(ref_iframe.current!, 'MEOW');
+    });
+
+    window.addEventListener('message', onMessage);
+
+    return () => window.removeEventListener('message', onMessage);
+  });
+
   return (
     <div className={scss.wrapper}>
       <div className={scss.body}>
-        <iframe src="/setting/company-info" className={scss.iframe} />
+        <iframe ref={ref_iframe} src="/setting/company-info" className={scss.iframe} />
 
         <Tabs
           className={classNames(scss.tabs)}
