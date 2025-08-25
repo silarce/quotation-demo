@@ -13,7 +13,7 @@ import Btn_fong from 'components/global/gear/button/btn_fong_old';
 
 import DataEntry, { Input, DataEntry_fong } from 'components/global/gear/dataEntry';
 
-import { sendMessage_iframe, createOnHandShake } from 'hooks/globalState/useInIrame';
+// import { useMessageReceiver, useMessageSender } from 'hooks/globalState/useWindowMessage';
 
 // ===========================================================================
 
@@ -32,16 +32,6 @@ export default function Approve() {
       children: <History />,
     },
   ];
-
-  useEffect(() => {
-    const onMessage = createOnHandShake(() => {
-      sendMessage_iframe(ref_iframe.current!, 'MEOW');
-    });
-
-    window.addEventListener('message', onMessage);
-
-    return () => window.removeEventListener('message', onMessage);
-  });
 
   return (
     <div className={scss.wrapper}>
