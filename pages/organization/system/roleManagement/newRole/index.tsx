@@ -10,7 +10,16 @@ import {
   deleteRoleById,
   updateRole,
 } from 'components/page/organization/system/roleManagement/api_role';
-import { Role } from 'components/page/organization/system/roleManagement/newRole/hook/useRoleReducer';
+
+type Role = {
+  role_id: string;
+  role_name: string;
+  role_code: string;
+  description: string;
+  created_by: string;
+  created_at: string;
+  updated_at?: string;
+};
 
 export default function AddRolePage() {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -41,6 +50,14 @@ export default function AddRolePage() {
   // 更新角色
   const handleUpdate = async (role: Role) => {
     try {
+      const errorMsg = validateRole(roles, role);
+
+      if (errorMsg) {
+        message.error(errorMsg);
+
+        return;
+      }
+
       await updateRole(role);
       message.success('角色已更新');
       await getRoles();
@@ -53,6 +70,14 @@ export default function AddRolePage() {
   // 新增角色
   const handleAdd = async (data: Omit<Role, 'role_id' | 'created_by' | 'created_at'>) => {
     try {
+      const errorMsg = validateRole(roles, data);
+
+      if (errorMsg) {
+        message.error(errorMsg);
+
+        return;
+      }
+
       await createRole(data);
       message.success('角色已新增');
       await getRoles();
@@ -78,3 +103,33 @@ export default function AddRolePage() {
     </div>
   );
 }
+
+// 共用檢查函式
+const validateRole = (
+  roles: Role[],
+  role: { role_id?: string; role_name: string; role_code: string }
+): string | null => {
+  // 檢查名稱是否重複
+  const isNameDuplicate = roles.some(
+    (r) =>
+      r.role_id !== role.role_id && // 更新時排除自己
+      r.role_name.trim() === role.role_name.trim()
+  );
+
+  if (isNameDuplicate) {
+    return '角色名稱重複，請重新輸入';
+  }
+
+  // 檢查代碼是否重複
+  const isCodeDuplicate = roles.some(
+    (r) =>
+      r.role_id !== role.role_id && // 更新時排除自己
+      r.role_code.trim() === role.role_code.trim()
+  );
+
+  if (isCodeDuplicate) {
+    return '角色代碼重複，請重新輸入';
+  }
+
+  return null; // 通過檢查
+};

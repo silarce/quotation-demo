@@ -83,7 +83,7 @@ const Template_confirm = ({
 };
 
 const modal_delete = ({
-  title = "確認刪除嗎？'",
+  title = '確認刪除嗎？',
   content = '此操作將永久刪除，且無法復原。',
   onCancel,
   onConfirm,
