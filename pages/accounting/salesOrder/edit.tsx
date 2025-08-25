@@ -45,6 +45,7 @@ export default function SalesOrder() {
     data: salesOrderData,
     isFetching: isFetchingSalesOrder,
     update: updateSalesOrder,
+    req_salesOrderToAccountsReceivables,
   } = useApiGetSalesOrderById(query.id);
 
   const instance_salesOrder = useSalesOrder(salesOrderData);
@@ -260,6 +261,21 @@ export default function SalesOrder() {
     }
   };
 
+  const handle_salesOrderToAccountsReceivables = async () => {
+    if (!salesOrderData?.id) {
+      return;
+    }
+
+    myAlert.confirm({
+      title: '確認銷貨單轉應收款？',
+      props: {
+        onOk: async () => {
+          await req_salesOrderToAccountsReceivables();
+        },
+      },
+    });
+  };
+
   // ---------------------------------------------------------------------------
 
   const handle_importContract = () => {
@@ -343,6 +359,8 @@ export default function SalesOrder() {
       <div className="pageTop flex justify-between items-center">
         <div className="text-xl font-semibold">銷貨單</div>
         <div className="flex gap-3">
+          {salesOrderData?.id && <Btn onClick={handle_salesOrderToAccountsReceivables}>銷貨單轉應收款</Btn>}
+
           <Btn theme="import" onClick={handle_importContract}>
             合約匯入
           </Btn>
