@@ -18,8 +18,8 @@ import {
   apiPatchSalesOrderData,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
-import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
+import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
@@ -94,11 +94,12 @@ export default function SalesOrder() {
     !userIdNumber && errorMessage.push('User idNumber is undefined');
     !sourceType && errorMessage.push('請選擇類別');
     !salesCurrency && errorMessage.push('請選擇幣別');
-    !exchangeRate && errorMessage.push('請輸入匯率');
-    !currencyAmount && errorMessage.push('請輸入外幣金額');
+    // !exchangeRate && errorMessage.push('請輸入匯率');
+    // !currencyAmount && errorMessage.push('請輸入外幣金額');
     !salesAmount && errorMessage.push('請輸入銷貨金額');
     !taxes && errorMessage.push('請輸入稅額');
     !totalAmount && errorMessage.push('請輸入銷售總總額');
+    !state_salesOrderItemArr.length && errorMessage.push('請新增銷貨明細');
 
     if (errorMessage.length) {
       myAlert.err({

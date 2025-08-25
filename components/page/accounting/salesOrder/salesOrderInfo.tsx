@@ -79,8 +79,14 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         />
       </DataEntry_fong>
 
-      <DataEntry_fong caption="合約編號" className="" isMust={true} disabled={true}>
-        {state_salesOrder.quotationContractNumber || '請匯入合約'}
+      <DataEntry_fong caption="合約編號" className="">
+        {/* {state_salesOrder.quotationContractNumber || '請匯入合約'} */}
+        <Input
+          value={state_salesOrder.quotationContractNumber}
+          onChange={(e) => {
+            setState_salesOrder({ ...state_salesOrder, quotationContractNumber: e.target.value });
+          }}
+        />
       </DataEntry_fong>
 
       <DataEntry_fong caption="案場名稱" className="col-span-2">
@@ -140,14 +146,14 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, salesCurrency: e as string })}
         />
       </DataEntry_fong>
-      <DataEntry_fong caption="匯率" className="" isMust={true}>
+      <DataEntry_fong caption="匯率" className="">
         <Input
           type="number"
           value={state_salesOrder.exchangeRate}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, exchangeRate: e.target.value as `${number}` })}
         />
       </DataEntry_fong>
-      <DataEntry_fong caption="外幣金額" className="" isMust={true}>
+      <DataEntry_fong caption="外幣金額" className="">
         <Input_money
           value={state_salesOrder.currencyAmount}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, currencyAmount: e.target.value as `${number}` })}
