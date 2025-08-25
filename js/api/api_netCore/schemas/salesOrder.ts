@@ -50,4 +50,14 @@ interface TproductView_Dto {
   price: number; // 單價 (decimal)
 }
 
-export type { TsalesOrder_simple_Dto, TproductView_Dto };
+interface TgetCustomerList_Dto {
+  id: string;
+  customerNumber: string;
+  name: string;
+  taxId: string;
+  phone1: string;
+  phone2: string;
+  address: string;
+}
+
+export type { TsalesOrder_simple_Dto, TproductView_Dto, TgetCustomerList_Dto };

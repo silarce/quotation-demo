@@ -6,7 +6,7 @@ import { axi_monkey } from '../_axiosCreator';
 import type { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import type { TsalesOrder_simple_Dto, TproductView_Dto } from 'js/api/api_netCore/schemas';
+import type { Tmeta, TsalesOrder_simple_Dto, TproductView_Dto, TgetCustomerList_Dto } from 'js/api/api_netCore/schemas';
 
 const apiGetSalesOrderDataList = async () => {
   const api = '/api/SalesOrder/GetSalesOrderDataList';
@@ -96,6 +96,54 @@ const useApiGetProductProfileList = ({ autoUpdate = true }: { autoUpdate?: boole
   };
 };
 
-export type { TsalesOrder_simple_Dto, TproductView_Dto };
+const apiGetCustomerList = async (params?: { page?: number; pageSize?: number; filter?: string }) => {
+  const api = '/api/SalesOrder/GetCustomerList';
 
-export { useApiGetSalesOrderDataList, useApiGetProductProfileList };
+  return await axi_monkey
+    .get<{
+      items: TgetCustomerList_Dto[];
+      meta: Tmeta;
+    }>(api, { params })
+    .then(({ data }) => data);
+};
+
+const useApiGetCustomerList = ({
+  params,
+  autoUpdate = true,
+}: {
+  params?: Parameters<typeof apiGetCustomerList>[0];
+  autoUpdate?: boolean;
+} = {}) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<Awaited<ReturnType<typeof apiGetCustomerList>> | null>();
+
+  const update = async () => {
+    setIsFetching(true);
+    await apiGetCustomerList(params)
+      .then((res) => {
+        setRes(res);
+      })
+      .catch(() => {
+        setRes(null);
+        myAlert.notify.error({
+          message: '取得客戶資料失敗',
+        });
+      })
+      .finally(() => setIsFetching(false));
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [JSON.stringify(params)]);
+
+  return {
+    data: res?.items,
+    meta: res?.meta,
+    isFetching,
+    update,
+  };
+};
+
+export type { TsalesOrder_simple_Dto, TproductView_Dto, TgetCustomerList_Dto };
+
+export { useApiGetSalesOrderDataList, useApiGetProductProfileList, useApiGetCustomerList };

@@ -47,7 +47,7 @@ export type {
   TpaymentRequestInvoiceList_Dto,
 } from './accountsReceivable';
 
-export type { TsalesOrder_simple_Dto, TproductView_Dto } from './salesOrder';
+export type { TsalesOrder_simple_Dto, TproductView_Dto, TgetCustomerList_Dto } from './salesOrder';
 
 export type { Tinvoice_Dto } from './invoice';
 
