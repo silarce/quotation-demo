@@ -27,7 +27,7 @@ import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalCo
 // import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
-import { useWindow } from 'hooks/globalState/useInIrame';
+import { useWindow } from 'hooks/globalState/useWindow';
 
 //
 import dayjs, { Dayjs } from 'dayjs';
