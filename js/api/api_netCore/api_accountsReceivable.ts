@@ -607,14 +607,12 @@ const useApiGetSalesOrderById = (
   const [isFetching, setIsFetching] = useState(false);
   const [res, setRes] = useState<TsalesOrder_Dto | null>();
 
-  const update = async () => {
-    if (isFetching || !salesOrderId) {
+  const update_ = async () => {
+    if (!salesOrderId) {
       return;
     }
 
-    setIsFetching(true);
-
-    const res = await apiGetSalesOrderById(salesOrderId)
+    return await apiGetSalesOrderById(salesOrderId)
       .then((res) => {
         setRes(res);
 
@@ -626,9 +624,39 @@ const useApiGetSalesOrderById = (
 
         return null;
       });
+  };
+
+  const update = async () => {
+    if (isFetching || !salesOrderId) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    const res = await update_();
+
     setIsFetching(false);
 
     return res;
+  };
+
+  const req_salesOrderToAccountsReceivables = async () => {
+    if (!res?.id) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    await apiPostSalesOrderToAccountsReceivables(res.id)
+      .then(async () => {
+        await update_();
+        myAlert.success({
+          title: '銷貨單轉應收款完成',
+        });
+      })
+      .catch(() => {});
+
+    setIsFetching(false);
   };
 
   useEffect(() => {
@@ -639,6 +667,7 @@ const useApiGetSalesOrderById = (
     isFetching,
     data: res,
     update,
+    req_salesOrderToAccountsReceivables,
   };
 };
 
@@ -799,6 +828,26 @@ const apiUpdatePRInvoice = async (body: Tbody_updatePRInvoice) => {
   });
 };
 
+const apiPostSalesOrderToAccountsReceivables = async (salesOrderId: string) => {
+  const api = '/api/AccountsReceivable/SalesOrderToAccountsReceivables';
+
+  return axi_monkey
+    .post<string>(api, salesOrderId, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .catch((error) => {
+      const err = error as AxiosError;
+      myAlert.err({
+        title: '銷貨單轉應收款失敗',
+        content: err.message,
+      });
+
+      return Promise.reject(err);
+    });
+};
+
 // ========================================================================
 export type {
   TaccountsReceivablesList_Dto,
@@ -835,6 +884,7 @@ export {
   apiPostSalesOrderData,
   apiPatchSalesOrderData,
   apiUpdatePRInvoice,
+  apiPostSalesOrderToAccountsReceivables,
 };
 
 export {

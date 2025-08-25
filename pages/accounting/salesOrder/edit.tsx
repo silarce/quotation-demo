@@ -18,8 +18,8 @@ import {
   apiPatchSalesOrderData,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
-import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
+import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
@@ -45,6 +45,7 @@ export default function SalesOrder() {
     data: salesOrderData,
     isFetching: isFetchingSalesOrder,
     update: updateSalesOrder,
+    req_salesOrderToAccountsReceivables,
   } = useApiGetSalesOrderById(query.id);
 
   const instance_salesOrder = useSalesOrder(salesOrderData);
@@ -93,11 +94,12 @@ export default function SalesOrder() {
     !userIdNumber && errorMessage.push('User idNumber is undefined');
     !sourceType && errorMessage.push('請選擇類別');
     !salesCurrency && errorMessage.push('請選擇幣別');
-    !exchangeRate && errorMessage.push('請輸入匯率');
-    !currencyAmount && errorMessage.push('請輸入外幣金額');
+    // !exchangeRate && errorMessage.push('請輸入匯率');
+    // !currencyAmount && errorMessage.push('請輸入外幣金額');
     !salesAmount && errorMessage.push('請輸入銷貨金額');
     !taxes && errorMessage.push('請輸入稅額');
     !totalAmount && errorMessage.push('請輸入銷售總總額');
+    !state_salesOrderItemArr.length && errorMessage.push('請新增銷貨明細');
 
     if (errorMessage.length) {
       myAlert.err({
@@ -260,6 +262,21 @@ export default function SalesOrder() {
     }
   };
 
+  const handle_salesOrderToAccountsReceivables = async () => {
+    if (!salesOrderData?.id) {
+      return;
+    }
+
+    myAlert.confirm({
+      title: '確認銷貨單轉應收款？',
+      props: {
+        onOk: async () => {
+          await req_salesOrderToAccountsReceivables();
+        },
+      },
+    });
+  };
+
   // ---------------------------------------------------------------------------
 
   const handle_importContract = () => {
@@ -343,6 +360,8 @@ export default function SalesOrder() {
       <div className="pageTop flex justify-between items-center">
         <div className="text-xl font-semibold">銷貨單</div>
         <div className="flex gap-3">
+          {salesOrderData?.id && <Btn onClick={handle_salesOrderToAccountsReceivables}>銷貨單轉應收款</Btn>}
+
           <Btn theme="import" onClick={handle_importContract}>
             合約匯入
           </Btn>
