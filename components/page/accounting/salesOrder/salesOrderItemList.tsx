@@ -1,28 +1,13 @@
-import { useMemo } from 'react';
-
 import classNames from 'classnames';
 
 import Btn from 'components/global/gear/button/btn_fong';
-import DataEntry, {
-  TdataEntrycontainerProps,
-  DataEntry_fong,
-  Input,
-  InputSelect,
-} from 'components/global/gear/dataEntry';
+import DataEntry, { TdataEntrycontainerProps, Input, InputSelect } from 'components/global/gear/dataEntry';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { modal_delete } from 'components/global/gear/modal/fongModal';
 
-import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
-import Icon_check from 'public/image/icon/fong/check.svg';
-import Icon_cancel from 'public/image/icon/fong/cancel.svg';
 
-import {
-  Tinstance_salesOrderItemArr,
-  Tstate,
-  Taction_salsesOrderItem,
-} from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
+import { Tinstance_salesOrderItemArr, Tstate } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
 import { useApiGetProductProfileList } from 'js/api/api_netCore/api_salesOrder';
 

@@ -78,7 +78,6 @@ const customProductNumber = 'A99999';
 // ===============================================================================
 
 // MARK: HOOK
-
 const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
   return useMemo(() => {
     if (!raw) {
@@ -99,14 +98,23 @@ const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] =>
   }, [raw]);
 };
 
+// MARK:useSalesOrderItemArr
 const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
   const defaultState = useDefaultState(raw);
 
   const [state, dispatch] = useReducer(reducer_salesOrderItem, defaultState);
 
-  const reset = () => {
-    dispatch({ type: 'replace', payload: defaultState });
-  };
+  // --------------------------------------------------------------------------------
+
+  const totalAmount = useMemo(() => {
+    const foo = state.reduce((acc, cur) => acc.add(cur.amount || 0), new Decimal(0)).toNumber();
+    console.log(state);
+    console.log(foo);
+
+    return state.reduce((acc, cur) => acc.add(cur.amount || 0), new Decimal(0)).toNumber();
+  }, [state]);
+
+  // --------------------------------------------------------------------------------
 
   const setProduct_custom = (index: number, value: string) => {
     dispatch({
@@ -180,12 +188,21 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
     dispatch({ type: 'unitPrice', payload: { index, unitPrice } });
   };
 
+  // --------------------------------------------------------------------------------
+
+  const reset = () => {
+    dispatch({ type: 'replace', payload: defaultState });
+  };
+
+  // --------------------------------------------------------------------------------
+
   useEffect(() => {
     reset();
   }, [defaultState]);
 
   return {
     state,
+    totalAmount,
     dispatch,
     //
     setUnitPrice,
@@ -196,6 +213,12 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
     checkIsAllowCustom,
   };
 };
+
+//  MARK: useSalesOrderItemArr END
+//
+//
+//
+//
 
 // MARK: reducer
 const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {

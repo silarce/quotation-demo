@@ -164,11 +164,13 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
 
       {/*  */}
 
-      <DataEntry_fong caption="銷售金額" isMust={true}>
-        <Input_money
+      <DataEntry_fong caption="銷售金額" isMust={true} disabled={true}>
+        {/* <Input_money
           value={state_salesOrder.salesAmount}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, salesAmount: e.target.value as `${number}` })}
-        />
+        /> */}
+
+        {formatToMoney(state_salesOrder.salesAmount)}
       </DataEntry_fong>
 
       <DataEntry_fong caption="稅別" isMust={true}>
@@ -179,19 +181,31 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         />
       </DataEntry_fong>
 
-      <DataEntry_fong caption="稅金" isMust={true}>
-        <Input_money
+      <DataEntry_fong caption="稅金" disabled={true}>
+        {/* <Input_money
           value={state_salesOrder.taxes}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, taxes: e.target.value as `${number}` })}
-        />
+        /> */}
+        {formatToMoney(state_salesOrder.taxes)}
       </DataEntry_fong>
 
-      <DataEntry_fong caption="銷售總額" isMust={true}>
-        <Input_money
+      <DataEntry_fong caption="銷售總額" isMust={true} disabled={true}>
+        {/* <Input_money
           value={state_salesOrder.totalAmount}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, totalAmount: e.target.value as `${number}` })}
-        />
+        /> */}
+        {formatToMoney(state_salesOrder.totalAmount)}
       </DataEntry_fong>
     </div>
   );
 }
+
+// =========================================================================================
+
+const formatToMoney = (value: number | `${number}` | '' | undefined) => {
+  if (value === undefined || value === '') {
+    return '';
+  }
+
+  return '$' + Number(value).toLocaleString();
+};

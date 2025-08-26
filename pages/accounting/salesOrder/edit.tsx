@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { Spin } from 'antd';
@@ -350,6 +351,12 @@ export default function SalesOrder() {
   const handle_save = () => {
     req_postOrPatch();
   };
+
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    instance_salesOrder.setAmount(instance_salesOrderItemArr.totalAmount);
+  }, [instance_salesOrderItemArr.totalAmount, instance_salesOrder.state.taxDeductionCategory]);
 
   // ---------------------------------------------------------------------------
 
