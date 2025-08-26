@@ -366,7 +366,7 @@ export default function SalesOrder() {
       <div className="pageTop flex justify-between items-center">
         <div className="text-xl font-semibold">銷貨單</div>
         <div className="flex gap-3">
-          {salesOrderData?.accountsReceivableId && salesOrderData?.id && (
+          {!salesOrderData?.accountsReceivableId && salesOrderData?.id && (
             <Btn onClick={handle_salesOrderToAccountsReceivables}>銷貨單轉應收款</Btn>
           )}
 
