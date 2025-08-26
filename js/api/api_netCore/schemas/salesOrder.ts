@@ -55,8 +55,8 @@ interface TgetCustomerList_Dto {
   customerNumber: string;
   name: string;
   taxId: string;
-  phone1: string;
-  phone2: string;
+  phone: string;
+  fax: string;
   address: string;
 }
 
