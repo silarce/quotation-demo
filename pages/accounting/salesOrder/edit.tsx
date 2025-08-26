@@ -55,8 +55,6 @@ export default function SalesOrder() {
 
   // ---------------------------------------------------------------------------
 
-  // ---------------------------------------------------------------------------
-
   const createBody_post = () => {
     const { state: state_salesOrder } = instance_salesOrder;
     const { state: state_salesOrderItemArr } = instance_salesOrderItemArr;
@@ -305,6 +303,7 @@ export default function SalesOrder() {
               exchangeRate,
               customerName,
               customerNumber,
+              customerId,
             } = quotation;
 
             instance_salesOrder.setState((prev) => ({
@@ -313,6 +312,7 @@ export default function SalesOrder() {
               quotationContractNumber: contractNumber || '',
               constructionSite: projectName || '',
 
+              customerId,
               customerName: customerName || '',
               salesAmount: `${subTotal || ''}`,
               taxes: `${salesTax || ''}`,
@@ -366,7 +366,9 @@ export default function SalesOrder() {
       <div className="pageTop flex justify-between items-center">
         <div className="text-xl font-semibold">銷貨單</div>
         <div className="flex gap-3">
-          {salesOrderData?.id && <Btn onClick={handle_salesOrderToAccountsReceivables}>銷貨單轉應收款</Btn>}
+          {salesOrderData?.accountsReceivableId && salesOrderData?.id && (
+            <Btn onClick={handle_salesOrderToAccountsReceivables}>銷貨單轉應收款</Btn>
+          )}
 
           <Btn theme="import" onClick={handle_importContract}>
             合約匯入
