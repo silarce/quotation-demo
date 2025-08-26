@@ -1,11 +1,11 @@
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
-import editIcon from 'public/image/icon/note.svg?url';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { DetailItem } from './type';
 import scss from 'components/global/myCom/myTable/table.module.scss';
 import Icon_list from 'public/image/icon/fong/Procurement2.svg';
+import { modal_delete } from 'components/global/gear/modal/fongModal';
 
 interface Props {
   data: DetailItem[];
@@ -129,7 +129,11 @@ const DepartmentTable = ({
           <Image
             src={deleteIcon}
             alt="delete"
-            onClick={() => onDelete(record.key)}
+            onClick={() => {
+              modal_delete({
+                onConfirm: () => onDelete(record.key),
+              });
+            }}
             style={{ cursor: 'pointer' }}
             width={16}
             height={16}
