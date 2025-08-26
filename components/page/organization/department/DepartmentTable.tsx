@@ -4,7 +4,7 @@ import Image from 'next/image';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { DetailItem } from './type';
 import scss from 'components/global/myCom/myTable/table.module.scss';
-import Icon_list from 'public/image/icon/fong/procurement2.svg';
+import Icon_list from 'public/image/icon/fong/procurement.svg';
 import { modal_delete } from 'components/global/gear/modal/fongModal';
 
 interface Props {

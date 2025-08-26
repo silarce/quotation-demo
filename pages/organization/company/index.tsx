@@ -3,7 +3,7 @@ import Input from 'components/global/myCom/Input/Input';
 import { useEffect, useState } from 'react';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
-import Icon_list from 'public/image/icon/fong/procurement2.svg';
+import Icon_list from 'public/image/icon/fong/procurement.svg';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { Table } from 'antd';
 import { useRouter } from 'next/router';

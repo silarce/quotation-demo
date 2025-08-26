@@ -5,7 +5,7 @@ import SearchButton from 'components/global/myCom/button/searchButton';
 import ClearButton from 'components/global/myCom/button/clearButton';
 import type { ColumnsType } from 'antd/es/table';
 import Image from 'next/image';
-import listIcon from 'public/image/icon/fong/procurement2.svg?url';
+import listIcon from 'public/image/icon/fong/procurement.svg?url';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { Table } from 'antd';
 import { useRouter } from 'next/router';
