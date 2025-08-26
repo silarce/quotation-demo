@@ -62,10 +62,6 @@ function Selector_customer({ onConfirm, onCancel, limit = 1 }: Tprops) {
 
   const pagenation = meta && metaToPageProps(meta);
 
-  useEffect(() => {
-    update();
-  }, [params]);
-
   return (
     <Container_confirm
       topRight={
