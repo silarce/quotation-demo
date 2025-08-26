@@ -320,6 +320,6 @@ const checkIsAllowCustom = (productNumber: string) => {
   return false;
 };
 
-export { useSalesOrderItemArr };
+export { useSalesOrderItemArr, checkIsAllowCustom };
 
 export type { Tinstance_salesOrderItemArr, TsalesOrderItem, Tstate, Taction_salsesOrderItem };

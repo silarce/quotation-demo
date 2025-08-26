@@ -7,7 +7,11 @@ import { modal_delete } from 'components/global/gear/modal/fongModal';
 
 import Icon_trash from 'public/image/icon/fong/trash.svg';
 
-import { Tinstance_salesOrderItemArr, Tstate } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
+import {
+  Tinstance_salesOrderItemArr,
+  Tstate,
+  checkIsAllowCustom,
+} from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
 import { useApiGetProductProfileList } from 'js/api/api_netCore/api_salesOrder';
 
@@ -140,11 +144,14 @@ const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr,
       align: 'right',
       width: 150,
       render: (value, record, index) => {
+        const isAllowCustom = checkIsAllowCustom(record.productNumber);
+
         return (
-          <MyDataEntry showBorder={true}>
+          <MyDataEntry showBorder={isAllowCustom}>
             <Input
               type="number"
               className="text-right"
+              readOnly={!isAllowCustom}
               value={value}
               onChange={(e) => {
                 const value = e.currentTarget.value as `${number}` | '';
