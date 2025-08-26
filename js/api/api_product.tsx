@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // type

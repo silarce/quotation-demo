@@ -1,6 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_FARM_URL;
 import { CreateDepFormState } from './type';
-import axios from 'js/api/axiosInstance';
+import axios from 'js/api/axiosCreator/axiosInstance';
 
 // === 查詢部門 ===
 export async function getDepartment(keyword: string = '', pageIndex: number = 1, pageSize: number = 10) {
