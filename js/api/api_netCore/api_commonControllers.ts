@@ -12,7 +12,8 @@ type TdropDownParams =
   | 'RetainageTaxCategory' // 保留款稅別
   | 'InvoiceType' //發票類型
   | 'IncomeType' // 收入類別
-  | 'deduction_type'; // 扣款類別
+  | 'deduction_type' // 扣款類別
+  | 'tax_category'; // 稅別
 
 const apiGetDropDown = async (ddtype: TdropDownParams) => {
   const api = '/api/CommonControllers/GetDropDownDate';
