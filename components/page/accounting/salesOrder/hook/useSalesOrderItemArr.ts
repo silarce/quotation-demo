@@ -107,10 +107,6 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
   // --------------------------------------------------------------------------------
 
   const totalAmount = useMemo(() => {
-    const foo = state.reduce((acc, cur) => acc.add(cur.amount || 0), new Decimal(0)).toNumber();
-    console.log(state);
-    console.log(foo);
-
     return state.reduce((acc, cur) => acc.add(cur.amount || 0), new Decimal(0)).toNumber();
   }, [state]);
 
