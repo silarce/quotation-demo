@@ -1,12 +1,10 @@
 import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 
 //components
-import Input from 'components/global/myCom/Input/Input';
-import AddButton from 'components/global/myCom/button/AddButton';
-import SearchButton from 'components/global/myCom/button/searchButton';
 import LeaveModal from 'components/global/myCom/myModal/leaveModal';
 import DeleteModal from 'components/global/myCom/myModal/deleteModal';
 import DepartmentModal from 'components/page/organization/department/DepartmentModal';
+import Btn from 'components/global/gear/button/btn_fong';
 
 //Table
 import DepartmentTable from 'components/page/organization/department/DepartmentTable';
@@ -14,10 +12,17 @@ import DepartmentTable from 'components/page/organization/department/DepartmentT
 import { useCallback, useEffect, useState } from 'react';
 
 //api
-import { getDepartment, createDepartment, updateDepartment } from 'components/page/organization/department/api';
+import {
+  getDepartment,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+} from 'components/page/organization/department/api';
 
 //type
-import { DetailItem, formState } from 'components/page/organization/department/type';
+import { DetailItem, CreateDepFormState } from 'components/page/organization/department/type';
+import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
+import { message } from 'antd';
 
 export default function Departmentdata() {
   // 搜尋輸入欄位狀態
@@ -41,22 +46,39 @@ export default function Departmentdata() {
 
   // 部門資料
   const [department, setDepartment] = useState<DetailItem[]>([]);
+  const [total, setTotal] = useState(0); //存總筆數
+  const [currentPage, setCurrentPage] = useState(1);
 
   // 取得部門資料，支援模糊查詢
-  const fetchDepartment = async (searchInput = '') => {
-    const res = await getDepartment(searchInput);
-    const rawData = res.data;
+  const fetchDepartment = async (searchInput = '', pageIndex = 1, pageSize = 10) => {
+    try {
+      const res = await getDepartment(searchInput, pageIndex, pageSize);
 
-    const formattedData: DetailItem[] = rawData.map((item: any) => ({
-      key: item.dep_id, // 用來當 table 的 rowKey
-      dep_code: item.dep_code,
-      dep_ch_name: item.dep_ch_name,
-      dep_en_name: item.dep_en_name,
-      description: item.description,
-      is_invalid: item.is_invalid,
-    }));
+      // 一定有 data（至少是 []）
+      const rawData = res.data ?? [];
 
-    setDepartment(formattedData);
+      const formattedData: DetailItem[] = rawData.map((item: any) => ({
+        key: item.depId,
+        depCode: item.depCode ? item.depCode.substring(0, 5) : '', // 只取前 5 個字
+        depChName: item.depChName,
+        depEnName: item.depEnName || '未命名英文名稱',
+        description: item.description,
+        isInvalid: item.isInvalid,
+      }));
+
+      setDepartment(formattedData);
+      setTotal(res.totalCount ?? 0);
+      setCurrentPage(pageIndex);
+    } catch (error) {
+      console.error('取得部門資料失敗:', error);
+      setDepartment([]);
+      setTotal(0);
+    }
+  };
+
+  // Table 換頁事件
+  const handlePageChange = (page: number, pageSize?: number) => {
+    fetchDepartment(searchInput, page, pageSize ?? 10);
   };
 
   // 初始載入全部資料
@@ -68,10 +90,11 @@ export default function Departmentdata() {
 
   // 表單初始狀態
   const initialFormState = {
-    dep_code: '',
-    dep_ch_name: '',
-    dep_en_name: '',
+    depCode: '',
+    depChName: '',
+    depEnName: '',
     description: '',
+    isEnabled: false,
   };
 
   // 表單狀態
@@ -79,8 +102,11 @@ export default function Departmentdata() {
 
   // 處理表單欄位變更
   const handleFormChange = useCallback(
-    (key: keyof formState) => (value: string) => {
-      setFormState((prev) => ({ ...prev, [key]: value }));
+    (key: keyof CreateDepFormState) => (value: string | boolean) => {
+      setFormState((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
     },
     []
   );
@@ -89,25 +115,40 @@ export default function Departmentdata() {
 
   // 點擊儲存按鈕時的邏輯（依 editId 決定新增或編輯）
   const handleSaveSubmit = async () => {
-    try {
-      if (editId) {
-        // 編輯模式
-        await handleSaveDepartment();
+    // 1. 前端必填驗證
+    if (!formState.depCode || !formState.depChName || !formState.depEnName) {
+      message.error('部門代號、部門名稱、部門英文名稱為必填');
 
-        return;
+      return;
+    }
+
+    // 2. 編輯模式
+    if (editId) {
+      const result = await handleSaveDepartment();
+
+      if (result) {
+        message.success('更新成功');
+        resetForm();
+        setIsModalOpen(false);
+        fetchDepartment();
       }
 
-      const payload = {
-        ...formState,
-      };
-
-      await createDepartment(payload);
-      resetForm();
-      setIsModalOpen(false);
-      fetchDepartment();
-    } catch (error) {
-      console.error('新增失敗:', error);
+      return;
     }
+
+    // 3. 新增模式
+    const result = await createDepartment(formState);
+
+    if (!result) {
+      // 失敗時不做任何事，錯誤訊息攔截器已經顯示
+      return;
+    }
+
+    // 成功才會執行這裡
+    message.success('新增成功');
+    resetForm();
+    setIsModalOpen(false);
+    fetchDepartment();
   };
 
   // 清空表單欄位
@@ -122,9 +163,9 @@ export default function Departmentdata() {
 
   // 編輯部門（點擊編輯圖示）
   const handleEditDepartment = (record: DetailItem) => {
-    const { key, dep_code, dep_ch_name, dep_en_name, description } = record;
+    const { key, depCode, depChName, depEnName, description } = record;
 
-    setFormState({ dep_code, dep_ch_name, dep_en_name, description });
+    setFormState({ depCode, depChName, depEnName, description, isEnabled: !record.isInvalid }); // 將資料帶入表單
     setEditId(key); // 設定目前編輯的 ID
     setIsModalOpen(true); // 打開 Modal
   };
@@ -138,14 +179,88 @@ export default function Departmentdata() {
         is_invalid: false, // 若之後有啟用/停用控制，可改從 state 拿
       };
 
-      await updateDepartment(editId!, payload);
+      const res = await updateDepartment(editId!, payload);
 
+      if (!res) {
+        return null; // 攔截器可能已經顯示錯誤，這裡直接回 null
+      }
+
+      // 更新成功，執行後續 UI 處理
       await fetchDepartment(); // 更新表格資料
       setIsModalOpen(false); // 關閉 Modal
       resetForm(); // 清空欄位
       setEditId(null); // 清除編輯狀態
+
+      return res; // 成功回傳資料
     } catch (err) {
       console.error('儲存失敗:', err);
+
+      return null; // 發生例外回傳 null
+    }
+  };
+
+  // 單筆刪除
+  const handleDeleteOne = async (depId: string) => {
+    try {
+      const result = await deleteDepartment(depId);
+
+      if (!result) {
+        return;
+      }
+
+      message.success('刪除成功');
+      await fetchDepartment(searchInput, currentPage);
+    } catch (err: any) {
+      message.error(err.message || '刪除失敗，請稍後再試');
+    }
+  };
+
+  //勾選刪除部門
+  const handleBatchDelete = async () => {
+    if (checkedDepartments.length === 0) {
+      message.warning('請先選取部門');
+
+      return;
+    }
+
+    try {
+      const results = await Promise.all(checkedDepartments.map((depId) => deleteDepartment(depId)));
+
+      const successCount = results.filter((res) => res).length;
+
+      if (successCount > 0) {
+        message.success(`成功刪除 ${successCount} 筆部門`);
+      } else {
+        message.warning('選取的部門已不存在或已被刪除');
+      }
+
+      setIsDeleteModalOpen(false);
+      setCheckedDepartments([]);
+      await fetchDepartment(searchInput, currentPage);
+    } catch (err: any) {
+      message.error(err.message || '刪除失敗，請稍後再試');
+    }
+  };
+
+  //勾選
+  const [checkedDepartments, setCheckedDepartments] = useState<string[]>([]);
+
+  // 勾選單一部門
+  const handleCheck = (depId: string) => {
+    setCheckedDepartments(
+      (prev) =>
+        prev.includes(depId)
+          ? prev.filter((id) => id !== depId) // 取消勾選
+          : [...prev, depId] // 加入勾選
+    );
+  };
+
+  // 全選/全不選
+  const handleSelectAll = () => {
+    if (checkedDepartments.length === department.length) {
+      setCheckedDepartments([]); // 全不選
+    } else {
+      setCheckedDepartments(department.map((d) => d.key)); // 全選
     }
   };
 
@@ -156,17 +271,26 @@ export default function Departmentdata() {
       <div className="border border-[#616161] rounded-md px-6 py-8 ">
         <div className="flex justify-between mb-6">
           <div className="flex gap-4">
-            <Input
-              label="搜索欄"
-              value={searchInput}
-              onChange={setSearchInput}
-              labelWidth="w-[27%]"
-              placeholder="請輸入代號/部門"
-            />
-            <SearchButton onClick={() => fetchDepartment(searchInput)} className="h-[40px]" />
+            <DataEntry_fong className="w-[137px]">
+              <Input
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="請輸入代號/部門"
+              ></Input>
+            </DataEntry_fong>
+            <Btn theme="query" onClick={() => fetchDepartment(searchInput)}>
+              搜尋資料
+            </Btn>
           </div>
-          <div>
-            <AddButton onClick={() => setIsModalOpen(true)} label="新增部門" className="h-[40px]" />
+          <div className="flex gap-4">
+            {checkedDepartments.length > 0 && (
+              <Btn theme="trash" onClick={() => setIsDeleteModalOpen(true)}>
+                刪除
+              </Btn>
+            )}
+            <Btn theme="add" onClick={() => setIsModalOpen(true)}>
+              新增部門
+            </Btn>
           </div>
         </div>
         <DepartmentModal
@@ -175,7 +299,7 @@ export default function Departmentdata() {
           formState={formState}
           onFormChange={handleFormChange}
           onSave={handleSaveSubmit}
-          onCancel={() => setIsLeaveModalOpen(true)}
+          onCancel={() => setIsModalOpen(false)}
         />
         <LeaveModal
           isOpen={isLeaveModalOpen}
@@ -189,9 +313,18 @@ export default function Departmentdata() {
         <DeleteModal
           isOpen={isDeleteModalOpen}
           onCancel={() => setIsDeleteModalOpen(false)}
-          onConfirm={() => console.log('刪除')}
+          onConfirm={() => handleBatchDelete()}
         />
-        <DepartmentTable data={department} onEdit={handleEditDepartment} onDelete={() => setIsDeleteModalOpen(true)} />
+        <DepartmentTable
+          data={department}
+          onEdit={handleEditDepartment}
+          onDelete={handleDeleteOne}
+          onPageChange={handlePageChange}
+          total={total}
+          checkedDepartments={checkedDepartments}
+          onCheck={handleCheck}
+          onSelectAll={handleSelectAll}
+        />
       </div>
     </>
   );
