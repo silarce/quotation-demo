@@ -4,7 +4,7 @@ import { notification } from 'antd';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { axi_netCore } from '../_axiosCreator';
+import { axi_netCore } from '../axiosCreator';
 import { AxiosError } from 'axios';
 
 import type {

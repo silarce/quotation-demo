@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 
 import { createUseApi_array_infinite } from './apiClientHookCreator';
 import { createUseInfinite } from './createUseInfinite';

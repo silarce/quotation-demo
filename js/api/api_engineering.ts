@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 import { AxiosError } from 'axios';
 
 import { createUseInfinite } from './createUseInfinite';

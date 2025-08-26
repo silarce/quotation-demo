@@ -2,7 +2,7 @@ import { useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import dayjs from 'dayjs';
 
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 import { AxiosError } from 'axios';
 
 import type {

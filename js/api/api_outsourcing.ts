@@ -3,7 +3,7 @@ import { useState } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { Decimal } from 'decimal.js';
 
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 import { AxiosError } from 'axios';
 
 import { createUseInfinite } from './createUseInfinite';

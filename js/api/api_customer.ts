@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';

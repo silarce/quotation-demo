@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { axi, domain } from './_axiosCreator';
+import { axi } from './axiosCreator';
 
 import { useInView } from 'react-intersection-observer';
 
@@ -22,7 +22,7 @@ import {
   TmodifyLegacyContractDto,
 } from './dtoTypes';
 
-export { domain };
+const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export type Tparams = {
   order?: 'ASC' | 'DESC';
@@ -38,17 +38,6 @@ export type Tparams = {
 type TgetLegacyContracts = {
   data: TlegacyContractDto[];
   meta: TpageMetaDto;
-};
-
-export type {
-  TpaymentMethodDto,
-  TlegacyContractProductDto,
-  TlegacyContractAdditionDto,
-  TlegacyContractDto,
-  TcreateLegacyContractProductDto,
-  TcreateLegacyContractAdditionDto,
-  TcreateLegacyContractDto,
-  TupdateLegacyContractDto,
 };
 
 // =================================================================
@@ -364,3 +353,16 @@ export const useLegacyContract_infinite = ({ customParams }: { customParams?: Tp
     reset,
   };
 };
+
+export type {
+  TpaymentMethodDto,
+  TlegacyContractProductDto,
+  TlegacyContractAdditionDto,
+  TlegacyContractDto,
+  TcreateLegacyContractProductDto,
+  TcreateLegacyContractAdditionDto,
+  TcreateLegacyContractDto,
+  TupdateLegacyContractDto,
+};
+
+export { domain };

@@ -1,12 +1,11 @@
 import { useState } from 'react';
 
-import { axi, domain } from './_axiosCreator';
+import { axi } from './axiosCreator';
 
 // type
 import { TcompanyInfoDto, TupdateCompanyInfoDto } from './dtoTypes';
 
-export type { TcompanyInfoDto, TupdateCompanyInfoDto };
-export { domain };
+const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // =============================================
 // 取得公司資訊
@@ -72,3 +71,6 @@ export const apiDelCompanyLogo = () => {
     .then(({ data }) => data)
     .catch((err) => Promise.reject('公司LOGO移除失敗'));
 };
+
+export type { TcompanyInfoDto, TupdateCompanyInfoDto };
+export { domain };
