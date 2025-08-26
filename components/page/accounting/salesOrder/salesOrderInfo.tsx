@@ -88,7 +88,15 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         />
       </DataEntry_fong>
       {/*  */}
-      <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true} onClick={hancle_selectCustomer}>
+      <DataEntry_fong
+        caption="客戶編號"
+        className="col-span-2"
+        isMust={true}
+        childrenWrapperProps={{
+          className: 'cursor-pointer',
+          onClick: hancle_selectCustomer,
+        }}
+      >
         {state_salesOrder.customerNumber}
       </DataEntry_fong>
 

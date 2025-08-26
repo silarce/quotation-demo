@@ -303,6 +303,7 @@ export default function SalesOrder() {
               foreignTotal,
               exchangeRate,
               customerName,
+              customerNumber,
             } = quotation;
 
             instance_salesOrder.setState((prev) => ({
@@ -310,14 +311,14 @@ export default function SalesOrder() {
               quotationNumber,
               quotationContractNumber: contractNumber || '',
               constructionSite: projectName || '',
-              customerNumber: '',
+
               customerName: customerName || '',
               salesAmount: `${subTotal || ''}`,
               taxes: `${salesTax || ''}`,
               totalAmount: `${total || ''}`,
+              customerNumber,
               sourceType: '',
-              客戶聯絡電話1: '',
-              客戶聯絡電話2: '',
+
               address: '',
               invoiceType: '',
               taxId: '',
