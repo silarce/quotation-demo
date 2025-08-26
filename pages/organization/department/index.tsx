@@ -51,21 +51,29 @@ export default function Departmentdata() {
 
   // 取得部門資料，支援模糊查詢
   const fetchDepartment = async (searchInput = '', pageIndex = 1, pageSize = 10) => {
-    const res = await getDepartment(searchInput, pageIndex, pageSize);
-    const rawData = res.data;
+    try {
+      const res = await getDepartment(searchInput, pageIndex, pageSize);
 
-    const formattedData: DetailItem[] = rawData.map((item: any) => ({
-      key: item.depId,
-      depCode: item.depCode ? item.depCode.substring(0, 5) : '', // 只取前 5 個字
-      depChName: item.depChName,
-      depEnName: item.depEnName || '未命名英文名稱',
-      description: item.description,
-      isInvalid: item.isInvalid,
-    }));
+      // 一定有 data（至少是 []）
+      const rawData = res.data ?? [];
 
-    setDepartment(formattedData);
-    setTotal(res.totalCount); //後端回傳總數
-    setCurrentPage(pageIndex);
+      const formattedData: DetailItem[] = rawData.map((item: any) => ({
+        key: item.depId,
+        depCode: item.depCode ? item.depCode.substring(0, 5) : '', // 只取前 5 個字
+        depChName: item.depChName,
+        depEnName: item.depEnName || '未命名英文名稱',
+        description: item.description,
+        isInvalid: item.isInvalid,
+      }));
+
+      setDepartment(formattedData);
+      setTotal(res.totalCount ?? 0);
+      setCurrentPage(pageIndex);
+    } catch (error) {
+      console.error('取得部門資料失敗:', error);
+      setDepartment([]);
+      setTotal(0);
+    }
   };
 
   // Table 換頁事件
@@ -107,28 +115,40 @@ export default function Departmentdata() {
 
   // 點擊儲存按鈕時的邏輯（依 editId 決定新增或編輯）
   const handleSaveSubmit = async () => {
-    try {
-      if (!formState.depCode || !formState.depChName || !formState.depEnName) {
-        message.error('部門代號、部門名稱、部門英文名稱為必填');
+    // 1. 前端必填驗證
+    if (!formState.depCode || !formState.depChName || !formState.depEnName) {
+      message.error('部門代號、部門名稱、部門英文名稱為必填');
 
-        return;
-      }
-
-      if (editId) {
-        await handleSaveDepartment();
-
-        return;
-      }
-
-      await createDepartment(formState); // 如果失敗這裡會進 catch
-      message.success('新增成功');
-      resetForm();
-      setIsModalOpen(false); //只在成功時關閉
-      fetchDepartment();
-    } catch (err: any) {
-      // 不會再看到 AxiosError，而是 Error("新增失敗") 或後端回的訊息
-      message.error(err.message);
+      return;
     }
+
+    // 2. 編輯模式
+    if (editId) {
+      const result = await handleSaveDepartment();
+
+      if (result) {
+        message.success('更新成功');
+        resetForm();
+        setIsModalOpen(false);
+        fetchDepartment();
+      }
+
+      return;
+    }
+
+    // 3. 新增模式
+    const result = await createDepartment(formState);
+
+    if (!result) {
+      // 失敗時不做任何事，錯誤訊息攔截器已經顯示
+      return;
+    }
+
+    // 成功才會執行這裡
+    message.success('新增成功');
+    resetForm();
+    setIsModalOpen(false);
+    fetchDepartment();
   };
 
   // 清空表單欄位
@@ -159,30 +179,61 @@ export default function Departmentdata() {
         is_invalid: false, // 若之後有啟用/停用控制，可改從 state 拿
       };
 
-      await updateDepartment(editId!, payload);
+      const res = await updateDepartment(editId!, payload);
 
+      if (!res) {
+        return null; // 攔截器可能已經顯示錯誤，這裡直接回 null
+      }
+
+      // 更新成功，執行後續 UI 處理
       await fetchDepartment(); // 更新表格資料
       setIsModalOpen(false); // 關閉 Modal
       resetForm(); // 清空欄位
       setEditId(null); // 清除編輯狀態
+
+      return res; // 成功回傳資料
     } catch (err) {
       console.error('儲存失敗:', err);
+
+      return null; // 發生例外回傳 null
     }
   };
 
-  //刪除部門
-  const handleBatchDelete = async () => {
-    const validIds = checkedDepartments.filter((id) => department.some((dep) => dep.key === id));
+  // 單筆刪除
+  const handleDeleteOne = async (depId: string) => {
+    try {
+      const result = await deleteDepartment(depId);
 
-    if (validIds.length === 0) {
-      message.warning('選取的部門已不存在或已被刪除');
+      if (!result) {
+        return;
+      }
+
+      message.success('刪除成功');
+      await fetchDepartment(searchInput, currentPage);
+    } catch (err: any) {
+      message.error(err.message || '刪除失敗，請稍後再試');
+    }
+  };
+
+  //勾選刪除部門
+  const handleBatchDelete = async () => {
+    if (checkedDepartments.length === 0) {
+      message.warning('請先選取部門');
 
       return;
     }
 
     try {
-      await Promise.all(validIds.map((depId) => deleteDepartment(depId)));
-      message.success('刪除成功');
+      const results = await Promise.all(checkedDepartments.map((depId) => deleteDepartment(depId)));
+
+      const successCount = results.filter((res) => res).length;
+
+      if (successCount > 0) {
+        message.success(`成功刪除 ${successCount} 筆部門`);
+      } else {
+        message.warning('選取的部門已不存在或已被刪除');
+      }
+
       setIsDeleteModalOpen(false);
       setCheckedDepartments([]);
       await fetchDepartment(searchInput, currentPage);
@@ -267,7 +318,7 @@ export default function Departmentdata() {
         <DepartmentTable
           data={department}
           onEdit={handleEditDepartment}
-          onDelete={() => setIsDeleteModalOpen(true)}
+          onDelete={handleDeleteOne}
           onPageChange={handlePageChange}
           total={total}
           checkedDepartments={checkedDepartments}
