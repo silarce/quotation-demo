@@ -1,15 +1,25 @@
 export interface DetailItem {
   key: string;
-  dep_code: string;
-  dep_ch_name: string;
-  dep_en_name: string;
+  depId: string;
+  comId: string;
+  parentId: string;
+  depCode: string;
+  depChName: string;
+  depEnName: string;
   description: string;
-  is_invalid: boolean;
+  createdBy: string;
+  createdAt: string;
+  updatedBy: string;
+  updatedAt: string;
+  deletedBy: string;
+  deletedAt: string;
+  isInvalid: boolean;
 }
 
-export type formState = {
-  dep_code: string;
-  dep_ch_name: string;
-  dep_en_name: string;
+export type CreateDepFormState = {
+  depCode: string;
+  depChName: string;
+  depEnName: string;
   description: string;
+  isEnabled: boolean;
 };
