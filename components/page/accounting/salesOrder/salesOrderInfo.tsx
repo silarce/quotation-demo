@@ -17,7 +17,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
 
   const { options: options_invoiceType } = useApiGetDropDown('InvoiceType');
   const { options: options_salesOrderType } = useApiGetDropDown('sales_order_type');
-  const { options: options_taxCategory } = useApiGetDropDown('RetainageTaxCategory');
+  const { options: options_taxCategory } = useApiGetDropDown('tax_category');
 
   const hancle_selectCustomer = () => {
     const { destroy } = selector_customer({
