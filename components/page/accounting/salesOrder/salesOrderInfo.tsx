@@ -33,7 +33,6 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
 
           const {
             id,
-            contacts,
             customerNumber,
             name,
             address,
@@ -43,18 +42,12 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
             fax,
           } = customer;
 
-          const [c1, c2] = contacts ?? [];
-          const phone1 = c1?.phone ?? '';
-          const phone2 = c2?.phone ?? '';
-
           return {
             ...copy,
             customerId: id,
             customerNumber,
             customerName: name,
             address,
-            客戶聯絡電話1: phone1,
-            客戶聯絡電話2: phone2,
             taxId,
             companyPhone: phone,
             companyFax: fax,
@@ -71,7 +64,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
   return (
     <div className="grid grid-cols-4 gap-fong">
       {/*  */}
-      <DataEntry_fong caption="類別" className="" isMust={true}>
+      <DataEntry_fong caption="類別" isMust={true}>
         <Select
           options={options_salesOrderType}
           value={state_salesOrder.sourceType}
@@ -79,8 +72,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         />
       </DataEntry_fong>
 
-      <DataEntry_fong caption="合約編號" className="">
-        {/* {state_salesOrder.quotationContractNumber || '請匯入合約'} */}
+      <DataEntry_fong caption="合約編號">
         <Input
           value={state_salesOrder.quotationContractNumber}
           onChange={(e) => {
@@ -96,7 +88,15 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         />
       </DataEntry_fong>
       {/*  */}
-      <DataEntry_fong caption="客戶編號" className="col-span-2" isMust={true} onClick={hancle_selectCustomer}>
+      <DataEntry_fong
+        caption="客戶編號"
+        className="col-span-2"
+        isMust={true}
+        childrenWrapperProps={{
+          className: 'cursor-pointer',
+          onClick: hancle_selectCustomer,
+        }}
+      >
         {state_salesOrder.customerNumber}
       </DataEntry_fong>
 
@@ -109,16 +109,16 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         {state_salesOrder.address}
       </DataEntry_fong>
 
-      <DataEntry_fong caption="客戶聯絡電話1 no get no post" className="">
+      <DataEntry_fong caption="客戶聯絡電話">
         <Input
-          value={state_salesOrder.客戶聯絡電話1}
-          onChange={(e) => setState_salesOrder({ ...state_salesOrder, 客戶聯絡電話1: e.target.value })}
+          value={state_salesOrder.companyPhone}
+          onChange={(e) => setState_salesOrder({ ...state_salesOrder, companyPhone: e.target.value })}
         />
       </DataEntry_fong>
-      <DataEntry_fong caption="客戶聯絡電話2 no get no post" className="">
+      <DataEntry_fong caption="傳真">
         <Input
-          value={state_salesOrder.客戶聯絡電話2}
-          onChange={(e) => setState_salesOrder({ ...state_salesOrder, 客戶聯絡電話2: e.target.value })}
+          value={state_salesOrder.companyFax}
+          onChange={(e) => setState_salesOrder({ ...state_salesOrder, companyFax: e.target.value })}
         />
       </DataEntry_fong>
 
@@ -128,7 +128,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         {state_salesOrder.taxId}
       </DataEntry_fong>
 
-      <DataEntry_fong caption="發票類型" className="">
+      <DataEntry_fong caption="發票類型">
         <Select
           options={options_invoiceType}
           value={state_salesOrder.invoiceType}
@@ -139,21 +139,21 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
       <div />
 
       {/*  */}
-      <DataEntry_fong caption="幣別" className="" isMust={true}>
+      <DataEntry_fong caption="幣別" isMust={true}>
         <Select
           options={options_currency}
           value={state_salesOrder.salesCurrency}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, salesCurrency: e as string })}
         />
       </DataEntry_fong>
-      <DataEntry_fong caption="匯率" className="">
+      <DataEntry_fong caption="匯率">
         <Input
           type="number"
           value={state_salesOrder.exchangeRate}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, exchangeRate: e.target.value as `${number}` })}
         />
       </DataEntry_fong>
-      <DataEntry_fong caption="外幣金額" className="">
+      <DataEntry_fong caption="外幣金額">
         <Input_money
           value={state_salesOrder.currencyAmount}
           onChange={(e) => setState_salesOrder({ ...state_salesOrder, currencyAmount: e.target.value as `${number}` })}
@@ -171,7 +171,7 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         />
       </DataEntry_fong>
 
-      <DataEntry_fong caption="稅別" className="" isMust={true}>
+      <DataEntry_fong caption="稅別" isMust={true}>
         <Select
           options={options_taxCategory}
           value={state_salesOrder.taxDeductionCategory}
