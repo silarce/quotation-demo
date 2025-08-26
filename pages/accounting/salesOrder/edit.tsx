@@ -76,8 +76,6 @@ export default function SalesOrder() {
       taxes,
       totalAmount,
       sourceType: 類別,
-      客戶聯絡電話1,
-      客戶聯絡電話2,
       address,
       invoiceType,
       taxId,

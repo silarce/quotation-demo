@@ -20,9 +20,6 @@ interface Tstate {
 
   sourceType: string | null;
 
-  客戶聯絡電話1: string;
-  客戶聯絡電話2: string;
-
   invoiceType: string | null;
   taxId: string;
   taxDeductionCategory: string | null; // 稅別
@@ -59,8 +56,6 @@ const emptyState = (): Tstate => {
     currencyAmount: '',
 
     sourceType: null,
-    客戶聯絡電話1: '',
-    客戶聯絡電話2: '',
   };
 };
 
@@ -119,8 +114,6 @@ const useDefaultState = (raw: TsalesOrder_Dto | undefined | null) => {
       taxes: `${taxes || ''}`,
       totalAmount: `${totalAmount || ''}`,
       sourceType,
-      客戶聯絡電話1: '',
-      客戶聯絡電話2: '',
       invoiceType,
       taxId: taxId || '',
       taxDeductionCategory,
