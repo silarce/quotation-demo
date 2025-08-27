@@ -6,6 +6,7 @@ interface TsalesOrder_simple_Dto {
   updatedBy: string | null;
 
   salesOrderNumber: string;
+  accountsReceivableId: string | null;
 
   status: number; //狀態
   sourceType: string; //來源類型
