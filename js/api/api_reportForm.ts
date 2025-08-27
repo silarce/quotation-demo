@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useInView } from 'react-intersection-observer';
 // import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import { axi, domain } from './_axiosCreator';
-import { createUseInfinite } from './createUseInfinite';
+import { axi } from './axiosCreator';
 import { AxiosError } from 'axios';
 
 // type

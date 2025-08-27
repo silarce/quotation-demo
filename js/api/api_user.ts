@@ -1,4 +1,4 @@
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 
 // type
 import { TUserPasswordDto } from './dtoTypes';

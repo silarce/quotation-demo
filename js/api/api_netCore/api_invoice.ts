@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { axi_monkey } from '../_axiosCreator';
+import { axi_monkey } from '../axiosCreator';
 
 import type { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';

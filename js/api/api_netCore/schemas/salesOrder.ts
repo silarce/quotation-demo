@@ -6,6 +6,7 @@ interface TsalesOrder_simple_Dto {
   updatedBy: string | null;
 
   salesOrderNumber: string;
+  accountsReceivableId: string | null;
 
   status: number; //狀態
   sourceType: string; //來源類型
@@ -50,4 +51,14 @@ interface TproductView_Dto {
   price: number; // 單價 (decimal)
 }
 
-export type { TsalesOrder_simple_Dto, TproductView_Dto };
+interface TgetCustomerList_Dto {
+  id: string;
+  customerNumber: string;
+  name: string;
+  taxId: string;
+  phone: string;
+  fax: string;
+  address: string;
+}
+
+export type { TsalesOrder_simple_Dto, TproductView_Dto, TgetCustomerList_Dto };

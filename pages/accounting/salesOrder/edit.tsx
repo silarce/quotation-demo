@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import { Spin } from 'antd';
@@ -8,6 +9,7 @@ import { modal_empty } from 'components/global/gear/modal/fongModal';
 import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
 import SalesOrderInfo from 'components/page/accounting/salesOrder/salesOrderInfo';
 import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
+import { modal_leave } from 'components/global/gear/modal/fongModal';
 
 import {
   useApiGetSalesOrderById,
@@ -17,8 +19,8 @@ import {
   apiPatchSalesOrderData,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
-import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 import { useSalesOrder } from 'components/page/accounting/salesOrder/hook/useSalesOrder';
+import { useSalesOrderItemArr } from 'components/page/accounting/salesOrder/hook/useSalesOrderItemArr';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
@@ -44,72 +46,12 @@ export default function SalesOrder() {
     data: salesOrderData,
     isFetching: isFetchingSalesOrder,
     update: updateSalesOrder,
+    req_salesOrderToAccountsReceivables,
   } = useApiGetSalesOrderById(query.id);
 
   const instance_salesOrder = useSalesOrder(salesOrderData);
 
   const instance_salesOrderItemArr = useSalesOrderItemArr(salesOrderData?.salesOrderItems);
-
-  // ---------------------------------------------------------------------------
-
-  const handle_importContract = () => {
-    const { destroy } = modal_empty({
-      width: 'fit-content',
-      content: (
-        <Selector_quotation
-          onCancel={() => {
-            destroy();
-          }}
-          onConfirm={([quotation]) => {
-            if (!quotation) {
-              destroy();
-
-              return;
-            }
-
-            const {
-              quotationNumber,
-              contractNumber,
-              projectName,
-              subTotal,
-              salesTax,
-              total,
-              currency,
-              foreignTotal,
-              exchangeRate,
-              customerName,
-            } = quotation;
-
-            instance_salesOrder.setState((prev) => ({
-              ...prev,
-              quotationNumber,
-              quotationContractNumber: contractNumber || '',
-              constructionSite: projectName || '',
-              customerNumber: '',
-              customerName: customerName || '',
-              salesAmount: `${subTotal || ''}`,
-              taxes: `${salesTax || ''}`,
-              totalAmount: `${total || ''}`,
-              sourceType: '',
-              客戶聯絡電話1: '',
-              客戶聯絡電話2: '',
-              address: '',
-              invoiceType: '',
-              taxId: '',
-              taxDeductionCategory: '',
-              salesCurrency: currency,
-              exchangeRate: `${exchangeRate || ''}`,
-              currencyAmount: `${foreignTotal || ''}`,
-            }));
-
-            destroy();
-
-            //
-          }}
-        />
-      ),
-    });
-  };
 
   // ---------------------------------------------------------------------------
 
@@ -133,8 +75,6 @@ export default function SalesOrder() {
       taxes,
       totalAmount,
       sourceType: 類別,
-      客戶聯絡電話1,
-      客戶聯絡電話2,
       address,
       invoiceType,
       taxId,
@@ -151,11 +91,12 @@ export default function SalesOrder() {
     !userIdNumber && errorMessage.push('User idNumber is undefined');
     !sourceType && errorMessage.push('請選擇類別');
     !salesCurrency && errorMessage.push('請選擇幣別');
-    !exchangeRate && errorMessage.push('請輸入匯率');
-    !currencyAmount && errorMessage.push('請輸入外幣金額');
+    // !exchangeRate && errorMessage.push('請輸入匯率');
+    // !currencyAmount && errorMessage.push('請輸入外幣金額');
     !salesAmount && errorMessage.push('請輸入銷貨金額');
     !taxes && errorMessage.push('請輸入稅額');
     !totalAmount && errorMessage.push('請輸入銷售總總額');
+    !state_salesOrderItemArr.length && errorMessage.push('請新增銷貨明細');
 
     if (errorMessage.length) {
       myAlert.err({
@@ -292,6 +233,9 @@ export default function SalesOrder() {
       if (body) {
         try {
           const id = await apiPostSalesOrderData(body);
+          myAlert.success({
+            title: '銷貨單已新增',
+          });
           router.replace({
             query: {
               ...query,
@@ -307,16 +251,112 @@ export default function SalesOrder() {
         try {
           await apiPatchSalesOrderData(body);
           await updateSalesOrder();
+          myAlert.success({
+            title: '銷貨單已更新',
+          });
         } catch (error) {}
       }
     }
   };
 
+  const handle_salesOrderToAccountsReceivables = async () => {
+    if (!salesOrderData?.id) {
+      return;
+    }
+
+    myAlert.confirm({
+      title: '確認銷貨單轉應收款？',
+      props: {
+        onOk: async () => {
+          await req_salesOrderToAccountsReceivables();
+        },
+      },
+    });
+  };
+
   // ---------------------------------------------------------------------------
+
+  const handle_importContract = () => {
+    const { destroy } = modal_empty({
+      width: 'fit-content',
+      content: (
+        <Selector_quotation
+          onCancel={() => {
+            destroy();
+          }}
+          onConfirm={([quotation]) => {
+            if (!quotation) {
+              destroy();
+
+              return;
+            }
+
+            const {
+              quotationNumber,
+              contractNumber,
+              projectName,
+              subTotal,
+              salesTax,
+              total,
+              currency,
+              foreignTotal,
+              exchangeRate,
+              customerName,
+              customerNumber,
+              customerId,
+            } = quotation;
+
+            instance_salesOrder.setState((prev) => ({
+              ...prev,
+              quotationNumber,
+              quotationContractNumber: contractNumber || '',
+              constructionSite: projectName || '',
+
+              customerId,
+              customerName: customerName || '',
+              salesAmount: `${subTotal || ''}`,
+              taxes: `${salesTax || ''}`,
+              totalAmount: `${total || ''}`,
+              customerNumber,
+              sourceType: '',
+
+              address: '',
+              invoiceType: '',
+              taxId: '',
+              taxDeductionCategory: '',
+              salesCurrency: currency,
+              exchangeRate: `${exchangeRate || ''}`,
+              currencyAmount: `${foreignTotal || ''}`,
+            }));
+
+            destroy();
+
+            //
+          }}
+        />
+      ),
+    });
+  };
+
+  const handle_reset = () => {
+    modal_leave({
+      title: '確認重置嗎？',
+      onConfirm: () => {
+        instance_salesOrder.reset();
+        instance_salesOrderItemArr.reset();
+      },
+    });
+  };
 
   const handle_save = () => {
     req_postOrPatch();
   };
+
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    instance_salesOrder.setAmount(instance_salesOrderItemArr.totalAmount);
+  }, [instance_salesOrderItemArr.totalAmount, instance_salesOrder.state.taxDeductionCategory]);
 
   // ---------------------------------------------------------------------------
 
@@ -326,10 +366,14 @@ export default function SalesOrder() {
       <div className="pageTop flex justify-between items-center">
         <div className="text-xl font-semibold">銷貨單</div>
         <div className="flex gap-3">
+          {!salesOrderData?.accountsReceivableId && salesOrderData?.id && (
+            <Btn onClick={handle_salesOrderToAccountsReceivables}>銷貨單轉應收款</Btn>
+          )}
+
           <Btn theme="import" onClick={handle_importContract}>
             合約匯入
           </Btn>
-          <Btn themeColor="red_I" onClick={instance_salesOrder.reset}>
+          <Btn themeColor="red_I" onClick={handle_reset}>
             重置
           </Btn>
           <Btn theme="save" onClick={handle_save}>

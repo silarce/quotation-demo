@@ -4,9 +4,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import _ from 'lodash';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import Decimal from 'decimal.js';
 
-import { axi, domain } from './_axiosCreator';
+import { axi } from './axiosCreator';
 import { createUseInfinite } from './createUseInfinite';
 import { AxiosError } from 'axios';
 
@@ -30,15 +29,15 @@ import type {
   TquotationAccouting,
   TquotationAccouting_years,
   TquotationAccouting_area,
-  TquotationAccounting_personal_content,
   TcontractAccountingReportFormDto,
   TquotationAccounting_modifyContract,
   TquotationStatus,
-  TbonusDto,
   TcopyQuotationDto,
 } from './dtoTypes';
 
 import type { TworksheetDto_addition } from 'js/api/api_engineering';
+
+const domain = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 type TquotationContractDto_addition = TquotationContractDto & {
   worksheet?: TworksheetDto_addition[] | undefined;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
-import { axi } from './_axiosCreator';
-import { AxiosError } from './_axiosCreator';
+import { axi } from './axiosCreator';
+import { AxiosError } from 'axios';
 
 import { createUseInfinite } from './createUseInfinite';
 

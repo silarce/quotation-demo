@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 
 import _ from 'lodash';
 

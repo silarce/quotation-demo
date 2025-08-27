@@ -4,9 +4,7 @@ import Image from 'next/image';
 import scss from './AddRoleTable.module.scss';
 
 //components
-import SaveButton from 'components/global/myCom/button/SaveButton';
-import AddButton from 'components/global/myCom/button/AddButton';
-import ClearButton from 'components/global/myCom/button/clearButton';
+import Btn from 'components/global/gear/button/btn_fong';
 
 //type
 import { AddRoleType, UpdateRole } from './schema/system';
@@ -117,11 +115,17 @@ const RoleForm: React.FC<RoleFormProps> = ({
 
       <div className="flex justify-end my-[32px] gap-4 h-[40px]">
         {editingRole ? (
-          <SaveButton label="儲存資料" onClick={handleSubmit} />
+          <Btn theme="save" onClick={handleSubmit}>
+            儲存資料
+          </Btn>
         ) : (
-          <AddButton label="新增角色" onClick={handleSubmit} />
+          <Btn theme="add" onClick={handleSubmit}>
+            新增角色
+          </Btn>
         )}
-        <ClearButton onClick={onCancel} label="清除" />
+        <Btn theme="trash" onClick={onCancel}>
+          清除
+        </Btn>
       </div>
     </div>
   );

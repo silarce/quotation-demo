@@ -89,8 +89,10 @@ interface TquotationListViewModel_Dto {
   agentEmployeeId: string | null; // 承辦人員id
   reviewSalesEmployeeId: string | null; // 審核業務人員id
 
-  customerId: string | null; // 客戶id
+  customerId: string; // 客戶id
+  customerNumber: string; // 客戶編號
   customerName: string | null; // 客戶名稱
+
   contactPerson: string; // 聯絡人
   contactNumber: string; // 聯絡人電話
 

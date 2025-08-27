@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 
 // type
 import { TpageMetaDto, TerpFeatureDto } from './dtoTypes';

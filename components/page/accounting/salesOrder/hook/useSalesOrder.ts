@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import Decimal from 'decimal.js';
 
 import { TsalesOrder_Dto } from 'js/api/api_netCore/api_accountsReceivable';
 
@@ -19,9 +20,6 @@ interface Tstate {
   totalAmount: `${number}` | ''; //總金額
 
   sourceType: string | null;
-
-  客戶聯絡電話1: string;
-  客戶聯絡電話2: string;
 
   invoiceType: string | null;
   taxId: string;
@@ -59,8 +57,6 @@ const emptyState = (): Tstate => {
     currencyAmount: '',
 
     sourceType: null,
-    客戶聯絡電話1: '',
-    客戶聯絡電話2: '',
   };
 };
 
@@ -119,8 +115,6 @@ const useDefaultState = (raw: TsalesOrder_Dto | undefined | null) => {
       taxes: `${taxes || ''}`,
       totalAmount: `${totalAmount || ''}`,
       sourceType,
-      客戶聯絡電話1: '',
-      客戶聯絡電話2: '',
       invoiceType,
       taxId: taxId || '',
       taxDeductionCategory,
@@ -138,6 +132,72 @@ const useSalesOrder = (raw: TsalesOrder_Dto | undefined | null) => {
 
   const [state, setState] = useState<Tstate>(defaultState);
 
+  const setAmount = (itemTotalAmount: number) => {
+    switch (state.taxDeductionCategory) {
+      case '免稅':
+        {
+          setState((prev) => {
+            return {
+              ...prev,
+              salesAmount: `${itemTotalAmount}`,
+              taxes: '0',
+              totalAmount: `${itemTotalAmount}`,
+            };
+          });
+        }
+
+        break;
+      case '應稅外加':
+        {
+          const taxes = new Decimal(itemTotalAmount).mul(0.05).toDecimalPlaces(0);
+          const totalAmount = new Decimal(itemTotalAmount).add(taxes).toDecimalPlaces(0);
+
+          setState((prev) => {
+            return {
+              ...prev,
+              salesAmount: `${itemTotalAmount}`,
+              taxes: `${taxes.toNumber()}`,
+              totalAmount: `${totalAmount.toNumber()}`,
+            };
+          });
+        }
+
+        break;
+
+      case '應稅內含':
+        {
+          const totalAmount = new Decimal(itemTotalAmount);
+          const salesAmount = totalAmount.div(1.05).toDecimalPlaces(0);
+          const taxes = totalAmount.sub(salesAmount).toDecimalPlaces(0);
+
+          setState((prev) => {
+            return {
+              ...prev,
+              salesAmount: `${salesAmount.toNumber()}`,
+              taxes: `${taxes.toNumber()}`,
+              totalAmount: `${itemTotalAmount}`,
+            };
+          });
+        }
+
+        break;
+
+      default:
+        {
+          setState((prev) => {
+            return {
+              ...prev,
+              salesAmount: '0',
+              taxes: '0',
+              totalAmount: '0',
+            };
+          });
+        }
+
+        break;
+    }
+  };
+
   const reset = () => {
     setState(defaultState);
   };
@@ -149,6 +209,7 @@ const useSalesOrder = (raw: TsalesOrder_Dto | undefined | null) => {
   return {
     state,
     setState,
+    setAmount,
     reset,
   };
 };

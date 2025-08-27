@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 
-import { axi_monkey } from '../_axiosCreator';
+import { axi_monkey } from '../axiosCreator';
 
 import type { AxiosError } from 'axios';
 
@@ -12,7 +12,8 @@ type TdropDownParams =
   | 'RetainageTaxCategory' // 保留款稅別
   | 'InvoiceType' //發票類型
   | 'IncomeType' // 收入類別
-  | 'deduction_type'; // 扣款類別
+  | 'deduction_type' // 扣款類別
+  | 'tax_category'; // 稅別
 
 const apiGetDropDown = async (ddtype: TdropDownParams) => {
   const api = '/api/CommonControllers/GetDropDownDate';

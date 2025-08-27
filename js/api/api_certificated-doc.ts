@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { axi } from './_axiosCreator';
+import { axi } from './axiosCreator';
 import { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 

@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { notification } from 'antd';
 
-import { axi_netCore } from '../_axiosCreator';
+import { axi_netCore } from '../axiosCreator';
 import { AxiosError } from 'axios';
 
 import { TemployeeDto, apiGetEmployee_id } from '../api_employee';

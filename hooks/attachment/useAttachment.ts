@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { nanoid } from 'nanoid';
-import { axi } from 'js/api/_axiosCreator';
+import { axi } from 'js/api/axiosCreator';
 
 import { createFileUrl } from 'js/api/api_file';
 import { TfileDto } from 'js/api/dtoTypes';
