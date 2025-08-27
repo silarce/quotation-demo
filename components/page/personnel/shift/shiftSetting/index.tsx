@@ -259,7 +259,7 @@ export default function ShiftSetting() {
       }));
       setData(mapped);
     } catch (err) {
-      message.error('班別資料獲取失敗');
+      return;
     } finally {
       setLoading(false);
     }
@@ -273,6 +273,10 @@ export default function ShiftSetting() {
     const fetchOptions = async () => {
       try {
         const res = await getShiftDataSource();
+
+        if (!res) {
+          return;
+        }
 
         res.data.forEach((item: any) => {
           if (item.paramCode === 'HOURS') {

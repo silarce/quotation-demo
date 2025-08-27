@@ -27,6 +27,13 @@ instance.interceptors.response.use(
   (response: any) => {
     const { status, data } = response;
 
+    // 如果完全沒回傳資料
+    if (data === null || data === undefined) {
+      message.error('API 回傳空資料');
+
+      return Promise.reject('API 回傳空資料');
+    }
+
     // 400~499 狀況
     if (status >= 400 && status < 500) {
       const errorMsg =
@@ -34,7 +41,7 @@ instance.interceptors.response.use(
 
       message.error('API錯誤: ' + errorMsg);
 
-      return null;
+      return Promise.reject(errorMsg);
     }
 
     // 業務邏輯失敗 (returnCode !== 0)
@@ -42,7 +49,7 @@ instance.interceptors.response.use(
       const errorMsg = data.returnMessage || '操作失敗';
       message.error(errorMsg);
 
-      return null;
+      return Promise.reject(errorMsg);
     }
 
     return response;
@@ -56,7 +63,7 @@ instance.interceptors.response.use(
 
     message.error(errorMsg);
 
-    return null;
+    return Promise.reject(errorMsg);
   }
 );
 

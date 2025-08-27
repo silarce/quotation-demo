@@ -1,5 +1,6 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_FARM_URL;
-import axios from 'axios';
+import { message } from 'antd';
+import axios from 'js/api/axiosCreator/axiosInstance';
 
 const getAuthHeader = () => {
   if (typeof window === 'undefined') {
@@ -98,7 +99,7 @@ export const getShiftAssignments = async (params: ShiftQueryParams): Promise<Shi
   const res = await axios.get(`${BASE_URL}/api/att/shiftassignment/Query`, {
     params,
     headers: {
-      ...getAuthHeader(),
+      // ...getAuthHeader(),
     },
   });
 
@@ -127,11 +128,17 @@ export async function getShiftDataSource() {
       },
     });
 
+    if (!res) {
+      message.error('API 回傳為 null');
+
+      return null;
+    }
+
     return res.data;
   } catch (error) {
     console.error('取得下拉選單資料失敗:', error);
 
-    throw error;
+    return null;
   }
 }
 
