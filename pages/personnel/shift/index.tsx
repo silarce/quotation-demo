@@ -5,7 +5,7 @@ import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 import ShiftSetting from 'components/page/personnel/shift/shiftSetting/index';
 import AddStaff from 'components/page/personnel/shift/addStaff';
 import SetHoliday from 'components/page/personnel/shift/setholiday';
-import MonthlySchedule from 'components/page/personnel/shift/monthlySchedule';
+import MonthlySchedule from './monthlySchedule';
 
 type TabKey = 'shiftSetting' | 'addStaff' | 'setHoliday' | 'monthlySchedule';
 
