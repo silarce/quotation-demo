@@ -21,26 +21,37 @@ import scss from './index.module.scss';
 export default function AccountsReceivableInquiry() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { keyword, createdAt, page } = router.query as Tquery;
+  const { keyword, page } = router.query as Tquery;
 
   const apiParam = useMemo(() => {
     return {
       filter: keyword,
       page: Number(page) || 1,
     };
-  }, [keyword, createdAt, page]);
+  }, [keyword, page]);
 
   const { data: accountsReceivablesArr, meta, isFetching } = useApiGetAccountsReceivablesList(apiParam);
 
-  const handel_search = ({ keyword, createdAt }: { keyword?: string; createdAt?: Dayjs }) => {
+  const isKeywordIsDate = !!keyword && dayjs(keyword).isValid();
+  const defaultSearchValue = isKeywordIsDate ? getTaiwanDateStr(keyword) : keyword;
+  // ---------------------------------------------------------------------------
+
+  const handel_search = ({ keyword }: { keyword?: string }) => {
+    const isKeywordIsDate = !!keyword && dayjs(keyword).isValid();
+
+    if (isKeywordIsDate) {
+      keyword = dayjs(keyword).add(1911, 'year').format('YYYY-MM-DD');
+    }
+
     router.replace({
       query: {
         ...query,
-        keyword: keyword ?? undefined,
-        createdAt: createdAt ? createdAt.toISOString() : undefined,
+        keyword: keyword,
       },
     });
   };
+
+  // MARK: RENDER
 
   return (
     <div>
@@ -54,19 +65,10 @@ export default function AccountsReceivableInquiry() {
                 className: scss.input,
               }}
             >
-              <Input placeholder="輸入合約編號 / 客戶姓名 / 案場名稱" defaultValue={keyword} />
+              <Input placeholder="輸入合約編號 / 客戶姓名 / 案場名稱 / 建立日期" defaultValue={defaultSearchValue} />
             </DataEntry_fong>
           </Form.Item>
 
-          <DataEntry_fong
-            childrenWrapperProps={{
-              className: scss.datePicker,
-            }}
-          >
-            <Form.Item className={scss.formItem} name="createdAt">
-              <DatePicker defaultValue={createdAt ? dayjs(createdAt) : undefined} />
-            </Form.Item>
-          </DataEntry_fong>
           <Btn theme="query">搜索資料</Btn>
         </Form>
         <div>
@@ -108,7 +110,6 @@ export default function AccountsReceivableInquiry() {
 
 interface Tquery {
   keyword?: string;
-  createdAt?: string;
 
   page?: `${number}`;
 }

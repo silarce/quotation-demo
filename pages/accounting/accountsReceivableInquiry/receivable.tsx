@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 
-import Link from 'next/link';
-import Router, { useRouter } from 'next/router';
+import Router from 'next/router';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, DatePicker, Select } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
-import Tab from 'components/global/gear/button/tab';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
 import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
@@ -15,7 +13,6 @@ import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
-import { ConsoleSqlOutlined } from '@ant-design/icons';
 
 export default function AccountsReceivable() {
   const handle_addNewOffsetAmount = () => {
