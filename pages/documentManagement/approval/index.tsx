@@ -16,6 +16,7 @@ import Icon_note from 'public/image/icon/fong/procurement.svg';
 interface Tquery {
   idNumber?: string;
   tab?: string;
+  type?: string;
 }
 
 interface Tdata {
@@ -142,13 +143,13 @@ const SearchPanel = ({
   const router = useRouter();
   const query = router.query as Tquery;
   const [idNumber, setIdNumber] = useState(query.idNumber || '');
-  const [type, setType] = useState(query.tab || '');
+  const [type, setType] = useState(query.type || '');
 
   const onSearch = () => {
     const newQuery: Tquery = {};
 
     idNumber && (newQuery.idNumber = idNumber);
-    type && (newQuery.tab = type);
+    type && (newQuery.type = type);
 
     router.replace({
       pathname: router.pathname,
