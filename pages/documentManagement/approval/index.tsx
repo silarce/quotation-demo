@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import Router, { useState } from 'react';
+import { useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -15,7 +15,7 @@ import Icon_note from 'public/image/icon/fong/procurement.svg';
 
 interface Tquery {
   idNumber?: string;
-  type?: string;
+  tab?: string;
 }
 
 interface Tdata {
@@ -36,11 +36,37 @@ interface Tdata {
 
 // ============================================================================
 export default function Approval() {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const tab = query.tab || 'awaitingReview';
+
+  const handle_awaitingReview = () => {
+    router.replace({
+      query: {
+        ...query,
+        tab: 'awaitingReview',
+      },
+    });
+  };
+
+  const handle_processingRecords = () => {
+    router.replace({
+      query: {
+        ...query,
+        tab: 'processingRecords',
+      },
+    });
+  };
+
   return (
     <div className="grid grid-rows-[fit-content(100%)_1fr] h-full">
       <div className="flex gap-4 mb-6">
-        <Tab>待審核</Tab>
-        <Tab>處理紀錄</Tab>
+        <Tab active={tab === 'awaitingReview'} onClick={handle_awaitingReview}>
+          待審核
+        </Tab>
+        <Tab active={tab === 'processingRecords'} onClick={handle_processingRecords}>
+          處理紀錄
+        </Tab>
       </div>
 
       <div className="wrapper_fong h-full">
@@ -116,13 +142,13 @@ const SearchPanel = ({
   const router = useRouter();
   const query = router.query as Tquery;
   const [idNumber, setIdNumber] = useState(query.idNumber || '');
-  const [type, setType] = useState(query.type || '');
+  const [type, setType] = useState(query.tab || '');
 
   const onSearch = () => {
     const newQuery: Tquery = {};
 
     idNumber && (newQuery.idNumber = idNumber);
-    type && (newQuery.type = type);
+    type && (newQuery.tab = type);
 
     router.replace({
       pathname: router.pathname,
