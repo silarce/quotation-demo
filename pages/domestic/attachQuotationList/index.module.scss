@@ -1,0 +1,24 @@
+.table {
+  border: solid 1px #616161;
+  border-radius: theme("border.radius.normal") !important;
+  overflow: hidden;
+}
+
+.thead {
+  min-height: 48px;
+  background-color: #edf1f7;
+  font-weight: 600;
+}
+
+.row.row {
+  gap: 0;
+  border-color: #616161;
+}
+
+.cell.cell {
+  padding: 0 12px;
+  min-height: 40px;
+  color: theme("colors.text02");
+  // border-color: #616161;
+  font-weight: 500;
+}
