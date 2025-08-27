@@ -21,6 +21,14 @@
 }
 
 .tabs {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: flex-start;
+  height: 258px;
+  margin-top: 24px;
+}
+
+.tabs {
   margin-top: 24px;
   border: solid 1px theme("colors.border02");
   border-radius: theme("border.radius.normal");
@@ -28,9 +36,13 @@
   box-shadow: theme("boxShadow.02");
 }
 
-.approvePanel {
+.response {
+  display: grid;
+  gap: 10px;
+  grid-template-rows: auto auto;
+  align-content: space-between;
+
   .btnBar {
-    margin-top: 10px;
     display: flex;
     justify-content: flex-end;
     gap: 10px;

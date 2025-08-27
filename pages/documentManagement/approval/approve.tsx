@@ -1,8 +1,7 @@
+import { useRouter } from 'next/router';
 import { useRef, useEffect } from 'react';
 
 import classNames from 'classnames';
-
-import { Tabs } from 'antd';
 
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -10,60 +9,63 @@ import type { ColumnsType } from 'antd/es/table';
 import scss from './approve.module.scss';
 
 import Btn_fong from 'components/global/gear/button/btn_fong_old';
+import Tab from 'components/global/gear/button/tab';
 
-import DataEntry, { Input, DataEntry_fong } from 'components/global/gear/dataEntry';
-
-// import { useMessageReceiver, useMessageSender } from 'hooks/globalState/useWindowMessage';
+import { Input, DataEntry_fong } from 'components/global/gear/dataEntry';
 
 // ===========================================================================
 
+interface Tquery {
+  tab?: string;
+}
+
+// ===========================================================================
+
+// MARK:RENDER
+
 export default function Approve() {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const tab = query.tab || 'response';
+
   const ref_iframe = useRef<HTMLIFrameElement>(null);
 
-  const items = [
-    {
-      key: 'a',
-      label: '單據回覆',
-      children: <Response />,
-    },
-    {
-      key: 'b',
-      label: '單據歷史',
-      children: <History />,
-    },
-  ];
+  const handle_tab = (v: 'response' | 'history') => {
+    router.replace({
+      query: {
+        ...query,
+        tab: v,
+      },
+    });
+  };
 
   return (
     <div className={scss.wrapper}>
       <div className={scss.body}>
         <iframe ref={ref_iframe} src="/setting/company-info" className={scss.iframe} />
 
-        <Tabs
-          className={classNames(scss.tabs)}
-          items={items}
-          renderTabBar={(props, DefaultTabBar) => {
-            const { onTabClick } = props;
-
-            const reactNode = items.map((item) => {
-              const { key } = item;
-
-              return (
-                <Btn_fong
-                  key={key}
-                  theme="large"
-                  onClick={(e) => {
-                    onTabClick(key, e);
-                  }}
-                >
-                  {item.label}
-                </Btn_fong>
-              );
-            });
-
-            return <div className="flex gap-[12px] mb-[24px]">{reactNode}</div>;
-          }}
-          //
-        />
+        <div className={scss.tabs}>
+          <div className="mb-6 flex gap-4">
+            <Tab
+              active={tab === 'response'}
+              onClick={() => {
+                handle_tab('response');
+              }}
+            >
+              單據回覆
+            </Tab>
+            <Tab
+              active={tab === 'history'}
+              onClick={() => {
+                handle_tab('history');
+              }}
+            >
+              單據歷史
+            </Tab>
+          </div>
+          {tab === 'response' ? <Response /> : null}
+          {tab === 'history' ? <History /> : null}
+        </div>
       </div>
     </div>
   );
@@ -71,16 +73,9 @@ export default function Approve() {
 
 const Response = () => {
   return (
-    <div className={scss.approvePanel}>
-      <div className="text-base font-semibold mb-[14.5px]">主管</div>
-
-      <DataEntry_fong
-        caption="主管回覆 :"
-        captionStyle={{
-          width: '106px',
-        }}
-      >
-        <input type="text" />
+    <div className={scss.response}>
+      <DataEntry_fong caption="審核人回覆" isMust={true}>
+        <Input />
       </DataEntry_fong>
 
       <div className={scss.btnBar}>
@@ -94,28 +89,26 @@ const Response = () => {
 
 const History = () => {
   return (
-    <div className={scss.approvePanel}>
-      <Table
-        className={scss.antdTable}
-        dataSource={fakeData}
-        rowKey="step"
-        columns={columns}
-        pagination={false}
-        scroll={{
-          y: 160,
-        }}
-        onHeaderRow={() => {
-          return {
-            className: scss.theadTr,
-          };
-        }}
-        onRow={() => {
-          return {
-            className: scss.rowTr,
-          };
-        }}
-      />
-    </div>
+    <Table
+      className={scss.antdTable}
+      dataSource={fakeData}
+      rowKey="step"
+      columns={columns}
+      pagination={false}
+      scroll={{
+        y: 140,
+      }}
+      onHeaderRow={() => {
+        return {
+          className: scss.theadTr,
+        };
+      }}
+      onRow={() => {
+        return {
+          className: scss.rowTr,
+        };
+      }}
+    />
   );
 };
 
