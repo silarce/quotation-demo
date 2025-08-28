@@ -45,6 +45,7 @@ export type {
   TsalesOrder_patch_Dto,
   TsalesOrderItem_patch_Dto,
   TpaymentRequestInvoiceList_Dto,
+  TgetOldContractData,
 } from './accountsReceivable';
 
 export type { TsalesOrder_simple_Dto, TproductView_Dto, TgetCustomerList_Dto } from './salesOrder';
