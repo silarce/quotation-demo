@@ -117,22 +117,22 @@ const columns: TableProps<TgetOldContractData>['columns'] = [
   {
     title: '合約編號',
     dataIndex: 'contractNumber',
-    width: 150,
+    width: 120,
   },
   {
     title: '案場名稱',
     dataIndex: 'projectName',
-    width: 200,
+    // width: 200,
   },
   {
     title: '客戶編號',
     dataIndex: 'customerNumber',
-    width: 150,
+    width: 120,
   },
   {
     title: '客戶名稱',
     dataIndex: 'customerName',
-    width: 200,
+    // width: 200,
   },
 ];
 
