@@ -83,11 +83,11 @@ export default function PaymentRequest() {
     const { state_paymentRequest } = instance_paymentRequest;
     const { sourceType, sourceId } = accountsReceivables!;
 
-    if (!sourceId) {
-      myAlert.err({ title: '沒有sourceId' });
+    // if (!sourceId) {
+    //   myAlert.err({ title: '沒有sourceId' });
 
-      return null;
-    }
+    //   return null;
+    // }
 
     if (!userInfo) {
       myAlert.err({ title: '沒有userInfo' });
