@@ -63,7 +63,7 @@ import { TfileInfo } from 'components/page/domestic/quotation/quotationTotal/app
 
 import { calcNTDToForeignCurrency } from 'components/page/domestic/quotation/function/utils_quotation';
 
-import { ToptionalConfigState, useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 // ===========================================================================
 
@@ -88,7 +88,9 @@ export default function AttachContract({
 
   let taxRate: number | undefined = undefined;
 
-  const optionalConfig = useGlobal_OptionalConfig();
+  const {
+    quotationPathList: { path_attachQuotation },
+  } = useGlobal_optionalConfig();
 
   // ------------------------------------------------------------------------------
   // region useState
@@ -252,7 +254,7 @@ export default function AttachContract({
       foreignTotal,
       //
       verifyForm: data_contract?.content.verifyForm,
-      optionalConfig,
+      path_attachQuotation,
     });
   };
 
@@ -433,7 +435,6 @@ export default function AttachContract({
     };
 
     return { control_signature };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userEmp]);
 
   // ___________________________________________________________________________
@@ -778,7 +779,7 @@ const reqModify = async ({
   //
   verifyForm,
 
-  optionalConfig,
+  path_attachQuotation,
 }: {
   router: ReturnType<typeof useRouter>;
   setIsLoadding: React.Dispatch<React.SetStateAction<boolean>>;
@@ -809,7 +810,7 @@ const reqModify = async ({
   //
   verifyForm: TcreateQuotationVerifyFormDto | undefined;
 
-  optionalConfig: ToptionalConfigState;
+  path_attachQuotation: string;
 }) => {
   try {
     setIsLading(true);
@@ -1041,9 +1042,10 @@ const reqModify = async ({
       verifyForm && (await apiSubmitContracting({ contentId, body: verifyForm }));
       setIsLading(false);
       // router.back();
-      const pathname = optionalConfig.isRefactoredQuotaion
-        ? optionalConfig.path_refactoredQuotation
-        : optionalConfig.path_attachQuotation;
+      // const pathname = optionalConfig.isRefactoredQuotaion
+      //   ? optionalConfig.path_refactoredQuotation
+      //   : optionalConfig.path_attachQuotation;
+      const pathname = path_attachQuotation;
 
       // router.push(`/domestic/quotationList/attachQuotation?id=${res.id}`);
       router.push({

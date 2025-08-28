@@ -18,7 +18,7 @@ import scss from './budgetList.module.scss';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
-import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 // ===========================================
 import { TquotationDto } from 'js/api/api_quotation';
@@ -42,8 +42,7 @@ export default function BudgetList({
   viewRef_bottom?: (node?: Element | null | undefined) => void;
 }) {
   // const { isRefactoredQuotaion: isRefactoredQuotaion } = useGlobal_OptionalConfig();
-  const optionalConfig = useGlobal_OptionalConfig();
-  const { isRefactoredQuotaion } = optionalConfig;
+  const { quotationPathList } = useGlobal_optionalConfig();
 
   // panelHeader點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -74,18 +73,20 @@ export default function BudgetList({
                 href: {
                   // pathname: `/domestic/quotationList/attachQuotation`,
                   // pathname: `/domestic/quotationList/quotation`,
-                  pathname: isRefactoredQuotaion
-                    ? optionalConfig.path_refactoredQuotation
-                    : optionalConfig.path_attachQuotation,
+                  // pathname: isRefactoredQuotaion
+                  //   ? optionalConfig.path_refactoredQuotation
+                  //   : optionalConfig.path_attachQuotation,
+                  pathname: quotationPathList.path_attachQuotation,
                   query: { id },
                 },
               }
             : {
                 href: {
                   // pathname: `/domestic/quotationList/quotation`,
-                  pathname: isRefactoredQuotaion
-                    ? optionalConfig.path_refactoredQuotation
-                    : optionalConfig.path_oldQuotation,
+                  // pathname: isRefactoredQuotaion
+                  //   ? optionalConfig.path_refactoredQuotation
+                  //   : optionalConfig.path_oldQuotation,
+                  pathname: quotationPathList.path_quotation,
                   query: { id, status },
                 },
               };
@@ -110,9 +111,10 @@ export default function BudgetList({
 
             const href_body = {
               // pathname: '/domestic/quotationList/quotation',
-              pathname: isRefactoredQuotaion
-                ? optionalConfig.path_refactoredQuotation
-                : optionalConfig.path_oldQuotation,
+              // pathname: isRefactoredQuotaion
+              //   ? optionalConfig.path_refactoredQuotation
+              //   : optionalConfig.path_oldQuotation,
+              pathname: quotationPathList.path_quotation,
               query: {
                 id: id,
                 status: content.status,
