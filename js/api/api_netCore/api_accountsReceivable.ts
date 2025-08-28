@@ -852,7 +852,7 @@ const apiPostSalesOrderToAccountsReceivables = async (salesOrderId: string) => {
 const apiGetOldContractData = async (params?: { filter?: string }) => {
   const api = '/api/AccountsReceivable/GetOldContractData';
 
-  return axi_monkey.get<TgetOldContractData[]>(api, { params }).then(({ data }) => data);
+  return axi_monkey.get<TpageResponse<TgetOldContractData>>(api, { params }).then(({ data }) => data);
 };
 
 const useApiGetOldContractData = ({
@@ -865,7 +865,7 @@ const useApiGetOldContractData = ({
   autoUpdate?: boolean;
 } = {}) => {
   const [isFetching, setIsFetching] = useState(false);
-  const [res, setRes] = useState<TgetOldContractData[] | null>();
+  const [res, setRes] = useState<TpageResponse<TgetOldContractData> | null>();
 
   const update = async () => {
     if (isFetching) {
@@ -900,8 +900,9 @@ const useApiGetOldContractData = ({
   }, [JSON.stringify(params)]);
 
   return {
+    data: res?.items,
+    meta: res?.meta,
     isFetching,
-    data: res,
     update,
   };
 };
