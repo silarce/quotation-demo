@@ -25,8 +25,10 @@ const SalesOrderItem = ({
     {
       title: '項目',
       dataIndex: 'itemName',
-      width: 80,
-      align: 'center',
+      width: 200,
+      render(_, record) {
+        return record.itemName + '　' + record.productName;
+      },
     },
     {
       title: '尺寸',
