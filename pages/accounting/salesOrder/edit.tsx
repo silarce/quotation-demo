@@ -9,6 +9,7 @@ import { modal_empty } from 'components/global/gear/modal/fongModal';
 import Selector_quotation from 'components/composition/selectorModal/selector_quotation';
 import SalesOrderInfo from 'components/page/accounting/salesOrder/salesOrderInfo';
 import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
+import { selector_oldContract } from 'components/composition/selectorModal/selector_oldContract';
 import { modal_leave } from 'components/global/gear/modal/fongModal';
 
 import {
@@ -321,8 +322,6 @@ export default function SalesOrder() {
             }));
 
             destroy();
-
-            //
           }}
         />
       ),
@@ -330,7 +329,59 @@ export default function SalesOrder() {
   };
 
   const handle_importOldProject = () => {
-    instance_salesOrder.clear();
+    const { destroy } = selector_oldContract({
+      onConfirm: (oldContractArr) => {
+        const oldContract = oldContractArr?.[0];
+
+        if (!oldContract) {
+          destroy();
+
+          return;
+        }
+
+        const {
+          contractNumber,
+          projectName,
+          customerNumber,
+          customerName,
+          phone,
+          fax,
+          taxId,
+          taxDeductionCategory,
+          address,
+        } = oldContract;
+
+        instance_salesOrder.clear();
+
+        instance_salesOrder.setState((prev) => {
+          return {
+            ...prev,
+            quotationContractNumber: contractNumber,
+            constructionSite: projectName,
+            customerNumber,
+            customerName,
+            companyPhone: phone,
+            companyFax: fax,
+            address,
+          };
+        });
+
+        if (taxDeductionCategory) {
+          // 會觸發下方的useEffect
+          instance_salesOrder.setState((prev) => {
+            return {
+              ...prev,
+              taxDeductionCategory,
+            };
+          });
+        }
+
+        destroy();
+      },
+      onCancel() {
+        destroy();
+      },
+    });
   };
 
   const handle_reset = () => {
