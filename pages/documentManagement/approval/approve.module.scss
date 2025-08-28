@@ -9,10 +9,10 @@
 
 .body {
   display: grid;
-  grid-template-rows: 1fr fit-content(100%);
-  align-content: space-between;
+  grid-template-rows: 3fr 2fr;
+  // grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
   height: 100%;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .iframe {
@@ -24,7 +24,6 @@
   display: grid;
   grid-template-rows: auto 1fr;
   align-content: flex-start;
-  height: 258px;
   margin-top: 24px;
 }
 
@@ -34,6 +33,7 @@
   border-radius: theme("border.radius.normal");
   padding: 24px;
   box-shadow: theme("boxShadow.02");
+  overflow: hidden;
 }
 
 .response {
@@ -67,39 +67,6 @@
     .input {
       width: 100%;
       color: theme("colors.text02");
-    }
-  }
-}
-
-.antdTable {
-  border: solid 1px theme("colors.border02");
-  border-radius: theme("border.radius.normal");
-  overflow: hidden;
-
-  .theadTr {
-    height: 48px;
-    th {
-      padding: 0;
-      padding-left: 24px;
-      border: none;
-      background-color: #e8e8e8;
-      box-shadow: inset 0px -1px 0px 0px #616161;
-      font-weight: 600;
-
-      &::before {
-        all: unset;
-        display: none;
-        content: none;
-      }
-    }
-  }
-  .rowTr {
-    height: 40px;
-    td {
-      padding: 0;
-      padding-left: 24px;
-      box-shadow: 0px -1px 0px 0px #616161;
-      border-bottom: none;
     }
   }
 }

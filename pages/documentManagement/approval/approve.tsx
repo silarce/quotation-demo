@@ -3,7 +3,8 @@ import { useRef, useEffect } from 'react';
 
 import classNames from 'classnames';
 
-import { Table } from 'antd';
+// import { Table } from 'antd';
+import Table_antd from 'components/global/myAntd/table';
 import type { ColumnsType } from 'antd/es/table';
 
 import scss from './approve.module.scss';
@@ -89,24 +90,12 @@ const Response = () => {
 
 const History = () => {
   return (
-    <Table
-      className={scss.antdTable}
+    <Table_antd
       dataSource={fakeData}
-      rowKey="step"
       columns={columns}
-      pagination={false}
+      rowKey="step"
       scroll={{
-        y: 140,
-      }}
-      onHeaderRow={() => {
-        return {
-          className: scss.theadTr,
-        };
-      }}
-      onRow={() => {
-        return {
-          className: scss.rowTr,
-        };
+        y: 80,
       }}
     />
   );
