@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 import { Dayjs } from 'dayjs';
 import { DeepNonNullable } from 'ts-essentials';
+import _ from 'lodash';
 
 import { Spin } from 'antd';
 
@@ -72,6 +73,10 @@ export default function PaymentRequest() {
     rawData_accountsReceivables: accountsReceivables,
   });
   const instance_salesOrderItem = useSalesOrderItemArr(salesOrderItems);
+
+  const orderedPaymentRequestLogs = useMemo(() => {
+    return _.sortBy(paymentRequestLogs, ({ period }) => Number(period));
+  }, [paymentRequestLogs]);
 
   const createBody = () => {
     if (!accountsReceivables) {
@@ -355,7 +360,7 @@ export default function PaymentRequest() {
           )}
         </CurrentPaymentRequestDetails>
         {/* 請款紀錄 */}
-        <History paymentRequestLogs={paymentRequestLogs} />
+        <History paymentRequestLogs={orderedPaymentRequestLogs} />
       </Spin>
     </div>
   );
