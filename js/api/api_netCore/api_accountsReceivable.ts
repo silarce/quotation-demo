@@ -28,6 +28,7 @@ import type {
   TsalesOrder_patch_Dto,
   TsalesOrderItem_patch_Dto,
   TpaymentRequestInvoiceList_Dto,
+  TgetOldContractData,
 } from './schemas';
 
 import type { TemployeeDto } from '../dtoTypes';
@@ -848,6 +849,62 @@ const apiPostSalesOrderToAccountsReceivables = async (salesOrderId: string) => {
     });
 };
 
+const apiGetOldContractData = async (params?: { filter?: string; page?: number }) => {
+  const api = '/api/AccountsReceivable/GetOldContractData';
+
+  return axi_monkey.get<TpageResponse<TgetOldContractData>>(api, { params }).then(({ data }) => data);
+};
+
+const useApiGetOldContractData = ({
+  params,
+  autoUpdate = true,
+}: {
+  params?: Parameters<typeof apiGetOldContractData>[0];
+  autoUpdate?: boolean;
+} = {}) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [res, setRes] = useState<TpageResponse<TgetOldContractData> | null>();
+
+  const update = async () => {
+    if (isFetching) {
+      return;
+    }
+
+    setIsFetching(true);
+
+    const res = await apiGetOldContractData(params)
+      .then((res) => {
+        setRes(res);
+
+        return res;
+      })
+      .catch((err: AxiosError) => {
+        myAlert.notify.error({
+          message: '取得舊合約資料失敗',
+          description: err.message,
+        });
+        setRes(null);
+
+        return null;
+      });
+
+    setIsFetching(false);
+
+    return res;
+  };
+
+  useEffect(() => {
+    autoUpdate && update();
+  }, [JSON.stringify(params)]);
+
+  return {
+    data: res?.items,
+    meta: res?.meta,
+    isFetching,
+    update,
+  };
+};
+
 // ========================================================================
 export type {
   TaccountsReceivablesList_Dto,
@@ -862,6 +919,7 @@ export type {
   TsalesOrderItem_patch_Dto,
   TsalesOrder_Dto,
   TpaymentRequestInvoiceList_Dto,
+  TgetOldContractData,
 };
 
 export type {
@@ -897,6 +955,7 @@ export {
   useApiGetPaymentRequestType,
   useApiGetSalesOrderById,
   useApiGetPaymentRequestInvoiceList,
+  useApiGetOldContractData,
 };
 
 export { apiGetPaymentRequestType };

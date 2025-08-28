@@ -202,6 +202,16 @@ const useSalesOrder = (raw: TsalesOrder_Dto | undefined | null) => {
     setState(defaultState);
   };
 
+  const clear = () => {
+    setState((prev) => ({
+      ...emptyState(),
+      salesAmount: prev.salesAmount,
+      taxes: prev.taxes,
+      totalAmount: prev.totalAmount,
+      taxDeductionCategory: prev.taxDeductionCategory,
+    }));
+  };
+
   useEffect(() => {
     setState(defaultState);
   }, [defaultState]);
@@ -211,6 +221,7 @@ const useSalesOrder = (raw: TsalesOrder_Dto | undefined | null) => {
     setState,
     setAmount,
     reset,
+    clear,
   };
 };
 

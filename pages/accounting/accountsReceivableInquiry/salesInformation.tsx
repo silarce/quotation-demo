@@ -11,7 +11,7 @@ import Btn from 'components/global/gear/button/btn_fong';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import Selector_quotation, {
   TquotationListViewModel_Dto,
-} from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
+} from 'components/composition/selectorModal/selector_quotation';
 
 import Icon_note from 'public/image/icon/fong/note.svg';
 
