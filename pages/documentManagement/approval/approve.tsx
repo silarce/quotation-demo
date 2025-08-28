@@ -9,10 +9,11 @@ import type { ColumnsType } from 'antd/es/table';
 
 import scss from './approve.module.scss';
 
-import Btn_fong from 'components/global/gear/button/btn_fong_old';
+import Btn_fong from 'components/global/gear/button/btn_fong';
 import Tab from 'components/global/gear/button/tab';
 
 import { Input, DataEntry_fong } from 'components/global/gear/dataEntry';
+import { useMessageSender } from 'hooks/globalState/useWindowMessage';
 
 // ===========================================================================
 
@@ -29,7 +30,7 @@ export default function Approve() {
   const query = router.query as Tquery;
   const tab = query.tab || 'response';
 
-  const ref_iframe = useRef<HTMLIFrameElement>(null);
+  const { sendMessage, setTarget, isReady } = useMessageSender<string>({ channel: 'approve' });
 
   const handle_tab = (v: 'response' | 'history') => {
     router.replace({
@@ -40,10 +41,22 @@ export default function Approve() {
     });
   };
 
+  useEffect(() => {
+    if (isReady) {
+      sendMessage('iframe握手完成，可以開始傳訊息');
+    }
+  }, [isReady]);
+
   return (
     <div className={scss.wrapper}>
       <div className={scss.body}>
-        <iframe ref={ref_iframe} src="/setting/company-info" className={scss.iframe} />
+        <iframe
+          ref={(ele) => {
+            setTarget(ele?.contentWindow);
+          }}
+          src="/documentManagement/approval/approveTest"
+          className={scss.iframe}
+        />
 
         <div className={scss.tabs}>
           <div className="mb-6 flex gap-4">
@@ -63,6 +76,18 @@ export default function Approve() {
             >
               單據歷史
             </Tab>
+            <form
+              className="flex gap-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                sendMessage(e.currentTarget.message.value);
+              }}
+            >
+              <DataEntry_fong>
+                <Input name="message" placeholder="測試iframe傳訊息" />
+              </DataEntry_fong>
+              <Btn_fong theme="send">送出測試訊息</Btn_fong>
+            </form>
           </div>
           {tab === 'response' ? <Response /> : null}
           {tab === 'history' ? <History /> : null}
