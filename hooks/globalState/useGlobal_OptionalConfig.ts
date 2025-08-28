@@ -5,6 +5,8 @@ import { immer } from 'zustand/middleware/immer';
 
 interface ToptionalConfigState {
   hadInit: boolean;
+  // 拼寫錯誤，但是這個字已經在使用者的 localStorage 了
+  // 所以不能改
   isRefactoredQuotaion: boolean;
   setIsRefactoredQuotaion: (value: boolean) => void;
   setHadInit: (value: boolean) => void;
@@ -26,6 +28,11 @@ const useStore_optionalConfig = create<ToptionalConfigState>()(
         set((state) => {
           state.isRefactoredQuotaion = value;
         });
+
+        if (typeof window === 'undefined') {
+          return;
+        }
+
         window.localStorage.setItem('isRefactoredQuotaion', value.toString());
       };
 
@@ -45,11 +52,7 @@ const useGlobal_optionalConfig = () => {
   const quotationPathList = isRefactoredQuotaion ? pathList_quotation : pathList_oldQuotation;
 
   const init = () => {
-    if (hadInit) {
-      return;
-    }
-
-    if (typeof window === 'undefined') {
+    if (hadInit || typeof window === 'undefined') {
       return;
     }
 
@@ -83,9 +86,6 @@ const pathList_oldQuotation = {
   path_attachQuotation: '/domestic/quotationList/attachQuotation',
   path_contractAttachContact: '/domestic/contract/attachContract',
 } as const;
-
-Object.freeze(pathList_oldQuotation);
-Object.freeze(pathList_quotation);
 
 // ============================================================================
 
