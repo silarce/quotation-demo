@@ -8,7 +8,7 @@ import { DataEntry_fong, Input, DatePicker, Select } from 'components/global/gea
 import Btn from 'components/global/gear/button/btn_fong';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 
-import Selector_accountant from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
+import Selector_accountant from 'components/composition/selectorModal/selector_accountant/indext';
 import { Container_confirm } from 'components/global/container/modal';
 
 import Icon_note from 'public/image/icon/fong/note.svg';

@@ -541,6 +541,19 @@ interface TpaymentRequestInvoiceList_Dto {
   contractNumber: string | null; //合約編號
 }
 
+interface TgetOldContractData {
+  id: null;
+  contractNumber: string;
+  projectName: string;
+  customerNumber: string;
+  customerName: string;
+  phone: string;
+  fax: string;
+  taxId: string;
+  taxDeductionCategory: string;
+  address: string;
+}
+
 export type {
   TaccountsReceivablesList_Dto_depressed,
   TaccountsReceivablesList_Dto,
@@ -553,6 +566,7 @@ export type {
   Tres_apiGetARPaymentData,
   Tres_apiGetARPaymentDataInset,
   Tbody_updatePRInvoice,
+  TgetOldContractData,
   //
   TsalesOrder_Dto,
   TsalesOrderItem_Dto,
