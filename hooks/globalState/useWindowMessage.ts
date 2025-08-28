@@ -1,26 +1,46 @@
 import { useEffect, useState, useRef } from 'react';
 
-type Tchannel = 'parent' | 'useWindow' | 'handshake' | 'iframe';
+// ============================================================================
+
+type Tchannel = string;
 
 interface Tmessage {
   channel: Tchannel;
   content: any;
 }
 
+// ============================================================================
+
+const channel_handshake = 'handshake';
+const content_handshake = 'ready';
+
+// ============================================================================
+
 // MARK:useMessageReceiver
 
-function useMessageReceiver<C>({
+/**
+ * 可帶入泛型M為message的型別
+ */
+function useMessageReceiver<M>({
   origin_, // origin為保留字，以origin_替代
   channel,
   from,
 }: {
   origin_?: string;
   channel: Tchannel;
-  from: Window | null | undefined;
+  from?: Window | null | undefined; // 基本上應該都會是undefied吧
 }) {
   const [theOrigin, setTheOrigin] = useState<string>('*');
 
-  const [message, setMessage] = useState<C>();
+  const [message, setMessage] = useState<M>();
+
+  const getFrom = () => {
+    if (from === undefined) {
+      return window.parent;
+    } else {
+      return from;
+    }
+  };
 
   useEffect(() => {
     if (origin_) {
@@ -33,6 +53,8 @@ function useMessageReceiver<C>({
   }, [origin_]);
 
   useEffect(() => {
+    const from = getFrom();
+
     const onMessage = (event: MessageEvent) => {
       if (event.origin !== theOrigin) {
         return;
@@ -55,10 +77,12 @@ function useMessageReceiver<C>({
   }, [theOrigin, from, channel]);
 
   useEffect(() => {
+    const from = getFrom();
+
     from?.postMessage(
       {
-        channel: 'handshake',
-        content: 'ready',
+        channel: channel_handshake,
+        content: content_handshake,
       } as Tmessage,
       theOrigin
     );
@@ -71,10 +95,10 @@ function useMessageReceiver<C>({
 
 // MARK:useMessageSender
 
-const useMessageSender = (props: {
+function useMessageSender<C>(props: {
   origin_?: string; // origin為保留字，以origin_替代
   channel?: Tchannel;
-}) => {
+}) {
   const [theOrigin, setTheOrigin] = useState<string>('*');
 
   const ref_target = useRef<Window | null>(null);
@@ -82,7 +106,7 @@ const useMessageSender = (props: {
   const [isReady, setIsReady] = useState(false);
   const [isTargetExist, setIsTargetExist] = useState(false);
 
-  const sendMessage = (content: any, channel?: Tchannel) => {
+  const sendMessage = (content: C, channel?: Tchannel) => {
     ref_target.current?.postMessage(
       {
         content,
@@ -92,8 +116,8 @@ const useMessageSender = (props: {
     );
   };
 
-  const setTarget = (target: Window | null) => {
-    ref_target.current = target;
+  const setTarget = (target: Window | null | undefined) => {
+    ref_target.current = target ?? null;
     setIsReady(false);
 
     if (target) {
@@ -114,6 +138,8 @@ const useMessageSender = (props: {
   }, [props.origin_]);
 
   useEffect(() => {
+    console.log('isTargetExist', isTargetExist);
+
     const target = ref_target.current;
 
     if (target === window) {
@@ -142,7 +168,7 @@ const useMessageSender = (props: {
         return;
       }
 
-      if (data.channel === 'handshake' && data.content === 'ready') {
+      if (data.channel === channel_handshake && data.content === content_handshake) {
         setIsReady(true);
         window.removeEventListener('message', onMessage);
       }
@@ -154,9 +180,8 @@ const useMessageSender = (props: {
   }, [isTargetExist, theOrigin]);
 
   return { sendMessage, isReady, setTarget };
-};
+}
 
-// ============================================================================
 // ============================================================================
 
 export { useMessageReceiver, useMessageSender };
