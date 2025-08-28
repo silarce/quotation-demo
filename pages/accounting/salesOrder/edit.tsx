@@ -291,13 +291,12 @@ export default function SalesOrder() {
               return;
             }
 
+            instance_salesOrder.clear();
+
             const {
               quotationNumber,
               contractNumber,
               projectName,
-              subTotal,
-              salesTax,
-              total,
               currency,
               foreignTotal,
               exchangeRate,
@@ -314,16 +313,8 @@ export default function SalesOrder() {
 
               customerId,
               customerName: customerName || '',
-              salesAmount: `${subTotal || ''}`,
-              taxes: `${salesTax || ''}`,
-              totalAmount: `${total || ''}`,
               customerNumber,
-              sourceType: '',
 
-              address: '',
-              invoiceType: '',
-              taxId: '',
-              taxDeductionCategory: '',
               salesCurrency: currency,
               exchangeRate: `${exchangeRate || ''}`,
               currencyAmount: `${foreignTotal || ''}`,
@@ -338,7 +329,9 @@ export default function SalesOrder() {
     });
   };
 
-  const handle_importOldProject = () => {};
+  const handle_importOldProject = () => {
+    instance_salesOrder.clear();
+  };
 
   const handle_reset = () => {
     modal_leave({
