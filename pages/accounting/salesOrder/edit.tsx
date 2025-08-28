@@ -6,7 +6,7 @@ import { Spin } from 'antd';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import Btn from 'components/global/gear/button/btn_fong';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
-import Selector_quotation from 'components/page/accounting/accountsReceivableInquiry/selector_quotation';
+import Selector_quotation from 'components/composition/selectorModal/selector_quotation';
 import SalesOrderInfo from 'components/page/accounting/salesOrder/salesOrderInfo';
 import SalesOrderItemList from 'components/page/accounting/salesOrder/salesOrderItemList';
 import { modal_leave } from 'components/global/gear/modal/fongModal';

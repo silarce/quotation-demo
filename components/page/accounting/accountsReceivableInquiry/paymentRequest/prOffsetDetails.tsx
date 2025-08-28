@@ -8,7 +8,7 @@ import { DataEntry_fong, Input, Select, DatePicker } from 'components/global/gea
 
 import Selector_accountant, {
   TaccountantDto,
-} from 'components/page/accounting/accountsReceivableInquiry/selector_accountant/indext';
+} from 'components/composition/selectorModal/selector_accountant/indext';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
 
