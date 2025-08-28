@@ -338,6 +338,8 @@ export default function SalesOrder() {
     });
   };
 
+  const handle_importOldProject = () => {};
+
   const handle_reset = () => {
     modal_leave({
       title: '確認重置嗎？',
@@ -370,6 +372,9 @@ export default function SalesOrder() {
             <Btn onClick={handle_salesOrderToAccountsReceivables}>銷貨單轉應收款</Btn>
           )}
 
+          <Btn theme="import" onClick={handle_importOldProject}>
+            舊案場匯入
+          </Btn>
           <Btn theme="import" onClick={handle_importContract}>
             合約匯入
           </Btn>
