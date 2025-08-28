@@ -6,6 +6,8 @@ import { Collapse } from 'components/global/myAntd/collapse';
 
 import { Tres_apiGetARPaymentData } from 'js/api/api_netCore/schemas';
 
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
 type TpaymentRequestLogs = Tres_apiGetARPaymentData['paymentRequestLogs'];
 type TpaymentRequestLog = TpaymentRequestLogs[number];
 
@@ -59,7 +61,7 @@ const HistoryDetail = ({ log }: { log: TpaymentRequestLog }) => {
         {toLocaleString(log.retainageAmount)}
       </DataEntry_fong>
       <DataEntry_fong caption="發票日期" disabled={true}>
-        {log.invoiceDate}
+        {getTaiwanDateStr(log.invoiceDate)}
       </DataEntry_fong>
       {/*  */}
       <DataEntry_fong caption="發票號碼" disabled={true}>
