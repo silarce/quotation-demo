@@ -849,7 +849,7 @@ const apiPostSalesOrderToAccountsReceivables = async (salesOrderId: string) => {
     });
 };
 
-const apiGetOldContractData = async (params?: { filter?: string }) => {
+const apiGetOldContractData = async (params?: { filter?: string; page?: number }) => {
   const api = '/api/AccountsReceivable/GetOldContractData';
 
   return axi_monkey.get<TpageResponse<TgetOldContractData>>(api, { params }).then(({ data }) => data);
@@ -859,9 +859,7 @@ const useApiGetOldContractData = ({
   params,
   autoUpdate = true,
 }: {
-  params?: {
-    filter?: string;
-  };
+  params?: Parameters<typeof apiGetOldContractData>[0];
   autoUpdate?: boolean;
 } = {}) => {
   const [isFetching, setIsFetching] = useState(false);
