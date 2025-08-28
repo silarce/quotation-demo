@@ -17,10 +17,12 @@ interface Tprops {
 
 export default function Selector_oldContract({ onConfirm, onCancel, limit = 1 }: Tprops) {
   const [state_filter, setState_filter] = useState('');
+  const [page, setPage] = useState(1);
 
-  const { data } = useApiGetOldContractData({
+  const { data, meta } = useApiGetOldContractData({
     params: {
       filter: state_filter,
+      page,
     },
   });
 
@@ -60,6 +62,7 @@ export default function Selector_oldContract({ onConfirm, onCancel, limit = 1 }:
             onSubmit={(e) => {
               e.preventDefault();
               setState_filter(e.currentTarget.filter.value);
+              setPage(1);
             }}
           >
             <DataEntry_fong
@@ -94,6 +97,14 @@ export default function Selector_oldContract({ onConfirm, onCancel, limit = 1 }:
             },
             className: classNames('cursor-pointer', selected?.some((item) => item === record) && 'bg-blue05'),
           };
+        }}
+        pagination={{
+          current: meta?.page,
+          pageSize: meta?.pageSize,
+          total: meta?.itemCount,
+          onChange: (page) => {
+            setPage(page);
+          },
         }}
       />
     </Container_confirm>
