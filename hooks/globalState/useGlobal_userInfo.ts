@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import _ from 'lodash';
 
 import { create } from 'zustand';
@@ -7,9 +7,10 @@ import { immer } from 'zustand/middleware/immer';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { TuserDto, useApiAuthMe, apiAuthMe, apiGetLoginInfoBySessionId, persistTokens } from 'js/api/api_auth';
-import { useApiErpFeaturesMe, TerpFeatureDto, apiErpFeaturesMe } from 'js/api/api_erpFeature';
+import { TuserDto, apiAuthMe, apiGetLoginInfoBySessionId, persistTokens } from 'js/api/api_auth';
+import { TerpFeatureDto, apiErpFeaturesMe } from 'js/api/api_erpFeature';
 
+// ===========================================================================
 interface Tglobal_userInfo {
   userInfo: TuserDto | undefined | null;
   userErpFeature: TerpFeatureDto[] | undefined | null;
@@ -18,6 +19,11 @@ interface Tglobal_userInfo {
   setErpFeature: (erpFeature: TerpFeatureDto[] | undefined | null) => void;
 }
 
+// ===========================================================================
+
+const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
+
+// ===========================================================================
 const instance_immer = immer<Tglobal_userInfo>((set) => {
   const setUserInfo: Tglobal_userInfo['setUserInfo'] = (userInfo) => {
     set((state) => {
@@ -41,37 +47,6 @@ const instance_immer = immer<Tglobal_userInfo>((set) => {
 
 const useStore = create<Tglobal_userInfo>()(instance_immer);
 
-// const useGlobal_userInfo = () => {
-//   const { userInfo, userErpFeature, setUserInfo, setErpFeature } = useStore();
-
-//   const { isAdmin, userGrade } = useMemo(() => {
-//     const isAdmin = userInfo?.account === 'admin3';
-
-//     let userGrade = 0;
-
-//     if (userInfo && !userInfo.employee) {
-//       userGrade = 16; // 代表admin // 實際上grade只到15
-//     } else if (userInfo && userInfo.employee?.jobs.length) {
-//       userGrade = _.sortBy(userInfo?.employee?.jobs, 'grade')?.reverse()[0]?.grade;
-//     }
-
-//     return {
-//       isAdmin,
-//       userGrade,
-//     };
-//   }, [userInfo]);
-
-//   return {
-//     userInfo,
-//     userErpFeature,
-//     setUserInfo,
-//     setErpFeature,
-//     //
-//     isAdmin,
-//     userGrade,
-//   };
-// };
-
 const useGlobal_userInfo = () => {
   const { userInfo, userErpFeature, setUserInfo, setErpFeature } = useStore();
 
@@ -88,6 +63,11 @@ const useGlobal_userInfo = () => {
         return { userInfo, userErpFeature };
       })
       .then(async ({ userInfo, userErpFeature }) => {
+        // 在正式站會跳過這後面的步驟
+        if (isInProd) {
+          return { userInfo, userErpFeature };
+        }
+
         const sessionId = userInfo?.latestSessionId;
 
         if (!sessionId) {
