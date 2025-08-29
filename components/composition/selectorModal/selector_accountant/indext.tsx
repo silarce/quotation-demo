@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
 import classNames from 'classnames';
+import dayjs, { Dayjs } from 'dayjs';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import Btn from 'components/global/gear/button/btn_fong';
 import { Container_confirm } from 'components/global/container/modal';
 import { Checkbox } from 'components/global/gear/dataEntry';
+import { DataEntry_fong, DatePicker, Select } from 'components/global/gear/dataEntry';
 
 // api
 import { useGetAccountant, TaccountantDto } from 'js/api/api_accountant';
@@ -24,9 +26,26 @@ export default function Selector_accountant({
   btn_confirm?: (data: TaccountantDto | undefined) => React.ReactNode;
 }) {
   const [page, setPage] = useState(1);
+
+  const [paymentType, setPaymentType] = useState<TaccountantDto['paymentType']>();
+  const [insertDate, setInsertDate] = useState<Dayjs | null>(null);
+
+  const [searchObj, setSearchObj] = useState<{ paymentType?: string; insertDate?: string }>({});
+
   const params = useMemo(() => {
-    return { page };
-  }, [page]);
+    return {
+      page,
+
+      filter: {
+        paymentType: {
+          $eq: searchObj.paymentType,
+        },
+        insertDate: {
+          $eq: searchObj.insertDate || undefined,
+        },
+      },
+    };
+  }, [page, searchObj]);
 
   const { data: rawArr, meta } = useGetAccountant({ params });
 
@@ -38,9 +57,43 @@ export default function Selector_accountant({
     }
   };
 
+  const handle_search = () => {
+    const newSearchObj = {
+      paymentType: paymentType || undefined,
+      insertDate: insertDate ? dayjs(insertDate).toISOString() : undefined,
+    };
+    setSearchObj(newSearchObj);
+    setPage(1);
+  };
+
   return (
     <Container_confirm
       title={title}
+      topRight={
+        <form
+          className="flex gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handle_search();
+          }}
+        >
+          <DataEntry_fong>
+            <Select
+              placeholder="付款方式"
+              className="w-24"
+              options={options}
+              value={paymentType}
+              onChange={(value) => setPaymentType(value)}
+            />
+          </DataEntry_fong>
+
+          <DataEntry_fong>
+            <DatePicker placeholder="匯入日期" value={insertDate} onChange={(date) => setInsertDate(date)} />
+          </DataEntry_fong>
+
+          <Btn theme="query">搜尋</Btn>
+        </form>
+      }
       footerRight={
         <>
           <Btn onClick={onCancel}>取消</Btn>
@@ -74,6 +127,8 @@ export default function Selector_accountant({
           })}
           pagination={{
             current: meta?.page,
+            pageSize: meta?.pageSize,
+            total: meta?.itemCount,
             onChange(page) {
               setPage(page);
             },
@@ -99,6 +154,12 @@ const columns: TableProps<TaccountantDto>['columns'] = [
     ),
   },
   {
+    title: '付款類型',
+    dataIndex: 'paymentType',
+    align: 'center',
+    width: 80,
+  },
+  {
     title: '匯入日期',
     dataIndex: 'insertDate',
     width: 120,
@@ -117,19 +178,17 @@ const columns: TableProps<TaccountantDto>['columns'] = [
   {
     title: '廠商名稱',
     dataIndex: 'vendorName',
-    width: 180,
   },
   {
     title: '幣別',
     dataIndex: 'currency',
-    align: 'center',
     width: 120,
   },
   {
     title: '匯率',
     dataIndex: 'exchangeRate',
-    align: 'center',
-    width: 80,
+    align: 'right',
+    width: 70,
   },
   {
     title: '金額',
@@ -145,6 +204,17 @@ const columns: TableProps<TaccountantDto>['columns'] = [
     width: 120,
     render: (value) => '$' + value.toLocaleString(),
   },
+];
+
+// export type TaccountantPaymentType = '匯款' | '票據' | '現金';
+
+const options: {
+  value: TaccountantDto['paymentType'];
+  label: TaccountantDto['paymentType'];
+}[] = [
+  { value: '匯款', label: '匯款' },
+  { value: '票據', label: '票據' },
+  { value: '現金', label: '現金' },
 ];
 
 // ============================================================================
