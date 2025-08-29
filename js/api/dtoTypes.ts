@@ -154,6 +154,26 @@ export type TuserDto_login = {
   latestSessionId: string; // 過期的latestSessionId，不使用
 };
 
+//登入以sid取得JWT
+export type LoginInfo = {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  token_type: string;
+  user_id: string;
+  user_name: string;
+};
+
+export type LoginInfoResponse = {
+  returnCode: number;
+  returnMessage: string;
+  data: { auth_info: LoginInfo };
+  beginTimestamp: string;
+  endTimestamp: string;
+  elapsedMilliseconds: number;
+};
+//====================================
+
 export type TUserPasswordDto = {
   id: string;
   createdAt: string;
