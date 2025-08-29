@@ -7,7 +7,7 @@ import { immer } from 'zustand/middleware/immer';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // api
-import { TuserDto, useApiAuthMe, apiAuthMe } from 'js/api/api_auth';
+import { TuserDto, useApiAuthMe, apiAuthMe, apiGetLoginInfoBySessionId, persistTokens } from 'js/api/api_auth';
 import { useApiErpFeaturesMe, TerpFeatureDto, apiErpFeaturesMe } from 'js/api/api_erpFeature';
 
 interface Tglobal_userInfo {
@@ -84,6 +84,24 @@ const useGlobal_userInfo = () => {
       .then(([userInfo, userErpFeature]) => {
         setUserInfo(userInfo);
         setErpFeature(userErpFeature);
+
+        return { userInfo, userErpFeature };
+      })
+      .then(async ({ userInfo, userErpFeature }) => {
+        const sessionId = userInfo?.latestSessionId;
+
+        if (!sessionId) {
+          throw new Error('沒有拿到 sessionId');
+        }
+
+        // 以 sid 換取 JWT
+        const auth = await apiGetLoginInfoBySessionId(sessionId);
+
+        if (auth) {
+          persistTokens(auth);
+        } else {
+          throw new Error('以 sessionId 取得 JWT 失敗');
+        }
 
         return { userInfo, userErpFeature };
       })
