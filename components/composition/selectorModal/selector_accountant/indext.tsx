@@ -30,7 +30,7 @@ export default function Selector_accountant({
   const [paymentType, setPaymentType] = useState<TaccountantDto['paymentType']>();
   const [insertDate, setInsertDate] = useState<Dayjs | null>(null);
 
-  const [searchObj, setSearchObj] = useState<{ paymentType?: string; insertDate?: string }>({});
+  const [searchObj, setSearchObj] = useState<{ paymentType?: string; insertDate?: Dayjs | null }>({});
 
   const params = useMemo(() => {
     return {
@@ -38,10 +38,11 @@ export default function Selector_accountant({
 
       filter: {
         paymentType: {
-          $eq: searchObj.paymentType,
+          $eq: searchObj.paymentType || undefined,
         },
         insertDate: {
-          $eq: searchObj.insertDate || undefined,
+          $gte: searchObj.insertDate?.startOf('month').toISOString(),
+          $lte: searchObj.insertDate?.endOf('month').toISOString(),
         },
       },
     };
@@ -59,8 +60,8 @@ export default function Selector_accountant({
 
   const handle_search = () => {
     const newSearchObj = {
-      paymentType: paymentType || undefined,
-      insertDate: insertDate ? dayjs(insertDate).toISOString() : undefined,
+      paymentType: paymentType,
+      insertDate: insertDate,
     };
     setSearchObj(newSearchObj);
     setPage(1);
@@ -88,7 +89,19 @@ export default function Selector_accountant({
           </DataEntry_fong>
 
           <DataEntry_fong>
-            <DatePicker placeholder="匯入日期" value={insertDate} onChange={(date) => setInsertDate(date)} />
+            <DatePicker
+              placeholder="匯入日期"
+              value={insertDate}
+              onChange={(date) => setInsertDate(date)}
+              picker="month"
+              format={(djs) => {
+                let dateStr = getTaiwanDateStr(djs);
+                const arr = dateStr.split('-');
+                dateStr = arr[0] + '-' + arr[1];
+
+                return dateStr;
+              }}
+            />
           </DataEntry_fong>
 
           <Btn theme="query">搜尋</Btn>
