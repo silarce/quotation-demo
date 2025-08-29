@@ -139,9 +139,22 @@ export default function InvoiceList() {
 
   const columns: TableProps<Tinvoice_Dto>['columns'] = [
     {
-      title: '發票號碼',
-      dataIndex: 'fullInvoiceNumber',
-      width: 150,
+      title: '開立日期',
+      dataIndex: 'invoiceDate',
+      width: 120,
+      render: (text) => 'no property',
+    },
+    {
+      title: '報價編號',
+      dataIndex: 'quotationNumber',
+      width: 120,
+      render: (text) => 'no property',
+    },
+    {
+      title: '合約編號',
+      dataIndex: 'contractNumber',
+      width: 120,
+      render: (text) => 'no property',
     },
     {
       title: '專案名稱',
@@ -172,6 +185,12 @@ export default function InvoiceList() {
       width: 150,
       align: 'right',
       render: (text) => '$' + text?.toLocaleString(),
+    },
+
+    {
+      title: '發票號碼',
+      dataIndex: 'fullInvoiceNumber',
+      width: 150,
     },
     {
       key: 'panel',
