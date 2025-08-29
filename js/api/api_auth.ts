@@ -31,7 +31,7 @@ export const apiLogout = () => {
 };
 
 // 取得使用者資料
-export const apiAuthMe = async () => {
+export const apiAuthMe = () => {
   const api = '/auth/me';
 
   //如果是admin帳號，不會有employee
