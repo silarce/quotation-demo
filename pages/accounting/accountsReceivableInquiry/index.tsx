@@ -14,7 +14,7 @@ import {
   TaccountsReceivablesList_Dto,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr, checkIsYMD } from 'js/utils/helpers/date/convertDate';
 import Icon_note from 'public/image/icon/fong/note.svg';
 import scss from './index.module.scss';
 
@@ -32,12 +32,13 @@ export default function AccountsReceivableInquiry() {
 
   const { data: accountsReceivablesArr, meta, isFetching } = useApiGetAccountsReceivablesList(apiParam);
 
-  const isKeywordIsDate = !!keyword && dayjs(keyword).isValid();
+  const isKeywordIsDate = !!keyword && checkIsYMD(keyword);
   const defaultSearchValue = isKeywordIsDate ? getTaiwanDateStr(keyword) : keyword;
   // ---------------------------------------------------------------------------
 
-  const handel_search = ({ keyword }: { keyword?: string }) => {
-    const isKeywordIsDate = !!keyword && dayjs(keyword).isValid();
+  const handel_search = (keyword: string) => {
+    // const isKeywordIsDate = !!keyword && dayjs(keyword).isValid();
+    const isKeywordIsDate = !!checkIsYMD(keyword);
 
     if (isKeywordIsDate) {
       keyword = dayjs(keyword).add(1911, 'year').format('YYYY-MM-DD');
@@ -56,21 +57,30 @@ export default function AccountsReceivableInquiry() {
   return (
     <div>
       <div className={'pageTop flex justify-between'}>
-        <Form className={classNames('flex gap-4 items-center', scss.form)} onFinish={handel_search}>
+        <form
+          //
+          className={classNames('flex gap-4 items-center', scss.form)}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handel_search(e.currentTarget.keyword.value as string);
+          }}
+        >
           <div className="text-base font-semibold">應收款列表</div>
 
-          <Form.Item className={scss.formItem} name="keyword">
-            <DataEntry_fong
-              childrenWrapperProps={{
-                className: scss.input,
-              }}
-            >
-              <Input placeholder="輸入合約編號 / 客戶姓名 / 案場名稱 / 建立日期" defaultValue={defaultSearchValue} />
-            </DataEntry_fong>
-          </Form.Item>
+          <DataEntry_fong
+            childrenWrapperProps={{
+              className: scss.input,
+            }}
+          >
+            <Input
+              name="keyword"
+              placeholder="輸入合約編號 / 客戶姓名 / 案場名稱 / 建立日期"
+              defaultValue={defaultSearchValue}
+            />
+          </DataEntry_fong>
 
           <Btn theme="query">搜索資料</Btn>
-        </Form>
+        </form>
         <div>
           <Link href={Router.pathname + '/salesInformation'}>
             <Btn theme="add">新增資料</Btn>
