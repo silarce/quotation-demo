@@ -239,10 +239,11 @@ export default function InvoiceList() {
         </div>
       </div>
       <Table_antd
-        key={state_invoiceBook?.id}
         rowKey={'fullInvoiceNumber'}
         dataSource={raw_invoiceArr || undefined}
         columns={columns}
+        pagination={false}
+        scroll={{ y: 600 }}
       />
     </div>
   );
