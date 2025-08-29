@@ -16,7 +16,7 @@ import scss from './info.module.scss';
 
 import { useTranslation } from 'react-i18next';
 
-import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 import { apiLogout } from 'js/api/api_auth';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -31,7 +31,11 @@ export default function Info() {
   const { t, i18n } = useTranslation('common');
   const { changeLanguage } = i18n;
 
-  const { isRefactoredQuotaion: isQuotation2, setIsRefactoredQuotaion: setIsQuotation2 } = useGlobal_OptionalConfig();
+  const {
+    //
+    isRefactoredQuotaion: isQuotation2,
+    setIsRefactoredQuotaion: setIsQuotation2,
+  } = useGlobal_optionalConfig();
 
   // ----------------------------------------------
 

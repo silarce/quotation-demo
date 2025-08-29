@@ -25,7 +25,7 @@ import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 import { TquotationStatus } from 'js/api/dtoTypes';
 
-import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 // ===========================================================
 
@@ -57,8 +57,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
     userId = undefined;
   }
 
-  const optionalConfig = useGlobal_OptionalConfig();
-  const { isRefactoredQuotaion } = optionalConfig;
+  const { quotationPathList } = useGlobal_optionalConfig();
 
   // ----------------------------------------------------
   //
@@ -194,7 +193,8 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
       onClick: () => {
         router.push({
           // pathname: `/domestic/quotationList/quotation`,
-          pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
+          // pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
+          pathname: quotationPathList.path_quotation,
           query: {
             status,
           },

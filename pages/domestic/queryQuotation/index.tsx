@@ -34,7 +34,7 @@ import { optionsCreator_productMaterial, optionsCreator_doorModelName } from 'js
 // type
 import type { Thead_popFormList } from 'components/page/domestic/queryQuotation/queryQuotationList/thead';
 
-import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 // ===========================================
 
 type Tquery = {
@@ -103,8 +103,7 @@ export default function Budget() {
 
   // ----------------------------------------------------------------------
 
-  const optionalConfig = useGlobal_OptionalConfig();
-  const { isRefactoredQuotaion } = optionalConfig;
+  const { quotationPathList } = useGlobal_optionalConfig();
 
   // ----------------------------------------------------------------------
 
@@ -203,7 +202,9 @@ export default function Budget() {
 
         const href_quotation = {
           // pathname: '/domestic/quotationList/quotation',
-          pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
+          // pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
+          pathname: quotationPathList.path_quotation,
+
           query: {
             id: id,
             status: latestContent.status,
@@ -212,10 +213,12 @@ export default function Budget() {
 
         const href_attachQuotation = {
           // pathname: '/domestic/quotationList/attachQuotation',
-          pathname: isRefactoredQuotaion
-            ? optionalConfig.path_refactoredQuotation
-            : optionalConfig.path_attachQuotation,
           // pathname: '/domestic/quotationList/quotation',
+          // pathname: isRefactoredQuotaion
+          //   ? optionalConfig.path_refactoredQuotation
+          //   : optionalConfig.path_attachQuotation,
+          pathname: quotationPathList.path_attachQuotation,
+
           query: {
             id: id,
             status: latestContent.status,
@@ -286,14 +289,16 @@ export default function Budget() {
 
           const href_body = {
             // pathname: '/domestic/quotationList/quotation',
-            pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
+            // pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
+            pathname: quotationPathList.path_quotation,
             query,
           };
           const href_body_attach = {
             // pathname: '/domestic/quotationList/attachQuotation',
-            pathname: isRefactoredQuotaion
-              ? optionalConfig.path_refactoredQuotation
-              : optionalConfig.path_attachQuotation,
+            // pathname: isRefactoredQuotaion
+            //   ? optionalConfig.path_refactoredQuotation
+            //   : optionalConfig.path_attachQuotation,
+            pathname: quotationPathList.path_attachQuotation,
             query: {
               ...query,
             },
