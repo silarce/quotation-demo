@@ -8,8 +8,6 @@ import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
 
-import Tab from 'components/global/gear/button/tab';
-
 import {
   useApiGetAccountsReceivablesList,
   TaccountsReceivablesList_Dto,
@@ -24,7 +22,6 @@ import scss from './index.module.scss';
 interface Tquery {
   keyword?: string;
   page?: `${number}`;
-  paymentType?: string;
 }
 
 // ==========================================================================
@@ -32,15 +29,14 @@ interface Tquery {
 export default function AccountsReceivableInquiry() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { keyword, page = '1', paymentType = '匯款' } = router.query as Tquery;
+  const { keyword, page = '1' } = router.query as Tquery;
 
   const apiParam = useMemo(() => {
     return {
       filter: keyword,
       page: Number(page) || 1, // 防範NaN
-      paymentType, // api還未支援
     };
-  }, [keyword, page, paymentType]);
+  }, [keyword, page]);
 
   const { data: accountsReceivablesArr, meta, isFetching } = useApiGetAccountsReceivablesList(apiParam);
 
@@ -63,16 +59,6 @@ export default function AccountsReceivableInquiry() {
     });
   };
 
-  const handle_paymentTypeChange = (paymentType: string) => {
-    router.replace({
-      query: {
-        ...query,
-        paymentType,
-        page: '1', // 換tab時，頁數回到1
-      },
-    });
-  };
-
   // MARK: RENDER
 
   return (
@@ -80,9 +66,6 @@ export default function AccountsReceivableInquiry() {
       <div className={'pageTop flex justify-between'}>
         <div className="flex gap-4 items-center">
           <div className="text-base font-semibold">應收款列表</div>
-          <TheTab tabName="匯款" />
-          <TheTab tabName="票據" />
-          <TheTab tabName="現金" />
         </div>
         <div className="flex gap-4">
           <form
@@ -245,25 +228,3 @@ const toLocaleString = (value: number | null) => {
 };
 
 // ==========================================================================
-
-const TheTab = ({ tabName }: { tabName: string }) => {
-  const router = useRouter();
-  const query = router.query as Tquery;
-  const { paymentType } = router.query as Tquery;
-
-  const handle_paymentTypeChange = () => {
-    router.replace({
-      query: {
-        ...query,
-        paymentType: tabName,
-        page: '1', // 換tab時，頁數回到1
-      },
-    });
-  };
-
-  return (
-    <Tab active={paymentType === tabName} onClick={handle_paymentTypeChange}>
-      {tabName}
-    </Tab>
-  );
-};
