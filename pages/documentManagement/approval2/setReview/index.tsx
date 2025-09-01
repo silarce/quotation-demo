@@ -2,7 +2,6 @@ import { Fragment } from 'react';
 import classNames from 'classnames';
 import { useState } from 'react';
 
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
@@ -10,12 +9,11 @@ import Tab from 'components/global/gear/button/tab';
 import Btn from 'components/global/gear/button/btn_fong';
 import { DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry';
 
-import Icon_note from 'public/image/icon/fong/procurement.svg';
-
 import Badge from 'components/global/gear/badge';
 
 import Icon_right from 'public/image/icon/fong/right.svg';
 import Icon_trash from 'public/image/icon/fong/trash.svg';
+// import Icon_note from 'public/image/icon/fong/procurement.svg';
 
 // ============================================================================
 
@@ -38,7 +36,6 @@ interface Tdata {
 // ============================================================================
 export default function Approval() {
   const router = useRouter();
-  const query = router.query as Tquery;
 
   const handle_tab1 = () => {
     router.push('../approval2');
@@ -52,8 +49,8 @@ export default function Approval() {
       </div>
 
       <div className="wrapper_fong h-full">
-        <div className="flex justify-between items-center">
-          <div className="text-[16px] font-semibold mb-[34px]">目前審核流程</div>
+        <div className="mb-6 flex justify-between items-center">
+          <div className="text-[16px] font-semibold">目前審核流程</div>
           <Btn theme="process" themeColor="green_I">
             新增流程
           </Btn>
