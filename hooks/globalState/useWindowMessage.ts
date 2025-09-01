@@ -101,13 +101,13 @@ function useMessageSender<C>(props: {
 }) {
   const [theOrigin, setTheOrigin] = useState<string>('*');
 
-  const ref_target = useRef<Window | null>(null);
+  const ref_targetWindow = useRef<Window | null>(null);
 
   const [isReady, setIsReady] = useState(false);
   const [isTargetExist, setIsTargetExist] = useState(false);
 
   const sendMessage = (content: C, channel?: Tchannel) => {
-    ref_target.current?.postMessage(
+    ref_targetWindow.current?.postMessage(
       {
         content,
         channel: channel ?? props.channel,
@@ -117,11 +117,18 @@ function useMessageSender<C>(props: {
   };
 
   const setTarget = (target: Window | null | undefined) => {
-    ref_target.current = target ?? null;
-    setIsReady(false);
+    ref_targetWindow.current = target ?? null;
 
     if (target) {
       setIsTargetExist(true);
+
+      // setTarget預期會被放在ref函式中
+      // 例如 ref={(ele) => { setTarget(ele?.contentWindow); }}
+      // 因為react的特性。每一次渲染這個函式都會被呼叫一次
+      // 所以要做判斷避免isReady被重設
+      if (target !== ref_targetWindow.current) {
+        setIsReady(false);
+      }
     } else {
       setIsTargetExist(false);
     }
@@ -140,7 +147,7 @@ function useMessageSender<C>(props: {
   useEffect(() => {
     console.log('isTargetExist', isTargetExist);
 
-    const target = ref_target.current;
+    const target = ref_targetWindow.current;
 
     if (target === window) {
       alert('不能傳送訊息給自己');
