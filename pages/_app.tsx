@@ -23,7 +23,6 @@ import { TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
-import { useGlobal_OptionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 // import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -85,7 +84,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // ----------------------------------------------------------------------------
 
   const globalState_review = useGlobal_review();
-  const optionalConfig = useGlobal_OptionalConfig();
   const { isInIframe } = useWindow();
 
   // ----------------------------------------------------------------------------
@@ -110,10 +108,6 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       globalState_review.update_2();
     }
   }, [userInfo]);
-
-  useEffect(() => {
-    optionalConfig.init();
-  }, []);
 
   // -----------------------------------------------------------------------
   const appContextValue = {

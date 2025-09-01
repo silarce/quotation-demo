@@ -1,43 +1,51 @@
 import { useMemo } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import Router, { useRouter } from 'next/router';
 import Link from 'next/link';
 import classNames from 'classnames';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
-import { DataEntry_fong, Input, DatePicker } from 'components/global/gear/dataEntry';
+import { DataEntry_fong, Input } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
-import { Form, Spin } from 'antd';
 
 import {
   useApiGetAccountsReceivablesList,
   TaccountsReceivablesList_Dto,
 } from 'js/api/api_netCore/api_accountsReceivable';
 
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+import { getTaiwanDateStr, checkIsYMD } from 'js/utils/helpers/date/convertDate';
 import Icon_note from 'public/image/icon/fong/note.svg';
 import scss from './index.module.scss';
+
+// ==========================================================================
+
+interface Tquery {
+  keyword?: string;
+  page?: `${number}`;
+}
+
+// ==========================================================================
 
 export default function AccountsReceivableInquiry() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const { keyword, page } = router.query as Tquery;
+  const { keyword, page = '1' } = router.query as Tquery;
 
   const apiParam = useMemo(() => {
     return {
       filter: keyword,
-      page: Number(page) || 1,
+      page: Number(page) || 1, // 防範NaN
     };
   }, [keyword, page]);
 
   const { data: accountsReceivablesArr, meta, isFetching } = useApiGetAccountsReceivablesList(apiParam);
 
-  const isKeywordIsDate = !!keyword && dayjs(keyword).isValid();
+  const isKeywordIsDate = !!keyword && checkIsYMD(keyword);
   const defaultSearchValue = isKeywordIsDate ? getTaiwanDateStr(keyword) : keyword;
   // ---------------------------------------------------------------------------
 
-  const handel_search = ({ keyword }: { keyword?: string }) => {
-    const isKeywordIsDate = !!keyword && dayjs(keyword).isValid();
+  const handel_search = (keyword: string) => {
+    const isKeywordIsDate = !!checkIsYMD(keyword);
 
     if (isKeywordIsDate) {
       keyword = dayjs(keyword).add(1911, 'year').format('YYYY-MM-DD');
@@ -56,62 +64,63 @@ export default function AccountsReceivableInquiry() {
   return (
     <div>
       <div className={'pageTop flex justify-between'}>
-        <Form className={classNames('flex gap-4 items-center', scss.form)} onFinish={handel_search}>
+        <div className="flex gap-4 items-center">
           <div className="text-base font-semibold">應收款列表</div>
-
-          <Form.Item className={scss.formItem} name="keyword">
+        </div>
+        <div className="flex gap-4">
+          <form
+            className={classNames('flex gap-4 items-center', scss.form)}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handel_search(e.currentTarget.keyword.value as string);
+            }}
+          >
             <DataEntry_fong
               childrenWrapperProps={{
                 className: scss.input,
               }}
             >
-              <Input placeholder="輸入合約編號 / 客戶姓名 / 案場名稱 / 建立日期" defaultValue={defaultSearchValue} />
+              <Input
+                name="keyword"
+                placeholder="輸入合約編號 / 客戶姓名 / 案場名稱 / 建立日期"
+                defaultValue={defaultSearchValue}
+              />
             </DataEntry_fong>
-          </Form.Item>
 
-          <Btn theme="query">搜索資料</Btn>
-        </Form>
-        <div>
+            <Btn theme="query">搜索資料</Btn>
+          </form>
           <Link href={Router.pathname + '/salesInformation'}>
             <Btn theme="add">新增資料</Btn>
           </Link>
         </div>
       </div>
 
-      <Spin spinning={isFetching} delay={300}>
-        <Table_antd
-          columns={columns}
-          dataSource={accountsReceivablesArr ?? undefined}
-          scroll={{
-            y: '550px',
-          }}
-          pagination={{
-            current: Number(page || 1),
-            pageSize: meta?.pageSize,
-            total: meta?.itemCount,
-            onChange(page) {
-              router.replace({
-                query: {
-                  ...query,
-                  page: page,
-                },
-              });
-            },
-          }}
-        />
-      </Spin>
+      <Table_antd
+        columns={columns}
+        dataSource={accountsReceivablesArr ?? undefined}
+        scroll={{
+          y: '550px',
+        }}
+        pagination={{
+          current: Number(page || 1),
+          pageSize: meta?.pageSize,
+          total: meta?.itemCount,
+          onChange(page) {
+            router.replace({
+              query: {
+                ...query,
+                page: page,
+              },
+            });
+          },
+        }}
+        loading={{
+          spinning: isFetching,
+          delay: 300,
+        }}
+      />
     </div>
   );
-}
-
-// ========================================================================
-
-// MARK: TYPE
-
-interface Tquery {
-  keyword?: string;
-
-  page?: `${number}`;
 }
 
 // ========================================================================
@@ -217,3 +226,5 @@ const columns: TableProps<TaccountsReceivablesList_Dto>['columns'] = [
 const toLocaleString = (value: number | null) => {
   return value !== null ? '$' + value.toLocaleString() : '';
 };
+
+// ==========================================================================

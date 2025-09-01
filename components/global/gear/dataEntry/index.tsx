@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { Dayjs } from 'dayjs';
 
 import classNames from 'classnames';
 
@@ -30,6 +31,7 @@ import ReactSelect, { Props as rsProps, GroupBase } from 'react-select';
 import Icon_asterisk from 'public/image/icon/fong/asterisk.svg';
 
 import { Form as AntdForm } from 'antd';
+import locale from 'antd/locale/zh_TW';
 
 // ======================================================================
 
@@ -468,6 +470,8 @@ const DatePicker = ({
         e.preventDefault();
         e.stopPropagation();
       }}
+      // locale.DatePicker已在_app修改過
+      locale={locale.DatePicker}
       {...suffixIcon}
       {...props}
     />
