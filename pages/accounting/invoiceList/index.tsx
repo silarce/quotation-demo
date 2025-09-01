@@ -50,7 +50,11 @@ export default function InvoiceList() {
 
   const invoiceBookDesc = state_invoiceBook && getInvoiceBookDesc(state_invoiceBook);
 
-  const { data: raw_invoiceArr, update: update_invoiceArr } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
+  const {
+    data: raw_invoiceArr,
+    update: update_invoiceArr,
+    clear: clear_invoiceArr,
+  } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
 
   // ----------------------------------------------------------------------------
 
@@ -62,6 +66,7 @@ export default function InvoiceList() {
           onConfirm={(invoiceBook) => {
             if (invoiceBook) {
               setState_invoiceBook(invoiceBook);
+              clear_invoiceArr();
             }
 
             if (invoiceBook?.id) {
