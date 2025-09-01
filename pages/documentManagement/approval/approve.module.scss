@@ -20,6 +20,12 @@
   width: 100%;
 }
 
+.spin {
+  :global(.ant-spin-container) {
+    height: 100%;
+  }
+}
+
 .tabs {
   display: grid;
   grid-template-rows: auto 1fr;

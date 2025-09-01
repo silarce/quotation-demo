@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react';
 
 import classNames from 'classnames';
 
-// import { Table } from 'antd';
+import { Spin } from 'antd';
 import Table_antd from 'components/global/myAntd/table';
 import type { ColumnsType } from 'antd/es/table';
 
@@ -50,13 +50,15 @@ export default function Approve() {
   return (
     <div className={scss.wrapper}>
       <div className={scss.body}>
-        <iframe
-          ref={(ele) => {
-            setTarget(ele?.contentWindow);
-          }}
-          src="/documentManagement/approval/approveTest"
-          className={scss.iframe}
-        />
+        <Spin wrapperClassName={scss.spin} spinning={!isReady} delay={300}>
+          <iframe
+            ref={(ele) => {
+              setTarget(ele?.contentWindow);
+            }}
+            src="/documentManagement/approval/approveTest"
+            className={scss.iframe}
+          />
+        </Spin>
 
         <div className={scss.tabs}>
           <div className="mb-6 flex gap-4">
