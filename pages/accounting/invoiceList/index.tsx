@@ -24,6 +24,7 @@ import { TaccountantInvoiceBookDto, apiGetAccountantInvoiceBook } from 'js/api/a
 import { Tinvoice_Dto, useApiGetInvoiceNumberLists } from 'js/api/api_netCore/api_invoice';
 
 import { Tbody_updatePRInvoice, apiUpdatePRInvoice } from 'js/api/api_netCore/api_accountsReceivable';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ==========================================================================
 
@@ -49,7 +50,11 @@ export default function InvoiceList() {
 
   const invoiceBookDesc = state_invoiceBook && getInvoiceBookDesc(state_invoiceBook);
 
-  const { data: raw_invoiceArr, update: update_invoiceArr } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
+  const {
+    data: raw_invoiceArr,
+    update: update_invoiceArr,
+    clear: clear_invoiceArr,
+  } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
 
   // ----------------------------------------------------------------------------
 
@@ -61,6 +66,7 @@ export default function InvoiceList() {
           onConfirm={(invoiceBook) => {
             if (invoiceBook) {
               setState_invoiceBook(invoiceBook);
+              clear_invoiceArr();
             }
 
             if (invoiceBook?.id) {
@@ -139,9 +145,24 @@ export default function InvoiceList() {
 
   const columns: TableProps<Tinvoice_Dto>['columns'] = [
     {
-      title: '發票號碼',
-      dataIndex: 'fullInvoiceNumber',
-      width: 150,
+      title: '開立日期',
+      dataIndex: 'invoiceDate',
+      width: 120,
+      render: (text) => getTaiwanDateStr(text),
+    },
+
+    {
+      title: '報價編號',
+      dataIndex: 'quotationNumber',
+      width: 120,
+      render: (text, record) => {
+        return record.quotationNumber as string;
+      },
+    },
+    {
+      title: '合約編號',
+      dataIndex: 'contractNumber',
+      width: 120,
     },
     {
       title: '專案名稱',
@@ -172,6 +193,12 @@ export default function InvoiceList() {
       width: 150,
       align: 'right',
       render: (text) => '$' + text?.toLocaleString(),
+    },
+
+    {
+      title: '發票號碼',
+      dataIndex: 'fullInvoiceNumber',
+      width: 150,
     },
     {
       key: 'panel',
@@ -239,10 +266,11 @@ export default function InvoiceList() {
         </div>
       </div>
       <Table_antd
-        key={state_invoiceBook?.id}
         rowKey={'fullInvoiceNumber'}
         dataSource={raw_invoiceArr || undefined}
         columns={columns}
+        pagination={false}
+        scroll={{ y: 600 }}
       />
     </div>
   );

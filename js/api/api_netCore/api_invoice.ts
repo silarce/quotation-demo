@@ -60,6 +60,10 @@ const useApiGetInvoiceNumberLists = (
       });
   };
 
+  const clear = () => {
+    setRes(undefined);
+  };
+
   useEffect(() => {
     autoUpdate && update();
   }, [invoiceBookId]);
@@ -68,6 +72,7 @@ const useApiGetInvoiceNumberLists = (
     data: res,
     isFetching,
     update,
+    clear,
   };
 };
 
