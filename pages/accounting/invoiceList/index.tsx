@@ -145,14 +145,10 @@ export default function InvoiceList() {
       width: 120,
       render: (text) => getTaiwanDateStr(text),
     },
+
     {
       title: '報價編號',
-      dataIndex: 'contractNumber',
-      width: 120,
-    },
-    {
-      title: '合約編號',
-      dataIndex: 'contractNumber',
+      dataIndex: 'quotationNumber',
       width: 120,
       render: (text, record) => {
         // api還沒給quotationNumber
@@ -162,6 +158,11 @@ export default function InvoiceList() {
 
         return 'no property';
       },
+    },
+    {
+      title: '合約編號',
+      dataIndex: 'contractNumber',
+      width: 120,
     },
     {
       title: '專案名稱',
