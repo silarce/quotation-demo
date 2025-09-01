@@ -8,6 +8,7 @@ import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import Tab from 'components/global/gear/button/tab';
 import Btn from 'components/global/gear/button/btn_fong';
 import { DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry';
+import { modal_delete } from 'components/global/gear/modal/fongModal';
 
 import Badge from 'components/global/gear/badge';
 
@@ -41,6 +42,17 @@ export default function Approval() {
     router.push('../approval2');
   };
 
+  const handle_delete = (id: string) => {
+    modal_delete({
+      onConfirm: () => {},
+      onCancel: () => {},
+    });
+  };
+
+  const columns = createColumns({
+    handle_delete,
+  });
+
   return (
     <div className="grid grid-rows-[fit-content(100%)_1fr] h-full">
       <div className="flex gap-4 mb-6">
@@ -69,50 +81,61 @@ const lookup_theme = {
   核准: 'success',
 } as const;
 
-const columns: TableProps<Tdata>['columns'] = [
-  {
-    title: '序',
-    key: 'index',
-    width: 80,
-    render: (_, __, index) => index + 1,
-  },
-  {
-    title: '名稱',
-    dataIndex: 'name',
-    width: 150,
-  },
-  {
-    title: '流程',
-    dataIndex: 'process',
-    render: (process: Tdata['process']) => {
-      return (
-        <div>
-          {process.map(({ name, status }, index) => {
-            const theme = status in lookup_theme ? lookup_theme[status as keyof typeof lookup_theme] : undefined;
-
-            const isLast = index === process.length - 1;
-
-            return (
-              <Fragment key={index}>
-                <span className="mr-1">{name}</span>
-                <Badge theme={theme}>{status}</Badge>
-                {!isLast && <Icon_right className="inline-block mx-[14px]" />}
-              </Fragment>
-            );
-          })}
-        </div>
-      );
+const createColumns = ({ handle_delete }: { handle_delete: (id: string) => void }) => {
+  const columns: TableProps<Tdata>['columns'] = [
+    {
+      title: '序',
+      key: 'index',
+      width: 80,
+      render: (_, __, index) => index + 1,
     },
-  },
+    {
+      title: '名稱',
+      dataIndex: 'name',
+      width: 150,
+    },
+    {
+      title: '流程',
+      dataIndex: 'process',
+      render: (process: Tdata['process']) => {
+        return (
+          <div>
+            {process.map(({ name, status }, index) => {
+              const theme = status in lookup_theme ? lookup_theme[status as keyof typeof lookup_theme] : undefined;
 
-  {
-    title: '操作',
-    key: 'panel',
-    width: 80,
-    align: 'center',
-    render: (_, record) => <Icon_trash className="inline-block text-red01" />,
-  },
-];
+              const isLast = index === process.length - 1;
+
+              return (
+                <Fragment key={index}>
+                  <span className="mr-1">{name}</span>
+                  <Badge theme={theme}>{status}</Badge>
+                  {!isLast && <Icon_right className="inline-block mx-[14px]" />}
+                </Fragment>
+              );
+            })}
+          </div>
+        );
+      },
+    },
+
+    {
+      title: '操作',
+      key: 'panel',
+      width: 80,
+      align: 'center',
+      render: (_, record) => (
+        <Icon_trash
+          className="inline-block text-red01 cursor-pointer"
+          onClick={() => {
+            handle_delete(record.id);
+          }}
+        />
+      ),
+    },
+  ];
+
+  return columns;
+};
 
 // ============================================================================
 
