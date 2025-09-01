@@ -12,6 +12,7 @@ interface Tinvoice_Dto {
   alphabeticLetter: string; // 發票字軌
   invoiceDate: DateTime | null; //發票日期
   contractNumber: string | null; //合約編號
+  quotationNumber: string | null; //報價單號
 }
 
 export type { Tinvoice_Dto };

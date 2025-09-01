@@ -151,12 +151,7 @@ export default function InvoiceList() {
       dataIndex: 'quotationNumber',
       width: 120,
       render: (text, record) => {
-        // api還沒給quotationNumber
-        if ('quotationNumber' in record) {
-          return record.quotationNumber as string;
-        }
-
-        return 'no property';
+        return record.quotationNumber as string;
       },
     },
     {
