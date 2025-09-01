@@ -11,6 +11,8 @@ import { DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry'
 
 import Icon_note from 'public/image/icon/fong/procurement.svg';
 
+import Badge from 'components/global/gear/badge';
+
 // ============================================================================
 
 interface Tquery {
@@ -73,7 +75,7 @@ export default function Approval() {
 
       <div className="wrapper_fong h-full">
         <SearchPanel className="mb-6" />
-        <Table_antd dataSource={fakeData} columns={columns} />
+        <Table_antd dataSource={fakeData} columns={columns} rowHoverable={false} />
       </div>
     </div>
   );
@@ -105,6 +107,21 @@ const columns: TableProps<Tdata>['columns'] = [
     dataIndex: 'status',
     width: 100,
     align: 'center',
+    render: (v) => {
+      if (v === '審核中') {
+        return <Badge theme="primary">{v}</Badge>;
+      }
+
+      if (v === '已核准') {
+        return <Badge theme="success">{v}</Badge>;
+      }
+
+      if (v === '駁回') {
+        return <Badge theme="danger">{v}</Badge>;
+      } else {
+        return <Badge>{v}</Badge>;
+      }
+    },
   },
   {
     title: '操作',
