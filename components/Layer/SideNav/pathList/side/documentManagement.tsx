@@ -27,6 +27,11 @@ export default function SidePathDocumentManagement() {
             path: path + '/approval',
             erpFeature: isInProd ? [] : 'allPass',
           },
+          {
+            label: '審核列表2',
+            path: path + '/approval2',
+            erpFeature: isInProd ? [] : 'allPass',
+          },
         ],
       },
     ],
