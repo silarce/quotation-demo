@@ -6,9 +6,7 @@ import Btn from 'components/global/gear/button/btn_fong';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, Select, DatePicker } from 'components/global/gear/dataEntry';
 
-import Selector_accountant, {
-  TaccountantDto,
-} from 'components/composition/selectorModal/selector_accountant/indext';
+import Selector_accountant, { TaccountantDto } from 'components/composition/selectorModal/selector_accountant/indext';
 import { modal_empty } from 'components/global/gear/modal/fongModal';
 import { Container_confirm } from 'components/global/container/modal';
 

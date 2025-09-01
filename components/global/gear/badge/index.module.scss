@@ -1,0 +1,37 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  height: 25px;
+  border-radius: 1000px;
+  padding: 0 8px;
+
+  font-weight: 500;
+  background-color: theme("colors.bgc01");
+  color: theme("colors.gray01");
+}
+
+.primary {
+  background-color: theme("colors.state01");
+  color: theme("colors.state02");
+}
+
+.secondary {
+  background-color: theme("colors.state01");
+  color: #1e40af;
+}
+
+.success {
+  background-color: theme("colors.state03");
+  color: theme("colors.green01");
+}
+
+.danger {
+  background-color: theme("colors.state04");
+  color: theme("colors.red01");
+}
+
+.warning {
+  background-color: theme("colors.state05");
+  color: theme("colors.brown01");
+}

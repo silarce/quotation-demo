@@ -21,7 +21,8 @@ interface Tglobal_userInfo {
 
 // ===========================================================================
 
-const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
+// const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
+const isInProd = process.env.NODE_ENV === 'production';
 
 // ===========================================================================
 const instance_immer = immer<Tglobal_userInfo>((set) => {
