@@ -145,8 +145,6 @@ function useMessageSender<C>(props: {
   }, [props.origin_]);
 
   useEffect(() => {
-    console.log('isTargetExist', isTargetExist);
-
     const target = ref_targetWindow.current;
 
     if (target === window) {
@@ -186,7 +184,13 @@ function useMessageSender<C>(props: {
     return () => window.removeEventListener('message', onMessage);
   }, [isTargetExist, theOrigin]);
 
-  return { sendMessage, isReady, setTarget };
+  return {
+    sendMessage,
+    isReady,
+    setTarget,
+
+    targetWindow: ref_targetWindow.current,
+  };
 }
 
 // ============================================================================

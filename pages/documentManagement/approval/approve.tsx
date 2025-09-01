@@ -30,7 +30,7 @@ export default function Approve() {
   const query = router.query as Tquery;
   const tab = query.tab || 'response';
 
-  const { sendMessage, setTarget, isReady } = useMessageSender<string>({ channel: 'approve' });
+  const { sendMessage, setTarget, isReady, targetWindow } = useMessageSender<string>({ channel: 'approve' });
 
   const handle_tab = (v: 'response' | 'history') => {
     router.replace({
@@ -39,6 +39,10 @@ export default function Approve() {
         tab: v,
       },
     });
+  };
+
+  const handle_editIframeState = () => {
+    targetWindow?.forApprove?.editState();
   };
 
   useEffect(() => {
@@ -90,6 +94,9 @@ export default function Approve() {
               </DataEntry_fong>
               <Btn_fong theme="send">送出測試訊息</Btn_fong>
             </form>
+            <Btn_fong theme="send" onClick={handle_editIframeState}>
+              測試iframe的window暴露的函式
+            </Btn_fong>
           </div>
           {tab === 'response' ? <Response /> : null}
           {tab === 'history' ? <History /> : null}
