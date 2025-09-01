@@ -24,6 +24,7 @@ import { TaccountantInvoiceBookDto, apiGetAccountantInvoiceBook } from 'js/api/a
 import { Tinvoice_Dto, useApiGetInvoiceNumberLists } from 'js/api/api_netCore/api_invoice';
 
 import { Tbody_updatePRInvoice, apiUpdatePRInvoice } from 'js/api/api_netCore/api_accountsReceivable';
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ==========================================================================
 
@@ -142,19 +143,25 @@ export default function InvoiceList() {
       title: '開立日期',
       dataIndex: 'invoiceDate',
       width: 120,
-      render: (text) => 'no property',
+      render: (text) => getTaiwanDateStr(text),
     },
     {
       title: '報價編號',
-      dataIndex: 'quotationNumber',
+      dataIndex: 'contractNumber',
       width: 120,
-      render: (text) => 'no property',
     },
     {
       title: '合約編號',
       dataIndex: 'contractNumber',
       width: 120,
-      render: (text) => 'no property',
+      render: (text, record) => {
+        // api還沒給quotationNumber
+        if ('quotationNumber' in record) {
+          return record.quotationNumber as string;
+        }
+
+        return 'no property';
+      },
     },
     {
       title: '專案名稱',
