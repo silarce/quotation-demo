@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import classNames from 'classnames';
 import { useState } from 'react';
 
@@ -13,6 +14,9 @@ import Icon_note from 'public/image/icon/fong/procurement.svg';
 
 import Badge from 'components/global/gear/badge';
 
+import Icon_right from 'public/image/icon/fong/right.svg';
+import Icon_trash from 'public/image/icon/fong/trash.svg';
+
 // ============================================================================
 
 interface Tquery {
@@ -22,34 +26,38 @@ interface Tquery {
 
 interface Tdata {
   id: string;
-  // 單號
-  idNumber: string;
-  // 類別
-  type: string;
-  // 送出日期
-  submitDate: string;
-  // 狀態
-  status: string;
+  name: string;
+  process: {
+    name: string;
+    status: string;
+  }[];
 }
+
+// ============================================================================
 
 // ============================================================================
 export default function Approval() {
   const router = useRouter();
   const query = router.query as Tquery;
 
-  const handle_tab2 = () => {
-    router.push('approval2/setReview');
+  const handle_tab1 = () => {
+    router.push('../approval2');
   };
 
   return (
     <div className="grid grid-rows-[fit-content(100%)_1fr] h-full">
       <div className="flex gap-4 mb-6">
-        <Tab active={true}>個人單據</Tab>
-        <Tab onClick={handle_tab2}>自訂審核</Tab>
+        <Tab onClick={handle_tab1}>個人單據</Tab>
+        <Tab active={true}>自訂審核</Tab>
       </div>
 
       <div className="wrapper_fong h-full">
-        <SearchPanel className="mb-6" />
+        <div className="flex justify-between items-center">
+          <div className="text-[16px] font-semibold mb-[34px]">目前審核流程</div>
+          <Btn theme="process" themeColor="green_I">
+            新增流程
+          </Btn>
+        </div>
         <Table_antd dataSource={fakeData} columns={columns} rowHoverable={false} />
       </div>
     </div>
@@ -58,64 +66,54 @@ export default function Approval() {
 
 // ============================================================================
 
+const lookup_theme = {
+  提出: 'secondary',
+  審查: 'primary',
+  核准: 'success',
+} as const;
+
 const columns: TableProps<Tdata>['columns'] = [
   {
-    title: '單號',
-    dataIndex: 'idNumber',
-    width: 200,
-    align: 'right',
+    title: '序',
+    key: 'index',
+    width: 80,
+    render: (_, __, index) => index + 1,
   },
   {
-    title: '類別',
-    dataIndex: 'type',
-    width: 100,
-  },
-  {
-    title: '送出日期',
-    dataIndex: 'submitDate',
+    title: '名稱',
+    dataIndex: 'name',
     width: 150,
-    align: 'right',
   },
-  {},
   {
-    title: '狀態',
-    dataIndex: 'status',
-    width: 100,
-    align: 'center',
-    render: (v) => {
-      if (v === '審核中') {
-        return <Badge theme="primary">{v}</Badge>;
-      }
+    title: '流程',
+    dataIndex: 'process',
+    render: (process: Tdata['process']) => {
+      return (
+        <div>
+          {process.map(({ name, status }, index) => {
+            const theme = status in lookup_theme ? lookup_theme[status as keyof typeof lookup_theme] : undefined;
 
-      if (v === '已核准') {
-        return <Badge theme="success">{v}</Badge>;
-      }
+            const isLast = index === process.length - 1;
 
-      if (v === '駁回') {
-        return <Badge theme="danger">{v}</Badge>;
-      } else {
-        return <Badge>{v}</Badge>;
-      }
+            return (
+              <Fragment key={index}>
+                <span className="mr-1">{name}</span>
+                <Badge theme={theme}>{status}</Badge>
+                {!isLast && <Icon_right className="inline-block mx-[14px]" />}
+              </Fragment>
+            );
+          })}
+        </div>
+      );
     },
   },
+
   {
     title: '操作',
     key: 'panel',
     width: 80,
     align: 'center',
-    render: (_, record) => (
-      <Link
-        href={{
-          pathname: 'approval/approve',
-          query: {
-            id: record.id,
-          },
-        }}
-        className="inline-block"
-      >
-        <Icon_note className="w-[20px] h-[16px]" />
-      </Link>
-    ),
+    render: (_, record) => <Icon_trash className="inline-block text-red01" />,
   },
 ];
 
@@ -187,17 +185,24 @@ const SearchPanel = ({ className }: { className?: string } = {}) => {
 
 // ============================================================================
 
-function generateFakeData(count: number): Tdata[] {
-  const types = ['類型1', '類型2', '類型3'];
-  const statuses = ['審核中', '已核准', '駁回'];
+// status:'提出'|"審查"|"核准"
 
-  return Array.from({ length: count }, (_, i) => ({
-    id: (i + 1).toString(),
-    idNumber: `APP-${String(i + 1).padStart(5, '0')}`,
-    type: types[i % types.length],
-    submitDate: `2023-10-${String((i % 30) + 1).padStart(2, '0')}`,
-    status: statuses[i % statuses.length],
-  }));
+function generateFakeData(count: number): Tdata[] {
+  const data: Tdata[] = [];
+
+  for (let i = 1; i <= count; i++) {
+    data.push({
+      id: i.toString(),
+      name: `文件名稱 ${i}`,
+      process: [
+        { name: '阿狗', status: '提出' },
+        { name: '阿貓', status: '審查' },
+        { name: '阿鳥', status: '核准' },
+      ],
+    });
+  }
+
+  return data;
 }
 
 const fakeData: Tdata[] = generateFakeData(50);
