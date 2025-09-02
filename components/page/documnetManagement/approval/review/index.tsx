@@ -16,7 +16,7 @@ import { useMessageSender } from 'hooks/globalState/useWindowMessage';
 
 // MARK:RENDER
 
-export default function Review({ id, allowResponse }: { id?: string; allowResponse?: boolean }) {
+export default function Review({ id, allowResponse = true }: { id?: string; allowResponse?: boolean }) {
   const { sendMessage, setTarget, isReady, targetWindow } = useMessageSender<string>({ channel: 'approve' });
 
   const [tab, setTab] = useState<'response' | 'history'>(allowResponse ? 'response' : 'history');
