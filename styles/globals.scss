@@ -155,11 +155,9 @@ input::placeholder {
 //Switch checked
 .ant-switch-checked.ant-switch-checked {
   background-color: #388e3c;
-}
-
-// Switch checked + hover
-.ant-switch-checked:hover.ant-switch-checked:hover {
-  background-color: #2e7d32 ;
+  &.ant-switch-checked:hover {
+    background-color: #2e7d32;
+  }
 }
 
 // ==========================================================================
