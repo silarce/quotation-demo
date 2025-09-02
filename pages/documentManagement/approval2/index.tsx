@@ -106,10 +106,10 @@ const columns: TableProps<Tdata>['columns'] = [
     render: (_, record) => (
       <Link
         href={{
-          pathname: 'approval/approve',
-          query: {
-            id: record.id,
-          },
+          pathname: 'approval2/approve',
+          // query: {
+          //   id: record.id,
+          // },
         }}
         className="inline-block"
       >
