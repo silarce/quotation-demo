@@ -11,11 +11,12 @@ import { DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry'
 
 import Icon_note from 'public/image/icon/fong/procurement.svg';
 
+import Badge from 'components/global/gear/badge';
+
 // ============================================================================
 
 interface Tquery {
   idNumber?: string;
-  tab?: string;
   type?: string;
 }
 
@@ -25,54 +26,31 @@ interface Tdata {
   idNumber: string;
   // 類別
   type: string;
-  //部門
-  department: string;
   // 送出日期
   submitDate: string;
-  // 申請人
-  applicant: string;
-  // 主旨
-  subject: string;
+  // 狀態
+  status: string;
 }
 
 // ============================================================================
 export default function Approval() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const tab = query.tab || 'awaitingReview';
 
-  const handle_awaitingReview = () => {
-    router.replace({
-      query: {
-        ...query,
-        tab: 'awaitingReview',
-      },
-    });
-  };
-
-  const handle_processingRecords = () => {
-    router.replace({
-      query: {
-        ...query,
-        tab: 'processingRecords',
-      },
-    });
+  const handle_tab2 = () => {
+    router.push('approval2/setReview');
   };
 
   return (
     <div className="grid grid-rows-[fit-content(100%)_1fr] h-full">
       <div className="flex gap-4 mb-6">
-        <Tab active={tab === 'awaitingReview'} onClick={handle_awaitingReview}>
-          待審核
-        </Tab>
-        <Tab active={tab === 'processingRecords'} onClick={handle_processingRecords}>
-          處理紀錄
-        </Tab>
+        <Tab active={true}>個人單據</Tab>
+        <Tab onClick={handle_tab2}>自訂審核</Tab>
       </div>
 
       <div className="wrapper_fong h-full">
         <SearchPanel className="mb-6" />
-        <Table_antd dataSource={fakeData} columns={columns} />
+        <Table_antd dataSource={fakeData} columns={columns} rowHoverable={false} />
       </div>
     </div>
   );
@@ -93,24 +71,32 @@ const columns: TableProps<Tdata>['columns'] = [
     width: 100,
   },
   {
-    title: '部門',
-    dataIndex: 'department',
-    width: 100,
-  },
-  {
     title: '送出日期',
     dataIndex: 'submitDate',
     width: 150,
     align: 'right',
   },
+  {},
   {
-    title: '申請人',
-    dataIndex: 'applicant',
+    title: '狀態',
+    dataIndex: 'status',
     width: 100,
-  },
-  {
-    title: '主旨',
-    dataIndex: 'subject',
+    align: 'center',
+    render: (v) => {
+      if (v === '審核中') {
+        return <Badge theme="primary">{v}</Badge>;
+      }
+
+      if (v === '已核准') {
+        return <Badge theme="success">{v}</Badge>;
+      }
+
+      if (v === '駁回') {
+        return <Badge theme="danger">{v}</Badge>;
+      } else {
+        return <Badge>{v}</Badge>;
+      }
+    },
   },
   {
     title: '操作',
@@ -120,10 +106,10 @@ const columns: TableProps<Tdata>['columns'] = [
     render: (_, record) => (
       <Link
         href={{
-          pathname: 'approval/approve',
-          query: {
-            id: record.id,
-          },
+          pathname: 'approval2/approve',
+          // query: {
+          //   id: record.id,
+          // },
         }}
         className="inline-block"
       >
@@ -135,11 +121,7 @@ const columns: TableProps<Tdata>['columns'] = [
 
 // ============================================================================
 
-const SearchPanel = ({
-  className,
-}: {
-  className?: string;
-} = {}) => {
+const SearchPanel = ({ className }: { className?: string } = {}) => {
   const router = useRouter();
   const query = router.query as Tquery;
   const [idNumber, setIdNumber] = useState(query.idNumber || '');
@@ -173,7 +155,12 @@ const SearchPanel = ({
           className: 'w-[102px]',
         }}
       >
-        <Input value={idNumber} onChange={(e) => setIdNumber(e.target.value)} placeholder="請輸入單號" />
+        <Input
+          //
+          value={idNumber}
+          onChange={(e) => setIdNumber(e.target.value)}
+          placeholder="請輸入單號"
+        />
       </DataEntry_fong>
       <DataEntry_fong
         childrenWrapperProps={{
@@ -181,10 +168,11 @@ const SearchPanel = ({
         }}
       >
         <Select
+          placeholder="選擇類別"
           options={[
-            { value: '1', label: '類型1' },
-            { value: '2', label: '類型2' },
-            { value: '3', label: '類型3' },
+            { value: '1', label: '類別1' },
+            { value: '2', label: '類別2' },
+            { value: '3', label: '類別3' },
           ]}
           value={type}
           onChange={(value) => setType(value)}
@@ -200,18 +188,15 @@ const SearchPanel = ({
 // ============================================================================
 
 function generateFakeData(count: number): Tdata[] {
-  const departments = ['部門A', '部門B', '部門C', '部門D'];
   const types = ['類型1', '類型2', '類型3'];
-  const applicants = ['張三', '李四', '王五', '陳六', '林七'];
+  const statuses = ['審核中', '已核准', '駁回'];
 
   return Array.from({ length: count }, (_, i) => ({
     id: (i + 1).toString(),
-    idNumber: (100000 + i).toString(),
+    idNumber: `APP-${String(i + 1).padStart(5, '0')}`,
     type: types[i % types.length],
-    department: departments[i % departments.length],
     submitDate: `2023-10-${String((i % 30) + 1).padStart(2, '0')}`,
-    applicant: applicants[i % applicants.length],
-    subject: `申請主旨${i + 1}`,
+    status: statuses[i % statuses.length],
   }));
 }
 

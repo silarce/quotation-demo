@@ -1,5 +1,7 @@
 import { TsidePathConfig } from '../type';
 
+const isInProd = process.env.NEXT_PUBLIC_NODE_ENV === 'prod';
+
 export default function SidePathDocumentManagement() {
   const path = '/documentManagement';
 
@@ -23,7 +25,12 @@ export default function SidePathDocumentManagement() {
           {
             label: '審核列表',
             path: path + '/approval',
-            erpFeature: 'allPass',
+            erpFeature: isInProd ? [] : 'allPass',
+          },
+          {
+            label: '審核列表2',
+            path: path + '/approval2',
+            erpFeature: isInProd ? [] : 'allPass',
           },
         ],
       },

@@ -26,6 +26,7 @@ import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 // import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+import { useWindow } from 'hooks/globalState/useWindow';
 
 //
 import dayjs, { Dayjs } from 'dayjs';
@@ -83,6 +84,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // ----------------------------------------------------------------------------
 
   const globalState_review = useGlobal_review();
+  const { isInIframe } = useWindow();
 
   // ----------------------------------------------------------------------------
   const [ready, setReady] = useState(false);
@@ -130,17 +132,23 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   }
   // ------------------------------------------------------------------
 
-  let getLayout = Component.getLayout;
+  const getLayout = (() => {
+    let getLayout = Component.getLayout;
 
-  if (!getLayout) {
-    if (!userInfo || !userErpFeature) {
+    if (getLayout) {
+      return getLayout;
+    }
+
+    if (!userInfo || !userErpFeature || isInIframe) {
       getLayout = (page) => page;
     } else {
       getLayout = (page) => {
         return <Layer>{page}</Layer>;
       };
     }
-  }
+
+    return getLayout;
+  })();
 
   // ------------------------------------------------------------------
 
