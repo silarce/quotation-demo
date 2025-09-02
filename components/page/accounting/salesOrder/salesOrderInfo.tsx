@@ -12,6 +12,8 @@ const options_currency = optionsCreator_currency();
 
 import { selector_customer } from 'components/composition/selectorModal/selector_customer';
 
+import Icon_query from 'public/image/icon/fong/query.svg';
+
 export default function SalesOrderInfo({ instance_salesOrder }: { instance_salesOrder: Tinstance_salesOrder }) {
   const { state: state_salesOrder, setState: setState_salesOrder } = instance_salesOrder;
 
@@ -92,21 +94,27 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
         caption="客戶編號"
         className="col-span-2"
         isMust={true}
-        childrenWrapperProps={{
-          className: 'cursor-pointer',
-          onClick: hancle_selectCustomer,
-        }}
+        suffix={<Icon_query onClick={hancle_selectCustomer} className="cursor-pointer" />}
       >
-        {state_salesOrder.customerNumber}
+        <Input
+          value={state_salesOrder.customerNumber}
+          onChange={(e) => setState_salesOrder({ ...state_salesOrder, customerNumber: e.target.value })}
+        />
       </DataEntry_fong>
 
-      <DataEntry_fong caption="客戶名稱" className="col-span-2" disabled={true}>
-        {state_salesOrder.customerName}
+      <DataEntry_fong caption="客戶名稱" className="col-span-2">
+        <Input
+          value={state_salesOrder.customerName}
+          onChange={(e) => setState_salesOrder({ ...state_salesOrder, customerName: e.target.value })}
+        />
       </DataEntry_fong>
       {/*  */}
 
-      <DataEntry_fong caption="客戶地址" className="col-span-2" disabled={true}>
-        {state_salesOrder.address}
+      <DataEntry_fong caption="客戶地址" className="col-span-2">
+        <Input
+          value={state_salesOrder.address}
+          onChange={(e) => setState_salesOrder({ ...state_salesOrder, address: e.target.value })}
+        />
       </DataEntry_fong>
 
       <DataEntry_fong caption="客戶聯絡電話">
@@ -124,8 +132,11 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
 
       {/*  */}
 
-      <DataEntry_fong caption="統一編號" className="col-span-2" disabled={true}>
-        {state_salesOrder.taxId}
+      <DataEntry_fong caption="統一編號" className="col-span-2">
+        <Input
+          value={state_salesOrder.taxId}
+          onChange={(e) => setState_salesOrder({ ...state_salesOrder, taxId: e.target.value })}
+        />
       </DataEntry_fong>
 
       <DataEntry_fong caption="發票類型">

@@ -198,7 +198,6 @@ const createBody_post_ = ({
     salesAmount,
     taxes,
     totalAmount,
-    sourceType: 類別,
     address,
     invoiceType,
     taxId,
