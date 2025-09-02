@@ -20,6 +20,8 @@ import VersionLabel from 'components/page/domestic/quotation_v2/hook/quotationPr
 import ContractVerifyForm, {
   useDefaultPaymentRatio_quotationContent,
 } from 'components/composition/contractVerifyForm/contractVerifyForm';
+
+// 未來舊報價單完全不用時要將以下相關元件刪掉
 // import Table_prod from 'components/page/domestic/quotation/quotation/product/table_prod';
 // import Table_com from 'components/page/domestic/quotation/quotation/product/table_component';
 // import Table_accessories from 'components/page/domestic/quotation/quotation/product/table_accessories';
@@ -124,7 +126,7 @@ import {
 
 import { useInterval } from 'hooks/useInterval';
 
-import { useBackup } from 'hooks/useBackup';
+import { useBackup, exportBackup, importBackup } from 'hooks/useBackup';
 
 // ======================================================================
 // ======================================================================
@@ -410,7 +412,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     type: 'quotation',
   });
 
-  const backupState = () => {
+  const createStateForRestore = () => {
     const payInfo_pre = exportState_payInfo({ exportCopy: false });
     const payInfo = {
       ...payInfo_pre,
@@ -431,7 +433,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       other: state_otherArr,
     };
 
-    updateBackup && updateBackup(stateForRestore);
+    return stateForRestore;
+  };
+
+  const backupState = () => {
+    updateBackup && updateBackup(createStateForRestore());
+  };
+
+  const doExportBackup = () => {
+    exportBackup(createStateForRestore(), `報價單備份-${state_profile.projectName}`);
   };
 
   const restoreAllState = !backup
@@ -446,6 +456,40 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         restoreState_payInfo(backup.payInfo);
         restoreState_other(backup.other);
       };
+
+  const doImportBackup = async () => {
+    const backup = (await importBackup()) as Tbackup;
+
+    if (!backup) {
+      return;
+    }
+
+    const { status, product, quotationTotalPrice, profile, annoArr, quotationRangeArr, payInfo, other } = backup;
+
+    if (
+      !status ||
+      !product ||
+      !quotationTotalPrice ||
+      !profile ||
+      !annoArr ||
+      !quotationRangeArr ||
+      !payInfo ||
+      !other
+    ) {
+      myAlert.err({ title: '備份資料格式錯誤' });
+
+      return;
+    }
+
+    setState_status(backup.status);
+    restoreState_product(backup.product);
+    restoreState_quotationTotalPrice(backup.quotationTotalPrice);
+    restoreState_profile(backup.profile);
+    restoreState_anno(backup.annoArr);
+    restoreState_quotationRange(backup.quotationRangeArr);
+    restoreState_payInfo(backup.payInfo);
+    restoreState_other(backup.other);
+  };
 
   // ----------------------------------------------------------------------
   // console.log('isBouncing', isBouncing);
@@ -997,73 +1041,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     //
     restoreAllState: restoreAllState,
     clearBackup,
+    doExportBackup,
+    doImportBackup,
   });
-  // const { panelList, customeRight } = usePanel({
-  //   disabled,
-  //   quotationType,
-  //   isReviewer,
-  //   status: content?.status ?? '',
-  //   isDesignatedContent,
-  //   //
-  //   isAllReviewedBeforePending,
-  //   //
-  //   btnEditOnClick: () => {
-  //     setDisabled(false);
-
-  //     if (backup) {
-  //       myAlert.confirm({
-  //         title: '確定不回復編輯狀態而編輯報價單?',
-  //         content: '編輯狀態將會被覆蓋',
-  //         props: {
-  //           onOk: () => {
-  //             setDisabled(false);
-  //           },
-  //         },
-  //       });
-  //     } else {
-  //       setDisabled(false);
-  //     }
-  //   },
-  //   btnCancelOnClick: () => {
-  //     myAlert.confirm({
-  //       title: '確定要取消編輯?',
-  //       content: '所有未儲存的變更將會被捨棄',
-  //       props: {
-  //         onOk: () => {
-  //           setDisabled(true);
-  //           clearBackup && clearBackup();
-  //         },
-  //       },
-  //     });
-  //   },
-
-  //   btnPatchOnClick: handlePatch,
-  //   btnPostOnClick: handlePost,
-  //   btnModifyOnClick: handleModify,
-  //   btnPatchModifyOnClick: handlePatchModify,
-
-  //   cloneQuotation: () => {
-  //     handleClone();
-  //   },
-  //   cloneQuotation_relation: () => {
-  //     handleClone(true);
-  //   },
-  //   handleReqToPending,
-
-  //   handleReview,
-  //   handleSubmit: preHandleSubmit,
-  //   showVerifyForm: () => setReviewFormShow(true),
-  //   handleReqUnlock,
-  //   //
-  //   showPdf,
-  //   showPdf_noDiscount,
-  //   showPdf_part: () => setShow_pdfPart(true),
-  //   //
-  //   isQuotationExpired,
-  //   quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
-  //   //
-  //   restoreAllState: restoreAllState,
-  // });
 
   const history = useHistory({
     quotationData,
@@ -1105,12 +1085,6 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
     setState_status(status);
   }, [content]);
-
-  // useEffect(() => {
-  //   if (quotationType === 'new' || quotationType === 'newAttachment') {
-  //     restoreAllState && restoreAllState();
-  //   }
-  // }, [quotationType]);
 
   useInterval(backupState, {
     interval: 5000,
