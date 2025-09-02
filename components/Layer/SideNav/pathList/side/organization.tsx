@@ -43,6 +43,11 @@ export default function SidePathPersonnel() {
               path: path + '/system/roleManagement',
               erpFeature: isInProd ? [] : 'allPass',
             },
+            {
+              label: '系統選單維護',
+              path: path + '/system/menu',
+              erpFeature: isInProd ? [] : 'allPass',
+            },
           ],
         },
       ],
