@@ -1,4 +1,4 @@
-@use "styles/theme01" as *;
+@use 'styles/theme01' as *;
 
 // 改為在pages/_document.tsx匯入字體
 /* 字體 Inter */
@@ -141,20 +141,25 @@ input::placeholder {
 
   .ant-checkbox-disabled + span,
   .ant-radio-disabled + span {
-    color: theme("colors.sub");
+    color: theme('colors.sub');
   }
 
   .ant-checkbox-disabled.ant-checkbox-checked .ant-checkbox-inner::after {
-    border-color: theme("colors.sub");
+    border-color: theme('colors.sub');
   }
 
   .ant-radio-disabled .ant-radio-inner::after {
-    background-color: theme("colors.sub");
+    background-color: theme('colors.sub');
   }
 }
-//Switch
+//Switch checked
 .ant-switch-checked.ant-switch-checked {
   background-color: #388e3c;
+}
+
+// Switch checked + hover
+.ant-switch-checked:hover.ant-switch-checked:hover {
+  background-color: #2e7d32;
 }
 
 // ==========================================================================
@@ -168,16 +173,16 @@ input::placeholder {
 }
 
 // 用來把input type="number"元素右邊的上下箭頭隱藏
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
 
   margin: 0;
 }
 
-input[type="text"],
-input[type="password"],
-input[type="number"],
+input[type='text'],
+input[type='password'],
+input[type='number'],
 textarea {
   -webkit-appearance: none;
   -moz-appearance: textfield;
@@ -216,16 +221,16 @@ input:focus-visible {
 }
 
 .cmain {
-  color: theme("colors.main");
+  color: theme('colors.main');
 }
 .csub {
-  color: theme("colors.sub");
+  color: theme('colors.sub');
 }
 .ctext {
-  color: theme("colors.text");
+  color: theme('colors.text');
 }
 .cactive {
-  color: theme("colors.active");
+  color: theme('colors.active');
 }
 
 ::-webkit-scrollbar {
@@ -233,7 +238,7 @@ input:focus-visible {
   // height: 7px;
   width: 12px;
   height: 12px;
-  background-color: theme("colors.bgc01");
+  background-color: theme('colors.bgc01');
 }
 
 /* Track */
@@ -271,7 +276,7 @@ input:focus-visible {
 .global_tip_must {
   position: relative;
   &:before {
-    content: "*";
+    content: '*';
     font-size: 30px;
     color: red;
     position: absolute;
@@ -282,7 +287,7 @@ input:focus-visible {
 
 .global_container01 {
   padding: 20px;
-  border: solid 1px theme("colors.border");
+  border: solid 1px theme('colors.border');
 }
 
 .global_grid01 {
