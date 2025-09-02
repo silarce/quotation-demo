@@ -126,7 +126,7 @@ import {
 
 import { useInterval } from 'hooks/useInterval';
 
-import { useBackup } from 'hooks/useBackup';
+import { useBackup, exportBackup } from 'hooks/useBackup';
 
 // ======================================================================
 // ======================================================================
@@ -412,7 +412,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     type: 'quotation',
   });
 
-  const backupState = () => {
+  const createStateForRestore = () => {
     const payInfo_pre = exportState_payInfo({ exportCopy: false });
     const payInfo = {
       ...payInfo_pre,
@@ -433,7 +433,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       other: state_otherArr,
     };
 
-    updateBackup && updateBackup(stateForRestore);
+    return stateForRestore;
+  };
+
+  const backupState = () => {
+    updateBackup && updateBackup(createStateForRestore());
+  };
+
+  const doExportBackup = () => {
+    exportBackup(createStateForRestore(), `報價單備份-${state_profile.projectName}`);
   };
 
   const restoreAllState = !backup
@@ -999,6 +1007,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     //
     restoreAllState: restoreAllState,
     clearBackup,
+    doExportBackup,
   });
 
   const history = useHistory({

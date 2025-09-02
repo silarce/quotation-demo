@@ -21,6 +21,7 @@ interface Tbackup {
 
 // =====================================================================
 
+// 儲存在localStorage的key，不要隨意變更，避免無法存取舊資料
 const key_backupMeta = 'backupMeta';
 
 // =====================================================================
@@ -231,4 +232,26 @@ const useClearBackup = () => {
   }, []);
 };
 
-export { useBackup, useClearBackup };
+const exportBackup = (dataWillBackup: any, fileName: string) => {
+  try {
+    const data_json = JSON.stringify(dataWillBackup);
+    const blob = new Blob([data_json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('匯出備份失敗:', error);
+    myAlert.notify.error({
+      message: '匯出備份失敗',
+    });
+  }
+};
+
+export { useBackup, useClearBackup, exportBackup };

@@ -46,49 +46,8 @@ interface Tprops {
 
   restoreAllState: undefined | null | (() => void);
   clearBackup: undefined | null | (() => void);
+  doExportBackup: () => void;
 }
-
-// interface Tprops {
-//   disabled: boolean;
-//   quotationType: TquotationType;
-
-//   // isQuotation: boolean;
-//   // isAttachmentQuotation: boolean;
-//   // isNewQuotation: boolean;
-//   // isNewAttachmentQuotation: boolean;
-
-//   isReviewer: boolean | undefined | null;
-//   status: string;
-//   isDesignatedContent: boolean;
-//   //
-//   isAllReviewedBeforePending: boolean;
-//   //
-//   btnEditOnClick: () => void;
-//   btnCancelOnClick: () => void;
-
-//   btnPatchOnClick: () => void;
-//   btnModifyOnClick: () => void;
-//   btnPostOnClick: () => void;
-//   btnPatchModifyOnClick: () => void;
-
-//   cloneQuotation: () => void;
-//   cloneQuotation_relation: () => void;
-
-//   handleReqToPending: () => void;
-//   handleReview: () => void;
-//   handleSubmit: () => void;
-//   showVerifyForm: () => void;
-//   handleReqUnlock: () => void;
-//   //
-//   showPdf: () => void;
-//   showPdf_noDiscount: () => void;
-//   showPdf_part: () => void;
-//   //
-//   isQuotationExpired: boolean;
-//   quotationExpiredInfo: string;
-//   //
-//   restoreAllState: undefined | null | (() => void);
-// }
 
 // ================================================================================
 
@@ -122,6 +81,7 @@ const usePanel = ({
 
   restoreAllState,
   clearBackup,
+  doExportBackup,
 }: Tprops) => {
   const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
 
@@ -256,6 +216,14 @@ const usePanel = ({
     },
   };
 
+  const panel_exportBackup: TpanelItem = {
+    type: 'myButton',
+    label: '匯出備份資料',
+    onClick: () => {
+      doExportBackup();
+    },
+  };
+
   const panel_expired: TpanelItem = {
     type: 'redButton',
     label: '報價單過期',
@@ -296,8 +264,8 @@ const usePanel = ({
 
   const panelList_abled: TpanelList = [
     ...{
-      new: [panel_post, restoreAllState ? panel_restore : null, panel_returnAndClearBackup],
-      old: [panel_patch, restoreAllState ? panel_restore : null, panel_cancelEdit],
+      new: [panel_post, panel_exportBackup, restoreAllState ? panel_restore : null, panel_returnAndClearBackup],
+      old: [panel_patch, panel_exportBackup, restoreAllState ? panel_restore : null, panel_cancelEdit],
       newAttachment: [panel_modify, restoreAllState ? panel_restore : null, panel_cancelEdit],
       oldAttachment: [panel_patchModify, restoreAllState ? panel_restore : null, panel_cancelEdit],
       undefined: [],
@@ -328,209 +296,6 @@ const usePanel = ({
 
   return { panelList, customeRight };
 };
-
-// const usePanel = ({
-//   disabled,
-//   quotationType,
-
-//   isReviewer,
-//   status,
-//   isDesignatedContent,
-
-//   btnEditOnClick,
-//   btnCancelOnClick,
-
-//   btnPatchOnClick,
-//   btnPostOnClick,
-//   btnModifyOnClick,
-//   btnPatchModifyOnClick,
-
-//   cloneQuotation,
-//   cloneQuotation_relation,
-//   showPdf,
-//   showPdf_noDiscount,
-//   showPdf_part,
-
-//   isAllReviewedBeforePending,
-
-//   handleReqToPending,
-
-//   handleReview,
-//   handleSubmit,
-//   showVerifyForm,
-//   handleReqUnlock,
-
-//   isQuotationExpired,
-//   quotationExpiredInfo,
-//   //
-//   restoreAllState,
-// }: Tprops) => {
-//   const router = useRouter();
-
-//   const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
-
-//   const notAllowCopy =
-//     !disabled ||
-//     status === 'Pending' ||
-//     isDesignatedContent ||
-//     quotationType === 'new' ||
-//     quotationType === 'newAttachment' ||
-//     quotationType === 'oldAttachment' ||
-//     isQuotationExpired;
-
-//   // -----------------------------------------------------------------------
-
-//   const { label_update, btnUpdateOnClick } = (() => {
-//     let label_update = '更新報價單';
-
-//     let btnUpdateOnClick = btnPatchOnClick;
-
-//     if (quotationType === 'new') {
-//       btnUpdateOnClick = btnPostOnClick;
-//       label_update = '新建報價單';
-//     } else if (quotationType === 'newAttachment') {
-//       btnUpdateOnClick = btnModifyOnClick;
-//       label_update = '新建追加追減報價單';
-//     } else if (quotationType === 'oldAttachment') {
-//       btnUpdateOnClick = btnPatchModifyOnClick;
-//       label_update = '更新追加追減報價單';
-//     }
-
-//     return { label_update, btnUpdateOnClick };
-//   })();
-
-//   let label_cancel = '取消';
-//   let onClick_cancel = btnCancelOnClick;
-
-//   if (quotationType === 'new') {
-//     label_cancel = '返回';
-//     onClick_cancel = () => router.back();
-//   }
-
-//   const panel_update: TpanelItem = {
-//     type: 'redButton',
-//     label: label_update,
-//     onClick: btnUpdateOnClick,
-//   };
-//   const panel_cancel: TpanelItem = {
-//     type: 'myButton',
-//     label: label_cancel,
-//     onClick: onClick_cancel,
-//   };
-//   const panel_turnToPending: TpanelItem = {
-//     type: 'redButton',
-//     label: '轉為準合約',
-//     onClick: () => {
-//       myAlert.confirm({
-//         title: '確定轉為準合約',
-//         props: {
-//           onOk: handleReqToPending,
-//         },
-//       });
-//     },
-//   };
-//   const panel_review: TpanelItem = {
-//     type: 'myButton',
-//     label: '審核',
-//     onClick: handleReview,
-//   };
-//   const panel_submit: TpanelItem = {
-//     type: 'myButton',
-//     label: '送審',
-//     onClick: handleSubmit,
-//   };
-//   const panel_showVerifyForm: TpanelItem = {
-//     type: 'myButton',
-//     label: '合約審核表',
-//     onClick: showVerifyForm,
-//   };
-//   const panel_edit: TpanelItem = {
-//     type: 'myButton',
-//     label: '編輯',
-//     onClick: btnEditOnClick,
-//   };
-//   const panel_unlock: TpanelItem = {
-//     type: 'myButton',
-//     label: '解除鎖定並退回發包',
-//     img: iconRedLock.src,
-//     onClick: handleReqUnlock,
-//   };
-//   const panel_return: TpanelItem = {
-//     type: 'myButton',
-//     label: '返回',
-//     onClick: () => router.back(),
-//   };
-//   const panel_restore: TpanelItem = restoreAllState
-//     ? {
-//         type: 'myButton',
-//         label: '回復備份狀態並編輯',
-//         onClick: restoreAllState,
-//       }
-//     : null;
-
-//   // -----------------------------------------------------------------------
-
-//   const customeRight: React.ReactNode[] = [
-//     notAllowCopy ? null : (
-//       <CloneQuotation
-//         key="CloneQuotation"
-//         cloneQuotation={cloneQuotation}
-//         cloneQuotation_relation={cloneQuotation_relation}
-//       />
-//     ),
-//     !disabled ? null : (
-//       <ExportQuotation
-//         key="ExportQuotation"
-//         showPdf={showPdf}
-//         setShowPdf_part={showPdf_part}
-//         showPdf_noDiscount={showPdf_noDiscount}
-//       />
-//     ),
-//   ];
-
-//   const panelList_abled: TpanelList = [
-//     //
-//     panel_update,
-//     panel_cancel,
-//   ];
-
-//   const panelList_disabled_quotation: TpanelList = [
-//     isOldQuotation && isAllReviewedBeforePending ? panel_turnToPending : null,
-//     isOldQuotation && isReviewer ? panel_review : null,
-//     isOldQuotation ? panel_submit : null,
-
-//     isOldQuotation && status === 'Pending' ? panel_showVerifyForm : null,
-
-//     status === 'Pending' ? null : panel_restore,
-//     status === 'Pending' ? null : panel_edit,
-
-//     status === 'Pending' || status === 'TempPending' ? panel_unlock : null,
-
-//     panel_return,
-//   ];
-
-//   const panelList_disabled_content: TpanelList = [panel_restore, panel_edit, panel_return];
-
-//   const panelList_disabled: TpanelList = isDesignatedContent
-//     ? panelList_disabled_content
-//     : panelList_disabled_quotation;
-
-//   const panelList_expired: TpanelList = [
-//     {
-//       type: 'redButton',
-//       label: '報價單過期',
-//       onClick: () => {
-//         myAlert.info({ title: '報價單過期', content: quotationExpiredInfo });
-//       },
-//     },
-//     panel_return,
-//   ];
-
-//   // const panelList = disabled ? panelList_disabled : panelList_abled;
-//   const panelList = isQuotationExpired ? panelList_expired : disabled ? panelList_disabled : panelList_abled;
-
-//   return { panelList, customeRight };
-// };
 
 // ================================================================================
 
