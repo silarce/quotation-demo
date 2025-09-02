@@ -7,8 +7,8 @@ import { useRouter } from 'next/router';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import Tab from 'components/global/gear/button/tab';
 import Btn from 'components/global/gear/button/btn_fong';
-import { DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry';
-import { modal_delete } from 'components/global/gear/modal/fongModal';
+import { modal_empty, modal_delete } from 'components/global/gear/modal/fongModal';
+import AddReviewProcesss from 'components/page/documnetManagement/approval2/addReviewProcess';
 
 import Badge from 'components/global/gear/badge';
 
@@ -17,11 +17,6 @@ import Icon_trash from 'public/image/icon/fong/trash.svg';
 // import Icon_note from 'public/image/icon/fong/procurement.svg';
 
 // ============================================================================
-
-interface Tquery {
-  idNumber?: string;
-  type?: string;
-}
 
 interface Tdata {
   id: string;
@@ -34,7 +29,7 @@ interface Tdata {
 
 // ============================================================================
 
-// ============================================================================
+// MARK: START
 export default function Approval() {
   const router = useRouter();
 
@@ -46,6 +41,12 @@ export default function Approval() {
     modal_delete({
       onConfirm: () => {},
       onCancel: () => {},
+    });
+  };
+
+  const handle_add = () => {
+    modal_empty({
+      content: <AddReviewProcesss />,
     });
   };
 
@@ -63,7 +64,7 @@ export default function Approval() {
       <div className="wrapper_fong h-full">
         <div className="mb-6 flex justify-between items-center">
           <div className="text-[16px] font-semibold">目前審核流程</div>
-          <Btn theme="process" themeColor="green_I">
+          <Btn theme="process" themeColor="green_I" onClick={handle_add}>
             新增流程
           </Btn>
         </div>
@@ -72,6 +73,7 @@ export default function Approval() {
     </div>
   );
 }
+// MARK: END
 
 // ============================================================================
 
@@ -138,74 +140,6 @@ const createColumns = ({ handle_delete }: { handle_delete: (id: string) => void 
 };
 
 // ============================================================================
-
-const SearchPanel = ({ className }: { className?: string } = {}) => {
-  const router = useRouter();
-  const query = router.query as Tquery;
-  const [idNumber, setIdNumber] = useState(query.idNumber || '');
-  const [type, setType] = useState(query.type || '');
-
-  const onSearch = () => {
-    const newQuery: Tquery = {};
-
-    idNumber && (newQuery.idNumber = idNumber);
-    type && (newQuery.type = type);
-
-    router.replace({
-      pathname: router.pathname,
-      query: {
-        ...query,
-        ...newQuery,
-      },
-    });
-  };
-
-  return (
-    <form
-      className={classNames('flex gap-4', className)}
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSearch();
-      }}
-    >
-      <DataEntry_fong
-        childrenWrapperProps={{
-          className: 'w-[102px]',
-        }}
-      >
-        <Input
-          //
-          value={idNumber}
-          onChange={(e) => setIdNumber(e.target.value)}
-          placeholder="請輸入單號"
-        />
-      </DataEntry_fong>
-      <DataEntry_fong
-        childrenWrapperProps={{
-          className: 'w-[118px]',
-        }}
-      >
-        <Select
-          placeholder="選擇類別"
-          options={[
-            { value: '1', label: '類別1' },
-            { value: '2', label: '類別2' },
-            { value: '3', label: '類別3' },
-          ]}
-          value={type}
-          onChange={(value) => setType(value)}
-        />
-      </DataEntry_fong>
-      <Btn theme="query" type="submit">
-        搜索資料
-      </Btn>
-    </form>
-  );
-};
-
-// ============================================================================
-
-// status:'提出'|"審查"|"核准"
 
 function generateFakeData(count: number): Tdata[] {
   const data: Tdata[] = [];
