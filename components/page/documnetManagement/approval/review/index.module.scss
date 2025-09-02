@@ -1,0 +1,78 @@
+.wrapper {
+  height: calc(100% - 29px);
+  padding: 24px;
+  margin: 17px;
+  margin-top: 12px;
+  border: solid 1px theme("colors.border02");
+  border-radius: theme("border.radius.normal");
+}
+
+.body {
+  display: grid;
+  grid-template-rows: 3fr 2fr;
+  // grid-template-rows: minmax(0, 3fr) minmax(0, 2fr);
+  height: 100%;
+  overflow: hidden;
+}
+
+.iframe {
+  height: 100%;
+  width: 100%;
+}
+
+.spin {
+  :global(.ant-spin-container) {
+    height: 100%;
+  }
+}
+
+.tabs {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-content: flex-start;
+  margin-top: 24px;
+}
+
+.tabs {
+  margin-top: 24px;
+  border: solid 1px theme("colors.border02");
+  border-radius: theme("border.radius.normal");
+  padding: 24px;
+  box-shadow: theme("boxShadow.02");
+  overflow: hidden;
+}
+
+.response {
+  display: grid;
+  gap: 10px;
+  grid-template-rows: auto auto;
+  align-content: space-between;
+
+  .btnBar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  .caption {
+    flex: 0 0 1;
+    width: 106px;
+    font-weight: 500;
+    color: theme("colors.text02");
+  }
+  .entryBox {
+    flex: 1 1 auto;
+    padding: 12px;
+    border: solid 1px theme("colors.border02");
+    border-radius: theme("border.radius.normal");
+    .input {
+      width: 100%;
+      color: theme("colors.text02");
+    }
+  }
+}
