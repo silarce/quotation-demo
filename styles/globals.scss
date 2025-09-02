@@ -152,6 +152,10 @@ input::placeholder {
     background-color: theme("colors.sub");
   }
 }
+//Switch
+.ant-switch-checked.ant-switch-checked {
+  background-color: #388e3c;
+}
 
 // ==========================================================================
 
