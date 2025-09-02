@@ -254,4 +254,57 @@ const exportBackup = (dataWillBackup: any, fileName: string) => {
   }
 };
 
-export { useBackup, useClearBackup, exportBackup };
+const importBackup = (): Promise<any | null> => {
+  return new Promise((resolve, reject) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.style.display = 'none';
+
+    let data: any = undefined;
+
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      if (!file.name.endsWith('.json')) {
+        myAlert.info({
+          title: '限定為json檔',
+        });
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
+          data = JSON.parse(e.target?.result as string);
+          resolve(data);
+        } catch (error) {
+          console.error('解析備份檔案失敗:', error);
+          myAlert.err({
+            title: '解析備份檔案失敗',
+          });
+
+          reject(null);
+        }
+      };
+
+      reader.onerror = () => {
+        reject(new Error('檔案讀取失敗'));
+      };
+
+      reader.readAsText(file);
+    };
+
+    document.body.appendChild(input);
+    input.click();
+    document.body.removeChild(input);
+
+    // return data;
+  });
+};
+
+export { useBackup, useClearBackup, exportBackup, importBackup };

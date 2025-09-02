@@ -126,7 +126,7 @@ import {
 
 import { useInterval } from 'hooks/useInterval';
 
-import { useBackup, exportBackup } from 'hooks/useBackup';
+import { useBackup, exportBackup, importBackup } from 'hooks/useBackup';
 
 // ======================================================================
 // ======================================================================
@@ -456,6 +456,40 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         restoreState_payInfo(backup.payInfo);
         restoreState_other(backup.other);
       };
+
+  const doImportBackup = async () => {
+    const backup = (await importBackup()) as Tbackup;
+
+    if (!backup) {
+      return;
+    }
+
+    const { status, product, quotationTotalPrice, profile, annoArr, quotationRangeArr, payInfo, other } = backup;
+
+    if (
+      !status ||
+      !product ||
+      !quotationTotalPrice ||
+      !profile ||
+      !annoArr ||
+      !quotationRangeArr ||
+      !payInfo ||
+      !other
+    ) {
+      myAlert.err({ title: '備份資料格式錯誤' });
+
+      return;
+    }
+
+    setState_status(backup.status);
+    restoreState_product(backup.product);
+    restoreState_quotationTotalPrice(backup.quotationTotalPrice);
+    restoreState_profile(backup.profile);
+    restoreState_anno(backup.annoArr);
+    restoreState_quotationRange(backup.quotationRangeArr);
+    restoreState_payInfo(backup.payInfo);
+    restoreState_other(backup.other);
+  };
 
   // ----------------------------------------------------------------------
   // console.log('isBouncing', isBouncing);
@@ -1008,6 +1042,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     restoreAllState: restoreAllState,
     clearBackup,
     doExportBackup,
+    doImportBackup,
   });
 
   const history = useHistory({

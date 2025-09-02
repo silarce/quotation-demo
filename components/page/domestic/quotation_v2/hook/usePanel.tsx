@@ -47,6 +47,7 @@ interface Tprops {
   restoreAllState: undefined | null | (() => void);
   clearBackup: undefined | null | (() => void);
   doExportBackup: () => void;
+  doImportBackup: () => void;
 }
 
 // ================================================================================
@@ -82,6 +83,7 @@ const usePanel = ({
   restoreAllState,
   clearBackup,
   doExportBackup,
+  doImportBackup,
 }: Tprops) => {
   const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
 
@@ -224,6 +226,14 @@ const usePanel = ({
     },
   };
 
+  const panel_importBackup: TpanelItem = {
+    type: 'myButton',
+    label: '匯入備份資料',
+    onClick: () => {
+      doImportBackup();
+    },
+  };
+
   const panel_expired: TpanelItem = {
     type: 'redButton',
     label: '報價單過期',
@@ -264,8 +274,20 @@ const usePanel = ({
 
   const panelList_abled: TpanelList = [
     ...{
-      new: [panel_post, panel_exportBackup, restoreAllState ? panel_restore : null, panel_returnAndClearBackup],
-      old: [panel_patch, panel_exportBackup, restoreAllState ? panel_restore : null, panel_cancelEdit],
+      new: [
+        panel_post,
+        panel_exportBackup,
+        panel_importBackup,
+        restoreAllState ? panel_restore : null,
+        panel_returnAndClearBackup,
+      ],
+      old: [
+        panel_patch,
+        panel_exportBackup,
+        panel_importBackup,
+        restoreAllState ? panel_restore : null,
+        panel_cancelEdit,
+      ],
       newAttachment: [panel_modify, restoreAllState ? panel_restore : null, panel_cancelEdit],
       oldAttachment: [panel_patchModify, restoreAllState ? panel_restore : null, panel_cancelEdit],
       undefined: [],
