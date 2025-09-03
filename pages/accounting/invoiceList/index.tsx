@@ -5,15 +5,16 @@ import Decimal from 'decimal.js';
 
 import classNames from 'classnames';
 
+// components
+import Discount from 'components/page/accounting/invoiceList/discount';
+
+// gear
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, DatePicker } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
-
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { Container_confirm } from 'components/global/container/modal';
-
 import { modal_empty, modal_delete } from 'components/global/gear/modal/fongModal';
-
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
 import Selector_paymentRequest_invoice, {
   TpaymentRequestInvoiceList_Dto,
@@ -180,6 +181,26 @@ export default function InvoiceList() {
     });
   };
 
+  const handle_discount = (invoiceNumber: string) => {
+    const { destroy } = modal_empty({
+      // width: 800,
+      content: (
+        <Discount
+          onCancel={() => {
+            destroy();
+          }}
+          onConfirm={async (state) => {
+            if (state) {
+              console.log(state);
+            }
+
+            destroy();
+          }}
+        />
+      ),
+    });
+  };
+
   // ----------------------------------------------------------------------------
 
   const columns: TableProps<Tinvoice_Dto>['columns'] = [
@@ -250,7 +271,14 @@ export default function InvoiceList() {
         if (isInvoiced) {
           return (
             <div className="flex gap-4">
-              <Btn theme="coinChange">折讓</Btn>
+              <Btn
+                theme="coinChange"
+                onClick={() => {
+                  handle_discount(fullInvoiceNumber);
+                }}
+              >
+                折讓
+              </Btn>
               <Btn icon="ban" themeColor="red_I" onClick={() => handle_banInvoice(fullInvoiceNumber)}>
                 作廢
               </Btn>
