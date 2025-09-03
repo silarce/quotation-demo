@@ -4,7 +4,7 @@ import { RightOutlined, DownOutlined } from '@ant-design/icons';
 import Image from 'next/image';
 import axios from 'js/api/axiosCreator/axiosInstance';
 
-import { MenuNode } from 'pages/organization/system/menu/index';
+import { MenuItem } from './type';
 import editIcon from 'public/image/icon/note.svg?url';
 import deleteIcon from 'public/image/icon/trash.svg?url';
 import { modal_delete } from 'components/global/gear/modal/fongModal';
@@ -27,8 +27,8 @@ const getAuthHeader = () => {
 };
 
 interface Props {
-  menuData: MenuNode[];
-  setMenuData: React.Dispatch<React.SetStateAction<MenuNode[]>>;
+  menuData: MenuItem[];
+  setMenuData: (menus: MenuItem[]) => void;
   state: MenuState;
   setState: React.Dispatch<React.SetStateAction<MenuState>>;
   refetchMenuPaths: () => void;
@@ -47,7 +47,7 @@ const MenuTree: React.FC<Props> = ({ menuData, setMenuData, state, setState, ref
   };
 
   // 尋找目標節點的父節點 ID
-  const findParentId = (items: MenuNode[], targetId: string, parentId: string | null = null): string | null => {
+  const findParentId = (items: MenuItem[], targetId: string, parentId: string | null = null): string | null => {
     for (const item of items) {
       if (item.menu_id === targetId) {
         return parentId;
@@ -66,7 +66,7 @@ const MenuTree: React.FC<Props> = ({ menuData, setMenuData, state, setState, ref
   };
 
   // 從資料中刪除目標節點
-  const deleteNode = (items: MenuNode[], targetId: string): MenuNode[] => {
+  const deleteNode = (items: MenuItem[], targetId: string): MenuItem[] => {
     return items.flatMap((item) => {
       if (item.menu_id === targetId) {
         return [];
@@ -124,7 +124,7 @@ const MenuTree: React.FC<Props> = ({ menuData, setMenuData, state, setState, ref
   };
 
   // 遞迴渲染選單節點
-  const renderMenu = (items: MenuNode[], level: number = 0) => (
+  const renderMenu = (items: MenuItem[], level: number = 0) => (
     <ul className="w-full">
       {items.map((item) => {
         const hasChildren = (item.children ?? []).length > 0;
@@ -158,18 +158,18 @@ const MenuTree: React.FC<Props> = ({ menuData, setMenuData, state, setState, ref
                     const parentId = findParentId(menuData, item.menu_id) ?? 'root';
 
                     const fetchPreviewIcon = async () => {
-                      if (!item.menu_icon) {
+                      if (!item.menu_icon_path) {
                         return undefined;
                       }
 
                       try {
-                        const res = await fetch(`${BASE_URL}/api/v1/sys/file/download/${item.menu_icon}`, {
+                        const res = await fetch(`${BASE_URL}/api/v1/sys/file/download/${item.menu_icon_path}`, {
                           headers: { ...getAuthHeader },
                         });
                         const blob = await res.blob();
 
                         // 包成 File
-                        return new File([blob], item.menu_icon, { type: blob.type });
+                        return new File([blob], item.menu_icon_path, { type: blob.type });
                       } catch (err) {
                         console.error('圖片下載失敗', err);
 
