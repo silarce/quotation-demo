@@ -60,6 +60,7 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
     const { destroy } = modal_empty({
       content: (
         <Selector_accountant
+          forbidden={(accountant) => accountant.isAlreadyImportIncomeBill}
           onCancel={() => {
             destroy();
           }}
