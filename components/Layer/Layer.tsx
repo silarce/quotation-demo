@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, createContext, useLayoutEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useGlobal_sideNavConfig } from 'hooks/globalState/useGlobal_sideNavConfig';
+
 import style from './layer.module.scss';
 
 // components
@@ -11,13 +11,14 @@ import SideNavNew from './SideNav/SideNavNew';
 
 // type
 import { TerpFeatureDto, TuserDto } from 'js/api/dtoTypes';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 // ======================================================================
 export default function Layer({ children }: { children: React.ReactNode }) {
   const { pathname } = useRouter();
-
+  const { isUseNewSideNav } = useGlobal_optionalConfig();
   const ref_main = useRef<HTMLDivElement>(null!);
-  const { useNewSideNav } = useGlobal_sideNavConfig();
+
   useEffect(() => {
     ref_main.current.scrollTo(0, 0);
   }, [pathname]);
@@ -27,7 +28,7 @@ export default function Layer({ children }: { children: React.ReactNode }) {
       <Header />
       <Header_mobile />
       <div className={style.wrapper}>
-        {useNewSideNav ? <SideNavNew /> : <SideNav />}
+        {isUseNewSideNav ? <SideNavNew /> : <SideNav />}
         {/* main */}
         <div ref={ref_main} className={style.main}>
           {children}

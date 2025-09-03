@@ -17,7 +17,6 @@ import scss from './info.module.scss';
 import { useTranslation } from 'react-i18next';
 
 import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
-import { useGlobal_sideNavConfig } from 'hooks/globalState/useGlobal_sideNavConfig';
 
 import { apiLogout } from 'js/api/api_auth';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -36,9 +35,9 @@ export default function Info() {
     //
     isRefactoredQuotaion: isQuotation2,
     setIsRefactoredQuotaion: setIsQuotation2,
+    isUseNewSideNav,
+    setIsUseNewSideNav,
   } = useGlobal_optionalConfig();
-
-  const { useNewSideNav, setUseNewSideNav } = useGlobal_sideNavConfig();
 
   // ----------------------------------------------
 
@@ -150,9 +149,9 @@ export default function Info() {
                     <span>使用新版選單</span>
                     <Switch
                       onChange={(isChecked) => {
-                        setUseNewSideNav(isChecked);
+                        setIsUseNewSideNav(isChecked);
                       }}
-                      checked={useNewSideNav}
+                      checked={isUseNewSideNav}
                     />
                   </div>
                 ),

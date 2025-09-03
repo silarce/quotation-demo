@@ -4,17 +4,15 @@ import Info from './Info/Info';
 import Nav from './Nav/Nav';
 // css
 import style from './header.module.scss';
-
-// hooks
-import { useGlobal_sideNavConfig } from 'hooks/globalState/useGlobal_sideNavConfig';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 export default function Header() {
-  const { useNewSideNav } = useGlobal_sideNavConfig();
+  const { isUseNewSideNav } = useGlobal_optionalConfig();
 
   return (
     <div className={style.container}>
       <Logo />
-      {useNewSideNav ? <div /> : <Nav />}
+      {isUseNewSideNav ? <div /> : <Nav />}
       <Info />
     </div>
   );
