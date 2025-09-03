@@ -15,4 +15,11 @@ interface Tinvoice_Dto {
   quotationNumber: string | null; //報價單號
 }
 
-export type { Tinvoice_Dto };
+interface Tbody_updateInvoiceStatus {
+  invoiceNumber: string;
+  status: number;
+  updatedBy: string; //員工編號;
+  updatedAt: string;
+}
+
+export type { Tinvoice_Dto, Tbody_updateInvoiceStatus };

@@ -8,23 +8,25 @@ import classNames from 'classnames';
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import { DataEntry_fong, Input, DatePicker } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
-import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
+
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { Container_confirm } from 'components/global/container/modal';
 
-import { modal_empty } from 'components/global/gear/modal/fongModal';
+import { modal_empty, modal_delete } from 'components/global/gear/modal/fongModal';
 
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
 import Selector_paymentRequest_invoice, {
   TpaymentRequestInvoiceList_Dto,
 } from 'components/composition/selectorModal/selector_paymentRequestInvoice';
 
+//  api
 import { TaccountantInvoiceBookDto, apiGetAccountantInvoiceBook } from 'js/api/api_accountant';
-
-import { Tinvoice_Dto, useApiGetInvoiceNumberLists } from 'js/api/api_netCore/api_invoice';
-
+import { Tinvoice_Dto, useApiGetInvoiceNumberLists, apiUpdateInvoiceStatus } from 'js/api/api_netCore/api_invoice';
 import { Tbody_updatePRInvoice, apiUpdatePRInvoice } from 'js/api/api_netCore/api_accountsReceivable';
+
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
+
+import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 // ==========================================================================
 
@@ -46,6 +48,9 @@ export default function InvoiceList() {
   const query = router.query as Tquery;
   const { id: invoiceBookId } = query;
 
+  const { userInfo } = useGlobal_userInfo();
+  const userIdNumber = userInfo?.employee?.idNumber;
+
   const [state_invoiceBook, setState_invoiceBook] = useState<TaccountantInvoiceBookDto>();
 
   const invoiceBookDesc = state_invoiceBook && getInvoiceBookDesc(state_invoiceBook);
@@ -55,6 +60,30 @@ export default function InvoiceList() {
     update: update_invoiceArr,
     clear: clear_invoiceArr,
   } = useApiGetInvoiceNumberLists(state_invoiceBook?.id);
+
+  // ----------------------------------------------------------------------------
+
+  const reqPatchBanInvoice = async (invoiceNumber: string) => {
+    if (!userIdNumber) {
+      myAlert.info({ title: '沒有使用者idNumber' });
+
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    const body = {
+      invoiceNumber,
+      status: 9, // 作廢
+      updatedBy: userIdNumber,
+      updatedAt: now,
+    };
+
+    try {
+      await apiUpdateInvoiceStatus(body);
+      await update_invoiceArr();
+    } catch (error) {}
+  };
 
   // ----------------------------------------------------------------------------
 
@@ -141,6 +170,16 @@ export default function InvoiceList() {
     update_invoiceArr();
   };
 
+  const handle_banInvoice = (invoiceNumber: string) => {
+    modal_delete({
+      title: '確定作廢發票?',
+      content: '作廢後將無法復原',
+      onConfirm: () => {
+        reqPatchBanInvoice(invoiceNumber);
+      },
+    });
+  };
+
   // ----------------------------------------------------------------------------
 
   const columns: TableProps<Tinvoice_Dto>['columns'] = [
@@ -202,25 +241,31 @@ export default function InvoiceList() {
     },
     {
       key: 'panel',
-      width: 100,
+      width: 220,
       align: 'center',
       render: (_, record) => {
-        const { buyer, taxId, projectName, invoiceAmount, invoiceTaxes, totalAmount } = record;
+        const { buyer, taxId, projectName, invoiceAmount, invoiceTaxes, totalAmount, fullInvoiceNumber } = record;
         const isInvoiced = buyer || taxId || projectName || invoiceAmount || invoiceTaxes || totalAmount;
 
         if (isInvoiced) {
-          return null;
+          return (
+            <div className="flex gap-4">
+              <Btn theme="coinChange">折讓</Btn>
+              <Btn icon="ban" themeColor="red_I" onClick={() => handle_banInvoice(fullInvoiceNumber)}>
+                作廢
+              </Btn>
+            </div>
+          );
         }
 
         return (
-          <SquareBtn
-            sharp="mini"
+          <Btn
             onClick={async () => {
               handle_searchPaymentRequest(record);
             }}
           >
             開立
-          </SquareBtn>
+          </Btn>
         );
       },
     },
@@ -271,6 +316,7 @@ export default function InvoiceList() {
         columns={columns}
         pagination={false}
         scroll={{ y: 600 }}
+        rowClassName={'h-[60px]'}
       />
     </div>
   );

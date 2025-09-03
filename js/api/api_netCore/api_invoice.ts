@@ -5,7 +5,7 @@ import { axi_monkey } from '../axiosCreator';
 import type { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import type { TapiParams, Tmeta, Tinvoice_Dto } from './schemas';
+import type { TapiParams, Tmeta, Tinvoice_Dto, Tbody_updateInvoiceStatus } from './schemas';
 
 const apiGetInvoiceNumberLists = (invoiceBookId: string) => {
   const api = `/api/Invoice/GetInvoiceNumberLists`;
@@ -76,8 +76,27 @@ const useApiGetInvoiceNumberLists = (
   };
 };
 
+const apiUpdateInvoiceStatus = (body: Tbody_updateInvoiceStatus) => {
+  const api = `/api/Invoice/UpdateInvoiceStatus`;
+
+  return axi_monkey
+    .patch(api, body)
+    .then(() => {
+      myAlert.success({ title: '作廢成功' });
+    })
+    .catch((error) => {
+      const err = error as AxiosError;
+      console.error(err);
+      myAlert.err({
+        title: '作廢發票狀態失敗',
+      });
+
+      return Promise.reject(err);
+    });
+};
+
 // ============================================================================
 
 export type { Tinvoice_Dto };
 
-export { useApiGetInvoiceNumberLists };
+export { useApiGetInvoiceNumberLists, apiUpdateInvoiceStatus };
