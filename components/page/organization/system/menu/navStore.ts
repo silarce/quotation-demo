@@ -1,24 +1,35 @@
 import { create } from 'zustand';
-import type { HeaderMenuItem, NestedMenuItem } from './type';
-interface NavStoreState {
-  headerNav: HeaderMenuItem[];
+import { immer } from 'zustand/middleware/immer';
+import { MenuItem } from './type';
+
+export interface NavState {
+  headerNav: any[];
+  sideNav: MenuItem[];
   selectedHeaderId: string | null;
-  sideNav: NestedMenuItem[];
-  sideNavActiveHeaderIds: string[];
-  setHeaderNav: (data: HeaderMenuItem[]) => void;
-  setSelectedHeaderId: (id: string) => void;
-  setSideNav: (data: NestedMenuItem[]) => void;
-  setSideNavActiveHeaderIds: (ids: string[]) => void;
+  setHeaderNav: (menus: any[]) => void;
+  setSideNav: (menus: MenuItem[]) => void;
+  setSelectedHeaderId: (id: string | null) => void;
 }
 
-export const useNavStore = create<NavStoreState>((set) => ({
-  headerNav: [],
-  headerNavReady: false,
-  selectedHeaderId: null,
-  sideNav: [],
-  sideNavActiveHeaderIds: [],
-  setHeaderNav: (data) => set({ headerNav: data }),
-  setSelectedHeaderId: (id) => set({ selectedHeaderId: id }),
-  setSideNav: (data) => set({ sideNav: data }),
-  setSideNavActiveHeaderIds: (ids) => set({ sideNavActiveHeaderIds: ids }),
-}));
+export const useNavStore = create<NavState>()(
+  immer((set) => ({
+    headerNav: [],
+    sideNav: [],
+    selectedHeaderId: null,
+    setHeaderNav: (menus) => {
+      set((state) => {
+        state.headerNav = menus;
+      });
+    },
+    setSideNav: (menus) => {
+      set((state) => {
+        state.sideNav = menus;
+      });
+    },
+    setSelectedHeaderId: (id) => {
+      set((state) => {
+        state.selectedHeaderId = id;
+      });
+    },
+  }))
+);

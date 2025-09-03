@@ -35,6 +35,8 @@ export default function Info() {
     //
     isRefactoredQuotaion: isQuotation2,
     setIsRefactoredQuotaion: setIsQuotation2,
+    isUseNewSideNav,
+    setIsUseNewSideNav,
   } = useGlobal_optionalConfig();
 
   // ----------------------------------------------
@@ -126,13 +128,30 @@ export default function Info() {
               {
                 key: '0',
                 label: (
-                  <div className="flex gap-2 cursor-auto" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex justify-between items-center cursor-auto" onClick={(e) => e.stopPropagation()}>
                     <span>使用新版報價單</span>
                     <Switch
                       onChange={(isChecked) => {
                         setIsQuotation2(isChecked);
                       }}
                       checked={isQuotation2}
+                    />
+                  </div>
+                ),
+              },
+              {
+                key: '1',
+                label: (
+                  <div
+                    className="flex justify-between items-center cursor-auto w-[150px]"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span>使用新版選單</span>
+                    <Switch
+                      onChange={(isChecked) => {
+                        setIsUseNewSideNav(isChecked);
+                      }}
+                      checked={isUseNewSideNav}
                     />
                   </div>
                 ),

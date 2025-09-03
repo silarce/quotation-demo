@@ -8,11 +8,10 @@ import MenuEditor from 'components/page/organization/system/menu/MenuEditor';
 //api
 import { getMenuList, getMenuPaths } from 'components/page/organization/system/menu/api_menu';
 import Btn from 'components/global/gear/button/btn_fong';
-import { fetchHeaderNav, fetchSideNav } from 'components/page/organization/system/menu/api';
 import { useNavStore } from 'components/page/organization/system/menu/navStore';
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 import axios from 'js/api/axiosCreator/axiosInstance';
-import { MenuState, FlatMenuItem } from 'components/page/organization/system/menu/type';
+import { MenuState, FlatMenuItem, MenuItem } from 'components/page/organization/system/menu/type';
 
 const getAuthHeader = () => {
   if (typeof window === 'undefined') {
@@ -26,23 +25,10 @@ const getAuthHeader = () => {
 };
 
 // 選單資料結構型別
-export type MenuNode = {
-  menu_id: string;
-  menu_name: string;
-  menu_url?: string;
-  display_order?: string;
-  is_enable?: boolean;
-  iconFile?: File;
-  icon_url?: string;
-  parent_menu_id?: string | null;
-  children?: MenuNode[];
-  menu_icon_path?: string;
-  menu_icon?: string;
-};
 
 export default function SettingMenu() {
-  // 選單樹狀資料
-  const [menuData, setMenuData] = useState<MenuNode[]>([]);
+  const { sideNav, setSideNav } = useNavStore();
+
   // 編輯/新增表單狀態
   const [state, setState] = useState({
     expandedMap: {},
@@ -60,28 +46,33 @@ export default function SettingMenu() {
   const generateId = useCallback(() => uuidv4(), []);
 
   // 將 API 平面資料轉為巢狀結構
-  const buildTree = (flatList: FlatMenuItem[]): MenuNode[] => {
-    const map = new Map<string, MenuNode>();
-    const roots: MenuNode[] = [];
+  const buildTree = (flatList: FlatMenuItem[]): MenuItem[] => {
+    const map = new Map<string, MenuItem>();
+    const roots: MenuItem[] = [];
 
     flatList.forEach((item) => {
       map.set(item.menu_id, {
         menu_id: item.menu_id,
+        parent_menu_id: item.parent_menu_id ?? undefined,
         menu_name: item.menu_name,
-        menu_url: item.menu_url,
+        menu_url: item.menu_url ?? undefined,
         is_enable: item.is_enable,
-        display_order: item.display_order,
+        display_order: item.display_order ?? '',
+        level: typeof item.level === 'number' ? item.level : Number(item.level) || 1,
+        path: item.menu_url ?? '',
         children: [],
-        menu_icon: item.menu_icon, // ✅ 圖示檔案 ID
-        menu_icon_path: item.menu_icon_path, // ✅ 圖示預覽 API 路徑
+        menu_icon_path: item.menu_icon_path ?? undefined,
       });
     });
-    // 建立父子關係
+
     flatList.forEach((item) => {
       const node = map.get(item.menu_id)!;
 
       if (item.parent_menu_id && map.has(item.parent_menu_id)) {
-        map.get(item.parent_menu_id)!.children!.push(node);
+        const parent = map.get(item.parent_menu_id)!;
+        node.level = Number(parent.level ?? 0) + 1;
+
+        parent.children?.push(node);
       } else {
         roots.push(node);
       }
@@ -93,8 +84,11 @@ export default function SettingMenu() {
   // 取得選單 API 並轉為樹狀
   const fetchMenu = async () => {
     try {
-      const data = await getMenuList();
-      setMenuData(buildTree(data.data));
+      const res = await getMenuList();
+
+      if (res?.data) {
+        setSideNav(buildTree(res.data));
+      }
     } catch (err) {
       console.error('取得選單失敗', err);
     }
@@ -152,16 +146,7 @@ export default function SettingMenu() {
         headers: { 'Content-Type': 'multipart/form-data', ...getAuthHeader() },
       });
 
-      await fetchHeaderNav().then((newNav) => {
-        useNavStore.getState().setHeaderNav(newNav);
-      });
-      const currentHeaderId = useNavStore.getState().selectedHeaderId;
-
-      if (currentHeaderId) {
-        await fetchSideNav(currentHeaderId).then((newSideNav) => {
-          useNavStore.getState().setSideNav(newSideNav);
-        });
-      }
+      await fetchMenu();
 
       // 成功後重置
       setState((prev: MenuState) => ({
@@ -201,16 +186,7 @@ export default function SettingMenu() {
         headers: { 'Content-Type': 'multipart/form-data', ...getAuthHeader() },
       });
 
-      await fetchHeaderNav().then((newNav) => {
-        useNavStore.getState().setHeaderNav(newNav);
-      });
-      const currentHeaderId = useNavStore.getState().selectedHeaderId;
-
-      if (currentHeaderId) {
-        await fetchSideNav(currentHeaderId).then((newSideNav) => {
-          useNavStore.getState().setSideNav(newSideNav);
-        });
-      }
+      await fetchMenu();
 
       setState((prev: MenuState) => ({
         ...prev,
@@ -283,15 +259,15 @@ export default function SettingMenu() {
         </div>
         <div className="flex gap-8 mt-6">
           <MenuTree
-            menuData={menuData}
-            setMenuData={setMenuData}
+            menuData={sideNav}
+            setMenuData={setSideNav}
             state={state}
             setState={setState}
             refetchMenuPaths={fetchMenuPaths}
           />
           <MenuEditor
-            menuData={menuData}
-            setMenuData={setMenuData}
+            menuData={sideNav}
+            setMenuData={setSideNav}
             state={state}
             setState={setState}
             generateId={generateId}

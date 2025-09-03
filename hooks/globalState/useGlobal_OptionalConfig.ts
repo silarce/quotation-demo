@@ -5,49 +5,59 @@ import { immer } from 'zustand/middleware/immer';
 
 interface ToptionalConfigState {
   hadInit: boolean;
-  // 拼寫錯誤，但是這個字已經在使用者的 localStorage 了
-  // 所以不能改
   isRefactoredQuotaion: boolean;
   setIsRefactoredQuotaion: (value: boolean) => void;
   setHadInit: (value: boolean) => void;
+
+  // 新增 sideNav 欄位
+  isUseNewSideNav: boolean;
+  setIsUseNewSideNav: (value: boolean) => void;
 }
 
 const useStore_optionalConfig = create<ToptionalConfigState>()(
-  immer(
-    (
-      set
-      // get
-    ) => {
-      const setHadInit = (value: boolean) => {
-        set((state) => {
-          state.hadInit = value;
-        });
-      };
+  immer((set) => {
+    const setHadInit = (value: boolean) => {
+      set((state) => {
+        state.hadInit = value;
+      });
+    };
 
-      const setIsRefactoredQuotaion = (value: boolean) => {
-        set((state) => {
-          state.isRefactoredQuotaion = value;
-        });
+    const setIsRefactoredQuotaion = (value: boolean) => {
+      set((state) => {
+        state.isRefactoredQuotaion = value;
+      });
 
-        if (typeof window === 'undefined') {
-          return;
-        }
-
+      if (typeof window !== 'undefined') {
         window.localStorage.setItem('isRefactoredQuotaion', value.toString());
-      };
+      }
+    };
 
-      return {
-        hadInit: false,
-        isRefactoredQuotaion: false,
-        setHadInit,
-        setIsRefactoredQuotaion,
-      };
-    }
-  )
+    // 新增 sideNav
+    const setIsUseNewSideNav = (value: boolean) => {
+      set((state) => {
+        state.isUseNewSideNav = value;
+      });
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('isUseNewSideNav', value.toString());
+      }
+    };
+
+    return {
+      hadInit: false,
+      isRefactoredQuotaion: false,
+      setHadInit,
+      setIsRefactoredQuotaion,
+
+      isUseNewSideNav: false,
+      setIsUseNewSideNav,
+    };
+  })
 );
 
 const useGlobal_optionalConfig = () => {
-  const { hadInit, isRefactoredQuotaion, setHadInit, setIsRefactoredQuotaion } = useStore_optionalConfig();
+  const { hadInit, isRefactoredQuotaion, setHadInit, setIsRefactoredQuotaion, isUseNewSideNav, setIsUseNewSideNav } =
+    useStore_optionalConfig();
 
   const quotationPathList = isRefactoredQuotaion ? pathList_quotation : pathList_oldQuotation;
 
@@ -58,6 +68,10 @@ const useGlobal_optionalConfig = () => {
 
     const isRefactoredQuotaion = window.localStorage.getItem('isRefactoredQuotaion') === 'true';
     setIsRefactoredQuotaion(isRefactoredQuotaion);
+
+    //初始化 sideNav 狀態
+    const isUseNewSideNav = window.localStorage.getItem('isUseNewSideNav') === 'true';
+    setIsUseNewSideNav(isUseNewSideNav);
 
     setHadInit(true);
   };
@@ -70,6 +84,9 @@ const useGlobal_optionalConfig = () => {
     isRefactoredQuotaion,
     quotationPathList,
     setIsRefactoredQuotaion,
+
+    isUseNewSideNav,
+    setIsUseNewSideNav,
   };
 };
 

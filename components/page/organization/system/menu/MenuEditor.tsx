@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch } from 'antd';
 import { LogoUploader } from './menuUploader';
-import { MenuNode } from 'pages/organization/system/menu/index';
+import { MenuItem } from './type';
 import { MenuState } from './type';
 
 import scss from './menuEditor.module.scss';
@@ -10,8 +10,8 @@ import scss from './menuEditor.module.scss';
 import { DataEntry_fong, Input, Select } from 'components/global/gear/dataEntry';
 
 interface MenuEditorProps {
-  menuData: MenuNode[];
-  setMenuData: React.Dispatch<React.SetStateAction<MenuNode[]>>;
+  menuData: MenuItem[];
+  setMenuData: (menus: MenuItem[]) => void;
   state: MenuState;
   setState: React.Dispatch<React.SetStateAction<MenuState>>;
   generateId: () => string;

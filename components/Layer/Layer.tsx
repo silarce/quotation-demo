@@ -7,14 +7,16 @@ import style from './layer.module.scss';
 import Header from './Header/Header';
 import Header_mobile from './Header/Header_mobile';
 import SideNav from './SideNav/SideNav';
+import SideNavNew from './SideNav/SideNavNew';
 
 // type
 import { TerpFeatureDto, TuserDto } from 'js/api/dtoTypes';
+import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
 
 // ======================================================================
 export default function Layer({ children }: { children: React.ReactNode }) {
   const { pathname } = useRouter();
-
+  const { isUseNewSideNav } = useGlobal_optionalConfig();
   const ref_main = useRef<HTMLDivElement>(null!);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function Layer({ children }: { children: React.ReactNode }) {
       <Header />
       <Header_mobile />
       <div className={style.wrapper}>
-        <SideNav />
+        {isUseNewSideNav ? <SideNavNew /> : <SideNav />}
         {/* main */}
         <div ref={ref_main} className={style.main}>
           {children}

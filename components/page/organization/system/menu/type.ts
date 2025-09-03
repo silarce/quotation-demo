@@ -1,23 +1,14 @@
 export interface MenuItem {
-  level: number;
-  path?: string;
-  menu_icon_path?: string;
-  menu_Id: string;
-  com_Id: string;
-  menu_Name: string;
-  menu_Url?: string;
-  menu_Icon?: string;
-  display_Order: string;
-  has_Function: boolean;
-  is_Enable: boolean;
-  created_By: string;
-  created_At: string; // or Date
-  updated_By: string;
-  updated_At: string; // or Date
-  deleted_At?: string; // 可選，因為有些項目沒有
-  deleted_By?: string;
-  is_Invalid: boolean;
-  parent_Menu_Id?: string;
+  menu_id: string;
+  parent_menu_id?: string;
+  menu_name: string;
+  menu_url?: string;
+  display_order: string;
+  is_enable: boolean;
+  level: number | string;
+  path: string | null;
+  menu_icon_path: string | undefined;
+  children?: MenuItem[];
 }
 
 export interface NestedMenuItem extends MenuItem {
@@ -27,7 +18,7 @@ export interface NestedMenuItem extends MenuItem {
 export interface HeaderMenuItem {
   level: number;
   path: string;
-  menu_Id: string;
+  menu_id: string;
   com_Id: string;
   menu_Name: string;
   menu_Url?: string;
@@ -59,11 +50,12 @@ export interface MenuState {
 
 export interface FlatMenuItem {
   menu_id: string;
-  menu_name: string;
-  menu_url?: string;
-  display_order?: string;
-  is_enable?: boolean;
   parent_menu_id?: string | null;
-  menu_icon?: string;
-  menu_icon_path?: string;
+  menu_name: string;
+  menu_url?: string | null;
+  display_order?: string | null;
+  is_enable: boolean;
+  level?: number | string | null;
+  menu_icon?: string | null;
+  menu_icon_path?: string | null;
 }
