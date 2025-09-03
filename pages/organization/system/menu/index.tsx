@@ -1,3 +1,4 @@
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 import React, { useEffect, useState, useCallback } from 'react';
 import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,9 +10,9 @@ import MenuEditor from 'components/page/organization/system/menu/MenuEditor';
 import { getMenuList, getMenuPaths } from 'components/page/organization/system/menu/api_menu';
 import Btn from 'components/global/gear/button/btn_fong';
 import { useNavStore } from 'components/page/organization/system/menu/navStore';
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 import axios from 'js/api/axiosCreator/axiosInstance';
-import { MenuState, FlatMenuItem, MenuItem } from 'components/page/organization/system/menu/type';
+import { MenuState } from 'components/page/organization/system/menu/type';
+import { buildTree } from 'components/page/organization/system/menu/utils_menu';
 
 const getAuthHeader = () => {
   if (typeof window === 'undefined') {
@@ -44,42 +45,6 @@ export default function SettingMenu() {
   });
   // 產生新的 UUID（用於新增選單 ID）
   const generateId = useCallback(() => uuidv4(), []);
-
-  // 將 API 平面資料轉為巢狀結構
-  const buildTree = (flatList: FlatMenuItem[]): MenuItem[] => {
-    const map = new Map<string, MenuItem>();
-    const roots: MenuItem[] = [];
-
-    flatList.forEach((item) => {
-      map.set(item.menu_id, {
-        menu_id: item.menu_id,
-        parent_menu_id: item.parent_menu_id ?? undefined,
-        menu_name: item.menu_name,
-        menu_url: item.menu_url ?? undefined,
-        is_enable: item.is_enable,
-        display_order: item.display_order ?? '',
-        level: typeof item.level === 'number' ? item.level : Number(item.level) || 1,
-        path: item.menu_url ?? '',
-        children: [],
-        menu_icon_path: item.menu_icon_path ?? undefined,
-      });
-    });
-
-    flatList.forEach((item) => {
-      const node = map.get(item.menu_id)!;
-
-      if (item.parent_menu_id && map.has(item.parent_menu_id)) {
-        const parent = map.get(item.parent_menu_id)!;
-        node.level = Number(parent.level ?? 0) + 1;
-
-        parent.children?.push(node);
-      } else {
-        roots.push(node);
-      }
-    });
-
-    return roots;
-  };
 
   // 取得選單 API 並轉為樹狀
   const fetchMenu = async () => {
