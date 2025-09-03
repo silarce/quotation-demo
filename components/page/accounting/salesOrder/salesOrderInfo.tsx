@@ -93,7 +93,6 @@ export default function SalesOrderInfo({ instance_salesOrder }: { instance_sales
       <DataEntry_fong
         caption="客戶編號"
         className="col-span-2"
-        isMust={true}
         suffix={<Icon_query onClick={hancle_selectCustomer} className="cursor-pointer" />}
       >
         <Input
