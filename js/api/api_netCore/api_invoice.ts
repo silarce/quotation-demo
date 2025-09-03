@@ -5,7 +5,13 @@ import { axi_monkey } from '../axiosCreator';
 import type { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import type { TapiParams, Tmeta, Tinvoice_Dto, Tbody_updateInvoiceStatus } from './schemas';
+import type {
+  TapiParams,
+  Tmeta,
+  Tinvoice_Dto,
+  Tbody_updateInvoiceStatus,
+  Tbody_insertInvoiceDiscount,
+} from './schemas';
 
 const apiGetInvoiceNumberLists = (invoiceBookId: string) => {
   const api = `/api/Invoice/GetInvoiceNumberLists`;
@@ -95,8 +101,29 @@ const apiUpdateInvoiceStatus = (body: Tbody_updateInvoiceStatus) => {
     });
 };
 
+const apiInsertInvoiceDiscount = (body: Tbody_insertInvoiceDiscount) => {
+  const api = `/api/Invoice/InsertInvoiceDiscount`;
+
+  return axi_monkey
+    .post<Tmeta>(api, body)
+    .then(({ data }) => {
+      myAlert.success({ title: '發票折讓完成' });
+
+      return data;
+    })
+    .catch((error) => {
+      const err = error as AxiosError;
+      console.error(err);
+      myAlert.err({
+        title: '發票折讓失敗',
+      });
+
+      return Promise.reject(err);
+    });
+};
+
 // ============================================================================
 
-export type { Tinvoice_Dto };
+export type { Tinvoice_Dto, Tbody_insertInvoiceDiscount };
 
-export { useApiGetInvoiceNumberLists, apiUpdateInvoiceStatus };
+export { useApiGetInvoiceNumberLists, apiUpdateInvoiceStatus, apiInsertInvoiceDiscount };
