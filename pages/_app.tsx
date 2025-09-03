@@ -23,6 +23,11 @@ import { TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+//選單
+import { useNavStore } from 'components/page/organization/system/menu/navStore';
+import { getMenuList } from 'components/page/organization/system/menu/api_menu';
+import { buildTree } from 'components/page/organization/system/menu/utils_menu';
+
 // import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -90,6 +95,27 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false);
 
   const { userInfo, userErpFeature, isAdmin, userGrade, update: update_userInfo } = useGlobal_userInfo();
+
+  //-----------------------------------------------------------------------------
+  //選單
+  const { setSideNav } = useNavStore();
+
+  // 初始化 SideNav
+  useEffect(() => {
+    if (userInfo && userErpFeature) {
+      (async () => {
+        try {
+          const res = await getMenuList();
+
+          if (res?.data) {
+            setSideNav(buildTree(res.data));
+          }
+        } catch (err) {
+          console.error('初始化 SideNav 失敗', err);
+        }
+      })();
+    }
+  }, [userInfo, userErpFeature, setSideNav]);
 
   // ----------------------------------------------------------------------------
 
