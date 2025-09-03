@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import classNames from 'classnames';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
 import Btn from 'components/global/gear/button/btn_fong';
@@ -13,17 +13,21 @@ import { useGetAccountant, TaccountantDto } from 'js/api/api_accountant';
 
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
+import scss from './index.module.scss';
+
 /**選擇器-會計收款 */
 export default function Selector_accountant({
   title = '會計收款列表',
   onConfirm,
   onCancel,
   btn_confirm,
+  forbidden,
 }: {
   title?: string;
   onConfirm?: (data: TaccountantDto | undefined) => void;
   onCancel?: () => void;
   btn_confirm?: (data: TaccountantDto | undefined) => React.ReactNode;
+  forbidden?: (accountant: TaccountantDto) => boolean;
 }) {
   const [page, setPage] = useState(1);
 
@@ -130,14 +134,24 @@ export default function Selector_accountant({
             x: 1400,
             y: 400,
           }}
-          rowClassName={(record) => {
-            return classNames('cursor-pointer', record === selected && 'bg-blue05');
+          onRow={(record) => {
+            const isForbidden = forbidden?.(record);
+
+            return {
+              className: classNames(
+                'cursor-pointer',
+                record === selected && 'bg-blue05',
+                isForbidden && scss.forbbiden
+              ),
+              onClick: () => {
+                if (record.isAlreadyImportIncomeBill) {
+                  return;
+                }
+
+                setSelected(record);
+              },
+            };
           }}
-          onRow={(record) => ({
-            onClick: () => {
-              setSelected(record);
-            },
-          })}
           pagination={{
             current: meta?.page,
             pageSize: meta?.pageSize,
@@ -156,10 +170,21 @@ export default function Selector_accountant({
 
 const columns: TableProps<TaccountantDto>['columns'] = [
   {
+    dataIndex: 'isAlreadyImportIncomeBill',
+    width: 120,
+    render: (v) => {
+      if (!v) {
+        return null;
+      }
+
+      return <span className="text-bgc01">匯入額度已滿</span>;
+    },
+  },
+  {
     title: <span className="whitespace-pre-wrap">{'已匯入紙本\n應收帳款'}</span>,
     dataIndex: 'isImported',
     align: 'center',
-    width: 120,
+    width: 110,
     render: (value) => (
       <div className="flex items-center justify-center">
         <Checkbox checked={value} disabled={true} />
@@ -175,7 +200,7 @@ const columns: TableProps<TaccountantDto>['columns'] = [
   {
     title: '匯入日期',
     dataIndex: 'insertDate',
-    width: 120,
+    width: 100,
     render: (value) => getTaiwanDateStr(value),
   },
   {
@@ -207,19 +232,17 @@ const columns: TableProps<TaccountantDto>['columns'] = [
     title: '金額',
     dataIndex: 'currencyValue',
     align: 'right',
-    width: 120,
+    width: 110,
     render: (value) => '$' + Number(value).toLocaleString(),
   },
   {
     title: '新臺幣',
     dataIndex: 'price',
     align: 'right',
-    width: 120,
+    width: 110,
     render: (value) => '$' + value.toLocaleString(),
   },
 ];
-
-// export type TaccountantPaymentType = '匯款' | '票據' | '現金';
 
 const options: {
   value: TaccountantDto['paymentType'];
