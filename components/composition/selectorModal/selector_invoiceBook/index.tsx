@@ -173,19 +173,20 @@ const columns: TableProps<TaccountantInvoiceBookDto>['columns'] = [
     width: 150,
     align: 'right',
   },
-  {
-    title: '最後開立發票號碼',
-    dataIndex: 'latestInvoiceNumber',
-    width: 150,
-    align: 'right',
-  },
-  {
-    title: '最後開立發票日期',
-    dataIndex: 'latestInvoiceDate',
-    width: 150,
-    align: 'right',
-    render: (value) => getTaiwanDateStr(value),
-  },
+  {},
+  // {
+  //   title: '最後開立發票號碼',
+  //   dataIndex: 'latestInvoiceNumber',
+  //   width: 150,
+  //   align: 'right',
+  // },
+  // {
+  //   title: '最後開立發票日期',
+  //   dataIndex: 'latestInvoiceDate',
+  //   width: 150,
+  //   align: 'right',
+  //   render: (value) => getTaiwanDateStr(value),
+  // },
 ];
 
 const lookup_month = {
