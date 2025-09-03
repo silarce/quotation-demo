@@ -53,6 +53,7 @@ const SalesOrderItemList = ({
         scroll={{
           y: 400,
         }}
+        pagination={false}
       />
       <br />
       <br />
