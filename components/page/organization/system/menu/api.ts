@@ -40,7 +40,7 @@ export const fetchSideNav = async (parent_menu_id: string): Promise<NestedMenuIt
 
   const nested: NestedMenuItem[] = level2Items.map((lv2) => ({
     ...lv2,
-    children: level3Items.filter((lv3) => lv3.parent_Menu_Id === lv2.menu_Id),
+    children: level3Items.filter((lv3) => lv3.parent_menu_id === lv2.menu_id),
   }));
 
   useNavStore.getState().setSideNav(nested);
