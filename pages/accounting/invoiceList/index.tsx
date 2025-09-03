@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Dayjs } from 'dayjs';
 import Decimal from 'decimal.js';
-
 import classNames from 'classnames';
 
 // components
@@ -24,9 +22,9 @@ import { TaccountantInvoiceBookDto, apiGetAccountantInvoiceBook } from 'js/api/a
 import { Tinvoice_Dto, useApiGetInvoiceNumberLists, apiUpdateInvoiceStatus } from 'js/api/api_netCore/api_invoice';
 import { Tbody_updatePRInvoice, apiUpdatePRInvoice } from 'js/api/api_netCore/api_accountsReceivable';
 
-import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
-
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
+
+import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 
 // ==========================================================================
 
@@ -109,7 +107,7 @@ export default function InvoiceList() {
     });
   };
 
-  const handle_searchPaymentRequest = async (invoice: Tinvoice_Dto) => {
+  const handle_issueInvoice = async (invoice: Tinvoice_Dto) => {
     if (!state_invoiceBook) {
       return;
     }
@@ -177,7 +175,6 @@ export default function InvoiceList() {
 
   const handle_discount = (invoiceNumber: string) => {
     const { destroy } = modal_empty({
-      // width: 800,
       content: (
         <Discount
           onCancel={() => {
@@ -197,101 +194,11 @@ export default function InvoiceList() {
 
   // ----------------------------------------------------------------------------
 
-  const columns: TableProps<Tinvoice_Dto>['columns'] = [
-    {
-      title: '開立日期',
-      dataIndex: 'invoiceDate',
-      width: 120,
-      render: (text) => getTaiwanDateStr(text),
-    },
-
-    {
-      title: '報價編號',
-      dataIndex: 'quotationNumber',
-      width: 120,
-      render: (text, record) => {
-        return record.quotationNumber as string;
-      },
-    },
-    {
-      title: '合約編號',
-      dataIndex: 'contractNumber',
-      width: 120,
-    },
-    {
-      title: '專案名稱',
-      dataIndex: 'projectName',
-    },
-    {
-      title: '買受人',
-      dataIndex: 'buyer',
-      width: 300,
-    },
-    {
-      title: '未稅金額',
-      dataIndex: 'invoiceAmount',
-      width: 150,
-      align: 'right',
-      render: (text) => '$' + text?.toLocaleString(),
-    },
-    {
-      title: '稅金',
-      dataIndex: 'invoiceTaxes',
-      width: 150,
-      align: 'right',
-      render: (text) => '$' + text?.toLocaleString(),
-    },
-    {
-      title: '發票金額',
-      dataIndex: 'totalAmount',
-      width: 150,
-      align: 'right',
-      render: (text) => '$' + text?.toLocaleString(),
-    },
-
-    {
-      title: '發票號碼',
-      dataIndex: 'fullInvoiceNumber',
-      width: 150,
-    },
-    {
-      key: 'panel',
-      width: 220,
-      align: 'center',
-      render: (_, record) => {
-        const { buyer, taxId, projectName, invoiceAmount, invoiceTaxes, totalAmount, fullInvoiceNumber } = record;
-        const isInvoiced = buyer || taxId || projectName || invoiceAmount || invoiceTaxes || totalAmount;
-
-        if (isInvoiced) {
-          return (
-            <div className="flex gap-4">
-              <Btn
-                theme="coinChange"
-                onClick={() => {
-                  handle_discount(fullInvoiceNumber);
-                }}
-              >
-                折讓
-              </Btn>
-              <Btn icon="ban" themeColor="red_I" onClick={() => handle_banInvoice(fullInvoiceNumber)}>
-                作廢
-              </Btn>
-            </div>
-          );
-        }
-
-        return (
-          <Btn
-            onClick={async () => {
-              handle_searchPaymentRequest(record);
-            }}
-          >
-            開立
-          </Btn>
-        );
-      },
-    },
-  ];
+  const columns = createColumn({
+    handle_searchPaymentRequest: handle_issueInvoice,
+    handle_banInvoice,
+    handle_discount,
+  });
 
   // ----------------------------------------------------------------------------
 
@@ -402,3 +309,112 @@ const getInvoiceInfo = (invoiceNumber: string, paymentRequest: TpaymentRequestIn
 };
 
 // ===========================================================================
+
+// MARK: createColumn
+const createColumn = ({
+  handle_searchPaymentRequest,
+  handle_banInvoice,
+  handle_discount,
+}: {
+  handle_searchPaymentRequest: (invoice: Tinvoice_Dto) => void;
+  handle_banInvoice: (invoiceNumber: string) => void;
+  handle_discount: (invoiceNumber: string) => void;
+}) => {
+  const columns: TableProps<Tinvoice_Dto>['columns'] = [
+    {
+      title: '開立日期',
+      dataIndex: 'invoiceDate',
+      width: 100,
+      render: (text) => getTaiwanDateStr(text),
+    },
+
+    {
+      title: '報價編號',
+      dataIndex: 'quotationNumber',
+      width: 120,
+      render: (text, record) => {
+        return record.quotationNumber as string;
+      },
+    },
+    {
+      title: '合約編號',
+      dataIndex: 'contractNumber',
+      width: 120,
+    },
+    {
+      title: '專案名稱',
+      dataIndex: 'projectName',
+    },
+    {
+      title: '買受人',
+      dataIndex: 'buyer',
+      width: 300,
+    },
+    {
+      title: '未稅金額',
+      dataIndex: 'invoiceAmount',
+      width: 100,
+      align: 'right',
+      render: (text) => '$' + text?.toLocaleString(),
+    },
+    {
+      title: '稅金',
+      dataIndex: 'invoiceTaxes',
+      width: 100,
+      align: 'right',
+      render: (text) => '$' + text?.toLocaleString(),
+    },
+    {
+      title: '發票金額',
+      dataIndex: 'totalAmount',
+      width: 100,
+      align: 'right',
+      render: (text) => '$' + text?.toLocaleString(),
+    },
+
+    {
+      title: '發票號碼',
+      dataIndex: 'fullInvoiceNumber',
+      width: 120,
+    },
+    {
+      key: 'panel',
+      width: 220,
+      align: 'center',
+      render: (_, record) => {
+        const { buyer, taxId, projectName, invoiceAmount, invoiceTaxes, totalAmount, fullInvoiceNumber } = record;
+        const isInvoiced = buyer || taxId || projectName || invoiceAmount || invoiceTaxes || totalAmount;
+
+        if (isInvoiced) {
+          return (
+            <div className="flex gap-4">
+              <Btn
+                theme="coinChange"
+                onClick={() => {
+                  handle_discount(fullInvoiceNumber);
+                }}
+              >
+                折讓
+              </Btn>
+              <Btn icon="ban" themeColor="red_I" onClick={() => handle_banInvoice(fullInvoiceNumber)}>
+                作廢
+              </Btn>
+            </div>
+          );
+        }
+
+        return (
+          <Btn
+            onClick={async () => {
+              handle_searchPaymentRequest(record);
+            }}
+          >
+            開立
+          </Btn>
+        );
+      },
+    },
+  ];
+
+  return columns;
+};
