@@ -7,13 +7,12 @@ import classNames from 'classnames';
 
 // components
 import Discount from 'components/page/accounting/invoiceList/discount';
+import InvoiceInfo, { Tstate_invoiceInfo } from 'components/page/accounting/invoiceList/invoiceInfo';
 
 // gear
 import Table_antd, { TableProps } from 'components/global/myAntd/table';
-import { DataEntry_fong, Input, DatePicker } from 'components/global/gear/dataEntry';
 import Btn from 'components/global/gear/button/btn_fong';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
-import { Container_confirm } from 'components/global/container/modal';
 import { modal_empty, modal_delete } from 'components/global/gear/modal/fongModal';
 import Selector_invoiceBook from 'components/composition/selectorModal/selector_invoiceBook';
 import Selector_paymentRequest_invoice, {
@@ -33,11 +32,6 @@ import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
 
 interface Tquery {
   id?: string;
-}
-
-interface Tstate_invoiceInfo {
-  invoiceDate: Dayjs | null;
-  invoiceAmount: `${number}` | '';
 }
 
 // ==========================================================================
@@ -389,9 +383,8 @@ const getPaymentRequest = async () => {
 const getInvoiceInfo = (invoiceNumber: string, paymentRequest: TpaymentRequestInvoiceList_Dto) => {
   return new Promise<Tstate_invoiceInfo>((resolve, reject) => {
     const { destroy } = modal_empty({
-      width: 600,
       content: (
-        <InputInvoiceInfo
+        <InvoiceInfo
           invoiceNumber={invoiceNumber}
           paymentRequest={paymentRequest}
           onConfirm={(invoiceInfo) => {
@@ -409,72 +402,3 @@ const getInvoiceInfo = (invoiceNumber: string, paymentRequest: TpaymentRequestIn
 };
 
 // ===========================================================================
-
-const InputInvoiceInfo = ({
-  invoiceNumber,
-  paymentRequest,
-  onConfirm,
-  onCancel,
-}: {
-  invoiceNumber: string;
-  paymentRequest: TpaymentRequestInvoiceList_Dto;
-  onConfirm: (params: Tstate_invoiceInfo) => void;
-  onCancel: () => void;
-}) => {
-  const [state, setState] = useState<Tstate_invoiceInfo>({
-    invoiceDate: null,
-    invoiceAmount: '',
-  });
-
-  const handle_confirm = () => {
-    onConfirm(state);
-  };
-
-  return (
-    <Container_confirm
-      title="發票資訊"
-      footerRight={
-        <>
-          <Btn onClick={onCancel} themeColor="red_I">
-            取消
-          </Btn>
-          <Btn onClick={handle_confirm}>確認</Btn>
-        </>
-      }
-    >
-      <div className="grid gap-4">
-        <DataEntry_fong caption="案場名稱" disabled={true}>
-          {paymentRequest.constructionSite}
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="請款期數" disabled={true}>
-          {paymentRequest.period}
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="請款類型" disabled={true}>
-          {paymentRequest.type}
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="請款金額" disabled={true}>
-          {paymentRequest.paymentAmount}
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="發票號碼" disabled={true}>
-          {invoiceNumber}
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="發票日期">
-          <DatePicker value={state.invoiceDate} onChange={(date) => setState({ ...state, invoiceDate: date })} />
-        </DataEntry_fong>
-
-        <DataEntry_fong caption="發票金額">
-          <Input
-            type="number"
-            value={state.invoiceAmount}
-            onChange={(e) => setState({ ...state, invoiceAmount: e.target.value as `${number}` | '' })}
-          />
-        </DataEntry_fong>
-      </div>
-    </Container_confirm>
-  );
-};
