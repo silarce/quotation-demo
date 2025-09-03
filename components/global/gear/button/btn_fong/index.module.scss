@@ -124,6 +124,21 @@
     border-color: theme("colors.brown03");
   }
 }
+.brown_II {
+  color: theme("colors.brown01");
+  border-color: theme("colors.brown01");
+  background-color: theme("colors.white01");
+  &:hover {
+    color: theme("colors.white01");
+    border-color: theme("colors.brown02");
+    background-color: theme("colors.brown02");
+  }
+  &:active {
+    color: theme("colors.white01");
+    border-color: theme("colors.brown03");
+    background-color: theme("colors.brown03");
+  }
+}
 
 .yellow_I {
   color: theme("colors.yellow01");

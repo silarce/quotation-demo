@@ -18,6 +18,8 @@ import Icon_setting from 'public/image/icon/fong/setting.svg';
 import Icon_calendar from 'public/image/icon/fong/calendar.svg';
 import Icon_paper from 'public/image/icon/fong/paper2.svg';
 import Icon_process from 'public/image/icon/fong/process.svg';
+import Icon_coinChange from 'public/image/icon/fong/coin-change.svg';
+import Icon_ban from 'public/image/icon/fong/ban.svg';
 
 // ================================================================================
 
@@ -79,7 +81,17 @@ const Btn_UpDown = ({
 
 // ================================================================================
 
-type Tcolors = 'basic' | 'blue_I' | 'blue_II' | 'green_I' | 'green_II' | 'red_I' | 'brown_I' | 'warning_I' | 'yellow_I';
+type Tcolors =
+  | 'basic'
+  | 'blue_I'
+  | 'blue_II'
+  | 'green_I'
+  | 'green_II'
+  | 'red_I'
+  | 'brown_I'
+  | 'brown_II'
+  | 'warning_I'
+  | 'yellow_I';
 
 type TthemeName =
   | 'basic'
@@ -100,7 +112,8 @@ type TthemeName =
   | 'setting'
   | 'calendar'
   | 'document'
-  | 'process';
+  | 'process'
+  | 'coinChange';
 
 type Tprops_btn = {
   theme?: TthemeName;
@@ -135,6 +148,8 @@ const lookup_icon = {
   trash: Icon_trash,
   send: Icon_send,
   setting: Icon_setting,
+  coinChange: Icon_coinChange,
+  ban: Icon_ban,
 } as const;
 
 const lookup_theme: Record<TthemeName, Ttheme> = {
@@ -207,6 +222,10 @@ const lookup_theme: Record<TthemeName, Ttheme> = {
   process: {
     themeColor: 'blue_I',
     Icon: Icon_process,
+  },
+  coinChange: {
+    themeColor: 'brown_II',
+    Icon: Icon_coinChange,
   },
 };
 

@@ -15,4 +15,22 @@ interface Tinvoice_Dto {
   quotationNumber: string | null; //報價單號
 }
 
-export type { Tinvoice_Dto };
+interface Tbody_updateInvoiceStatus {
+  invoiceNumber: string;
+  status: number;
+  updatedBy: string; //員工編號;
+  updatedAt: string;
+}
+
+interface Tbody_insertInvoiceDiscount {
+  createdAt: string;
+  createdBy: string; // 員工編號,
+
+  invoiceNumber: string;
+  discountDate: string;
+  memo: string; //備註
+  invoiceBookId: string; // 發票本ID;
+  discountAmount: number; // 折讓金額;
+}
+
+export type { Tinvoice_Dto, Tbody_updateInvoiceStatus, Tbody_insertInvoiceDiscount };
