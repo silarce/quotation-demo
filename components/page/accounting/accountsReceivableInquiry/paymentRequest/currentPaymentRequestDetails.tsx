@@ -265,7 +265,13 @@ const CurrentPaymentRequestDetails = ({
               disabled={!state_paymentRequest.invoiceBookInfo || !isAllowEditInvoice}
             >
               <DatePicker
-                placeholder={!state_paymentRequest.invoiceBookInfo ? '請先選擇發票本' : undefined}
+                placeholder={(() => {
+                  if (!isAllowEditInvoice) {
+                    return '';
+                  }
+
+                  return !state_paymentRequest.invoiceBookInfo ? '請先選擇發票本' : undefined;
+                })()}
                 value={state_paymentRequest.invoiceDate}
                 onChange={(date) => {
                   setState_paymentRequest((prev) => ({
@@ -288,7 +294,13 @@ const CurrentPaymentRequestDetails = ({
                 className: !isAllowEditInvoice ? '' : 'cursor-pointer',
               }}
             >
-              {state_paymentRequest.invoiceBookInfo ? state_paymentRequest.invoiceNumber : '請先選擇發票本'}
+              {(() => {
+                if (!isAllowEditInvoice) {
+                  return state_paymentRequest.invoiceNumber;
+                }
+
+                return !!state_paymentRequest.invoiceBookInfo ? state_paymentRequest.invoiceNumber : '請先選擇發票本';
+              })()}
             </DataEntry_fong>
             <DataEntry_fong
               className="col-span-2"
