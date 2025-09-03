@@ -19,7 +19,13 @@ import Selector_paymentRequest_invoice, {
 
 //  api
 import { TaccountantInvoiceBookDto, apiGetAccountantInvoiceBook } from 'js/api/api_accountant';
-import { Tinvoice_Dto, useApiGetInvoiceNumberLists, apiUpdateInvoiceStatus } from 'js/api/api_netCore/api_invoice';
+import {
+  Tinvoice_Dto,
+  Tbody_insertInvoiceDiscount,
+  useApiGetInvoiceNumberLists,
+  apiUpdateInvoiceStatus,
+  apiInsertInvoiceDiscount,
+} from 'js/api/api_netCore/api_invoice';
 import { Tbody_updatePRInvoice, apiUpdatePRInvoice } from 'js/api/api_netCore/api_accountsReceivable';
 
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -181,9 +187,34 @@ export default function InvoiceList() {
             destroy();
           }}
           onConfirm={async (state) => {
-            if (state) {
-              console.log(state);
+            if (!userIdNumber) {
+              myAlert.info({ title: '沒有使用者idNumber' });
+
+              return;
             }
+
+            const { date, amount, note } = state;
+
+            if (!date) {
+              myAlert.info({ title: '請輸入折讓日期' });
+
+              return;
+            }
+
+            const body: Tbody_insertInvoiceDiscount = {
+              createdAt: new Date().toISOString(),
+              createdBy: userIdNumber,
+              invoiceNumber,
+              discountDate: date.toISOString(),
+              memo: note,
+              invoiceBookId: state_invoiceBook!.id,
+              discountAmount: Number(amount || 0),
+            };
+
+            try {
+              await apiInsertInvoiceDiscount(body);
+              await update_invoiceArr();
+            } catch (error) {}
 
             destroy();
           }}
@@ -353,21 +384,21 @@ const createColumn = ({
     {
       title: '未稅金額',
       dataIndex: 'invoiceAmount',
-      width: 100,
+      width: 110,
       align: 'right',
       render: (text) => '$' + text?.toLocaleString(),
     },
     {
       title: '稅金',
       dataIndex: 'invoiceTaxes',
-      width: 100,
+      width: 110,
       align: 'right',
       render: (text) => '$' + text?.toLocaleString(),
     },
     {
       title: '發票金額',
       dataIndex: 'totalAmount',
-      width: 100,
+      width: 110,
       align: 'right',
       render: (text) => '$' + text?.toLocaleString(),
     },
