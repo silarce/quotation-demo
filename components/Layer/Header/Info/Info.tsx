@@ -17,6 +17,7 @@ import scss from './info.module.scss';
 import { useTranslation } from 'react-i18next';
 
 import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+import { useGlobal_sideNavConfig } from 'hooks/globalState/useGlobal_sideNavConfig';
 
 import { apiLogout } from 'js/api/api_auth';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -36,6 +37,8 @@ export default function Info() {
     isRefactoredQuotaion: isQuotation2,
     setIsRefactoredQuotaion: setIsQuotation2,
   } = useGlobal_optionalConfig();
+
+  const { useNewSideNav, setUseNewSideNav } = useGlobal_sideNavConfig();
 
   // ----------------------------------------------
 
@@ -126,13 +129,30 @@ export default function Info() {
               {
                 key: '0',
                 label: (
-                  <div className="flex gap-2 cursor-auto" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex justify-between items-center cursor-auto" onClick={(e) => e.stopPropagation()}>
                     <span>使用新版報價單</span>
                     <Switch
                       onChange={(isChecked) => {
                         setIsQuotation2(isChecked);
                       }}
                       checked={isQuotation2}
+                    />
+                  </div>
+                ),
+              },
+              {
+                key: '1',
+                label: (
+                  <div
+                    className="flex justify-between items-center cursor-auto w-[150px]"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <span>使用新版選單</span>
+                    <Switch
+                      onChange={(isChecked) => {
+                        setUseNewSideNav(isChecked);
+                      }}
+                      checked={useNewSideNav}
                     />
                   </div>
                 ),
