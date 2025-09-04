@@ -43,12 +43,6 @@ const SalesOrderItem = ({
       align: 'right',
     },
     {
-      title: '幣別 no property',
-      key: 'currency',
-      width: 80,
-      align: 'center',
-    },
-    {
       title: '合約單價',
       dataIndex: 'unitPrice',
       width: 150,
