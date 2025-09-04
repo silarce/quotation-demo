@@ -7,9 +7,9 @@ import MenuTree from 'components/page/organization/system/menu/MenuTree';
 import MenuEditor from 'components/page/organization/system/menu/MenuEditor';
 
 //api
-import { getMenuList, getMenuPaths } from 'components/page/organization/system/menu/api_menu';
+import { getMenuList, getMenuPaths } from 'js/api_menu/api_menu';
 import Btn from 'components/global/gear/button/btn_fong';
-import { useNavStore } from 'components/page/organization/system/menu/navStore';
+import { useNavStore } from 'hooks/globalState/useGlobal_navStore';
 import axios from 'js/api/axiosCreator/axiosInstance';
 import { MenuState } from 'components/page/organization/system/menu/type';
 import { buildTree } from 'components/page/organization/system/menu/utils_menu';

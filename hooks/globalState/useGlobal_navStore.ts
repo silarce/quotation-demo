@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { MenuItem } from './type';
+import { MenuItem } from '../../components/page/organization/system/menu/type';
+import { getMenuList } from 'js/api_menu/api_menu';
+import { buildTree } from 'components/page/organization/system/menu/utils_menu';
 
 export interface NavState {
   headerNav: any[];
@@ -9,6 +11,8 @@ export interface NavState {
   setHeaderNav: (menus: any[]) => void;
   setSideNav: (menus: MenuItem[]) => void;
   setSelectedHeaderId: (id: string | null) => void;
+
+  initSideNav: () => Promise<void>;
 }
 
 export const useNavStore = create<NavState>()(
@@ -30,6 +34,21 @@ export const useNavStore = create<NavState>()(
       set((state) => {
         state.selectedHeaderId = id;
       });
+    },
+
+    //  初始化 SideNav
+    initSideNav: async () => {
+      try {
+        const res = await getMenuList();
+
+        if (res?.data) {
+          set((state) => {
+            state.sideNav = buildTree(res.data);
+          });
+        }
+      } catch (err) {
+        console.error('初始化 SideNav 失敗', err);
+      }
     },
   }))
 );

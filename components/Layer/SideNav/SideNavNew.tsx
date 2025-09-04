@@ -15,7 +15,7 @@ import { Collapse } from 'antd';
 import style from './sideNavNew.module.scss';
 
 // hooks
-import { useNavStore } from 'components/page/organization/system/menu/navStore';
+import { useNavStore } from 'hooks/globalState/useGlobal_navStore';
 
 export default function SideNav() {
   const router = useRouter();
