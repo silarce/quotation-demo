@@ -15,14 +15,9 @@ import { IconCheck02, IconEdit, IconDelete01 } from 'public/image/icon/svgCompon
 // css
 import scss from './index.module.scss';
 
-import {
-  TaccountantKey,
-  //
-  lookup_keyArr,
-  rowCellPropsList,
-} from './rowCellProps';
+import { TaccountantKey, lookup_keyArr, rowCellPropsList } from './rowCellProps';
 
-import { TpaymentType, Tstate_accountant, TreqPost, TreqPatch, TreqPostPatchIsImported, TreqDelete } from '.';
+import type { TpaymentType, Tstate_accountant, TreqPost, TreqPatch, TreqPostPatchIsImported, TreqDelete } from '.';
 
 // type
 import type { Toption } from 'js/utils/options/options';

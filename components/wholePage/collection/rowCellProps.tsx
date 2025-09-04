@@ -14,7 +14,7 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
-import { TpaymentType, Tstate_accountant } from '.';
+import type { TpaymentType, Tstate_accountant } from '.';
 import { Tcurrency } from 'js/api/dtoTypes';
 
 // css
