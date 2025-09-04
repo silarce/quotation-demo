@@ -7,7 +7,7 @@ import { TsalesOrder_Dto } from 'js/api/api_netCore/api_accountsReceivable';
 
 type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
 
-interface Tstate {
+interface Tstate_salesOrderItem {
   readonly attachedToProductId: string | null;
 
   quantity: `${number}` | '';
@@ -38,7 +38,7 @@ type Taction_salsesOrderItem =
     }
   | {
       type: 'replace';
-      payload: Tstate[];
+      payload: Tstate_salesOrderItem[];
     }
   | {
       type: 'productId';
@@ -87,14 +87,13 @@ const customProductNumber = 'A99999';
 // ===============================================================================
 
 // MARK: HOOK
-const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
+const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate_salesOrderItem[] => {
   return useMemo(() => {
     if (!raw) {
       return [];
     }
 
     return raw.map((item) => ({
-      // raw: item,
       attachedToProductId: item.attachedToProductId,
       productId: item.productId,
 
@@ -104,7 +103,7 @@ const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] =>
       productName: item.productName,
       productNumber: item.productNumber,
 
-      itemName: '',
+      itemName: item.itemName ?? '',
     }));
   }, [raw]);
 };
@@ -228,13 +227,13 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
 //
 
 // MARK: reducer
-const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
+const reducer_salesOrderItem = (state: Tstate_salesOrderItem[], action: Taction_salsesOrderItem) => {
   if (action.type === 'replace') {
     return action.payload;
   }
 
   if (action.type === 'add') {
-    const newItem: Tstate = emptyState();
+    const newItem: Tstate_salesOrderItem = emptyState();
 
     return [...state, newItem];
   }
@@ -321,7 +320,7 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
 
 // ===============================================================================
 
-const emptyState = (): Tstate => ({
+const emptyState = (): Tstate_salesOrderItem => ({
   attachedToProductId: null,
   productId: null,
   quantity: '',
@@ -342,4 +341,4 @@ const checkIsAllowCustom = (productNumber: string) => {
 
 export { useSalesOrderItemArr, checkIsAllowCustom };
 
-export type { Tinstance_salesOrderItemArr, TsalesOrderItem, Tstate, Taction_salsesOrderItem };
+export type { Tinstance_salesOrderItemArr, TsalesOrderItem, Tstate_salesOrderItem as Tstate, Taction_salsesOrderItem };

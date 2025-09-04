@@ -78,8 +78,8 @@ const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr,
     },
     {
       dataIndex: 'itemName',
-      title: '項目名稱 no property',
-      width: 100,
+      title: '項目名稱',
+      width: 300,
       render: (v, _, index) => {
         return (
           <MyDataEntry showBorder={true}>

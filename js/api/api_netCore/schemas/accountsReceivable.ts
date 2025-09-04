@@ -446,6 +446,8 @@ interface TsalesOrderItem_Dto {
   taxes: number | null;
   attachedToProductId: string | null;
   dualPrice: number | null;
+
+  itemName: string | null;
 }
 
 type TsalesOrder_post_Dto = {
@@ -497,6 +499,8 @@ interface TsalesOrderItem_post_Dto {
   discount?: decimal | null; //折扣
   dualPrice?: decimal | null; //牌價
   taxes?: decimal | null; //稅金
+
+  itemName: string;
 }
 
 type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
