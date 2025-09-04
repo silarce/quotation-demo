@@ -276,6 +276,11 @@ const rowCellPropsList: TconfigList = {
           onChange: (option) => {
             setState_accountant((state) => ({ ...state, ['accountingNumber']: option?.value ?? '' }));
           },
+          classNames: {
+            menuPortal(props) {
+              return scss.selectMenu;
+            },
+          },
         },
       };
 
@@ -535,6 +540,11 @@ const rowCellPropsList: TconfigList = {
 
             const value = option.value as (typeof options_currency)[number]['value'];
             setState_accountant((state) => ({ ...state, ['currency']: value }));
+          },
+          classNames: {
+            menuPortal(props) {
+              return scss.selectMenu;
+            },
           },
         },
       };
