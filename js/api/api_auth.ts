@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { axi, axi_monkey } from './axiosCreator';
-import _ from 'lodash';
+
 import axios from 'js/api/axiosCreator/axiosInstance';
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
 
@@ -103,42 +102,6 @@ export const persistTokens = (auth: LoginInfo) => {
   axi_monkey.defaults.headers.common['Authorization'] = authHeader;
 };
 //===========================================================================
-
-export const useApiAuthMe = () => {
-  const [userInfo, setUserInfo] = useState<TuserDto>();
-
-  const updateUserInfo = async () => {
-    const res = await apiAuthMe();
-
-    if (res) {
-      // 1. 儲存 sessionId
-      persistSessionId(res.latestSessionId);
-
-      // 2. 以 sid 換取 JWT
-      try {
-        const auth = await apiGetLoginInfoBySessionId(res.latestSessionId);
-
-        if (auth) {
-          persistTokens(auth);
-        } else {
-          console.warn('未取得有效的登入資訊');
-        }
-      } catch (err) {
-        console.error('以 sessionId 取得 JWT 失敗：', err);
-      }
-
-      if (res.employee) {
-        res.employee.jobs = _.sortBy(res.employee.jobs, (job) => ['grade', 'department.createdAt']);
-      }
-
-      setUserInfo(res);
-    }
-
-    return res;
-  };
-
-  return { userInfo, setUserInfo, updateUserInfo };
-};
 
 // 取得使用者權限
 export const apiAuthPermissions = () => {
