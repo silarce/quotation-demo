@@ -23,6 +23,9 @@ import { TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // global state
 import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+//選單
+import { useNavStore } from 'hooks/globalState/useGlobal_navStore';
+
 // import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
 import { useGlobal_userInfo } from 'hooks/globalState/useGlobal_userInfo';
@@ -90,6 +93,15 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   const [ready, setReady] = useState(false);
 
   const { userInfo, userErpFeature, isAdmin, userGrade, update: update_userInfo } = useGlobal_userInfo();
+
+  //-----------------------------------------------------------------------------
+  //選單
+  const { initSideNav } = useNavStore();
+
+  // 初始化 SideNav
+  useEffect(() => {
+    initSideNav();
+  }, []);
 
   // ----------------------------------------------------------------------------
 

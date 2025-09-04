@@ -72,16 +72,19 @@ const useGlobal_userInfo = () => {
         const sessionId = userInfo?.latestSessionId;
 
         if (!sessionId) {
-          throw new Error('沒有拿到 sessionId');
-        }
-
-        // 以 sid 換取 JWT
-        const auth = await apiGetLoginInfoBySessionId(sessionId);
-
-        if (auth) {
-          persistTokens(auth);
+          console.warn('沒有拿到 sessionId，跳過 JWT 驗證（站台關閉模式）');
         } else {
-          throw new Error('以 sessionId 取得 JWT 失敗');
+          try {
+            const auth = await apiGetLoginInfoBySessionId(sessionId);
+
+            if (auth) {
+              persistTokens(auth);
+            } else {
+              console.warn('以 sessionId 取得 JWT 失敗，跳過（站台關閉模式）');
+            }
+          } catch (err) {
+            console.warn('JWT 驗證站台無法連線，跳過此流程：', err);
+          }
         }
 
         return { userInfo, userErpFeature };

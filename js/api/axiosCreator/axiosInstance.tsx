@@ -14,7 +14,7 @@ const getAuthHeader = () => {
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_SYS_URL,
-  timeout: 10000,
+  timeout: 3000,
   headers: {
     'Content-Type': 'application/json',
   },

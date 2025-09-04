@@ -1,5 +1,5 @@
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_SYS_URL;
-import { useNavStore } from './navStore';
+import { useNavStore } from 'hooks/globalState/useGlobal_navStore';
 import { MenuItem, NestedMenuItem } from './type';
 import axios from 'js/api/axiosCreator/axiosInstance';
 

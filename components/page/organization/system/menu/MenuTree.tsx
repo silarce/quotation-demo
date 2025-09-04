@@ -13,7 +13,7 @@ import { MenuState } from './type';
 // import scss from './menuTree.module.scss';
 
 import { fetchHeaderNav, fetchSideNav } from './api';
-import { useNavStore } from './navStore';
+import { useNavStore } from 'hooks/globalState/useGlobal_navStore';
 
 const getAuthHeader = () => {
   if (typeof window === 'undefined') {
