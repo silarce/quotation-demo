@@ -1,11 +1,10 @@
 import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Switch } from 'antd';
 import dayjs from 'dayjs';
-import debounce from 'lodash/debounce';
-import { v4 as uuidv4 } from 'uuid';
 import { useFormReducer } from 'components/page/organization/employee/addEmployee/formReducer';
+import { v4 as uuidv4 } from 'uuid';
 //scss
 import scss from './employeeData.module.scss';
 
@@ -33,8 +32,9 @@ import Icon_house from 'public/image/icon/fong/pepicons-pop_house.svg';
 import Icon_folder from 'public/image/icon/fong/folder.svg';
 
 import { Checkbox } from 'components/global/gear/dataEntry';
+import { CreateEmployeePayload } from 'components/page/organization/employee/type';
 
-type OptionType = { label: string; value: string }; // value 用 string，最單純
+type OptionType = { label: string; value: string };
 type ApiItem = { value: string; label: string };
 type ApiGroup = {
   targetElement: string;
@@ -46,25 +46,6 @@ type ApiGroup = {
 
 type SelectOptionsMap = Record<string, OptionType[]>;
 
-interface Dependent {
-  id: string;
-  name: string;
-  birthday: string;
-  idNumber: string;
-  isForeign: string;
-  relation: string;
-  isInsured?: boolean;
-}
-
-interface InsuranceHistory {
-  id: string;
-  changeDate: string;
-  laborLevel: string;
-  healthLevel: string;
-  reason: string;
-  effectiveDate: string;
-}
-
 export default function Organization() {
   const mapPageHeaderTop: MapPageHeader = {
     title: [
@@ -75,34 +56,32 @@ export default function Organization() {
   };
   const [formState, dispatch] = useFormReducer();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEnable, setIsEnable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
   const [labor, setLabor] = useState(false);
   const [health, setHealth] = useState(false);
-  const [dependents, setDependents] = useState<Dependent[]>([]);
-  const [laborInsurance, setLaborInsurance] = useState<InsuranceHistory[]>([]);
-  const [healthInsurance, setHealthInsurance] = useState<InsuranceHistory[]>([]);
+  console.log('formState: ', formState);
 
-  const updateField = useMemo(
-    () =>
-      debounce((field: string, value: string) => {
-        dispatch({ type: 'SET_FIELD', field, value });
-      }),
-    []
+  const updateField = useCallback(
+    <K extends keyof CreateEmployeePayload>(field: K, value: CreateEmployeePayload[K]) => {
+      dispatch({ type: 'SET_FIELD', field, value });
+    },
+    [dispatch]
   );
 
   const router = useRouter();
-  const { com_id } = router.query;
 
   const [selectOptionsMap, setSelectOptionsMap] = useState<Record<string, OptionType[]>>({});
 
-  const toOptionsMap = (resp: any): SelectOptionsMap => {
-    const groups: ApiGroup[] = Array.isArray(resp?.data) ? resp.data : [];
+  const toOptionsMap = (resp: { data?: ApiGroup[] }): SelectOptionsMap => {
+    const groups: ApiGroup[] = Array.isArray(resp?.data) ? resp.data! : [];
 
     return groups.reduce<SelectOptionsMap>((acc, g) => {
       const opts: OptionType[] = [
         { label: '請選擇', value: '' },
-        ...(g.items ?? []).map((it) => ({ label: it.label, value: String(it.value) })),
+        ...(g.items ?? []).map((it: ApiItem) => ({
+          label: it.label,
+          value: String(it.value),
+        })),
       ];
       acc[g.targetElement] = opts;
 
@@ -114,8 +93,8 @@ export default function Organization() {
     const fetchSelectOptions = async () => {
       try {
         const data = await getAllEmployeeSelectOptions({
-          countyCode: formState.residence_county_pcode ?? '',
-          departmentId: formState.departmentId ?? '',
+          countyCode: formState.residenceCountyPcode ?? '',
+          departmentId: formState.department ?? '',
         });
         setSelectOptionsMap(toOptionsMap(data));
       } catch (err) {
@@ -124,122 +103,79 @@ export default function Organization() {
     };
 
     fetchSelectOptions();
-  }, []);
+  }, [formState.department, formState.residenceCountyPcode]);
 
   //新增員工
-  // const handleSave = async () => {
-  //   try {
-  //     const payload = {
-  //       emp_code: formState.emp_id, // 這邊假設 emp_code 來自 emp_id
-  //       id_no: 'A123456789',
-  //       emp_ch_name: formState.emp_name,
-  //       emp_en_name: '',
-  //       email: formState.email,
-  //       birthday_date: formState.birthday_date,
-  //       gender_pcode: formState.genderPcode,
-  //       marital_pcode: formState.marital_pcode,
-  //       education_pcode: formState.education_pcode,
-  //       phone1: formState.contact_phone,
-  //       phone2: formState.contact_phone2,
-  //       residence_county_pcode: formState.residence_county_pcode,
-  //       residence_district_pcode: '', // ➜ 請補上對應區域欄位
-  //       residence_address: formState.residence_address,
-  //       mailing_county_pcode: formState.mailing_county_pcode,
-  //       mailing_district_pcode: '', // ➜ 請補上對應區域欄位
-  //       mailing_address: formState.mailing_address,
-  //       seniority: formState.seniority,
-  //       start_date: formState.start_date,
-  //       leave_date: formState.leave_date,
-  //       retire_date: formState.retire__date,
-  //       severance_date: formState.severance__date,
-  //       military_service_type_pcode: formState.military_service_type_pcode,
-  //       emergency_contact_phone: formState.urgent_phone,
-  //       emergency_contact_relationship: formState.emergency_contact_relationship,
-  //       phone_number: formState.contact_phone,
-  //       department: formState.department,
-  //       job_grade_id: formState.job_grade_id,
-  //       hire_date: formState.start_date,
-  //       is_enable: isEnable,
-  //     };
-
-  //     const res = await createEmployee(payload);
-  //     console.log('✅ 新增成功:', res);
-  //     // 可加跳轉或提示
-  //   } catch (error) {
-  //     console.error('❌ 新增失敗:', error);
-  //   }
-  // };
+  const handleSave = async () => {
+    try {
+      const payload: CreateEmployeePayload = formState;
+      const res = await createEmployee(payload);
+      console.log('新增成功:', res);
+    } catch (error) {
+      console.error('新增失敗:', error);
+    }
+  };
 
   //新增眷屬
   const handleAddDependent = () => {
-    setDependents((prev) => [
-      ...prev,
+    updateField('dependents', [
+      ...formState.dependents,
       {
-        id: uuidv4(),
-        name: '',
-        birthday: '',
-        idNumber: '',
-        isForeign: '',
-        relation: '',
+        empRelativeId: uuidv4(),
+        empRelativeName: '',
+        empRelativeBirthday: '',
+        empRelativeDomesticPcode: '',
+        empRelativeRelationPcode: '',
+        empRelativeIdNo: '',
+        is_nhi: false,
       },
     ]);
   };
-
-  const updateDependentField = (id: string, key: keyof Dependent, value: string | boolean) => {
-    setDependents((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
-  };
-
-  const handleRemove = (id: string) => {
-    setDependents((prev) => prev.filter((item) => item.id !== id));
-  };
-  //=============================
 
   //新增勞保歷程
   const handleAddLaborInsurance = () => {
-    setLaborInsurance((prev) => [
-      ...prev,
+    updateField('insuranceItems', [
+      ...formState.insuranceItems,
       {
-        id: uuidv4(),
-        changeDate: '',
-        laborLevel: '',
-        healthLevel: '',
-        reason: '',
+        insuranceId: uuidv4(),
+        insuranceTypePcode: 'labor',
+        createdAt: '',
         effectiveDate: '',
+        levelAmount: '',
+        reason: '',
       },
     ]);
-  };
-
-  const updateLaborInsuranceField = (id: string, key: keyof InsuranceHistory, value: string) => {
-    setLaborInsurance((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
-  };
-
-  const handleRemoveLaborInsurance = (id: string) => {
-    setLaborInsurance((prev) => prev.filter((item) => item.id !== id));
   };
 
   //新增健保歷程
 
   const handleAddHealthInsurance = () => {
-    setHealthInsurance((prev) => [
-      ...prev,
+    updateField('insuranceItems', [
+      ...formState.insuranceItems,
       {
-        id: uuidv4(),
-        changeDate: '',
-        laborLevel: '',
-        healthLevel: '',
-        reason: '',
+        insuranceId: uuidv4(),
+        insuranceTypePcode: 'health',
+        createdAt: '',
         effectiveDate: '',
+        levelAmount: '',
+        reason: '',
       },
     ]);
   };
 
-  const updateHealthInsuranceField = (id: string, key: keyof InsuranceHistory, value: string) => {
-    setHealthInsurance((prev) => prev.map((item) => (item.id === id ? { ...item, [key]: value } : item)));
-  };
+  useEffect(() => {
+    if (!formState.empEnName) {
+      updateField('empEnName', 'John Doe');
+    }
 
-  const handleRemoveHealthInsurance = (id: string) => {
-    setHealthInsurance((prev) => prev.filter((item) => item.id !== id));
-  };
+    if (!formState.residenceDistrictPcode) {
+      updateField('residenceDistrictPcode', '1000');
+    }
+
+    if (!formState.mailingDistrictPcode) {
+      updateField('mailingDistrictPcode', '1000');
+    }
+  }, [formState.empEnName, formState.residenceDistrictPcode, formState.mailingDistrictPcode, updateField]);
 
   return (
     <>
@@ -256,7 +192,7 @@ export default function Organization() {
           <Btn theme="trash" onClick={() => console.log('Clear!')}>
             刪除
           </Btn>
-          <Btn theme="save" onClick={() => console.log('save')}>
+          <Btn theme="save" onClick={() => handleSave()}>
             儲存
           </Btn>
           <LeaveModal isOpen={isModalOpen} onConfirm={() => router.back()} onCancel={() => setIsModalOpen(false)} />
@@ -274,8 +210,8 @@ export default function Organization() {
         <div className="grid grid-cols-6 gap-[24px]">
           <LabeledInputV2
             label="員工姓名"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.empChName}
+            onChange={(val) => updateField('empChName', val)}
             placeholder="- -"
             required={true}
           />
@@ -288,31 +224,38 @@ export default function Organization() {
             onChange={(val) => updateField('genderPcode', val)}
             options={selectOptionsMap.genderPcode || []}
           />
+          <LabeledInputV2
+            label="身分證字號"
+            value={formState.idNo}
+            onChange={(val) => updateField('idNo', val)}
+            placeholder="- -"
+            required={true}
+          />
           <LabeledDatePickerV2
             label="出生日期"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-            onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
+            value={formState.birthdayDate ? dayjs(formState.birthdayDate) : null}
+            onChange={(date, dateString) => updateField('birthdayDate', dateString as string)}
           />
           <LabeledSelectV2
             label="婚姻"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.marital_pcode}
-            onChange={(val) => updateField('marital_pcode', val)}
-            options={selectOptionsMap.marital_pcode || []}
+            value={formState.maritalPcode}
+            onChange={(val) => updateField('maritalPcode', val)}
+            options={selectOptionsMap.maritalPcode || []}
           />
           <LabeledSelectV2
             label="學歷"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.education_pcode}
-            onChange={(val) => updateField('education_pcode', val)}
-            options={selectOptionsMap.education_pcode || []}
+            value={formState.educationPcode}
+            onChange={(val) => updateField('educationPcode', val)}
+            options={selectOptionsMap.educationPcode || []}
           />
           <LabeledSelectV2
             label="兵役別"
@@ -344,29 +287,29 @@ export default function Organization() {
         <div className="grid grid-cols-6 gap-[24px]">
           <LabeledInputV2
             label="電子郵件"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.email}
+            onChange={(val) => updateField('email', val)}
             placeholder="- -"
             required={true}
           />
           <LabeledInputV2
             label="連絡電話1"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.phone1}
+            onChange={(val) => updateField('phone1', val)}
             placeholder="- -"
             required={true}
           />
           <LabeledInputV2
             label="連絡電話2"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.phone2}
+            onChange={(val) => updateField('phone2', val)}
             placeholder="- -"
             required={true}
           />
           <LabeledInputV2
             label="緊急連絡人"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.emergencyContactName}
+            onChange={(val) => updateField('emergencyContactName', val)}
             placeholder="- -"
             required={true}
           />
@@ -381,8 +324,8 @@ export default function Organization() {
           />
           <LabeledInputV2
             label="緊急連絡人電話"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.emergencyContactPhone}
+            onChange={(val) => updateField('emergencyContactPhone', val)}
             placeholder="- -"
             required={true}
           />
@@ -393,15 +336,15 @@ export default function Organization() {
             label="戶籍城市"
             required={true}
             placeholder="請選擇"
-            value={formState.residence_county_pcode}
-            onChange={(val) => updateField('residence_county_pcode', val)}
+            value={formState.residenceCountyPcode}
+            onChange={(val) => updateField('residenceCountyPcode', val)}
             options={selectOptionsMap.CountyPcode || []}
           />
           <div className="col-span-2">
             <LabeledInputV2
               label="戶籍地址"
-              value={formState.emp_id}
-              onChange={(val) => updateField('emp_id', val)}
+              value={formState.residenceAddress}
+              onChange={(val) => updateField('residenceAddress', val)}
               placeholder="- -"
               required={true}
             />
@@ -411,15 +354,15 @@ export default function Organization() {
             label="通訊城市"
             required={true}
             placeholder="請選擇"
-            value={formState.mailing_county_pcode}
-            onChange={(val) => updateField('mailing_county_pcode', val)}
+            value={formState.mailingCountyPcode}
+            onChange={(val) => updateField('mailingCountyPcode', val)}
             options={selectOptionsMap.CountyPcode || []}
           />
           <div className="col-span-2">
             <LabeledInputV2
               label="通訊地址"
-              value={formState.emp_id}
-              onChange={(val) => updateField('emp_id', val)}
+              value={formState.mailingAddress}
+              onChange={(val) => updateField('mailingAddress', val)}
               placeholder="- -"
               required={true}
             />
@@ -438,45 +381,59 @@ export default function Organization() {
             label="工作地點"
             required={true}
             placeholder="請選擇"
-            value={formState.workLocationPcode}
-            onChange={(val) => updateField('workLocationPcode', val)}
+            value={formState.employeeEmployment.workLocationPcode}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                workLocationPcode: val,
+              })
+            }
             options={selectOptionsMap.workLocationPcode || []}
           />
           <LabeledSelectV2
             label="部門"
             required={true}
             placeholder="請選擇"
-            value={formState.departmentId}
-            onChange={(val) => updateField('departmentId', val)}
+            value={formState.department}
+            onChange={(val) => updateField('department', val)}
             options={selectOptionsMap.departmentId || []}
           />
           <LabeledSelectV2
             label="職稱"
             required={true}
             placeholder="請選擇"
-            value={formState.jobId}
-            onChange={(val) => updateField('jobId', val)}
+            value={formState.jobGradeId}
+            onChange={(val) => updateField('jobGradeId', val)}
             options={selectOptionsMap.jobId || []}
           />
           <LabeledInputV2
             label="分機"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.employeeEmployment.extensionNo}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                extensionNo: val,
+              })
+            }
             placeholder="- -"
-            required={true}
           />
-          <LabeledDatePickerV2
+          <LabeledSelectV2
             label="薪資帳別"
             required={true}
             placeholder="請選擇"
-            className="w-[100%]"
-            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-            onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
+            value={formState.employeeEmployment.salaryAccountPcode}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                salaryAccountPcode: val,
+              })
+            }
+            options={selectOptionsMap.salaryAccountPcode || []}
           />
           <LabeledInputV2
             label="年資歷"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.seniority}
+            onChange={(val) => updateField('seniority', val)}
             placeholder="- -"
             required={true}
           />
@@ -485,44 +442,54 @@ export default function Organization() {
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-            onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
+            value={formState.startDate ? dayjs(formState.startDate) : null}
+            onChange={(date, dateString) => updateField('startDate', dateString as string)}
           />
           <LabeledDatePickerV2
             label="離職日"
             required={true}
             placeholder="請選擇"
             className=""
-            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-            onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
+            value={formState.leaveDate ? dayjs(formState.leaveDate) : null}
+            onChange={(date, dateString) => updateField('leaveDate', dateString as string)}
           />
           <LabeledDatePickerV2
             label="資遣日"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-            onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
+            value={formState.severanceDate ? dayjs(formState.severanceDate) : null}
+            onChange={(date, dateString) => updateField('severanceDate', dateString as string)}
           />
           <LabeledDatePickerV2
             label="退休日"
             required={true}
             placeholder="請選擇"
             className="w-[100%]"
-            value={formState.birthday_date ? dayjs(formState.birthday_date) : null}
-            onChange={(date, dateString) => updateField('birthday_date', dateString as string)}
+            value={formState.retireDate ? dayjs(formState.retireDate) : null}
+            onChange={(date, dateString) => updateField('retireDate', dateString as string)}
           />
           <LabeledInputV2
             label="勞退百分比"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.employeeEmployment.laborRetirePercentage}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                laborRetirePercentage: val,
+              })
+            }
             placeholder="- -"
             required={true}
           />
           <LabeledInputV2
             label="員工本薪"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.employeeEmployment.salaryPlainText}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                salaryPlainText: val,
+              })
+            }
             placeholder="- -"
             required={true}
             isPassword
@@ -539,15 +506,20 @@ export default function Organization() {
         <div className="flex w-full gap-[24px]">
           <LabeledInputV2
             label="員工編號"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.empCode}
+            onChange={(val) => updateField('empCode', val)}
             placeholder="- -"
             required={true}
           />
           <LabeledInputV2
             label="卡號設定"
-            value={formState.emp_id}
-            onChange={(val) => updateField('emp_id', val)}
+            value={formState.employeeEmployment.userAddr}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                userAddr: val,
+              })
+            }
             placeholder="- -"
             required={true}
           />
@@ -555,16 +527,26 @@ export default function Organization() {
             label="勤務"
             required={true}
             placeholder="請選擇"
-            value={formState.workTypePcode}
-            onChange={(val) => updateField('workTypePcode', val)}
+            value={formState.employeeEmployment.workTypePcode}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                workTypePcode: val,
+              })
+            }
             options={selectOptionsMap.workTypePcode || []}
           />
           <LabeledSelectV2
             label="班別"
             required={true}
             placeholder="請選擇"
-            value={formState.shiftId}
-            onChange={(val) => updateField('shiftId', val)}
+            value={formState.employeeEmployment.shiftId}
+            onChange={(val) =>
+              updateField('employeeEmployment', {
+                ...formState.employeeEmployment,
+                shiftId: val,
+              })
+            }
             options={selectOptionsMap.shiftId || []}
           />
         </div>
@@ -583,49 +565,77 @@ export default function Organization() {
           />
         </div>
         <div className={`transition-all duration-300  ${labor ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          {laborInsurance.map((history) => (
-            <div key={history.id} className="grid grid-cols-4 gap-[24px] relative mb-[16px]">
-              <LabeledInputV2
-                label="勞保投保級距"
-                value={history.laborLevel}
-                onChange={(val) => updateLaborInsuranceField(history.id, 'laborLevel', val)}
-                placeholder="- -"
-                required
-              />
-              <LabeledDatePickerV2
-                label="異動日期"
-                required
-                placeholder="請選擇"
-                className="w-full"
-                value={history.changeDate ? dayjs(history.changeDate) : null}
-                onChange={(date, dateString) =>
-                  updateLaborInsuranceField(history.id, 'changeDate', dateString as string)
-                }
-              />
-              <LabeledInputV2
-                label="異動原因"
-                value={history.reason}
-                onChange={(val) => updateLaborInsuranceField(history.id, 'reason', val)}
-                placeholder="- -"
-                required
-              />
-              <LabeledInputV2
-                label="生效日"
-                value={history.effectiveDate}
-                onChange={(val) => updateLaborInsuranceField(history.id, 'effectiveDate', val)}
-                placeholder="- -"
-                required
-              />
-              <div className="absolute right-0 top-[-1.5px]">
-                <ClearButton
-                  label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
-                  className="h-[24px]"
-                  iconPosition="right"
-                  onClick={() => handleRemoveLaborInsurance(history.id)}
+          {formState.insuranceItems
+            .filter((item) => item.insuranceTypePcode === 'labor')
+            .map((history) => (
+              <div key={history.insuranceId} className="grid grid-cols-4 gap-[24px] relative mb-[16px]">
+                <LabeledInputV2
+                  label="勞保投保級距"
+                  value={history.levelAmount}
+                  onChange={(val) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, levelAmount: val } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                  placeholder="- -"
+                  required
                 />
+                <LabeledDatePickerV2
+                  label="異動日期"
+                  required
+                  placeholder="請選擇"
+                  className="w-full"
+                  value={history.createdAt ? dayjs(history.createdAt) : null}
+                  onChange={(date, dateString) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, createdAt: dateString as string } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                />
+
+                <LabeledInputV2
+                  label="異動原因"
+                  value={history.reason}
+                  onChange={(val) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, reason: val } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                  placeholder="- -"
+                  required
+                />
+
+                <LabeledInputV2
+                  label="生效日"
+                  value={history.effectiveDate}
+                  onChange={(val) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, effectiveDate: val } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                  placeholder="- -"
+                  required
+                />
+
+                <div className="absolute right-0 top-[-1.5px]">
+                  <ClearButton
+                    label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
+                    className="h-[24px]"
+                    iconPosition="right"
+                    onClick={() => {
+                      const updated = formState.insuranceItems.filter(
+                        (item) => !(item.insuranceId === history.insuranceId && item.insuranceTypePcode === 'labor')
+                      );
+                      updateField('insuranceItems', updated);
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
         {/* MARK:健保歷程記錄  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
@@ -633,7 +643,13 @@ export default function Organization() {
             <Icon_security2 style={{ width: '24px', height: '24px' }} />
             健保歷程記錄
           </span>
-          <AddButton label="歷程記錄" onClick={() => handleAddHealthInsurance()} className="h-[40px] mr-3" />
+          <AddButton
+            label="歷程記錄"
+            onClick={() => {
+              handleAddHealthInsurance();
+            }}
+            className="h-[40px] mr-3"
+          />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
           <ExtendButton
             label={health ? '收合' : '展開'}
@@ -642,49 +658,78 @@ export default function Organization() {
           />
         </div>
         <div className={`transition-all duration-300  ${health ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          {healthInsurance.map((history) => (
-            <div key={history.id} className="grid grid-cols-4 gap-[24px] relative mb-[16px]">
-              <LabeledInputV2
-                label="健保投保級距"
-                value={history.laborLevel}
-                onChange={(val) => updateHealthInsuranceField(history.id, 'laborLevel', val)}
-                placeholder="- -"
-                required
-              />
-              <LabeledDatePickerV2
-                label="異動日期"
-                required
-                placeholder="請選擇"
-                className="w-full"
-                value={history.changeDate ? dayjs(history.changeDate) : null}
-                onChange={(date, dateString) =>
-                  updateHealthInsuranceField(history.id, 'changeDate', dateString as string)
-                }
-              />
-              <LabeledInputV2
-                label="異動原因"
-                value={history.reason}
-                onChange={(val) => updateHealthInsuranceField(history.id, 'reason', val)}
-                placeholder="- -"
-                required
-              />
-              <LabeledInputV2
-                label="生效日"
-                value={history.effectiveDate}
-                onChange={(val) => updateHealthInsuranceField(history.id, 'effectiveDate', val)}
-                placeholder="- -"
-                required
-              />
-              <div className="absolute right-0 top-[-1.5px]">
-                <ClearButton
-                  label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
-                  className="h-[24px]"
-                  iconPosition="right"
-                  onClick={() => handleRemoveHealthInsurance(history.id)}
+          {formState.insuranceItems
+            .filter((item) => item.insuranceTypePcode === 'health')
+            .map((history) => (
+              <div key={history.insuranceId} className="grid grid-cols-4 gap-[24px] relative mb-[16px]">
+                <LabeledInputV2
+                  label="健保投保級距"
+                  value={history.levelAmount}
+                  onChange={(val) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, levelAmount: val } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                  placeholder="- -"
+                  required
                 />
+
+                <LabeledDatePickerV2
+                  label="異動日期"
+                  required
+                  placeholder="請選擇"
+                  className="w-full"
+                  value={history.createdAt ? dayjs(history.createdAt) : null}
+                  onChange={(date, dateString) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, createdAt: dateString as string } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                />
+
+                <LabeledInputV2
+                  label="異動原因"
+                  value={history.reason}
+                  onChange={(val) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, reason: val } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                  placeholder="- -"
+                  required
+                />
+
+                <LabeledInputV2
+                  label="生效日"
+                  value={history.effectiveDate}
+                  onChange={(val) => {
+                    const updated = formState.insuranceItems.map((item) =>
+                      item.insuranceId === history.insuranceId ? { ...item, effectiveDate: val } : item
+                    );
+                    updateField('insuranceItems', updated);
+                  }}
+                  placeholder="- -"
+                  required
+                />
+
+                <div className="absolute right-0 top-[-1.5px]">
+                  <ClearButton
+                    label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
+                    className="h-[24px]"
+                    iconPosition="right"
+                    onClick={() => {
+                      const updated = formState.insuranceItems.filter(
+                        (item) => !(item.insuranceId === history.insuranceId && item.insuranceTypePcode === 'health')
+                      );
+                      updateField('insuranceItems', updated);
+                    }}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
         {/* MARK:眷屬資料  */}
         <div className="flex items-center justify-center w-full mt-[40px] mb-[20px]">
@@ -695,20 +740,30 @@ export default function Organization() {
           <AddButton label="新增眷屬" onClick={() => handleAddDependent()} className="h-[40px] mr-3" />
           <div className="h-px bg-[#E0E0E0] flex-1 rounded-[10px]" />
         </div>
-        {dependents.map((dep) => (
-          <div key={dep.id} className="grid grid-cols-12 gap-[24px] relative mb-[16px]">
+        {formState.dependents.map((dep) => (
+          <div key={dep.empRelativeId} className="grid grid-cols-12 gap-[24px] relative mb-[16px]">
             <div className="flex col-span-3">
               <div className="flex flex-col justify-center items-center pr-[24px]">
                 <Checkbox
-                  checked={!!dep.isInsured}
-                  onChange={(e) => updateDependentField(dep.id, 'isInsured', e.target.checked)}
-                ></Checkbox>
+                  checked={!!dep.is_nhi}
+                  onChange={(e) => {
+                    const updated = formState.dependents.map((item) =>
+                      item.empRelativeId === dep.empRelativeId ? { ...item, is_nhi: e.target.checked } : item
+                    );
+                    updateField('dependents', updated);
+                  }}
+                />
                 <span className="whitespace-nowrap">計入健保扶養</span>
               </div>
               <LabeledInputV2
                 label="員工眷屬姓名"
-                value={dep.name}
-                onChange={(val) => updateDependentField(dep.id, 'name', val)}
+                value={dep.empRelativeName}
+                onChange={(val) => {
+                  const updated = formState.dependents.map((item) =>
+                    item.empRelativeId === dep.empRelativeId ? { ...item, empRelativeName: val } : item
+                  );
+                  updateField('dependents', updated);
+                }}
                 placeholder="- -"
                 required
               />
@@ -716,20 +771,32 @@ export default function Organization() {
             <div className="col-span-3">
               <LabeledDatePickerV2
                 label="員工眷屬生日"
-                required={!!dep.isInsured}
+                required={!!dep.empRelativeBirthday}
                 placeholder="請選擇"
                 className="w-full"
-                value={dep.birthday ? dayjs(dep.birthday) : null}
-                onChange={(date, dateString) => updateDependentField(dep.id, 'birthday', dateString as string)}
+                value={dep.empRelativeBirthday ? dayjs(dep.empRelativeBirthday) : null}
+                onChange={(date, dateString) => {
+                  const updated = formState.dependents.map((item) =>
+                    item.empRelativeId === dep.empRelativeId
+                      ? { ...item, empRelativeBirthday: dateString as string }
+                      : item
+                  );
+                  updateField('dependents', updated);
+                }}
               />
             </div>
             <div className="col-span-2">
               <LabeledInputV2
                 label="眷屬身分證"
-                value={dep.idNumber}
-                onChange={(val) => updateDependentField(dep.id, 'idNumber', val)}
+                value={dep.empRelativeIdNo}
+                onChange={(val) => {
+                  const updated = formState.dependents.map((item) =>
+                    item.empRelativeId === dep.empRelativeId ? { ...item, empRelativeIdNo: val } : item
+                  );
+                  updateField('dependents', updated);
+                }}
                 placeholder="- -"
-                required={!!dep.isInsured}
+                required={!!dep.is_nhi}
               />
             </div>
             <div className="col-span-2">
@@ -737,19 +804,29 @@ export default function Organization() {
                 label="員工眷屬關係"
                 required
                 placeholder="請選擇"
-                value={dep.relation || ''}
-                onChange={(val) => updateDependentField(dep.id, 'relation', val)}
-                options={selectOptionsMap.emergency_contact_relationship || []}
+                value={dep.empRelativeRelationPcode || ''}
+                onChange={(val) => {
+                  const updated = formState.dependents.map((item) =>
+                    item.empRelativeId === dep.empRelativeId ? { ...item, empRelativeRelationPcode: val } : item
+                  );
+                  updateField('dependents', updated);
+                }}
+                options={selectOptionsMap.emergencyContactRelationshipPcode || []}
               />
             </div>
             <div className="col-span-2">
               <LabeledSelectV2
                 label="眷屬是否國外"
-                required={!!dep.isInsured}
+                required={!!dep.is_nhi}
                 placeholder="請選擇"
-                value={dep.isForeign}
-                onChange={(val) => updateDependentField(dep.id, 'isForeign', val)}
-                options={selectOptionsMap.isForeign || []}
+                value={dep.empRelativeDomesticPcode}
+                onChange={(val) => {
+                  const updated = formState.dependents.map((item) =>
+                    item.empRelativeId === dep.empRelativeId ? { ...item, empRelativeDomesticPcode: val } : item
+                  );
+                  updateField('dependents', updated);
+                }}
+                options={selectOptionsMap.domesticPcode || []}
               />
             </div>
             <div className="absolute right-0 top-[-1.5px]">
@@ -757,7 +834,10 @@ export default function Organization() {
                 label={<span className="text-[14px] text-[#EA1833] ">刪除</span>}
                 className="h-[24px]"
                 iconPosition="right"
-                onClick={() => handleRemove(dep.id)}
+                onClick={() => {
+                  const updated = formState.dependents.filter((item) => item.empRelativeId !== dep.empRelativeId);
+                  updateField('dependents', updated);
+                }}
               />
             </div>
           </div>
