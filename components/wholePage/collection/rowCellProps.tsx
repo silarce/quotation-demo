@@ -14,7 +14,7 @@ import SquareBtn from 'components/global/gear/button/larrysBtn/squarebtn';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import { SearchModal_customer } from 'components/composition/searchModal/useSearchModal/useSearchModal_customer';
 
-import { TpaymentType, Tstate_accountant } from '.';
+import type { TpaymentType, Tstate_accountant } from '.';
 import { Tcurrency } from 'js/api/dtoTypes';
 
 // css
@@ -276,6 +276,11 @@ const rowCellPropsList: TconfigList = {
           onChange: (option) => {
             setState_accountant((state) => ({ ...state, ['accountingNumber']: option?.value ?? '' }));
           },
+          classNames: {
+            menuPortal(props) {
+              return scss.selectMenu;
+            },
+          },
         },
       };
 
@@ -535,6 +540,11 @@ const rowCellPropsList: TconfigList = {
 
             const value = option.value as (typeof options_currency)[number]['value'];
             setState_accountant((state) => ({ ...state, ['currency']: value }));
+          },
+          classNames: {
+            menuPortal(props) {
+              return scss.selectMenu;
+            },
           },
         },
       };
