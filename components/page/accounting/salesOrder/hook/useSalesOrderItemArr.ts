@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useReducer } from 'react';
+import { useMemo, useEffect, useReducer } from 'react';
 import Decimal from 'decimal.js';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -7,7 +7,7 @@ import { TsalesOrder_Dto } from 'js/api/api_netCore/api_accountsReceivable';
 
 type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
 
-interface Tstate {
+interface Tstate_salesOrderItem {
   readonly attachedToProductId: string | null;
 
   quantity: `${number}` | '';
@@ -17,6 +17,8 @@ interface Tstate {
   productId: string | null;
   productNumber: string;
   productName: string;
+
+  itemName: string;
 }
 
 type Taction_salsesOrderItem =
@@ -36,7 +38,7 @@ type Taction_salsesOrderItem =
     }
   | {
       type: 'replace';
-      payload: Tstate[];
+      payload: Tstate_salesOrderItem[];
     }
   | {
       type: 'productId';
@@ -67,6 +69,13 @@ type Taction_salsesOrderItem =
       payload: {
         index: number;
       };
+    }
+  | {
+      type: 'itemName';
+      payload: {
+        index: number;
+        itemName: string;
+      };
     };
 
 type Tinstance_salesOrderItemArr = ReturnType<typeof useSalesOrderItemArr>;
@@ -78,14 +87,13 @@ const customProductNumber = 'A99999';
 // ===============================================================================
 
 // MARK: HOOK
-const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] => {
+const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate_salesOrderItem[] => {
   return useMemo(() => {
     if (!raw) {
       return [];
     }
 
     return raw.map((item) => ({
-      // raw: item,
       attachedToProductId: item.attachedToProductId,
       productId: item.productId,
 
@@ -94,6 +102,8 @@ const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] =>
       amount: item.amount || 0,
       productName: item.productName,
       productNumber: item.productNumber,
+
+      itemName: item.itemName ?? '',
     }));
   }, [raw]);
 };
@@ -217,13 +227,13 @@ const useSalesOrderItemArr = (raw: TsalesOrderItem[] | undefined | null) => {
 //
 
 // MARK: reducer
-const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem) => {
+const reducer_salesOrderItem = (state: Tstate_salesOrderItem[], action: Taction_salsesOrderItem) => {
   if (action.type === 'replace') {
     return action.payload;
   }
 
   if (action.type === 'add') {
-    const newItem: Tstate = emptyState();
+    const newItem: Tstate_salesOrderItem = emptyState();
 
     return [...state, newItem];
   }
@@ -293,6 +303,14 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
       };
       break;
     }
+
+    case 'itemName': {
+      target = {
+        ...target,
+        itemName: action.payload.itemName,
+      };
+      break;
+    }
   }
 
   copy[action.payload.index] = target;
@@ -302,7 +320,7 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
 
 // ===============================================================================
 
-const emptyState = (): Tstate => ({
+const emptyState = (): Tstate_salesOrderItem => ({
   attachedToProductId: null,
   productId: null,
   quantity: '',
@@ -310,6 +328,7 @@ const emptyState = (): Tstate => ({
   amount: 0,
   productName: '',
   productNumber: customProductNumber,
+  itemName: '',
 });
 
 const checkIsAllowCustom = (productNumber: string) => {
@@ -322,4 +341,4 @@ const checkIsAllowCustom = (productNumber: string) => {
 
 export { useSalesOrderItemArr, checkIsAllowCustom };
 
-export type { Tinstance_salesOrderItemArr, TsalesOrderItem, Tstate, Taction_salsesOrderItem };
+export type { Tinstance_salesOrderItemArr, TsalesOrderItem, Tstate_salesOrderItem as Tstate, Taction_salsesOrderItem };

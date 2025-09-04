@@ -36,7 +36,13 @@ function Table_antd<T>({ className, pagination, ...props }: TableProps<T>) {
       pagination={
         pagination !== false && {
           position: ['bottomCenter'],
-          hideOnSinglePage: true,
+
+          // hideOnSinglePage不建議預設為true，有些地方不應該出現分頁器
+          // 在開發時資料數量常常不足10個，分頁器不會出現
+          // 到了生產環境資料數量超過10個，分頁器出現，發生問題
+          // hideOnSinglePage設為true的話容易疏忽這個細節
+          // hideOnSinglePage: true,
+
           showTotal: (total, range) => {
             return `總計 ${total} 項`;
           },

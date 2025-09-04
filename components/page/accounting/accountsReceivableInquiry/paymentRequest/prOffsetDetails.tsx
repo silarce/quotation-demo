@@ -185,6 +185,7 @@ const PrOffsetDetails = ({ prOffsetDetails, onAddDataConfirm, onAddDeductionConf
         scroll={{
           y: 400,
         }}
+        pagination={false}
       />
     </div>
   );

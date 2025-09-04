@@ -43,12 +43,6 @@ const SalesOrderItem = ({
       align: 'right',
     },
     {
-      title: '幣別 no property',
-      key: 'currency',
-      width: 80,
-      align: 'center',
-    },
-    {
       title: '合約單價',
       dataIndex: 'unitPrice',
       width: 150,
@@ -101,7 +95,13 @@ const SalesOrderItem = ({
   return (
     <div>
       <div className="text-xl font-semibold mb-8">項目明細</div>
-      <Table_antd className={className} columns={columns_projectDetail} dataSource={stateArr} />
+      <Table_antd
+        className={className}
+        columns={columns_projectDetail}
+        dataSource={stateArr}
+        pagination={false}
+        scroll={{ y: 400 }}
+      />
     </div>
   );
 };

@@ -240,6 +240,8 @@ const createBody_post_ = ({
       quantity,
       unitPrice,
       amount,
+
+      itemName,
     } = item;
 
     const salesOrderItem: TsalesOrder_post_Dto['salesOrderItems'][number] = {
@@ -254,6 +256,8 @@ const createBody_post_ = ({
       productId,
       productName,
       productNumber,
+
+      itemName,
     };
 
     return salesOrderItem;
@@ -325,6 +329,8 @@ const createBody_patch_ = ({
 
       productName,
       productNumber,
+
+      itemName,
     } = item;
 
     const salesOrderItem: TsalesOrder_patch_Dto['salesOrderItems'][number] = {
@@ -340,6 +346,8 @@ const createBody_patch_ = ({
 
       id: null,
       salesOrderNumber: salesOrderData.salesOrderNumber,
+
+      itemName,
     };
 
     return salesOrderItem;
