@@ -101,7 +101,13 @@ const SalesOrderItem = ({
   return (
     <div>
       <div className="text-xl font-semibold mb-8">項目明細</div>
-      <Table_antd className={className} columns={columns_projectDetail} dataSource={stateArr} />
+      <Table_antd
+        className={className}
+        columns={columns_projectDetail}
+        dataSource={stateArr}
+        pagination={false}
+        scroll={{ y: 400 }}
+      />
     </div>
   );
 };
