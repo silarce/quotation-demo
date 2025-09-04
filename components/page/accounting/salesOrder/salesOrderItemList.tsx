@@ -72,6 +72,32 @@ const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr,
 
   const columns: TableProps<Tstate>['columns'] = [
     {
+      dataIndex: 'productNumber',
+      title: '產品代號',
+      width: 150,
+    },
+    {
+      dataIndex: 'itemName',
+      title: '項目名稱 no property',
+      width: 100,
+      render: (v, _, index) => {
+        return (
+          <MyDataEntry showBorder={true}>
+            <Input
+              value={v}
+              onChange={(e) => {
+                const value = e.currentTarget.value;
+                dispatch({
+                  type: 'itemName',
+                  payload: { index, itemName: value },
+                });
+              }}
+            />
+          </MyDataEntry>
+        );
+      },
+    },
+    {
       dataIndex: 'productName',
       title: '產品名稱',
       width: 200,
@@ -114,12 +140,6 @@ const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr,
         </MyDataEntry>
       ),
     },
-    {
-      dataIndex: 'productNumber',
-      title: '產品代號',
-      width: 150,
-    },
-
     {
       dataIndex: 'quantity',
       title: '數量',

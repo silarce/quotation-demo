@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useReducer } from 'react';
+import { useMemo, useEffect, useReducer } from 'react';
 import Decimal from 'decimal.js';
 
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
@@ -17,6 +17,8 @@ interface Tstate {
   productId: string | null;
   productNumber: string;
   productName: string;
+
+  itemName: string;
 }
 
 type Taction_salsesOrderItem =
@@ -67,6 +69,13 @@ type Taction_salsesOrderItem =
       payload: {
         index: number;
       };
+    }
+  | {
+      type: 'itemName';
+      payload: {
+        index: number;
+        itemName: string;
+      };
     };
 
 type Tinstance_salesOrderItemArr = ReturnType<typeof useSalesOrderItemArr>;
@@ -94,6 +103,8 @@ const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate[] =>
       amount: item.amount || 0,
       productName: item.productName,
       productNumber: item.productNumber,
+
+      itemName: '',
     }));
   }, [raw]);
 };
@@ -293,6 +304,14 @@ const reducer_salesOrderItem = (state: Tstate[], action: Taction_salsesOrderItem
       };
       break;
     }
+
+    case 'itemName': {
+      target = {
+        ...target,
+        itemName: action.payload.itemName,
+      };
+      break;
+    }
   }
 
   copy[action.payload.index] = target;
@@ -310,6 +329,7 @@ const emptyState = (): Tstate => ({
   amount: 0,
   productName: '',
   productNumber: customProductNumber,
+  itemName: '',
 });
 
 const checkIsAllowCustom = (productNumber: string) => {
