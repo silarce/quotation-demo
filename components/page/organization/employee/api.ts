@@ -71,7 +71,7 @@ export const getEmployeeList = async ({
     const res = await axios.get<QueryEmployeesAPIResp>(`${BASE_URL}/api/org/employee/query`, {
       params: { keyword, departmentId, pageIndex, pageSize },
       headers: {
-        ...getAuthHeader(), // ✅ 沒 token 就不送，避免 "Bearer undefined"
+        ...getAuthHeader(),
       },
     });
 
@@ -98,68 +98,80 @@ type AllOpts = {
 
 export async function getAllEmployeeSelectOptions({ countyCode = '', departmentId }: AllOpts = {}) {
   const targets: string[] = [
-    'genderPcode',
-    'nationalityPcode',
+    'genderPcode', //性別
+    'maritalPcode', //婚姻
+    'educationPcode', //學歷
+    'nationalityPcode', //國籍
     'CountyPcode',
-    'DistrictPcode',
-    'militaryServiceTypePcode',
-    'emergencyContactRelationshipPcode',
-    'workTypePcode',
-    'workLocationPcode',
-    'departmentId',
-    // 'jobId',  // 先別加，等下視情況 push
-    'shiftId',
-    'salaryAccountPcode',
+    'DistrictPcode', //縣市、區
+    'militaryServiceTypePcode', //兵役
+    'emergencyContactRelationshipPcode', //緊急聯絡人關係
+    'workTypePcode', //勤務類別
+    'workLocationPcode', //工作所在地
+    'departmentId', //部門
+    // 'jobId', //職稱
+    'shiftId', //班別
+    'salaryAccountPcode', //薪資帳別
     'laborInsuranceSettingId',
-    'healthInsuranceSettingId',
+    'healthInsuranceSettingId', //勞保級距、健保級距
+    'domesticPcode', //眷屬是否國內外
   ];
   const modules: string[] = [
+    'MDM', //for 性別
+    'MDM', //for 婚姻
+    'MDM', //for 學歷
+    'MDM', //for 國籍
     'MDM',
-    'MDM',
-    'MDM',
-    'MDM',
+    'MDM', //for 縣市、區
+    'HRM', //for 兵役
+    'HRM', //緊急聯絡人關係
+    'HRM', //for 勤務類別
+    'HRM', //for 工作所在地
+    'HRM', //for 部門
+    // 'HRM', //for 職稱
+    'HRM', //for 班別
+    'SAL', //for 薪資帳別
     'HRM',
-    'HRM',
-    'HRM',
-    'HRM',
-    'HRM',
-    // 'HRM', // jobId
-    'HRM',
-    'SAL',
-    'HRM',
-    'HRM',
+    'HRM', //for 勞保級距、健保級距
+    'MDM', //員工眷屬是否國外。
   ];
   const codes: string[] = [
-    'GENDER_CODE',
-    'NATIONALITY_CODE',
+    'GENDER_CODE', //性別
+    'MARITAL_CODE', //婚姻
+    'EDUCATION_CODE', //學歷
+    'NATIONALITY_CODE', //國籍
     'COUNTY_CODE',
-    'DISTRICT_CODE',
-    'MILITARY_SERVICE_TYPE_CODE',
-    'EMERGENCY_CONTACT_RELATIONSHIP_CODE',
-    'WORK_TYPE_CODE',
-    'WORK_LOCATION_CODE',
-    'DEPARTMENT_ID',
-    // 'JOB_ID', // jobId
-    'SHIFT_ID',
-    'SALARY_ACCOUNT_CODE',
+    'DISTRICT_CODE', //縣市、區
+    'MILITARY_SERVICE_TYPE_CODE', //兵役
+    'EMERGENCY_CONTACT_RELATIONSHIP_CODE', //緊急聯絡人關係
+    'WORK_TYPE_CODE', //勤務類別
+    'WORK_LOCATION_CODE', //工作所在地
+    'DEPARTMENT_ID', //部門
+    // 'JOB_ID', //職稱
+    'SHIFT_ID', //班別
+    'SALARY_ACCOUNT_CODE', //薪資帳別
     'LABOR_INSURANCE_SETTING_ID',
-    'HEALTH_INSURANCE_SETTING_ID',
+    'HEALTH_INSURANCE_SETTING_ID', //勞保級距、健保級距
+    'DOMESTIC_CODE', //員工眷屬是否國外。
   ];
   const conds: string[] = [
+    '', //for 性別
+    '', //for 婚姻
+    '', //for 學歷
+    '', //for 國籍
     '',
-    '', // gender, nationality
+    '10001', //for 縣市、區(需傳入已經選擇的縣市代碼)
+    '', //for 兵役
+    '', //緊急聯絡人關係
+    '', //for 勤務類別
+    '', //for 工作所在地
+    '', //for 部門
+    '部門ID', //for 職稱(需傳入已經選擇的所屬部門ID)
+    '', //for 班別
+    '', //for 薪資帳別
     '',
-    countyCode, // county, district (區需要縣市代碼)
-    '',
-    '', // military, emergency relationship
-    '',
-    '', // work type, work location
-    '', // department
-    // departmentId ?? '', // jobId 需部門ID，但我們未加入 jobId，這行也先不加
-    '', // shift
-    '', // salary account
-    '',
-    '', // labor, health
+    '', //for 勞保級距、健保級距
+    '', //for 員工眷屬是否國外。
   ];
 
   // 若有部門才把 jobId 插入同樣索引位置（對齊四個陣列）
@@ -189,9 +201,8 @@ export async function getAllEmployeeSelectOptions({ countyCode = '', departmentI
 
 export const createEmployee = async (data: CreateEmployeePayload) => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/org/employee`, {
-      data,
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await axios.post(`${BASE_URL}/api/org/employee`, data, {
+      headers: { ...getAuthHeader() },
     });
 
     return response.data;
