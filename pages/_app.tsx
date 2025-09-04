@@ -100,7 +100,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // 初始化 SideNav
   useEffect(() => {
-    initSideNav(); // 一鍵初始化
+    initSideNav();
   }, []);
 
   // ----------------------------------------------------------------------------
