@@ -413,8 +413,24 @@ const createColumn = ({
       width: 220,
       align: 'center',
       render: (_, record) => {
-        const { buyer, taxId, projectName, invoiceAmount, invoiceTaxes, totalAmount, fullInvoiceNumber } = record;
+        const {
+          //
+          buyer,
+          taxId,
+          projectName,
+          invoiceAmount,
+          invoiceTaxes,
+          totalAmount,
+          fullInvoiceNumber,
+          status,
+        } = record;
+
+        // 已開立
         const isInvoiced = buyer || taxId || projectName || invoiceAmount || invoiceTaxes || totalAmount;
+
+        if (status === '作廢') {
+          return <span className="text-red-500 font-bold">已作廢</span>;
+        }
 
         if (isInvoiced) {
           return (
@@ -435,13 +451,19 @@ const createColumn = ({
         }
 
         return (
-          <Btn
-            onClick={async () => {
-              handle_searchPaymentRequest(record);
-            }}
-          >
-            開立
-          </Btn>
+          <div className="flex gap-4">
+            <Btn
+              className="w-[84px]"
+              onClick={async () => {
+                handle_searchPaymentRequest(record);
+              }}
+            >
+              開立
+            </Btn>
+            <Btn icon="ban" themeColor="red_I" onClick={() => handle_banInvoice(fullInvoiceNumber)}>
+              作廢
+            </Btn>
+          </div>
         );
       },
     },

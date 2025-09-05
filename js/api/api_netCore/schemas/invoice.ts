@@ -13,6 +13,7 @@ interface Tinvoice_Dto {
   invoiceDate: DateTime | null; //發票日期
   contractNumber: string | null; //合約編號
   quotationNumber: string | null; //報價單號
+  status: string; // 發票狀態
 }
 
 interface Tbody_updateInvoiceStatus {
