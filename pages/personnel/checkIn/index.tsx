@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import PageHeader, { MapPageHeader } from 'components/global/myCom/pageHeader';
 
@@ -38,7 +37,7 @@ export default function RoleManagementIndex() {
   const mapPageHeaderTop: MapPageHeader = {
     title: [
       {
-        name: '打卡資料匯入',
+        name: '打卡結算',
         onClick: () => handleTabChange('ImportAttendance'),
         className: activeTab === 'ImportAttendance' ? activeClass : inactiveClass,
       },
