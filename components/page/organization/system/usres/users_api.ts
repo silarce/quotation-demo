@@ -19,6 +19,13 @@ export interface RawUserItem {
   user_email: string;
   is_active: boolean;
   is_invalid: boolean;
+  emp_id?: string;
+  emp_code?: string;
+  emp_ch_name?: string;
+  com_ch_name?: string;
+  dep_id?: string;
+  is_binding: boolean;
+  isChanged: boolean;
 }
 
 //取得使用者列表
@@ -55,7 +62,7 @@ export const deleteUser = async (user_id: string) => {
 //取得可綁定員工的資料清單
 export const getBindableEmployeeList = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/v2/sys/user/querybindableemplist`, {
+    const response = await axios.get(`${BASE_URL}/api/v1/sys/user/QueryBindableEmpList`, {
       headers: {
         ...getAuthHeader(),
       },
@@ -68,7 +75,7 @@ export const getBindableEmployeeList = async () => {
 };
 
 export const bindUserToEmployee = async (user_id: string, emp_id: string) => {
-  const res = await axios.post(`${BASE_URL}/api/v2/sys/user/bind`, {
+  const res = await axios.post(`${BASE_URL}/api/v1/sys/user/bind`, {
     user_id,
     emp_id,
     headers: {
