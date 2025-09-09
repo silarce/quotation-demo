@@ -10,18 +10,12 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
 
 // components
-// import BudgeList from "components/page/domestic/budget/budgetList"
 import QueryQuotationList, {
   Tcontrol_queryQuotationList,
 } from 'components/page/domestic/queryQuotation/queryQuotationList';
 
 // api
-import {
-  Tparams,
-  useGetQuotation,
-  useGetQuotation_infinite,
-  apiPatchQuotationContent_id_progress,
-} from 'js/api/api_quotation';
+import { Tparams, useGetQuotation_infinite, apiPatchQuotationContent_id_progress } from 'js/api/api_quotation';
 
 // utils
 import { quotationStatusLookup } from 'config/lookupTable';
@@ -38,10 +32,6 @@ import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalCo
 // ===========================================
 
 type Tquery = {
-  // county: string | undefined;
-  // customerName: string | undefined;
-  // keyWord: string | undefined;
-  // keyWord_prod: string | undefined;
   status?: string | undefined;
   county?: string | undefined;
   prodMaterial?: string | undefined;
@@ -112,7 +102,6 @@ export default function Budget() {
     order: order || 'DESC',
     populate: [
       'contents.customer',
-      // 'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewSalesManagerEmployee',
@@ -201,8 +190,6 @@ export default function Budget() {
         isAttachtQuotation && (href_contract.query.id = attachedToContractId);
 
         const href_quotation = {
-          // pathname: '/domestic/quotationList/quotation',
-          // pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
           pathname: quotationPathList.path_quotation,
 
           query: {
@@ -212,11 +199,6 @@ export default function Budget() {
         };
 
         const href_attachQuotation = {
-          // pathname: '/domestic/quotationList/attachQuotation',
-          // pathname: '/domestic/quotationList/quotation',
-          // pathname: isRefactoredQuotaion
-          //   ? optionalConfig.path_refactoredQuotation
-          //   : optionalConfig.path_attachQuotation,
           pathname: quotationPathList.path_attachQuotation,
 
           query: {
@@ -288,16 +270,10 @@ export default function Budget() {
           }
 
           const href_body = {
-            // pathname: '/domestic/quotationList/quotation',
-            // pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
             pathname: quotationPathList.path_quotation,
             query,
           };
           const href_body_attach = {
-            // pathname: '/domestic/quotationList/attachQuotation',
-            // pathname: isRefactoredQuotaion
-            //   ? optionalConfig.path_refactoredQuotation
-            //   : optionalConfig.path_attachQuotation,
             pathname: quotationPathList.path_attachQuotation,
             query: {
               ...query,
@@ -399,7 +375,6 @@ export default function Budget() {
 
   useEffect(() => {
     reset();
-    // }, [county, prodMaterial, doorModel, customerName, keyWord]);
   }, [query]);
 
   // -----------------------------------------------------------------------
