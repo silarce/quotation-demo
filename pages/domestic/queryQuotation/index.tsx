@@ -8,40 +8,38 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // components
-// import BudgeList from "components/page/domestic/budget/budgetList"
 import QueryQuotationList, {
   Tcontrol_queryQuotationList,
 } from 'components/page/domestic/queryQuotation/queryQuotationList';
+import type { Thead_popFormList } from 'components/page/domestic/queryQuotation/queryQuotationList/thead';
 
 // api
 import {
   Tparams,
-  useGetQuotation,
+  TquotationDto,
   useGetQuotation_infinite,
+  useQuotationList_oneByOne,
   apiPatchQuotationContent_id_progress,
 } from 'js/api/api_quotation';
 
 // utils
-import { quotationStatusLookup } from 'config/lookupTable';
 import { getTaiwanDateStr } from 'js/utils/helpers/date/convertDate';
 import { quotationToReiviewChain } from 'js/utils/quotation/quotationToReiviewChain';
 
-import { Toption, optionsCreator_county } from 'js/utils/options/countryAndDistrict';
+import { Toption } from 'js/utils/options/countryAndDistrict';
 import { optionsCreator_productMaterial, optionsCreator_doorModelName } from 'js/utils/options/productOptions';
 
-// type
-import type { Thead_popFormList } from 'components/page/domestic/queryQuotation/queryQuotationList/thead';
-
 import { useGlobal_optionalConfig } from 'hooks/globalState/useGlobal_OptionalConfig';
+
+import { quotationStatusLookup } from 'config/lookupTable';
+
+import { optionsCreator_county } from 'js/utils/options/countryAndDistrict';
 // ===========================================
 
 type Tquery = {
-  // county: string | undefined;
-  // customerName: string | undefined;
-  // keyWord: string | undefined;
-  // keyWord_prod: string | undefined;
   status?: string | undefined;
   county?: string | undefined;
   prodMaterial?: string | undefined;
@@ -74,32 +72,7 @@ const options_productMaterial = optionsCreator_productMaterial({ haveEmpty: true
 export default function Budget() {
   const router = useRouter();
   const query = router.query as Tquery;
-  const {
-    //
-    status,
-    county,
-    prodMaterial,
-    doorModel,
-    customerName,
-    contactPerson,
-    dateStart,
-    dateEnd,
-    projectName,
-    quotationNumber,
-    contractNumber,
-    order,
-    isLost: isLost_str,
-    agentName,
-    salesName,
-    reviewStatus,
-  } = query;
-
-  const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
-
-  const dateStart_moment = dateStart ? dayjs(dateStart) : undefined;
-  dateStart_moment && (dateStart_moment.add(1911, 'year') as Dayjs);
-  const dateEnd_moment = dateEnd ? dayjs(dateEnd) : undefined;
-  dateEnd_moment && (dateEnd_moment.add(1911, 'year') as Dayjs);
+  const { contactPerson } = query;
 
   // ----------------------------------------------------------------------
 
@@ -107,57 +80,7 @@ export default function Budget() {
 
   // ----------------------------------------------------------------------
 
-  const params: Tparams = {
-    sort: 'latestContent.quotationDate',
-    order: order || 'DESC',
-    populate: [
-      'contents.customer',
-      // 'latestContent.customer',
-      'latestContent.agentEmployee',
-      'latestContent.reviewSalesEmployee',
-      'latestContent.reviewSalesManagerEmployee',
-      'latestContent.reviewWorkDirectorEmployee',
-      'latestContent.reviewCashierEmployee',
-      'latestContent.reviewSupervisorEmployee',
-      'latestContent.reviewManagerEmployee',
-      'latestContent.managerReviewedAt',
-      'latestContent.products.quantity',
-      'latestContent.products.options',
-      'latestContent.contract',
-      'attachedToContract',
-      'attachedToContractId',
-    ],
-
-    filter: {
-      // 狀態
-      'latestContent.status': { $eq: status },
-      // 工程地點
-      'latestContent.county': { $eq: county },
-      // 客戶名稱
-      'contents.customer.name': { $contains: customerName },
-      // 日期起訖 quoteDate
-      'latestContent.quotationDate': { $gte: dateStart_moment?.toISOString(), $lte: dateEnd_moment?.toISOString() },
-      // 工程名稱
-      'latestContent.projectName': { $contains: projectName },
-      // 報價編號
-      $or: {
-        'latestContent.quotationNumber': { $contains: quotationNumber },
-        'latestContent.contract.contractNumber': { $contains: contractNumber },
-      },
-
-      // 失件
-      'latestContent.isLost': { $eq: isLost },
-
-      'latestContent.agentEmployee.chName': { $contains: agentName },
-      'latestContent.reviewSalesEmployee.chName': { $contains: salesName },
-
-      'latestContent.contactPerson': { $contains: contactPerson },
-      'latestContent.products.doorModelName': { $eq: doorModel },
-      'latestContent.products.materialName': { $eq: prodMaterial },
-      ...filter_reviewStatus(reviewStatus),
-    },
-    pageSize: 20,
-  };
+  const params: Tparams = useParams();
 
   const {
     dataArr: quoatationArr,
@@ -168,10 +91,226 @@ export default function Budget() {
     setDataList,
   } = useGetQuotation_infinite({ customParams: params });
 
+  const { data: quotationList_oneByOne, getQuotation: getQuotation_oneByOne } = useQuotationList_oneByOne();
+
+  // ----------------------------------------------------------------------
+
+  const onActiveChange = async (panelIndex: string | string[]) => {
+    const indexArr = (typeof panelIndex === 'string' ? [panelIndex] : panelIndex) as `${number}`[];
+
+    const promiseArr = indexArr.map((index) => {
+      const target = quoatationArr[index];
+
+      if (!target) {
+        myAlert.notify.error({ message: '取得報價單content失敗', description: `索引${index}不存在` });
+
+        return Promise.resolve();
+      }
+
+      if (quotationList_oneByOne[target.id]?.data) {
+        return Promise.resolve();
+      }
+
+      return getQuotation_oneByOne(target.id);
+    });
+
+    await Promise.all(promiseArr);
+  };
   // ----------------------------------------------------------------------
 
   // region PROPS
 
+  const panelArr = usePanelArr({
+    quoatationArr,
+    dataList,
+    quotationPathList,
+    viewRef_bottom,
+    setDataList,
+    quotationList_oneByOne,
+  });
+
+  const control: Tcontrol_queryQuotationList = {
+    panelArr: panelArr,
+  };
+
+  const searchGroup: TsearchGroup = useSearchGroup({ contactPerson });
+
+  const popFormList = usePopFormListCreator();
+
+  const panelList: TpanelList = [{ searchGroup }];
+
+  // -----------------------------------------------------------------------
+
+  // region useEffect
+
+  useEffect(() => {
+    reset();
+  }, [query]);
+
+  // -----------------------------------------------------------------------
+
+  // MARK: RENDER
+
+  return (
+    <SubLayer isLoading_subLayer={isLoadingPage1}>
+      <PageHeader02 tag="報價單列表" panelList={panelList} />
+      <div>
+        <QueryQuotationList control={control} popFormList={popFormList} onActiveChange={onActiveChange} />
+      </div>
+    </SubLayer>
+  );
+}
+
+// MARK: END
+
+// ============================================================================
+
+const Status = ({ status, isLost }: { status: string; isLost: boolean }) => {
+  return (
+    <>
+      <span className="text-danger">{status}</span>
+      {isLost && (
+        <>
+          <br />
+          <span className="text-[#999]">失件</span>
+        </>
+      )}
+    </>
+  );
+};
+
+// ============================================================================
+
+const clearEmptyProperty = (obj: { [key: string]: any }) => {
+  return _.omitBy(obj, (item) => {
+    return item === undefined || item === '';
+  });
+};
+
+// MARK:filter_reviewStatus
+const filter_reviewStatus = (reviewStatus: Tquery['reviewStatus']) => {
+  if (reviewStatus === '未送審') {
+    return {
+      'latestContent.toSalesAt': { $null: true },
+      'latestContent.toSupervisorAt': { $null: true },
+      'latestContent.toSalesManagerAt': { $null: true },
+      'latestContent.toWorkDirectorAt': { $null: true },
+      'latestContent.toCashierAt': { $null: true },
+      'latestContent.toManagerAt': { $null: true },
+    };
+  } else if (reviewStatus === '審核中') {
+    return {
+      $or: [
+        {
+          'latestContent.toSalesAt': { $notNull: true },
+        },
+        {
+          'latestContent.toSupervisorAt': { $notNull: true },
+        },
+        {
+          'latestContent.toSalesManagerAt': { $notNull: true },
+        },
+        {
+          'latestContent.toWorkDirectorAt': { $notNull: true },
+        },
+        {
+          'latestContent.toCashierAt': { $notNull: true },
+        },
+        {
+          'latestContent.toManagerAt': { $notNull: true },
+        },
+      ],
+    };
+  } else if (reviewStatus === '審核完成') {
+    return {
+      'latestContent.managerReviewedAt': { $notNull: true },
+    };
+  } else {
+    return undefined;
+  }
+};
+
+// MARK:useSearchGroup
+const useSearchGroup = ({ contactPerson }: { contactPerson: string | undefined }) => {
+  const router = useRouter();
+
+  const searchTargetList: TsearchGroup['searchTargetList'] = [
+    {
+      placeholder: '主產品門型',
+      options: optionsCreator_doorModelName({ haveEmpty: true }),
+    },
+    {
+      placeholder: '主產品材質',
+      options: options_productMaterial,
+    },
+    {
+      placeholder: '聯絡人',
+      width: '100px',
+      defaultValue: contactPerson,
+    },
+    {
+      placeholder: '經辦',
+      width: '100px',
+      defaultValue: '',
+    },
+    {
+      placeholder: '業務',
+      width: '100px',
+      defaultValue: '',
+    },
+  ];
+
+  const doSearch: TsearchGroup['doSearch'] = (vArr) => {
+    const doorModelOption = vArr[0] as Toption;
+    const prodMaterialOption = vArr[1] as Toption;
+    const contactPerson = vArr[2] as string;
+    const agentName = vArr[3] as string;
+    const salesName = vArr[4] as string;
+
+    const prodMaterial = prodMaterialOption.value;
+    const doorModel = doorModelOption.value;
+
+    router.replace({
+      query: clearEmptyProperty({
+        ...router.query,
+        contactPerson,
+        prodMaterial,
+        doorModel,
+        agentName,
+        salesName,
+      }),
+    });
+  };
+
+  const searchGroup: TsearchGroup = {
+    searchTargetList,
+    doSearch,
+  };
+
+  return searchGroup;
+};
+
+// MARK:usePanelArr
+
+const usePanelArr = ({
+  quoatationArr,
+  dataList,
+  quotationPathList,
+  viewRef_bottom,
+  setDataList,
+  quotationList_oneByOne,
+}: {
+  quoatationArr: TquotationDto[];
+  dataList: { [key: `${number}`]: TquotationDto[] };
+  quotationPathList: ReturnType<typeof useGlobal_optionalConfig>['quotationPathList'];
+  viewRef_bottom: (node?: Element | null | undefined) => void;
+  setDataList: React.Dispatch<
+    React.SetStateAction<{
+      [key: `${number}`]: TquotationDto[];
+    }>
+  >;
+  quotationList_oneByOne: ReturnType<typeof useQuotationList_oneByOne>['data'];
+}) => {
   const panelArr = useMemo(() => {
     const panelArr: Tcontrol_queryQuotationList['panelArr'] = [];
 
@@ -182,13 +321,17 @@ export default function Budget() {
       const isLastPage = pageArr.length - 1 === pageIndex;
 
       arr.forEach((quotation, index) => {
-        const { contents, latestContent, id, attachedToContractId } = quotation;
+        const {
+          // contents,
+          latestContent,
+          id,
+          attachedToContractId,
+        } = quotation;
         const isContract = latestContent.status === 'Contract';
 
         const isAttachtQuotation = !!attachedToContractId;
 
         const processChain = quotationToReiviewChain(latestContent);
-        const sortedContent = _.sortBy(contents, (content) => content.version).reverse();
 
         const href_contract = {
           pathname: '/domestic/contract/quotation',
@@ -201,8 +344,6 @@ export default function Budget() {
         isAttachtQuotation && (href_contract.query.id = attachedToContractId);
 
         const href_quotation = {
-          // pathname: '/domestic/quotationList/quotation',
-          // pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
           pathname: quotationPathList.path_quotation,
 
           query: {
@@ -212,11 +353,6 @@ export default function Budget() {
         };
 
         const href_attachQuotation = {
-          // pathname: '/domestic/quotationList/attachQuotation',
-          // pathname: '/domestic/quotationList/quotation',
-          // pathname: isRefactoredQuotaion
-          //   ? optionalConfig.path_refactoredQuotation
-          //   : optionalConfig.path_attachQuotation,
           pathname: quotationPathList.path_attachQuotation,
 
           query: {
@@ -227,7 +363,7 @@ export default function Budget() {
 
         const href_head = isContract ? href_contract : isAttachtQuotation ? href_attachQuotation : href_quotation;
 
-        const latestCustomer = sortedContent[0].customer;
+        const latestCustomer = latestContent.customer;
 
         const header: Tcontrol_queryQuotationList['panelArr'][number]['header'] = {
           quotationNumber: latestContent.contract?.contractNumber ?? latestContent.quotationNumber,
@@ -273,6 +409,9 @@ export default function Budget() {
           },
         };
 
+        const quotationForContents = quotationList_oneByOne[id];
+
+        const sortedContent = _.sortBy(quotationForContents?.data?.contents ?? [], 'version').reverse();
         const body = sortedContent.map((content) => {
           const { status, quotationDate, county, projectName, customer, version } = content;
 
@@ -288,16 +427,10 @@ export default function Budget() {
           }
 
           const href_body = {
-            // pathname: '/domestic/quotationList/quotation',
-            // pathname: isRefactoredQuotaion ? optionalConfig.path_refactoredQuotation : optionalConfig.path_oldQuotation,
             pathname: quotationPathList.path_quotation,
             query,
           };
           const href_body_attach = {
-            // pathname: '/domestic/quotationList/attachQuotation',
-            // pathname: isRefactoredQuotaion
-            //   ? optionalConfig.path_refactoredQuotation
-            //   : optionalConfig.path_attachQuotation,
             pathname: quotationPathList.path_attachQuotation,
             query: {
               ...query,
@@ -306,7 +439,7 @@ export default function Budget() {
 
           const href = isAttachtQuotation ? href_body_attach : href_body;
 
-          return {
+          const body: Tcontrol_queryQuotationList['panelArr'][number]['body'][number] = {
             status: <Status status={quotationStatusLookup[status]} isLost={content.isLost} />,
             quoteDate: getTaiwanDateStr(quotationDate),
             county: county,
@@ -314,119 +447,116 @@ export default function Budget() {
             customerName: customer?.name ?? '',
             href,
           };
+
+          return body;
         });
 
-        // body.reverse();
         body.shift();
 
         panelArr.push({
           header,
           body,
+          isFetching: quotationForContents?.isFetching,
         });
       });
     });
 
     return panelArr;
-  }, [quoatationArr]);
+  }, [quoatationArr, quotationList_oneByOne]);
 
-  const control: Tcontrol_queryQuotationList = {
-    panelArr: panelArr,
+  return panelArr;
+};
+
+// MARK:useParams
+const useParams = () => {
+  const router = useRouter();
+  const query = router.query as Tquery;
+  const {
+    status,
+    county,
+    prodMaterial,
+    doorModel,
+    customerName,
+    contactPerson,
+    dateStart,
+    dateEnd,
+    projectName,
+    quotationNumber,
+    contractNumber,
+    order,
+    isLost: isLost_str,
+    agentName,
+    salesName,
+    reviewStatus,
+  } = query;
+
+  const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
+
+  const dateStart_dayjs = dateStart ? dayjs(dateStart) : undefined;
+  dateStart_dayjs && (dateStart_dayjs.add(1911, 'year') as Dayjs);
+  const dateEnd_dayjs = dateEnd ? dayjs(dateEnd) : undefined;
+  dateEnd_dayjs && (dateEnd_dayjs.add(1911, 'year') as Dayjs);
+
+  const params: Tparams = {
+    sort: 'latestContent.quotationDate',
+    order: order || 'DESC',
+    populate: [
+      // 'contents.customer',
+      'latestContent.customer',
+      'latestContent.agentEmployee',
+      'latestContent.reviewSalesEmployee',
+      'latestContent.reviewSalesManagerEmployee',
+      'latestContent.reviewWorkDirectorEmployee',
+      'latestContent.reviewCashierEmployee',
+      'latestContent.reviewSupervisorEmployee',
+      'latestContent.reviewManagerEmployee',
+      'latestContent.managerReviewedAt',
+      'latestContent.products.quantity',
+      'latestContent.products.options',
+      'latestContent.contract',
+      'attachedToContract',
+      'attachedToContractId',
+    ],
+
+    filter: {
+      // 狀態
+      'latestContent.status': { $eq: status },
+      // 工程地點
+      'latestContent.county': { $eq: county },
+      // 客戶名稱
+      'contents.customer.name': { $contains: customerName },
+      // 日期起訖 quoteDate
+      'latestContent.quotationDate': { $gte: dateStart_dayjs?.toISOString(), $lte: dateEnd_dayjs?.toISOString() },
+      // 工程名稱
+      'latestContent.projectName': { $contains: projectName },
+      // 報價編號
+      $or: {
+        'latestContent.quotationNumber': { $contains: quotationNumber },
+        'latestContent.contract.contractNumber': { $contains: contractNumber },
+      },
+
+      // 失件
+      'latestContent.isLost': { $eq: isLost },
+
+      'latestContent.agentEmployee.chName': { $contains: agentName },
+      'latestContent.reviewSalesEmployee.chName': { $contains: salesName },
+
+      'latestContent.contactPerson': { $contains: contactPerson },
+      'latestContent.products.doorModelName': { $eq: doorModel },
+      'latestContent.products.materialName': { $eq: prodMaterial },
+      ...filter_reviewStatus(reviewStatus),
+    },
+    pageSize: 20,
   };
 
-  // 搜尋用的
-  const searchTargetList: TsearchGroup['searchTargetList'] = [
-    {
-      placeholder: '主產品門型',
-      options: optionsCreator_doorModelName({ haveEmpty: true }),
-    },
-    {
-      placeholder: '主產品材質',
-      options: options_productMaterial,
-    },
-    {
-      placeholder: '聯絡人',
-      width: '100px',
-      defaultValue: contactPerson,
-    },
-    {
-      placeholder: '經辦',
-      width: '100px',
-      defaultValue: '',
-    },
-    {
-      placeholder: '業務',
-      width: '100px',
-      defaultValue: '',
-    },
-  ];
+  return params;
+};
 
-  const doSearch: TsearchGroup['doSearch'] = (vArr) => {
-    const doorModelOption = vArr[0] as Toption;
-    const prodMaterialOption = vArr[1] as Toption;
-    const contactPerson = vArr[2] as string;
-    const agentName = vArr[3] as string;
-    const salesName = vArr[4] as string;
-
-    const prodMaterial = prodMaterialOption.value;
-    const doorModel = doorModelOption.value;
-
-    router.replace({
-      query: clearEmptyProperty({
-        ...query,
-        contactPerson,
-        prodMaterial,
-        doorModel,
-        agentName,
-        salesName,
-      }),
-    });
-  };
-
-  const searchGroup: TsearchGroup = {
-    searchTargetList,
-    doSearch,
-  };
-
-  // ____________________________________________________________________________
-  // ____________________________________________________________________________
-
-  const popFormList = usePopFormListCreator();
-  const panelList: TpanelList = [{ searchGroup }];
-
-  // -----------------------------------------------------------------------
-
-  // region useEffect
-
-  useEffect(() => {
-    reset();
-    // }, [county, prodMaterial, doorModel, customerName, keyWord]);
-  }, [query]);
-
-  // -----------------------------------------------------------------------
-
-  // MARK: RENDER
-
-  return (
-    <SubLayer isLoading_subLayer={isLoadingPage1}>
-      {/* header panel */}
-      <PageHeader02 tag="報價單列表" panelList={panelList} />
-      {/*  */}
-      <div>
-        <QueryQuotationList control={control} popFormList={popFormList} />
-      </div>
-    </SubLayer>
-  );
-}
-
-// MARK: END
-
-// ===================================================================
-
+// MARK:usePopFormListCreator
 const usePopFormListCreator = () => {
   const router = useRouter();
   const query = router.query as Tquery;
   const {
-    //
     status,
     county,
     customerName,
@@ -440,7 +570,7 @@ const usePopFormListCreator = () => {
     reviewStatus,
   } = query;
 
-  const popFormList = useMemo(() => {
+  return useMemo(() => {
     const dateStart_moment = dateStart ? dayjs(dateStart) : undefined;
     dateStart_moment && (dateStart_moment.add(1911, 'year') as Dayjs);
     const dateEnd_moment = dateEnd ? dayjs(dateEnd) : undefined;
@@ -656,71 +786,5 @@ const usePopFormListCreator = () => {
     };
 
     return popFormList;
-  }, [query]);
-
-  return popFormList;
-};
-
-// ============================================================================
-
-const Status = ({ status, isLost }: { status: string; isLost: boolean }) => {
-  return (
-    <>
-      <span className="text-danger">{status}</span>
-      {isLost && (
-        <>
-          <br />
-          <span className="text-[#999]">失件</span>
-        </>
-      )}
-    </>
-  );
-};
-
-const clearEmptyProperty = (obj: { [key: string]: any }) => {
-  return _.omitBy(obj, (item) => {
-    return item === undefined || item === '';
-  });
-};
-
-const filter_reviewStatus = (reviewStatus: Tquery['reviewStatus']) => {
-  if (reviewStatus === '未送審') {
-    return {
-      'latestContent.toSalesAt': { $null: true },
-      'latestContent.toSupervisorAt': { $null: true },
-      'latestContent.toSalesManagerAt': { $null: true },
-      'latestContent.toWorkDirectorAt': { $null: true },
-      'latestContent.toCashierAt': { $null: true },
-      'latestContent.toManagerAt': { $null: true },
-    };
-  } else if (reviewStatus === '審核中') {
-    return {
-      $or: [
-        {
-          'latestContent.toSalesAt': { $notNull: true },
-        },
-        {
-          'latestContent.toSupervisorAt': { $notNull: true },
-        },
-        {
-          'latestContent.toSalesManagerAt': { $notNull: true },
-        },
-        {
-          'latestContent.toWorkDirectorAt': { $notNull: true },
-        },
-        {
-          'latestContent.toCashierAt': { $notNull: true },
-        },
-        {
-          'latestContent.toManagerAt': { $notNull: true },
-        },
-      ],
-    };
-  } else if (reviewStatus === '審核完成') {
-    return {
-      'latestContent.managerReviewedAt': { $notNull: true },
-    };
-  } else {
-    return undefined;
-  }
+  }, []);
 };
