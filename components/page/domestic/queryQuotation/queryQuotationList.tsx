@@ -17,6 +17,7 @@ type Tcontrol = {
   panelArr: {
     header: Tcontrol_panelHeader;
     body: Tcontrol_panelBody[];
+    isFetching: boolean | undefined;
   }[];
 };
 
@@ -25,12 +26,13 @@ export type { Tcontrol as Tcontrol_queryQuotationList };
 // =======================================================================
 
 export default function QueryQuotationList({
-  //
   control,
   popFormList,
+  onActiveChange,
 }: {
   control: Tcontrol;
   popFormList: Thead_popFormList;
+  onActiveChange: (panelIndex: string | string[]) => void;
 }) {
   // panelHeader點擊變粉紅色用
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -38,6 +40,7 @@ export default function QueryQuotationList({
   const changeActive = (panelIndex: string | string[]) => {
     const activeIndex = parseInt(panelIndex as string);
     setActiveIndex(activeIndex);
+    onActiveChange(panelIndex);
   };
 
   return (
@@ -51,13 +54,13 @@ export default function QueryQuotationList({
         destroyOnHidden={true}
         onChange={changeActive}
         items={control.panelArr.map((item, index) => {
-          const { header, body } = item;
+          const { header, body, isFetching } = item;
           const isActive = activeIndex === index;
 
           return {
             key: `${index}`,
             label: <PanelHeader control={header} isActive={isActive} />,
-            children: <PanelBody control={body} />,
+            children: <PanelBody control={body} isFetching={isFetching} />,
           };
         })}
       />

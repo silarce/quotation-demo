@@ -40,7 +40,14 @@ export type { Tcontrol_panelHeader };
 
 // =======================================================================
 
-export default function PanelHeader({ control, isActive }: { control: Tcontrol_panelHeader; isActive: boolean }) {
+export default function PanelHeader({
+  //
+  control,
+  isActive,
+}: {
+  control: Tcontrol_panelHeader;
+  isActive: boolean;
+}) {
   const [disabled, setDisabled] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 

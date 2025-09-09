@@ -8,6 +8,7 @@ import SubLayer from 'components/Layer/SubLayer/SubLayer';
 
 // global gear
 import PageHeader02, { TpanelList, TsearchGroup } from 'components/PageHeader/PageHeader02/PageHeader02';
+import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 // components
 import QueryQuotationList, {
@@ -20,6 +21,7 @@ import {
   Tparams,
   TquotationDto,
   useGetQuotation_infinite,
+  useQuotationList_oneByOne,
   apiPatchQuotationContent_id_progress,
 } from 'js/api/api_quotation';
 
@@ -89,6 +91,31 @@ export default function Budget() {
     setDataList,
   } = useGetQuotation_infinite({ customParams: params });
 
+  const { data: quotationList_oneByOne, getQuotation: getQuotation_oneByOne } = useQuotationList_oneByOne();
+
+  // ----------------------------------------------------------------------
+
+  const onActiveChange = async (panelIndex: string | string[]) => {
+    const indexArr = (typeof panelIndex === 'string' ? [panelIndex] : panelIndex) as `${number}`[];
+
+    const promiseArr = indexArr.map((index) => {
+      const target = quoatationArr[index];
+
+      if (!target) {
+        myAlert.notify.error({ message: '取得報價單content失敗', description: `索引${index}不存在` });
+
+        return Promise.resolve();
+      }
+
+      if (quotationList_oneByOne[target.id]?.data) {
+        return Promise.resolve();
+      }
+
+      return getQuotation_oneByOne(target.id);
+    });
+
+    await Promise.all(promiseArr);
+  };
   // ----------------------------------------------------------------------
 
   // region PROPS
@@ -99,6 +126,7 @@ export default function Budget() {
     quotationPathList,
     viewRef_bottom,
     setDataList,
+    quotationList_oneByOne,
   });
 
   const control: Tcontrol_queryQuotationList = {
@@ -127,7 +155,7 @@ export default function Budget() {
     <SubLayer isLoading_subLayer={isLoadingPage1}>
       <PageHeader02 tag="報價單列表" panelList={panelList} />
       <div>
-        <QueryQuotationList control={control} popFormList={popFormList} />
+        <QueryQuotationList control={control} popFormList={popFormList} onActiveChange={onActiveChange} />
       </div>
     </SubLayer>
   );
@@ -270,6 +298,7 @@ const usePanelArr = ({
   quotationPathList,
   viewRef_bottom,
   setDataList,
+  quotationList_oneByOne,
 }: {
   quoatationArr: TquotationDto[];
   dataList: { [key: `${number}`]: TquotationDto[] };
@@ -280,6 +309,7 @@ const usePanelArr = ({
       [key: `${number}`]: TquotationDto[];
     }>
   >;
+  quotationList_oneByOne: ReturnType<typeof useQuotationList_oneByOne>['data'];
 }) => {
   const panelArr = useMemo(() => {
     const panelArr: Tcontrol_queryQuotationList['panelArr'] = [];
@@ -291,13 +321,17 @@ const usePanelArr = ({
       const isLastPage = pageArr.length - 1 === pageIndex;
 
       arr.forEach((quotation, index) => {
-        const { contents, latestContent, id, attachedToContractId } = quotation;
+        const {
+          // contents,
+          latestContent,
+          id,
+          attachedToContractId,
+        } = quotation;
         const isContract = latestContent.status === 'Contract';
 
         const isAttachtQuotation = !!attachedToContractId;
 
         const processChain = quotationToReiviewChain(latestContent);
-        const sortedContent = _.sortBy(contents, (content) => content.version).reverse();
 
         const href_contract = {
           pathname: '/domestic/contract/quotation',
@@ -329,7 +363,7 @@ const usePanelArr = ({
 
         const href_head = isContract ? href_contract : isAttachtQuotation ? href_attachQuotation : href_quotation;
 
-        const latestCustomer = sortedContent[0].customer;
+        const latestCustomer = latestContent.customer;
 
         const header: Tcontrol_queryQuotationList['panelArr'][number]['header'] = {
           quotationNumber: latestContent.contract?.contractNumber ?? latestContent.quotationNumber,
@@ -375,6 +409,9 @@ const usePanelArr = ({
           },
         };
 
+        const quotationForContents = quotationList_oneByOne[id];
+
+        const sortedContent = _.sortBy(quotationForContents?.data?.contents ?? [], 'version').reverse();
         const body = sortedContent.map((content) => {
           const { status, quotationDate, county, projectName, customer, version } = content;
 
@@ -402,7 +439,7 @@ const usePanelArr = ({
 
           const href = isAttachtQuotation ? href_body_attach : href_body;
 
-          return {
+          const body: Tcontrol_queryQuotationList['panelArr'][number]['body'][number] = {
             status: <Status status={quotationStatusLookup[status]} isLost={content.isLost} />,
             quoteDate: getTaiwanDateStr(quotationDate),
             county: county,
@@ -410,6 +447,8 @@ const usePanelArr = ({
             customerName: customer?.name ?? '',
             href,
           };
+
+          return body;
         });
 
         body.shift();
@@ -417,12 +456,13 @@ const usePanelArr = ({
         panelArr.push({
           header,
           body,
+          isFetching: quotationForContents?.isFetching,
         });
       });
     });
 
     return panelArr;
-  }, [quoatationArr]);
+  }, [quoatationArr, quotationList_oneByOne]);
 
   return panelArr;
 };
@@ -461,7 +501,8 @@ const useParams = () => {
     sort: 'latestContent.quotationDate',
     order: order || 'DESC',
     populate: [
-      'contents.customer',
+      // 'contents.customer',
+      'latestContent.customer',
       'latestContent.agentEmployee',
       'latestContent.reviewSalesEmployee',
       'latestContent.reviewSalesManagerEmployee',
