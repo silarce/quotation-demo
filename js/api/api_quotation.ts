@@ -391,10 +391,64 @@ export const useGetQuotation_id_2 = (
   };
 };
 
-//
+export const useQuotationList_oneByOne = () => {
+  const [quotaionList, setQuotationList] = useState<
+    Record<
+      string,
+      {
+        isFetching: boolean;
+        data: TquotationDto | undefined;
+      }
+    >
+  >({});
 
-//
-//
+  const params: Tparams = {
+    populate: ['contents'],
+  };
+
+  const getQuotation = async (id: string) => {
+    if (quotaionList[id]?.isFetching) {
+      return;
+    }
+
+    setQuotationList((prev) => {
+      return {
+        ...prev,
+        [id]: {
+          isFetching: true,
+          data: undefined,
+        },
+      };
+    });
+
+    await apiGetQuotation_id(id, params)
+      .then((data) => {
+        setQuotationList((prev) => {
+          return {
+            ...prev,
+            [data.id]: {
+              isFetching: false,
+              data,
+            },
+          };
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        myAlert.notify.error({ message: '取得報價單失敗', description: `id:${id}` });
+        setQuotationList((prev) => {
+          const { [id]: removed, ...copy } = { ...prev };
+
+          return copy;
+        });
+      });
+  };
+
+  return {
+    data: quotaionList,
+    getQuotation,
+  };
+};
 
 // 以 id 取得 QuotationContent
 const apiGetQuotationContent_Id = async (id: string) => {
