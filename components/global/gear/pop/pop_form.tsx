@@ -41,8 +41,9 @@ export default function Pop_form({
 
   return (
     <Tooltip
-      //
-      overlayClassName={scss.antd_tooltip}
+      classNames={{
+        root: scss.antd_tooltip,
+      }}
       title={<PopContent control={control} setIsShow={setIsShow} confirmText={confirmText} />}
       trigger="click"
       color={theme.colors_bgc02}
