@@ -524,7 +524,7 @@ const useParams = () => {
       // 工程地點
       'latestContent.county': { $eq: county },
       // 客戶名稱
-      'contents.customer.name': { $contains: customerName },
+      'latestContent.customer.name': { $contains: customerName },
       // 日期起訖 quoteDate
       'latestContent.quotationDate': { $gte: dateStart_dayjs?.toISOString(), $lte: dateEnd_dayjs?.toISOString() },
       // 工程名稱
