@@ -786,5 +786,17 @@ const usePopFormListCreator = () => {
     };
 
     return popFormList;
-  }, []);
+  }, [
+    status,
+    county,
+    customerName,
+    projectName,
+    dateStart,
+    dateEnd,
+    quotationNumber,
+    contractNumber,
+    order,
+    isLost,
+    reviewStatus,
+  ]);
 };
