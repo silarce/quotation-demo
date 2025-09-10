@@ -492,10 +492,10 @@ const useParams = () => {
 
   const isLost = isLost_str === 'true' ? true : isLost_str === 'false' ? false : undefined;
 
-  const dateStart_dayjs = dateStart ? dayjs(dateStart) : undefined;
-  dateStart_dayjs && (dateStart_dayjs.add(1911, 'year') as Dayjs);
-  const dateEnd_dayjs = dateEnd ? dayjs(dateEnd) : undefined;
-  dateEnd_dayjs && (dateEnd_dayjs.add(1911, 'year') as Dayjs);
+  let dateStart_dayjs = dateStart ? dayjs(dateStart) : undefined;
+  dateStart_dayjs && (dateStart_dayjs = dateStart_dayjs.add(1911, 'year') as Dayjs);
+  let dateEnd_dayjs = dateEnd ? dayjs(dateEnd) : undefined;
+  dateEnd_dayjs && (dateEnd_dayjs = dateEnd_dayjs.add(1911, 'year') as Dayjs);
 
   const params: Tparams = {
     sort: 'latestContent.quotationDate',
@@ -571,10 +571,10 @@ const usePopFormListCreator = () => {
   } = query;
 
   return useMemo(() => {
-    const dateStart_moment = dateStart ? dayjs(dateStart) : undefined;
-    dateStart_moment && (dateStart_moment.add(1911, 'year') as Dayjs);
-    const dateEnd_moment = dateEnd ? dayjs(dateEnd) : undefined;
-    dateEnd_moment && (dateEnd_moment.add(1911, 'year') as Dayjs);
+    let dateStart_moment = dateStart ? dayjs(dateStart) : undefined;
+    dateStart_moment && (dateStart_moment = dateStart_moment.add(1911, 'year') as Dayjs);
+    let dateEnd_moment = dateEnd ? dayjs(dateEnd) : undefined;
+    dateEnd_moment && (dateEnd_moment = dateEnd_moment.add(1911, 'year') as Dayjs);
 
     const popFormList: Thead_popFormList = {
       quotationNumber: {
@@ -678,6 +678,7 @@ const usePopFormListCreator = () => {
       quoteDate: {
         onConfirm: (list) => {
           const { dateStart, dateEnd, order } = list;
+
           router.replace({
             query: clearEmptyProperty({
               ...query,
