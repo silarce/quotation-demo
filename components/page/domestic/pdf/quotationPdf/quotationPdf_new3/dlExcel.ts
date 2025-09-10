@@ -2,7 +2,7 @@ import _ from 'lodash';
 import ExcelJs from 'exceljs';
 import dayjs from 'dayjs';
 
-import { Tprod, TpdfData } from './modal_quotationPdf';
+import type { Tprod, TpdfData } from './modal_quotationPdf';
 
 import { companyInfo } from 'config/companyInfo';
 
