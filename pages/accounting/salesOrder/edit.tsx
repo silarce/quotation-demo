@@ -217,7 +217,7 @@ const createBody_post_ = ({
   // !exchangeRate && errorMessage.push('請輸入匯率');
   // !currencyAmount && errorMessage.push('請輸入外幣金額');
   !salesAmount && errorMessage.push('請輸入銷貨金額');
-  !taxes && errorMessage.push('請輸入稅額');
+  // !taxes && errorMessage.push('請輸入稅額');
   !totalAmount && errorMessage.push('請輸入銷售總總額');
   !state_salesOrderItemArr.length && errorMessage.push('請新增銷貨明細');
 
@@ -269,7 +269,7 @@ const createBody_post_ = ({
     createdBy: userIdNumber!,
     updatedBy: userIdNumber!,
 
-    customerId,
+    customerId: customerId || null,
     customerNumber,
     customerName,
     constructionSite,

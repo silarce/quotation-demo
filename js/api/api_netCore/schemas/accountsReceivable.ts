@@ -451,7 +451,7 @@ interface TsalesOrderItem_Dto {
 }
 
 type TsalesOrder_post_Dto = {
-  customerId: Guid | null; //客戶id
+  customerId: Guid | null; //客戶id // 不可以是空字串
   customerNumber: string | null; //客戶編號
   customerName: string; //客戶名稱
   constructionSite: string; //工地名稱
