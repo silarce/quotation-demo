@@ -217,7 +217,7 @@ const createBody_post_ = ({
   // !exchangeRate && errorMessage.push('請輸入匯率');
   // !currencyAmount && errorMessage.push('請輸入外幣金額');
   !salesAmount && errorMessage.push('請輸入銷貨金額');
-  !taxes && errorMessage.push('請輸入稅額');
+  // !taxes && errorMessage.push('請輸入稅額');
   !totalAmount && errorMessage.push('請輸入銷售總總額');
   !state_salesOrderItemArr.length && errorMessage.push('請新增銷貨明細');
 
@@ -269,7 +269,7 @@ const createBody_post_ = ({
     createdBy: userIdNumber!,
     updatedBy: userIdNumber!,
 
-    customerId,
+    customerId: customerId || null,
     customerNumber,
     customerName,
     constructionSite,
@@ -323,6 +323,7 @@ const createBody_patch_ = ({
 
   const salesOrderItems = state_salesOrderItemArr.map((item, index) => {
     const {
+      id,
       quantity,
       unitPrice,
       amount,
@@ -344,7 +345,8 @@ const createBody_patch_ = ({
       productNumber,
       itemNumber: `${index}`,
 
-      id: null,
+      id,
+      // id: null,
       salesOrderNumber: salesOrderData.salesOrderNumber,
 
       itemName,

@@ -451,7 +451,7 @@ interface TsalesOrderItem_Dto {
 }
 
 type TsalesOrder_post_Dto = {
-  customerId: Guid | null; //客戶id
+  customerId: Guid | null; //客戶id // 不可以是空字串
   customerNumber: string | null; //客戶編號
   customerName: string; //客戶名稱
   constructionSite: string; //工地名稱
@@ -512,10 +512,9 @@ type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
 
 type TsalesOrderItem_patch_Dto = Omit<
   TsalesOrderItem_post_Dto,
-  // 'id' |
-  'itemNumber' | 'salesOrderNumber' | 'productId'
+  'id' | 'itemNumber' | 'salesOrderNumber' | 'productId'
 > & {
-  // id: string; // 後端說不需要
+  id: string | null; // 後端說不需要
   itemNumber: string; // 排序，post的時候可以null為什麼patch就不可以，莫名其妙
   salesOrderNumber: string;
   productId: Guid | null; //產品id
