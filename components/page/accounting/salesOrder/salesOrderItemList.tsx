@@ -194,30 +194,30 @@ const createColoumns = (instance_salesOrderItemArr: Tinstance_salesOrderItemArr,
       },
     },
     {},
-    {
-      key: 'panel',
-      title: '操作',
-      align: 'center',
-      width: 100,
-      render: (_, __, index) => {
-        return (
-          <div className="flex gap-[16px] justify-center">
-            <Icon_trash
-              className="w-[16px] h-[16px] text-red01 cursor-pointer"
-              onClick={() => {
-                modal_delete({
-                  title: '確認刪除嗎？',
-                  content: null,
-                  onConfirm: () => {
-                    dispatch({ type: 'delete', payload: { index } });
-                  },
-                });
-              }}
-            />
-          </div>
-        );
-      },
-    },
+    // {
+    //   key: 'panel',
+    //   title: '操作',
+    //   align: 'center',
+    //   width: 100,
+    //   render: (_, __, index) => {
+    //     return (
+    //       <div className="flex gap-[16px] justify-center">
+    //         <Icon_trash
+    //           className="w-[16px] h-[16px] text-red01 cursor-pointer"
+    //           onClick={() => {
+    //             modal_delete({
+    //               title: '確認刪除嗎？',
+    //               content: null,
+    //               onConfirm: () => {
+    //                 dispatch({ type: 'delete', payload: { index } });
+    //               },
+    //             });
+    //           }}
+    //         />
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   return columns;
