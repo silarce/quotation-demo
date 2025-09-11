@@ -8,6 +8,7 @@ import { TsalesOrder_Dto } from 'js/api/api_netCore/api_accountsReceivable';
 type TsalesOrderItem = NonNullable<TsalesOrder_Dto['salesOrderItems']>[number];
 
 interface Tstate_salesOrderItem {
+  readonly id: string | null;
   readonly attachedToProductId: string | null;
 
   quantity: `${number}` | '';
@@ -94,6 +95,7 @@ const useDefaultState = (raw: TsalesOrderItem[] | undefined | null): Tstate_sale
     }
 
     return raw.map((item) => ({
+      id: item.id,
       attachedToProductId: item.attachedToProductId,
       productId: item.productId,
 
@@ -321,6 +323,7 @@ const reducer_salesOrderItem = (state: Tstate_salesOrderItem[], action: Taction_
 // ===============================================================================
 
 const emptyState = (): Tstate_salesOrderItem => ({
+  id: null,
   attachedToProductId: null,
   productId: null,
   quantity: '',

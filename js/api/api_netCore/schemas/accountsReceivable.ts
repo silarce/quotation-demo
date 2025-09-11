@@ -512,10 +512,9 @@ type TsalesOrder_patch_Dto = Omit<TsalesOrder_post_Dto, 'salesOrderItems'> & {
 
 type TsalesOrderItem_patch_Dto = Omit<
   TsalesOrderItem_post_Dto,
-  // 'id' |
-  'itemNumber' | 'salesOrderNumber' | 'productId'
+  'id' | 'itemNumber' | 'salesOrderNumber' | 'productId'
 > & {
-  // id: string; // 後端說不需要
+  id: string | null; // 後端說不需要
   itemNumber: string; // 排序，post的時候可以null為什麼patch就不可以，莫名其妙
   salesOrderNumber: string;
   productId: Guid | null; //產品id

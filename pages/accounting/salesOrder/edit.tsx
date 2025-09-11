@@ -323,6 +323,7 @@ const createBody_patch_ = ({
 
   const salesOrderItems = state_salesOrderItemArr.map((item, index) => {
     const {
+      id,
       quantity,
       unitPrice,
       amount,
@@ -344,7 +345,8 @@ const createBody_patch_ = ({
       productNumber,
       itemNumber: `${index}`,
 
-      id: null,
+      id,
+      // id: null,
       salesOrderNumber: salesOrderData.salesOrderNumber,
 
       itemName,
