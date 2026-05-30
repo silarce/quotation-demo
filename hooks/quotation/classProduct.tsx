@@ -3139,7 +3139,7 @@ class Class_product {
       // }
 
       // await this.updateBoxD();
-      await this.updateBoxD();
+      // await this.updateBoxD();
 
       this.area = this.calcArea();
 
@@ -3198,7 +3198,7 @@ class Class_product {
       //   this.isLoading = false;
       // }
 
-      await this.updateBoxD();
+      // await this.updateBoxD();
 
       this.area = this.calcArea();
       this.reRender();
@@ -4576,31 +4576,31 @@ class Class_product {
 
   //-----------------------------------------
 
-  async updateBoxD() {
-    const reqBody: TgetBoxDParams = {
-      modelName: this.doorType,
-      rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
-      sidePlateSizeB: Number(this.boxB_mm),
-      hp: this.horsepower,
-      motorVendor: this.motor,
-    };
+  // async updateBoxD() {
+  //   const reqBody: TgetBoxDParams = {
+  //     modelName: this.doorType,
+  //     rollerDiameter: this._doorGeneralSpecs?.diameter ?? 0,
+  //     sidePlateSizeB: Number(this.boxB_mm),
+  //     hp: this.horsepower,
+  //     motorVendor: this.motor,
+  //   };
 
-    try {
-      this.isLoading = true;
-      const res = await apiGetboxD(reqBody);
+  //   try {
+  //     this.isLoading = true;
+  //     const res = await apiGetboxD(reqBody);
 
-      if (res) {
-        const sidePlateSizeD = res?.sidePlateSizeD;
-        this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
-      }
-    } catch (error) {
-      // const err = error as Error;
-      // myAlert.err({ title: '取得boxD失敗', content: err.message });
-      this._prodData.boxD = '0';
-    } finally {
-      this.isLoading = false;
-    }
-  }
+  //     if (res) {
+  //       const sidePlateSizeD = res?.sidePlateSizeD;
+  //       this._prodData.boxD = new Decimal(sidePlateSizeD).div(1000).toString();
+  //     }
+  //   } catch (error) {
+  //     // const err = error as Error;
+  //     // myAlert.err({ title: '取得boxD失敗', content: err.message });
+  //     this._prodData.boxD = '0';
+  //   } finally {
+  //     this.isLoading = false;
+  //   }
+  // }
 
   async callSideEffect(
     action:
