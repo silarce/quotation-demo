@@ -72,6 +72,9 @@ type TmyPageProps = {
 
 // MARK: START
 function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const router = appProps.router;
 
   // 這個東西在產品環境沒用，因為程式都被編譯過了，即使有錯誤log也難以解讀
@@ -85,6 +88,9 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
   // const globalState_review = useGlobal_review();
   const { isInIframe } = useWindow();
 
+  if (!mounted) {
+    return null;
+  }
   // ----------------------------------------------------------------------------
 
   //-----------------------------------------------------------------------------

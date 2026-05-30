@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import type { WritableDraft } from 'immer/src/types/types-external';
+import type { Draft as WritableDraft } from 'immer';
 
 import { BaseRouter } from 'next/dist/shared/lib/router/router';
 // import type { ParsedUrlQueryInput } from 'querystring';

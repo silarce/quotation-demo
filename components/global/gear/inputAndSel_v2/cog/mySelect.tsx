@@ -14,7 +14,7 @@ import Select, {
 
 import CreatableSelect from 'react-select/creatable';
 
-import { GroupBase } from 'react-select/dist/declarations/src/types.d';
+import { GroupBase } from 'react-select';
 // type
 import type { Toption } from 'js/utils/options/options';
 import { TcreOptionWithIconProps } from '../selectCustom/creOptionWithIcon';
@@ -62,7 +62,7 @@ export default function MySelect<
 >({ props, wrapperClassName, wrapperStyle, arrowType = 'black', fontClassName }: TselectProps<Option, IsMulti, Group>) {
   // 客製化元件
   // 箭頭
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const DropdownIndicator = (indicatorProps: DropdownIndicatorProps<Option, IsMulti, Group>) => {
     if (indicatorProps?.isDisabled) {
       return null;

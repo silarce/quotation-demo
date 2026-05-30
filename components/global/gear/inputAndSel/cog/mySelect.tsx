@@ -11,7 +11,7 @@ import Select, {
   DropdownIndicatorProps,
   SelectComponentsConfig,
 } from 'react-select';
-import { GroupBase } from 'react-select/dist/declarations/src/types.d';
+import { GroupBase } from 'react-select';
 
 // icon
 import iconArrowRed from 'public/image/icon/arrow_down_red.svg?url';

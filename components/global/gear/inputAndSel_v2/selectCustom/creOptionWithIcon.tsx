@@ -2,7 +2,7 @@ import classNames from 'classnames';
 
 import { components } from 'react-select';
 import { OptionProps } from 'react-select';
-import { GroupBase } from 'react-select/dist/declarations/src/types.d';
+import { GroupBase } from 'react-select';
 
 import type { Toption } from 'js/utils/options/options';
 

@@ -1,7 +1,7 @@
 import { components, SingleValueProps } from 'react-select';
 import classNames from 'classnames';
 
-import { GroupBase } from 'react-select/dist/declarations/src/types.d';
+import { GroupBase } from 'react-select';
 const { SingleValue } = components;
 
 import type { Toption } from 'js/utils/options/options';
