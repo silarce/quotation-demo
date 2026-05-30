@@ -10,6 +10,7 @@ import type { Class_accessory } from '../accessory/classAccessory';
 import { getProdDefaults, createComponentDictFromTemplate, getDoorModelComponentKeys } from 'config/product/lookup';
 import { optionsCreator_productMaterial, optionsCreator_surface } from 'js/utils/options/productOptions';
 import type { Toption } from 'js/utils/options/options';
+import type { TdoorAccessoryDto } from 'js/api/dtoTypes';
 
 type TclassComponentDictLite = { [k: string]: Interface_ClassComponent_prime | undefined };
 type TclassAccessoryDictLite = { [k: string]: Class_accessory | undefined };
@@ -327,14 +328,31 @@ class ClassProd {
     this.onPordTotalChange?.();
   }
 
-  addAccessory(accessory: Class_accessory) {
-    const key = (accessory as unknown as { codeName?: string })?.codeName ?? `acc-${Date.now()}`;
+  addAccessory(accessories: TdoorAccessoryDto[] | TdoorAccessoryDto) {
+    const arr = Array.isArray(accessories) ? accessories : [accessories];
+    const baseOrder = this.state.accessoryKeyArr.length;
 
-    this.state.data_accessoryDict[key] = accessory as unknown as TstateProd['data_accessoryDict'][string];
+    arr.forEach((dto, i) => {
+      const key = dto.id;
 
-    if (!this.state.accessoryKeyArr.includes(key)) {
-      this.state.accessoryKeyArr.push(key);
-    }
+      this.state.data_accessoryDict[key] = {
+        codeName: dto.id,
+        name: dto.name,
+        unit: dto.unit ?? '',
+        quantity: '1' as `${number}`,
+        originalPrice: dto.price ?? 0,
+        price: `${dto.price ?? 0}` as `${number}`,
+        dualPrice: '0' as `${number}`,
+        unitPrice: '0' as `${number}`,
+        totalPrice: '0' as `${number}`,
+        referenceSpec: dto.referenceSpec ?? null,
+        order: baseOrder + i,
+      };
+
+      if (!this.state.accessoryKeyArr.includes(key)) {
+        this.state.accessoryKeyArr.push(key);
+      }
+    });
 
     this.renewProdAllPrice_updateQuotationTotalPrice();
     this.render();

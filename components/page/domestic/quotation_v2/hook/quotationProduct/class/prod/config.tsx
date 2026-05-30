@@ -23,12 +23,14 @@ const optionsCreator_quoteType_local = () =>
   optionsCreator_quoteType().filter((opt) => ALLOWED_QUOTE_TYPES.includes(opt.value));
 
 const filterDoorModelOptionDict = (
-  dict: { [k: string]: Toption } | undefined
+  dict: { [k: string]: Toption | undefined } | undefined
 ): { [k: string]: Toption } | undefined => {
   if (!dict) return dict;
   const filtered: { [k: string]: Toption } = {};
   ALLOWED_DOOR_MODELS.forEach((name) => {
-    if (dict[name]) filtered[name] = dict[name];
+    const opt = dict[name];
+
+    if (opt) filtered[name] = opt;
   });
   return filtered;
 };
@@ -124,7 +126,7 @@ const numberInputCell = (
   label,
   style: { width, textAlign: 'right' },
   createNode({ disabled, classProd }) {
-    const { value, type } = inputLocaleStringSwitcher(getter(classProd), disabled);
+    const { value, type } = inputLocaleStringSwitcher(getter(classProd) as `${number}` | '', disabled);
     const inputSelProps: TinputSelProps = {
       disabled,
       inputProps: {
