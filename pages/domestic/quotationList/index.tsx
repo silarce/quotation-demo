@@ -1,9 +1,6 @@
 import { useEffect, useContext } from 'react';
 import { useRouter, NextRouter } from 'next/router';
 
-// layer
-import SubLayer from 'components/Layer/SubLayer/SubLayer';
-
 // components
 import BudgeList from 'components/page/domestic/budget/budgetList';
 
@@ -206,7 +203,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
   // ----------------------------------------------------------
 
   return (
-    <SubLayer isLoading_subLayer={isLoadingPage1}>
+    <div>
       <PageHeader02 tag={status ? quotationStatusLookup[status] : '--'} panelList={panelList} />
       <div>
         <ApprovalsBar router={router} />
@@ -228,7 +225,7 @@ export default function QuotationList({ userGrade }: { userGrade: number }) {
         }}
         onCancel={() => setContractSelectShow(false)}
       /> */}
-    </SubLayer>
+    </div>
   );
 }
 

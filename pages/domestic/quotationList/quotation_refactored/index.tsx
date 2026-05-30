@@ -5,9 +5,6 @@ import { useRouter } from 'next/router';
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
-// layer
-import SubLayer from 'components/Layer/SubLayer/SubLayer';
-
 // components
 import QuotationPdf, {
   useModalQuotationPdf,
@@ -1093,7 +1090,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: RENDER
   return (
-    <SubLayer isLoading_all={isFetching_update || isFetching}>
+    <div>
       <PageHeader02 tag={tag} panelList={panelList} customeLeft={customeLeft} customeRight={customeRight} />
 
       <div className="relative z-50">
@@ -1267,7 +1264,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/*  */}
         {/*  */}
       </div>
-    </SubLayer>
+    </div>
   );
 }
 // MARK: END

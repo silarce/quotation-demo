@@ -10,10 +10,6 @@ import type { NextPage } from 'next';
 import { ConfigProvider as AntdConfigProvider, unstableSetRender } from 'antd';
 import locale from 'antd/locale/zh_TW';
 
-// conponents
-import Layer from 'components/Layer/Layer';
-import ErrorBoundary from 'components/Layer/errorBoundary/errorBoundary01';
-
 // global gear
 import RootLoadingCover from 'components/global/gear/loadingCover/rootLoadingCover';
 
@@ -22,9 +18,9 @@ import { TuserDto } from 'js/api/api_auth';
 import { TerpFeatureDto } from 'js/api/api_erpFeature';
 
 // global state
-import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
+// import { useGlobal_review } from 'hooks/globalState/useGlobal_review';
 //選單
-import { useNavStore } from 'hooks/globalState/useGlobal_navStore';
+// import { useNavStore } from 'hooks/globalState/useGlobal_navStore';
 
 // import { useGlobalErrorCatcher } from 'hooks/useGlobalErrorCatcher';
 import { useClearBackup } from 'hooks/useBackup';
@@ -86,90 +82,55 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
 
   // ----------------------------------------------------------------------------
 
-  const globalState_review = useGlobal_review();
+  // const globalState_review = useGlobal_review();
   const { isInIframe } = useWindow();
 
   // ----------------------------------------------------------------------------
-  const [ready, setReady] = useState(false);
-
-  const { userInfo, userErpFeature, isAdmin, userGrade, update: update_userInfo } = useGlobal_userInfo();
 
   //-----------------------------------------------------------------------------
   //選單
-  const { initSideNav } = useNavStore();
+  // const { initSideNav } = useNavStore();
 
   // 初始化 SideNav
-  useEffect(() => {
-    initSideNav();
-  }, []);
+  // useEffect(() => {
+  //   initSideNav();
+  // }, []);
 
   // ----------------------------------------------------------------------------
 
-  useEffect(() => {
-    (async () => {
-      // 檢查是否已登入
-      await update_userInfo();
-      setReady(true);
-    })();
-  }, []);
-
-  useEffect(() => {
-    if (userInfo) {
-      globalState_review.editUserId(userInfo?.employee?.id);
-      // globalState_review.update();
-      globalState_review.update_2();
-    }
-  }, [userInfo]);
+  // useEffect(() => {
+  //   if (userInfo) {
+  //     globalState_review.editUserId(userInfo?.employee?.id);
+  //     // globalState_review.update();
+  //     globalState_review.update_2();
+  //   }
+  // }, [userInfo]);
 
   // -----------------------------------------------------------------------
-  const appContextValue = {
-    userInfo,
-    userGrade,
-    erpFeature: userErpFeature,
-  };
 
   // -----------------------------------------------------------------------
-  if (!ready) {
-    return null;
-  }
-
-  if ((!userInfo || !userErpFeature) && router.route !== '/login' && router.route !== '/errorProcess/429') {
-    router.push('/login');
-
-    return null;
-  }
-
-  if (userInfo && userErpFeature && router.route === '/login') {
-    router.push('/home');
-  }
-  // ------------------------------------------------------------------
-
-  const getLayout = (() => {
-    let getLayout = Component.getLayout;
-
-    if (getLayout) {
-      return getLayout;
-    }
-
-    if (!userInfo || !userErpFeature || isInIframe) {
-      getLayout = (page) => page;
-    } else {
-      getLayout = (page) => {
-        return <Layer>{page}</Layer>;
-      };
-    }
-
-    return getLayout;
-  })();
 
   // ------------------------------------------------------------------
 
-  const myPageProps: TmyPageProps = {
-    isAdmin: isAdmin,
-    userInfo: userInfo,
-    userGrade: userGrade,
-    userErpFeature: userErpFeature,
-  };
+  // const getLayout = (() => {
+  //   let getLayout = Component.getLayout;
+
+  //   if (getLayout) {
+  //     return getLayout;
+  //   }
+
+  //   if (!userInfo || !userErpFeature || isInIframe) {
+  //     getLayout = (page) => page;
+  //   } else {
+  //     getLayout = (page) => {
+  //       return <Layer>{page}</Layer>;
+  //     };
+  //   }
+
+  //   return getLayout;
+  // })();
+
+  // ------------------------------------------------------------------
 
   // ------------------------------------------------------------------
 
@@ -186,13 +147,8 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
         <title>三久ERP</title>
       </Head>
 
-      <ErrorBoundary>
-        {getLayout(
-          <ErrorBoundary pathname={router.pathname}>
-            <Component {...pageProps} {...myPageProps} />
-          </ErrorBoundary>
-        )}
-      </ErrorBoundary>
+      <Component {...pageProps} />
+
       {/* 全域loading cover */}
       {/* 只能在這邊呼叫這"一次"，不可以在其他地方使用 */}
       <RootLoadingCover />

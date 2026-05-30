@@ -1,2 +1,0 @@
-這個txt僅僅為了讓開發者可以一眼就知道certifiedDocument這個資料夾裝的是什麼東西
-還有方便用中文搜尋證明文件component

@@ -1,8 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
-import Error429 from 'components/wholePage/error429';
-
 let is429ing = false;
 let is401ing = false;
 
@@ -82,23 +80,6 @@ axi.interceptors.response.use(
           // if (pathname !== '/errorProcess/429') {
           //   window.location.href = `${origin}/errorProcess/429`;
           // }
-
-          if (!is429ing) {
-            is429ing = true;
-            const modal = myAlert.clear({
-              maskClosable: false,
-            });
-            modal.update({
-              content: (
-                <Error429
-                  onClose={() => {
-                    modal.destroy();
-                    is429ing = false;
-                  }}
-                />
-              ),
-            });
-          }
 
           break;
 
