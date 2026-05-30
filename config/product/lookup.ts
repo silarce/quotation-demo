@@ -3,6 +3,8 @@ import type {
   TquotationProductItemDto,
   TdoorComponentType,
   TdoorModelInfoDto,
+  TdoorAccessoryDto,
+  TdoorModel,
 } from 'js/api/dtoTypes';
 import type { Tdata_componentDict } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
 
@@ -295,9 +297,7 @@ export const lookup_doorModelTemplate: Record<string, TdoorModelTemplate> = {
 };
 
 // 寫死的 doorModel 最小資訊集，給 useGlobal_doorModel 注入用
-export const lookup_doorModelInfoMinimal: TdoorModelInfoDto[] = Object.keys(
-  lookup_doorModelTemplate
-).map(
+export const lookup_doorModelInfoMinimal: TdoorModelInfoDto[] = Object.keys(lookup_doorModelTemplate).map(
   (name) =>
     ({
       name,
@@ -319,16 +319,22 @@ export const getProdDefaults = (doorModelName: string) => {
 };
 
 // 依模板組出 component dict，material/materialSurface 來自所屬 product 預設
-export const createComponentDictFromTemplate = (
-  doorModelName: string
-): Tdata_componentDict => {
+export const createComponentDictFromTemplate = (doorModelName: string): Tdata_componentDict => {
   const template = lookup_doorModelTemplate[doorModelName];
-  if (!template) return {};
+
+  if (!template) {
+    return {};
+  }
+
   const { materialName, materialSurface } = template.prodDefault;
   const dict: Tdata_componentDict = {};
   (Object.keys(template.components) as TdoorComponentType[]).forEach((key) => {
     const tmpl = template.components[key];
-    if (!tmpl) return;
+
+    if (!tmpl) {
+      return;
+    }
+
     (dict as Record<string, unknown>)[key] = {
       type: key,
       number: tmpl.number,
@@ -339,12 +345,106 @@ export const createComponentDictFromTemplate = (
       price: tmpl.price,
     };
   });
+
   return dict;
 };
 
 // 取得門型下所有 component key (用於 componentKeyArr)
 export const getDoorModelComponentKeys = (doorModelName: string): TdoorComponentType[] => {
   const template = lookup_doorModelTemplate[doorModelName];
-  if (!template) return [];
+
+  if (!template) {
+    return [];
+  }
+
   return Object.keys(template.components) as TdoorComponentType[];
+};
+
+// ============================================================================
+// 寫死門型選配（accessory）假資料。API 停用期間供選擇器使用。
+// ============================================================================
+const _now = '2025-01-01T00:00:00.000Z';
+
+export const lookup_doorAccessoryByModel: Record<string, TdoorAccessoryDto[]> = {
+  'SJ-302': [
+    {
+      id: 'ACC-302-001',
+      createdAt: _now,
+      updatedAt: _now,
+      doorModelName: 'SJ-302' as TdoorModel,
+      name: '遵導防水條',
+      unit: 'M',
+      referenceSpec: 'fullWidth',
+      cost: 80,
+      price: 150,
+    },
+    {
+      id: 'ACC-302-002',
+      createdAt: _now,
+      updatedAt: _now,
+      doorModelName: 'SJ-302' as TdoorModel,
+      name: '門片加厚棒',
+      unit: '㎡',
+      referenceSpec: 'area',
+      cost: 200,
+      price: 350,
+    },
+    {
+      id: 'ACC-302-003',
+      createdAt: _now,
+      updatedAt: _now,
+      doorModelName: 'SJ-302' as TdoorModel,
+      name: '遥控器組',
+      unit: '組',
+      referenceSpec: null,
+      cost: 600,
+      price: 1200,
+    },
+    {
+      id: 'ACC-302-004',
+      createdAt: _now,
+      updatedAt: _now,
+      doorModelName: 'SJ-302' as TdoorModel,
+      name: '緊急手拉組',
+      unit: '組',
+      referenceSpec: null,
+      cost: 500,
+      price: 950,
+    },
+  ],
+  'SJ-312': [
+    {
+      id: 'ACC-312-001',
+      createdAt: _now,
+      updatedAt: _now,
+      doorModelName: 'SJ-312' as TdoorModel,
+      name: '防颱補強內條',
+      unit: 'M',
+      referenceSpec: 'fullWidth',
+      cost: 180,
+      price: 320,
+    },
+    {
+      id: 'ACC-312-002',
+      createdAt: _now,
+      updatedAt: _now,
+      doorModelName: 'SJ-312' as TdoorModel,
+      name: '加厚門片表面處理',
+      unit: '㎡',
+      referenceSpec: 'area',
+      cost: 280,
+      price: 480,
+    },
+    {
+      id: 'ACC-312-003',
+      createdAt: _now,
+      updatedAt: _now,
+      doorModelName: 'SJ-312' as TdoorModel,
+      name: '雙路限位開關',
+      unit: '組',
+      referenceSpec: null,
+      cost: 800,
+      price: 1600,
+    },
+  ],
 };

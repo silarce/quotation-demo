@@ -326,12 +326,12 @@ export const apiPostProdGenerateDoorProductBom = (body: TgenerateDoorProductBomD
 };
 
 export const apiGetProdAccessories = (params: { modelName: string }) => {
-  const api = '/products/door/accessories';
+  // API 停用：依門型回傳寫死選配資料
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { lookup_doorAccessoryByModel } = require('config/product/lookup') as typeof import('config/product/lookup');
+  const data = lookup_doorAccessoryByModel[params.modelName] ?? [];
 
-  return axi
-    .get<TdoorAccessoryDto[]>(api, { params })
-    .then(({ data }) => data)
-    .catch((err) => Promise.reject(err));
+  return Promise.resolve<TdoorAccessoryDto[]>(data);
 };
 
 export const useGetProdAccessories = (modelName: string) => {

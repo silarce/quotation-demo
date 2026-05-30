@@ -2,7 +2,7 @@ import Decimal from 'decimal.js';
 
 import type { TstateProd, TstateProdDict, TsetProd } from '../../type';
 import type { TnodeConfig } from './config';
-import { calcProdTotalPrice, calcPriceDiscount_percent } from '../../method/calcProd';
+import { calcProdTotalPrice, calcPriceDiscount_percent, calcAllPrice } from '../../method/calcProd';
 
 import type { Interface_ClassComponent_prime } from '../component/classComponent_base';
 import type { Class_accessory } from '../accessory/classAccessory';
@@ -183,6 +183,7 @@ class ClassProd {
   set fullWidth(v: `${number}` | '') {
     this.data.fullWidth = v;
     this.data.area = calcArea(v, this.data.height);
+    this.renewAccessoryQuantityBySize();
     this.render();
   }
 
@@ -193,7 +194,12 @@ class ClassProd {
   set height(v: `${number}` | '') {
     this.data.height = v;
     this.data.area = calcArea(this.data.fullWidth, v);
+    this.renewAccessoryQuantityBySize();
     this.render();
+  }
+
+  protected renewAccessoryQuantityBySize() {
+    Object.values(this.classAccessoryDict).forEach((a) => a?.renewQuantity?.());
   }
 
   get area() {
@@ -331,21 +337,50 @@ class ClassProd {
   addAccessory(accessories: TdoorAccessoryDto[] | TdoorAccessoryDto) {
     const arr = Array.isArray(accessories) ? accessories : [accessories];
     const baseOrder = this.state.accessoryKeyArr.length;
+    const discountPct = this.priceDiscount_percent;
 
     arr.forEach((dto, i) => {
       const key = dto.id;
+      const referenceSpec = dto.referenceSpec ?? null;
+
+      let quantityNum = 1;
+
+      if (referenceSpec === 'fullWidth') {
+        quantityNum = new Decimal(this.data.fullWidth || 0).toDecimalPlaces(2).toNumber();
+      } else if (referenceSpec === 'area') {
+        quantityNum = new Decimal(this.data.area || 0).toDecimalPlaces(2).toNumber();
+      }
+
+      let unit = dto.unit ?? '';
+
+      if (!unit) {
+        if (referenceSpec === 'fullWidth') {
+          unit = 'M';
+        } else if (referenceSpec === 'area') {
+          unit = '㎡';
+        } else {
+          unit = '組';
+        }
+      }
+
+      const priceNum = dto.price ?? 0;
+      const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+        price: priceNum,
+        quantity: quantityNum,
+        priceDiscount_percent: discountPct,
+      });
 
       this.state.data_accessoryDict[key] = {
         codeName: dto.id,
         name: dto.name,
-        unit: dto.unit ?? '',
-        quantity: '1' as `${number}`,
-        originalPrice: dto.price ?? 0,
-        price: `${dto.price ?? 0}` as `${number}`,
-        dualPrice: '0' as `${number}`,
-        unitPrice: '0' as `${number}`,
-        totalPrice: '0' as `${number}`,
-        referenceSpec: dto.referenceSpec ?? null,
+        unit,
+        quantity: `${quantityNum}` as `${number}`,
+        originalPrice: priceNum,
+        price: `${priceNum}` as `${number}`,
+        dualPrice: `${dualPrice}` as `${number}`,
+        unitPrice: `${unitPrice}` as `${number}`,
+        totalPrice: `${totalPrice}` as `${number}`,
+        referenceSpec,
         order: baseOrder + i,
       };
 
