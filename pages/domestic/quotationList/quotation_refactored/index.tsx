@@ -1195,7 +1195,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           <br />
           <br />
           <br />
-          <QuotationOther disabled={isAttach || disabled} instance_useQuotationOther={instance_useQuotationOther} />
+          {/* <QuotationOther disabled={isAttach || disabled} instance_useQuotationOther={instance_useQuotationOther} /> */}
         </div>
 
         {/* prod */}
