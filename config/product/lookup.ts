@@ -262,8 +262,8 @@ type TdoorModelTemplate = {
 export const lookup_doorModelTemplate: Record<string, TdoorModelTemplate> = {
   'SJ-302': {
     prodDefault: {
-      materialName: 'SGCC',
-      materialSurface: '電鍍鋅',
+      materialName: '鍍鋅鋼板',
+      materialSurface: '烤漆',
     },
     components: {
       slat: { number: 'C-302001', desc: '捲門門片', price: '3000', quantity: '1' },
@@ -278,7 +278,7 @@ export const lookup_doorModelTemplate: Record<string, TdoorModelTemplate> = {
   },
   'SJ-312': {
     prodDefault: {
-      materialName: 'SUS304',
+      materialName: 'SST#304',
       materialSurface: '2B',
     },
     components: {
