@@ -5,10 +5,6 @@ import _ from 'lodash';
 import { createClassComponentDict } from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/createClassComponentDict';
 import { createAccessoryDict } from 'components/page/domestic/quotation_v2/hook/quotationProduct/method/createAccessoryDict';
 import { ClassProd } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
-import {
-  Class_distributionBox,
-  Class_installationFee,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/pseudoComponent';
 
 import type { TsetProd } from '../type';
 import type {
@@ -16,31 +12,20 @@ import type {
   TclassComponentDict,
   TcreateSetComponent,
   TcreateSetAccessory,
-  TclassAccessoryDict,
   TstateProdDict,
   TsetComponent,
   TsetAccessory,
-  TclassPsuedoComponentDict,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 
 import {
-  TconfigItem,
-  TcellKey,
   TnodeConfig,
-
-  //
-  defaultKeyArr,
-  createNodeConfig_prime,
-  nodeConfig_origin,
-  //
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/config';
 
 import {
-  useDefaultState_prodDict,
   createEmptyStateProd,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useDefaultState_prodDict';
 
-import { calcProdTotalPrice, calcPriceDiscount_percent, calcProdDistributionBoxAndInstallationFee } from './calcProd';
+import { calcProdTotalPrice, calcPriceDiscount_percent } from './calcProd';
 
 // ===========================================================================
 
@@ -274,27 +259,7 @@ const kit_createClass = ({
       copyedProd.rootProduct = attachedToProduct;
       copyedProd.action = '變更追加';
 
-      const priceDiscount_percent = calcPriceDiscount_percent({
-        prodDiscount: data_prod.discount,
-        quotationDiscount: state_quotationDiscount || '',
-      });
-
       data_prod.id = attachedToProductId!;
-
-      const {
-        distributionBoxUnitPrice,
-        distributionBoxTotalPrice,
-        installationFeeUnitPrice,
-        installationFeeTotalPrice,
-      } = calcProdDistributionBoxAndInstallationFee({
-        stateProd: copyedProd,
-        priceDiscount_percent: priceDiscount_percent,
-      });
-
-      data_prod.distributionBoxUnitPrice = distributionBoxUnitPrice;
-      data_prod.distributionBoxTotalPrice = distributionBoxTotalPrice;
-      data_prod.installationFeeUnitPrice = installationFeeUnitPrice;
-      data_prod.installationFeeTotalPrice = installationFeeTotalPrice;
 
       const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
         stateProd: copyedProd,
@@ -304,12 +269,6 @@ const kit_createClass = ({
       data_prod.dualPrice = dualPrice;
       data_prod.unitPrice = unitPrice;
       data_prod.totalPrice = totalPrice;
-
-      const copmonentDict = copyedProd.data_componentDict;
-
-      for (const component of Object.values(copmonentDict)) {
-        component.isInited = false;
-      }
     }
 
     const newProd: TstateProd = {
@@ -376,7 +335,6 @@ const useActivedClass = ({
     //
     activedClassProd,
     activedClassComponentDict,
-    activedClassPseudoComponentDict,
     activedClassAccessoryDict,
   } = useMemo(() => {
     // let activedProd = activedProd;
@@ -399,29 +357,9 @@ const useActivedClass = ({
     const activedClassComponentDict = createActivedClassComponentDict(stateProd);
     activedClassProd.registerClassComponentDict(activedClassComponentDict);
 
-    if (activedClassProd.doorModelName !== 'special') {
-      Object.values(activedClassComponentDict).forEach((classComponent) =>
-        classComponent.setClassProd(activedClassProd)
-      );
-    }
-
-    const activedPseudoComponentDict: TclassPsuedoComponentDict = {
-      distributionBox: new Class_distributionBox({
-        stateProd: stateProd,
-        setStateProd: createSetProd(stateProd.key),
-        classProd: activedClassProd,
-      }),
-      installationFee: new Class_installationFee({
-        stateProd: stateProd,
-        setStateProd: createSetProd(stateProd.key),
-        classProd: activedClassProd,
-      }),
-    };
-
-    if (activedClassProd.doorModelName === 'W2') {
-      delete activedPseudoComponentDict.installationFee;
-      delete activedPseudoComponentDict.distributionBox;
-    }
+    Object.values(activedClassComponentDict).forEach((classComponent) =>
+      classComponent.setClassProd(activedClassProd)
+    );
 
     const activedClassAccessoryDict = createAccessoryDict({
       activedClassProd,
@@ -433,7 +371,6 @@ const useActivedClass = ({
     return {
       activedClassProd,
       activedClassComponentDict,
-      activedClassPseudoComponentDict: activedPseudoComponentDict,
       activedClassAccessoryDict,
     };
   }, [activedProd, activedProd?.renderCount, createClassProd]);
@@ -441,7 +378,6 @@ const useActivedClass = ({
   return {
     activedClassProd,
     activedClassComponentDict,
-    activedClassPseudoComponentDict,
     activedClassAccessoryDict,
   };
 };

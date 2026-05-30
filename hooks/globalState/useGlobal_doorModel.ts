@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import _ from 'lodash';
-import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
+// import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 
 import {
   create,
@@ -10,7 +10,8 @@ import {
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 
-import { TdoorModelInfoDto, apiGetProdDoorModels } from 'js/api/api_product';
+import { TdoorModelInfoDto } from 'js/api/api_product';
+import { lookup_doorModelInfoMinimal } from 'config/product/lookup';
 
 type TdoorModelDict = {
   [name: string]: TdoorModelInfoDto;
@@ -34,30 +35,18 @@ const useDoorModel_prime = create<TdoorModelList>()(
   immer<TdoorModelList>(
     (set, get) => {
       const update = async () => {
-        return await apiGetProdDoorModels()
-          .then((data) => {
-            const dict: TdoorModelDict = data.reduce((acc, item) => {
-              acc[item.name] = item;
+        const data = lookup_doorModelInfoMinimal;
+        const dict: TdoorModelDict = data.reduce((acc, item) => {
+          acc[item.name] = item;
+          return acc;
+        }, {} as TdoorModelDict);
 
-              return acc;
-            }, {} as TdoorModelDict);
-
-            set((state) => ({
-              raw: data,
-              doorModelArr: _.cloneDeep(data),
-              doorModelDict: dict,
-              isReady: true,
-            }));
-          })
-          .catch(() => {
-            set((state) => ({
-              raw: null,
-              doorModelArr: null,
-              doorModelDict: null,
-              isReady: true,
-            }));
-            myAlert.notify.error({ message: '取得門型列表失敗' });
-          });
+        set((state) => ({
+          raw: data,
+          doorModelArr: _.cloneDeep(data),
+          doorModelDict: dict,
+          isReady: true,
+        }));
       };
 
       const checkIsSpecialDoor = (doorModelName: string) => {

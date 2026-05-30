@@ -1,5 +1,10 @@
 import { TassetPath, createAssetUrl } from 'js/api/api_product';
-import type { TquotationProductItemDto } from 'js/api/dtoTypes';
+import type {
+  TquotationProductItemDto,
+  TdoorComponentType,
+  TdoorModelInfoDto,
+} from 'js/api/dtoTypes';
+import type { Tdata_componentDict } from 'components/page/domestic/quotation_v2/hook/quotationProduct/type';
 
 type TpariBD = {
   [key: string]:
@@ -232,4 +237,114 @@ export const lookup_componentConfig = (doorModelName: string) => {
       unit: '支',
     },
   };
+};
+
+// ============================================================================
+// 寫死門型模板：每筆門型對應 product 預設材質與 8 件 component 預設值。
+// 未來新增門型或 component 種類時，僅需在此追加。
+// ============================================================================
+
+type TdoorModelTemplateComponent = {
+  number: string;
+  desc: string;
+  price: `${number}`;
+  quantity: `${number}`;
+};
+
+type TdoorModelTemplate = {
+  prodDefault: {
+    materialName: string;
+    materialSurface: string;
+  };
+  components: Partial<Record<TdoorComponentType, TdoorModelTemplateComponent>>;
+};
+
+export const lookup_doorModelTemplate: Record<string, TdoorModelTemplate> = {
+  'SJ-302': {
+    prodDefault: {
+      materialName: 'SGCC',
+      materialSurface: '電鍍鋅',
+    },
+    components: {
+      slat: { number: 'C-302001', desc: '捲門門片', price: '3000', quantity: '1' },
+      bottomBar: { number: 'C-302002', desc: '底座', price: '1500', quantity: '1' },
+      guideRail: { number: 'C-302003', desc: '門軌', price: '2000', quantity: '1' },
+      sidePlate: { number: 'C-302004', desc: '側板組', price: '1000', quantity: '1' },
+      roller: { number: 'C-302005', desc: '捲軸組', price: '2000', quantity: '1' },
+      motor: { number: 'C-302006', desc: '捲門馬達', price: '3000', quantity: '1' },
+      motorAccessories: { number: 'C-302007', desc: '馬達配件', price: '1000', quantity: '1' },
+      headBox: { number: 'C-302008', desc: '捲箱', price: '1500', quantity: '1' },
+    },
+  },
+  'SJ-312': {
+    prodDefault: {
+      materialName: 'SUS304',
+      materialSurface: '2B',
+    },
+    components: {
+      slat: { number: 'C-312001', desc: '加厚捲門門片', price: '6000', quantity: '1' },
+      bottomBar: { number: 'C-312002', desc: '加厚底座', price: '3000', quantity: '1' },
+      guideRail: { number: 'C-312003', desc: '加厚門軌', price: '4000', quantity: '1' },
+      sidePlate: { number: 'C-312004', desc: '加厚側板組', price: '2000', quantity: '1' },
+      roller: { number: 'C-312005', desc: '加厚捲軸組', price: '4000', quantity: '1' },
+      motor: { number: 'C-312006', desc: '加厚捲門馬達', price: '6000', quantity: '1' },
+      motorAccessories: { number: 'C-312007', desc: '加厚馬達配件', price: '2000', quantity: '1' },
+      headBox: { number: 'C-312008', desc: '加厚捲箱', price: '3000', quantity: '1' },
+    },
+  },
+};
+
+// 寫死的 doorModel 最小資訊集，給 useGlobal_doorModel 注入用
+export const lookup_doorModelInfoMinimal: TdoorModelInfoDto[] = Object.keys(
+  lookup_doorModelTemplate
+).map(
+  (name) =>
+    ({
+      name,
+      density: 0,
+      guideRails: [],
+      thickness: '',
+      slatMaterials: [],
+    } as unknown as TdoorModelInfoDto)
+);
+
+// 取 product 預設材質
+export const getProdDefaults = (doorModelName: string) => {
+  return (
+    lookup_doorModelTemplate[doorModelName]?.prodDefault ?? {
+      materialName: '',
+      materialSurface: '',
+    }
+  );
+};
+
+// 依模板組出 component dict，material/materialSurface 來自所屬 product 預設
+export const createComponentDictFromTemplate = (
+  doorModelName: string
+): Tdata_componentDict => {
+  const template = lookup_doorModelTemplate[doorModelName];
+  if (!template) return {};
+  const { materialName, materialSurface } = template.prodDefault;
+  const dict: Tdata_componentDict = {};
+  (Object.keys(template.components) as TdoorComponentType[]).forEach((key) => {
+    const tmpl = template.components[key];
+    if (!tmpl) return;
+    (dict as Record<string, unknown>)[key] = {
+      type: key,
+      number: tmpl.number,
+      desc: tmpl.desc,
+      material: materialName,
+      materialSurface: materialSurface,
+      quantity: tmpl.quantity,
+      price: tmpl.price,
+    };
+  });
+  return dict;
+};
+
+// 取得門型下所有 component key (用於 componentKeyArr)
+export const getDoorModelComponentKeys = (doorModelName: string): TdoorComponentType[] => {
+  const template = lookup_doorModelTemplate[doorModelName];
+  if (!template) return [];
+  return Object.keys(template.components) as TdoorComponentType[];
 };

@@ -35,8 +35,6 @@ import {
   ClassCompnent_backBone,
 } from './class/component';
 
-import { Class_distributionBox, Class_installationFee } from './class/pseudoComponent';
-
 import {
   TnodeConfig_component,
   TcellKey_component,
@@ -134,11 +132,6 @@ type TclassComponentDict = {
     : never;
 };
 
-type TclassPsuedoComponentDict = {
-  distributionBox?: Class_distributionBox;
-  installationFee?: Class_installationFee;
-};
-
 interface TclassAccessoryDict {
   [key: string]: Class_accessory;
 }
@@ -150,7 +143,6 @@ interface Tinstance_useQuotationProduct {
   prodKeyArr: string[];
 
   activedClassComponentDict: TclassComponentDict | undefined;
-  activedClassPseudoComponentDict: TclassPsuedoComponentDict | undefined;
   activedClassAccessoryDict: TclassAccessoryDict | undefined;
 
   cellKeyArr: TcellKey[];
@@ -291,10 +283,8 @@ const useQuotationProduct = ({
   );
 
   const nodeConfig_prime = useMemo(() => {
-    return createNodeConfig_prime({
-      doorModelDict,
-    });
-  }, [doorModelDict]);
+    return createNodeConfig_prime();
+  }, []);
 
   const prodKeyArr_iterative = useMemo(() => Object.keys(state_iterativeProdDict), [state_iterativeProdDict]);
 
@@ -573,7 +563,6 @@ const useQuotationProduct = ({
     //
     activedClassProd,
     activedClassComponentDict,
-    activedClassPseudoComponentDict,
     activedClassAccessoryDict,
   } = useActivedClass({
     activedProd,
@@ -587,7 +576,6 @@ const useQuotationProduct = ({
     //
     activedClassProd: activedClassProd_iterative,
     activedClassComponentDict: activedClassComponentDict_iterative,
-    activedClassPseudoComponentDict: activedClassPseudoComponentDict_iterative,
     activedClassAccessoryDict: activedClassAccessoryDict_iterative,
   } = useActivedClass({
     activedProd: activedProd_iterative,
@@ -710,7 +698,6 @@ const useQuotationProduct = ({
     activedClassProd,
     prodKeyArr,
     activedClassComponentDict,
-    activedClassPseudoComponentDict,
     activedClassAccessoryDict,
     componentKeyArr: activedProd?.componentKeyArr,
     accessoryKeyArr: activedProd?.accessoryKeyArr,
@@ -763,7 +750,6 @@ const useQuotationProduct = ({
         activedClassProd: activedClassProd_iterative,
         prodKeyArr: prodKeyArr_iterative,
         activedClassComponentDict: activedClassComponentDict_iterative,
-        activedClassPseudoComponentDict: activedClassPseudoComponentDict_iterative,
         activedClassAccessoryDict: activedClassAccessoryDict_iterative,
         componentKeyArr: activedProd_iterative?.componentKeyArr,
         accessoryKeyArr: activedProd_iterative?.accessoryKeyArr,
@@ -846,7 +832,6 @@ export type {
   TstateProdDict,
   TsetComponent,
   TsetAccessory,
-  TclassPsuedoComponentDict,
   TprodSource,
   TexportState,
 };

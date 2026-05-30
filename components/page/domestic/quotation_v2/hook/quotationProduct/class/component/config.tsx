@@ -1,15 +1,11 @@
 // gear
-import InputSel, { TinputSelProps, inputLocaleStringSwitcher } from 'components/global/gear/inputAndSel_v2/inputSel';
+import { TinputSelProps, inputLocaleStringSwitcher } from 'components/global/gear/inputAndSel_v2/inputSel';
 import {
   InputSel_prod,
   InputSel_prod_memo_select,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
-import { Interface_ClassComponent_base, Interface_ClassComponent_prime } from './classComponent_base';
-
-import { TdoorModelInfoDto } from 'js/api/api_product';
-
-import { Checkbox } from 'antd';
+import { Interface_ClassComponent_prime } from './classComponent_base';
 
 // ========================================================================
 
@@ -34,8 +30,6 @@ type TcellKey_component = keyof Pick<
   | 'desc'
   | 'material'
   | 'materialSurface'
-  | 'density'
-  | 'isPainted'
   | 'quantity'
   | 'unit'
   | 'price'
@@ -56,8 +50,6 @@ const defaultKeyArr_component: TcellKey_component[] = [
   'desc',
   'material',
   'materialSurface',
-  'density',
-  'isPainted',
   'unit',
   'quantity',
   'price',
@@ -85,11 +77,7 @@ const createNodeConfig_component = (): TnodeConfig_component => {
     desc: {
       label: '說明',
       style: { width: 200 },
-      createNode({ disabled, classComponent }) {
-        if (!classComponent.isRawDataExist) {
-          return <span className="text-danger">{classComponent.desc}</span>;
-        }
-
+      createNode({ classComponent }) {
         return classComponent.desc;
       },
     },
@@ -144,33 +132,6 @@ const createNodeConfig_component = (): TnodeConfig_component => {
         };
 
         return <InputSel_prod_memo_select {...inputSelProps} />;
-      },
-    },
-
-    density: {
-      label: '重量基重',
-      style: { width: 80 },
-      createNode() {
-        return null;
-      },
-    },
-
-    isPainted: {
-      label: '烤漆',
-      style: {
-        width: 40,
-        textAlign: 'center',
-      },
-      createNode({ disabled, classComponent }) {
-        return (
-          <Checkbox
-            disabled={disabled}
-            checked={classComponent.isPainted}
-            onChange={(e) => {
-              classComponent.isPainted = e.target.checked;
-            }}
-          />
-        );
       },
     },
 

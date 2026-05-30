@@ -1,5 +1,5 @@
 import { ClassProd } from '../class/prod/classProd_remake';
-import type { TcreateSetComponent } from '../useQuotationProduct';
+import type { TcreateSetComponent, TclassComponentDict } from '../useQuotationProduct';
 
 import {
   ClassCompnent_slat,
@@ -14,9 +14,20 @@ import {
   ClassCompnent_backBone,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component';
 
-import type { TclassComponentDict } from '../useQuotationProduct';
+import type { TdoorComponentType } from 'js/api/dtoTypes';
 
-// ===============================================
+const Lookup = {
+  slat: ClassCompnent_slat,
+  bottomBar: ClassCompnent_bottomBar,
+  guideRail: ClassCompnent_guideRail,
+  sidePlate: ClassCompnent_sidePlate,
+  roller: ClassCompnent_roller,
+  motor: ClassCompnent_motor,
+  motorAccessories: ClassCompnent_motorAccessories,
+  headBox: ClassCompnent_headBox,
+  middlePillar: ClassCompnent_middlePillar,
+  backBone: ClassCompnent_backBone,
+} as const;
 
 const createClassComponentDict = ({
   activedClassProd,
@@ -28,133 +39,17 @@ const createClassComponentDict = ({
   const data_componentDict = activedClassProd.state.data_componentDict;
   const activeProdKey = activedClassProd.key;
 
-  const slat =
-    data_componentDict['slat'] &&
-    new (ClassCompnent_slat.subspecies(activedClassProd.doorModelName))({
-      state_component: data_componentDict['slat'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'slat',
-      }),
-      // activedClassProd,
-    });
+  const classComponentDict: TclassComponentDict = {};
 
-  const bottomBar =
-    data_componentDict['bottomBar'] &&
-    new (ClassCompnent_bottomBar.subspecies(activedClassProd.doorModelName))({
-      state_component: data_componentDict['bottomBar'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'bottomBar',
-      }),
-      // activedClassProd,
-    });
+  (Object.keys(Lookup) as TdoorComponentType[]).forEach((key) => {
+    const stateComponent = data_componentDict[key];
+    if (!stateComponent) return;
 
-  const guideRail =
-    data_componentDict['guideRail'] &&
-    new (ClassCompnent_guideRail.subspecies(activedClassProd.doorModelName))({
-      state_component: data_componentDict['guideRail'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'guideRail',
-      }),
-      // activedClassProd,
+    const Klass = Lookup[key] as any;
+    (classComponentDict as any)[key] = new Klass({
+      state_component: stateComponent,
+      setState_component: createSetComponent({ pordKey: activeProdKey, componentKey: key }),
     });
-
-  const sidePlate =
-    data_componentDict['sidePlate'] &&
-    new ClassCompnent_sidePlate({
-      state_component: data_componentDict['sidePlate'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'sidePlate',
-      }),
-      // activedClassProd,
-    });
-
-  const roller =
-    data_componentDict['roller'] &&
-    new ClassCompnent_roller({
-      state_component: data_componentDict['roller'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'roller',
-      }),
-      // activedClassProd,
-    });
-
-  const motor =
-    data_componentDict['motor'] &&
-    new ClassCompnent_motor({
-      state_component: data_componentDict['motor'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'motor',
-      }),
-      // activedClassProd,
-    });
-
-  const motorAccessories =
-    data_componentDict['motorAccessories'] &&
-    new ClassCompnent_motorAccessories({
-      state_component: data_componentDict['motorAccessories'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'motorAccessories',
-      }),
-      // activedClassProd,
-    });
-  const headBox =
-    data_componentDict['headBox'] &&
-    new (ClassCompnent_headBox.subspecies(activedClassProd.doorModelName))({
-      state_component: data_componentDict['headBox'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'headBox',
-      }),
-      // activedClassProd,
-    });
-  const middlePillar =
-    data_componentDict['middlePillar'] &&
-    new ClassCompnent_middlePillar({
-      state_component: data_componentDict['middlePillar'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'middlePillar',
-      }),
-      // activedClassProd,
-    });
-  const backBone =
-    data_componentDict['backBone'] &&
-    new ClassCompnent_backBone({
-      state_component: data_componentDict['backBone'],
-      setState_component: createSetComponent({
-        pordKey: activeProdKey,
-        componentKey: 'backBone',
-      }),
-      // activedClassProd,
-    });
-
-  const classComponentDict: TclassComponentDict = {
-    slat,
-    bottomBar,
-    guideRail,
-    sidePlate,
-    roller,
-    motor,
-    motorAccessories,
-    headBox,
-    middlePillar,
-    backBone,
-  };
-
-  // 清除classComponentDict中為undefined的項目
-  Object.keys(classComponentDict).forEach((key) => {
-    const theKey = key as keyof TclassComponentDict;
-
-    if (classComponentDict[theKey] === undefined) {
-      delete classComponentDict[theKey];
-    }
   });
 
   return classComponentDict;

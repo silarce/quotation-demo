@@ -225,18 +225,9 @@ const Table_prod = ({
   } = instance_useQuotationProductInstance;
 
   const nodeConfig_itemName = nodeConfig_origin['itemName'];
-  const nodeConfig_attachedToProductName = nodeConfig_origin['rootProductName'];
 
   let theadLeft = (
     <Panel_prod className_delete="invisible" className_copy="invisible">
-      {isIterativeProdExist && (
-        <Cell
-          className={classNames(nodeConfig_attachedToProductName.className_thead)}
-          style={nodeConfig_attachedToProductName.style}
-        >
-          {nodeConfig_attachedToProductName.label}
-        </Cell>
-      )}
       <Cell className={classNames(nodeConfig_itemName.className_thead)} style={nodeConfig_itemName.style}>
         {nodeConfig_itemName.label}
       </Cell>
@@ -368,7 +359,6 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
   const {
     activedProd,
     activedClassComponentDict,
-    activedClassPseudoComponentDict,
     //
     cellKeyArr_component,
     setCellKeyArr_component,
@@ -490,62 +480,6 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
             );
           })}
           {/*  */}
-          {Object.entries(activedClassPseudoComponentDict ?? {}).map(([key, classComponent], index) => {
-            if (!classComponent) {
-              return null;
-            }
-
-            const nodeConfig_name = classComponent.nodeConfig['name'];
-
-            const left = (
-              <>
-                <Cell className={classNames(nodeConfig_name.className)} style={nodeConfig_name.style}>
-                  {nodeConfig_name.createNode?.({
-                    disabled,
-                    classComponent: classComponent,
-                  })}
-                </Cell>
-              </>
-            );
-
-            return (
-              // <QuotationRow_dnd_memo
-              <QuotationRow_dnd
-                //
-                // rerenderTrigger01={classComponent.state.renderCount}
-                // rerenderTrigger02={disabled}
-                // rerenderTrigger03={null}
-                // rerenderTrigger04={null}
-                //
-                key={classComponent.key}
-                id={classComponent.key}
-                index={index}
-                isActive={activeIndex === key}
-                //
-                dragHandleInvisible={true}
-                left={left}
-                //
-                onClick={() => {
-                  setActiveIndex(key);
-                }}
-              >
-                {cellKeyArr_component.map((cellKey, cIndex) => {
-                  const { style, className, createNode } = classComponent.nodeConfig[cellKey];
-
-                  const node = createNode?.({
-                    disabled,
-                    classComponent: classComponent,
-                  });
-
-                  return (
-                    <Cell key={cellKey} className={classNames(className)} style={style}>
-                      {node}
-                    </Cell>
-                  );
-                })}
-              </QuotationRow_dnd>
-            );
-          })}
         </Table_dnd>
       </div>
     </div>
@@ -761,7 +695,6 @@ const QuotationRow_dealClass = ({
   const classProd = activedClassProd?.state === stateProd ? activedClassProd : createClassProd(stateProd);
 
   const nodeConfig_itemName = classProd.nodeConfig['itemName'];
-  const nodeConfig_attachedToProductName = classProd.nodeConfig['rootProductName'];
 
   let left = (
     <>
@@ -773,17 +706,6 @@ const QuotationRow_dealClass = ({
         onCopyClick={() => copyProd({ prodKey: classProd.key })}
         indexNumber={index + 1}
       >
-        {isIterativeProdExist && (
-          <Cell
-            className={classNames(nodeConfig_attachedToProductName.className)}
-            style={nodeConfig_attachedToProductName.style}
-          >
-            {nodeConfig_attachedToProductName.createNode({
-              disabled,
-              classProd,
-            })}
-          </Cell>
-        )}
         <Cell className={classNames(nodeConfig_itemName.className)} style={nodeConfig_itemName.style}>
           {nodeConfig_itemName.createNode({
             disabled,
