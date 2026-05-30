@@ -184,59 +184,63 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // ----------------------------------------------------------------------
   const ref_quotationPayInfo = useRef<HTMLFormElement>(null);
 
-  let { managerReviewedAt, toSalesAt, toSupervisorAt, toCashierAt, isAttach, isAllReviewedBeforePending } =
-    init_variable();
+  // let { managerReviewedAt, toSalesAt, toSupervisorAt, toCashierAt, isAttach, isAllReviewedBeforePending } =
+  //   init_variable();
+  const variable = init_variable();
+  let { managerReviewedAt, toSalesAt, toSupervisorAt, toCashierAt, isAttach } = variable;
+  const { isAllReviewedBeforePending } = variable;
 
   // ----------------------------------------------------------------------
 
   // region GET DATA
 
-  const {
-    //
-    instatnce_getQuotationId3,
-    content,
-    contractProfile,
-    prodArr,
-    iterativeContractProductArr,
-    prodArrForPDf,
-    isQuotationExpired,
-    latestSubContract,
-    parentSubContract,
-  } = useData();
+  // const {
+  //   //
+  //   instatnce_getQuotationId3,
+  //   content,
+  //   contractProfile,
+  //   prodArr,
+  //   iterativeContractProductArr,
+  //   prodArrForPDf,
+  //   isQuotationExpired,
+  //   latestSubContract,
+  //   parentSubContract,
+  // } = useData();
 
-  isAttach = !!iterativeContractProductArr?.length;
+  isAttach = false;
 
   let quotationType: TquotationType = undefined;
 
   !quotationId && !contentId && (quotationType = 'new');
   (quotationId || contentId) && (quotationType = 'old');
   quotationType === 'new' && !!contractId && (quotationType = 'newAttachment');
-  quotationType === 'old' && !!iterativeContractProductArr?.length && (quotationType = 'oldAttachment');
+  // quotationType === 'old' && !!iterativeContractProductArr?.length && (quotationType = 'oldAttachment');
 
-  const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
+  // const isOldQuotation = quotationType === 'old' || quotationType === 'oldAttachment';
+  const isOldQuotation = false;
 
-  const {
-    isFetching: isFetching_update,
+  // const {
+  //   isFetching: isFetching_update,
 
-    raw: quotationData,
-    update: update_quotation,
-    attachmentArr,
-    isDesignatedContent,
-    reqReview,
-    reqUnlock,
-    reqPatchReviewer,
-    reqPatchQuotationContent_id_progress,
-    reqToPending,
-  } = instatnce_getQuotationId3;
+  //   raw: quotationData,
+  //   update: update_quotation,
+  //   attachmentArr,
+  //   isDesignatedContent,
+  //   reqReview,
+  //   reqUnlock,
+  //   reqPatchReviewer,
+  //   reqPatchQuotationContent_id_progress,
+  //   reqToPending,
+  // } = instatnce_getQuotationId3;
 
-  const haveVerifyForm = content?.verifyForm;
+  const haveVerifyForm = false;
 
-  managerReviewedAt = content?.managerReviewedAt;
-  toSalesAt = content?.toSalesAt;
-  toSupervisorAt = content?.toSupervisorAt;
-  toCashierAt = content?.toCashierAt;
+  managerReviewedAt = undefined;
+  toSalesAt = undefined;
+  toSupervisorAt = undefined;
+  toCashierAt = undefined;
 
-  const agentEmployee = !quotationId ? userInfo?.employee : content?.agentEmployee;
+  const agentEmployee = undefined;
 
   const {
     isSendToReview,
@@ -248,17 +252,11 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     isCashier,
     isSupervisor,
     isManager,
-  } =
-    (content &&
-      parseQuotationContentSituation({
-        quotationContent: content,
-        userId,
-      })) ??
-    {};
+  } = {} as any;
 
-  if (content?.status === 'Budget' || content?.status === 'Bidding' || content?.status === 'Contracting') {
-    managerReviewedAt && (isAllReviewedBeforePending = true);
-  }
+  // if (content?.status === 'Budget' || content?.status === 'Bidding' || content?.status === 'Contracting') {
+  //   managerReviewedAt && (isAllReviewedBeforePending = true);
+  // }
 
   // ----------------------------------------------------------------------
 
@@ -292,9 +290,9 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
     isBouncing,
   } = useQuotationProduct({
-    raw_quotationProductArr: prodArr,
-    raw_quotationDiscount: content?.discount,
-    iterativeContractProductArr: iterativeContractProductArr,
+    raw_quotationProductArr: undefined,
+    raw_quotationDiscount: undefined,
+    iterativeContractProductArr: undefined,
     disabled,
     onProdAllTotalChange: (prodAllTotal) => {
       handleSetQuotationPriceTotal({
@@ -302,8 +300,41 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         otherPriceAllTotal: instance_useQuotationOther.calcAllOtherTotalPrice(),
       });
     },
-    raw_autoRefresh: content?.autoRefresh ?? true,
+    raw_autoRefresh: true,
   });
+
+  // const {
+  //   instance: instance_quotationProduct,
+  //   instance_iterative,
+  //   allProdTotal,
+  //   allProdTotal_iterative,
+  //   theProductTotal,
+  //   calcProductBody,
+  //   doorModelSummery,
+  //   doorModelSummery_reduceModified,
+  //   checkIsIterativeProdValid,
+  //   //
+  //   exportState: exportState_product,
+  //   restoreState: restoreState_product,
+  //   //
+
+  //   changeAllowProdAutoChange,
+  //   state_allowProdAutoChange,
+
+  //   isBouncing,
+  // } = useQuotationProduct({
+  //   raw_quotationProductArr: prodArr,
+  //   raw_quotationDiscount: content?.discount,
+  //   iterativeContractProductArr: iterativeContractProductArr,
+  //   disabled,
+  //   onProdAllTotalChange: (prodAllTotal) => {
+  //     handleSetQuotationPriceTotal({
+  //       prodPriceAllTotal: prodAllTotal,
+  //       otherPriceAllTotal: instance_useQuotationOther.calcAllOtherTotalPrice(),
+  //     });
+  //   },
+  //   raw_autoRefresh: content?.autoRefresh ?? true,
+  // });
 
   const {
     avgDiscount,
@@ -311,7 +342,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   } = instance_quotationProduct;
 
   const instance_quotationTotalPrice = useQuotationTotalPrice({
-    raw_quotationContent: content,
+    raw_quotationContent: undefined,
     disabled,
   });
   const {
@@ -327,43 +358,43 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     restoreState: restoreState_profile,
   } = useProfile({
     disabled,
-    profile: quotationType === 'newAttachment' ? contractProfile : content,
+    profile: undefined,
   });
 
-  const {
-    annoKitArr,
-    annoArr,
-    addAnno,
-    openSelector: openSelector_anno,
-    restoreState: restoreState_anno,
-  } = useAnnotations({
-    disabled: true,
-    raw_remarkArr: content?.annotations,
-  });
+  // const {
+  //   annoKitArr,
+  //   annoArr,
+  //   addAnno,
+  //   openSelector: openSelector_anno,
+  //   restoreState: restoreState_anno,
+  // } = useAnnotations({
+  //   disabled: true,
+  //   raw_remarkArr: undefined,
+  // });
 
-  const {
-    quotationRangeKitArr,
-    quotationRangeArr,
-    addQuotationRange,
-    openSelector: openSelector_qr,
-    restoreState: restoreState_quotationRange,
-  } = useQuotationRange({
-    disabled: true,
-    raw_remarkArr: content?.quotationRanges,
-  });
+  // const {
+  //   quotationRangeKitArr,
+  //   quotationRangeArr,
+  //   addQuotationRange,
+  //   openSelector: openSelector_qr,
+  //   restoreState: restoreState_quotationRange,
+  // } = useQuotationRange({
+  //   disabled: true,
+  //   raw_remarkArr: undefined,
+  // });
 
-  const {
-    //
-    fileInfoKitArr,
-    addFile,
-    createFileArr, // 要呼叫patch時使用
-  } = useAttachment({
-    resetTrigger: disabled,
-    rawArr: attachmentArr,
-    kit: {
-      removeWithConfirm: false,
-    },
-  });
+  // const {
+  //   //
+  //   fileInfoKitArr,
+  //   addFile,
+  //   createFileArr, // 要呼叫patch時使用
+  // } = useAttachment({
+  //   resetTrigger: disabled,
+  //   rawArr: undefined,
+  //   kit: {
+  //     removeWithConfirm: false,
+  //   },
+  // });
 
   const {
     state: state_payInfo,
@@ -373,12 +404,12 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     restoreState: restoreState_payInfo,
   } = usePayInfo({
     disabled,
-    raw: content,
+    raw: undefined,
   });
 
   const instance_useQuotationOther = useQuotationOther({
     disabled,
-    raw_contentOtherArr: content?.others,
+    raw_contentOtherArr: undefined,
     onOtherPriceAllTotalChange(total) {
       handleSetQuotationPriceTotal({
         // prodPriceAllTotal: instance_quotationProduct.calcProdAllTotal(),
@@ -423,8 +454,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       quotationTotalPrice: exportState_quotationTotalPrice({ exportCopy: false }),
       profile: state_profile,
 
-      annoArr,
-      quotationRangeArr,
+      annoArr: [],
+      quotationRangeArr: [],
 
       payInfo: payInfo,
       other: state_otherArr,
@@ -448,8 +479,10 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         restoreState_product(backup.product);
         restoreState_quotationTotalPrice(backup.quotationTotalPrice);
         restoreState_profile(backup.profile);
-        restoreState_anno(backup.annoArr);
-        restoreState_quotationRange(backup.quotationRangeArr);
+        // restoreState_anno(backup.annoArr);
+        // restoreState_quotationRange(backup.quotationRangeArr);
+        // restoreState_anno(backup.annoArr);
+        // restoreState_quotationRange(backup.quotationRangeArr);
         restoreState_payInfo(backup.payInfo);
         restoreState_other(backup.other);
       };
@@ -482,8 +515,8 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     restoreState_product(backup.product);
     restoreState_quotationTotalPrice(backup.quotationTotalPrice);
     restoreState_profile(backup.profile);
-    restoreState_anno(backup.annoArr);
-    restoreState_quotationRange(backup.quotationRangeArr);
+    // restoreState_anno(backup.annoArr);
+    // restoreState_quotationRange(backup.quotationRangeArr);
     restoreState_payInfo(backup.payInfo);
     restoreState_other(backup.other);
   };
@@ -492,422 +525,422 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
   // console.log('isBouncing', isBouncing);
   // region REQUEST
 
-  const {
-    reqPostQuotation,
-    reqPatchQuotation,
+  // const {
+  //   reqPostQuotation,
+  //   reqPatchQuotation,
 
-    reqModifyQuotation,
-    reqPatchModifiedQuotation,
+  //   reqModifyQuotation,
+  //   reqPatchModifiedQuotation,
 
-    reqCloneQuotation,
-  } = kit_req({
-    userId,
-    quotationId,
-    contractId,
-    instance_quotationProduct,
-    instance_quotationProduct_iterative: instance_iterative,
-    instance_useQuotationOther,
-    state_profile,
-    state_payInfo,
-    annoArr: annoKitArr.map((anno) => anno.value),
-    quotationRangeArr: quotationRangeKitArr.map((qr) => qr.value),
-    setIsFetching,
-    createFileArr,
-    update_quotation: async () => {
-      await update_quotation();
-    },
-    setDisabled,
-    state_quotationTotal,
-    instatnce_getQuotationId3,
-    status: state_status,
-    calcProductBody,
-    allowProdAutoChange: state_allowProdAutoChange,
-  });
+  //   reqCloneQuotation,
+  // } = kit_req({
+  //   userId,
+  //   quotationId,
+  //   contractId,
+  //   instance_quotationProduct,
+  //   instance_quotationProduct_iterative: instance_iterative,
+  //   instance_useQuotationOther,
+  //   state_profile,
+  //   state_payInfo,
+  //   annoArr: annoKitArr.map((anno) => anno.value),
+  //   quotationRangeArr: quotationRangeKitArr.map((qr) => qr.value),
+  //   setIsFetching,
+  //   createFileArr,
+  //   update_quotation: async () => {
+  //     // await update_quotation();
+  //   },
+  //   setDisabled,
+  //   state_quotationTotal,
+  //   instatnce_getQuotationId3,
+  //   status: state_status,
+  //   calcProductBody,
+  //   allowProdAutoChange: state_allowProdAutoChange,
+  // });
 
   // MARK:更新報價單
-  const handlePatch = () => {
-    if (isBouncing) {
-      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+  // const handlePatch = () => {
+  //   if (isBouncing) {
+  //     myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
-      myAlert.info({
-        title: '付款資訊未正確填寫',
-      });
+  //   if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+  //     myAlert.info({
+  //       title: '付款資訊未正確填寫',
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const { destroy } = myAlert.input({
-      props_input: {
-        isTextArea: true,
-      },
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        const res = await reqPatchQuotation({ editNote });
+  //   const { destroy } = myAlert.input({
+  //     props_input: {
+  //       isTextArea: true,
+  //     },
+  //     title: '報價單註解',
+  //     width: 500,
+  //     onConfirm: async (editNote) => {
+  //       destroy();
+  //       const res = await reqPatchQuotation({ editNote });
 
-        if (!res) {
-          return;
-        }
+  //       if (!res) {
+  //         return;
+  //       }
 
-        const { newQuotation } = res;
+  //       const { newQuotation } = res;
 
-        clearBackup && clearBackup();
+  //       clearBackup && clearBackup();
 
-        if (newQuotation) {
-          const {
-            contentId,
-            // contractId,
-            ...rest
-          } = query;
-          router.replace({
-            query: {
-              ...rest,
-              status: newQuotation.latestContent.status,
-            },
-          });
-        }
-      },
-    });
-  };
+  //       if (newQuotation) {
+  //         const {
+  //           contentId,
+  //           // contractId,
+  //           ...rest
+  //         } = query;
+  //         router.replace({
+  //           query: {
+  //             ...rest,
+  //             status: newQuotation.latestContent.status,
+  //           },
+  //         });
+  //       }
+  //     },
+  //   });
+  // };
 
   // MARK:新增報價單
-  const handlePost = () => {
-    if (isBouncing) {
-      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+  // const handlePost = () => {
+  //   if (isBouncing) {
+  //     myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
-      myAlert.info({
-        title: '付款資訊未正確填寫',
-      });
+  //   if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+  //     myAlert.info({
+  //       title: '付款資訊未正確填寫',
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const { destroy } = myAlert.input({
-      props_input: {
-        isTextArea: true,
-      },
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        // const { newQuotation } = await reqPostQuotation({ editNote });
-        const res = await reqPostQuotation({ editNote });
+  //   const { destroy } = myAlert.input({
+  //     props_input: {
+  //       isTextArea: true,
+  //     },
+  //     title: '報價單註解',
+  //     width: 500,
+  //     onConfirm: async (editNote) => {
+  //       destroy();
+  //       // const { newQuotation } = await reqPostQuotation({ editNote });
+  //       const res = await reqPostQuotation({ editNote });
 
-        if (!res) {
-          return;
-        }
+  //       if (!res) {
+  //         return;
+  //       }
 
-        const { newQuotation } = res;
+  //       const { newQuotation } = res;
 
-        clearBackup && clearBackup();
+  //       clearBackup && clearBackup();
 
-        if (newQuotation) {
-          const {
-            contentId,
-            //  contractId,
-            ...rest
-          } = query;
-          router.replace({
-            query: {
-              ...rest,
-              id: newQuotation.id,
-              status: newQuotation.latestContent.status,
-            },
-          });
-        }
-      },
-    });
-  };
+  //       if (newQuotation) {
+  //         const {
+  //           contentId,
+  //           //  contractId,
+  //           ...rest
+  //         } = query;
+  //         router.replace({
+  //           query: {
+  //             ...rest,
+  //             id: newQuotation.id,
+  //             status: newQuotation.latestContent.status,
+  //           },
+  //         });
+  //       }
+  //     },
+  //   });
+  // };
 
   // MARK:追加追減報價單
-  const handleModify = () => {
-    if (isBouncing) {
-      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+  // const handleModify = () => {
+  //   if (isBouncing) {
+  //     myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
-      myAlert.info({
-        title: '付款資訊未正確填寫',
-      });
+  //   if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+  //     myAlert.info({
+  //       title: '付款資訊未正確填寫',
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const { destroy } = myAlert.input({
-      props_input: {
-        isTextArea: true,
-      },
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        const newQuotation = await reqModifyQuotation({ editNote });
-        clearBackup && clearBackup();
+  //   const { destroy } = myAlert.input({
+  //     props_input: {
+  //       isTextArea: true,
+  //     },
+  //     title: '報價單註解',
+  //     width: 500,
+  //     onConfirm: async (editNote) => {
+  //       destroy();
+  //       const newQuotation = await reqModifyQuotation({ editNote });
+  //       clearBackup && clearBackup();
 
-        if (newQuotation) {
-          const { contentId, contractId, ...rest } = query;
-          router.replace({
-            query: {
-              ...rest,
-              id: newQuotation.id,
-              status: newQuotation.latestContent.status,
-            },
-          });
-          setDisabled(true);
-        }
-      },
-    });
-  };
+  //       if (newQuotation) {
+  //         const { contentId, contractId, ...rest } = query;
+  //         router.replace({
+  //           query: {
+  //             ...rest,
+  //             id: newQuotation.id,
+  //             status: newQuotation.latestContent.status,
+  //           },
+  //         });
+  //         setDisabled(true);
+  //       }
+  //     },
+  //   });
+  // };
 
   // MARK:更新追加追減報價單
-  const handlePatchModify = () => {
-    if (isBouncing) {
-      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+  // const handlePatchModify = () => {
+  //   if (isBouncing) {
+  //     myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
-      myAlert.info({
-        title: '付款資訊未正確填寫',
-      });
+  //   if (ref_quotationPayInfo.current && !ref_quotationPayInfo.current.checkValidity()) {
+  //     myAlert.info({
+  //       title: '付款資訊未正確填寫',
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (!checkIsIterativeProdValid()) {
-      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
+  //   if (!checkIsIterativeProdValid()) {
+  //     myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const { destroy } = myAlert.input({
-      props_input: {
-        isTextArea: true,
-      },
-      title: '報價單註解',
-      width: 500,
-      onConfirm: async (editNote) => {
-        destroy();
-        const newQuotation = await reqPatchModifiedQuotation({ editNote });
-        clearBackup && clearBackup();
+  //   const { destroy } = myAlert.input({
+  //     props_input: {
+  //       isTextArea: true,
+  //     },
+  //     title: '報價單註解',
+  //     width: 500,
+  //     onConfirm: async (editNote) => {
+  //       destroy();
+  //       const newQuotation = await reqPatchModifiedQuotation({ editNote });
+  //       clearBackup && clearBackup();
 
-        if (newQuotation) {
-          update_quotation();
-          setDisabled(true);
-        }
-      },
-    });
-  };
+  //       if (newQuotation) {
+  //         update_quotation();
+  //         setDisabled(true);
+  //       }
+  //     },
+  //   });
+  // };
 
   // MARK:複製報價單
-  const handleClone = async (isRelationQuotation?: boolean | undefined) => {
-    if (isBouncing) {
-      myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
+  // const handleClone = async (isRelationQuotation?: boolean | undefined) => {
+  //   if (isBouncing) {
+  //     myAlert.warning({ title: '正在計算資料，請稍後0.5秒' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const { destroy } = myAlert.clear({
-      content: (
-        <SearchModal_customer
-          onRowClick={async (customer) => {
-            const customerId = customer.id;
-            destroy();
-            const res = await reqCloneQuotation({ customerId, isRelationQuotation });
-            setDisabled(true);
+  //   const { destroy } = myAlert.clear({
+  //     content: (
+  //       <SearchModal_customer
+  //         onRowClick={async (customer) => {
+  //           const customerId = customer.id;
+  //           destroy();
+  //           const res = await reqCloneQuotation({ customerId, isRelationQuotation });
+  //           setDisabled(true);
 
-            if (res) {
-              router.replace({
-                query: {
-                  id: res.id,
-                },
-              });
-            }
-          }}
-        />
-      ),
-      onCancel: () => destroy(),
-    });
-  };
+  //           if (res) {
+  //             router.replace({
+  //               query: {
+  //                 id: res.id,
+  //               },
+  //             });
+  //           }
+  //         }}
+  //       />
+  //     ),
+  //     onCancel: () => destroy(),
+  //   });
+  // };
 
   // MARK:轉為準合約
-  const handleReqToPending = async () => {
-    if (!content) {
-      return;
-    }
+  // const handleReqToPending = async () => {
+  //   if (!content) {
+  //     return;
+  //   }
 
-    if (!isAllReviewedBeforePending) {
-      myAlert.info({ title: '此報價單尚未審核完畢' });
+  //   if (!isAllReviewedBeforePending) {
+  //     myAlert.info({ title: '此報價單尚未審核完畢' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (content.status === 'Pending') {
-      myAlert.info({ title: '此報價單已經是準合約' });
-    }
+  //   if (content.status === 'Pending') {
+  //     myAlert.info({ title: '此報價單已經是準合約' });
+  //   }
 
-    if (content.status === 'Contract') {
-      myAlert.info({ title: '此報價單已是合約' });
-    }
+  //   if (content.status === 'Contract') {
+  //     myAlert.info({ title: '此報價單已是合約' });
+  //   }
 
-    const { quotation } = (await reqToPending(content.id)) ?? {};
+  //   const { quotation } = (await reqToPending(content.id)) ?? {};
 
-    router.replace({
-      query: {
-        ...query,
-        status: quotation?.latestContent.status,
-      },
-    });
-  };
+  //   router.replace({
+  //     query: {
+  //       ...query,
+  //       status: quotation?.latestContent.status,
+  //     },
+  //   });
+  // };
 
   // MARK: 送審
-  const handleSubmit = async ({
-    sales,
-    supervisor,
-  }: {
-    sales: TemployeeDto | undefined;
-    supervisor: TemployeeDto | undefined;
-  }) => {
-    if (!isOldQuotation) {
-      return;
-    }
+  // const handleSubmit = async ({
+  //   sales,
+  //   supervisor,
+  // }: {
+  //   sales: TemployeeDto | undefined;
+  //   supervisor: TemployeeDto | undefined;
+  // }) => {
+  //   if (!isOldQuotation) {
+  //     return;
+  //   }
 
-    const reviewSalesEmployeeId = sales?.id ?? null;
-    const reviewSupervisorEmployeeId = supervisor?.id ?? null;
+  //   const reviewSalesEmployeeId = sales?.id ?? null;
+  //   const reviewSupervisorEmployeeId = supervisor?.id ?? null;
 
-    if (content?.status === 'Pending' && !reviewSalesEmployeeId) {
-      return myAlert.err({ title: '沒有業務' });
-    }
+  //   if (content?.status === 'Pending' && !reviewSalesEmployeeId) {
+  //     return myAlert.err({ title: '沒有業務' });
+  //   }
 
-    if (content?.status === 'TempPending') {
-      if (!reviewSalesEmployeeId) {
-        return myAlert.info({ title: '請選擇業務' });
-      }
-    } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
-      return myAlert.info({ title: '請選擇所有審核人員' });
-    }
+  //   if (content?.status === 'TempPending') {
+  //     if (!reviewSalesEmployeeId) {
+  //       return myAlert.info({ title: '請選擇業務' });
+  //     }
+  //   } else if (!reviewSalesEmployeeId || !reviewSupervisorEmployeeId) {
+  //     return myAlert.info({ title: '請選擇所有審核人員' });
+  //   }
 
-    const body = { reviewSalesEmployeeId, reviewSupervisorEmployeeId };
+  //   const body = { reviewSalesEmployeeId, reviewSupervisorEmployeeId };
 
-    reqPatchReviewer({
-      body,
-    });
+  //   reqPatchReviewer({
+  //     body,
+  //   });
 
-    setShowEmployeSelector(false);
-  };
+  //   setShowEmployeSelector(false);
+  // };
 
-  const handleSubmit_pending = async () => {
-    if (!isOldQuotation) {
-      return;
-    }
+  // const handleSubmit_pending = async () => {
+  //   if (!isOldQuotation) {
+  //     return;
+  //   }
 
-    const body = {};
+  //   const body = {};
 
-    reqPatchReviewer({
-      body,
-    });
+  //   reqPatchReviewer({
+  //     body,
+  //   });
 
-    setShowEmployeSelector(false);
-  };
+  //   setShowEmployeSelector(false);
+  // };
 
   // MARK: 審核
-  const handleReview = async () => {
-    if (!checkIsIterativeProdValid()) {
-      myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
+  // const handleReview = async () => {
+  //   if (!checkIsIterativeProdValid()) {
+  //     myAlert.warning({ title: '總主產品的剩餘數量低於追加追減數量' });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    const callReq = async (isPass: boolean) => {
-      if (isPass && content?.status === 'Pending' && !haveVerifyForm) {
-        myAlert.warning({ title: '請先送出合約審核表' });
+  //   const callReq = async (isPass: boolean) => {
+  //     if (isPass && content?.status === 'Pending' && !haveVerifyForm) {
+  //       myAlert.warning({ title: '請先送出合約審核表' });
 
-        return;
-      }
+  //       return;
+  //     }
 
-      const body = {
-        reviewSalesEmployeeId: isSales ? userId : null,
-        reviewSupervisorEmployeeId: isSupervisor ? userId : null,
-        // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
-        reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
-        reviewCashierEmployeeId: isCashier ? userId : null,
-        reviewManagerEmployeeId: isManager ? userId : null,
-        reviewResult: isPass,
-      };
+  //     const body = {
+  //       reviewSalesEmployeeId: isSales ? userId : null,
+  //       reviewSupervisorEmployeeId: isSupervisor ? userId : null,
+  //       // reviewSalesManagerEmployeeId: isSalesManagerEmployee ? userId : null,
+  //       reviewWorkDirectorEmployeeId: isWorkDirector ? userId : null,
+  //       reviewCashierEmployeeId: isCashier ? userId : null,
+  //       reviewManagerEmployeeId: isManager ? userId : null,
+  //       reviewResult: isPass,
+  //     };
 
-      const res = await reqReview(body);
+  //     const res = await reqReview(body);
 
-      if (
-        res?.status === 'Contract' // 沒有給status.....
-        // 可以這樣判斷是否已被審核完畢並轉為合約
-        // content?.status==="Pending" && !!res.managerReviewedAt
-        // 但是原本的錯誤一直都沒有被使用者反應，所以決定不修正
-      ) {
-        // res中沒有contract的id，無法導向到合約頁面
-        // router.replace({
-        //   pathname: '/domestic/contract/quotation',
-        //   query: {
-        //     id: res.id,
-        //     version: '1',
-        //   },
-        // });
-        router.back();
-      } else {
-        update_quotation();
-      }
-    };
+  //     if (
+  //       res?.status === 'Contract' // 沒有給status.....
+  //       // 可以這樣判斷是否已被審核完畢並轉為合約
+  //       // content?.status==="Pending" && !!res.managerReviewedAt
+  //       // 但是原本的錯誤一直都沒有被使用者反應，所以決定不修正
+  //     ) {
+  //       // res中沒有contract的id，無法導向到合約頁面
+  //       // router.replace({
+  //       //   pathname: '/domestic/contract/quotation',
+  //       //   query: {
+  //       //     id: res.id,
+  //       //     version: '1',
+  //       //   },
+  //       // });
+  //       router.back();
+  //     } else {
+  //       update_quotation();
+  //     }
+  //   };
 
-    const { destroy } = myAlert.clear({
-      content: (
-        <AskRevier
-          //
-          onPass={async () => {
-            await callReq(true);
-            destroy();
-          }}
-          onNoPass={async () => {
-            await callReq(false);
-            destroy();
-          }}
-          onCancel={() => destroy()}
-        />
-      ),
-    });
-  };
+  //   const { destroy } = myAlert.clear({
+  //     content: (
+  //       <AskRevier
+  //         //
+  //         onPass={async () => {
+  //           await callReq(true);
+  //           destroy();
+  //         }}
+  //         onNoPass={async () => {
+  //           await callReq(false);
+  //           destroy();
+  //         }}
+  //         onCancel={() => destroy()}
+  //       />
+  //     ),
+  //   });
+  // };
 
   // MARK: 解除鎖定
-  const handleReqUnlock = async () => {
-    myAlert.confirm({
-      title: '確定要解除鎖定?',
-      content: '此報價單將需要重新送審並回到發包狀態',
-      props: {
-        onOk: async () => {
-          const { quotation } = (await reqUnlock()) ?? {};
+  // const handleReqUnlock = async () => {
+  //   myAlert.confirm({
+  //     title: '確定要解除鎖定?',
+  //     content: '此報價單將需要重新送審並回到發包狀態',
+  //     props: {
+  //       onOk: async () => {
+  //         const { quotation } = (await reqUnlock()) ?? {};
 
-          if (quotation) {
-            router.replace({
-              query: {
-                ...query,
-                status: quotation.latestContent.status,
-              },
-            });
-          }
-        },
-      },
-    });
-  };
+  //         if (quotation) {
+  //           router.replace({
+  //             query: {
+  //               ...query,
+  //               status: quotation.latestContent.status,
+  //             },
+  //           });
+  //         }
+  //       },
+  //     },
+  //   });
+  // };
 
   // ----------------------------------------------------------------------
 
@@ -925,75 +958,75 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     setQuotationPriceTotal(quotationPriceTotal);
   }
 
-  const preHandleSubmit = () => {
-    if (content?.status === 'Pending') {
-      if (!haveVerifyForm) {
-        myAlert.warning({ title: '請先送出合約審核表' });
+  // const preHandleSubmit = () => {
+  //   if (content?.status === 'Pending') {
+  //     if (!haveVerifyForm) {
+  //       myAlert.warning({ title: '請先送出合約審核表' });
 
-        return;
-      }
+  //       return;
+  //     }
 
-      if (toCashierAt) {
-        myAlert.info({ title: '此報價單已經送審' });
+  //     if (toCashierAt) {
+  //       myAlert.info({ title: '此報價單已經送審' });
 
-        return;
-      }
+  //       return;
+  //     }
 
-      myAlert.confirm({
-        title: '送審後合約審核表將被鎖定',
-        content: '建議先確認合約審核表是否正確',
-        // props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
-        props: {
-          width: 450,
-          onOk: () => {
-            if (!content?.toSupervisorAt) {
-              setShowEmployeSelector(true);
-            } else {
-              handleSubmit_pending();
-            }
-          },
-          okText: '確定送審',
-          cancelText: '取消',
-        },
-      });
+  //     myAlert.confirm({
+  //       title: '送審後合約審核表將被鎖定',
+  //       content: '建議先確認合約審核表是否正確',
+  //       // props: { width: 450, onOk: reqPatchReviewer_pending, okText: '確定送審', cancelText: '取消' },
+  //       props: {
+  //         width: 450,
+  //         onOk: () => {
+  //           if (!content?.toSupervisorAt) {
+  //             setShowEmployeSelector(true);
+  //           } else {
+  //             handleSubmit_pending();
+  //           }
+  //         },
+  //         okText: '確定送審',
+  //         cancelText: '取消',
+  //       },
+  //     });
 
-      return;
-    }
+  //     return;
+  //   }
 
-    if (toSalesAt || toSupervisorAt) {
-      myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
-    } else {
-      setShowEmployeSelector(true);
-    }
-  };
+  //   if (toSalesAt || toSupervisorAt) {
+  //     myAlert.info({ title: '此報價單已經送審，不可以變更業務與業務主管' });
+  //   } else {
+  //     setShowEmployeSelector(true);
+  //   }
+  // };
 
   // ----------------------------------------------------------------------
   // region PROPS
 
-  const {
-    visible: pdfModalVisible,
-    // setVisible: setPdfModalVisible,
-    showPdf,
-    showPdf_noDiscount,
-    hidePdf,
-    pdfData,
-  } = useModalQuotationPdf({
-    quotationContent: content,
-    attachedProdArr: prodArrForPDf,
-    emptySomeProperty: state_status === 'Bidding',
-  });
+  // const {
+  //   visible: pdfModalVisible,
+  //   // setVisible: setPdfModalVisible,
+  //   showPdf,
+  //   showPdf_noDiscount,
+  //   hidePdf,
+  //   pdfData,
+  // } = useModalQuotationPdf({
+  //   quotationContent: content,
+  //   attachedProdArr: prodArrForPDf,
+  //   emptySomeProperty: state_status === 'Bidding',
+  // });
 
-  const { pdfPartProps, show_pdfPart, setShow_pdfPart } = usePdfPart({
-    quotationContent: content,
-    prodArrForPDf,
-  });
+  // const { pdfPartProps, show_pdfPart, setShow_pdfPart } = usePdfPart({
+  //   quotationContent: content,
+  //   prodArrForPDf,
+  // });
 
-  const props_profileForm = createProps_profileForm({
-    state_profile,
-    setState_profile,
-    reqPatchTrackProgressOrProjectProgress: reqPatchQuotationContent_id_progress,
-    allowEditClick: isSendToReview,
-  });
+  // const props_profileForm = createProps_profileForm({
+  //   state_profile,
+  //   setState_profile,
+  //   reqPatchTrackProgressOrProjectProgress: reqPatchQuotationContent_id_progress,
+  //   allowEditClick: isSendToReview,
+  // });
 
   const props_payInfo = createProps_payInfo({
     instance_quotationPrice: instance_quotationTotalPrice,
@@ -1009,32 +1042,33 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     disabled,
     quotationType,
     isReviewer,
-    status: content?.status ?? '',
-    isDesignatedContent,
+    status: '',
+    isDesignatedContent: false,
     //
     isAllReviewedBeforePending,
     //
     setDisabled,
 
-    handlePatch,
-    handlePost,
-    handleModify,
-    handlePatchModify,
+    handlePatch: () => {},
+    handlePost: () => {},
+    handleModify: () => {},
+    handlePatchModify: () => {},
 
-    handleClone,
-    handleReqToPending,
+    handleClone: async () => {},
+    handleReqToPending: () => {},
 
-    handleReview,
-    preHandleSubmit,
+    handleReview: () => {},
+    preHandleSubmit: () => {},
     showVerifyForm: () => setReviewFormShow(true),
-    handleReqUnlock,
+    handleReqUnlock: () => {},
     //
-    showPdf,
-    showPdf_noDiscount,
-    showPdf_part: () => setShow_pdfPart(true),
+    showPdf: () => {},
+    showPdf_noDiscount: () => {},
+    showPdf_part: () => () => {},
     //
-    isQuotationExpired,
-    quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
+    isQuotationExpired: false,
+    // quotationExpiredInfo: `報價單建立時的合約版本為${parentSubContract?.version}，但現在最新的版本為${latestSubContract?.version}`,
+    quotationExpiredInfo: ``,
     //
     restoreAllState: restoreAllState,
     clearBackup,
@@ -1042,14 +1076,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
     doImportBackup,
   });
 
-  const history = useHistory({
-    quotationData,
-  });
+  // const history = useHistory({
+  //   quotationData,
+  // });
 
   const customeLeft: React.ReactNode[] = [
     <VersionLabel
       key="0"
-      version={content?.version}
+      version={undefined}
       subTotal={state_quotationTotal.subTotal}
       salesTax={state_quotationTotal.salesTax}
       total={state_quotationTotal.total}
@@ -1058,13 +1092,13 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK:control_signature
 
-  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useReviewrUi({
-    quotationData,
-    agentEmployee,
-    status: state_status,
-  });
+  // const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useReviewrUi({
+  //   quotationData: undefined,
+  //   agentEmployee,
+  //   status: state_status,
+  // });
 
-  let tag = `報價編號 ${content?.quotationNumber}`;
+  let tag = `報價編號 ${undefined}`;
   quotationType === 'new' && (tag = '新增報價單');
   quotationType === 'newAttachment' && (tag = '新增追加追減報價單');
 
@@ -1073,15 +1107,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // ----------------------------------------------------------------------
   // region useEffect
-  useEffect(() => {
-    update_quotation();
-  }, [quotationId]);
+  // useEffect(() => {
+  //   update_quotation();
+  // }, [quotationId]);
 
-  useEffect(() => {
-    const status = content?.status || 'Budget';
+  // useEffect(() => {
+  //   const status = content?.status || 'Budget';
 
-    setState_status(status);
-  }, [content]);
+  //   setState_status(status);
+  // }, [content]);
 
   useInterval(backupState, {
     interval: 5000,
@@ -1094,7 +1128,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
       <PageHeader02 tag={tag} panelList={panelList} customeLeft={customeLeft} customeRight={customeRight} />
 
       <div className="relative z-50">
-        <QuotationProfile
+        {/* <QuotationProfile
           disabled={disabled}
           form={props_profileForm}
           quotationNumber={content?.quotationNumber ?? '---'}
@@ -1113,7 +1147,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
               />
             )
           }
-        />
+        /> */}
         <div className={'ml-[50px]'}>
           <InputSel
             caption={'門型彙總'}
@@ -1170,22 +1204,22 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         <div className={scss.summary}>
           <div className={scss.left}>
             {/* 備註 */}
-            <QuotationRemark
+            {/* <QuotationRemark
               label="備註"
               disabled={disabled}
               remarkArr={annoKitArr}
               onUpponAddClick={openSelector_anno}
               onAddClick={addAnno}
-            />
-            <QuotationRemark
+            /> */}
+            {/* <QuotationRemark
               label="報價範圍"
               disabled={disabled}
               remarkArr={quotationRangeKitArr}
               onUpponAddClick={openSelector_qr}
               onAddClick={addQuotationRange}
-            />
+            /> */}
             {/* 附件 */}
-            <QuotationAttachment disabled={disabled} fileArr={fileInfoKitArr} addFile={addFile} />
+            {/* <QuotationAttachment disabled={disabled} fileArr={fileInfoKitArr} addFile={addFile} /> */}
           </div>
           {/* 付款資訊 */}
           <form ref={ref_quotationPayInfo}>
@@ -1194,16 +1228,16 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             <QuotationPayInfo disabled={disabled} form={props_payInfo} />
           </form>
         </div>
-        <SignatureBar
+        {/* <SignatureBar
           //
           className={'mx-[50px] mt-[130px] mb-[40px]'}
           control={control_signature}
-        />
+        /> */}
         {/*  */}
         {/*  */}
         {/*  */}
 
-        <ContractVerifyForm
+        {/* <ContractVerifyForm
           showModal={reviewFormShow}
           readOnly={state_status === 'Pending' && isSendToReview_pending}
           onCancel={() => setReviewFormShow(false)}
@@ -1214,25 +1248,25 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           // verifyForm={verifyForm}
           onConfirm={update_quotation}
           // defaultPaymentRatioArr={useDefaultPaymentRatio_quotationContent(latestContent)}
-        />
+        /> */}
 
-        <QuotationPdf
+        {/* <QuotationPdf
           open={pdfModalVisible}
           pdfData={pdfData}
           onCancel={hidePdf}
           fileName={content?.quotationNumber ?? ''}
-        />
+        /> */}
 
-        <QuotationPdf_part
+        {/* <QuotationPdf_part
           isVisable={show_pdfPart}
           onCancel={() => {
             setShow_pdfPart(false);
           }}
           mainProductArr={pdfPartProps}
           quotationId={content?.quotationNumber ?? ''}
-        />
+        /> */}
 
-        <EmployeeSelectorGroup
+        {/* <EmployeeSelectorGroup
           showModal={showEmployeSelector}
           caption="請選擇審核人員"
           isCancelOnConfirm={false}
@@ -1258,7 +1292,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
           onCancel={() => {
             setShowEmployeSelector(false);
           }}
-        />
+        /> */}
 
         {/*  */}
         {/*  */}
@@ -1274,440 +1308,440 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 // =============================================================================
 
 // MARK:useReviewr
-const useReviewrUi = ({
-  quotationData,
-  agentEmployee,
-  status,
-}: {
-  quotationData: TquotationDto | undefined | null;
-  agentEmployee: TemployeeDto | undefined | null;
-  status: TquotationContentDto['status'];
-}) => {
-  const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
-    const latestContent = quotationData?.latestContent;
+// const useReviewrUi = ({
+//   quotationData,
+//   agentEmployee,
+//   status,
+// }: {
+//   quotationData: TquotationDto | undefined | null;
+//   agentEmployee: TemployeeDto | undefined | null;
+//   status: TquotationContentDto['status'];
+// }) => {
+//   const { control_signature, defaultSeletedDataArrArr, dynaSelectorPropsList } = useMemo(() => {
+//     const latestContent = quotationData?.latestContent;
 
-    const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
-      {
-        label: '總經理',
-        value: latestContent?.reviewManagerEmployee?.chName,
-        style: { width: '180px' },
-        isReviewed: !!latestContent?.managerReviewedAt,
-      },
-      {
-        label: '應收帳款',
-        value: latestContent?.reviewCashierEmployee?.chName,
-        style: { width: '180px' },
-        isReviewed: !!latestContent?.cashierReviewedAt,
-      },
-      {
-        label: '應收帳款',
-        value: latestContent?.reviewWorkDirectorEmployee?.chName,
-        style: { width: '180px' },
-        isReviewed: !!latestContent?.workDirectorReviewedAt,
-      },
-      // {
-      //   label: '業務經理',
-      //   value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
-      //   style: { width: '180px' },
-      //   isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
-      // },
-      {
-        label: '業務主管',
-        value: latestContent?.reviewSupervisorEmployee?.chName,
-        style: { width: '180px' },
-        isReviewed: !!latestContent?.supervisorReviewedAt,
-      },
-      {
-        label: '業務',
-        value: latestContent?.reviewSalesEmployee?.chName,
-        style: { width: '180px' },
-        isReviewed: !!latestContent?.salesReviewedAt,
-      },
-      {
-        label: '經辦',
-        value: agentEmployee?.chName,
-        style: { width: '180px' },
-      },
-    ];
+//     const signatureArr: Tcontrol_signatureBar['signatureArr'] = [
+//       {
+//         label: '總經理',
+//         value: latestContent?.reviewManagerEmployee?.chName,
+//         style: { width: '180px' },
+//         isReviewed: !!latestContent?.managerReviewedAt,
+//       },
+//       {
+//         label: '應收帳款',
+//         value: latestContent?.reviewCashierEmployee?.chName,
+//         style: { width: '180px' },
+//         isReviewed: !!latestContent?.cashierReviewedAt,
+//       },
+//       {
+//         label: '應收帳款',
+//         value: latestContent?.reviewWorkDirectorEmployee?.chName,
+//         style: { width: '180px' },
+//         isReviewed: !!latestContent?.workDirectorReviewedAt,
+//       },
+//       // {
+//       //   label: '業務經理',
+//       //   value: quotationData?.latestContent.reviewSalesManagerEmployee?.chName,
+//       //   style: { width: '180px' },
+//       //   isReviewed: !!quotationData?.latestContent.salesManagerReviewedAt,
+//       // },
+//       {
+//         label: '業務主管',
+//         value: latestContent?.reviewSupervisorEmployee?.chName,
+//         style: { width: '180px' },
+//         isReviewed: !!latestContent?.supervisorReviewedAt,
+//       },
+//       {
+//         label: '業務',
+//         value: latestContent?.reviewSalesEmployee?.chName,
+//         style: { width: '180px' },
+//         isReviewed: !!latestContent?.salesReviewedAt,
+//       },
+//       {
+//         label: '經辦',
+//         value: agentEmployee?.chName,
+//         style: { width: '180px' },
+//       },
+//     ];
 
-    if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
-      signatureArr.splice(1, 2);
-    }
+//     if (status === 'Budget' || status === 'Bidding' || status === 'Contracting') {
+//       signatureArr.splice(1, 2);
+//     }
 
-    // if (status === 'Pending') {
-    //   signatureArr.splice(5, 1);
-    // }
+//     // if (status === 'Pending') {
+//     //   signatureArr.splice(5, 1);
+//     // }
 
-    const control_signature = {
-      signatureArr,
-    };
+//     const control_signature = {
+//       signatureArr,
+//     };
 
-    const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
-      latestContent?.reviewSalesEmployee ? [latestContent.reviewSalesEmployee] : undefined,
-      latestContent?.reviewSupervisorEmployee ? [latestContent.reviewSupervisorEmployee] : undefined,
-    ];
+//     const defaultSeletedDataArrArr: Parameters<typeof EmployeeSelectorGroup>[0]['defaultSeletedDataArrArr'] = [
+//       latestContent?.reviewSalesEmployee ? [latestContent.reviewSalesEmployee] : undefined,
+//       latestContent?.reviewSupervisorEmployee ? [latestContent.reviewSupervisorEmployee] : undefined,
+//     ];
 
-    const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
+//     const dynaSelectorPropsList: Parameters<typeof EmployeeSelectorGroup>[0]['dynaSelectorPropsList'] = [{}, {}];
 
-    if (status === 'TempPending') {
-      // if (latestContent?.toSalesAt) {
-      //   dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
-      // }
+//     if (status === 'TempPending') {
+//       // if (latestContent?.toSalesAt) {
+//       //   dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+//       // }
 
-      // if (latestContent?.toSupervisorAt) {
-      //   dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
-      // }
-      dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
-    }
+//       // if (latestContent?.toSupervisorAt) {
+//       //   dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+//       // }
+//       dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+//     }
 
-    if (status === 'Pending') {
-      // dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+//     if (status === 'Pending') {
+//       // dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
 
-      // dynaSelectorPropsList[0].isSkip = true;
+//       // dynaSelectorPropsList[0].isSkip = true;
 
-      if (latestContent?.toSalesAt) {
-        dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
-      }
+//       if (latestContent?.toSalesAt) {
+//         dynaSelectorPropsList[0] && (dynaSelectorPropsList[0].isSkip = true);
+//       }
 
-      if (latestContent?.toSupervisorAt) {
-        dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
-      }
-    }
+//       if (latestContent?.toSupervisorAt) {
+//         dynaSelectorPropsList[1] && (dynaSelectorPropsList[1].isSkip = true);
+//       }
+//     }
 
-    return {
-      control_signature,
-      defaultSeletedDataArrArr,
-      dynaSelectorPropsList,
-    };
-  }, [agentEmployee?.chName, quotationData?.latestContent, status]);
+//     return {
+//       control_signature,
+//       defaultSeletedDataArrArr,
+//       dynaSelectorPropsList,
+//     };
+//   }, [agentEmployee?.chName, quotationData?.latestContent, status]);
 
-  return {
-    control_signature,
-    defaultSeletedDataArrArr,
-    dynaSelectorPropsList,
-  };
-};
+//   return {
+//     control_signature,
+//     defaultSeletedDataArrArr,
+//     dynaSelectorPropsList,
+//   };
+// };
 
 // ================================================================================
 
-const AskRevier = ({
-  onPass,
-  onNoPass,
-  onCancel,
-}: {
-  onPass: () => void;
-  onNoPass: () => void;
-  onCancel: () => void;
-}) => {
-  return (
-    <div className="p-10">
-      <p className="text-center text-2xl text-main mb-10">是否通過審核?</p>
-      <div className="flex justify-center gap-10 mt-4">
-        <MyButton_v2 onClick={onPass} theme="danger">
-          通過審核
-        </MyButton_v2>
-        <MyButton_v2 onClick={onNoPass}>不通過審核</MyButton_v2>
-        <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
-      </div>
-    </div>
-  );
-};
+// const AskRevier = ({
+//   onPass,
+//   onNoPass,
+//   onCancel,
+// }: {
+//   onPass: () => void;
+//   onNoPass: () => void;
+//   onCancel: () => void;
+// }) => {
+//   return (
+//     <div className="p-10">
+//       <p className="text-center text-2xl text-main mb-10">是否通過審核?</p>
+//       <div className="flex justify-center gap-10 mt-4">
+//         <MyButton_v2 onClick={onPass} theme="danger">
+//           通過審核
+//         </MyButton_v2>
+//         <MyButton_v2 onClick={onNoPass}>不通過審核</MyButton_v2>
+//         <MyButton_v2 onClick={onCancel}>取消</MyButton_v2>
+//       </div>
+//     </div>
+//   );
+// };
 
 // ================================================================================
 
 // MARK:useData
-const useData = () => {
-  const router = useRouter();
-  const query = router.query as Tquery;
-  const { id: quotationId, contentId, contractId } = query;
+// const useData = () => {
+//   const router = useRouter();
+//   const query = router.query as Tquery;
+//   const { id: quotationId, contentId, contractId } = query;
 
-  const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
-    designatedContentId: contentId,
-  });
+//   const instatnce_getQuotationId3 = useGetQuotation_id_3(quotationId as string, {
+//     designatedContentId: contentId,
+//   });
 
-  const { data: raw_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
+//   const { data: raw_contract, update: update_contract } = useGetContract_id_forAttach(contractId);
 
-  const quotationData = instatnce_getQuotationId3.raw;
+//   const quotationData = instatnce_getQuotationId3.raw;
 
-  const attachedToContract = quotationData?.attachedToContract || raw_contract;
+//   const attachedToContract = quotationData?.attachedToContract || raw_contract;
 
-  const content = quotationData?.designatedContent;
+//   const content = quotationData?.designatedContent;
 
-  const { isQuotationExpired, latestSubContract, parentSubContract } = useMemo(() => {
-    const result: {
-      isQuotationExpired: boolean;
-      latestSubContract: TquotationContractDto | undefined;
-      parentSubContract: TquotationContractDto | undefined;
-    } = {
-      isQuotationExpired: false,
-      latestSubContract: undefined,
-      parentSubContract: undefined,
-    };
+//   const { isQuotationExpired, latestSubContract, parentSubContract } = useMemo(() => {
+//     const result: {
+//       isQuotationExpired: boolean;
+//       latestSubContract: TquotationContractDto | undefined;
+//       parentSubContract: TquotationContractDto | undefined;
+//     } = {
+//       isQuotationExpired: false,
+//       latestSubContract: undefined,
+//       parentSubContract: undefined,
+//     };
 
-    if (!attachedToContract?.subContracts.length || !quotationData) {
-      return result;
-    }
+//     if (!attachedToContract?.subContracts.length || !quotationData) {
+//       return result;
+//     }
 
-    const subContracts = _.orderBy(attachedToContract.subContracts ?? [], 'version');
-    const latestSubContract = subContracts[subContracts.length - 1];
-    const latestSubContractCreatedAt = new Date(latestSubContract.createdAt);
-    const quotationCreatedAt = new Date(quotationData.createdAt);
+//     const subContracts = _.orderBy(attachedToContract.subContracts ?? [], 'version');
+//     const latestSubContract = subContracts[subContracts.length - 1];
+//     const latestSubContractCreatedAt = new Date(latestSubContract.createdAt);
+//     const quotationCreatedAt = new Date(quotationData.createdAt);
 
-    const subContractBelongedArr = subContracts.filter(({ createdAt }) => {
-      return quotationCreatedAt > new Date(createdAt);
-    });
+//     const subContractBelongedArr = subContracts.filter(({ createdAt }) => {
+//       return quotationCreatedAt > new Date(createdAt);
+//     });
 
-    const parentSubContract = subContractBelongedArr[subContractBelongedArr.length - 1];
+//     const parentSubContract = subContractBelongedArr[subContractBelongedArr.length - 1];
 
-    if (latestSubContractCreatedAt > quotationCreatedAt) {
-      result.isQuotationExpired = true;
-      result.latestSubContract = latestSubContract;
-      result.parentSubContract = parentSubContract;
+//     if (latestSubContractCreatedAt > quotationCreatedAt) {
+//       result.isQuotationExpired = true;
+//       result.latestSubContract = latestSubContract;
+//       result.parentSubContract = parentSubContract;
 
-      return result;
-    }
+//       return result;
+//     }
 
-    return result;
-  }, [quotationData, attachedToContract]);
+//     return result;
+//   }, [quotationData, attachedToContract]);
 
-  // iterativeContractProductDict為原合約以及所有追加追減合約的主產品迭代後的結果
-  const iterativeContractProductDict = useIterativeContractProduct({
-    contract: attachedToContract,
-    untilVersion: parentSubContract?.version,
-  });
+//   // iterativeContractProductDict為原合約以及所有追加追減合約的主產品迭代後的結果
+//   const iterativeContractProductDict = useIterativeContractProduct({
+//     contract: attachedToContract,
+//     untilVersion: parentSubContract?.version,
+//   });
 
-  const { iterativeContractProductArr, prodArr } = useMemo(() => {
-    const arr = Object.values(iterativeContractProductDict);
-    let prodArr = content?.products ? [...content.products] : [];
-    prodArr = _.sortBy(prodArr, 'order');
+//   const { iterativeContractProductArr, prodArr } = useMemo(() => {
+//     const arr = Object.values(iterativeContractProductDict);
+//     let prodArr = content?.products ? [...content.products] : [];
+//     prodArr = _.sortBy(prodArr, 'order');
 
-    let parsedProdArr = prodArr.map((_prod) => {
-      const prod = { ..._prod, addition: {} } as TprodSource;
+//     let parsedProdArr = prodArr.map((_prod) => {
+//       const prod = { ..._prod, addition: {} } as TprodSource;
 
-      const action = parseProdAction({
-        quotationProduct: prod,
-        quotationProductArr: prodArr,
-      });
+//       const action = parseProdAction({
+//         quotationProduct: prod,
+//         quotationProductArr: prodArr,
+//       });
 
-      let W: number | `${number}` = calcW({
-        WG: prod.WG,
-        G: prod.guideRailG || 0, // 若是特殊門，guideRailG應該會是0
-      });
-      W = new Decimal(W).div(1000).toString() as `${number}`;
+//       let W: number | `${number}` = calcW({
+//         WG: prod.WG,
+//         G: prod.guideRailG || 0, // 若是特殊門，guideRailG應該會是0
+//       });
+//       W = new Decimal(W).div(1000).toString() as `${number}`;
 
-      prod.addition.action = action;
-      prod.addition.W = W;
+//       prod.addition.action = action;
+//       prod.addition.W = W;
 
-      return prod;
-    });
+//       return prod;
+//     });
 
-    if (!arr.length) {
-      return {
-        iterativeContractProductArr: undefined,
-        prodArr: parsedProdArr,
-      };
-    }
+//     if (!arr.length) {
+//       return {
+//         iterativeContractProductArr: undefined,
+//         prodArr: parsedProdArr,
+//       };
+//     }
 
-    const dict = Object.entries(iterativeContractProductDict).reduce((acc, [key, prod]) => {
-      const { discount, quotationDiscount } = prod;
+//     const dict = Object.entries(iterativeContractProductDict).reduce((acc, [key, prod]) => {
+//       const { discount, quotationDiscount } = prod;
 
-      const priceDiscount_percent = calcPriceDiscount_percent({
-        prodDiscount: Number(discount || 0),
-        quotationDiscount: quotationDiscount,
-      });
+//       const priceDiscount_percent = calcPriceDiscount_percent({
+//         prodDiscount: Number(discount || 0),
+//         quotationDiscount: quotationDiscount,
+//       });
 
-      let W: number | `${number}` = calcW({
-        WG: prod.WG,
-        G: prod.guideRailG || 0, // 若是特殊門，guideRailG應該會是0
-      });
-      W = new Decimal(W).div(1000).toString() as `${number}`;
+//       let W: number | `${number}` = calcW({
+//         WG: prod.WG,
+//         G: prod.guideRailG || 0, // 若是特殊門，guideRailG應該會是0
+//       });
+//       W = new Decimal(W).div(1000).toString() as `${number}`;
 
-      acc[key] = {
-        ...prod,
-        addition: {
-          qty_reduce: 0,
-          deductedPrice: 0,
-          latestIterativeId: prod.latestIterativeId,
-          modifyedProduct: {},
-          action: undefined,
-          quotationDiscount,
-          priceDiscount_percent,
-          W,
-        },
-      };
+//       acc[key] = {
+//         ...prod,
+//         addition: {
+//           qty_reduce: 0,
+//           deductedPrice: 0,
+//           latestIterativeId: prod.latestIterativeId,
+//           modifyedProduct: {},
+//           action: undefined,
+//           quotationDiscount,
+//           priceDiscount_percent,
+//           W,
+//         },
+//       };
 
-      return acc;
-    }, {} as Record<string, TprodSource>);
+//       return acc;
+//     }, {} as Record<string, TprodSource>);
 
-    const parsedProdArr_modify = parsedProdArr.filter((prod) => prod.addition.action === '變更追加');
-    const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.addition.action === '變更追減');
+//     const parsedProdArr_modify = parsedProdArr.filter((prod) => prod.addition.action === '變更追加');
+//     const parsedProdArr_modifyReduce = parsedProdArr.filter((prod) => prod.addition.action === '變更追減');
 
-    parsedProdArr?.forEach((prod) => {
-      const action = prod.addition.action;
+//     parsedProdArr?.forEach((prod) => {
+//       const action = prod.addition.action;
 
-      if (action === '追減') {
-        const rootProd = dict[prod.rootProductId];
+//       if (action === '追減') {
+//         const rootProd = dict[prod.rootProductId];
 
-        const rootProdQty = rootProd.quantity;
-        rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
-        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
-          .mul(rootProd.unitPrice)
-          .mul(-1)
-          .toNumber();
-      } else if (action === '變更追減') {
-        const attachedToProductId = prod.attachedToProductId;
+//         const rootProdQty = rootProd.quantity;
+//         rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).toNumber();
+//         rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
+//           .mul(rootProd.unitPrice)
+//           .mul(-1)
+//           .toNumber();
+//       } else if (action === '變更追減') {
+//         const attachedToProductId = prod.attachedToProductId;
 
-        const rootProd = dict[prod.rootProductId];
-        const rootProdQty = rootProd.quantity;
+//         const rootProd = dict[prod.rootProductId];
+//         const rootProdQty = rootProd.quantity;
 
-        const modifyBelong = parsedProdArr_modify.filter((modifyedProd) => {
-          return modifyedProd.attachedToProductId === attachedToProductId;
-        });
+//         const modifyBelong = parsedProdArr_modify.filter((modifyedProd) => {
+//           return modifyedProd.attachedToProductId === attachedToProductId;
+//         });
 
-        const qty_modify = modifyBelong
-          .reduce((acc, prod) => {
-            acc = acc.add(prod.quantity || 0);
+//         const qty_modify = modifyBelong
+//           .reduce((acc, prod) => {
+//             acc = acc.add(prod.quantity || 0);
 
-            return acc;
-          }, new Decimal(0))
-          .toNumber();
+//             return acc;
+//           }, new Decimal(0))
+//           .toNumber();
 
-        rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).sub(qty_modify).toNumber();
-        rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
-          .add(qty_modify)
-          .mul(rootProd.unitPrice)
-          .mul(-1)
-          .toNumber();
-      } else if (action === '變更追加') {
-        const attachedToProductId = prod.attachedToProductId;
-        const prod_modifyReduce = parsedProdArr_modifyReduce.find(
-          (prod) => prod.attachedToProductId === attachedToProductId
-        );
+//         rootProd.addition.qty_reduce = new Decimal(rootProdQty).sub(prod.quantity).sub(qty_modify).toNumber();
+//         rootProd.addition.deductedPrice = new Decimal(rootProd.addition.qty_reduce)
+//           .add(qty_modify)
+//           .mul(rootProd.unitPrice)
+//           .mul(-1)
+//           .toNumber();
+//       } else if (action === '變更追加') {
+//         const attachedToProductId = prod.attachedToProductId;
+//         const prod_modifyReduce = parsedProdArr_modifyReduce.find(
+//           (prod) => prod.attachedToProductId === attachedToProductId
+//         );
 
-        if (!prod_modifyReduce) {
-          throw new Error('useData，變更追加找不到對應的變更追減');
-        }
+//         if (!prod_modifyReduce) {
+//           throw new Error('useData，變更追加找不到對應的變更追減');
+//         }
 
-        const rootProductId = prod_modifyReduce.rootProductId;
-        const rootProd = dict[rootProductId];
-        rootProd.addition.modifyedProduct![prod.id] = {
-          key: prod.id,
-          quantity: prod.quantity,
-        };
-        prod.addition.rootRootProductKey = rootProductId;
-        // const rootProdQty = rootProd.quantity;
-      }
-      //
-    });
+//         const rootProductId = prod_modifyReduce.rootProductId;
+//         const rootProd = dict[rootProductId];
+//         rootProd.addition.modifyedProduct![prod.id] = {
+//           key: prod.id,
+//           quantity: prod.quantity,
+//         };
+//         prod.addition.rootRootProductKey = rootProductId;
+//         // const rootProdQty = rootProd.quantity;
+//       }
+//       //
+//     });
 
-    parsedProdArr = parsedProdArr.filter(
-      (prod) => prod.addition.action !== '追減' && prod.addition.action !== '變更追減'
-    );
+//     parsedProdArr = parsedProdArr.filter(
+//       (prod) => prod.addition.action !== '追減' && prod.addition.action !== '變更追減'
+//     );
 
-    const iterativeContractProductArr = Object.values(dict);
+//     const iterativeContractProductArr = Object.values(dict);
 
-    return { iterativeContractProductArr, prodArr: parsedProdArr };
-  }, [iterativeContractProductDict, content?.products]);
-  //
+//     return { iterativeContractProductArr, prodArr: parsedProdArr };
+//   }, [iterativeContractProductDict, content?.products]);
+//   //
 
-  const prodArrForPDf = useMemo(() => {
-    let iterativeContractProductArr_modifyed = (iterativeContractProductArr ?? []).filter((prod) => {
-      let pass = false;
-      const { qty_reduce, modifyedProduct } = prod.addition;
-      !!qty_reduce && (pass = true);
-      !!Object.keys(modifyedProduct ?? {}).length && (pass = true);
+//   const prodArrForPDf = useMemo(() => {
+//     let iterativeContractProductArr_modifyed = (iterativeContractProductArr ?? []).filter((prod) => {
+//       let pass = false;
+//       const { qty_reduce, modifyedProduct } = prod.addition;
+//       !!qty_reduce && (pass = true);
+//       !!Object.keys(modifyedProduct ?? {}).length && (pass = true);
 
-      return pass;
-    });
+//       return pass;
+//     });
 
-    iterativeContractProductArr_modifyed = _.cloneDeep(iterativeContractProductArr_modifyed);
+//     iterativeContractProductArr_modifyed = _.cloneDeep(iterativeContractProductArr_modifyed);
 
-    iterativeContractProductArr_modifyed = iterativeContractProductArr_modifyed?.map((prod) => {
-      const modifyedProduct = prod.addition.modifyedProduct;
+//     iterativeContractProductArr_modifyed = iterativeContractProductArr_modifyed?.map((prod) => {
+//       const modifyedProduct = prod.addition.modifyedProduct;
 
-      const qty_modify = calcQtyModify({ modifyedProduct: modifyedProduct ?? {} });
-      const qty_reduce = prod.addition.qty_reduce;
-      prod.quantity = new Decimal(qty_modify)
-        .add(qty_reduce || 0)
-        .mul(-1)
-        .toNumber();
+//       const qty_modify = calcQtyModify({ modifyedProduct: modifyedProduct ?? {} });
+//       const qty_reduce = prod.addition.qty_reduce;
+//       prod.quantity = new Decimal(qty_modify)
+//         .add(qty_reduce || 0)
+//         .mul(-1)
+//         .toNumber();
 
-      prod.dualPrice = new Decimal(prod.quantity).mul(prod.price).toNumber();
-      // 其實addition.deductionPrice就等於算出來的prod.totalPrice了`，不一樣的話不正常
-      prod.totalPrice = new Decimal(prod.quantity).mul(prod.unitPrice).toNumber();
+//       prod.dualPrice = new Decimal(prod.quantity).mul(prod.price).toNumber();
+//       // 其實addition.deductionPrice就等於算出來的prod.totalPrice了`，不一樣的話不正常
+//       prod.totalPrice = new Decimal(prod.quantity).mul(prod.unitPrice).toNumber();
 
-      return prod;
-    });
+//       return prod;
+//     });
 
-    let prodArrForPDf = [...iterativeContractProductArr_modifyed, ...prodArr];
-    prodArrForPDf = prodArrForPDf.map((prod, index) => {
-      prod.order = index;
+//     let prodArrForPDf = [...iterativeContractProductArr_modifyed, ...prodArr];
+//     prodArrForPDf = prodArrForPDf.map((prod, index) => {
+//       prod.order = index;
 
-      return prod;
-    });
+//       return prod;
+//     });
 
-    return prodArrForPDf;
-    //
-  }, [prodArr, iterativeContractProductArr]);
+//     return prodArrForPDf;
+//     //
+//   }, [prodArr, iterativeContractProductArr]);
 
-  // ----------------------------------------------------------------------
+//   // ----------------------------------------------------------------------
 
-  const contractProfile = useMemo(() => {
-    if (!raw_contract) {
-      return undefined;
-    }
+//   const contractProfile = useMemo(() => {
+//     if (!raw_contract) {
+//       return undefined;
+//     }
 
-    const contractContent = raw_contract.content;
+//     const contractContent = raw_contract.content;
 
-    const defaultProfile: Traw_profile = {
-      projectName: contractContent.projectName,
-      validityPeriod: contractContent.validityPeriod,
-      county: contractContent.county,
-      district: contractContent.district,
-      address: contractContent.address,
-      contactPerson: contractContent.contactPerson,
-      contactNumber: contractContent.contactNumber,
-      faxNumber: contractContent.faxNumber,
-      trackProgress: contractContent.trackProgress,
-      projectProgress: contractContent.projectProgress,
-      designatedBrand: contractContent.designatedBrand,
-      siteManager: contractContent.siteManager,
-      siteManagerNumber: contractContent.siteManagerNumber,
-      type: contractContent.type,
-      isLost: contractContent.isLost,
-      customer: contractContent.customer,
-      designUnit: contractContent.designUnit,
-    };
+//     const defaultProfile: Traw_profile = {
+//       projectName: contractContent.projectName,
+//       validityPeriod: contractContent.validityPeriod,
+//       county: contractContent.county,
+//       district: contractContent.district,
+//       address: contractContent.address,
+//       contactPerson: contractContent.contactPerson,
+//       contactNumber: contractContent.contactNumber,
+//       faxNumber: contractContent.faxNumber,
+//       trackProgress: contractContent.trackProgress,
+//       projectProgress: contractContent.projectProgress,
+//       designatedBrand: contractContent.designatedBrand,
+//       siteManager: contractContent.siteManager,
+//       siteManagerNumber: contractContent.siteManagerNumber,
+//       type: contractContent.type,
+//       isLost: contractContent.isLost,
+//       customer: contractContent.customer,
+//       designUnit: contractContent.designUnit,
+//     };
 
-    return defaultProfile;
-  }, [raw_contract]);
+//     return defaultProfile;
+//   }, [raw_contract]);
 
-  // ----------------------------------------------------------------------
+//   // ----------------------------------------------------------------------
 
-  useEffect(() => {
-    // quotation如果並不歸屬於該contract會出問題
-    // 所以要確保若是能取得quotation就不取得contract
-    if (contractId && !quotationId && !contentId) {
-      update_contract();
-    }
-  }, [quotationId, contentId, contractId]);
+//   useEffect(() => {
+//     // quotation如果並不歸屬於該contract會出問題
+//     // 所以要確保若是能取得quotation就不取得contract
+//     if (contractId && !quotationId && !contentId) {
+//       update_contract();
+//     }
+//   }, [quotationId, contentId, contractId]);
 
-  return {
-    instatnce_getQuotationId3,
-    content,
-    attachedToContract,
-    contractProfile,
-    //
-    prodArr,
-    iterativeContractProductArr,
-    //
-    prodArrForPDf,
-    //
-    isQuotationExpired,
-    latestSubContract,
-    parentSubContract,
-  };
-};
+//   return {
+//     instatnce_getQuotationId3,
+//     content,
+//     attachedToContract,
+//     contractProfile,
+//     //
+//     prodArr,
+//     iterativeContractProductArr,
+//     //
+//     prodArrForPDf,
+//     //
+//     isQuotationExpired,
+//     latestSubContract,
+//     parentSubContract,
+//   };
+// };
 
 // ===================================================================
 export type { TquotationType };
