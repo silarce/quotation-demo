@@ -9,12 +9,7 @@ import styles from '../styles/index.module.scss';
 const Home: NextPage = () => {
   const router = useRouter();
 
-  useEffect(() => {
-    router.push('/home/dailyReport?isMine=true');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return <></>;
+  return <>home</>;
 };
 
 export default Home;
