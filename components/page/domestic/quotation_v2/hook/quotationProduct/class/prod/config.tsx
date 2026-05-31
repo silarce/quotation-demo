@@ -78,7 +78,6 @@ type TnodeConfig = {
 };
 
 const defaultKeyArr: TcellKey[] = [
-  'itemName',
   'quoteType',
   'doorModelName',
   'fullWidth',
