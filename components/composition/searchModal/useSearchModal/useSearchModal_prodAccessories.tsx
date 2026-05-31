@@ -81,7 +81,7 @@ const useConfig_data = () => {
   const dataConfig = useMemo(() => {
     const config: Tconfig<TdoorAccessoryDto> = {
       doorModelName: {
-        label: '門型',
+        label: '型號',
         style: {
           width: '100px',
         },

@@ -260,7 +260,7 @@ const Table_prod = ({
       className={scss.prodTableWrapper}
     >
       <div className={scss.tablePanel}>
-        <span className={scss.title}>主產品設定</span>
+        <span className={scss.title}>產品設定</span>
         {showQuotationDiscount && (
           <InputSel_prod
             caption="總折數 : "
@@ -343,7 +343,7 @@ const Table_prod = ({
         </div>
         <div className={classNames(scss.bottom)}>
           <SquareBtn sharp="mini" onClick={addEmptyProd} className={classNames(scss.btn, disabled && 'invisible')}>
-            新增主產品
+            新增產品
           </SquareBtn>
           <div className={scss.total}>
             {isIterativeProd ? '追減變更合計' : '複價合計'}：{prodTotal}
@@ -379,7 +379,7 @@ const Table_component = ({ instance_useQuotationProductInstance, disabled, class
 
   return (
     <div>
-      <div className={classNames(scss.title, 'p-[10px]')}>材料配件</div>
+      <div className={classNames(scss.title, 'p-[10px]')}>組件</div>
       <div className={classNames(scss.componentTable, className)}>
         <QuotationRow_dndThead
           className={scss.rowThead}
@@ -618,7 +618,14 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
             className={scss.btn}
             //
             onClick={() => {
-              activedClassProd && !activedClassProd.isSpecial && setShowSelector(true);
+              // activedClassProd && !activedClassProd.isSpecial && setShowSelector(true);
+              if (activedClassProd) {
+                setShowSelector(true);
+              } else {
+                myAlert.info({
+                  title: '請先選擇一個產品',
+                });
+              }
             }}
           >
             {activedClassProd?.isSpecial ? '特殊門無選配' : '新增選配'}
