@@ -9,6 +9,10 @@ import styles from '../styles/index.module.scss';
 const Home: NextPage = () => {
   const router = useRouter();
 
+  useEffect(() => {
+    router.push('/quotation_refactored');
+  }, []);
+
   return <>home</>;
 };
 
