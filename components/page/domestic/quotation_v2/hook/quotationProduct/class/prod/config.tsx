@@ -1,16 +1,11 @@
 import _ from 'lodash';
 
 import { TinputSelProps, inputLocaleStringSwitcher } from 'components/global/gear/inputAndSel_v2/inputSel';
-import {
-  InputSel_prod,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
+import { InputSel_prod } from 'components/page/domestic/quotation_v2/hook/quotationProduct/ui/InputSel_prod';
 
 import { ClassProd } from './classProd_remake';
 
-import {
-  optionsCreator_quoteType,
-  lookup_quoteType_doorModelName,
-} from 'js/utils/options/productOptions';
+import { optionsCreator_quoteType, lookup_quoteType_doorModelName } from 'js/utils/options/productOptions';
 
 import type { Toption } from 'js/utils/options/options';
 
@@ -25,13 +20,19 @@ const optionsCreator_quoteType_local = () =>
 const filterDoorModelOptionDict = (
   dict: { [k: string]: Toption | undefined } | undefined
 ): { [k: string]: Toption } | undefined => {
-  if (!dict) return dict;
+  if (!dict) {
+    return dict;
+  }
+
   const filtered: { [k: string]: Toption } = {};
   ALLOWED_DOOR_MODELS.forEach((name) => {
     const opt = dict[name];
 
-    if (opt) filtered[name] = opt;
+    if (opt) {
+      filtered[name] = opt;
+    }
   });
+
   return filtered;
 };
 
@@ -40,6 +41,7 @@ const options_quoteType = optionsCreator_quoteType_local();
 const InputSel_prod_select = (props: TinputSelProps) => {
   const { selectProps } = props;
   selectProps?.props && (selectProps.props.menuPortalTarget = undefined);
+
   return <InputSel_prod {...props} />;
 };
 
@@ -50,10 +52,7 @@ interface TconfigItem_prod {
   style?: React.CSSProperties;
   className?: string;
   className_thead?: string;
-  createNode: (params: {
-    classProd: ClassProd;
-    disabled: boolean;
-  }) => React.ReactNode;
+  createNode: (params: { classProd: ClassProd; disabled: boolean }) => React.ReactNode;
 }
 
 type TcellKey = keyof Pick<
@@ -97,7 +96,12 @@ const defaultKeyArr: TcellKey[] = [
 
 // =======================================================================
 
-const textInputCell = (label: string, width: number, getter: (p: ClassProd) => string, setter: (p: ClassProd, v: string) => void): TconfigItem_prod => ({
+const textInputCell = (
+  label: string,
+  width: number,
+  getter: (p: ClassProd) => string,
+  setter: (p: ClassProd, v: string) => void
+): TconfigItem_prod => ({
   label,
   style: { width },
   createNode({ disabled, classProd }) {
@@ -113,6 +117,7 @@ const textInputCell = (label: string, width: number, getter: (p: ClassProd) => s
         },
       },
     };
+
     return <InputSel_prod {...inputSelProps} />;
   },
 });
@@ -145,15 +150,21 @@ const numberInputCell = (
         },
       },
     };
+
     return <InputSel_prod {...inputSelProps} />;
   },
 });
 
-const readOnlyNumberCell = (label: string, width: number, getter: (p: ClassProd) => string | number): TconfigItem_prod => ({
+const readOnlyNumberCell = (
+  label: string,
+  width: number,
+  getter: (p: ClassProd) => string | number
+): TconfigItem_prod => ({
   label,
   style: { width, textAlign: 'right' },
   createNode({ classProd }) {
     const v = getter(classProd);
+
     return Number(v || 0).toLocaleString();
   },
 });
@@ -161,7 +172,12 @@ const readOnlyNumberCell = (label: string, width: number, getter: (p: ClassProd)
 // =======================================================================
 
 const nodeConfig_origin: TnodeConfig = {
-  itemName: textInputCell('項目名', 120, (p) => p.itemName ?? '', (p, v) => (p.itemName = v)),
+  itemName: textInputCell(
+    '項目名',
+    120,
+    (p) => p.itemName ?? '',
+    (p, v) => (p.itemName = v)
+  ),
 
   quoteType: {
     label: '報價別',
@@ -178,6 +194,7 @@ const nodeConfig_origin: TnodeConfig = {
           },
         },
       };
+
       return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
     },
   },
@@ -186,12 +203,11 @@ const nodeConfig_origin: TnodeConfig = {
     label: '門型',
     style: { width: 110 },
     createNode({ disabled, classProd }) {
-      const optionsDict = filterDoorModelOptionDict(
-        lookup_quoteType_doorModelName[classProd.quoteType || 'undefined']
-      );
+      const optionsDict = filterDoorModelOptionDict(lookup_quoteType_doorModelName[classProd.quoteType || 'undefined']);
       const options = optionsDict ? Object.values(optionsDict) : [];
 
       let value: Toption | null = null;
+
       if (classProd.doorModelName) {
         value = (optionsDict && optionsDict[classProd.doorModelName]) || {
           value: classProd.doorModelName,
@@ -209,18 +225,30 @@ const nodeConfig_origin: TnodeConfig = {
           },
         },
       };
+
       return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
     },
   },
 
-  fullWidth: numberInputCell('全寬(m)', 80, (p) => p.fullWidth ?? '', (p, v) => (p.fullWidth = v)),
-  height: numberInputCell('高(m)', 80, (p) => p.height ?? '', (p, v) => (p.height = v)),
+  fullWidth: numberInputCell(
+    '全寬(m)',
+    80,
+    (p) => p.fullWidth ?? '',
+    (p, v) => (p.fullWidth = v)
+  ),
+  height: numberInputCell(
+    '高(m)',
+    80,
+    (p) => p.height ?? '',
+    (p, v) => (p.height = v)
+  ),
 
   area: {
     label: '面積',
     style: { width: 80, textAlign: 'right' },
     createNode({ classProd }) {
       const v = classProd.area;
+
       return Number(v || 0).toLocaleString();
     },
   },
@@ -241,6 +269,7 @@ const nodeConfig_origin: TnodeConfig = {
           },
         },
       };
+
       return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
     },
   },
@@ -261,18 +290,34 @@ const nodeConfig_origin: TnodeConfig = {
           },
         },
       };
+
       return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
     },
   },
 
-  quantity: numberInputCell('數量', 60, (p) => p.quantity ?? '', (p, v) => (p.quantity = v)),
-  price: numberInputCell('牌價', 90, (p) => p.price ?? '', (p, v) => (p.price = v)),
+  quantity: numberInputCell(
+    '數量',
+    60,
+    (p) => p.quantity ?? '',
+    (p, v) => (p.quantity = v)
+  ),
+  price: numberInputCell(
+    '牌價',
+    90,
+    (p) => p.price ?? '',
+    (p, v) => (p.price = v)
+  ),
 
   dualPrice: readOnlyNumberCell('牌價複價', 100, (p) => p.dualPrice ?? ''),
   unitPrice: readOnlyNumberCell('單價', 90, (p) => p.unitPrice ?? ''),
   totalPrice: readOnlyNumberCell('複價', 100, (p) => p.totalPrice ?? ''),
 
-  discount: numberInputCell('折數', 60, (p) => p.discount ?? '', (p, v) => (p.discount = v)),
+  discount: numberInputCell(
+    '折數',
+    60,
+    (p) => p.discount ?? '',
+    (p, v) => (p.discount = v)
+  ),
 };
 
 // MARK: createNodeConfig_prime
@@ -281,11 +326,7 @@ const createNodeConfig_prime = () => {
 };
 
 // ===============================================================================
-export type {
-  TconfigItem_prod as TconfigItem,
-  TcellKey,
-  TnodeConfig,
-};
+export type { TconfigItem_prod as TconfigItem, TcellKey, TnodeConfig };
 export {
   defaultKeyArr,
   createNodeConfig_prime,
