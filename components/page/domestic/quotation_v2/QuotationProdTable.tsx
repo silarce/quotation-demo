@@ -204,6 +204,7 @@ const Table_prod = ({
 
     cellKeyArr,
     setCellKeyArr,
+    persistCellKeyArr,
 
     // choseActiveProd,
 
@@ -278,7 +279,19 @@ const Table_prod = ({
             captionSize="18"
           />
         )}
-        <SquareBtn className="ml-2" sharp="mini" onClick={() => setAllowCellSort((v) => !v)}>
+        <SquareBtn
+          className="ml-2"
+          sharp="mini"
+          onClick={() =>
+            setAllowCellSort((v) => {
+              if (v) {
+                persistCellKeyArr();
+              }
+
+              return !v;
+            })
+          }
+        >
           {allowCellSort ? '完成欄位排序' : '編輯欄位排序'}
         </SquareBtn>
 

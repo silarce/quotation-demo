@@ -147,17 +147,20 @@ interface Tinstance_useQuotationProduct {
 
   cellKeyArr: TcellKey[];
   setCellKeyArr: React.Dispatch<React.SetStateAction<TcellKey[]>>;
+  persistCellKeyArr: () => void;
   setProdKeyArr: React.Dispatch<React.SetStateAction<string[]>>;
 
   choseActiveProd: (stateProd: TstateProd | undefined) => void;
 
   cellKeyArr_component: TcellKey_component[];
   setCellKeyArr_component: React.Dispatch<React.SetStateAction<TcellKey_component[]>>;
+  persistCellKeyArr_component: () => void;
   componentKeyArr: TdoorComponentType[] | undefined;
   setComponentKeyArr: (newKeyArr: TdoorComponentType[]) => void;
 
   cellKeyArr_accessory: TcellKey_accessory[];
   setCellKeyArr_accessory: React.Dispatch<React.SetStateAction<TcellKey_accessory[]>>;
+  persistCellKeyArr_accessory: () => void;
   accessoryKeyArr: string[] | undefined;
   setAccessoryKeyArr: (newKeyArr: string[]) => void;
 
@@ -202,6 +205,52 @@ const nodeConfig_accessory_origin = createNodeConfig_accessory();
 
 const throwErr = () => {
   throw new Error('合約總主產品表格預期不可以呼叫這個方法');
+};
+
+// 欄位排序 localStorage key
+const LS_KEY_CELL_KEY_ARR = 'domestic/quotation_v2_cellKeyArr';
+const LS_KEY_CELL_KEY_ARR_COMPONENT = 'domestic/quotation_v2_cellKeyArr_component';
+const LS_KEY_CELL_KEY_ARR_ACCESSORY = 'domestic/quotation_v2_cellKeyArr_accessory';
+
+// 從 localStorage 讀取欄位排序；若不存在或鍵組與 default 不符（新增或刪除欄位）則回退 default
+const loadCellKeyArrFromLS = <T extends string>(storageKey: string, defaultArr: readonly T[]): T[] => {
+  if (typeof window === 'undefined') {
+    return [...defaultArr];
+  }
+
+  try {
+    const jsonStr = window.localStorage.getItem(storageKey);
+
+    if (!jsonStr) {
+      return [...defaultArr];
+    }
+
+    const localArr = JSON.parse(jsonStr) as T[];
+
+    if (
+      !Array.isArray(localArr) ||
+      _.difference(localArr, defaultArr as T[]).length !== 0 ||
+      _.difference(defaultArr as T[], localArr).length !== 0
+    ) {
+      return [...defaultArr];
+    }
+
+    return localArr;
+  } catch {
+    return [...defaultArr];
+  }
+};
+
+const saveCellKeyArrToLS = <T extends string>(storageKey: string, arr: T[]) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(arr));
+  } catch {
+    // ignore
+  }
 };
 
 // ================================================================================
@@ -271,9 +320,20 @@ const useQuotationProduct = ({
 
   const [activeProdKey_iterative, setActiveProdKey_iterative] = useState<string>();
 
-  const [cellKeyArr, setCellKeyArr] = useState<TcellKey[]>([...defaultKeyArr]); // 欄位的key
-  const [cellKeyArr_component, setCellKeyArr_component] = useState<TcellKey_component[]>([...defaultKeyArr_component]); // 欄位的key
-  const [cellKeyArr_accessory, setCellKeyArr_accessory] = useState<TcellKey_accessory[]>([...defaultKeyArr_accessory]); // 欄位的key
+  const [cellKeyArr, setCellKeyArr] = useState<TcellKey[]>(() =>
+    loadCellKeyArrFromLS(LS_KEY_CELL_KEY_ARR, defaultKeyArr)
+  ); // 欄位的key
+  const [cellKeyArr_component, setCellKeyArr_component] = useState<TcellKey_component[]>(() =>
+    loadCellKeyArrFromLS(LS_KEY_CELL_KEY_ARR_COMPONENT, defaultKeyArr_component)
+  ); // 欄位的key
+  const [cellKeyArr_accessory, setCellKeyArr_accessory] = useState<TcellKey_accessory[]>(() =>
+    loadCellKeyArrFromLS(LS_KEY_CELL_KEY_ARR_ACCESSORY, defaultKeyArr_accessory)
+  ); // 欄位的key
+
+  // 不自動寫入 localStorage，由呼叫端在「完成欄位排序」時觸發
+  const persistCellKeyArr = () => saveCellKeyArrToLS(LS_KEY_CELL_KEY_ARR, cellKeyArr);
+  const persistCellKeyArr_component = () => saveCellKeyArrToLS(LS_KEY_CELL_KEY_ARR_COMPONENT, cellKeyArr_component);
+  const persistCellKeyArr_accessory = () => saveCellKeyArrToLS(LS_KEY_CELL_KEY_ARR_ACCESSORY, cellKeyArr_accessory);
 
   // state用來儲存資料狀態
   const [state_prodDict, setState_prodDict] = useState<TstateProdDict>(defaultState_copy.stateProdDict);
@@ -705,14 +765,17 @@ const useQuotationProduct = ({
     //
     cellKeyArr,
     setCellKeyArr,
+    persistCellKeyArr,
     setProdKeyArr,
     //
     cellKeyArr_component,
     setCellKeyArr_component,
+    persistCellKeyArr_component,
     setComponentKeyArr,
     //
     cellKeyArr_accessory,
     setCellKeyArr_accessory,
+    persistCellKeyArr_accessory,
     setAccessoryKeyArr,
     //
     nodeConfig_origin,
@@ -763,12 +826,15 @@ const useQuotationProduct = ({
         //
         cellKeyArr,
         setCellKeyArr,
+        persistCellKeyArr,
 
         cellKeyArr_component,
         setCellKeyArr_component,
+        persistCellKeyArr_component,
 
         cellKeyArr_accessory,
         setCellKeyArr_accessory,
+        persistCellKeyArr_accessory,
         //
         nodeConfig_origin,
         nodeConfig_component_origin,
