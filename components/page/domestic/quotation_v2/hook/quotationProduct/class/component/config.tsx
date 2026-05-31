@@ -29,7 +29,7 @@ type TcellKey_component = keyof Pick<
   | 'number'
   | 'desc'
   | 'material'
-  | 'materialSurface'
+  // | 'materialSurface'
   | 'quantity'
   | 'unit'
   | 'price'
@@ -49,7 +49,7 @@ const defaultKeyArr_component: TcellKey_component[] = [
   'number',
   'desc',
   'material',
-  'materialSurface',
+  // 'materialSurface',
   'unit',
   'quantity',
   'price',
@@ -109,30 +109,30 @@ const createNodeConfig_component = (): TnodeConfig_component => {
       },
     },
 
-    materialSurface: {
-      label: '表面',
-      style: { width: 110 },
-      createNode({ disabled, classComponent }) {
-        const v = classComponent.materialSurface;
-        const value = v ? { value: v, label: v } : null;
+    // materialSurface: {
+    //   label: '表面',
+    //   style: { width: 110 },
+    //   createNode({ disabled, classComponent }) {
+    //     const v = classComponent.materialSurface;
+    //     const value = v ? { value: v, label: v } : null;
 
-        const inputSelProps: TinputSelProps = {
-          disabled,
-          selectProps: {
-            props: {
-              placeholder: '',
-              options: classComponent.options_materialSurface,
-              value,
-              onChange(newValue) {
-                classComponent.materialSurface = newValue?.value ?? '';
-              },
-            },
-          },
-        };
+    //     const inputSelProps: TinputSelProps = {
+    //       disabled,
+    //       selectProps: {
+    //         props: {
+    //           placeholder: '',
+    //           options: classComponent.options_materialSurface,
+    //           value,
+    //           onChange(newValue) {
+    //             classComponent.materialSurface = newValue?.value ?? '';
+    //           },
+    //         },
+    //       },
+    //     };
 
-        return <InputSel_prod_memo_select {...inputSelProps} />;
-      },
-    },
+    //     return <InputSel_prod_memo_select {...inputSelProps} />;
+    //   },
+    // },
 
     unit: {
       label: '單位',
