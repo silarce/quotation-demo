@@ -543,7 +543,7 @@ export default function Quotation() {
           <div className={scss.left}>
             <div className={''}>
               <InputSel
-                caption={'門型彙總'}
+                caption={'彙總'}
                 showBaseline="invisible"
                 captionStyle={{ width: '120px' }}
                 wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
