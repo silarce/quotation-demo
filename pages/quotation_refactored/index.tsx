@@ -486,6 +486,71 @@ export default function Quotation() {
   // MARK: RENDER
   return (
     <div className=" px-40 pb-10">
+      <section className="my-6 rounded-lg border border-slate-200 bg-slate-50 text-slate-700">
+        <header className="border-b border-slate-200 px-5 py-3">
+          <h2 className="text-xl font-semibold text-slate-800">說明</h2>
+          <p className="mt-1 text-base text-slate-500">
+            此 demo 為過去做過的報價單的簡化版，移除了所有涉及 API 的業務邏輯，並大幅簡化與減少欄位。
+          </p>
+        </header>
+
+        <div className="grid gap-x-8 gap-y-5 px-5 py-4 text-lg leading-8 md:grid-cols-2">
+          <div>
+            <h3 className="mb-1 font-medium text-slate-800">基本操作</h3>
+            <ul className="ml-4 list-disc space-y-1">
+              <li>新增產品後，先選擇「種類」再選擇「型號」，該產品的組件便會出現。</li>
+              <li>點擊產品列（粉紅色狀態）會顯示其組件與選配，即可開始編輯。</li>
+              <li>輸入寬、高會自動計算面積。</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-1 font-medium text-slate-800">尺寸與材料連動</h3>
+            <ul className="ml-4 list-disc space-y-1">
+              <li>寬與面積會連動到組件的數量：單位為 M 者跟著寬、單位為 ㎡ 者跟著面積。</li>
+              <li>變更產品材料會套用到其所有組件；反之，變更單一組件材料只影響該組件。</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-1 font-medium text-slate-800">金額計算</h3>
+            <ul className="ml-4 list-disc space-y-1">
+              <li>產品牌價 = 組件與選配的「牌價複價」總和；產品單價 = 組件與選配的「複價」總和。</li>
+              <li>
+                組件單價 = <span className="font-mono text-base">牌價 × 折數/100 × 總折數/100</span>。
+              </li>
+              <li>折數為單一產品的折扣，總折數為套用到所有產品的第二次折扣。</li>
+              <li>計算金額設有防抖，停止輸入 300 毫秒後才會重算。</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-1 font-medium text-slate-800">排序與列操作</h3>
+            <ul className="ml-4 list-disc space-y-1">
+              <li>主產品列最左側圖示可按住拖拉排序，其後為刪除與複製。</li>
+              <li>組件可排序；選配可排序、刪除，但不可複製。</li>
+              <li>主產品可拖拉排序欄位：點「編輯欄位排序」按鈕後即可開始調整。</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-1 font-medium text-slate-800">備份</h3>
+            <ul className="ml-4 list-disc space-y-1">
+              <li>每 5 秒自動備份；可重新整理頁面後按「回復備份狀態」測試。</li>
+              <li>另提供匯出 / 匯入功能。</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-1 font-medium text-slate-800">其他</h3>
+            <ul className="ml-4 list-disc space-y-1">
+              <li>左上角與右下角顯示小計與總計。</li>
+              <li>左下角為彙總。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
       <div className={scss.pageHeaderWrapper}>
         <PageHeader02
           // tag={tag}
