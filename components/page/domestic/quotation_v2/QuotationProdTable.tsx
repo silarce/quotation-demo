@@ -226,6 +226,8 @@ const Table_prod = ({
 
   const nodeConfig_itemName = nodeConfig_origin['itemName'];
 
+  const [allowCellSort, setAllowCellSort] = useState(false);
+
   let theadLeft = (
     <Panel_prod className_delete="invisible" className_copy="invisible">
       <Cell className={classNames(nodeConfig_itemName.className_thead)} style={nodeConfig_itemName.style}>
@@ -276,9 +278,9 @@ const Table_prod = ({
             captionSize="18"
           />
         )}
-        {/* <SquareBtn className="ml-2" sharp="mini">
-          編輯欄位排序
-        </SquareBtn> */}
+        <SquareBtn className="ml-2" sharp="mini" onClick={() => setAllowCellSort((v) => !v)}>
+          {allowCellSort ? '完成欄位排序' : '編輯欄位排序'}
+        </SquareBtn>
 
         <div className={'ml-auto'}></div>
       </div>
@@ -288,7 +290,7 @@ const Table_prod = ({
           <QuotationRow_dndThead
             className={scss.rowThead}
             // disabled={disabled}
-            disabled={true}
+            disabled={!allowCellSort}
             keyArr={cellKeyArr}
             onDragEnd={({ move }) => {
               setCellKeyArr(move(cellKeyArr));
