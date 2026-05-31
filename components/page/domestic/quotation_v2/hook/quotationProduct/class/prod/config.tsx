@@ -64,7 +64,7 @@ type TcellKey = keyof Pick<
   | 'height'
   | 'area'
   | 'materialName'
-  | 'materialSurface'
+  // | 'materialSurface'
   | 'quantity'
   | 'price'
   | 'dualPrice'
@@ -84,7 +84,7 @@ const defaultKeyArr: TcellKey[] = [
   'height',
   'area',
   'materialName',
-  'materialSurface',
+  // 'materialSurface',
   'quantity',
   'price',
   'dualPrice',
@@ -164,7 +164,7 @@ const nodeConfig_origin: TnodeConfig = {
   },
 
   quoteType: {
-    label: '報價別',
+    label: '種類',
     style: { width: 100 },
     createNode({ disabled, classProd }) {
       const v = classProd.quoteType;
@@ -184,7 +184,7 @@ const nodeConfig_origin: TnodeConfig = {
   },
 
   doorModelName: {
-    label: '門型',
+    label: '型號',
     style: { width: 110 },
     createNode({ disabled, classProd }) {
       const optionsDict = filterDoorModelOptionDict(lookup_quoteType_doorModelName[classProd.quoteType || 'undefined']);
@@ -258,26 +258,26 @@ const nodeConfig_origin: TnodeConfig = {
     },
   },
 
-  materialSurface: {
-    label: '表面',
-    style: { width: 100 },
-    createNode({ disabled, classProd }) {
-      const v = classProd.materialSurface;
-      const options = classProd.options_surface ?? [];
-      const value = options.find((opt) => opt.value === v) || (v ? { value: v, label: v } : null);
-      const selectProps: TinputSelProps['selectProps'] = {
-        props: {
-          options,
-          value,
-          onChange: (opt) => {
-            classProd.materialSurface = opt?.value ?? null;
-          },
-        },
-      };
+  // materialSurface: {
+  //   label: '表面',
+  //   style: { width: 100 },
+  //   createNode({ disabled, classProd }) {
+  //     const v = classProd.materialSurface;
+  //     const options = classProd.options_surface ?? [];
+  //     const value = options.find((opt) => opt.value === v) || (v ? { value: v, label: v } : null);
+  //     const selectProps: TinputSelProps['selectProps'] = {
+  //       props: {
+  //         options,
+  //         value,
+  //         onChange: (opt) => {
+  //           classProd.materialSurface = opt?.value ?? null;
+  //         },
+  //       },
+  //     };
 
-      return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
-    },
-  },
+  //     return <InputSel_prod_select selectProps={selectProps} disabled={disabled} />;
+  //   },
+  // },
 
   quantity: numberInputCell(
     '數量',
