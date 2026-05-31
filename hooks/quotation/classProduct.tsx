@@ -1243,7 +1243,7 @@ class Class_product {
       if (
         !(
           this.doorType === 'A-001' ||
-          this.doorType === 'SJ-312' ||
+          this.doorType === 'A-002' ||
           this.doorType === 'SJ-303A' ||
           this.doorType === 'SJ-303AS'
         )
@@ -2870,7 +2870,7 @@ class Class_product {
 
     this.clearProd_all();
 
-    if (v === 'SJ-312') {
+    if (v === 'A-002') {
       this._prodData.typhoonProtection = true;
     } else if (v !== 'A-001') {
       this._prodData.typhoonProtection = false;
@@ -3655,7 +3655,7 @@ class Class_product {
     }
     // ________________________
 
-    if (this.doorType === 'SJ-312') {
+    if (this.doorType === 'A-002') {
       if ((v = true)) {
         return;
       }
@@ -5274,7 +5274,7 @@ const lookup_options_boxB: {
   'SJ-303A': optionsCreator_boxB_SJ303A(),
   'SJ-303AS': optionsCreator_boxB_SJ303A(),
   'SJ-305D': optionsCreator_boxB_SJ305D(),
-  'SJ-312': optionsCreator_boxB_SJ312(),
+  'A-002': optionsCreator_boxB_SJ312(),
 };
 
 // ===========================================================

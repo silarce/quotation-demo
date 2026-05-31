@@ -2,8 +2,8 @@
 
 export type TcustomerType = 'construction' | 'firm' | 'propertyOwner' | 'contractor' | 'supplier';
 
-// export type TdoorModel = 'A-001' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S' | 'W2';
-export type TdoorModel = 'A-001' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'W2';
+// export type TdoorModel = 'A-001' | 'A-002' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S' | 'W2';
+export type TdoorModel = 'A-001' | 'A-002' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'W2';
 
 // 表面處理
 export type TmaterialSurface = '2B' | 'HL' | 'BA' | 'NO.4' | '烤漆' | '氟碳' | null;
@@ -858,7 +858,7 @@ export type TannotationDto = {
   /**類別 */
   category: string;
   /**門型 */
-  doorModelName: 'A-001' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
+  doorModelName: 'A-001' | 'A-002' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
   type: annotationAndQuotationRangeType;
   /**內容 */
@@ -867,14 +867,14 @@ export type TannotationDto = {
 
 export type TcreateAnnotationDto = {
   category: string;
-  doorModelName: 'A-001' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
+  doorModelName: 'A-001' | 'A-002' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   type: annotationAndQuotationRangeType;
   description: string;
 };
 
 export type TcreateQuotationRangeDto = {
   category: string;
-  doorModelName: 'A-001' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
+  doorModelName: 'A-001' | 'A-002' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   type: annotationAndQuotationRangeType;
   description: string;
 };
@@ -886,7 +886,7 @@ export type TquotationRangeDto = {
   /**類別 */
   category: string;
   /**門型 */
-  doorModelName: 'A-001' | 'SJ-312' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
+  doorModelName: 'A-001' | 'A-002' | 'SJ-305D' | 'SJ-303A' | 'SJ-303AS' | 'SJ-120A' | 'SJ-303S';
   /**型式 */
   type: annotationAndQuotationRangeType;
   /**內容 */

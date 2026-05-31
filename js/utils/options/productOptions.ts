@@ -30,7 +30,7 @@ const doorModelDict: Record<
   }
 > = {
   'A-001': { quoteType: '捲門', value: 'A-001' as const, label: 'A-001 電動防火捲門', name: '電動防火捲門' },
-  'SJ-312': { quoteType: '捲門', value: 'SJ-312' as const, label: 'SJ-312 重型防颱捲門', name: '重型防颱捲門' },
+  'A-002': { quoteType: '捲門', value: 'A-002' as const, label: 'A-002 重型防颱捲門', name: '重型防颱捲門' },
   'SJ-303S': { quoteType: '捲門', value: 'SJ-303S' as const, label: 'SJ-303S 遮煙捲簾', name: '遮煙捲簾' },
   'SJ-305D': { quoteType: '捲門', value: 'SJ-305D' as const, label: 'SJ-305D 花格型捲門', name: '花格型捲門' },
   'SJ-120A': { quoteType: '捲門', value: 'SJ-120A' as const, label: 'SJ-120A 葉片式阻熱捲門', name: '葉片式阻熱捲門' },
@@ -128,7 +128,7 @@ export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): T
   const { haveEmpty } = props;
   const arr = [
     doorModelDict['A-001'],
-    doorModelDict['SJ-312'],
+    doorModelDict['A-002'],
     doorModelDict['SJ-303S'],
     doorModelDict['SJ-305D'],
     doorModelDict['SJ-120A'],
@@ -184,7 +184,7 @@ export const optionsCreator_doorModel = (props: { haveEmpty?: boolean } = {}): T
 //   const { haveEmpty } = props;
 //   const arr = [
 //     { quoteType: '捲門', value: 'A-001' as const, label: 'A-001 電動防火捲門', name: '電動防火捲門' },
-//     { quoteType: '捲門', value: 'SJ-312' as const, label: 'SJ-312 重型防颱捲門', name: '重型防颱捲門' },
+//     { quoteType: '捲門', value: 'A-002' as const, label: 'A-002 重型防颱捲門', name: '重型防颱捲門' },
 //     { quoteType: '捲門', value: 'SJ-303S' as const, label: 'SJ-303S 遮煙捲簾', name: '遮煙捲簾' },
 //     { quoteType: '捲門', value: 'SJ-305D' as const, label: 'SJ-305D 花格型捲門', name: '花格型捲門' },
 //     { quoteType: '捲門', value: 'SJ-120A' as const, label: 'SJ-120A 葉片式阻熱捲門', name: '葉片式阻熱捲門' },
@@ -245,7 +245,7 @@ export const optionsCreator_doorModelName = (props: { haveEmpty?: boolean } = {}
     { value: 'SJ-303AS', label: 'SJ-303AS' },
     // { value: 'SJ-303S', label: 'SJ-303S' },
     { value: 'SJ-305D', label: 'SJ-305D' },
-    { value: 'SJ-312', label: 'SJ-312' },
+    { value: 'A-002', label: 'A-002' },
     // { value: 'SJ-120A', label: 'SJ-120A' },
   ];
 
@@ -764,7 +764,7 @@ const lookup_options_bottomBarAngleIronAndPlate = {
     angleIron: optionsCreator_bottomBarAngleIron_305D,
     plate: optionsCreator_bottomBarPlate_305D,
   },
-  'SJ-312': {
+  'A-002': {
     angleIron: optionsCreator_bottomBarAngleIron_312,
     plate: optionsCreator_bottomBarPlate_312,
   },
@@ -779,7 +779,7 @@ type Tlookup_quoteType_doorModelName = {
 
   捲門: {
     'A-001': Toption;
-    'SJ-312': Toption;
+    'A-002': Toption;
     'SJ-303S': Toption;
     'SJ-305D': Toption;
     'SJ-120A': Toption;
@@ -824,9 +824,9 @@ type Tlookup_quoteType_doorModelName = {
 const lookup_quoteType_doorModelName: Tlookup_quoteType_doorModelName = {
   捲門: {
     // 'A-001': { quoteType: '捲門', value: 'A-001', label: 'A-001 電動防火捲門', name: '電動防火捲門' },
-    // 'SJ-312': { quoteType: '捲門', value: 'SJ-312', label: 'SJ-312 重型防颱捲門', name: '重型防颱捲門' },
+    // 'A-002': { quoteType: '捲門', value: 'A-002', label: 'A-002 重型防颱捲門', name: '重型防颱捲門' },
     'A-001': { quoteType: '捲門', value: 'A-001', label: 'A-001', name: '電動防火捲門' },
-    'SJ-312': { quoteType: '捲門', value: 'SJ-312', label: 'A-002', name: '重型防颱捲門' },
+    'A-002': { quoteType: '捲門', value: 'A-002', label: 'A-002', name: '重型防颱捲門' },
     'SJ-303S': { quoteType: '捲門', value: 'SJ-303S', label: 'SJ-303S 遮煙捲簾', name: '遮煙捲簾' },
     'SJ-305D': { quoteType: '捲門', value: 'SJ-305D', label: 'SJ-305D 花格型捲門', name: '花格型捲門' },
     'SJ-120A': {

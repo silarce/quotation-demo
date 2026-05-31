@@ -12,7 +12,7 @@ import type { Toption } from 'js/utils/options/options';
 // =======================================================================
 // 報價別與門型限縮：只剩「捲門」、SJ-302、SJ-312。
 const ALLOWED_QUOTE_TYPES = ['捲門'];
-const ALLOWED_DOOR_MODELS = ['A-001', 'SJ-312'];
+const ALLOWED_DOOR_MODELS = ['A-001', 'A-002'];
 
 const optionsCreator_quoteType_local = () =>
   optionsCreator_quoteType().filter((opt) => ALLOWED_QUOTE_TYPES.includes(opt.value));

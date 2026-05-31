@@ -186,7 +186,7 @@ const doorTrack_sorted: TdoorTrack_sorted = {
       icon: icon_sJ305D_22.src,
     },
   },
-  'SJ-312': {
+  'A-002': {
     sJ312_106_60t: {
       value: 'sJ312_106_60t',
       label: 'SJ312_106_60t',

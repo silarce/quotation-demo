@@ -83,7 +83,7 @@ export const lookup_guideRailUnicode: {
   SJ302_95_30t: '\uE016',
   SJ302_95_45t: '\uE016',
   SJ302_60: '\uE011',
-  // SJ-312
+  // A-002
   SJ312_106_60t: '\uE014',
   // SJ-305D
   SJ305D_22: '\uE010',
@@ -278,7 +278,7 @@ export const lookup_doorModelTemplate: Record<string, TdoorModelTemplate> = {
       headBox: { number: 'C-102008', desc: '馬達箱', price: '1500', quantity: '1' },
     },
   },
-  'SJ-312': {
+  'A-002': {
     prodDefault: {
       materialName: 'SST#304',
       materialSurface: '2B',
@@ -412,7 +412,7 @@ export const lookup_doorAccessoryByModel: Record<string, TdoorAccessoryDto[]> = 
       price: 950,
     },
   ],
-  'SJ-312': [
+  'A-002': [
     {
       id: 'ACC-312-001',
       createdAt: _now,
