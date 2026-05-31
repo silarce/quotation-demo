@@ -279,7 +279,7 @@ const usePanel = ({
         panel_exportBackup,
         panel_importBackup,
         restoreAllState ? panel_restore : null,
-        panel_returnAndClearBackup,
+        // panel_returnAndClearBackup,
       ],
       old: [
         panel_patch,
