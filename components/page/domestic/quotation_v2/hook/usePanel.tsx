@@ -275,7 +275,7 @@ const usePanel = ({
   const panelList_abled: TpanelList = [
     ...{
       new: [
-        panel_post,
+        // panel_post,
         panel_exportBackup,
         panel_importBackup,
         restoreAllState ? panel_restore : null,

@@ -2,9 +2,21 @@
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 50px;
-  margin: 50px 50px 0 50px;
+  margin: 00px 50px 0 50px;
   .left {
     display: grid;
     gap: 30px;
   }
+}
+
+.pageHeaderWrapper {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  // background-color: pink;
+  z-index: 51;
+  padding-top: 40px;
+  // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  // box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+  border-bottom: 5px solid #e8e8e8;
 }

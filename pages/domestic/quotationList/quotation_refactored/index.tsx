@@ -1124,8 +1124,15 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: RENDER
   return (
-    <div>
-      <PageHeader02 tag={tag} panelList={panelList} customeLeft={customeLeft} customeRight={customeRight} />
+    <div className="px-10 pb-10">
+      <div className={scss.pageHeaderWrapper}>
+        <PageHeader02
+          // tag={tag}
+          panelList={panelList}
+          customeLeft={customeLeft}
+          customeRight={customeRight}
+        />
+      </div>
 
       <div className="relative z-50">
         {/* <QuotationProfile
@@ -1148,42 +1155,14 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
             )
           }
         /> */}
-        <div className={'ml-[50px]'}>
-          <InputSel
-            caption={'門型彙總'}
-            showBaseline="invisible"
-            captionStyle={{ width: '120px' }}
-            wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
-            node={<DoorSummary list={doorSummaryArr} />}
-          />
-        </div>
 
         {/* prod */}
         {/* prod */}
         {/* prod */}
         <br />
         <br />
-        {instance_iterative && (
-          <>
-            <div className={'px-[48px]'}>
-              <div className="border border-red-500">
-                <span className="inline-block pl-[10px] text-2xl text-main ">合約總主產品</span>
-                <QuotationProdTable
-                  disabled={true}
-                  disabled_iterativeProd={disabled}
-                  instance_useQuotationProductInstance={instance_iterative}
-                  showQuotationDiscount={false}
-                  // isIterativeProd={true}
-                  prodTotal={allProdTotal_iterative.toLocaleString()}
-                />
-              </div>
-            </div>
-            <br />
-            <br />
-          </>
-        )}
 
-        <div className={'px-[50px]'}>
+        <div className={''}>
           <QuotationProdTable
             disabled={disabled}
             instance_useQuotationProductInstance={{ ...instance_quotationProduct }}
@@ -1203,6 +1182,16 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         <div className={scss.summary}>
           <div className={scss.left}>
+            <div className={'ml-[50px]'}>
+              <InputSel
+                caption={'門型彙總'}
+                showBaseline="invisible"
+                captionStyle={{ width: '120px' }}
+                wrapperStyle={{ padding: '21px 0px 4px 0px', gap: '24px' }}
+                node={<DoorSummary list={doorSummaryArr} />}
+              />
+            </div>
+
             {/* 備註 */}
             {/* <QuotationRemark
               label="備註"

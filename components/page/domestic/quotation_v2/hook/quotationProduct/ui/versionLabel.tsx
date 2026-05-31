@@ -11,7 +11,7 @@ const VersionLabel = ({
 }) => {
   return (
     <div className="ml-2 mb-1 mt-auto">
-      <div>版本 : {version}</div>
+      {/* <div>版本 : {version}</div> */}
       <div>
         小計 : {subTotal}　 營業稅: {salesTax}　 總計 : {total}
         {/*  */}

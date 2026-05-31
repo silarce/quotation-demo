@@ -226,7 +226,7 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
 
         <hr className={classNames(scss.grayHr, !currency && !exchangeRate && !foreignTotal && 'hidden')} />
 
-        {currency && (
+        {/* {currency && (
           <div className={classNames(scss.avgDiscount, 'relative')}>
             <span className="relative">{'幣別'}</span>
             <div>
@@ -255,9 +255,9 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
               />
             </div>
           </div>
-        )}
+        )} */}
 
-        {exchangeRate && (
+        {/* {exchangeRate && (
           <div className={classNames(scss.avgDiscount, 'relative')}>
             <span className="relative">{'匯率(外幣兌新台幣)'}</span>
             <div>
@@ -288,8 +288,8 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
               />
             </div>
           </div>
-        )}
-
+        )} */}
+        {/* 
         {foreignTotal !== undefined && (
           <div className={classNames(scss.avgDiscount, 'relative')}>
             <span className="relative">
@@ -303,13 +303,13 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
               <input className={classNames('bg-transparent', scss.noBaseLine)} value={foreignTotal} readOnly={true} />
             </div>
           </div>
-        )}
+        )} */}
       </div>
 
-      <hr className={classNames(scss.grayHr)} />
+      {/* <hr className={classNames(scss.grayHr)} /> */}
 
       <div>
-        <div className={scss.inputBox01}>
+        {/* <div className={scss.inputBox01}>
           <span>交貨地點</span>
           <InputSel
             disabled={disabled}
@@ -324,10 +324,10 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
               },
             }}
           />
-        </div>
-        <div className={classNames(scss.inputBox01, scss.date)}>
+        </div> */}
+        {/* <div className={classNames(scss.inputBox01, scss.date)}>
           <span className={'relative'}>
-            {/* <MustTip_simple /> */}
+            <MustTip_simple />
             交貨日期
           </span>
           <InputSel
@@ -343,9 +343,9 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
               },
             }}
           />
-        </div>
+        </div> */}
         {/* 付款辦法 */}
-        <div className={classNames(scss.payMethodContainer, 'relative')}>
+        {/* <div className={classNames(scss.payMethodContainer, 'relative')}>
           <span>付款辦法</span>
           {paymentMethod.map((item, index) => {
             const { milestone, totalPaymentRatio, onDelete } = item;
@@ -385,7 +385,7 @@ export default function QuotationPayInfo({ disabled, form }: Tprops_quotationPay
             );
           })}
           {!disabled && <IconAddCircle className={scss.btn} onClick={() => addPaymentMethod?.()} />}
-        </div>
+        </div> */}
       </div>
     </div>
   );

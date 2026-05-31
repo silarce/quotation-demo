@@ -280,22 +280,7 @@ const Table_prod = ({
           編輯欄位排序
         </SquareBtn> */}
 
-        <div className={'ml-auto'}>
-          {changeAllowProdAutoChange && (
-            <div className="flex gap-0">
-              <DataEntry.Checkbox
-                disabled={disabled}
-                checked={state_allowProdAutoChange}
-                onChange={(e) => {
-                  changeAllowProdAutoChange(e.target.checked);
-                }}
-              >
-                自動計算
-              </DataEntry.Checkbox>
-              <Tip content="編輯L、W、h、boxB時仍會自動計算。" />
-            </div>
-          )}
-        </div>
+        <div className={'ml-auto'}></div>
       </div>
       {/*  */}
       <div className={classNames(scss.prodTable, className)}>
@@ -624,7 +609,13 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
             {activedClassProd?.isSpecial ? '特殊門無選配' : '新增選配'}
           </SquareBtn>
         </div>
-        <DragableModal style={{ zIndex: 50 }} show={showSelector} onCrossClick={() => setShowSelector(false)}>
+        <DragableModal
+          //
+          style={{ zIndex: 52 }}
+          show={showSelector}
+          onCrossClick={() => setShowSelector(false)}
+          handleText="選擇選配"
+        >
           <SearchModal_prodAccessories
             doorNModelName={activedClassProd?.doorModelName ?? ''}
             onConfirm={(v) => {
