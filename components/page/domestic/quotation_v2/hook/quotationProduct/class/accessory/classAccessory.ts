@@ -86,32 +86,6 @@ class Class_accessory implements Interface_ClassAccessory {
     this.render();
   }
 
-  renewQuantity() {
-    if (!this.classProd) {
-      return;
-    }
-
-    const referenceSpec = this.state.referenceSpec;
-
-    if (!(referenceSpec === 'fullWidth' || referenceSpec === 'area')) {
-      return;
-    }
-
-    const newQuantity = calcQuantity({
-      classProd: this.classProd,
-      referenceSpec: referenceSpec,
-    });
-
-    if (`${newQuantity}` === this.state.quantity) {
-      return;
-    }
-
-    this.state.quantity = `${newQuantity}`;
-    this.renewAcceAllPrice();
-    // this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
-    this.render();
-  }
-
   // -----------------------------------------------------------------------
   get name() {
     return this.state.name;

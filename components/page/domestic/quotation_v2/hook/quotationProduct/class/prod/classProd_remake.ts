@@ -43,7 +43,29 @@ type RecalcTask =
   | { target: 'accessory'; action: 'recalcPrice'; prodKey: string; acceKey: string }
   | { target: 'accessory'; action: 'syncQuantityFromSize'; prodKey: string; acceKey: string }
   | { target: 'component'; action: 'recalcPrice'; prodKey: string; compKey: TdoorComponentType }
+  | { target: 'component'; action: 'syncQuantityFromSize'; prodKey: string; compKey: TdoorComponentType }
   | { target: 'prod'; action: 'recalcTotals'; prodKey: string };
+
+// 各 component 子類的 readonly unit 在此查表，避免 flush 內反查 class instance。
+const componentTypeUnitMap: Partial<Record<TdoorComponentType, 'M' | '㎡'>> = {
+  slat: '㎡',
+  bottomBar: 'M',
+  headBox: 'M',
+  guideRail: 'M',
+};
+
+// 依 unit 取出對應的 prod 尺寸（'M' → fullWidth, '㎡' → area）；其它 unit 不同步。
+const getQuantityForUnit = (stateProd: TstateProd, unit: string | undefined): `${number}` | null => {
+  if (unit === 'M') {
+    return `${new Decimal(stateProd.data_prod.fullWidth || 0).toDecimalPlaces(2).toNumber()}` as `${number}`;
+  }
+
+  if (unit === '㎡') {
+    return `${new Decimal(stateProd.data_prod.area || 0).toDecimalPlaces(2).toNumber()}` as `${number}`;
+  }
+
+  return null;
+};
 
 const RECALC_DEBOUNCE_MS = 300;
 
@@ -95,12 +117,10 @@ const applyAccessoryTask = (
   const acceCopy: TstateAccessoryData = { ...acce };
 
   if (task.action === 'syncQuantityFromSize') {
-    const { referenceSpec } = acceCopy;
+    const newQty = getQuantityForUnit(next, acceCopy.unit);
 
-    if (referenceSpec === 'fullWidth') {
-      acceCopy.quantity = `${new Decimal(next.data_prod.fullWidth || 0).toDecimalPlaces(2).toNumber()}` as `${number}`;
-    } else if (referenceSpec === 'area') {
-      acceCopy.quantity = `${new Decimal(next.data_prod.area || 0).toDecimalPlaces(2).toNumber()}` as `${number}`;
+    if (newQty !== null) {
+      acceCopy.quantity = newQty;
     }
   }
 
@@ -120,6 +140,14 @@ const applyComponentTask = (
   }
 
   const compCopy = { ...comp } as NonNullable<Tdata_componentDict[typeof task.compKey]>;
+
+  if (task.action === 'syncQuantityFromSize') {
+    const newQty = getQuantityForUnit(next, componentTypeUnitMap[task.compKey]);
+
+    if (newQty !== null) {
+      compCopy.quantity = newQty;
+    }
+  }
 
   recalcComponentInPlace(compCopy, priceDiscount_percent);
   (next.data_componentDict as Record<TdoorComponentType, unknown>)[task.compKey] = compCopy;
@@ -180,7 +208,11 @@ function flushRecalc() {
 
             break;
           case 'syncQuantityFromSize':
-            applyAccessoryTask(next, task, priceDiscount_percent);
+            if (task.target === 'accessory') {
+              applyAccessoryTask(next, task, priceDiscount_percent);
+            } else if (task.target === 'component') {
+              applyComponentTask(next, task, priceDiscount_percent);
+            }
 
             break;
           case 'recalcTotals':
@@ -361,7 +393,7 @@ class ClassProd {
   set fullWidth(v: `${number}` | '') {
     this.data.fullWidth = v;
     this.data.area = calcArea(v, this.data.height);
-    this.renewAccessoryQuantityBySize();
+    this.requestSyncChildrenQtyFromSize();
     this.requestRecalc();
     this.render();
   }
@@ -373,13 +405,28 @@ class ClassProd {
   set height(v: `${number}` | '') {
     this.data.height = v;
     this.data.area = calcArea(this.data.fullWidth, v);
-    this.renewAccessoryQuantityBySize();
+    this.requestSyncChildrenQtyFromSize();
     this.requestRecalc();
     this.render();
   }
 
-  protected renewAccessoryQuantityBySize() {
-    Object.values(this.classAccessoryDict).forEach((a) => a?.renewQuantity?.());
+  // prod 尺寸變動 → 喰各個 unit='M' / unit='㎡' 的 child sync task。單向（child 不反向影響 prod）。
+  protected requestSyncChildrenQtyFromSize() {
+    Object.entries(this.state.data_accessoryDict).forEach(([key, acce]) => {
+      if (!acce) {
+        return;
+      }
+
+      if (acce.unit === 'M' || acce.unit === '㎡') {
+        this.requestSyncAccessoryQtyFromSize(key);
+      }
+    });
+
+    (Object.keys(componentTypeUnitMap) as TdoorComponentType[]).forEach((compKey) => {
+      if (this.state.data_componentDict[compKey]) {
+        this.requestSyncComponentQtyFromSize(compKey);
+      }
+    });
   }
 
   get area() {
@@ -533,6 +580,11 @@ class ClassProd {
 
   requestSyncAccessoryQtyFromSize(acceKey: string) {
     enqueueRecalc({ target: 'accessory', action: 'syncQuantityFromSize', prodKey: this.state.key, acceKey });
+    enqueueRecalc({ target: 'prod', action: 'recalcTotals', prodKey: this.state.key });
+  }
+
+  requestSyncComponentQtyFromSize(compKey: TdoorComponentType) {
+    enqueueRecalc({ target: 'component', action: 'syncQuantityFromSize', prodKey: this.state.key, compKey });
     enqueueRecalc({ target: 'prod', action: 'recalcTotals', prodKey: this.state.key });
   }
 
