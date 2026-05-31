@@ -285,12 +285,7 @@ const nodeConfig_origin: TnodeConfig = {
     (p) => p.quantity ?? '',
     (p, v) => (p.quantity = v)
   ),
-  price: numberInputCell(
-    '牌價',
-    90,
-    (p) => p.price ?? '',
-    (p, v) => (p.price = v)
-  ),
+  price: readOnlyNumberCell('牌價', 90, (p) => p.price ?? ''),
 
   dualPrice: readOnlyNumberCell('牌價複價', 100, (p) => p.dualPrice ?? ''),
   unitPrice: readOnlyNumberCell('單價', 90, (p) => p.unitPrice ?? ''),
