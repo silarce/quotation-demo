@@ -17,13 +17,9 @@ import type {
   TsetAccessory,
 } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useQuotationProduct';
 
-import {
-  TnodeConfig,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/config';
+import { TnodeConfig } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/prod/config';
 
-import {
-  createEmptyStateProd,
-} from 'components/page/domestic/quotation_v2/hook/quotationProduct/useDefaultState_prodDict';
+import { createEmptyStateProd } from 'components/page/domestic/quotation_v2/hook/quotationProduct/useDefaultState_prodDict';
 
 import { calcProdTotalPrice, calcPriceDiscount_percent } from './calcProd';
 
@@ -357,9 +353,7 @@ const useActivedClass = ({
     const activedClassComponentDict = createActivedClassComponentDict(stateProd);
     activedClassProd.registerClassComponentDict(activedClassComponentDict);
 
-    Object.values(activedClassComponentDict).forEach((classComponent) =>
-      classComponent.setClassProd(activedClassProd)
-    );
+    Object.values(activedClassComponentDict).forEach((classComponent) => classComponent.setClassProd(activedClassProd));
 
     const activedClassAccessoryDict = createAccessoryDict({
       activedClassProd,
