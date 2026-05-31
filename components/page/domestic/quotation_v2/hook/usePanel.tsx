@@ -10,7 +10,7 @@ import myAlert from 'components/global/gear/modal/simpleModal/alertModals';
 import iconUpload from 'public/image/icon/upload.svg?url';
 import iconRedLock from 'public/image/icon/redLock.svg?url';
 
-import type { TquotationType } from 'pages/domestic/quotationList/quotation_refactored';
+import type { TquotationType } from 'pages/quotation_refactored';
 
 // ================================================================================
 

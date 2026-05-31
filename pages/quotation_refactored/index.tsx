@@ -488,7 +488,6 @@ export default function Quotation() {
           customeRight={customeRight}
         />
       </div>
-
       <div className="relative z-50">
         {/* <QuotationProfile
           disabled={disabled}
