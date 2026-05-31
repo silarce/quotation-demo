@@ -95,32 +95,6 @@ const defaultKeyArr: TcellKey[] = [
 
 // =======================================================================
 
-const textInputCell = (
-  label: string,
-  width: number,
-  getter: (p: ClassProd) => string,
-  setter: (p: ClassProd, v: string) => void
-): TconfigItem_prod => ({
-  label,
-  style: { width },
-  createNode({ disabled, classProd }) {
-    const inputSelProps: TinputSelProps = {
-      disabled,
-      inputProps: {
-        props: {
-          placeholder: '',
-          value: getter(classProd),
-          onChange(e) {
-            setter(classProd, e.target.value);
-          },
-        },
-      },
-    };
-
-    return <InputSel_prod {...inputSelProps} />;
-  },
-});
-
 const numberInputCell = (
   label: string,
   width: number,
@@ -171,12 +145,23 @@ const readOnlyNumberCell = (
 // =======================================================================
 
 const nodeConfig_origin: TnodeConfig = {
-  itemName: textInputCell(
-    '項目名',
-    120,
-    (p) => p.itemName ?? '',
-    (p, v) => (p.itemName = v)
-  ),
+  itemName: {
+    label: '項目名',
+    style: { width: 100 },
+    className_thead: 'text-lg text-main',
+    createNode({ disabled, classProd }) {
+      const inputProps: TinputSelProps['inputProps'] = {
+        props: {
+          value: classProd.itemName ?? '',
+          onChange: (e) => {
+            classProd.itemName = e.target.value;
+          },
+        },
+      };
+
+      return <InputSel_prod inputProps={inputProps} disabled={disabled} />;
+    },
+  },
 
   quoteType: {
     label: '報價別',
