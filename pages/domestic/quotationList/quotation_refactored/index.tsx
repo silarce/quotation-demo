@@ -1124,7 +1124,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
 
   // MARK: RENDER
   return (
-    <div className="px-10 pb-10">
+    <div className=" px-40 pb-10">
       <div className={scss.pageHeaderWrapper}>
         <PageHeader02
           // tag={tag}
@@ -1182,7 +1182,7 @@ export default function Quotation({ userInfo }: { userInfo?: TuserDto }) {
         {/* prod */}
         <div className={scss.summary}>
           <div className={scss.left}>
-            <div className={'ml-[50px]'}>
+            <div className={''}>
               <InputSel
                 caption={'門型彙總'}
                 showBaseline="invisible"
