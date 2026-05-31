@@ -263,6 +263,19 @@ export default function Quotation() {
 
   const { backup, updateBackup, clearBackup } = useQuotationBackup<Tbackup>();
 
+  // 進入page時把當下載入到的備份釘在ref，避免被自動備份覆寫
+  const ref_initialBackup = useRef<Tbackup | null>(null);
+  const [hasInitialBackup, setHasInitialBackup] = useState(false);
+
+  useEffect(() => {
+    if (backup === undefined || ref_initialBackup.current) {
+      return;
+    }
+
+    ref_initialBackup.current = backup;
+    setHasInitialBackup(!!backup);
+  }, [backup]);
+
   const createStateForRestore = () => {
     const payInfo_pre = exportState_payInfo({ exportCopy: false });
     const payInfo = {
@@ -295,9 +308,15 @@ export default function Quotation() {
     exportBackup(createStateForRestore(), `報價單備份-${state_profile.projectName}`);
   };
 
-  const restoreAllState = !backup
+  const restoreAllState = !hasInitialBackup
     ? undefined
     : () => {
+        const backup = ref_initialBackup.current;
+
+        if (!backup) {
+          return;
+        }
+
         setState_status(backup.status);
         restoreState_product(backup.product);
         restoreState_quotationTotalPrice(backup.quotationTotalPrice);
@@ -467,6 +486,11 @@ export default function Quotation() {
   // MARK: RENDER
   return (
     <div className=" px-40 pb-10">
+      <div>
+        說明：
+        <br />
+      </div>
+
       <div className={scss.pageHeaderWrapper}>
         <PageHeader02
           // tag={tag}
