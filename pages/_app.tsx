@@ -150,7 +150,7 @@ function MyApp({ Component, pageProps, ...appProps }: AppPropsWithLayout) {
       locale={locale}
     >
       <Head>
-        <title>三久ERP</title>
+        <title>超簡化版報價單demo</title>
       </Head>
 
       <Component {...pageProps} />
