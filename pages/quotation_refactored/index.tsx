@@ -486,11 +486,6 @@ export default function Quotation() {
   // MARK: RENDER
   return (
     <div className=" px-40 pb-10">
-      <div>
-        說明：
-        <br />
-      </div>
-
       <div className={scss.pageHeaderWrapper}>
         <PageHeader02
           // tag={tag}
