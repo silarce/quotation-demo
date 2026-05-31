@@ -89,7 +89,8 @@ import {
 
 import { useInterval } from 'hooks/useInterval';
 
-import { useBackup, exportBackup, importBackup } from 'hooks/useBackup';
+import { exportBackup, importBackup } from 'hooks/useBackup';
+import { useQuotationBackup } from 'hooks/useQuotationBackup';
 
 // ======================================================================
 // ======================================================================
@@ -260,21 +261,7 @@ export default function Quotation() {
 
   // MARK: Backup
 
-  const key_useBackup = (() => {
-    if (quotationType === 'new') {
-      return 'newQuotation';
-    }
-
-    if (quotationType === 'newAttachment') {
-      return `newAttachmentQuotation-${contractId}`;
-    }
-
-    return contentId || quotationId || undefined;
-  })();
-
-  const { backup, updateBackup, clearBackup } = useBackup<Tbackup>(key_useBackup, {
-    type: 'quotation',
-  });
+  const { backup, updateBackup, clearBackup } = useQuotationBackup<Tbackup>();
 
   const createStateForRestore = () => {
     const payInfo_pre = exportState_payInfo({ exportCopy: false });
@@ -301,7 +288,7 @@ export default function Quotation() {
   };
 
   const backupState = () => {
-    updateBackup && updateBackup(createStateForRestore());
+    void updateBackup(createStateForRestore());
   };
 
   const doExportBackup = () => {
