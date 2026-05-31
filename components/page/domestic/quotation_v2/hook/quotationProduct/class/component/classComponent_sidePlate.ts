@@ -1,7 +1,4 @@
-import {
-  ClassCompnent_base,
-  Interface_ClassComponent_prime,
-} from './classComponent_base';
+import { ClassCompnent_base, Interface_ClassComponent_prime } from './classComponent_base';
 import { createNodeConfig_component } from 'components/page/domestic/quotation_v2/hook/quotationProduct/class/component/config';
 
 const nodeConfig = createNodeConfig_component();

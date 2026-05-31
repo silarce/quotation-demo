@@ -281,7 +281,8 @@ export const optionsCreator_doorForm = (props: { haveEmpty?: boolean } = {}): To
 export const optionsCreator_quoteType = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
   const arr = [
-    { value: '捲門', label: '捲門' },
+    // { value: '捲門', label: '捲門' },
+    { value: '捲門', label: '一般型' },
     { value: '電動大門', label: '電動大門' },
     // { value: '伸縮大門' as const, label: '伸縮大門' },
     { value: '水閘門' as const, label: '水閘門' },
@@ -417,11 +418,11 @@ export const lookup_horsePowerToToptions = {
 
 export const optionsCreator_productMaterial = createOptionsCreator({
   optionsArr: [
-    { value: '黑鐵', label: '鐵材烤漆' },
-    { value: '鍍鋅鋼板', label: '鍍鋅鋼板' },
-    { value: 'SST#304', label: 'SST#304' },
-    { value: 'SST#316', label: 'SST#316' },
-    { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
+    { value: '黑鐵', label: '鐵' },
+    { value: '鍍鋅鋼板', label: '啞鐵' },
+    { value: 'SST#304', label: '不鏽鋼' },
+    { value: 'SST#316', label: '鋁' },
+    // { value: '高耐鍍鋅鋼板', label: '高耐鍍鋅鋼板' },
   ],
 });
 
@@ -822,8 +823,10 @@ type Tlookup_quoteType_doorModelName = {
 
 const lookup_quoteType_doorModelName: Tlookup_quoteType_doorModelName = {
   捲門: {
-    'SJ-302': { quoteType: '捲門', value: 'SJ-302', label: 'SJ-302 電動防火捲門', name: '電動防火捲門' },
-    'SJ-312': { quoteType: '捲門', value: 'SJ-312', label: 'SJ-312 重型防颱捲門', name: '重型防颱捲門' },
+    // 'SJ-302': { quoteType: '捲門', value: 'SJ-302', label: 'SJ-302 電動防火捲門', name: '電動防火捲門' },
+    // 'SJ-312': { quoteType: '捲門', value: 'SJ-312', label: 'SJ-312 重型防颱捲門', name: '重型防颱捲門' },
+    'SJ-302': { quoteType: '捲門', value: 'SJ-302', label: 'A-001', name: '電動防火捲門' },
+    'SJ-312': { quoteType: '捲門', value: 'SJ-312', label: 'A-002', name: '重型防颱捲門' },
     'SJ-303S': { quoteType: '捲門', value: 'SJ-303S', label: 'SJ-303S 遮煙捲簾', name: '遮煙捲簾' },
     'SJ-305D': { quoteType: '捲門', value: 'SJ-305D', label: 'SJ-305D 花格型捲門', name: '花格型捲門' },
     'SJ-120A': {
