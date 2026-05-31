@@ -215,13 +215,13 @@ const nodeConfig_origin: TnodeConfig = {
   },
 
   fullWidth: numberInputCell(
-    '全寬(m)',
+    '寬(W)',
     80,
     (p) => p.fullWidth ?? '',
     (p, v) => (p.fullWidth = v)
   ),
   height: numberInputCell(
-    '高(m)',
+    '高(h)',
     80,
     (p) => p.height ?? '',
     (p, v) => (p.height = v)
