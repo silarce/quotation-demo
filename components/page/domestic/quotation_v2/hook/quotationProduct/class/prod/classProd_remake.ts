@@ -648,10 +648,39 @@ class ClassProd {
   }
 
   removeAccessory(key: string) {
+    // 清掉佇列中針對此 accessory 的 pending task，避免 flush 又把資料寫回去。
+    recalcQueue.delete(`recalcPrice:accessory:${this.state.key}:${key}`);
+    recalcQueue.delete(`syncQuantityFromSize:accessory:${this.state.key}:${key}`);
+
+    // 注意：不可走 renewProdAllPrice_updateQuotationTotalPrice，
+    // 它會遍歷 classAccessoryDict（仍含舊實例）並 setAccessory 把已刪 entry 寫回。
+    this.setState((latest) => {
+      if (!latest) {
+        return latest;
+      }
+
+      const nextDict = { ...latest.data_accessoryDict };
+
+      delete nextDict[key];
+
+      const next: TstateProd = {
+        ...latest,
+        data_prod: { ...latest.data_prod },
+        data_componentDict: { ...latest.data_componentDict },
+        data_accessoryDict: nextDict,
+        accessoryKeyArr: latest.accessoryKeyArr.filter((k) => k !== key),
+      };
+
+      recalcProdTotalsInPlace(next, quotationDiscountRef);
+
+      return next;
+    });
+
+    // 同步本地 this.state，避免後續同實例的 getter 讀到舊資料。
     delete this.state.data_accessoryDict[key];
     this.state.accessoryKeyArr = this.state.accessoryKeyArr.filter((k) => k !== key);
-    this.renewProdAllPrice_updateQuotationTotalPrice();
-    this.render();
+
+    this.onPordTotalChange?.();
   }
 }
 
