@@ -1,9 +1,10 @@
 import Decimal from 'decimal.js';
 import _ from 'lodash';
 
-import type { TstateProd, TstateProdDict } from '../type';
+import type { TstateProd, TstateProdDict, TstateAccessoryData, Tdata_componentDict } from '../type';
 import type { TprodSource } from '../useQuotationProduct';
 import type { XOR } from 'ts-essentials';
+import type { TdoorComponentType } from 'js/api/dtoTypes';
 
 // MARK:calcProdTotalPrice
 const calcProdTotalPrice = ({
@@ -78,6 +79,81 @@ const calcProdTotalPrice = ({
     unitPrice: `${unitPrice}` as `${number}`,
     totalPrice: `${totalPrice}` as `${number}`,
   };
+};
+
+// MARK:recalcAccessoryInPlace
+const recalcAccessoryInPlace = (
+  acceState: TstateAccessoryData,
+  priceDiscount_percent: number | `${number}`
+): TstateAccessoryData => {
+  const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+    price: acceState.price || 0,
+    quantity: acceState.quantity || 0,
+    priceDiscount_percent,
+  });
+
+  acceState.dualPrice = `${dualPrice}` as `${number}`;
+  acceState.unitPrice = `${unitPrice}` as `${number}`;
+  acceState.totalPrice = `${totalPrice}` as `${number}`;
+
+  return acceState;
+};
+
+// MARK:recalcComponentInPlace
+const recalcComponentInPlace = <K extends TdoorComponentType>(
+  compState: NonNullable<Tdata_componentDict[K]>,
+  priceDiscount_percent: number | `${number}`
+): NonNullable<Tdata_componentDict[K]> => {
+  const { dualPrice, unitPrice, totalPrice } = calcAllPrice({
+    price: compState.price || 0,
+    quantity: compState.quantity || 0,
+    priceDiscount_percent,
+  });
+
+  compState.dualPrice = dualPrice;
+  compState.unitPrice = unitPrice;
+  compState.totalPrice = totalPrice;
+
+  return compState;
+};
+
+// MARK:recalcProdTotalsInPlace
+// 先兜底重算每個 child（避免 child task 因故漏單），再算 prod 四價，最後遞增 renderCount 觸發 useActivedClass useMemo 重建 dict。
+const recalcProdTotalsInPlace = (stateProd: TstateProd, quotationDiscount: `${number}` | number | ''): TstateProd => {
+  const priceDiscount_percent = calcPriceDiscount_percent({
+    prodDiscount: (stateProd.data_prod.discount || 0) as `${number}` | 0,
+    quotationDiscount: quotationDiscount || 0,
+  });
+
+  Object.values(stateProd.data_accessoryDict).forEach((acce) => {
+    if (!acce) {
+      return;
+    }
+
+    recalcAccessoryInPlace(acce, priceDiscount_percent);
+  });
+
+  Object.values(stateProd.data_componentDict).forEach((comp) => {
+    if (!comp) {
+      return;
+    }
+
+    recalcComponentInPlace(comp, priceDiscount_percent);
+  });
+
+  const { price, dualPrice, unitPrice, totalPrice } = calcProdTotalPrice({
+    stateProd,
+    quotationDiscount: quotationDiscount || 0,
+  });
+
+  stateProd.data_prod.price = price;
+  stateProd.data_prod.dualPrice = dualPrice;
+  stateProd.data_prod.unitPrice = unitPrice;
+  stateProd.data_prod.totalPrice = totalPrice;
+
+  stateProd.renderCount = (stateProd.renderCount ?? 0) + 1;
+
+  return stateProd;
 };
 
 // MARK:calcAndRenewAllProdPrice_sideEffect
@@ -255,4 +331,7 @@ export {
   calcProdRemain,
   calcProdDeductedPrice,
   calcQtyReduceModified,
+  recalcAccessoryInPlace,
+  recalcComponentInPlace,
+  recalcProdTotalsInPlace,
 };

@@ -100,7 +100,11 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   set quantity(value) {
     this.state.quantity = value;
     this.renewComponentAllPrice();
-    this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
+
+    if (this.key) {
+      this.classProd?.requestRecalcComponent(this.key);
+    }
+
     this.render();
   }
 
@@ -110,7 +114,11 @@ class ClassCompnent_base<T extends keyof Tdata_componentDict> implements Interfa
   set price(value) {
     this.state.price = value;
     this.renewComponentAllPrice();
-    this.classProd?.renewProdAllPrice_updateQuotationTotalPrice();
+
+    if (this.key) {
+      this.classProd?.requestRecalcComponent(this.key);
+    }
+
     this.render();
   }
 

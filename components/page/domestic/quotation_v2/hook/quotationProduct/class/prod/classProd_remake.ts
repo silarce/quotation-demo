@@ -1,8 +1,15 @@
 import Decimal from 'decimal.js';
 
-import type { TstateProd, TstateProdDict, TsetProd } from '../../type';
+import type { TstateProd, TstateProdDict, TsetProd, TstateAccessoryData, Tdata_componentDict } from '../../type';
 import type { TnodeConfig } from './config';
-import { calcProdTotalPrice, calcPriceDiscount_percent, calcAllPrice } from '../../method/calcProd';
+import {
+  calcProdTotalPrice,
+  calcPriceDiscount_percent,
+  calcAllPrice,
+  recalcAccessoryInPlace,
+  recalcComponentInPlace,
+  recalcProdTotalsInPlace,
+} from '../../method/calcProd';
 
 import type { Interface_ClassComponent_prime } from '../component/classComponent_base';
 import type { Class_accessory } from '../accessory/classAccessory';
@@ -10,7 +17,7 @@ import type { Class_accessory } from '../accessory/classAccessory';
 import { getProdDefaults, createComponentDictFromTemplate, getDoorModelComponentKeys } from 'config/product/lookup';
 import { optionsCreator_productMaterial, optionsCreator_surface } from 'js/utils/options/productOptions';
 import type { Toption } from 'js/utils/options/options';
-import type { TdoorAccessoryDto } from 'js/api/dtoTypes';
+import type { TdoorAccessoryDto, TdoorComponentType } from 'js/api/dtoTypes';
 
 type TclassComponentDictLite = { [k: string]: Interface_ClassComponent_prime | undefined };
 type TclassAccessoryDictLite = { [k: string]: Class_accessory | undefined };
@@ -25,6 +32,172 @@ type TconstructorProps = {
   onPordTotalChange: TonPordTotalChange;
   allowProdAutoChange?: boolean;
 };
+
+// ===========================================================================
+// MARK: 重算任務佇列（去重 + 共用 timer）
+// task 不存 bound method，改存「描述」(target + action + key)；flush 透過 module-level
+// registry 拿到最新的 setState_prodDict，再用 functional updater 對 React live state
+// 做 in-place mutate，避免「new ClassProd 取代 instance 後，timer 內 this.state 是舊參照」的雷。
+
+type RecalcTask =
+  | { target: 'accessory'; action: 'recalcPrice'; prodKey: string; acceKey: string }
+  | { target: 'accessory'; action: 'syncQuantityFromSize'; prodKey: string; acceKey: string }
+  | { target: 'component'; action: 'recalcPrice'; prodKey: string; compKey: TdoorComponentType }
+  | { target: 'prod'; action: 'recalcTotals'; prodKey: string };
+
+const RECALC_DEBOUNCE_MS = 300;
+
+const recalcQueue = new Map<string, RecalcTask>();
+let recalcTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+const setProdRegistry = new Map<string, TsetProd>();
+const onPordTotalChangeRegistry = new Map<string, TonPordTotalChange>();
+let quotationDiscountRef: `${number}` | number | '' = '';
+
+const targetOrder: Record<RecalcTask['target'], number> = {
+  accessory: 0,
+  component: 0,
+  prod: 1,
+};
+
+const taskDedupKey = (task: RecalcTask): string => {
+  switch (task.target) {
+    case 'accessory':
+      return `${task.action}:${task.target}:${task.prodKey}:${task.acceKey}`;
+    case 'component':
+      return `${task.action}:${task.target}:${task.prodKey}:${task.compKey}`;
+    case 'prod':
+      return `${task.action}:${task.target}:${task.prodKey}`;
+  }
+};
+
+const enqueueRecalc = (task: RecalcTask): void => {
+  recalcQueue.set(taskDedupKey(task), task);
+
+  if (recalcTimeoutId !== null) {
+    clearTimeout(recalcTimeoutId);
+  }
+
+  recalcTimeoutId = setTimeout(flushRecalc, RECALC_DEBOUNCE_MS);
+};
+
+const applyAccessoryTask = (
+  next: TstateProd,
+  task: Extract<RecalcTask, { target: 'accessory' }>,
+  priceDiscount_percent: number | `${number}`
+): void => {
+  const acce = next.data_accessoryDict[task.acceKey];
+
+  if (!acce) {
+    return;
+  }
+
+  const acceCopy: TstateAccessoryData = { ...acce };
+
+  if (task.action === 'syncQuantityFromSize') {
+    const { referenceSpec } = acceCopy;
+
+    if (referenceSpec === 'fullWidth') {
+      acceCopy.quantity = `${new Decimal(next.data_prod.fullWidth || 0).toDecimalPlaces(2).toNumber()}` as `${number}`;
+    } else if (referenceSpec === 'area') {
+      acceCopy.quantity = `${new Decimal(next.data_prod.area || 0).toDecimalPlaces(2).toNumber()}` as `${number}`;
+    }
+  }
+
+  recalcAccessoryInPlace(acceCopy, priceDiscount_percent);
+  next.data_accessoryDict[task.acceKey] = acceCopy;
+};
+
+const applyComponentTask = (
+  next: TstateProd,
+  task: Extract<RecalcTask, { target: 'component' }>,
+  priceDiscount_percent: number | `${number}`
+): void => {
+  const comp = next.data_componentDict[task.compKey];
+
+  if (!comp) {
+    return;
+  }
+
+  const compCopy = { ...comp } as NonNullable<Tdata_componentDict[typeof task.compKey]>;
+
+  recalcComponentInPlace(compCopy, priceDiscount_percent);
+  (next.data_componentDict as Record<TdoorComponentType, unknown>)[task.compKey] = compCopy;
+};
+
+function flushRecalc() {
+  recalcTimeoutId = null;
+  const tasks = Array.from(recalcQueue.values());
+  recalcQueue.clear();
+
+  // 排序：child 在前、prod 在後；同階層維持插入順序（Array.from 已保留）。
+  tasks.sort((a, b) => targetOrder[a.target] - targetOrder[b.target]);
+
+  // 按 prodKey 分組，逐組透過該 prod 的 setState functional updater 套用 task。
+  const grouped = new Map<string, RecalcTask[]>();
+  tasks.forEach((task) => {
+    const arr = grouped.get(task.prodKey);
+
+    if (arr) {
+      arr.push(task);
+    } else {
+      grouped.set(task.prodKey, [task]);
+    }
+  });
+
+  grouped.forEach((groupTasks, prodKey) => {
+    const setProd = setProdRegistry.get(prodKey);
+
+    if (!setProd) {
+      return;
+    }
+
+    setProd((latest) => {
+      if (!latest) {
+        return latest;
+      }
+
+      const next: TstateProd = {
+        ...latest,
+        data_prod: { ...latest.data_prod },
+        data_componentDict: { ...latest.data_componentDict },
+        data_accessoryDict: { ...latest.data_accessoryDict },
+      };
+
+      const priceDiscount_percent = calcPriceDiscount_percent({
+        prodDiscount: (next.data_prod.discount || 0) as `${number}` | 0,
+        quotationDiscount: quotationDiscountRef || 0,
+      });
+
+      groupTasks.forEach((task) => {
+        switch (task.action) {
+          case 'recalcPrice':
+            if (task.target === 'accessory') {
+              applyAccessoryTask(next, task, priceDiscount_percent);
+            } else if (task.target === 'component') {
+              applyComponentTask(next, task, priceDiscount_percent);
+            }
+
+            break;
+          case 'syncQuantityFromSize':
+            applyAccessoryTask(next, task, priceDiscount_percent);
+
+            break;
+          case 'recalcTotals':
+            recalcProdTotalsInPlace(next, quotationDiscountRef);
+
+            break;
+        }
+      });
+
+      return next;
+    });
+
+    onPordTotalChangeRegistry.get(prodKey)?.();
+  });
+}
+
+// ===========================================================================
 
 const calcArea = (fullWidth: `${number}` | '' | undefined, height: `${number}` | '' | undefined): `${number}` => {
   const w = Number(fullWidth || 0);
@@ -58,6 +231,11 @@ class ClassProd {
     this.quotationDiscount = quotationDiscount;
     this.onPordTotalChange = onPordTotalChange;
     this.allowProdAutoChange = allowProdAutoChange;
+
+    // 註冊到 module-level registry，讓 debounced flushRecalc() 能拿到「永遠最新」的 setState。
+    setProdRegistry.set(stateProd.key, setStateProd);
+    onPordTotalChangeRegistry.set(stateProd.key, onPordTotalChange);
+    quotationDiscountRef = quotationDiscount;
   }
 
   protected render() {
@@ -184,6 +362,7 @@ class ClassProd {
     this.data.fullWidth = v;
     this.data.area = calcArea(v, this.data.height);
     this.renewAccessoryQuantityBySize();
+    this.requestRecalc();
     this.render();
   }
 
@@ -195,6 +374,7 @@ class ClassProd {
     this.data.height = v;
     this.data.area = calcArea(this.data.fullWidth, v);
     this.renewAccessoryQuantityBySize();
+    this.requestRecalc();
     this.render();
   }
 
@@ -232,7 +412,7 @@ class ClassProd {
 
   set quantity(v: `${number}` | '') {
     this.data.quantity = v;
-    this.renewProdAllPrice_updateQuotationTotalPrice();
+    this.requestRecalc();
     this.render();
   }
 
@@ -243,7 +423,7 @@ class ClassProd {
   set price(v: `${number}` | '') {
     this.data.price = v;
     this.state.isCustomPrice = true;
-    this.renewProdAllPrice_updateQuotationTotalPrice();
+    this.requestRecalc();
     this.render();
   }
 
@@ -265,7 +445,7 @@ class ClassProd {
 
   set discount(v: `${number}` | '') {
     this.data.discount = v;
-    this.renewProdAllPrice_updateQuotationTotalPrice();
+    this.requestRecalc();
     this.render();
   }
 
@@ -332,6 +512,28 @@ class ClassProd {
     this.data.totalPrice = totalPrice;
 
     this.onPordTotalChange?.();
+  }
+
+  // MARK: requestRecalc / requestRecalcAccessory / requestRecalcComponent / requestSyncAccessoryQtyFromSize
+  // 這些 wrapper 在 setter 裡被呼叫。所有金額 / 折數 / 尺寸的變動都透過佇列收斂到 prod 的 recalcTotals，
+  // 以達成 300ms 防抖 + 去重。
+  requestRecalc() {
+    enqueueRecalc({ target: 'prod', action: 'recalcTotals', prodKey: this.state.key });
+  }
+
+  requestRecalcAccessory(acceKey: string) {
+    enqueueRecalc({ target: 'accessory', action: 'recalcPrice', prodKey: this.state.key, acceKey });
+    enqueueRecalc({ target: 'prod', action: 'recalcTotals', prodKey: this.state.key });
+  }
+
+  requestRecalcComponent(compKey: TdoorComponentType) {
+    enqueueRecalc({ target: 'component', action: 'recalcPrice', prodKey: this.state.key, compKey });
+    enqueueRecalc({ target: 'prod', action: 'recalcTotals', prodKey: this.state.key });
+  }
+
+  requestSyncAccessoryQtyFromSize(acceKey: string) {
+    enqueueRecalc({ target: 'accessory', action: 'syncQuantityFromSize', prodKey: this.state.key, acceKey });
+    enqueueRecalc({ target: 'prod', action: 'recalcTotals', prodKey: this.state.key });
   }
 
   addAccessory(accessories: TdoorAccessoryDto[] | TdoorAccessoryDto) {
