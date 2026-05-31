@@ -22,7 +22,7 @@ type TpariBD = {
 };
 // 單位為公尺
 export const lookup_boxBAndBoxD: TpariBD = {
-  'SJ-302': {
+  'A-001': {
     BtoD: {
       '0.35': '0.56',
       '0.40': '0.60',
@@ -76,7 +76,7 @@ export const lookup_horsePowerToNumber: { [key: string]: number | undefined } = 
 export const lookup_guideRailUnicode: {
   [guideRail: string]: string | undefined;
 } = {
-  // SJ-302
+  // A-001
   SJ302_30: '\uE010',
   SJ302_75_30t: '\uE013',
   SJ302_90_30t: '\uE013',
@@ -262,7 +262,7 @@ type TdoorModelTemplate = {
 };
 
 export const lookup_doorModelTemplate: Record<string, TdoorModelTemplate> = {
-  'SJ-302': {
+  'A-001': {
     prodDefault: {
       materialName: '鍍鋅鋼板',
       materialSurface: '烤漆',
@@ -366,7 +366,7 @@ export const getDoorModelComponentKeys = (doorModelName: string): TdoorComponent
 const _now = '2025-01-01T00:00:00.000Z';
 
 export const lookup_doorAccessoryByModel: Record<string, TdoorAccessoryDto[]> = {
-  'SJ-302': [
+  'A-001': [
     {
       id: 'ACC-302-001',
       createdAt: _now,

@@ -1437,7 +1437,7 @@ const quotationProdToTableProdList = ({
       })();
 
       // const doorRailForExcel =
-      //   doorType !== 'SJ-302'
+      //   doorType !== 'A-001'
       //     ? ''
       //     : findGuideRailUnicode({
       //         isAntiTyphoon: typhoonProtection,

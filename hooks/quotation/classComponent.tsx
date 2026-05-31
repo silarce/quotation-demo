@@ -125,7 +125,7 @@ class Class_component {
       return;
     }
 
-    if (this._prod.doorType === 'SJ-302' && this.key === 'bottomBar') {
+    if (this._prod.doorType === 'A-001' && this.key === 'bottomBar') {
       const options = comLookUp[this.key](this).options;
 
       //如果v === 高耐鍍鋅鋼板
@@ -241,7 +241,7 @@ class Class_component {
     }
 
     // SJ-302的底座沒有高耐鍍鋅鋼板，因此將高耐鍍鋅鋼板的選項拿掉
-    if (this.key === 'bottomBar' && this._prod.doorType === 'SJ-302') {
+    if (this.key === 'bottomBar' && this._prod.doorType === 'A-001') {
       let copy = _.cloneDeep(comLookUp[this.key](this).options ?? []);
       copy = copy.filter((item) => {
         return item.value !== '高耐鍍鋅鋼板';
@@ -278,7 +278,7 @@ class Class_component {
       options = optionsCreator_surface();
     }
 
-    // if (doorType === 'SJ-302' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
+    // if (doorType === 'A-001' || doorType === 'SJ-303A' || doorType === 'SJ-303AS') {
     //   options = options.filter((item) => {
     //     return item.value !== '烤漆';
     //   });

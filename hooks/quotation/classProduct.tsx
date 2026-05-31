@@ -1242,7 +1242,7 @@ class Class_product {
 
       if (
         !(
-          this.doorType === 'SJ-302' ||
+          this.doorType === 'A-001' ||
           this.doorType === 'SJ-312' ||
           this.doorType === 'SJ-303A' ||
           this.doorType === 'SJ-303AS'
@@ -2281,7 +2281,7 @@ class Class_product {
   //   if (this._prodData.doorType) {
   //     this.options_boxB = undefined;
 
-  //     if (this.doorType === 'SJ-302') {
+  //     if (this.doorType === 'A-001') {
   //       this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ302());
   //     } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
   //       this.options_boxB = _.cloneDeep(optionsCreator_boxB_SJ303A());
@@ -2556,7 +2556,7 @@ class Class_product {
       }
     }
 
-    // if (this.doorType === 'SJ-302' || this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
+    // if (this.doorType === 'A-001' || this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
     //   options = options.filter((item) => {
     //     return item.value !== '烤漆';
     //   });
@@ -2591,7 +2591,7 @@ class Class_product {
     options = lookup_options_boxB[this.doorType];
     options = _.cloneDeep(options);
 
-    // if (this.doorType === 'SJ-302') {
+    // if (this.doorType === 'A-001') {
     //   options = _.cloneDeep(optionsCreator_boxB_SJ302());
     // } else if (this.doorType === 'SJ-303A' || this.doorType === 'SJ-303AS') {
     //   options = _.cloneDeep(optionsCreator_boxB_SJ303A());
@@ -2872,7 +2872,7 @@ class Class_product {
 
     if (v === 'SJ-312') {
       this._prodData.typhoonProtection = true;
-    } else if (v !== 'SJ-302') {
+    } else if (v !== 'A-001') {
       this._prodData.typhoonProtection = false;
     }
 
@@ -3352,7 +3352,7 @@ class Class_product {
     }
 
     // label為鐵材烤漆，value為黑鐵
-    if (this.doorType === 'SJ-302' && v === '黑鐵') {
+    if (this.doorType === 'A-001' && v === '黑鐵') {
       this.comList?.headBox && (this.comList.headBox.material = '鍍鋅鋼板');
       this.comList?.guideRail && (this.comList.guideRail.material = '鍍鋅鋼板');
       this.comList?.bottomBar && (this.comList.bottomBar.material = '鍍鋅鋼板');
@@ -3661,7 +3661,7 @@ class Class_product {
       }
 
       v = true;
-    } else if (this.doorType !== 'SJ-302') {
+    } else if (this.doorType !== 'A-001') {
       if ((v = false)) {
         return;
       }
@@ -3699,7 +3699,7 @@ class Class_product {
   }
 
   get isTyphoonProtectionDisabled() {
-    if (this.doorType !== 'SJ-302') {
+    if (this.doorType !== 'A-001') {
       return true;
     }
   }
@@ -4933,7 +4933,7 @@ const checkIsGalvanized = (material: string) => {
 const creOptions_surface: () => Toption[] = () => optionsCreator_surface();
 // // 單位為m
 // const pairBD: TpariBD = {
-//   'SJ-302': {
+//   'A-001': {
 //     BtoD: {
 //       '0.35': '0.56',
 //       '0.40': '0.60',
@@ -5270,7 +5270,7 @@ const check_isValueInOptions = (value: string, options: Toption[]) => {
 const lookup_options_boxB: {
   [doorType: string]: Toption[] | undefined;
 } = {
-  'SJ-302': optionsCreator_boxB_SJ302(),
+  'A-001': optionsCreator_boxB_SJ302(),
   'SJ-303A': optionsCreator_boxB_SJ303A(),
   'SJ-303AS': optionsCreator_boxB_SJ303A(),
   'SJ-305D': optionsCreator_boxB_SJ305D(),

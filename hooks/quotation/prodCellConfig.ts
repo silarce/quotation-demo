@@ -548,7 +548,7 @@ const getInstallationFee = ({
   doorModel: string;
   m2: number;
 }) => {
-  if (doorModel === 'SJ-302') {
+  if (doorModel === 'A-001') {
     return 1800;
   }
 

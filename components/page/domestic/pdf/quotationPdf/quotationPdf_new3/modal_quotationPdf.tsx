@@ -70,7 +70,7 @@ type Tprod = {
 };
 
 // const guideRailForExcel =
-// doorModelName !== 'SJ-302'
+// doorModelName !== 'A-001'
 //   ? ''
 //   : findGuideRailUnicode({
 //       isAntiTyphoon: typhoonProtection,
@@ -1078,7 +1078,7 @@ const quotationProdAndOther_ToProdArr = ({
 
       // const doorRailForExcel = isSpecialDoor
       //   ? guideRail
-      //   : doorModelName === 'SJ-302'
+      //   : doorModelName === 'A-001'
       //   ? findGuideRailUnicode({
       //       isAntiTyphoon: !!isAntiTyphoon,
       //       isSilencing: !!hasSilencingStrip,
@@ -1086,7 +1086,7 @@ const quotationProdAndOther_ToProdArr = ({
       //   : '';
       // const doorRailForExcel = isSpecialDoor
       //   ? guideRail
-      //   : doorModelName === 'SJ-302'
+      //   : doorModelName === 'A-001'
       //   ? findGuideRailUnicode({
       //       guideRail,
       //     })

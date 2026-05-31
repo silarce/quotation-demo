@@ -141,7 +141,7 @@ export const optionsCreator_prodClass = (props: { haveEmpty?: boolean } = {}): T
 export const optionsCreator_doorType = (props: { haveEmpty?: boolean } = {}): Toption[] => {
   const { haveEmpty } = props;
   const arr = [
-    { value: 'SJ-302', label: 'SJ-302' },
+    { value: 'A-001', label: 'A-001' },
     // { value: "SJ-302A", label: "SJ-302A" },
     // { value: "SJ-302AS", label: "SJ-302AS" },
     // { value: "SJ-305D", label: "SJ-305D" },
