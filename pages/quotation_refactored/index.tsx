@@ -537,7 +537,7 @@ export default function Quotation() {
             <h3 className="mb-1 font-medium text-slate-800">備份</h3>
             <ul className="ml-4 list-disc space-y-1">
               <li>每 5 秒自動備份；可重新整理頁面後按「回復備份狀態」測試。</li>
-              <li>另提供匯出 / 匯入功能。</li>
+              <li>有匯出 / 匯入功能。</li>
             </ul>
           </div>
 
@@ -546,6 +546,7 @@ export default function Quotation() {
             <ul className="ml-4 list-disc space-y-1">
               <li>左上角與右下角顯示小計與總計。</li>
               <li>左下角為彙總。</li>
+              <li>選配選擇器可以拖拉移動。</li>
             </ul>
           </div>
         </div>
