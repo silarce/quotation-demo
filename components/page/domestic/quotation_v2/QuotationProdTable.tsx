@@ -505,10 +505,12 @@ const Table_accessory = ({ instance_useQuotationProductInstance, disabled, class
 
   // const classAccessoryDict = createActivedClassAccessoryDict(activedProd);
 
+  // 依賴穩定的產品 key，而非每次 render 都重建的 activedClassProd 物件參考，
+  // 否則自動備份等造成的 re-render 會誤觸發此 effect 而關閉選配視窗。
   useEffect(() => {
     setActiveIndex(undefined);
     setShowSelector(false);
-  }, [activedClassProd]);
+  }, [activedClassProd?.key]);
 
   useEffect(() => {
     setShowSelector(false);
