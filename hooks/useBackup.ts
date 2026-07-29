@@ -238,9 +238,13 @@ const exportBackup = (dataWillBackup: any, fileName: string) => {
     const blob = new Blob([data_json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
+    // 若呼叫端未帶副檔名，瀏覽器會依系統對該mime type的關聯自行決定副檔名(部分電腦會變成非預期的副檔名，例如.customization)
+    // 因此這裡強制補上.json，確保下載的檔案一定是.json
+    const fileName_withExt = fileName.toLowerCase().endsWith('.json') ? fileName : `${fileName}.json`;
+
     const link = document.createElement('a');
     link.href = url;
-    link.download = fileName;
+    link.download = fileName_withExt;
     document.body.appendChild(link);
     link.click();
 
